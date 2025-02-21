@@ -581,7 +581,6 @@
     <ClInclude Include="Scene\Components\Standalone\MeshComponent.h" />
     <ClInclude Include="Scene\Components\ComponentUtils.h" />
     <ClInclude Include="Scene\GameObjects\GameObject.h" />
-    <ClInclude Include="Utils\BoundingBox.h" />
     <ClInclude Include="Utils\Framebuffer.h" />
     <ClInclude Include="Tests\CameraModule.h" />
     <ClInclude Include="DebugDraw\debugdraw.h" />

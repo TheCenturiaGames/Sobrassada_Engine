@@ -273,15 +273,17 @@
     <ClCompile Include="Utils\FrustumPlanes.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Utils\Transform.cpp" />
     <ClCompile Include="Modules\ResourcesModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
     <ClCompile Include="FileSystem\Importer.cpp">
       <Filter>FileSystem</Filter>
-      </ClCompile>
-          <ClCompile Include="Utils\EngineTimer.cpp">
-            <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\EngineTimer.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\Transform.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -429,13 +431,9 @@
     <ClInclude Include="Scene\GameObjects\GameObject.h">
       <Filter>Scene\GameObjects</Filter>
     </ClInclude>
-    <ClInclude Include="Utils\BoundingBox.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Modules\SceneModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\AABBUpdatable.h" />
     <ClInclude Include="Scene\Components\Root\RootComponent.h">
       <Filter>Scene\Components</Filter>
     </ClInclude>
@@ -503,8 +501,11 @@
       <Filter>Modules</Filter>
     </ClInclude>
     <ClInclude Include="Utils\EngineTimer.h">
-          <Filter>Utils</Filter>
-        </ClInclude>
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\AABBUpdatable.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl">
