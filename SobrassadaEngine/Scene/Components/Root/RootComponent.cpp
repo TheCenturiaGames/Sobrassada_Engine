@@ -10,7 +10,7 @@
 #include <Algorithm/Random/LCG.h>
 
 RootComponent::RootComponent(const UID uid, const UID uidParent, const Transform& parentGlobalTransform)
-        : Component(uid, uidParent, uid, "Root component", COMPONENT_ROOT, parentGlobalTransform)
+        : Component(uid, uidParent, uid, "Root Component", COMPONENT_ROOT, parentGlobalTransform)
 {
     selectedUID = uid;  
 }
