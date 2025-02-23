@@ -15,6 +15,6 @@ class DirectionalLight : public LightComponent
 
     void Render() override;
 
-    const float3& GetDirection() const;
+    float3 GetDirection() const;
 
 };

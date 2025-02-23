@@ -16,7 +16,7 @@ class SpotLight : public LightComponent
     void RenderEditorInspector() override;
     void Render() override;
 
-    const float3& GetDirection() const;
+    float3 GetDirection() const;
     float GetRange() const { return range; }
     float GetInnerAngle() const { return innerAngle; }
     float GetOuterAngle() const { return outerAngle; }

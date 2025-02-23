@@ -116,7 +116,7 @@ void SpotLight::Render()
     debug->DrawCircle(center, -direction, float3(1, 1, 1), outerCathetus);
 }
 
-const float3& SpotLight::GetDirection() const
+float3 SpotLight::GetDirection() const
 {
     return (float4x4::FromQuat(
                 Quat::FromEulerXYZ(globalTransform.rotation.x, globalTransform.rotation.y, globalTransform.rotation.z)
