@@ -108,7 +108,11 @@ void MeshComponent::AddMesh(UID resource, bool reloadAABB)
     ResourceMesh* newMesh = dynamic_cast<ResourceMesh*>(App->GetResourcesModule()->RequestResource(resource));
     if (newMesh != nullptr)
     {
-        App->GetResourcesModule()->ReleaseResource(currentMesh);
+        if (currentMesh != nullptr)
+        {
+            if (currentMesh->GetUID() != newMesh->GetUID()) App->GetResourcesModule()->ReleaseResource(currentMesh);
+        }
+
         newMesh->SetMaterial(currentMaterial != nullptr ? currentMaterial->GetUID() : CONSTANT_EMPTY_UID);
         currentMeshName    = newMesh->GetName();
         currentMesh        = newMesh;
