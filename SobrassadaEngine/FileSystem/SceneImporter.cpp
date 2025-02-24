@@ -72,27 +72,6 @@ namespace SceneImporter
             }
         }
 
-        // for (const auto &srcImages : model.images)
-        //{
-        //     std::string fullPath = path + srcImages.uri;
-
-        //    UID ddsPath  = TextureImporter::Import(fullPath.c_str());
-        //    //mapping dds path to texture name(png)
-        //    if (!ddsPath.empty())
-        //    {
-        //        App->GetLibraryModule()->AddTexture(srcImages.uri, ddsPath);
-        //    }
-        //}
-
-        // int matIndex = 0;
-        // for (const auto &srcMaterials : model.materials)
-        //{
-        //     std::string materialName = srcMaterials.name;
-        //     std::string materialPath = MATERIALS_PATH + materialName + MATERIAL_EXTENSION;
-
-        //    MaterialImporter::ImportMaterial(model, matIndex);
-        //}
-
         for (const auto &srcMesh : model.meshes)
         {
             name         = srcMesh.name;

@@ -181,4 +181,17 @@ namespace FileSystem
             }
         }
     }
+
+    time_t GetLastModifiedTime(const std::string& path)
+    {
+        struct stat fileInfo;
+
+        if (stat(path.c_str(), &fileInfo) != 0)
+        {
+            return 0;
+        }
+
+        return fileInfo.st_mtime; 
+
+    }
 } // namespace FileSystem
