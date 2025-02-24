@@ -577,12 +577,7 @@ void EditorUIModule::GetFilesSorted(const std::string& currentPath, std::vector<
 
 void EditorUIModule::EngineWindow(bool& engineEditorWindows) const
 {
-    if (!ImGui::Begin("Basic Engine Editor", &engineEditorWindows))
-    {
-        ImGui::End();
-        return;
-    }
-    ImGui::End();
+    App->GetEngineEditorModule()->RenderEditor(engineEditorWindows);
 }
 
 void EditorUIModule::Console(bool& consoleMenu) const

@@ -137,6 +137,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="UI\EngineEditorModule.cpp" />
     <ClCompile Include="Utils\EngineTimer.cpp" />
     <ClCompile Include="FileSystem\Importer.cpp" />
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp" />
@@ -565,6 +566,7 @@
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="FileSystem\MeshImporter.h" />
     <ClInclude Include="FileSystem\SceneImporter.h" />
+    <ClInclude Include="UI\EngineEditorModule.h" />
     <ClInclude Include="Utils\EngineTimer.h" />
     <ClInclude Include="Scene\Components\Component.h" />
     <ClInclude Include="Scene\Components\Standalone\LightComponent.h" />

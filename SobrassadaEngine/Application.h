@@ -1,5 +1,6 @@
 #pragma once
 
+#include "EngineEditorModule.h"
 #include "Globals.h"
 #include "Module.h"
 
@@ -39,7 +40,7 @@ class Application
     LibraryModule *GetLibraryModule() { return libraryModule; }
     EditorUIModule *GetEditorUIModule() { return editorUIModule; };
     SceneModule *GetSceneModule() { return sceneModule; }
-
+   EngineEditorModule *GetEngineEditorModule() { return engineEditorModule; }
     // TMP: TEMPORAL JUST FOR HAVING A CAMERA TO RENDER
     CameraModule *GetCameraModule() { return cameraModule; }
     DebugDrawModule *GetDebugDrawModule() { return debugDraw; }
@@ -57,7 +58,7 @@ class Application
     LibraryModule *libraryModule         = nullptr;
     EditorUIModule *editorUIModule       = nullptr;
     SceneModule *sceneModule             = nullptr;
-
+    EngineEditorModule *engineEditorModule = nullptr;
     // TMP: TEMPORAL JUST FOR HAVING A CAMERA TO RENDER
     CameraModule *cameraModule           = nullptr;
     DebugDrawModule *debugDraw           = nullptr;
