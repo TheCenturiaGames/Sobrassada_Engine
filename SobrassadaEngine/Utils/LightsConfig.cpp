@@ -268,6 +268,7 @@ void LightsConfig::AddDirectionalLight(DirectionalLight* newDirectional)
 {
     if (directionalLight == nullptr) directionalLight = newDirectional;
 }
+
 void LightsConfig::AddPointLight(PointLight* newPoint)
 {
     // Add point light to vector and resize buffer
@@ -282,13 +283,15 @@ void LightsConfig::AddPointLight(PointLight* newPoint)
         bufferSize
     );
 }
+
 void LightsConfig::AddSpotLight(SpotLight* newSpot)
 {
     spotLights.push_back(newSpot);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, spotBufferId);
-    int bufferSize =
-        static_cast<int>((sizeof(Lights::SpotLightShaderData) + 12) * spotLights.size() + 16); // 12 bytes offset between spotlights
+    int bufferSize = static_cast<int>(
+        (sizeof(Lights::SpotLightShaderData) + 12) * spotLights.size() + 16
+    ); // 12 bytes offset between spotlights
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize, nullptr, GL_STATIC_DRAW);
 
     GLOG(
@@ -324,6 +327,7 @@ void LightsConfig::RemovePointLight(UID pointUid)
 
     GLOG("Point lights size: %d. Buffer size: %d", pointLights.size(), bufferSize);
 }
+
 void LightsConfig::RemoveSpotLight(UID spotUid)
 {
     GLOG("Remove spot light with UID: %d", spotUid);
@@ -341,8 +345,9 @@ void LightsConfig::RemoveSpotLight(UID spotUid)
 
     // Resize lights buffer
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, spotBufferId);
-    int bufferSize =
-        static_cast<int>((sizeof(Lights::SpotLightShaderData) + 12) * spotLights.size() + 16); // 12 bytes offset between spotlights
+    int bufferSize = static_cast<int>(
+        (sizeof(Lights::SpotLightShaderData) + 12) * spotLights.size() + 16
+    ); // 12 bytes offset between spotlights
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize, nullptr, GL_STATIC_DRAW);
 
     GLOG("Spot lights size: %d. Buffer size: %d", spotLights.size(), bufferSize);

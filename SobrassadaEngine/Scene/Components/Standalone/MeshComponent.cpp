@@ -105,14 +105,15 @@ void MeshComponent::AddMesh(UID resource, bool reloadAABB)
 {
     if (resource == CONSTANT_EMPTY_UID) return;
 
+    if (currentMesh != nullptr)
+    {
+        if (currentMesh->GetUID() == resource) return;
+    }
+
     ResourceMesh* newMesh = dynamic_cast<ResourceMesh*>(App->GetResourcesModule()->RequestResource(resource));
     if (newMesh != nullptr)
     {
-        if (currentMesh != nullptr)
-        {
-            if (currentMesh->GetUID() != newMesh->GetUID()) App->GetResourcesModule()->ReleaseResource(currentMesh);
-        }
-
+        App->GetResourcesModule()->ReleaseResource(currentMesh);
         newMesh->SetMaterial(currentMaterial != nullptr ? currentMaterial->GetUID() : CONSTANT_EMPTY_UID);
         currentMeshName    = newMesh->GetName();
         currentMesh        = newMesh;
@@ -132,6 +133,11 @@ void MeshComponent::AddMesh(UID resource, bool reloadAABB)
 
 void MeshComponent::AddMaterial(UID resource)
 {
+    if (currentMaterial != nullptr)
+    {
+        if (currentMaterial->GetUID() == resource) return;
+    }
+
     ResourceMaterial* newMaterial =
         dynamic_cast<ResourceMaterial*>(App->GetResourcesModule()->RequestResource(resource));
     if (newMaterial != nullptr)
