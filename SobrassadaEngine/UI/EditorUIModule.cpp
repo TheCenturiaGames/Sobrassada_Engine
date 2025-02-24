@@ -170,6 +170,8 @@ void EditorUIModule::Draw()
     if (save) SaveDialog(save);
 
     if (editorSettingsMenu) EditorSettings(editorSettingsMenu);
+
+    if (engineEditorWindows) EngineWindow(engineEditorWindows);
 }
 
 void EditorUIModule::MainMenu()
@@ -215,6 +217,12 @@ void EditorUIModule::MainMenu()
 
         if (ImGui::MenuItem("Quadtree", "", quadtreeViewerViewport)) quadtreeViewerViewport = !quadtreeViewerViewport;
 
+       if (ImGui::BeginMenu("Engine Editor Window"))
+       {
+           if (ImGui::MenuItem("Basic Engine Editor", "", engineEditorWindows)) engineEditorWindows = !engineEditorWindows;
+           ImGui::EndMenu();
+       }
+
         if (ImGui::MenuItem("Editor settings", "", editorSettingsMenu)) editorSettingsMenu = !editorSettingsMenu;
 
         if (ImGui::MenuItem("About", "", aboutMenu)) aboutMenu = !aboutMenu;
@@ -224,6 +232,7 @@ void EditorUIModule::MainMenu()
 
     ImGui::EndMainMenuBar();
 }
+
 
 void EditorUIModule::LoadDialog(bool& load)
 {
@@ -564,6 +573,16 @@ void EditorUIModule::GetFilesSorted(const std::string& currentPath, std::vector<
             return a < b;
         }
     );
+}
+
+void EditorUIModule::EngineWindow(bool& engineEditorWindows) const
+{
+    if (!ImGui::Begin("Basic Engine Editor", &engineEditorWindows))
+    {
+        ImGui::End();
+        return;
+    }
+    ImGui::End();
 }
 
 void EditorUIModule::Console(bool& consoleMenu) const
