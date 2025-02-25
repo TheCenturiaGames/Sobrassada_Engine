@@ -12,7 +12,7 @@
 #include <deque>
 #include <string>
 #include <unordered_map>
-
+enum EditorType { BASE, ANIMATION};
 struct CPUFeature
 {
     SDL_bool (*check)();
@@ -73,7 +73,7 @@ class EditorUIModule : public Module
     void SaveDialog(bool &save);
     void Console(bool &consoleMenu) const;
     void About(bool &aboutMenu) const;
-    
+    EngineEditorBase* CreateEditor(EditorType type);
 
   private:
     bool consoleMenu            = true;

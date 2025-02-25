@@ -242,8 +242,7 @@ void EditorUIModule::MainMenu()
            if (ImGui::MenuItem("Mockup Base Engine Editor", ""))
            {
                //GENERATE ENGINE EDITOR OUTSIDE AND CALL THE OPENEDITOR FUNCTION.
-               EngineEditorBase* testBase = new EngineEditorBase(std::to_string(GenerateUID()), GenerateUID());
-               OpenEditor(testBase);
+               OpenEditor(CreateEditor(EditorType::BASE));
            }
            ImGui::EndMenu();
        }
@@ -980,6 +979,19 @@ void EditorUIModule::About(bool& aboutMenu) const
         ImGui::EndChild();
     }
     ImGui::End();
+}
+
+EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
+{
+    uint32_t uid = GenerateUID();
+    switch (type)
+    {
+    case EditorType::BASE:
+        return  new EngineEditorBase("Base Editor " + std::to_string(uid), uid);
+
+    default:
+        return nullptr;
+    }
 }
 
 void EditorUIModule::EditorSettings(bool& editorSettingsMenu)
