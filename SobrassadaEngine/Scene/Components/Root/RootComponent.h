@@ -25,7 +25,6 @@ public:
     void RenderComponentEditor();
     void RenderEditorComponentTree(UID selectedComponentUID) override;
     void RenderEditorInspector() override;
-    void RenderGuizmo();
 
     void Update() override;
 
@@ -35,7 +34,13 @@ public:
     int GetMobilitySettings() const { return mobilitySettings; }
 
 private:
+
+    Component* GetSelectedComponent();
+
+private:
     
     UID selectedUID;
     int mobilitySettings = DYNAMIC;
+
+    Component* selectedComponent = nullptr;
 };

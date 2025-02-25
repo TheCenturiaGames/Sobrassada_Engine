@@ -48,7 +48,8 @@ AABB & RootComponent::TransformUpdated(const Transform &parentGlobalTransform)
 
 void RootComponent::RenderComponentEditor()
 {
-    Component* selectedComponent = App->GetSceneModule()->GetComponentByUID(selectedUID);
+    Component* selectedComponent = GetSelectedComponent();
+    // TODO Replace nullptr checks with asserts (Components aquired by uid must never be nullptr, if they are, there is a bug elsewhere)
     
     if (!ImGui::Begin("Inspector", &App->GetEditorUIModule()->inspectorMenu))
     {
@@ -123,6 +124,11 @@ void RootComponent::RenderComponentEditor()
     ImGui::PopStyleVar();
     
     ImGui::End();
+    
+    if (selectedComponent != nullptr)
+    {
+        selectedComponent->RenderGuizmo();
+    }
 }
 
 void RootComponent::RenderEditorComponentTree(const UID selectedComponentUID)
@@ -172,21 +178,6 @@ void RootComponent::RenderEditorInspector()
     }
 }
 
-void RootComponent::RenderGuizmo()
-{
-    if (selectedUID == uid)
-    {
-        if (App->GetEditorUIModule()->RenderImGuizmo(localTransform))
-        {
-            AABBUpdatable* parentGameObject = GetParent();
-            if (parentGameObject != nullptr)
-            {
-                OnTransformUpdate(parentGameObject->GetParentGlobalTransform()); // Step up two parents to get the correct transform
-            }
-        }
-    }
-}
-
 void RootComponent::Update()
 {
 }
@@ -211,4 +202,17 @@ bool RootComponent::CreateComponent(const ComponentType componentType)
         }
     }
     return false;
+}
+
+Component* RootComponent::GetSelectedComponent()
+{
+    if (selectedComponent == nullptr)
+    {
+        selectedComponent = App->GetSceneModule()->GetComponentByUID(selectedUID);
+        if (selectedComponent == nullptr)
+        {
+            // GLOG("Could not load parent with UID: %s - Object does not exist", uidParent)
+        }
+    }
+    return selectedComponent;
 }

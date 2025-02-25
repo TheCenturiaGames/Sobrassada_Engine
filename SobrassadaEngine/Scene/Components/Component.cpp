@@ -141,6 +141,18 @@ bool Component::DeleteChildComponent(const UID componentUID)
     return false;
 }
 
+void Component::RenderGuizmo()
+{
+    if (App->GetEditorUIModule()->RenderImGuizmo(localTransform))
+    {
+        AABBUpdatable* parentGameObject = GetParent();
+        if (parentGameObject != nullptr)
+        {
+            OnTransformUpdate(parentGameObject->GetParentGlobalTransform()); 
+        }
+    }
+}
+
 void Component::RenderEditorInspector()
 {
     ImGui::InputText("Name", name, sizeof(name));

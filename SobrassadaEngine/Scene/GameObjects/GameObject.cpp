@@ -296,7 +296,6 @@ void GameObject::RenderEditor()
         if (rootComponent != nullptr)
         {
             rootComponent->RenderComponentEditor();
-            rootComponent->RenderGuizmo();
         }
     }
     if (App->GetEditorUIModule()->hierarchyMenu)

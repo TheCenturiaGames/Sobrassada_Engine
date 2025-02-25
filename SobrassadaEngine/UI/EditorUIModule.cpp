@@ -62,6 +62,15 @@ bool EditorUIModule::Init()
     App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_W, [&] { mCurrentGizmoOperation = ImGuizmo::TRANSLATE; });
     App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_E, [&] { mCurrentGizmoOperation = ImGuizmo::ROTATE; });
     App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_R, [&] { mCurrentGizmoOperation = ImGuizmo::SCALE; });
+    
+    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_1, [&]
+    {
+        transformType = ImGuizmo::LOCAL;
+    });
+    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_2, [&]
+    {
+        transformType = ImGuizmo::WORLD;
+    });
 
     return true;
 }
@@ -592,45 +601,16 @@ bool EditorUIModule::RenderTransformWidget(
     Transform& localTransform, Transform& globalTransform, const Transform& parentTransform
 )
 {
-    bool positionValueChanged = false;
-    bool rotationValueChanged = false;
-    bool scaleValueChanged    = false;
+    Transform& outputTransform = transformType == ImGuizmo::LOCAL ? localTransform : globalTransform;
+    
+    bool positionValueChanged = false, rotationValueChanged = false, scaleValueChanged = false;
     static bool lockScaleAxis = false;
-    static int transformType  = LOCAL;
-    static int pivotType      = OBJECT;
-    float3 originalScale;
+    float3 originalScale = float3(outputTransform.scale);
 
-    ImGui::SeparatorText("Transform");
-    ImGui::RadioButton("Use object pivot", &pivotType, OBJECT);
-    // TODO Add later if necessary
-    // ImGui::SameLine();
-    // ImGui::RadioButton("Use root pivot", &pivotType, ROOT);
-
-    ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
-    if (ImGui::BeginTabBar("TransformType##", tab_bar_flags))
-    {
-        if (ImGui::BeginTabItem("Local transform"))
-        {
-            transformType = LOCAL;
-            originalScale = float3(localTransform.scale);
-            RenderBasicTransformModifiers(
-                localTransform, lockScaleAxis, positionValueChanged, rotationValueChanged, scaleValueChanged
-            );
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Global transform"))
-        {
-            transformType = GLOBAL;
-            originalScale = float3(globalTransform.scale);
-            RenderBasicTransformModifiers(
-                globalTransform, lockScaleAxis, positionValueChanged, rotationValueChanged, scaleValueChanged
-            );
-            ImGui::EndTabItem();
-        }
-        ImGui::EndTabBar();
-    }
-
-    Transform& outputTransform = transformType == LOCAL ? localTransform : globalTransform;
+    std::string transformName  = std::string(transformType == ImGuizmo::LOCAL ? "Local " : "World ") + "Transform";
+    ImGui::SeparatorText(transformName.c_str());
+    
+    RenderBasicTransformModifiers(outputTransform, lockScaleAxis, positionValueChanged, rotationValueChanged, scaleValueChanged);
 
     if (positionValueChanged || rotationValueChanged || scaleValueChanged)
     {
@@ -653,7 +633,7 @@ bool EditorUIModule::RenderTransformWidget(
             outputTransform.scale  = originalScale;
         }
 
-        if (transformType == GLOBAL)
+        if (transformType == ImGuizmo::WORLD)
         {
             localTransform.Set(globalTransform - parentTransform);
         }
@@ -677,7 +657,7 @@ bool EditorUIModule::RenderImGuizmo(Transform& gameObjectTransform)
         gizmoMatrix.ptr()
     );
 
-    Manipulate(view.ptr(), proj.ptr(), mCurrentGizmoOperation, ImGuizmo::MODE::LOCAL, gizmoMatrix.ptr());
+    Manipulate(view.ptr(), proj.ptr(), mCurrentGizmoOperation, transformType, gizmoMatrix.ptr());
 
     ImGuizmo::DecomposeMatrixToComponents(
         gizmoMatrix.ptr(), gameObjectTransform.position.ptr(), gameObjectTransform.rotation.ptr(),

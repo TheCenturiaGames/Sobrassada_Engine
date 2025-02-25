@@ -85,7 +85,7 @@ class EditorUIModule : public Module
     std::deque<float> framerate;
     std::deque<float> frametime;
 
-    int transformType = LOCAL;
+    ImGuizmo::MODE transformType = ImGuizmo::LOCAL;
 
     
     QuadtreeViewer *quadtreeViewer = nullptr;
