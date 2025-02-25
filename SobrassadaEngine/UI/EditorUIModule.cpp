@@ -38,6 +38,11 @@ EditorUIModule::EditorUIModule()
 
 EditorUIModule::~EditorUIModule()
 {
+    for (auto values: openEditors)
+    {
+        delete values.second;
+    }
+    openEditors.clear();
 }
 
 bool EditorUIModule::Init()
@@ -88,11 +93,25 @@ update_status EditorUIModule::Update(float deltaTime)
 update_status EditorUIModule::RenderEditor(float deltaTime)
 {
     Draw();
-
+    for (auto it = openEditors.cbegin(); it != openEditors.cend();)
+    {
+        if (!it->second->RenderEditor())
+        {
+            delete it->second;
+            it = openEditors.erase(it); 
+        }
+        else
+        {
+            
+            ++it;
+        }
+    }
     if (quadtreeViewerViewport) quadtreeViewer->Render(quadtreeViewerViewport);
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+    
 
     return UPDATE_CONTINUE;
 }
@@ -171,7 +190,7 @@ void EditorUIModule::Draw()
 
     if (editorSettingsMenu) EditorSettings(editorSettingsMenu);
 
-    if (engineEditorWindows) EngineWindow(engineEditorWindows);
+   
 }
 
 void EditorUIModule::MainMenu()
@@ -219,7 +238,13 @@ void EditorUIModule::MainMenu()
 
        if (ImGui::BeginMenu("Engine Editor Window"))
        {
-           if (ImGui::MenuItem("Basic Engine Editor", "", engineEditorWindows)) engineEditorWindows = !engineEditorWindows;
+           
+           if (ImGui::MenuItem("Mockup Base Engine Editor", ""))
+           {
+               //GENERATE ENGINE EDITOR OUTSIDE AND CALL THE OPENEDITOR FUNCTION.
+               EngineEditorBase* testBase = new EngineEditorBase(std::to_string(GenerateUID()), GenerateUID());
+               OpenEditor(testBase);
+           }
            ImGui::EndMenu();
        }
 
@@ -575,10 +600,7 @@ void EditorUIModule::GetFilesSorted(const std::string& currentPath, std::vector<
     );
 }
 
-void EditorUIModule::EngineWindow(bool& engineEditorWindows) const
-{
-    App->GetEngineEditorModule()->RenderEditor(engineEditorWindows);
-}
+
 
 void EditorUIModule::Console(bool& consoleMenu) const
 {
@@ -758,6 +780,14 @@ UID EditorUIModule::RenderResourceSelectDialog(
         ImGui::EndPopup();
     }
     return result;
+}
+
+void EditorUIModule::OpenEditor(EngineEditorBase* editorToOpen)
+{
+    if (editorToOpen != nullptr)
+    {
+        openEditors.insert({editorToOpen->GetUID(), editorToOpen});
+    }
 }
 
 void EditorUIModule::About(bool& aboutMenu) const

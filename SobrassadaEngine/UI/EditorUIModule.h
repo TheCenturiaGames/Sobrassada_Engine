@@ -7,6 +7,8 @@
 #include "Transform.h"
 
 #include "SDL.h"
+#include "EngineEditors/EngineEditorBase.h"
+
 #include <deque>
 #include <string>
 #include <unordered_map>
@@ -37,6 +39,8 @@ class EditorUIModule : public Module
     bool RenderImGuizmo(Transform& gameObjectTransform);
 
     UID RenderResourceSelectDialog(const char *id, const std::unordered_map<std::string, UID> &availableResources);
+
+    void OpenEditor(EngineEditorBase* editorToOpen);  // Will be called when a resource in the library is double clicked
 
   public:
     bool hierarchyMenu = true;
@@ -69,7 +73,7 @@ class EditorUIModule : public Module
     void SaveDialog(bool &save);
     void Console(bool &consoleMenu) const;
     void About(bool &aboutMenu) const;
-    void EngineWindow(bool &engineEditorWindows) const;
+    
 
   private:
     bool consoleMenu            = true;
@@ -80,7 +84,6 @@ class EditorUIModule : public Module
     bool editorSettingsMenu = false;
     bool quadtreeViewerViewport = false;
     bool closeApplication   = false;
-    bool engineEditorWindows = false;
     int maxFPS              = 60;
     int maximumPlotData     = 50;
     std::deque<float> framerate;
@@ -97,5 +100,7 @@ class EditorUIModule : public Module
     std::string libraryPath;
     
     ImGuizmo::OPERATION mCurrentGizmoOperation;
+
+    std::unordered_map<UID, EngineEditorBase*> openEditors;
 };
 

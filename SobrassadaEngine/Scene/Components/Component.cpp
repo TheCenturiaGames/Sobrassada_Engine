@@ -58,10 +58,6 @@ type(initialState["Type"].GetInt())
 Component::~Component(){
     for (Component* childComponent : GetChildComponents())
     {
-        globalComponentAABB.Enclose(childComponent->GetGlobalAABB());
-    }
-    for (Component* childComponent : GetChildComponents())
-    {
         App->GetSceneModule()->RemoveComponent(childComponent->GetUID());
         delete App->GetSceneModule()->GetComponentByUID(childComponent->GetUID());
     }
