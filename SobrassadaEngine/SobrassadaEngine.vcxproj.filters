@@ -283,7 +283,16 @@
     <ClCompile Include="Utils\EngineTimer.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="MetaFileCreator.cpp">
+    <ClCompile Include="MetaFile.cpp">
+      <Filter>FileSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="MetaMesh.cpp">
+      <Filter>FileSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="MetaTexture.cpp">
+      <Filter>FileSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="MetaMaterial.cpp">
       <Filter>FileSystem</Filter>
     </ClCompile>
   </ItemGroup>
@@ -508,7 +517,16 @@
     <ClInclude Include="Utils\EngineTimer.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="MetaFileCreator.h">
+    <ClInclude Include="MetaFile.h">
+      <Filter>FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="MetaMesh.h">
+      <Filter>FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="MetaMaterial.h">
+      <Filter>FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="MetaTexture.h">
       <Filter>FileSystem</Filter>
     </ClInclude>
   </ItemGroup>
