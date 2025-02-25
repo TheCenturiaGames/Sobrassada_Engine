@@ -184,6 +184,7 @@ void RootComponent::Update()
 
 void RootComponent::SetSelectedComponent(const UID componentUID)
 {
+    selectedComponent = nullptr;
     selectedUID = componentUID;
 }
 
