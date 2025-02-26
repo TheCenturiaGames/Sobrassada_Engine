@@ -2,15 +2,15 @@
 
 #include "Component.h"
 #include "Root/RootComponent.h"
-#include "Standalone/MeshComponent.h"
+#include "Standalone/Lights/DirectionalLightComponent.h"
 #include "Standalone/Lights/PointLightComponent.h"
 #include "Standalone/Lights/SpotLightComponent.h"
-#include "Standalone/Lights/DirectionalLightComponent.h"
+#include "Standalone/MeshComponent.h"
 
 #include <cstdint>
 
-Component *ComponentUtils::CreateEmptyComponent(
-    ComponentType type, UID uid, UID uidParent, UID uidRoot, const Transform &parentGlobalTransform
+Component* ComponentUtils::CreateEmptyComponent(
+    ComponentType type, UID uid, UID uidParent, UID uidRoot, const Transform& parentGlobalTransform
 )
 {
     switch (type)
@@ -31,7 +31,7 @@ Component *ComponentUtils::CreateEmptyComponent(
     return nullptr;
 }
 
-Component *ComponentUtils::CreateExistingComponent(const rapidjson::Value &initialState)
+Component* ComponentUtils::CreateExistingComponent(const rapidjson::Value& initialState)
 {
     if (initialState.HasMember("Type"))
     {

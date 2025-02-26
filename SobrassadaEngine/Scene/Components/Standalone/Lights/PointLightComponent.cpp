@@ -1,18 +1,17 @@
 #include "PointLightComponent.h"
 
 #include "Application.h"
+#include "DebugDrawModule.h"
 #include "SceneModule.h"
 
-#include "DebugDrawModule.h"
 #include "ImGui.h"
-
 #include <vector>
 
 PointLightComponent::PointLightComponent(UID uid, UID uidParent, UID uidRoot, const Transform& parentGlobalTransform)
     : LightComponent(uid, uidParent, uidRoot, "Point Light", COMPONENT_POINT_LIGHT, parentGlobalTransform)
 {
-    range      = 1;
-    gizmosMode = 0;
+    range                      = 1;
+    gizmosMode                 = 0;
 
     LightsConfig* lightsConfig = App->GetSceneModule()->GetLightsConfig();
     if (lightsConfig != nullptr) lightsConfig->AddPointLight(this);

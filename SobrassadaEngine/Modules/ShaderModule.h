@@ -6,7 +6,7 @@ class ShaderModule : public Module
 {
   public:
     ShaderModule();
-    ~ShaderModule();
+    ~ShaderModule() override;
 
     unsigned int GetProgram(const char *vertexPath, const char *fragmentPath);
     void DeleteProgram(unsigned int programID);
