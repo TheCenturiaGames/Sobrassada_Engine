@@ -12,11 +12,8 @@ class DirectionalLightComponent : public LightComponent
     ~DirectionalLightComponent();
 
     void Render() override;
-    void RenderEditorInspector() override;
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
 
-    float3 GetDirection() const { return direction; }
+    float3 GetDirection() const;
 
-  private:
-    float3 direction;
 };
