@@ -1,5 +1,9 @@
 ﻿#pragma once
 
+#include "LightsConfig.h"
+
+
+#include <Math/Quat.h>
 #include <Math/float3.h>
 
 struct Transform 
@@ -26,6 +30,18 @@ public:
         newScale.z = transform.scale.z != 0 ? scale.z / transform.scale.z : 0;  
         
         return {position - transform.position, rotation - transform.rotation, newScale};
+    }
+
+    void orientedAdd(const Transform& transform)
+    {
+        rotation += transform.rotation;
+        const Quat newRotation = Quat::FromEulerXYZ(rotation.x, rotation.y, rotation.z);
+        //scale += Math.
+    }
+
+    void orientedSub(const Transform& transform) const
+    {
+        
     }
 
     void Set(const Transform &transform);
