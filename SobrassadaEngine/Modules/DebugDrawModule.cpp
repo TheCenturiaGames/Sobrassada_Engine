@@ -4,7 +4,6 @@
 #include "CameraModule.h"
 #include "Globals.h"
 #include "MathGeoLib.h"
-#include "QuadtreeViewer.h"
 #include "WindowModule.h"
 #include "OpenGLModule.h"
 #include "Framebuffer.h"

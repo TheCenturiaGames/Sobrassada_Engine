@@ -37,4 +37,7 @@ class ResourceMesh : public Resource
     unsigned int vertexCount = 0;
     unsigned int indexCount  = 0;
     AABB aabb;
+
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> indices;
 };
