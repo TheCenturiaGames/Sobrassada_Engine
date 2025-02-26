@@ -10,7 +10,16 @@ struct NodeData
     std::string name;
     Transform transform;
     int parentIndex;
+    int skinIndex;
     std::vector<std::pair<UID, UID>> meshes;
+};
+
+struct Skin
+{
+    int parentIndex; // Maybe UID
+
+    std::vector<unsigned int> bonesIndices;
+    std::vector<float4x4> inverseBindMatrices;
 };
 
 class Model
@@ -28,4 +37,5 @@ class Model
   private:
     UID uid;
     std::vector<NodeData> nodes;
+    std::vector<Skin> skins;
 };

@@ -173,7 +173,7 @@ namespace MeshImporter
                 Vertex vertex;
                 vertex.position = *reinterpret_cast<const float3*>(bufferPos);
                 vertex.tangent  = bufferTan ? *reinterpret_cast<const float4*>(bufferTan) : float4(0, 0, 0, 1);
-                //vertex.joint    = bufferJoints ? *reinterpret_cast<const float4*>(bufferJoints) : float4(0, 0, 0, 1);
+                // vertex.joint    = bufferJoints ? *reinterpret_cast<const float4*>(bufferJoints) : float4(0, 0, 0, 1);
 
                 if (dataType == UNSIGNED_CHAR)
                 {
@@ -192,7 +192,7 @@ namespace MeshImporter
                     vertex.joint[3]              = (unsigned int)joints[3];
                     GLOG("Joints pre: %d, %d, %d, %d", joints[0], joints[1], joints[2], joints[3]);
                 }
-                else 
+                else
                 {
                     const unsigned int* joints = reinterpret_cast<const unsigned int*>(bufferJoints);
                 }
