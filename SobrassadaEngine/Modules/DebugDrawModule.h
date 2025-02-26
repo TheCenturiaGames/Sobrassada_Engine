@@ -31,5 +31,5 @@ class DebugDrawModule : public Module
     void DrawAxisTriad(const float4x4& transform, bool depthEnabled = true);
 
   private:
-    static DDRenderInterfaceCoreGL *implementation;
+    static DDRenderInterfaceCoreGL* implementation;
 };

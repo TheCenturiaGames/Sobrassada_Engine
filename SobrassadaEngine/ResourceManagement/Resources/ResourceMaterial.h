@@ -1,14 +1,16 @@
 ﻿#pragma once
+
 #include "Resource.h"
+#include "FileSystem/Material.h"
 
 #include <Math/float4.h>
-#include <Material.h>
 
 namespace tinygltf
 {
     class Model;
     struct Material;
 } // namespace tinygltf
+
 struct TextureInfo
 {
     unsigned int textureID = 0;
@@ -18,23 +20,21 @@ struct TextureInfo
 
 struct MaterialGPU
 {
-    float4 diffColor      = {1.0f, 0.0f, 0.0f, 1.0f};
-    float3 specColor      = {1.0f, 0.0f, 0.0f};
-    float shininess       = 500.0f;
-    int shininessInAlpha  = 0;
-    int hasNormal         = 0;
-    int padding2[2]        = {0, 0};
+    float4 diffColor     = {1.0f, 0.0f, 0.0f, 1.0f};
+    float3 specColor     = {1.0f, 0.0f, 0.0f};
+    float shininess      = 500.0f;
+    int shininessInAlpha = 0;
+    int hasNormal        = 0;
+    int padding2[2]      = {0, 0};
 };
 
 class ResourceMaterial : public Resource
 {
   public:
     ResourceMaterial(UID uid, const std::string& name);
-
     ~ResourceMaterial() override;
 
     void OnEditorUpdate();
-
     void LoadMaterialData(Material mat);
     void RenderMaterial(int program) const;
     void FreeMaterials() const;

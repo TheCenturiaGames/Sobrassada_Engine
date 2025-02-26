@@ -2,8 +2,8 @@
 
 #include "FileSystem.h"
 #include "Globals.h"
-#include "MeshImporter.h"
 #include "MaterialImporter.h"
+#include "MeshImporter.h"
 #include "TextureImporter.h"
 #include "ModelImporter.h"
 
@@ -13,7 +13,7 @@
 
 namespace SceneImporter
 {
-    void Import(const char *filePath)
+    void Import(const char* filePath)
     {
         CreateLibraryDirectories();
 
@@ -23,7 +23,7 @@ namespace SceneImporter
         else TextureImporter::Import(filePath);
     }
 
-    void ImportGLTF(const char *filePath)
+    void ImportGLTF(const char* filePath)
     {
         // Copy gltf to Assets folder
         {
@@ -62,7 +62,7 @@ namespace SceneImporter
         std::string path = FileSystem::GetFilePath(filePath);
 
         // Copy bin to Assets folder
-        for (const auto &srcBuffers : model.buffers)
+        for (const auto& srcBuffers : model.buffers)
         {
             std::string binPath  = path + srcBuffers.uri;
             std::string copyPath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(binPath);
@@ -188,5 +188,4 @@ namespace SceneImporter
             }
         }
     }
-
 }; // namespace SceneImporter
