@@ -560,9 +560,9 @@
     <ClInclude Include="Scene\AABBUpdatable.h" />
     <ClInclude Include="FileSystem\FileSystem.h" />
     <ClInclude Include="Modules\LibraryModule.h" />
-    <ClInclude Include="Material.h" />
+    <ClInclude Include="FileSystem\Material.h" />
     <ClInclude Include="FileSystem\MaterialImporter.h" />
-    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="FileSystem\Mesh.h" />
     <ClInclude Include="FileSystem\MeshImporter.h" />
     <ClInclude Include="FileSystem\SceneImporter.h" />
     <ClInclude Include="Utils\EngineTimer.h" />
@@ -581,7 +581,6 @@
     <ClInclude Include="Scene\Components\Standalone\MeshComponent.h" />
     <ClInclude Include="Scene\Components\ComponentUtils.h" />
     <ClInclude Include="Scene\GameObjects\GameObject.h" />
-    <ClInclude Include="Utils\BoundingBox.h" />
     <ClInclude Include="Utils\Framebuffer.h" />
     <ClInclude Include="Tests\CameraModule.h" />
     <ClInclude Include="DebugDraw\debugdraw.h" />

@@ -8,10 +8,10 @@
 #include "Root/RootComponent.h"
 #include "SceneImporter.h"
 #include "SceneModule.h"
+
 #include "document.h"
 #include "prettywriter.h"
 #include "stringbuffer.h"
-
 #include <filesystem>
 
 LibraryModule::LibraryModule()
@@ -139,7 +139,7 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
     return true;
 }
 
-bool LibraryModule::LoadScene(const char* path, bool reload)
+bool LibraryModule::LoadScene(const char* path, bool reload) const
 {
     rapidjson::Document doc;
     bool loaded = FileSystem::LoadJSON(path, doc);
@@ -229,9 +229,9 @@ bool LibraryModule::LoadLibraryMaps()
             // Generate UID using the function from globals.h
             try
             {
-                UID originalUID      = std::stoull(fileName);
+                UID originalUID = std::stoull(fileName);
 
-                UID prefix           = originalUID / 100000000000000;
+                UID prefix      = originalUID / 100000000000000;
 
                 switch (prefix)
                 {
@@ -251,11 +251,11 @@ bool LibraryModule::LoadLibraryMaps()
                     GLOG("Category: Unknown File Type (10)");
                     break;
                 }
-            } catch (std::invalid_argument&)
+            }
+            catch (std::invalid_argument&)
             {
                 GLOG("File %s is not an asset file", fileName);
             }
-            
         }
     }
 

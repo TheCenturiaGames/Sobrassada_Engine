@@ -17,12 +17,11 @@ class WindowModule : public Module
 
     int GetWidth() const { return windowWidth; }
     int GetHeight() const { return windowHeight; }
-    SDL_DisplayMode &GetDesktopDisplayMode();
+    SDL_DisplayMode& GetDesktopDisplayMode();
     float GetBrightness() const { return SDL_GetWindowBrightness(window); }
 
     void SetWidth(const unsigned int width);
     void SetHeight(const unsigned int height);
-
     void SetBrightness(const float brightness) const { SDL_SetWindowBrightness(window, brightness); }
     bool SetFullscreen(bool fullscreen) const { return SDL_SetWindowFullscreen(window, fullscreen); }
     void SetResizable(bool resizable) const { SDL_SetWindowResizable(window, resizable ? SDL_TRUE : SDL_FALSE); }
@@ -38,7 +37,7 @@ class WindowModule : public Module
     SDL_Surface* screenSurface = nullptr;
 
   private:
-    SDL_DisplayMode displayMode;
     int windowWidth  = SCREEN_WIDTH;
     int windowHeight = SCREEN_HEIGHT;
+    SDL_DisplayMode displayMode;
 };

@@ -1,24 +1,24 @@
 #pragma once
 
-#include "Component.h"
 #include "Application.h"
+#include "Component.h"
 
 #include "Math/float3.h"
 
-class LightComponent: public Component
+class LightComponent : public Component
 {
   public:
     LightComponent(
-        UID uid, UID uidParent, UID uidRoot, const char *uiName, const ComponentType lightType,
-        const Transform &parentGlobalTransform
+        UID uid, UID uidParent, UID uidRoot, const char* uiName, const ComponentType lightType,
+        const Transform& parentGlobalTransform
     );
     LightComponent(const rapidjson::Value& initialState);
 
-    virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
-
-    virtual void RenderEditorInspector() override;
     void Update() override;
     virtual void Render() override;
+    virtual void RenderEditorInspector() override;
+
+    virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
 
     float GetIntensity() const { return intensity; }
     float3 GetColor() const { return color; }

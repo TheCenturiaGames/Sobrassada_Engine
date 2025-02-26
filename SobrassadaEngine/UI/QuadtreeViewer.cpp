@@ -1,12 +1,11 @@
 #include "QuadtreeViewer.h"
 
 #include "Application.h"
+#include "CameraModule.h"
 #include "DebugDrawModule.h"
 #include "Framebuffer.h"
 #include "Globals.h"
 #include "Quadtree.h"
-#include "CameraModule.h"
-
 #include "MockGameObject.h"
 
 #include "Algorithm/Random/LCG.h"
@@ -52,7 +51,7 @@ QuadtreeViewer::QuadtreeViewer()
         float3 minPoint = float3(xCoord - halfObjectsSize, yCoord - halfObjectsSize, zCoord - halfObjectsSize);
         float3 maxPoint = float3(xCoord + halfObjectsSize, yCoord + halfObjectsSize, zCoord + halfObjectsSize);
 
-        MockGameObject *newGameObject = new MockGameObject(minPoint, maxPoint);
+        MockGameObject* newGameObject = new MockGameObject(minPoint, maxPoint);
         gameObjects.push_back(newGameObject);
 
         quadtree->InsertElement(gameObjects[i]);
@@ -64,7 +63,7 @@ QuadtreeViewer::~QuadtreeViewer()
     delete framebuffer;
     delete quadtree;
 
-    for (auto &gameObject : gameObjects)
+    for (auto& gameObject : gameObjects)
     {
         delete gameObject;
     }
@@ -72,7 +71,7 @@ QuadtreeViewer::~QuadtreeViewer()
     gameObjects.clear();
 }
 
-void QuadtreeViewer::Render(bool &renderBoolean)
+void QuadtreeViewer::Render(bool& renderBoolean)
 {
     framebuffer->CheckResize();
     framebuffer->Bind();
@@ -89,7 +88,7 @@ void QuadtreeViewer::Render(bool &renderBoolean)
     quadtree->GetDrawLines(drawLines, elementLines);
 
     AABB queryArea = AABB(float3(-10, -10, -10), float3(10, 10, 10));
-    std::vector<const MockGameObject *> retrievedElements;
+    std::vector<const MockGameObject*> retrievedElements;
     quadtree->QueryElements(queryArea, retrievedElements);
 
     CreateQueryAreaLines(queryArea, queryAreaLines);
@@ -150,7 +149,7 @@ void QuadtreeViewer::ChangeCameraSize(float width, float height)
     projectionMatrix          = camera.ProjectionMatrix();
 }
 
-void QuadtreeViewer::CreateQueryAreaLines(const AABB &queryArea, std::vector<float4> &queryAreaLines) const
+void QuadtreeViewer::CreateQueryAreaLines(const AABB& queryArea, std::vector<float4>& queryAreaLines) const
 {
     AABB2D area2D      = AABB2D(queryArea.minPoint.xz(), queryArea.maxPoint.xz());
     float2 center      = area2D.CenterPoint();
@@ -170,11 +169,11 @@ void QuadtreeViewer::CreateQueryAreaLines(const AABB &queryArea, std::vector<flo
     queryAreaLines[3]  = float4(topLeft.x, topLeft.y, bottomLeft.x, bottomLeft.y);
 }
 
-void QuadtreeViewer::CreateGameObjectsAreaLines(std::vector<float4> &elementsAreaLines) const
+void QuadtreeViewer::CreateGameObjectsAreaLines(std::vector<float4>& elementsAreaLines) const
 {
     elementsAreaLines = std::vector<float4>(gameObjects.size() * 4);
     int currentLine   = 0;
-    for (const auto &element : gameObjects)
+    for (const auto& element : gameObjects)
     {
         AABB2D area2D =
             AABB2D(element->GetWorldBoundingBox().minPoint.xz(), element->GetWorldBoundingBox().maxPoint.xz());
