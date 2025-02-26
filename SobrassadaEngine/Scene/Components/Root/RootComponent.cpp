@@ -14,11 +14,6 @@ RootComponent::RootComponent(const UID uid, const UID uidParent, const Transform
     selectedUID = uid;  
 }
 
-RootComponent::RootComponent(const rapidjson::Value &initialState) : Component(initialState)
-{
-    selectedUID = uid;
-}
-
 RootComponent::RootComponent(const rapidjson::Value& initialState) : Component(initialState)
 {
     selectedUID      = uid;
