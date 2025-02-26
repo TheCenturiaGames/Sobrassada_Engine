@@ -13,8 +13,8 @@
 namespace ModelImporter
 {
     UID ImportModel(
-        const std::vector<tinygltf::Node>& nodes, const std::vector<std::vector<std::pair<UID, UID>>>& meshesUIDs,
-        const char* filePath
+        const std::vector<tinygltf::Node>& nodes, const std::vector<tinygltf::Skin>& skins,
+        const std::vector<std::vector<std::pair<UID, UID>>>& meshesUIDs, const char* filePath
     )
     {
         // Get Nodes data
@@ -24,16 +24,19 @@ namespace ModelImporter
         GLOG("Start filling nodes")
         FillNodes(nodes, 0, -1, meshesUIDs, orderedNodes); // -1 parentId for root
         GLOG("Nodes filled");
-
-        // for (int i = 0; i < orderedNodes.size(); ++i)
-        //{
-        //     GLOG(
-        //         "Node %d. Name: %s. Parent id: %d. Meshes count: %d", i, orderedNodes[i].name.c_str(),
-        //         orderedNodes[i].parentId, orderedNodes[i].meshes.size()
-        //     )
-        // }
-
         newModel.SetNodes(orderedNodes);
+
+
+        // Save skin data
+        std::vector<Skin> skinsData;
+        for (const tinygltf::Skin& skin : skins)
+        {
+            Skin newSkin;
+            newSkin.rootIndex    = skin.skeleton;
+            newSkin.bonesIndices = skin.joints;
+            skinsData.push_back(newSkin);
+        }
+
 
         // Save in JSON format, way easier for this data
         // Create doc JSON
@@ -55,7 +58,6 @@ namespace ModelImporter
 
         // Serialize ordered nodes
         rapidjson::Value nodesJSON(rapidjson::kArrayType);
-
         for (const NodeData& node : orderedNodes)
         {
             rapidjson::Value nodeDataJSON(rapidjson::kObjectType);
@@ -90,8 +92,28 @@ namespace ModelImporter
             }
             nodesJSON.PushBack(nodeDataJSON, allocator);
         }
-
         modelJSON.AddMember("Nodes", nodesJSON, allocator);
+
+        // Serialize skins
+        rapidjson::Value skinsJSON(rapidjson::kArrayType);
+        for (const Skin& skin : skinsData)
+        {
+            rapidjson::Value skinDataJSON(rapidjson::kObjectType);
+
+            skinDataJSON.AddMember("RootIndex", skin.rootIndex, allocator);
+
+            rapidjson::Value valBones(rapidjson::kArrayType);
+            for (const int bone : skin.bonesIndices)
+            {
+                valBones.PushBack(bone, allocator);
+            }
+            skinDataJSON.AddMember("BonesIndices", valBones, allocator);
+
+            skinsJSON.PushBack(skinDataJSON, allocator);
+        }
+        modelJSON.AddMember("Skins", skinsJSON, allocator);
+
+
         doc.AddMember("Model", modelJSON, allocator);
 
         // Save file like JSON
@@ -214,20 +236,23 @@ namespace ModelImporter
         // Fill node data
         const tinygltf::Node& nodeData = nodesList[nodeId];
         NodeData newNode;
-        newNode.name               = nodeData.name;
+        newNode.name              = nodeData.name;
+        newNode.parentIndex       = parentId;
 
-        float4x4 rawTransform      = GetNodeTransform(nodeData);
-        Transform parentTransform  = Transform::identity;
+        float4x4 rawTransform     = GetNodeTransform(nodeData);
+        Transform parentTransform = Transform::identity;
         if (parentId != -1) parentTransform = outNodes[parentId].transform;
         newNode.transform.position = parentTransform.position + rawTransform.TranslatePart();
         newNode.transform.rotation = parentTransform.rotation + rawTransform.RotatePart().ToEulerXYZ();
-        newNode.parentIndex        = parentId;
+
 
         // Get reference to Mesh and Material UIDs
         if (nodeData.mesh > -1)
         {
             newNode.meshes = meshesUIDs[nodeData.mesh];
         }
+
+        newNode.skinIndex = nodeData.skin;
 
         outNodes.push_back(newNode);
 

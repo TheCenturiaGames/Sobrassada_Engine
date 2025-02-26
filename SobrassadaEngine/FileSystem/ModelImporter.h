@@ -12,8 +12,8 @@ class ResourceModel;
 namespace ModelImporter
 {
     UID ImportModel(
-        const std::vector<tinygltf::Node>& nodes, const std::vector<std::vector<std::pair<UID, UID>>>& meshesUIDs,
-        const char* filePath
+        const std::vector<tinygltf::Node>& nodes, const std::vector<tinygltf::Skin>& skins,
+        const std::vector<std::vector<std::pair<UID, UID>>>& meshesUIDs, const char* filePath
     );
     ResourceModel* LoadModel(UID modelUID);
     void FillNodes(

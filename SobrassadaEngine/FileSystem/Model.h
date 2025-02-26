@@ -16,10 +16,9 @@ struct NodeData
 
 struct Skin
 {
-    int parentIndex; // Maybe UID
-
-    std::vector<unsigned int> bonesIndices;
-    std::vector<float4x4> inverseBindMatrices;
+    int rootIndex;
+    std::vector<int> bonesIndices;
+    //std::vector<float4x4> inverseBindMatrices;
 };
 
 class Model
@@ -33,6 +32,7 @@ class Model
 
     void SetUID(const UID uid) { this->uid = uid; }
     void SetNodes(const std::vector<NodeData>& nodes) { this->nodes = nodes; }
+    void SetSkins(const std::vector<Skin>& skins) { this->skins = skins; }
 
   private:
     UID uid;
