@@ -983,7 +983,7 @@ void EditorUIModule::About(bool& aboutMenu) const
 
 EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
 {
-    uint32_t uid = GenerateUID();
+    UID uid = GenerateUID();
     switch (type)
     {
     case EditorType::BASE:
