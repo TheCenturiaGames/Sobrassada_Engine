@@ -15,7 +15,7 @@
 MeshComponent::MeshComponent(
     const UID uid, const UID uidParent, const UID uidRoot, const Transform& parentGlobalTransform
 )
-    : Component(uid, uidParent, uidRoot, "Mesh component", COMPONENT_MESH, parentGlobalTransform)
+    : Component(uid, uidParent, uidRoot, "Mesh", COMPONENT_MESH, parentGlobalTransform)
 {
 }
 
