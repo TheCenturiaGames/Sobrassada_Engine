@@ -15,6 +15,7 @@ class EngineTimer
   protected:
     virtual float TicksSinceStartup() const;
 
+  protected:
     bool isEnabled;
     float time;
     float startTime;

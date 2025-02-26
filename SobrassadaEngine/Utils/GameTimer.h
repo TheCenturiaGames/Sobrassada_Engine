@@ -10,6 +10,7 @@ class GameTimer : public EngineTimer
 
     void Start() override;
     float Tick() override;
+
     void TogglePause();
     void Reset();
     float Step();
@@ -25,6 +26,7 @@ class GameTimer : public EngineTimer
   private:
     float TicksSinceReference() const;
 
+  private:
     bool isPaused;
 
     int frameCount;

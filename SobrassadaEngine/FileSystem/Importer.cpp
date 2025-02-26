@@ -2,9 +2,11 @@
 
 #include "Application.h"
 #include "LibraryModule.h"
+#include "MaterialImporter.h"
 #include "MeshImporter.h"
 #include "TextureImporter.h"
 #include "MaterialImporter.h"
+#include "ModelImporter.h"
 
 Resource* Importer::Load(UID uid)
 {
@@ -19,6 +21,8 @@ Resource* Importer::Load(UID uid)
             return MaterialImporter::LoadMaterial(uid);
         case ResourceType::Mesh:
             return MeshImporter::LoadMesh(uid);
+        case ResourceType::Model:
+            return ModelImporter::LoadModel(uid);
             
         default:
             GLOG("Unknown resource type: %d", type)

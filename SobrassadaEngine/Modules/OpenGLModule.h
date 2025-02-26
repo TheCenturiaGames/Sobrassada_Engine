@@ -8,7 +8,7 @@ class OpenGLModule : public Module
 {
   public:
     OpenGLModule();
-    ~OpenGLModule();
+    ~OpenGLModule() override;
 
     bool Init() override;
     update_status PreUpdate(float deltaTime) override;
@@ -16,13 +16,13 @@ class OpenGLModule : public Module
     update_status PostUpdate(float deltaTime) override;
     bool ShutDown() override;
 
-    void *GetContext() const { return context; }
+    void* GetContext() const { return context; }
     float GetClearRed() const { return clearColorRed; }
     float GetClearGreen() const { return clearColorGreen; }
     float GetClearBlue() const { return clearColorBlue; }
-    Framebuffer *GetFramebuffer() const { return framebuffer; }
+    Framebuffer* GetFramebuffer() const { return framebuffer; }
 
-    void SetDepthTest(bool enable);
+    void SetDepthTest(bool enable); // TODO: inline
     void SetFaceCull(bool enable);
     void SetDepthFunc(bool enable);
     void SetFrontFaceMode(int mode);
@@ -31,10 +31,8 @@ class OpenGLModule : public Module
     void SetClearBlue(float newValue);
 
   private:
-    void *context;
-
-    Framebuffer *framebuffer = nullptr;
-
+    void* context;
+    Framebuffer* framebuffer = nullptr;
     float clearColorRed      = DEFAULT_GL_CLEAR_COLOR_RED;
     float clearColorGreen    = DEFAULT_GL_CLEAR_COLOR_GREEN;
     float clearColorBlue     = DEFAULT_GL_CLEAR_COLOR_BLUE;

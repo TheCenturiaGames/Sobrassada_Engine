@@ -13,8 +13,6 @@ class ShaderModule;
 class LibraryModule;
 class EditorUIModule;
 class SceneModule;
-
-// TMP: TEMPORAL JUST FOR HAVING A CAMERA TO RENDER
 class CameraModule;
 class DebugDrawModule;
 
@@ -31,39 +29,35 @@ class Application
     update_status Update();
     bool ShutDown();
 
-    WindowModule *GetWindowModule() { return windowModule; }
-    OpenGLModule *GetOpenGLModule() { return openGLModule; }
+    WindowModule* GetWindowModule() { return windowModule; }
+    OpenGLModule* GetOpenGLModule() { return openGLModule; }
     ResourcesModule* GetResourcesModule() { return resourcesModule; }
-    InputModule *GetInputModule() { return inputModule; }
-    ShaderModule *GetShaderModule() { return shaderModule; }
-    LibraryModule *GetLibraryModule() { return libraryModule; }
-    EditorUIModule *GetEditorUIModule() { return editorUIModule; };
-    SceneModule *GetSceneModule() { return sceneModule; }
+    InputModule* GetInputModule() { return inputModule; }
+    ShaderModule* GetShaderModule() { return shaderModule; }
+    LibraryModule* GetLibraryModule() { return libraryModule; }
+    EditorUIModule* GetEditorUIModule() { return editorUIModule; };
+    SceneModule* GetSceneModule() { return sceneModule; }
+    CameraModule* GetCameraModule() { return cameraModule; }
+    DebugDrawModule* GetDebugDrawModule() { return debugDraw; }
 
-    // TMP: TEMPORAL JUST FOR HAVING A CAMERA TO RENDER
-    CameraModule *GetCameraModule() { return cameraModule; }
-    DebugDrawModule *GetDebugDrawModule() { return debugDraw; }
-
-    GameTimer *GetGameTimer() { return gameTimer; }
+    GameTimer* GetGameTimer() { return gameTimer; }
 
   private:
-    std::list<Module *> modules;
+    std::list<Module*> modules;
 
-    WindowModule *windowModule           = nullptr;
-    OpenGLModule *openGLModule           = nullptr;
-    ResourcesModule *resourcesModule     = nullptr;
-    InputModule *inputModule             = nullptr;
-    ShaderModule *shaderModule           = nullptr;
-    LibraryModule *libraryModule         = nullptr;
-    EditorUIModule *editorUIModule       = nullptr;
-    SceneModule *sceneModule             = nullptr;
+    WindowModule* windowModule       = nullptr;
+    OpenGLModule* openGLModule       = nullptr;
+    ResourcesModule* resourcesModule = nullptr;
+    InputModule* inputModule         = nullptr;
+    ShaderModule* shaderModule       = nullptr;
+    LibraryModule* libraryModule     = nullptr;
+    EditorUIModule* editorUIModule   = nullptr;
+    SceneModule* sceneModule         = nullptr;
+    CameraModule* cameraModule       = nullptr;
+    DebugDrawModule* debugDraw       = nullptr;
 
-    // TMP: TEMPORAL JUST FOR HAVING A CAMERA TO RENDER
-    CameraModule *cameraModule           = nullptr;
-    DebugDrawModule *debugDraw           = nullptr;
-
-    EngineTimer *engineTimer             = nullptr;
-    GameTimer *gameTimer                 = nullptr;
+    EngineTimer* engineTimer         = nullptr;
+    GameTimer* gameTimer             = nullptr;
 };
 
-extern Application *App;
+extern Application* App;

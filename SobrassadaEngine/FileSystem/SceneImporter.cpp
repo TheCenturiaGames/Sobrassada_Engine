@@ -2,18 +2,18 @@
 
 #include "FileSystem.h"
 #include "Globals.h"
-#include "MeshImporter.h"
 #include "MaterialImporter.h"
+#include "MeshImporter.h"
 #include "TextureImporter.h"
+#include "ModelImporter.h"
 
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_EXTERNAL_IMAGE
-#include "tiny_gltf.h"
 
 namespace SceneImporter
 {
-    void Import(const char *filePath)
+    void Import(const char* filePath)
     {
         CreateLibraryDirectories();
 
@@ -23,7 +23,7 @@ namespace SceneImporter
         else TextureImporter::Import(filePath);
     }
 
-    void ImportGLTF(const char *filePath)
+    void ImportGLTF(const char* filePath)
     {
         // Copy gltf to Assets folder
         {
@@ -62,7 +62,7 @@ namespace SceneImporter
         std::string path = FileSystem::GetFilePath(filePath);
 
         // Copy bin to Assets folder
-        for (const auto &srcBuffers : model.buffers)
+        for (const auto& srcBuffers : model.buffers)
         {
             std::string binPath  = path + srcBuffers.uri;
             std::string copyPath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(binPath);
@@ -93,22 +93,40 @@ namespace SceneImporter
         //    MaterialImporter::ImportMaterial(model, matIndex);
         //}
 
+        // Store all primitives and materials of each mesh to later be used by the ImportModel
+
+        std::vector<std::vector<std::pair<UID, UID>>> gltfMeshes;
+
+        int meshIndex = 0;
         for (const auto &srcMesh : model.meshes)
         {
             name         = srcMesh.name;
             n            = 0;
             int matIndex = 0;
+            std::vector<std::pair<UID, UID>> primitives;
+
             for (const auto &primitive : srcMesh.primitives)
             {
                 name += std::to_string(n);
 
-                MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath);
+                UID modelUID = MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath);
                 matIndex = primitive.material;
 
-                MaterialImporter::ImportMaterial(model, matIndex, filePath);
+                UID matUID = MaterialImporter::ImportMaterial(model, matIndex, filePath);
                 n++;
+
+                primitives.emplace_back(modelUID, matUID);
+                GLOG("New primitive with mesh UID: %d and Material UID: %d", modelUID, matUID);
             }
+
+            gltfMeshes.emplace_back(primitives);
         }
+
+        GLOG("Total .gltf meshes: %d", gltfMeshes.size());
+
+        // Import Model
+        ModelImporter::ImportModel(model.nodes, gltfMeshes, filePath);
+
     }
 
     void CreateLibraryDirectories()
@@ -134,11 +152,11 @@ namespace SceneImporter
                 GLOG("Failed to create directory: %s", AUDIO_PATH);
             }
         }
-        if (!FileSystem::IsDirectory(BONES_PATH))
+        if (!FileSystem::IsDirectory(MODELS_PATH))
         {
-            if (!FileSystem::CreateDirectories(BONES_PATH))
+            if (!FileSystem::CreateDirectories(MODELS_PATH))
             {
-                GLOG("Failed to create directory: %s", BONES_PATH);
+                GLOG("Failed to create directory: %s", MODELS_PATH);
             }
         }
         if (!FileSystem::IsDirectory(MESHES_PATH))
@@ -170,5 +188,4 @@ namespace SceneImporter
             }
         }
     }
-
 }; // namespace SceneImporter

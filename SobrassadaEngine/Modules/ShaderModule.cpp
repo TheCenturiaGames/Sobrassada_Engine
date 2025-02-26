@@ -2,17 +2,21 @@
 
 #include "glew.h"
 
-ShaderModule::ShaderModule() {}
+ShaderModule::ShaderModule()
+{
+}
 
-ShaderModule::~ShaderModule() {}
+ShaderModule::~ShaderModule()
+{
+}
 
-unsigned int ShaderModule::GetProgram(const char *vertexPath, const char *fragmentPath)
+unsigned int ShaderModule::GetProgram(const char* vertexPath, const char* fragmentPath)
 {
     GLOG("Loading shaders")
     unsigned int program    = 0;
 
-    char *vertexShader      = LoadShaderSource(vertexPath);
-    char *fragmentShader    = LoadShaderSource(fragmentPath);
+    char* vertexShader      = LoadShaderSource(vertexPath);
+    char* fragmentShader    = LoadShaderSource(fragmentPath);
 
     unsigned int vertexId   = CompileShader(GL_VERTEX_SHADER, vertexShader);
     unsigned int fragmentId = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
@@ -25,18 +29,18 @@ unsigned int ShaderModule::GetProgram(const char *vertexPath, const char *fragme
     return program;
 }
 
-char *ShaderModule::LoadShaderSource(const char *shaderPath)
+char* ShaderModule::LoadShaderSource(const char* shaderPath)
 {
     GLOG("Reading shader: %s", shaderPath)
-    char *data = nullptr;
-    FILE *file = nullptr;
+    char* data = nullptr;
+    FILE* file = nullptr;
 
     fopen_s(&file, shaderPath, "rb");
     if (file)
     {
         fseek(file, 0, SEEK_END);
         int size = ftell(file);
-        data     = (char *)malloc(size + 1);
+        data     = (char*)malloc(size + 1);
         fseek(file, 0, SEEK_SET);
         fread(data, 1, size, file);
         data[size] = 0;
@@ -46,7 +50,7 @@ char *ShaderModule::LoadShaderSource(const char *shaderPath)
     return data;
 }
 
-unsigned int ShaderModule::CompileShader(unsigned int shaderType, const char *source)
+unsigned int ShaderModule::CompileShader(unsigned int shaderType, const char* source)
 {
     GLOG("Compiling %s", GL_VERTEX_SHADER == shaderType ? "vertex shader" : "fragment shader")
     unsigned shaderId = glCreateShader(shaderType);
@@ -64,7 +68,7 @@ unsigned int ShaderModule::CompileShader(unsigned int shaderType, const char *so
         if (logLenght > 0)
         {
             int written = 0;
-            char *info  = (char *)malloc(logLenght);
+            char* info  = (char*)malloc(logLenght);
             glGetShaderInfoLog(shaderId, logLenght, &written, info);
             GLOG("Log Info: %s", info);
             free(info);
@@ -94,7 +98,7 @@ unsigned int ShaderModule::CreateProgram(unsigned int vertexShader, unsigned fra
         if (logLenght > 0)
         {
             int written = 0;
-            char *info  = (char *)malloc(logLenght);
+            char* info  = (char*)malloc(logLenght);
             glGetProgramInfoLog(programId, logLenght, &written, info);
             GLOG("Program Log Info: %s", info);
             free(info);
@@ -107,4 +111,7 @@ unsigned int ShaderModule::CreateProgram(unsigned int vertexShader, unsigned fra
     return programId;
 }
 
-void ShaderModule::DeleteProgram(unsigned int programID) { glDeleteProgram(programID); }
+void ShaderModule::DeleteProgram(unsigned int programID)
+{
+    glDeleteProgram(programID);
+}

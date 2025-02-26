@@ -7,13 +7,11 @@
 
 class ResourcesModule : public Module
 {
-public:
-
+  public:
     ResourcesModule();
     ~ResourcesModule() override;
 
     bool Init() override;
-   
     bool ShutDown() override;
 
     Resource* RequestResource(UID uid);
@@ -21,11 +19,10 @@ public:
 
     int GetProgram() const { return program; }
 
-private:
-    int program = -1;
-    
+  private:
     Resource* CreateNewResource(UID uid);
 
+  private:
+    int program = -1;
     std::map<UID, Resource*> resources;
-    
 };

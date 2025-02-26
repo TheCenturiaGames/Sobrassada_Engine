@@ -1,8 +1,8 @@
 #pragma once
 
+#include "Geometry/AABB2D.h"
 #include "Geometry/Frustum.h"
 #include "Math/float4x4.h"
-#include "Geometry/AABB2D.h"
 #include <vector>
 
 class Framebuffer;
@@ -15,16 +15,16 @@ class QuadtreeViewer
     QuadtreeViewer();
     ~QuadtreeViewer();
 
-    void Render(bool &renderBoolean);
+    void Render(bool& renderBoolean);
 
   private:
     void ChangeCameraSize(float width, float height);
-    void CreateQueryAreaLines(const AABB &queryArea, std::vector<float4> &queryAreaLines) const;
-    void CreateGameObjectsAreaLines(std::vector<float4> &elementsAreaLines) const;
+    void CreateQueryAreaLines(const AABB& queryArea, std::vector<float4>& queryAreaLines) const;
+    void CreateGameObjectsAreaLines(std::vector<float4>& elementsAreaLines) const;
 
   private:
-    Framebuffer *framebuffer;
-    Quadtree *quadtree;
+    Framebuffer* framebuffer;
+    Quadtree* quadtree;
     float cameraSizeScaleFactor = 10.f;
 
     Frustum camera;

@@ -1,14 +1,13 @@
 ﻿#include "ResourceMaterial.h"
 
 #include "Application.h"
-#include "DirectXTex/DirectXTex.h"
 #include "LibraryModule.h"
 #include "TextureImporter.h"
-#include "imgui.h"
 
+#include "DirectXTex/DirectXTex.h"
+#include "imgui.h"
 #include <glew.h>
 #include <unordered_set>
-
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_EXTERNAL_IMAGE
