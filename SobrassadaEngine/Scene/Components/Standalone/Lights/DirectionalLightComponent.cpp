@@ -1,5 +1,4 @@
-#include "DirectionalLight.h"
-
+#include "DirectionalLightComponent.h"
 #include "Application.h"
 #include "DebugDrawModule.h"
 #include "SceneModule.h"
@@ -7,30 +6,30 @@
 #include "Math/Quat.h"
 #include "imgui.h"
 
-DirectionalLight::DirectionalLight(UID uid, UID uidParent, UID uidRoot, const Transform& parentGlobalTransform)
+DirectionalLightComponent::DirectionalLightComponent(UID uid, UID uidParent, UID uidRoot, const Transform& parentGlobalTransform)
     : LightComponent(uid, uidParent, uidRoot, "Directional Light", COMPONENT_DIRECTIONAL_LIGHT, parentGlobalTransform)
 {
     LightsConfig* lightsConfig = App->GetSceneModule()->GetLightsConfig();
     if (lightsConfig != nullptr) lightsConfig->AddDirectionalLight(this);
 }
 
-DirectionalLight::DirectionalLight(const rapidjson::Value& initialState) : LightComponent(initialState)
+DirectionalLightComponent::DirectionalLightComponent(const rapidjson::Value& initialState) : LightComponent(initialState)
 {
     LightsConfig* lightsConfig = App->GetSceneModule()->GetLightsConfig();
     if (lightsConfig != nullptr) lightsConfig->AddDirectionalLight(this);
 }
 
-DirectionalLight::~DirectionalLight()
+DirectionalLightComponent::~DirectionalLightComponent()
 {
     App->GetSceneModule()->GetLightsConfig()->RemoveDirectionalLight();
 }
 
-void DirectionalLight::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
+void DirectionalLightComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
 {
     LightComponent::Save(targetState, allocator);
 }
 
-void DirectionalLight::Render()
+void DirectionalLightComponent::Render()
 {
     if (!enabled || !drawGizmos) return;
 

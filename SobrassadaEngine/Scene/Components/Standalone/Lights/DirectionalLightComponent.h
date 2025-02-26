@@ -4,12 +4,12 @@
 
 #include <Libs/rapidjson/document.h>
 
-class DirectionalLight : public LightComponent
+class DirectionalLightComponent : public LightComponent
 {
   public:
-    DirectionalLight(UID uid, UID uidParent, UID uidRoot, const Transform& parentGlobalTransform);
-    DirectionalLight(const rapidjson::Value& initialState);
-    ~DirectionalLight();
+    DirectionalLightComponent(UID uid, UID uidParent, UID uidRoot, const Transform &parentGlobalTransform);
+    DirectionalLightComponent(const rapidjson::Value& initialState);
+    ~DirectionalLightComponent();
 
     void Render() override;
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
