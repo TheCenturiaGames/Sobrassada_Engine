@@ -63,11 +63,11 @@ bool EditorUIModule::Init()
     App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_E, [&] { mCurrentGizmoOperation = ImGuizmo::ROTATE; });
     App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_R, [&] { mCurrentGizmoOperation = ImGuizmo::SCALE; });
     
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_1, [&]
+    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_Y, [&]
     {
         transformType = ImGuizmo::LOCAL;
     });
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_2, [&]
+    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_X, [&]
     {
         transformType = ImGuizmo::WORLD;
     });
@@ -635,7 +635,7 @@ bool EditorUIModule::RenderTransformWidget(
 
         if (transformType == ImGuizmo::WORLD)
         {
-            localTransform.Set(globalTransform - parentTransform);
+            localTransform.Set(globalTransform.orientedSub(parentTransform));
         }
     }
 

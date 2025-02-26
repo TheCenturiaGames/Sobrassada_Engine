@@ -143,7 +143,7 @@ bool Component::DeleteChildComponent(const UID componentUID)
 
 void Component::RenderGuizmo()
 {
-    if (App->GetEditorUIModule()->RenderImGuizmo(localTransform))
+    if (App->GetEditorUIModule()->RenderImGuizmo(globalTransform))
     {
         AABBUpdatable* parentGameObject = GetParent();
         if (parentGameObject != nullptr)
@@ -271,7 +271,7 @@ void Component::OnTransformUpdate(const Transform &parentGlobalTransform)
 
 AABB& Component::TransformUpdated(const Transform &parentGlobalTransform)
 {
-    globalTransform = parentGlobalTransform + localTransform;
+    globalTransform = parentGlobalTransform.orientedAdd(localTransform);
 
     CalculateLocalAABB();
 

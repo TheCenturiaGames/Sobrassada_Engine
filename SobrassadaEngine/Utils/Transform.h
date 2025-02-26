@@ -32,16 +32,34 @@ public:
         return {position - transform.position, rotation - transform.rotation, newScale};
     }
 
-    void orientedAdd(const Transform& transform)
+    Transform orientedAdd(const Transform& transform) const
     {
-        rotation += transform.rotation;
-        const Quat newRotation = Quat::FromEulerXYZ(rotation.x, rotation.y, rotation.z);
-        //scale += Math.
+        Transform newTransform;
+        newTransform.rotation = rotation + transform.rotation;
+        const Quat newRotation = Quat::FromEulerXYZ(newTransform.rotation.x, newTransform.rotation.y, newTransform.rotation.z);
+
+        //float3 rotatedScale = newRotation.Transform(transform.scale);
+        //newTransform.scale.x = rotatedScale.x != 0 ? scale.x * rotatedScale.x : 0;  
+        //newTransform.scale.y = rotatedScale.y != 0 ? scale.y * rotatedScale.y : 0;  
+        //newTransform.scale.z = rotatedScale.z != 0 ? scale.z * rotatedScale.z : 0;
+        
+        newTransform.position = position + newRotation.Transform(transform.position);
+        return newTransform;
     }
 
-    void orientedSub(const Transform& transform) const
+    Transform orientedSub(const Transform& transform) const
     {
+        Transform newTransform;
+        newTransform.rotation = rotation + transform.rotation * -1;
+        const Quat newRotation = Quat::FromEulerXYZ(newTransform.rotation.x, newTransform.rotation.y, newTransform.rotation.z);
         
+        //float3 rotatedScale = newRotation.Transform(transform.scale);
+        //newTransform.scale.x = rotatedScale.x != 0 ? scale.x / rotatedScale.x : 0;  
+        //newTransform.scale.y = rotatedScale.y != 0 ? scale.y / rotatedScale.y : 0;  
+        //newTransform.scale.z = rotatedScale.z != 0 ? scale.z / rotatedScale.z : 0;
+        
+        newTransform.position = position + newRotation.Transform(transform.position * -1);
+        return newTransform;
     }
 
     void Set(const Transform &transform);
