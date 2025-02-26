@@ -32,9 +32,9 @@ class CameraModule : public Module
     update_status Update(float deltaTime) override;
     bool ShutDown() override;
 
+    bool IsCameraDetached() const { return isCameraDetached; }
     void UpdateUBO();
 
-    bool IsCameraDetached() const { return isCameraDetached; }
     const float4x4& GetProjectionMatrix() { return isCameraDetached ? detachedProjectionMatrix : projectionMatrix; }
     const float4x4& GetViewMatrix() { return isCameraDetached ? detachedViewMatrix : viewMatrix; }
     const float4x4& GetFrustumViewMatrix() { return viewMatrix; }
@@ -42,6 +42,7 @@ class CameraModule : public Module
     const FrustumPlanes& GetFrustrumPlanes() const { return frustumPlanes; }
     const float3& GetCameraPosition() const { return isCameraDetached ? detachedCamera.pos : camera.pos; }
     unsigned int GetUbo() const { return ubo; }
+    const LineSegment& GetLastCastedRay() const { return lastCastedRay; }
 
     void SetAspectRatio(float newAspectRatio);
 

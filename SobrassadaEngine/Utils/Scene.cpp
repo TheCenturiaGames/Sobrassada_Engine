@@ -10,6 +10,7 @@
 #include "Octree.h"
 #include "OpenGLModule.h"
 #include "SceneModule.h"
+#include "RaycastController.h"
 
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -339,6 +340,11 @@ void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects)
 
         if (frustumPlanes.Intersects(objectOBB)) outRenderGameObjects.push_back(gameObject);
     }
+
+    std::vector<GameObject*> rayObjects;
+    RaycastController::GetRayIntersections(App->GetCameraModule()->GetLastCastedRay(), sceneOctree, rayObjects);
+
+    int x = 0;
 }
 
 GameObject* Scene::GetGameObjectByUUID(UID gameObjectUUID)
