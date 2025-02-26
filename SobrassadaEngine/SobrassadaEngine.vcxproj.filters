@@ -192,9 +192,6 @@
     <ClCompile Include="ResourceManagement\Resources\ResourceTexture.cpp">
       <Filter>Resources</Filter>
     </ClCompile>
-    <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp">
-      <Filter>External\ImGuizmo</Filter>
-    </ClCompile>
     <ClCompile Include="ResourceManagement\Resources\Resource.cpp">
       <Filter>Resources</Filter>
     </ClCompile>
@@ -216,8 +213,14 @@
     <ClCompile Include="Utils\LightsConfig.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
+    <ClCompile Include="UI\QuadtreeViewer.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
     <ClCompile Include="Utils\Quadtree.cpp">
       <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\MockGameObject.cpp">
+      <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="Utils\Octree.cpp">
       <Filter>Utils</Filter>
@@ -272,6 +275,9 @@
     </ClCompile>
     <ClCompile Include="Modules\EditorUIModule.cpp">
       <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp">
+      <Filter>External\ImGuizmo</Filter>
     </ClCompile>
     <ClCompile Include="RaycastController.cpp">
       <Filter>Utils</Filter>
@@ -490,8 +496,6 @@
     </ClInclude>
     <ClInclude Include="Modules\EditorUIModule.h">
       <Filter>Modules</Filter>
-    </ClInclude>
-      <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="RaycastController.h">
       <Filter>Utils</Filter>
