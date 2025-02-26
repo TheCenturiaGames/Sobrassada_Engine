@@ -20,7 +20,6 @@ Resource* Importer::Load(UID uid)
         case ResourceType::Material:
             return MaterialImporter::LoadMaterial(uid);
         case ResourceType::Mesh:
-            
             return MeshImporter::LoadMesh(uid);
         case ResourceType::Animation:
             GLOG("HOLA");

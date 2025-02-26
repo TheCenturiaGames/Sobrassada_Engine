@@ -104,7 +104,7 @@ namespace AnimationImporter
 
         GLOG("%s saved as binary", fileName.c_str());
 
-        LoadAnimation(animationUID);
+        //LoadAnimation(animationUID);
 
         return animationUID;
     }
@@ -151,7 +151,7 @@ namespace AnimationImporter
 
             Channel& animChannel        = animation->channels[nodeName];
 
-            if (animType == 0)// Translation (float)
+            if (animType == 0)
             {
                 animChannel.numPositions  = keyframeCount;
                 animChannel.posTimeStamps = std::make_unique<float[]>(keyframeCount);
@@ -162,7 +162,7 @@ namespace AnimationImporter
                 memcpy(animChannel.positions.get(), cursor, keyframeCount * sizeof(float3));
                 cursor += keyframeCount * sizeof(float3);
             }
-            else if (animType == 1) // Rotation (Quat)
+            else if (animType == 1)
             {
                 animChannel.numRotations  = keyframeCount;
                 animChannel.rotTimeStamps = std::make_unique<float[]>(keyframeCount);
@@ -189,16 +189,14 @@ namespace AnimationImporter
             uint32_t posIndex           = 0;
             uint32_t rotIndex           = 0;
 
-            // Log de nombre de nodo y cantidad de posiciones y rotaciones
+
             GLOG(
                 "Node: %s, Total Positions: %u, Total Rotations: %u", nodeName.c_str(), animChannel.numPositions,
                 animChannel.numRotations
             );
 
-            // Recorrer todos los keyframes, considerando las posiciones y las rotaciones
             while (posIndex < animChannel.numPositions || rotIndex < animChannel.numRotations)
             {
-                // Si tenemos posiciones y la posición tiene un timestamp menor o igual al de la rotación
                 if (posIndex < animChannel.numPositions &&
                     (rotIndex >= animChannel.numRotations ||
                      animChannel.posTimeStamps[posIndex] <= animChannel.rotTimeStamps[rotIndex]))
@@ -211,20 +209,18 @@ namespace AnimationImporter
                     logMessage += ", Translation: (" + std::to_string(position.x) + ", " + std::to_string(position.y) +
                                   ", " + std::to_string(position.z) + ")";
 
-                    // Si las posiciones y rotaciones tienen el mismo timestamp, lo mostramos en la misma línea
                     if (rotIndex < animChannel.numRotations &&
                         animChannel.posTimeStamps[posIndex] == animChannel.rotTimeStamps[rotIndex])
                     {
                         const Quat& rotation = animChannel.rotations[rotIndex];
                         logMessage += ", Rotation: (" + std::to_string(rotation.x) + ", " + std::to_string(rotation.y) +
                                       ", " + std::to_string(rotation.z) + ", " + std::to_string(rotation.w) + ")";
-                        rotIndex++; // Avanzamos el índice de rotaciones
+                        rotIndex++; 
                     }
 
-                    // Log de la posición (y posible rotación si coincide el timestamp)
                     GLOG("%s", logMessage.c_str());
 
-                    posIndex++; // Avanzamos el índice de posiciones
+                    posIndex++; 
                 }
                 else if (rotIndex < animChannel.numRotations)
                 {
@@ -236,10 +232,10 @@ namespace AnimationImporter
                     logMessage += ", Rotation: (" + std::to_string(rotation.x) + ", " + std::to_string(rotation.y) +
                                   ", " + std::to_string(rotation.z) + ", " + std::to_string(rotation.w) + ")";
 
-                    // Log de la rotación
+
                     GLOG("%s", logMessage.c_str());
 
-                    rotIndex++; // Avanzamos el índice de rotaciones
+                    rotIndex++; 
                 }
             }
         }
