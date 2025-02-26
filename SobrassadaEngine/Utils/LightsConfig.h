@@ -1,12 +1,10 @@
 #pragma once
 
-#include "Globals.h"
-
 #include "../ResourceManagement/Resources/ResourceTexture.h"
+#include "Globals.h"
 
 #include "Math/float3.h"
 #include "Math/float4.h"
-
 #include <memory>
 #include <Libs/rapidjson/document.h>
 
@@ -68,7 +66,6 @@ class LightsConfig
     LightsConfig();
     ~LightsConfig();
 
-  public:
     void EditorParams();
 
     void InitSkybox();
@@ -92,15 +89,15 @@ class LightsConfig
 
   private:
     unsigned int LoadSkyboxTexture(UID cubemapUID);
-    void SetDirectionalLightShaderData() const;
-    void SetPointLightsShaderData() const;
-    void SetSpotLightsShaderData() const;
 
     void GetAllSceneLights();
-
     void GetAllPointLights();
     void GetAllSpotLights();
     void GetDirectionalLight();
+
+    void SetDirectionalLightShaderData() const;
+    void SetPointLightsShaderData() const;
+    void SetSpotLightsShaderData() const;
 
   private:
     UID skyboxUID;

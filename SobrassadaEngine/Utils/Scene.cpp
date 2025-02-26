@@ -13,7 +13,7 @@
 
 #include "imgui.h"
 #include "imgui_internal.h"
-
+// guizmo after imgui include
 #include "./Libs/ImGuizmo/ImGuizmo.h"
 
 Scene::Scene(UID sceneUID, const char* sceneName, UID rootGameObject)
@@ -59,7 +59,6 @@ void Scene::LoadComponents(const std::map<UID, Component*>& loadedGameComponents
     gameObjectsContainer.clear();
     gameComponents.insert(loadedGameComponents.begin(), loadedGameComponents.end());
 
-    // LigthsConfig init here, so scene already exists and can get the existing lights
     lightsConfig->InitSkybox();
     lightsConfig->InitLightBuffers();
 }
@@ -81,7 +80,6 @@ void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGa
 
 update_status Scene::Render(float deltaTime)
 {
-    // Render skybox and lights
     lightsConfig->RenderSkybox();
     lightsConfig->RenderLights();
 
