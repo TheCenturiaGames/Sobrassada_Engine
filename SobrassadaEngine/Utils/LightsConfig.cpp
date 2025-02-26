@@ -99,11 +99,32 @@ void LightsConfig::RenderSkybox() const
     App->GetOpenGLModule()->SetDepthFunc(true);
 }
 
-unsigned int LightsConfig::LoadSkyboxTexture(UID cubemapUid) const
+unsigned int LightsConfig::LoadSkyboxTexture(UID cubemapUid)
 {
     std::string stringPath = App->GetLibraryModule()->GetResourcePath(cubemapUid);
-
+    skyboxUID              = cubemapUid;
     return TextureImporter::LoadCubemap(stringPath.c_str());
+}
+
+void LightsConfig::SaveData(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
+{
+    rapidjson::Value ambientColorArray(rapidjson::kArrayType);
+    ambientColorArray.PushBack(ambientColor.x, allocator)
+        .PushBack(ambientColor.y, allocator)
+        .PushBack(ambientColor.z, allocator);
+
+    // Add to Light
+    targetState.AddMember("Ambient Color", ambientColorArray, allocator);
+    targetState.AddMember("Ambient Intensity", ambientIntensity, allocator);
+    targetState.AddMember("Skybox UID", skyboxUID, allocator);
+}
+
+void LightsConfig::LoadData(rapidjson::Value& lights)
+{
+    rapidjson::Value& ambientColorArray = lights["Ambient Color"];
+    ambientColor = {ambientColorArray[0].GetFloat(), ambientColorArray[1].GetFloat(), ambientColorArray[2].GetFloat()};
+    ambientIntensity = lights["Ambient Intensity"].GetFloat();
+    skyboxTexture    = LoadSkyboxTexture(lights["Skybox UID"].GetUint64());
 }
 
 void LightsConfig::AddSkyboxTexture(UID resource)

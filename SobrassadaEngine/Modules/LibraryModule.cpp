@@ -107,6 +107,19 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
 
     doc.AddMember("Scene", scene, allocator);
 
+    // Serialize Lights Config
+    LightsConfig* lightConfig = App->GetSceneModule()->GetLightsConfig();
+
+     if (lightConfig != nullptr)
+     {
+        rapidjson::Value lights(rapidjson::kObjectType);
+
+        lightConfig->SaveData(lights, allocator);
+
+        doc.AddMember("Lights Config", lights, allocator);
+
+     } else GLOG("Light Config not found");
+
     // Save file like JSON
     rapidjson::StringBuffer buffer;
     rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
@@ -209,6 +222,13 @@ bool LibraryModule::LoadScene(const char* path, bool reload) const
     }
 
     App->GetSceneModule()->LoadGameObjects(loadedGameObjects);
+
+    // Deserialize Lights Config
+    if (doc.HasMember("Lights Config") && doc["Lights Config"].IsObject())
+    {
+        LightsConfig* lightConfig           = App->GetSceneModule()->GetLightsConfig();
+        lightConfig->LoadData(doc["Lights Config"]);
+    }
 
     GLOG("%s scene loaded", name.c_str());
     return true;

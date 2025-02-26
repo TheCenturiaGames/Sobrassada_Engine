@@ -6,6 +6,7 @@
 #include "Math/float3.h"
 #include "Math/float4.h"
 #include <memory>
+#include <Libs/rapidjson/document.h>
 
 namespace Math
 {
@@ -83,8 +84,11 @@ class LightsConfig
     void RemovePointLight(UID pointUid);
     void RemoveSpotLight(UID spotUid);
 
+    void SaveData(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
+    void LoadData(rapidjson::Value& lights);
+
   private:
-    unsigned int LoadSkyboxTexture(UID cubemapUID) const;
+    unsigned int LoadSkyboxTexture(UID cubemapUID);
 
     void GetAllSceneLights();
     void GetAllPointLights();
@@ -96,6 +100,7 @@ class LightsConfig
     void SetSpotLightsShaderData() const;
 
   private:
+    UID skyboxUID;
     unsigned int skyboxVao;
     unsigned int skyboxTexture;
     unsigned int skyboxProgram;
