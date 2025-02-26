@@ -289,6 +289,7 @@ void LightsConfig::AddDirectionalLight(DirectionalLight* newDirectional)
 {
     if (directionalLight == nullptr) directionalLight = newDirectional;
 }
+
 void LightsConfig::AddPointLight(PointLight* newPoint)
 {
     // Add point light to vector and resize buffer
@@ -303,6 +304,7 @@ void LightsConfig::AddPointLight(PointLight* newPoint)
         bufferSize
     );
 }
+
 void LightsConfig::AddSpotLight(SpotLight* newSpot)
 {
     spotLights.push_back(newSpot);
@@ -346,6 +348,7 @@ void LightsConfig::RemovePointLight(UID pointUid)
 
     GLOG("Point lights size: %d. Buffer size: %d", pointLights.size(), bufferSize);
 }
+
 void LightsConfig::RemoveSpotLight(UID spotUid)
 {
     GLOG("Remove spot light with UID: %d", spotUid);
