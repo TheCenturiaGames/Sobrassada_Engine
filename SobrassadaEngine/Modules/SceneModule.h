@@ -15,6 +15,7 @@
 #include <map>
 #include <string>
 #include <unordered_map>
+#include <tuple>
 
 class GameObject;
 class Component;
@@ -71,6 +72,11 @@ class SceneModule : public Module
     LightsConfig* GetLightsConfig() { return loadedScene != nullptr ? loadedScene->GetLightsConfig() : nullptr; }
 
     void RegenerateTree() { loadedScene->UpdateSpatialDataStruct(); };
+
+    bool IsSceneWindowFocused() const { return loadedScene != nullptr ? loadedScene->IsSceneWindowFocused() : false; }
+    const std::tuple<float, float>& GetWindowPosition() const { return loadedScene->GetWindowPosition(); };
+    const std::tuple<float, float>& GetWindowSize() const { return loadedScene->GetWindowSize(); };
+    const std::tuple<float, float>& GetMousePosition() const { return loadedScene->GetMousePosition(); };
 
   private:
 

@@ -11,7 +11,9 @@
 #include "MathGeoLib.h"
 #include "SDL_scancode.h"
 #include "glew.h"
+
 #include <functional>
+#include <tuple>
 
 CameraModule::CameraModule()
 {
@@ -23,24 +25,24 @@ CameraModule::~CameraModule()
 
 bool CameraModule::Init()
 {
-    camera.type              = FrustumType::PerspectiveFrustum;
+    camera.type                      = FrustumType::PerspectiveFrustum;
 
-    camera.pos               = float3(0, 1, 5);
-    camera.front             = -float3::unitZ;
-    camera.up                = float3::unitY;
+    camera.pos                       = float3(0, 1, 5);
+    camera.front                     = -float3::unitZ;
+    camera.up                        = float3::unitY;
 
-    camera.nearPlaneDistance = 0.1f;
-    camera.farPlaneDistance  = 100.f;
+    camera.nearPlaneDistance         = 0.1f;
+    camera.farPlaneDistance          = 100.f;
 
-    camera.horizontalFov     = (float)HFOV * DEGTORAD;
+    camera.horizontalFov             = (float)HFOV * DEGTORAD;
 
-    int width                = App->GetWindowModule()->GetWidth();
-    int height               = App->GetWindowModule()->GetHeight();
+    int width                        = App->GetWindowModule()->GetWidth();
+    int height                       = App->GetWindowModule()->GetHeight();
 
-    camera.verticalFov       = 2.0f * atanf(tanf(camera.horizontalFov * 0.5f) * ((float)height / (float)width));
+    camera.verticalFov               = 2.0f * atanf(tanf(camera.horizontalFov * 0.5f) * ((float)height / (float)width));
 
-    viewMatrix               = camera.ViewMatrix();
-    projectionMatrix         = camera.ProjectionMatrix();
+    viewMatrix                       = camera.ViewMatrix();
+    projectionMatrix                 = camera.ProjectionMatrix();
 
     detachedCamera.type              = FrustumType::PerspectiveFrustum;
 
@@ -60,6 +62,9 @@ bool CameraModule::Init()
     glBufferData(GL_UNIFORM_BUFFER, sizeof(CameraMatrices), nullptr, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
+    // REMOVE
+    lastCastedRay = LineSegment(float3::zero, float3::zero);
+
     return true;
 }
 
@@ -76,10 +81,12 @@ void CameraModule::UpdateUBO()
 
 update_status CameraModule::Update(float deltaTime)
 {
+    if (App->GetSceneModule()->GetSceneUID() == CONSTANT_EMPTY_UID) return UPDATE_CONTINUE;
+
     InputModule* inputModule     = App->GetInputModule();
     const KeyState* keyboard     = inputModule->GetKeyboard();
     const KeyState* mouseButtons = inputModule->GetMouseButtons();
-    const float2 mouseMotion     = inputModule->GetMouseMotion();
+    const float2& mouseMotion    = inputModule->GetMouseMotion();
 
     float finalCameraSpeed       = cameraMoveSpeed * deltaTime;
 
@@ -164,14 +171,44 @@ update_status CameraModule::Update(float deltaTime)
 
         FocusCamera();
     }
+    // Handle mouse picking
+    else if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_UP)
+    {
+        if (App->GetSceneModule()->IsSceneWindowFocused())
+        {
+            auto& windowPosition = App->GetSceneModule()->GetWindowPosition();
+            auto& windowSize     = App->GetSceneModule()->GetWindowSize();
+            auto& mousePos       = App->GetSceneModule()->GetMousePosition();
 
-    // Detach camera
+            float windowMinX     = std::get<0>(windowPosition);
+            float windowMaxX     = std::get<0>(windowPosition) + std::get<0>(windowSize);
+
+            float windowMinY     = std::get<1>(windowPosition);
+            float windowMaxY     = std::get<1>(windowPosition) + std::get<1>(windowSize);
+
+            float percentageX    = (std::get<0>(mousePos) - windowMinX) / (windowMaxX - windowMinX);
+            float percentageY    = (std::get<1>(mousePos) - windowMinY) / (windowMaxY - windowMinY);
+
+            float normalizedX    = Lerp(-1, 1, percentageX);
+            float normalizedY    = Lerp(1, -1, percentageY);
+
+            LineSegment ray;
+
+            if (isCameraDetached) ray = detachedCamera.UnProjectLineSegment(normalizedX, normalizedY);
+            else ray = camera.UnProjectLineSegment(normalizedX, normalizedY);
+            lastCastedRay = ray;
+        }
+    }
 
     viewMatrix         = camera.ViewMatrix();
     detachedViewMatrix = detachedCamera.ViewMatrix();
 
     frustumPlanes.UpdateFrustumPlanes(viewMatrix, projectionMatrix);
     UpdateUBO();
+
+    // REMOVE
+    std::vector<LineSegment> asd = {lastCastedRay};
+    App->GetDebugDrawModule()->RenderLines(asd, float3(0.f, 1.f, 0.f));
 
     return UPDATE_CONTINUE;
 }

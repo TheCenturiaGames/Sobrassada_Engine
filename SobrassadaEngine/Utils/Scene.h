@@ -4,6 +4,7 @@
 #include "LightsConfig.h"
 
 #include <map>
+#include <tuple>
 #include <unordered_map>
 
 class GameObject;
@@ -28,7 +29,6 @@ class Scene
     update_status RenderEditor(float deltaTime);
     void RenderScene();
     void RenderSelectedGameObjectUI();
-
 
     void RenderHierarchyUI(bool& hierarchyMenu);
 
@@ -55,8 +55,12 @@ class Scene
     void AddComponent(UID uid, Component* newComponent) { gameComponents.insert({uid, newComponent}); }
 
     LightsConfig* GetLightsConfig() { return lightsConfig; }
-    
+
     void UpdateSpatialDataStruct();
+    bool IsSceneWindowFocused() const { return isWindowFocused; };
+    const std::tuple<float, float>& GetWindowPosition() const { return sceneWindowPosition; };
+    const std::tuple<float, float>& GetWindowSize() const { return sceneWindowSize; };
+    const std::tuple<float, float>& GetMousePosition() const { return mousePosition; };
 
   private:
     void CreateSpatialDataStruct();
@@ -72,6 +76,12 @@ class Scene
     std::map<UID, Component*> gameComponents; // TODO Move components to individual gameObjects
     std::unordered_map<UID, GameObject*> gameObjectsContainer;
 
-    LightsConfig* lightsConfig = nullptr;
-    Octree* sceneOctree        = nullptr;
+    LightsConfig* lightsConfig                   = nullptr;
+    Octree* sceneOctree                          = nullptr;
+
+    // IMGUI WINDOW DATA
+    bool isWindowFocused                         = false;
+    std::tuple<float, float> sceneWindowPosition = std::make_tuple(0.f, 0.f);
+    std::tuple<float, float> sceneWindowSize     = std::make_tuple(0.f, 0.f);
+    std::tuple<float, float> mousePosition       = std::make_tuple(0.f, 0.f);
 };

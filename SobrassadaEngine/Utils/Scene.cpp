@@ -164,6 +164,9 @@ void Scene::RenderScene()
             "##SceneChild", ImVec2(0.f, 0.f), NULL, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar
         ))
     {
+        if (ImGui::IsWindowFocused(ImGuiFocusedFlags_DockHierarchy)) isWindowFocused = true;
+        else isWindowFocused = false;
+
         const auto& framebuffer = App->GetOpenGLModule()->GetFramebuffer();
 
         ImGui::SetCursorPos(ImVec2(0.f, 0.f));
@@ -188,6 +191,12 @@ void Scene::RenderScene()
             App->GetCameraModule()->SetAspectRatio(aspectRatio);
             framebuffer->Resize((int)windowSize.x, (int)windowSize.y);
         }
+
+        ImVec2 windowPosition     = ImGui::GetWindowPos();
+        ImVec2 imGuimousePosition = ImGui::GetMousePos();
+        sceneWindowPosition       = std::make_tuple(windowPosition.x, windowPosition.y);
+        sceneWindowSize           = std::make_tuple(width, height);
+        mousePosition             = std::make_tuple(imGuimousePosition.x, imGuimousePosition.y);
 
         ImGui::EndChild();
     }
