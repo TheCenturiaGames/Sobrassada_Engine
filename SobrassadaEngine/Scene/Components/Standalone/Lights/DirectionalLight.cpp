@@ -1,8 +1,10 @@
 #include "DirectionalLight.h"
+
 #include "Application.h"
 #include "DebugDrawModule.h"
-#include "Math/Quat.h"
 #include "SceneModule.h"
+
+#include "Math/Quat.h"
 #include "imgui.h"
 
 DirectionalLight::DirectionalLight(UID uid, UID uidParent, UID uidRoot, const Transform& parentGlobalTransform)

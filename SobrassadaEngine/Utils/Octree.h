@@ -4,7 +4,6 @@
 #include "Geometry/LineSegment.h"
 #include "Math/float3.h"
 #include "Math/float4.h"
-
 #include <vector>
 
 class GameObject;
@@ -34,7 +33,6 @@ class Octree
       public:
         OctreeNode() = default;
         OctreeNode(const AABB& currentArea, int capacity) : currentArea(currentArea), elementsCapacity(capacity) {};
-
         ~OctreeNode();
 
         void Subdivide();
@@ -63,6 +61,7 @@ class Octree
     bool InsertElement(GameObject* gameObject);
     void QueryElements(const AABB& area, std::vector<GameObject*>& foundElements) const;
     void QueryElements(const FrustumPlanes& cameraPlanes, std::vector<GameObject*>& foundElements) const;
+
     void GetDrawLines(std::vector<LineSegment>& drawLines, std::vector<LineSegment>& elementLines) const;
 
   private:
