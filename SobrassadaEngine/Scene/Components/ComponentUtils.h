@@ -22,14 +22,16 @@ enum ComponentType
     COMPONENT_MESH              = 2,
     COMPONENT_POINT_LIGHT       = 4,
     COMPONENT_SPOT_LIGHT        = 5,
-    COMPONENT_DIRECTIONAL_LIGHT = 6
+    COMPONENT_DIRECTIONAL_LIGHT = 6,
+    COMPONENT_CAMERA            = 7
 };
 
 static const std::map<std::string, ComponentType> standaloneComponents = {
     {"Mesh",              COMPONENT_MESH             },
     {"Point Light",       COMPONENT_POINT_LIGHT      },
     {"Spot Light",        COMPONENT_SPOT_LIGHT       },
-    {"Directional Light", COMPONENT_DIRECTIONAL_LIGHT}
+    {"Directional Light", COMPONENT_DIRECTIONAL_LIGHT},
+    {"Camera",            COMPONENT_CAMERA           }
 };
 
 class ComponentUtils
