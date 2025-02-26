@@ -346,6 +346,7 @@ void LightsConfig::RemovePointLight(UID pointUid)
 
     GLOG("Point lights size: %d. Buffer size: %d", pointLights.size(), bufferSize);
 }
+
 void LightsConfig::RemoveSpotLight(UID spotUid)
 {
     GLOG("Remove spot light with UID: %d", spotUid);
