@@ -20,7 +20,7 @@ public:
 
     AABB & TransformUpdated(const Transform &parentGlobalTransform) override;
 
-    virtual bool CreateComponent(ComponentType componentType);
+    virtual bool CreateComponent(ComponentType componentType, const int primitiveType = 0);
     
     void RenderComponentEditor();
     void RenderEditorComponentTree(UID selectedComponentUID) override;

@@ -283,7 +283,7 @@
     <ClCompile Include="Utils\EngineTimer.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="CubeMesh.cpp" />
+    <ClCompile Include="PrimitiveMesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -506,7 +506,7 @@
     <ClInclude Include="Utils\EngineTimer.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="CubeMesh.h" />
+    <ClInclude Include="PrimitiveMesh.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl">

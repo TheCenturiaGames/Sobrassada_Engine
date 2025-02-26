@@ -240,7 +240,66 @@ void EditorUIModule::MainMenu()
                 selectedGameObject->ComponentGlobalTransformUpdated();
 
                 RootComponent* root = newGameObject->GetRootComponent();
-                root->CreateComponent(COMPONENT_CUBE_MESH);
+                root->SetSelectedComponent(root->GetUID());
+                root->CreateComponent(COMPONENT_PRIMITIVE_MESH, 0);
+                App->GetSceneModule()->RegenerateTree();
+            }
+        }
+
+        if (ImGui::MenuItem("Sphere Mesh"))
+        {
+            GameObject* selectedGameObject = App->GetSceneModule()->GetSeletedGameObject();
+            if (selectedGameObject != nullptr)
+            {
+                GameObject* newGameObject = new GameObject(selectedGameObject->GetUID(), "Sphere Mesh GameObject");
+
+                selectedGameObject->AddChildren(newGameObject->GetUID());
+
+                App->GetSceneModule()->AddGameObject(newGameObject->GetUID(), newGameObject);
+                newGameObject->ComponentGlobalTransformUpdated();
+                selectedGameObject->ComponentGlobalTransformUpdated();
+
+                RootComponent* root = newGameObject->GetRootComponent();
+                root->SetSelectedComponent(root->GetUID());
+                root->CreateComponent(COMPONENT_PRIMITIVE_MESH, 1);
+            }
+        }
+
+        if (ImGui::MenuItem("Plane Mesh"))
+        {
+            GameObject* selectedGameObject = App->GetSceneModule()->GetSeletedGameObject();
+            if (selectedGameObject != nullptr)
+            {
+                GameObject* newGameObject = new GameObject(selectedGameObject->GetUID(), "Plane Mesh GameObject");
+
+                selectedGameObject->AddChildren(newGameObject->GetUID());
+
+                App->GetSceneModule()->AddGameObject(newGameObject->GetUID(), newGameObject);
+                newGameObject->ComponentGlobalTransformUpdated();
+                selectedGameObject->ComponentGlobalTransformUpdated();
+
+                RootComponent* root = newGameObject->GetRootComponent();
+                root->SetSelectedComponent(root->GetUID());
+                root->CreateComponent(COMPONENT_PRIMITIVE_MESH, 2);
+            }
+        }
+
+        if (ImGui::MenuItem("Cylinder Mesh"))
+        {
+            GameObject* selectedGameObject = App->GetSceneModule()->GetSeletedGameObject();
+            if (selectedGameObject != nullptr)
+            {
+                GameObject* newGameObject = new GameObject(selectedGameObject->GetUID(), "Cylinder Mesh GameObject");
+
+                selectedGameObject->AddChildren(newGameObject->GetUID());
+
+                App->GetSceneModule()->AddGameObject(newGameObject->GetUID(), newGameObject);
+                newGameObject->ComponentGlobalTransformUpdated();
+                selectedGameObject->ComponentGlobalTransformUpdated();
+
+                RootComponent* root = newGameObject->GetRootComponent();
+                root->SetSelectedComponent(root->GetUID());
+                root->CreateComponent(COMPONENT_PRIMITIVE_MESH, 3);
             }
         }
         ImGui::EndMenu();

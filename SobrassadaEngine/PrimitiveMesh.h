@@ -4,10 +4,10 @@
 #include "ResourceManagement/Resources/ResourceMaterial.h"
 #include "ResourceManagement/Resources/ResourceMesh.h"
 
-class CubeMesh : public Component
+class PrimitiveMesh : public Component
 {
   public:
-    CubeMesh(UID uid, UID uidParent, UID uidRoot, const Transform& parentGlobalTransform);
+    PrimitiveMesh(UID uid, UID uidParent, UID uidRoot, const Transform& parentGlobalTransform, const int primitiveType);
 
     void Update() override;
     void Render() override;

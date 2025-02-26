@@ -6,12 +6,12 @@
 #include "Standalone/Lights/PointLight.h"
 #include "Standalone/Lights/SpotLight.h"
 #include "Standalone/Lights/DirectionalLight.h"
-#include "CubeMesh.h"
+#include "PrimitiveMesh.h"
 
 #include <cstdint>
 
 Component *ComponentUtils::CreateEmptyComponent(
-    ComponentType type, UID uid, UID uidParent, UID uidRoot, const Transform &parentGlobalTransform
+    ComponentType type, UID uid, UID uidParent, UID uidRoot, const Transform &parentGlobalTransform, const int primitiveType
 )
 {
     switch (type)
@@ -28,10 +28,9 @@ Component *ComponentUtils::CreateEmptyComponent(
         return new SpotLight(uid, uidParent, uidRoot, parentGlobalTransform);
     case COMPONENT_DIRECTIONAL_LIGHT:
         return new DirectionalLight(uid, uidParent, uidRoot, parentGlobalTransform);
-    case COMPONENT_CUBE_MESH:
-        return new CubeMesh(uid, uidParent, uidRoot, parentGlobalTransform);
+    case COMPONENT_PRIMITIVE_MESH:
+        return new PrimitiveMesh(uid, uidParent, uidRoot, parentGlobalTransform, primitiveType);
     }
-
 
     return nullptr;
 }

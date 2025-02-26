@@ -12,6 +12,14 @@ namespace tinygltf
     struct Primitive;
 } // namespace tinygltf
 
+enum class PrimitiveType
+{
+    Cube,
+    Sphere,
+    Plane,
+    Cylinder
+};
+
 class ResourceMesh : public Resource
 {
   public:
@@ -29,6 +37,8 @@ class ResourceMesh : public Resource
     int GetIndexCount() const { return indexCount; }
 
     void Render(int program, float4x4& modelMatrix, unsigned int cameraUBO, ResourceMaterial* material);
+
+    void CreatePrimitive(PrimitiveType type);
 
     const AABB& GetAABB() const { return aabb; }
 

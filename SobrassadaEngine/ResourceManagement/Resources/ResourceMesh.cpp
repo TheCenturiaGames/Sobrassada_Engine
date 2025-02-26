@@ -32,8 +32,8 @@ void ResourceMesh::LoadData(
     unsigned int mode, const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices
 )
 {
-    this->mode = mode;
-    this->material = material;
+    this->mode              = mode;
+    this->material          = material;
     this->vertexCount       = static_cast<unsigned int>(vertices.size());
     this->indexCount        = static_cast<unsigned int>(indices.size());
     unsigned int bufferSize = sizeof(Vertex);
@@ -311,6 +311,132 @@ glVertexAttribPointer(
 }
 
     glBindVertexArray(0);*/
+}
+
+void ResourceMesh::CreatePrimitive(PrimitiveType type)
+{
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> indices;
+
+    float radius = 0.5f;
+    int slices   = 32;
+    int stacks   = 32;
+
+    switch (type)
+    {
+        case PrimitiveType::Cube:
+            vertices = {{{-0.5f, -0.5f, -0.5f}}, {{0.5f, -0.5f, -0.5f}}, {{0.5f, 0.5f, -0.5f}}, {{-0.5f, 0.5f, -0.5f}},
+
+                        {{-0.5f, -0.5f, 0.5f}},  {{0.5f, -0.5f, 0.5f}},  {{0.5f, 0.5f, 0.5f}},  {{-0.5f, 0.5f, 0.5f}}};
+
+            indices  = {0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4, 0, 1, 5, 5, 4, 0,
+                        2, 3, 7, 7, 6, 2, 1, 2, 6, 6, 5, 1, 3, 0, 4, 4, 7, 3};
+            break;
+
+        case PrimitiveType::Plane:
+            vertices = {{{-0.5f, 0.0f, -0.5f}}, {{0.5f, 0.0f, -0.5f}}, {{0.5f, 0.0f, 0.5f}}, {{-0.5f, 0.0f, 0.5f}}};
+            indices  = {0, 1, 2, 2, 3, 0};
+            break;
+
+        case PrimitiveType::Sphere:
+            radius = 0.5f;
+            slices   = 32;
+            stacks   = 32;
+            for (int stack = 0; stack <= stacks; ++stack)
+            {
+                float phi = 3.1415926535f * stack / stacks;
+                float y   = cos(phi);
+                float r   = sin(phi);
+
+                for (int slice = 0; slice <= slices; ++slice)
+                {
+                    float theta = 2.0f * 3.1415926535f * slice / slices;
+                    float x     = r * cos(theta);
+                    float z     = r * sin(theta);
+
+                    vertices.push_back({
+                        {x * radius, y * radius, z * radius}
+                    });
+                }
+            }
+
+            for (int stack = 0; stack < stacks; ++stack)
+            {
+                for (int slice = 0; slice < slices; ++slice)
+                {
+                    int first  = (stack * (slices + 1)) + slice;
+                    int second = first + slices + 1;
+
+                    indices.push_back(first);
+                    indices.push_back(second);
+                    indices.push_back(first + 1);
+
+                    indices.push_back(second);
+                    indices.push_back(second + 1);
+                    indices.push_back(first + 1);
+                }
+            }
+            break;
+        case PrimitiveType::Cylinder:
+        {
+            radius = 0.5f;
+            float height = 1.0f;
+            slices   = 32;
+            stacks   = 32;
+
+            vertices.push_back({
+                {0.0f, height * 0.5f, 0.0f},
+            });
+            vertices.push_back({
+                {0.0f, -height * 0.5f, 0.0f},
+            });
+
+            for (int i = 0; i <= slices; ++i)
+            {
+                float theta = 2.0f * 3.1415926535f * i / slices;
+                float x     = radius * cos(theta);
+                float z     = radius * sin(theta);
+
+                float3 normal = float3(x, 0.0f, z).Normalized();
+
+                vertices.push_back({
+                    {x, height * 0.5f, z},
+
+                });
+                vertices.push_back({
+                    {x, -height * 0.5f, z},
+                });
+            }
+
+            for (int i = 2; i < slices * 2 + 1; i += 2)
+            {
+                indices.push_back(0);
+                indices.push_back(i);
+                indices.push_back(i + 2);
+            }
+
+            for (int i = 3; i < slices * 2 + 2; i += 2)
+            {
+                indices.push_back(1);
+                indices.push_back(i + 2);
+                indices.push_back(i);
+            }
+
+            for (int i = 2; i < slices * 2 + 1; i += 2)
+            {
+                indices.push_back(i);
+                indices.push_back(i + 1);
+                indices.push_back(i + 3);
+
+                indices.push_back(i);
+                indices.push_back(i + 3);
+                indices.push_back(i + 2);
+            }
+            break;
+        }
+    }
+
+    LoadData(4, vertices, indices);
 }
 
 void ResourceMesh::Render(int program, float4x4& modelMatrix, unsigned int cameraUBO, ResourceMaterial* material)

@@ -196,12 +196,14 @@ void RootComponent::SetSelectedComponent(const UID componentUID)
     selectedUID = componentUID;
 }
 
-bool RootComponent::CreateComponent(const ComponentType componentType)
+bool RootComponent::CreateComponent(const ComponentType componentType, const int primitiveType)
 {
     // TODO Call library to create the component with an id instead
     Component* selectedComponent = App->GetSceneModule()->GetComponentByUID(selectedUID);
     if (selectedComponent != nullptr) {
-        Component* createdComponent = ComponentUtils::CreateEmptyComponent(componentType, LCG().IntFast(), selectedUID, uid, selectedComponent->GetGlobalTransform());
+        Component* createdComponent = ComponentUtils::CreateEmptyComponent(
+            componentType, LCG().IntFast(), selectedUID, uid, selectedComponent->GetGlobalTransform(), primitiveType
+        );
         if (createdComponent != nullptr)
         {
             App->GetSceneModule()->AddComponent(createdComponent->GetUID(), createdComponent);
