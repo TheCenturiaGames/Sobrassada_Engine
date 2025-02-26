@@ -13,7 +13,7 @@ class SpotLight : public LightComponent
 
     void Render() override;
     void RenderEditorInspector() override;
-    virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
+    void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
 
     float3 GetDirection() const { return direction; }
     float GetRange() const { return range; }

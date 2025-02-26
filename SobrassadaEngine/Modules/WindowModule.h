@@ -8,7 +8,7 @@ class WindowModule : public Module
 {
   public:
     WindowModule();
-    ~WindowModule();
+    ~WindowModule() override;
 
     bool Init() override;
     bool ShutDown() override;

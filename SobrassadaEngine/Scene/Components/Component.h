@@ -15,34 +15,29 @@ class Component : public AABBUpdatable
     Component(
         UID uid, UID uidParent, UID uidRoot, const char* initName, int type, const Transform& parentGlobalTransform
     );
-
     Component(const rapidjson::Value& initialState);
-
     ~Component() override;
 
-    virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
+    void PassAABBUpdateToParent() override;
+    void ComponentGlobalTransformUpdated() override {}
+    const Transform& GetGlobalTransform() const override { return globalTransform; }
+    const Transform& GetParentGlobalTransform() override;
 
     virtual void Update() = 0;
     virtual void Render();
+    virtual void RenderEditorInspector();
+    virtual void RenderEditorComponentTree(UID selectedComponentUID);
+    virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
 
     virtual bool AddChildComponent(UID componentUID);
     virtual bool RemoveChildComponent(UID componentUID);
     virtual bool DeleteChildComponent(UID componentUID);
 
-    virtual void RenderEditorInspector();
-    virtual void RenderEditorComponentTree(UID selectedComponentUID);
-
     virtual void OnTransformUpdate(const Transform& parentGlobalTransform);
     virtual AABB& TransformUpdated(const Transform& parentGlobalTransform);
 
-    const Transform& GetGlobalTransform() const override { return globalTransform; }
-    void PassAABBUpdateToParent() override;
-    void ComponentGlobalTransformUpdated() override {}
-    const Transform& GetParentGlobalTransform() override;
-
     void HandleDragNDrop();
-
-    void SetUIDParent(UID newUIDParent);
+    void CalculateLocalAABB();
 
     UID GetUID() const { return uid; }
     UID GetUIDParent() const { return uidParent; }
@@ -51,7 +46,7 @@ class Component : public AABBUpdatable
     const AABB& GetGlobalAABB() const { return globalComponentAABB; }
     int GetType() const { return type; }
 
-    void CalculateLocalAABB();
+    void SetUIDParent(UID newUIDParent);
 
   protected:
     RootComponent* GetRootComponent();

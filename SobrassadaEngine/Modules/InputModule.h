@@ -22,11 +22,11 @@ class InputModule : public Module
 {
   public:
     InputModule();
-    ~InputModule();
+    ~InputModule() override;
 
     bool Init() override;
     update_status PreUpdate(float deltaTime) override;
-    bool ShutDown();
+    bool ShutDown() override;
 
     void SubscribeToEvent(int keyEvent, const std::function<void(void)>& functionCallback);
 

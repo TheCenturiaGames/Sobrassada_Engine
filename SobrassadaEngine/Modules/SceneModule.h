@@ -4,8 +4,7 @@
 #include "LightsConfig.h"
 #include "Module.h"
 #include "Scene/AABBUpdatable.h"
-
-// TMP
+//TMP
 #include "Application.h"
 #include "CameraModule.h"
 #include "DebugDrawModule.h"

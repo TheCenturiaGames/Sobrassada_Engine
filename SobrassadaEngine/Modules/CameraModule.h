@@ -23,7 +23,7 @@ class CameraModule : public Module
 {
   public:
     CameraModule();
-    ~CameraModule();
+    ~CameraModule() override;
 
     bool Init() override;
     update_status Update(float deltaTime) override;

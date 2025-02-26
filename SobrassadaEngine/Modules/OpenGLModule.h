@@ -8,7 +8,7 @@ class OpenGLModule : public Module
 {
   public:
     OpenGLModule();
-    ~OpenGLModule();
+    ~OpenGLModule() override;
 
     bool Init() override;
     update_status PreUpdate(float deltaTime) override;

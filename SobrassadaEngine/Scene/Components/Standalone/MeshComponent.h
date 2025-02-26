@@ -17,8 +17,7 @@ class MeshComponent : public Component
     void Update() override;
     void Render() override;
     void RenderEditorInspector() override;
-
-    virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
+    void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
 
   private:
     void AddMesh(UID resource, bool reloadAABB = true);

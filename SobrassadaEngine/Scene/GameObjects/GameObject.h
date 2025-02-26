@@ -18,7 +18,7 @@ class GameObject : public AABBUpdatable
     GameObject(UID parentUUID, std::string name);
     GameObject(UID parentUUID, std::string name, UID rootComponent);
     GameObject(const rapidjson::Value& initialState);
-    ~GameObject();
+    ~GameObject() override;
 
     void PassAABBUpdateToParent() override;
     void ComponentGlobalTransformUpdated() override;
