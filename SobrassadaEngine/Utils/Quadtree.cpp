@@ -20,7 +20,7 @@ Quadtree::~Quadtree()
     delete rootNode;
 }
 
-bool Quadtree::InsertElement(const GameObject* gameObject)
+bool Quadtree::InsertElement(GameObject* gameObject)
 {
     if (gameObject == nullptr) return false;
 
@@ -40,7 +40,7 @@ bool Quadtree::InsertElement(const GameObject* gameObject)
         {
             if (currentNode->IsLeaf())
             {
-                if (currentNode->currentArea.Size().x <= MinimumLeafSize)
+                if (currentNode->currentArea.Size().x <= MINIMUM_TREE_LEAF_SIZE)
                 {
                     currentNode->elements.push_back(quadtreeElement);
                     inserted = true;

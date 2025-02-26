@@ -9,9 +9,6 @@
 #include <vector>
 
 class GameObject;
-class FrustumPlanes;
-
-constexpr float MinimumLeafSize = 1;
 
 class Octree
 {

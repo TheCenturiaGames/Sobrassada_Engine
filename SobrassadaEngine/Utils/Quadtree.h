@@ -11,8 +11,6 @@
 
 class GameObject;
 
-constexpr int MinimumLeafSize = 2;
-
 class Quadtree
 {
   private:
@@ -20,9 +18,9 @@ class Quadtree
     {
         size_t id = -1;
         AABB boundingBox;
-        const GameObject* gameObject = nullptr;
+        GameObject* gameObject = nullptr;
 
-        QuadtreeElement(const AABB& boundingBox, const GameObject* gameObject, size_t id)
+        QuadtreeElement(const AABB& boundingBox, GameObject* gameObject, size_t id)
             : boundingBox(boundingBox), gameObject(gameObject), id(id) {};
 
         bool operator==(const QuadtreeElement& otherElement) const { return id == otherElement.id; }
@@ -57,11 +55,11 @@ class Quadtree
     Quadtree(const float3& position, float size, int capacity);
     ~Quadtree();
 
-    bool InsertElement(const GameObject* newElement);
+    bool InsertElement(GameObject* newElement);
     void GetDrawLines(std::vector<LineSegment>& drawLines, std::vector<LineSegment>& elementLines) const;
 
     template <typename AreaType>
-    void QueryElements(const AreaType& queryObject, std::vector<const GameObject*>& foundElements) const;
+    void QueryElements(const AreaType& queryObject, std::vector<GameObject*>& foundElements) const;
 
   private:
     QuadtreeNode* rootNode;
@@ -71,10 +69,9 @@ class Quadtree
 };
 
 template <typename AreaType>
-inline void Quadtree::QueryElements(const AreaType& queryObject, std::vector<const GameObject*>& foundElements) const
+inline void Quadtree::QueryElements(const AreaType& queryObject, std::vector<GameObject*>& foundElements) const
 {
     std::vector<bool> insertedElements = std::vector<bool>(totalElements, false);
-    AABB area                          = AABB(area.minPoint.xz(), area.maxPoint.xz());
 
     std::stack<const QuadtreeNode*> nodesToVisit;
     nodesToVisit.push(rootNode);
