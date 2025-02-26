@@ -12,53 +12,43 @@
 class Component : public AABBUpdatable
 {
   public:
-    Component(UID uid, UID uidParent, UID uidRoot, const char *initName, int type, const Transform &parentGlobalTransform);
-
-    Component(const rapidjson::Value &initialState);
-
+    Component(
+        UID uid, UID uidParent, UID uidRoot, const char* initName, int type, const Transform& parentGlobalTransform
+    );
+    Component(const rapidjson::Value& initialState);
     ~Component() override;
 
-    virtual void Save(rapidjson::Value &targetState, rapidjson::Document::AllocatorType &allocator) const;
+    void PassAABBUpdateToParent() override;
+    void ComponentGlobalTransformUpdated() override {}
+    const Transform& GetGlobalTransform() const override { return globalTransform; }
+    const Transform& GetParentGlobalTransform() override;
 
     virtual void Update() = 0;
     virtual void Render();
+    virtual void RenderEditorInspector();
+    virtual void RenderEditorComponentTree(UID selectedComponentUID);
+    virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
 
     virtual bool AddChildComponent(UID componentUID);
     virtual bool RemoveChildComponent(UID componentUID);
     virtual bool DeleteChildComponent(UID componentUID);
 
-    virtual void RenderEditorInspector();
-    virtual void RenderEditorComponentTree(UID selectedComponentUID);
-
-    virtual void OnTransformUpdate(const Transform &parentGlobalTransform);
-    virtual AABB &TransformUpdated(const Transform &parentGlobalTransform);
-    void PassAABBUpdateToParent() override;
-
-    void ComponentGlobalTransformUpdated() override {}
-
-    const Transform& GetParentGlobalTransform() override;
+    virtual void OnTransformUpdate(const Transform& parentGlobalTransform);
+    virtual AABB& TransformUpdated(const Transform& parentGlobalTransform);
 
     void HandleDragNDrop();
+    void CalculateLocalAABB();
 
     UID GetUID() const { return uid; }
-
     UID GetUIDParent() const { return uidParent; }
-
-    const std::vector<UID> &GetChildren() const { return children; }
+    const std::vector<UID>& GetChildren() const { return children; }
+    const Transform& GetLocalTransform() const { return localTransform; }
+    const AABB& GetGlobalAABB() const { return globalComponentAABB; }
+    int GetType() const { return type; }
 
     void SetUIDParent(UID newUIDParent);
 
-    const Transform &GetGlobalTransform() const override { return globalTransform; }
-    const Transform &GetLocalTransform() const { return localTransform; }
-
-    const AABB &GetGlobalAABB() const { return globalComponentAABB; }
-
-    void CalculateLocalAABB();
-
-    int GetType() const { return type; }
-
   protected:
-
     RootComponent* GetRootComponent();
     AABBUpdatable* GetParent();
     std::vector<Component*>& GetChildComponents();
@@ -80,9 +70,8 @@ class Component : public AABBUpdatable
 
     const int type = COMPONENT_NONE;
 
-private:
-    
+  private:
     RootComponent* rootComponent = nullptr;
-    AABBUpdatable* parent = nullptr;
+    AABBUpdatable* parent        = nullptr;
     std::vector<Component*> childComponents;
 };

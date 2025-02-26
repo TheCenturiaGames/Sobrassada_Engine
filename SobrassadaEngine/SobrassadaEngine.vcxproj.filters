@@ -16,137 +16,128 @@
     <ClCompile Include="Modules\ShaderModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
-    <ClCompile Include="UI\EditorUIModule.cpp">
-      <Filter>Modules</Filter>
-    </ClCompile>
     <ClCompile Include="Modules\OpenGLModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
     <ClCompile Include="Libs\ImGui\imgui.cpp">
-      <Filter>ImGui</Filter>
+      <Filter>External\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="Libs\ImGui\imgui_demo.cpp">
-      <Filter>ImGui</Filter>
+      <Filter>External\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="Libs\ImGui\imgui_draw.cpp">
-      <Filter>ImGui</Filter>
+      <Filter>External\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="Libs\ImGui\imgui_impl_opengl3.cpp">
-      <Filter>ImGui</Filter>
+      <Filter>External\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="Libs\ImGui\imgui_impl_sdl2.cpp">
-      <Filter>ImGui</Filter>
+      <Filter>External\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="Libs\ImGui\imgui_tables.cpp">
-      <Filter>ImGui</Filter>
+      <Filter>External\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="Libs\ImGui\imgui_widgets.cpp">
-      <Filter>ImGui</Filter>
+      <Filter>External\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Geometry\AABB.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Math\BitOps.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Geometry\Capsule.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Geometry\Circle.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Time\Clock.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Geometry\Cone.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Geometry\Cylinder.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Math\float2.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Math\float3.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Math\float3x3.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Math\float3x4.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Math\float4.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Math\float4x4.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Geometry\Frustum.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Algorithm\Random\LCG.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Geometry\Line.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Geometry\LineSegment.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Math\MathFunc.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Math\MathLog.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Math\MathOps.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Geometry\OBB.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Geometry\Plane.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Geometry\Polygon.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Geometry\Polyhedron.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Math\Polynomial.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Math\Quat.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Geometry\Ray.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Geometry\Sphere.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Math\SSEMath.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Math\TransformOps.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Geometry\Triangle.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Libs\MathGeoLib\include\Geometry\TriangleMesh.cpp">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Modules\DebugDrawModule.cpp">
-      <Filter>Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Tests\CameraModule.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
     <ClCompile Include="Utils\Framebuffer.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
@@ -202,7 +193,7 @@
       <Filter>Resources</Filter>
     </ClCompile>
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp">
-      <Filter>ImGuizmo</Filter>
+      <Filter>External\ImGuizmo</Filter>
     </ClCompile>
     <ClCompile Include="ResourceManagement\Resources\Resource.cpp">
       <Filter>Resources</Filter>
@@ -261,7 +252,6 @@
     <ClCompile Include="Utils\FrustumPlanes.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Utils\Transform.cpp" />
     <ClCompile Include="Modules\ResourcesModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
@@ -270,6 +260,18 @@
     </ClCompile>
     <ClCompile Include="Utils\EngineTimer.cpp">
       <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\Transform.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\DebugDrawModule.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\CameraModule.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\EditorUIModule.cpp">
+      <Filter>Modules</Filter>
     </ClCompile>
     <ClCompile Include="RaycastController.cpp">
       <Filter>Utils</Filter>
@@ -281,15 +283,6 @@
     </Filter>
     <Filter Include="Utils">
       <UniqueIdentifier>{2cd12f8e-4d83-4137-a3bb-33b6ec3804a8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ImGui">
-      <UniqueIdentifier>{add34c0e-22b7-4156-b4ab-74923f0775f1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MathGeoLib">
-      <UniqueIdentifier>{77ec05ef-e581-4de2-bda3-50c6c7bcc0d2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Debug">
-      <UniqueIdentifier>{b890b5cb-22e9-4094-8b54-814ae6ff1684}</UniqueIdentifier>
     </Filter>
     <Filter Include="Tests">
       <UniqueIdentifier>{27fbe6cb-da01-4a99-989c-de397f7946c3}</UniqueIdentifier>
@@ -306,17 +299,26 @@
     <Filter Include="Scene\GameObjects">
       <UniqueIdentifier>{ba55c87b-9ef3-442f-a67f-7017601a591f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ImGuizmo">
-      <UniqueIdentifier>{557b3855-2c1e-41d1-b6ab-ecab1faac98c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="FileSystem">
       <UniqueIdentifier>{71717f5e-3c10-4a82-a6fa-814368871f96}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Component">
-      <UniqueIdentifier>{4703276c-c78f-40d2-95ff-988860911c40}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resources">
       <UniqueIdentifier>{d7c688e0-aa2a-4d05-b818-bca402d54e0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External">
+      <UniqueIdentifier>{e5f96ce0-35af-48d5-aa32-bc195a6551cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\ImGui">
+      <UniqueIdentifier>{add34c0e-22b7-4156-b4ab-74923f0775f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\ImGuizmo">
+      <UniqueIdentifier>{557b3855-2c1e-41d1-b6ab-ecab1faac98c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\Debug">
+      <UniqueIdentifier>{b890b5cb-22e9-4094-8b54-814ae6ff1684}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\MathGeoLib">
+      <UniqueIdentifier>{77ec05ef-e581-4de2-bda3-50c6c7bcc0d2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -338,51 +340,42 @@
     <ClInclude Include="Modules\ShaderModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
-    <ClInclude Include="UI\EditorUIModule.h">
-      <Filter>Modules</Filter>
-    </ClInclude>
     <ClInclude Include="Modules\OpenGLModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
     <ClInclude Include="Libs\ImGui\imconfig.h">
-      <Filter>ImGui</Filter>
+      <Filter>External\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="Libs\ImGui\imgui.h">
-      <Filter>ImGui</Filter>
+      <Filter>External\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="Libs\ImGui\imgui_impl_opengl3.h">
-      <Filter>ImGui</Filter>
+      <Filter>External\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="Libs\ImGui\imgui_impl_opengl3_loader.h">
-      <Filter>ImGui</Filter>
+      <Filter>External\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="Libs\ImGui\imgui_impl_sdl2.h">
-      <Filter>ImGui</Filter>
+      <Filter>External\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="Libs\ImGui\imgui_internal.h">
-      <Filter>ImGui</Filter>
+      <Filter>External\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="Libs\ImGui\imstb_rectpack.h">
-      <Filter>ImGui</Filter>
+      <Filter>External\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="Libs\ImGui\imstb_textedit.h">
-      <Filter>ImGui</Filter>
+      <Filter>External\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="Libs\ImGui\imstb_truetype.h">
-      <Filter>ImGui</Filter>
+      <Filter>External\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="Application.h" />
     <ClInclude Include="DebugDraw\debugdraw.h">
-      <Filter>Debug</Filter>
+      <Filter>External\Debug</Filter>
     </ClInclude>
     <ClInclude Include="DebugDraw\debug_draw.hpp">
-      <Filter>Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="Modules\DebugDrawModule.h">
-      <Filter>Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="Tests\CameraModule.h">
-      <Filter>Tests</Filter>
+      <Filter>External\Debug</Filter>
     </ClInclude>
     <ClInclude Include="Utils\Framebuffer.h">
       <Filter>Utils</Filter>
@@ -402,10 +395,10 @@
     <ClInclude Include="FileSystem\MaterialImporter.h">
       <Filter>FileSystem</Filter>
     </ClInclude>
-    <ClInclude Include="Material.h">
+    <ClInclude Include="FileSystem\Material.h">
       <Filter>FileSystem</Filter>
     </ClInclude>
-    <ClInclude Include="Mesh.h">
+    <ClInclude Include="FileSystem\Mesh.h">
       <Filter>FileSystem</Filter>
     </ClInclude>
     <ClInclude Include="Modules\LibraryModule.h">
@@ -420,13 +413,9 @@
     <ClInclude Include="Scene\GameObjects\GameObject.h">
       <Filter>Scene\GameObjects</Filter>
     </ClInclude>
-    <ClInclude Include="Utils\BoundingBox.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Modules\SceneModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\AABBUpdatable.h" />
     <ClInclude Include="Scene\Components\Root\RootComponent.h">
       <Filter>Scene\Components</Filter>
     </ClInclude>
@@ -446,7 +435,7 @@
       <Filter>Resources</Filter>
     </ClInclude>
     <ClInclude Include="Libs\ImGuizmo\ImGuizmo.h">
-      <Filter>ImGuizmo</Filter>
+      <Filter>External\ImGuizmo</Filter>
     </ClInclude>
     <ClInclude Include="ResourceManagement\Resources\Resource.h">
       <Filter>Resources</Filter>
@@ -490,13 +479,27 @@
     <ClInclude Include="Utils\EngineTimer.h">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="Scene\AABBUpdatable.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\DebugDrawModule.h">
+      <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\CameraModule.h">
+      <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\EditorUIModule.h">
+      <Filter>Modules</Filter>
+    </ClInclude>
+      <Filter>Utils</Filter>
+    </ClInclude>
     <ClInclude Include="RaycastController.h">
       <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl">
-      <Filter>MathGeoLib</Filter>
+      <Filter>External\MathGeoLib</Filter>
     </None>
     <None Include=".clang-format" />
   </ItemGroup>

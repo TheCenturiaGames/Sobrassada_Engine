@@ -32,7 +32,6 @@ class Octree
       public:
         OctreeNode() = default;
         OctreeNode(const AABB& currentArea, int capacity) : currentArea(currentArea), elementsCapacity(capacity) {};
-
         ~OctreeNode();
 
         void Subdivide();

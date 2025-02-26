@@ -1,6 +1,7 @@
 #include "EditorUIModule.h"
 
 #include "Application.h"
+#include "Component.h"
 #include "FileSystem.h"
 #include "GameTimer.h"
 #include "InputModule.h"
@@ -10,17 +11,13 @@
 #include "SceneModule.h"
 #include "WindowModule.h"
 
-#include "Component.h"
-
 #include "glew.h"
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl2.h"
-#include <string>
-
 #include <cstring>
 #include <filesystem>
-
+#include <string>
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_EXTERNAL_IMAGE
@@ -167,7 +164,7 @@ void EditorUIModule::MainMenu()
 {
     ImGui::BeginMainMenuBar();
 
-    // File menu
+    // File tab menu
     if (ImGui::BeginMenu("File"))
     {
         if (ImGui::MenuItem("Create", "")) App->GetSceneModule()->CreateScene();
@@ -191,7 +188,7 @@ void EditorUIModule::MainMenu()
         ImGui::EndMenu();
     }
 
-    // Windows menu
+    // Windows tab menu
     if (ImGui::BeginMenu("Window"))
     {
         if (ImGui::MenuItem("Console", "", consoleMenu)) consoleMenu = !consoleMenu;
@@ -231,7 +228,7 @@ void EditorUIModule::LoadDialog(bool& load)
 
     if (FileSystem::Exists(libraryPath.c_str()))
     {
-        // Only scenes for now
+        // Only scenes library folder for now
         if (ImGui::TreeNode("Scenes/"))
         {
             GetFilesSorted(libraryPath, files);
