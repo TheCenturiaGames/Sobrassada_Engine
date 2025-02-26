@@ -7,7 +7,7 @@
 #include "ImGui.h"
 #include "Math/Quat.h"
 
-SpotLight::SpotLight(UID uid, UID uidParent, UID uidRoot, const Transform& parentGlobalTransform)
+SpotLightComponent::SpotLightComponent(UID uid, UID uidParent, UID uidRoot, const Transform& parentGlobalTransform)
     : LightComponent(uid, uidParent, uidRoot, "Spot Light", COMPONENT_SPOT_LIGHT, parentGlobalTransform)
 {
     range                      = 3;
@@ -116,7 +116,7 @@ void SpotLightComponent::Render()
     debug->DrawCircle(center, -direction, float3(1, 1, 1), outerCathetus);
 }
 
-float3 SpotLight::GetDirection() const
+float3 SpotLightComponent::GetDirection() const
 {
     return (float4x4::FromQuat(
                 Quat::FromEulerXYZ(globalTransform.rotation.x, globalTransform.rotation.y, globalTransform.rotation.z)

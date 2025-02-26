@@ -41,7 +41,7 @@ void DirectionalLightComponent::Render()
     debug->DrawLine(globalTransform.position, (rot.RotatePart() * -float3::unitY).Normalized(), 2, float3(1, 1, 1));
 }
 
-float3 DirectionalLight::GetDirection() const
+float3 DirectionalLightComponent::GetDirection() const
 {
     return (float4x4::FromQuat(
                 Quat::FromEulerXYZ(globalTransform.rotation.x, globalTransform.rotation.y, globalTransform.rotation.z)
