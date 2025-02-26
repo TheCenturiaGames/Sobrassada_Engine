@@ -9,6 +9,8 @@ struct Vertex
 {
     float3 position;
     float4 tangent;
+    unsigned int joint[4];
+    float4 weights;
     float3 normal;
     float2 texCoord;
 };
