@@ -8,10 +8,9 @@
 #include "Math/Quat.h"
 #include "Math/float4x4.h"
 
-constexpr float DEGTORAD             = PI / 180.f;
-constexpr float cameraRotationAngle  = 135.f * DEGTORAD;
-constexpr float maximumPositivePitch = 89.f * DEGTORAD;
-constexpr float maximumNegativePitch = -89.f * DEGTORAD;
+constexpr float cameraRotationAngle  = 135.f / RAD_DEGREE_CONV;
+constexpr float maximumPositivePitch = 89.f / RAD_DEGREE_CONV;
+constexpr float maximumNegativePitch = -89.f / RAD_DEGREE_CONV;
 
 struct CameraMatrices
 {
