@@ -4,6 +4,8 @@
 #include "Quadtree.h"
 #include "GameObject.h"
 
+#include "Math/float4x4.h"
+#include "Math/Quat.h"
 #include <map>
 
 void RaycastController::GetRayIntersections(const LineSegment& ray, const Octree* octree, std::vector<GameObject*>& outGameObjects)
@@ -26,7 +28,16 @@ void RaycastController::GetRayIntersections(const LineSegment& ray, const Octree
         }
     }
 
-    int x = 0;
+    for (const auto& pair : sortedGameObjects)
+    {
+        LineSegment localRay(ray.a, ray.b);
+        
+        Transform globalTransform = pair.second->GetGlobalTransform();
+        Quat rotator      = Quat(globalTransform.rotation.x, globalTransform.rotation.y, globalTransform.rotation.z, 1);
+        float4x4 modelMat = float4x4::FromTRS(globalTransform.position, rotator, globalTransform.scale);
+        localRay.Transform(modelMat);
+        
+    }
 }
 
 void RaycastController::GetRayIntersections(
