@@ -65,6 +65,8 @@ class EditorUIModule : public Module
     void Console(bool& consoleMenu) const;
     void About(bool& aboutMenu) const;
 
+    void LoadModelDialog(bool& loadModel);
+
   public:
     bool hierarchyMenu = true;
     bool inspectorMenu = true;
