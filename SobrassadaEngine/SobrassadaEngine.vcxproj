@@ -587,7 +587,6 @@
     <ClInclude Include="DebugDraw\debugdraw.h" />
     <ClInclude Include="Modules\DebugDrawModule.h" />
     <ClInclude Include="DebugDraw\debug_draw.hpp" />
-    <ClInclude Include="UI\EditorUIModule.h" />
     <ClInclude Include="Utils\Globals.h" />
     <ClInclude Include="Modules\InputModule.h" />
     <ClInclude Include="Libs\ImGui\imconfig.h" />

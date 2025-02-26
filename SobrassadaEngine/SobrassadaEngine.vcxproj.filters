@@ -349,9 +349,6 @@
     <ClInclude Include="Modules\ShaderModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
-    <ClInclude Include="UI\EditorUIModule.h">
-      <Filter>Modules</Filter>
-    </ClInclude>
     <ClInclude Include="Modules\OpenGLModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
