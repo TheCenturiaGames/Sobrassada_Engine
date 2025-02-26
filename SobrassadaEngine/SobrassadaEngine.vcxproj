@@ -584,7 +584,6 @@
     <ClInclude Include="Scene\Components\ComponentUtils.h" />
     <ClInclude Include="Scene\GameObjects\GameObject.h" />
     <ClInclude Include="Utils\Framebuffer.h" />
-    <ClInclude Include="Tests\CameraModule.h" />
     <ClInclude Include="DebugDraw\debugdraw.h" />
     <ClInclude Include="Modules\DebugDrawModule.h" />
     <ClInclude Include="DebugDraw\debug_draw.hpp" />
