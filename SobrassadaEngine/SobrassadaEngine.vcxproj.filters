@@ -225,14 +225,8 @@
     <ClCompile Include="Utils\LightsConfig.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="UI\QuadtreeViewer.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
     <ClCompile Include="Utils\Quadtree.cpp">
       <Filter>Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="Tests\MockGameObject.cpp">
-      <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="Utils\Octree.cpp">
       <Filter>Utils</Filter>
@@ -275,6 +269,9 @@
       <Filter>FileSystem</Filter>
     </ClCompile>
     <ClCompile Include="Utils\EngineTimer.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="RaycastController.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
   </ItemGroup>
@@ -491,6 +488,9 @@
       <Filter>Modules</Filter>
     </ClInclude>
     <ClInclude Include="Utils\EngineTimer.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="RaycastController.h">
       <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>

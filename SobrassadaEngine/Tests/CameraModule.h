@@ -77,6 +77,5 @@ class CameraModule : public Module
 
     unsigned int ubo;
 
-    // REMOVE
     LineSegment lastCastedRay;
 };
