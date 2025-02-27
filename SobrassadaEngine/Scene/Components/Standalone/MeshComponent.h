@@ -19,6 +19,8 @@ class MeshComponent : public Component
     void RenderEditorInspector() override;
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
 
+    const ResourceMesh* GetResourceMesh() const { return currentMesh; }
+
   private:
     void AddMesh(UID resource, bool reloadAABB = true);
     void AddMaterial(UID resource);
