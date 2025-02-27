@@ -12,8 +12,8 @@
 ResourceMesh::ResourceMesh(UID uid, const std::string& name, const float3& maxPos, const float3& minPos, const float4x4& transform)
     : Resource(uid, name, ResourceType::Mesh)
 {
-    aabb.maxPoint = maxPos;
-    aabb.minPoint = minPos;
+    aabb.maxPoint = transform.MulPos(maxPos);
+    aabb.minPoint = transform.MulPos(minPos);
 }
 
 ResourceMesh::~ResourceMesh()
