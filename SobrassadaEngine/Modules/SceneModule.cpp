@@ -3,6 +3,7 @@
 #include "CameraModule.h"
 #include "ComponentUtils.h"
 #include "EditorUIModule.h"
+#include "FileSystem.h"
 #include "FrustumPlanes.h"
 #include "GameObject.h"
 #include "LibraryModule.h"
@@ -78,7 +79,7 @@ void SceneModule::CreateScene()
 {
     CloseScene();
 
-    GameObject* sceneGameObject = new GameObject("SceneModule GameObject");
+    GameObject* sceneGameObject = new GameObject("New Scene");
 
     loadedScene                 = new Scene(GenerateUID(), "New Scene", sceneGameObject->GetUID());
 
@@ -89,8 +90,6 @@ void SceneModule::CreateScene()
     loadedScene->LoadGameObjects(loadedGameObjects);
 
     sceneGameObject->CreateRootComponent();
-
-    // TODO Filesystem: Save this new created level immediatelly
 }
 
 void SceneModule::LoadScene(
@@ -113,26 +112,20 @@ void SceneModule::CloseScene()
     loadedScene = nullptr;
 }
 
-void SceneModule::SwitchPlayModeStateTo(bool wantedStatePlayMode)
+void SceneModule::SwitchPlayMode(bool play)
 {
-    if (wantedStatePlayMode == bInPlayMode) return;
+    if (play == isPlayMode || loadedScene == nullptr) return;
 
-    if (bInPlayMode)
+    if (isPlayMode)
     {
-        if (loadedScene != nullptr)
-        {
-            App->GetLibraryModule()->LoadScene(
-                std::string(SCENES_PATH + std::string(loadedScene->GetSceneName()) + SCENE_EXTENSION).c_str(), true
-            );
-            bInPlayMode = false;
-        }
+        std::string tmpScene = std::to_string(loadedScene->GetSceneUID()) + SCENE_EXTENSION;
+        App->GetLibraryModule()->LoadScene(tmpScene.c_str(), true);
+        FileSystem::Delete((SCENES_PATH + tmpScene).c_str());
+        isPlayMode = false;
     }
     else
     {
-        if (loadedScene != nullptr)
-        {
-            loadedScene->Save();
-            bInPlayMode = true;
-        }
+        App->GetLibraryModule()->SaveScene("", SaveMode::SavePlayMode);
+        isPlayMode = true;
     }
 }

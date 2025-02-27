@@ -9,7 +9,8 @@
 enum class SaveMode
 {
     Save,
-    SaveAs
+    SaveAs,
+    SavePlayMode
 };
 
 class LibraryModule : public Module
@@ -22,7 +23,7 @@ class LibraryModule : public Module
     bool Init() override;
 
     bool SaveScene(const char* path, SaveMode saveMode) const;
-    bool LoadScene(const char* path, bool reload = false) const;
+    bool LoadScene(const char* fileName, bool reload = false) const;
 
     bool LoadLibraryMaps();
     UID AssignFiletypeUID(UID originalUID, const std::string& filePath);

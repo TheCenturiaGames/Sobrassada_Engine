@@ -30,25 +30,39 @@ bool LibraryModule::Init()
     return true;
 }
 
-// Save = library/scenes/
-// SaveAs = all path + name.scene
+// Save         = Path: library/scenes/   | UID: sceneUID     | FileName: scene name
+// SaveAs       = Path: fileName          | UID: generate new | FileName: path filename
+// SavePlayMode = Path: sceneUID          | UID: sceneUID     | FileName: sceneUID
 bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
 {
     SceneModule* sceneModule = App->GetSceneModule();
-    if (sceneModule == nullptr)
+    if (sceneModule == nullptr || !sceneModule->IsSceneLoaded())
     {
-        GLOG("Scene module not found");
+        GLOG("Scene not found");
         return false;
     }
 
-    UID sceneUID = (saveMode == SaveMode::Save) ? sceneModule->GetSceneUID() : GenerateUID();
-    const std::string& sceneName =
-        (saveMode == SaveMode::Save) ? sceneModule->GetSceneName() : FileSystem::GetFileNameWithoutExtension(path);
+    UID sceneUID = CONSTANT_EMPTY_UID;
+    std::string sceneName;
+    switch (saveMode)
+    {
+    case SaveMode::Save:
+        sceneUID  = sceneModule->GetSceneUID();
+        sceneName = sceneModule->GetSceneName();
+        break;
+    case SaveMode::SaveAs:
+        sceneUID  = GenerateUID();
+        sceneName = std::string(path);
+        break;
+    case SaveMode::SavePlayMode:
+        sceneUID  = sceneModule->GetSceneUID();
+        sceneName = sceneModule->GetSceneName();
+        break;
+    }
 
-    if (sceneUID == 0 && saveMode == SaveMode::Save) return false;
+    if (sceneUID == CONSTANT_EMPTY_UID && saveMode == SaveMode::Save) return false;
 
     UID gameObjectRootUID   = sceneModule->GetGameObjectRootUID();
-
     const auto* gameObjects = sceneModule->GetAllGameObjects();
     const auto* components  = sceneModule->GetAllComponents();
 
@@ -71,7 +85,6 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
 
     // Serialize GameObjects
     rapidjson::Value gameObjectsJSON(rapidjson::kArrayType);
-
     for (auto it = gameObjects->begin(); it != gameObjects->end(); ++it)
     {
         if (it->second != nullptr)
@@ -83,13 +96,11 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
             gameObjectsJSON.PushBack(goJSON, allocator);
         }
     }
-
     // Add gameObjects to scene
     scene.AddMember("GameObjects", gameObjectsJSON, allocator);
 
     // Serialize Components
     rapidjson::Value componentsJSON(rapidjson::kArrayType);
-
     for (auto it = components->begin(); it != components->end(); ++it)
     {
         if (it->second != nullptr)
@@ -101,24 +112,25 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
             componentsJSON.PushBack(componentJSON, allocator);
         }
     }
-
     // Add components to scene
     scene.AddMember("Components", componentsJSON, allocator);
-
     doc.AddMember("Scene", scene, allocator);
 
     // Serialize Lights Config
     LightsConfig* lightConfig = App->GetSceneModule()->GetLightsConfig();
-
-     if (lightConfig != nullptr)
-     {
+    if (lightConfig != nullptr)
+    {
         rapidjson::Value lights(rapidjson::kObjectType);
 
         lightConfig->SaveData(lights, allocator);
 
         doc.AddMember("Lights Config", lights, allocator);
-
-     } else GLOG("Light Config not found");
+    }
+    else
+    {
+        GLOG("Light Config not found");
+        return false;
+    }
 
     // Save file like JSON
     rapidjson::StringBuffer buffer;
@@ -126,46 +138,35 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
     doc.Accept(writer);
 
     std::string sceneFilePath;
-    std::string fileName;
-
-    if (saveMode == SaveMode::Save)
-    {
-        sceneFilePath = std::string(path) + sceneName + SCENE_EXTENSION;
-        fileName      = sceneName;
-    }
-    else
-    {
-        fileName      = FileSystem::GetFileNameWithoutExtension(path);
-        sceneFilePath = FileSystem::GetFilePath(path) + fileName + SCENE_EXTENSION;
-    }
+    if (saveMode == SaveMode::SavePlayMode) sceneFilePath = SCENES_PATH + std::to_string(sceneUID) + SCENE_EXTENSION;
+    else sceneFilePath = SCENES_PATH + sceneName + SCENE_EXTENSION;
 
     unsigned int bytesWritten = (unsigned int
     )FileSystem::Save(sceneFilePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
     if (bytesWritten == 0)
     {
-        GLOG("Failed to save scene file: %s", path);
+        GLOG("Failed to save scene file: %s", sceneName.c_str());
         return false;
     }
 
-    GLOG("%s saved as scene", fileName.c_str());
-
+    GLOG("%s saved as scene", sceneName.c_str());
     return true;
 }
 
-bool LibraryModule::LoadScene(const char* path, bool reload) const
+bool LibraryModule::LoadScene(const char* file, bool reload) const
 {
     rapidjson::Document doc;
-    bool loaded = FileSystem::LoadJSON(path, doc);
+    bool loaded = FileSystem::LoadJSON((SCENES_PATH + std::string(file)).c_str(), doc);
 
     if (!loaded)
     {
-        GLOG("Failed to load scene file: %s", path);
+        GLOG("Failed to load scene file: %s", file);
         return false;
     }
 
     if (!doc.HasMember("Scene") || !doc["Scene"].IsObject())
     {
-        GLOG("Invalid scene format: %s", path);
+        GLOG("Invalid scene format: %s", file);
         return false;
     }
 
@@ -181,8 +182,6 @@ bool LibraryModule::LoadScene(const char* path, bool reload) const
         GLOG("Scene already loaded: %s", name.c_str());
         return false;
     }
-
-    App->GetSceneModule()->CloseScene();
 
     std::map<UID, Component*> loadedGameComponents;
     std::unordered_map<UID, GameObject*> loadedGameObjects;
@@ -226,7 +225,7 @@ bool LibraryModule::LoadScene(const char* path, bool reload) const
     // Deserialize Lights Config
     if (doc.HasMember("Lights Config") && doc["Lights Config"].IsObject())
     {
-        LightsConfig* lightConfig           = App->GetSceneModule()->GetLightsConfig();
+        LightsConfig* lightConfig = App->GetSceneModule()->GetLightsConfig();
         lightConfig->LoadData(doc["Lights Config"]);
     }
 

@@ -18,13 +18,14 @@ class Scene
     Scene(UID sceneUID, const char* sceneName, UID rootGameObject);
     ~Scene();
 
-    void Save() const;
     void LoadComponents(const std::map<UID, Component*>& loadedGameComponents);
     void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
 
     update_status Render(float deltaTime);
     update_status RenderEditor(float deltaTime);
+    void RenderEditorControl();
     void RenderScene();
+    void RenderGame();
     void RenderSelectedGameObjectUI();
     void RenderHierarchyUI(bool& hierarchyMenu);
 
@@ -37,16 +38,16 @@ class Scene
 
     const char* GetSceneName() const { return sceneName.c_str(); }
     UID GetSceneUID() const { return sceneUID; }
-    UID GetGameObjectRootUID() const { return gameObjectRootUUID; }
-    GameObject* GetSeletedGameObject() { return GetGameObjectByUUID(selectedGameObjectUUID); }
+    UID GetGameObjectRootUID() const { return gameObjectRootUID; }
+    GameObject* GetSelectedGameObject() { return GetGameObjectByUID(selectedGameObjectUID); }
 
     const std::unordered_map<UID, GameObject*>& GetAllGameObjects() const { return gameObjectsContainer; }
     const std::map<UID, Component*>& GetAllComponents() const { return gameComponents; }
 
-    GameObject* GetGameObjectByUUID(UID gameObjectUUID); // TODO: Change when filesystem defined
+    GameObject* GetGameObjectByUID(UID gameObjectUID); // TODO: Change when filesystem defined
     Component* GetComponentByUID(UID componentUID);
 
-    AABBUpdatable* GetTargetForAABBUpdate(UID uuid);
+    AABBUpdatable* GetTargetForAABBUpdate(UID uid);
     LightsConfig* GetLightsConfig() { return lightsConfig; }
 
   private:
@@ -54,10 +55,11 @@ class Scene
     void CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects) const;
 
   private:
+    bool stop = false;
     std::string sceneName;
     UID sceneUID;
-    UID gameObjectRootUUID;
-    UID selectedGameObjectUUID;
+    UID gameObjectRootUID;
+    UID selectedGameObjectUID;
 
     std::map<UID, Component*> gameComponents; // TODO Move components to individual gameObjects
     std::unordered_map<UID, GameObject*> gameObjectsContainer;

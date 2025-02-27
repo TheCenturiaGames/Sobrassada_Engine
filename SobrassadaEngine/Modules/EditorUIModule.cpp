@@ -94,7 +94,6 @@ update_status EditorUIModule::RenderEditor(float deltaTime)
 
 update_status EditorUIModule::PostUpdate(float deltaTime)
 {
-
     if (closeApplication) return UPDATE_STOP;
 
     return UPDATE_CONTINUE;
@@ -181,14 +180,9 @@ void EditorUIModule::MainMenu()
         if (ImGui::MenuItem("Load", "", load)) load = !load;
 
         if (ImGui::MenuItem("Save"))
-        {
-            if (!App->GetLibraryModule()->SaveScene(libraryPath.c_str(), SaveMode::Save))
-            {
-                save = !save;
-            }
-        }
+            if (!App->GetLibraryModule()->SaveScene(libraryPath.c_str(), SaveMode::Save)) save = !save;
 
-        if (ImGui::MenuItem("Save as")) save = !save;
+        if (ImGui::MenuItem("Save as", "", save)) save = !save;
 
         if (ImGui::MenuItem("Quit")) closeApplication = true;
 
@@ -268,8 +262,7 @@ void EditorUIModule::LoadDialog(bool& load)
     {
         if (!inputFile.empty())
         {
-            std::string loadPath = SCENES_PATH + inputFile;
-            App->GetLibraryModule()->LoadScene(loadPath.c_str());
+            App->GetLibraryModule()->LoadScene(inputFile.c_str());
         }
         inputFile = "";
         load      = false;
@@ -329,7 +322,7 @@ void EditorUIModule::SaveDialog(bool& save)
     {
         if (strlen(inputFile) > 0)
         {
-            std::string savePath = libraryPath + inputFile + SCENE_EXTENSION;
+            std::string savePath = inputFile;
             App->GetLibraryModule()->SaveScene(savePath.c_str(), SaveMode::SaveAs);
         }
         inputFile[0] = '\0';

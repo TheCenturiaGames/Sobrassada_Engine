@@ -159,7 +159,7 @@ void LightsConfig::EditorParams()
         const UID uid = LoadSkyboxTexture(App->GetEditorUIModule()->RenderResourceSelectDialog(
             CONSTANT_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetTextureMap()
         ));
-        if (uid != INVALID_UUID) skyboxTexture = static_cast<unsigned int>(uid);
+        if (uid != INVALID_UID) skyboxTexture = static_cast<unsigned int>(uid);
     }
 
     ImGui::SeparatorText("Ambient light");

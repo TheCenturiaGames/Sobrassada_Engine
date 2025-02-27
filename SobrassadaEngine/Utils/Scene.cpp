@@ -17,11 +17,11 @@
 #include "./Libs/ImGuizmo/ImGuizmo.h"
 
 Scene::Scene(UID sceneUID, const char* sceneName, UID rootGameObject)
-    : sceneUID(sceneUID), sceneName(std::string(sceneName)), gameObjectRootUUID(rootGameObject)
+    : sceneUID(sceneUID), sceneName(std::string(sceneName)), gameObjectRootUID(rootGameObject)
 {
-    selectedGameObjectUUID = gameObjectRootUUID;
+    selectedGameObjectUID = gameObjectRootUID;
 
-    lightsConfig           = new LightsConfig();
+    lightsConfig          = new LightsConfig();
 }
 
 Scene::~Scene()
@@ -45,18 +45,9 @@ Scene::~Scene()
     GLOG("%s scene closed", sceneName.c_str());
 }
 
-void Scene::Save() const
-{
-    if (!App->GetLibraryModule()->SaveScene(SCENES_PATH, SaveMode::Save))
-    {
-        GLOG("%s scene saving failed", sceneName.c_str());
-    }
-}
-
 void Scene::LoadComponents(const std::map<UID, Component*>& loadedGameComponents)
 {
     gameComponents.clear();
-    gameObjectsContainer.clear();
     gameComponents.insert(loadedGameComponents.begin(), loadedGameComponents.end());
 
     lightsConfig->InitSkybox();
@@ -68,7 +59,7 @@ void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGa
     gameObjectsContainer.clear();
     gameObjectsContainer.insert(loadedGameObjects.begin(), loadedGameObjects.end());
 
-    GameObject* root = GetGameObjectByUUID(gameObjectRootUUID);
+    GameObject* root = GetGameObjectByUID(gameObjectRootUID);
     if (root != nullptr)
     {
         GLOG("Init transform and AABB calculation");
@@ -99,102 +90,144 @@ update_status Scene::Render(float deltaTime)
 
 update_status Scene::RenderEditor(float deltaTime)
 {
+    stop = false;
+
+    RenderEditorControl();
     RenderScene();
+    RenderGame();
+
+    if (stop) return UPDATE_CONTINUE;
 
     RenderSelectedGameObjectUI();
-
     lightsConfig->EditorParams();
 
     return UPDATE_CONTINUE;
 }
 
-void Scene::RenderScene()
+void Scene::RenderEditorControl()
 {
-    if (!ImGui::Begin(sceneName.c_str()))
+    if (!ImGui::Begin("Editor Control"))
     {
         ImGui::End();
         return;
     }
 
-    if (ImGui::BeginChild("##SceneChildToolBar", ImVec2(0, 70)))
+    GameTimer* gameTimer = App->GetGameTimer();
+
+    float timeScale      = gameTimer->GetTimeScale();
+
+    if (ImGui::Button("Play"))
     {
-        GameTimer* gameTimer = App->GetGameTimer();
-
-        float timeScale      = gameTimer->GetTimeScale();
-
-        if (ImGui::Button("Play"))
-        {
-            App->GetSceneModule()->SwitchPlayModeStateTo(true);
-            gameTimer->Start();
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Pause"))
-        {
-            gameTimer->TogglePause();
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Step"))
-        {
-            gameTimer->Step();
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Stop"))
-        {
-            App->GetSceneModule()->SwitchPlayModeStateTo(false);
-            gameTimer->Reset();
-        }
-        ImGui::SameLine();
-        if (ImGui::SliderFloat("Time scale", &timeScale, 0, 4)) gameTimer->SetTimeScale(timeScale);
-
-        if (App->GetSceneModule()->IsInPlayMode())
-        {
-            ImGui::SeparatorText("Playing");
-            ImGui::Text("Frame count: %d", gameTimer->GetFrameCount());
-            ImGui::SameLine();
-            ImGui::Text("Game time: %.3f", gameTimer->GetTime() / 1000.0f);
-            ImGui::SameLine();
-            ImGui::Text("Delta time: %.3f", gameTimer->GetDeltaTime() / 1000.0f);
-        }
-
-        ImGui::EndChild();
+        App->GetSceneModule()->SwitchPlayMode(true);
+        gameTimer->Start();
     }
-    if (ImGui::BeginChild(
-            "##SceneChild", ImVec2(0.f, 0.f), NULL, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar
-        ))
+    ImGui::SameLine();
+    if (ImGui::Button("Pause"))
     {
-        const auto& framebuffer = App->GetOpenGLModule()->GetFramebuffer();
-
-        ImGui::SetCursorPos(ImVec2(0.f, 0.f));
-
-        ImGui::Image(
-            (ImTextureID)framebuffer->GetTextureID(),
-            ImVec2((float)framebuffer->GetTextureWidth(), (float)framebuffer->GetTextureHeight()), ImVec2(0.f, 1.f),
-            ImVec2(1.f, 0.f)
-        );
-
-        ImGuizmo::SetOrthographic(false);
-        ImGuizmo::SetDrawlist(); // ImGui::GetWindowDrawList()
-
-        float width  = ImGui::GetWindowWidth();
-        float height = ImGui::GetWindowHeight();
-        ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, width, height);
-
-        ImVec2 windowSize = ImGui::GetWindowSize();
-        if (framebuffer->GetTextureWidth() != windowSize.x || framebuffer->GetTextureHeight() != windowSize.y)
-        {
-            float aspectRatio = windowSize.y / windowSize.x;
-            App->GetCameraModule()->SetAspectRatio(aspectRatio);
-            framebuffer->Resize((int)windowSize.x, (int)windowSize.y);
-        }
-
-        ImGui::EndChild();
+        gameTimer->TogglePause();
     }
+    ImGui::SameLine();
+    if (ImGui::Button("Step"))
+    {
+        gameTimer->Step();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Stop"))
+    {
+        stop = true;
+        App->GetSceneModule()->SwitchPlayMode(false);
+        gameTimer->Reset();
+    }
+    ImGui::SameLine();
+    if (ImGui::SliderFloat("Time scale", &timeScale, 0, 4)) gameTimer->SetTimeScale(timeScale);
+
+    if (App->GetSceneModule()->IsInPlayMode())
+    {
+        ImGui::SeparatorText("Playing");
+        ImGui::Text("Frame count: %d", gameTimer->GetFrameCount());
+        ImGui::SameLine();
+        ImGui::Text("Game time: %.3f", gameTimer->GetTime() / 1000.0f);
+        ImGui::SameLine();
+        ImGui::Text("Delta time: %.3f", gameTimer->GetDeltaTime() / 1000.0f);
+    }
+    ImGui::End();
+}
+
+void Scene::RenderScene()
+{
+    if (!ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar))
+    {
+        ImGui::End();
+        return;
+    }
+
+    const auto& framebuffer = App->GetOpenGLModule()->GetFramebuffer();
+
+    ImGui::SetCursorPos(ImVec2(0.f, 0.f));
+
+    ImGui::Image(
+        (ImTextureID)framebuffer->GetTextureID(),
+        ImVec2((float)framebuffer->GetTextureWidth(), (float)framebuffer->GetTextureHeight()), ImVec2(0.f, 1.f),
+        ImVec2(1.f, 0.f)
+    );
+
+    ImGuizmo::SetOrthographic(false);
+    ImGuizmo::SetDrawlist(); // ImGui::GetWindowDrawList()
+
+    float width  = ImGui::GetWindowWidth();
+    float height = ImGui::GetWindowHeight();
+    ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, width, height);
+
+    ImVec2 windowSize = ImGui::GetWindowSize();
+    if (framebuffer->GetTextureWidth() != windowSize.x || framebuffer->GetTextureHeight() != windowSize.y)
+    {
+        float aspectRatio = windowSize.y / windowSize.x;
+        App->GetCameraModule()->SetAspectRatio(aspectRatio);
+        framebuffer->Resize((int)windowSize.x, (int)windowSize.y);
+    }
+
+    ImGui::End();
+}
+
+void Scene::RenderGame()
+{
+    if (!ImGui::Begin("Game", nullptr, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar))
+    {
+        ImGui::End();
+        return;
+    }
+
+    const auto& framebuffer = App->GetOpenGLModule()->GetFramebuffer();
+
+    ImGui::SetCursorPos(ImVec2(0.f, 0.f));
+
+    ImGui::Image(
+        (ImTextureID)framebuffer->GetTextureID(),
+        ImVec2((float)framebuffer->GetTextureWidth(), (float)framebuffer->GetTextureHeight()), ImVec2(0.f, 1.f),
+        ImVec2(1.f, 0.f)
+    );
+
+    ImGuizmo::SetOrthographic(false);
+    ImGuizmo::SetDrawlist(); // ImGui::GetWindowDrawList()
+
+    float width  = ImGui::GetWindowWidth();
+    float height = ImGui::GetWindowHeight();
+    ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, width, height);
+
+    ImVec2 windowSize = ImGui::GetWindowSize();
+    if (framebuffer->GetTextureWidth() != windowSize.x || framebuffer->GetTextureHeight() != windowSize.y)
+    {
+        float aspectRatio = windowSize.y / windowSize.x;
+        App->GetCameraModule()->SetAspectRatio(aspectRatio);
+        framebuffer->Resize((int)windowSize.x, (int)windowSize.y);
+    }
+
     ImGui::End();
 }
 
 void Scene::RenderSelectedGameObjectUI()
 {
-    GameObject* selectedGameObject = GetSeletedGameObject();
+    GameObject* selectedGameObject = GetSelectedGameObject();
     if (selectedGameObject != nullptr)
     {
         selectedGameObject->RenderEditor();
@@ -211,63 +244,63 @@ void Scene::RenderHierarchyUI(bool& hierarchyMenu)
 
     if (ImGui::Button("Add GameObject"))
     {
-        GameObject* newGameObject = new GameObject(selectedGameObjectUUID, "new Game Object");
+        GameObject* newGameObject = new GameObject(selectedGameObjectUID, "new Game Object");
         UID newUUID               = newGameObject->GetUID();
 
-        GetGameObjectByUUID(selectedGameObjectUUID)->AddGameObject(newUUID);
+        GetGameObjectByUID(selectedGameObjectUID)->AddGameObject(newUUID);
 
         // TODO: change when filesystem defined
         gameObjectsContainer.insert({newUUID, newGameObject});
 
-        GetGameObjectByUUID(newGameObject->GetParent())->ComponentGlobalTransformUpdated();
+        GetGameObjectByUID(newGameObject->GetParent())->ComponentGlobalTransformUpdated();
     }
 
-    if (selectedGameObjectUUID != gameObjectRootUUID)
+    if (selectedGameObjectUID != gameObjectRootUID)
     {
         ImGui::SameLine();
 
         if (ImGui::Button("Delete GameObject"))
         {
-            UID parentUID                = GetGameObjectByUUID(selectedGameObjectUUID)->GetParent();
-            GameObject* parentGameObject = GetGameObjectByUUID(parentUID);
-            RemoveGameObjectHierarchy(selectedGameObjectUUID);
+            UID parentUID                = GetGameObjectByUID(selectedGameObjectUID)->GetParent();
+            GameObject* parentGameObject = GetGameObjectByUID(parentUID);
+            RemoveGameObjectHierarchy(selectedGameObjectUID);
             // parentGameObject->PassAABBUpdateToParent(); // TODO: check if it works
         }
     }
 
-    GameObject* rootGameObject = GetGameObjectByUUID(gameObjectRootUUID);
+    GameObject* rootGameObject = GetGameObjectByUID(gameObjectRootUID);
     if (rootGameObject)
     {
-        rootGameObject->RenderHierarchyNode(selectedGameObjectUUID);
+        rootGameObject->RenderHierarchyNode(selectedGameObjectUID);
     }
 
     ImGui::End();
 }
 
-void Scene::RemoveGameObjectHierarchy(UID gameObjectUUID)
+void Scene::RemoveGameObjectHierarchy(UID gameObjectUID)
 {
     // TODO: Change when filesystem defined
-    if (!gameObjectsContainer.count(gameObjectUUID) || gameObjectUUID == gameObjectRootUUID) return;
+    if (!gameObjectsContainer.count(gameObjectUID) || gameObjectUID == gameObjectRootUID) return;
 
-    GameObject* gameObject = GetGameObjectByUUID(gameObjectUUID);
+    GameObject* gameObject = GetGameObjectByUID(gameObjectUID);
 
-    for (UID childUUID : gameObject->GetChildren())
+    for (UID childUID : gameObject->GetChildren())
     {
-        RemoveGameObjectHierarchy(childUUID);
+        RemoveGameObjectHierarchy(childUID);
     }
 
-    UID parentUUID = gameObject->GetParent();
+    UID parentUID = gameObject->GetParent();
 
     // TODO: change when filesystem defined
-    if (gameObjectsContainer.count(parentUUID))
+    if (gameObjectsContainer.count(parentUID))
     {
-        GameObject* parentGameObject = GetGameObjectByUUID(parentUUID);
-        parentGameObject->RemoveGameObject(gameObjectUUID);
-        selectedGameObjectUUID = parentUUID;
+        GameObject* parentGameObject = GetGameObjectByUID(parentUID);
+        parentGameObject->RemoveGameObject(gameObjectUID);
+        selectedGameObjectUID = parentUID;
     }
 
     // TODO: change when filesystem defined
-    gameObjectsContainer.erase(gameObjectUUID);
+    gameObjectsContainer.erase(gameObjectUID);
 
     delete gameObject;
 }
@@ -332,7 +365,7 @@ void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects)
     }
 }
 
-GameObject* Scene::GetGameObjectByUUID(UID gameObjectUUID)
+GameObject* Scene::GetGameObjectByUID(UID gameObjectUUID)
 {
     if (gameObjectsContainer.count(gameObjectUUID))
     {

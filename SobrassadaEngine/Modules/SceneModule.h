@@ -39,7 +39,7 @@ class SceneModule : public Module
     void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
     void CloseScene();
     void CheckObjectsToRender();
-    void SwitchPlayModeStateTo(bool wantedStatePlayMode);
+    void SwitchPlayMode(bool play);
 
     void AddGameObject(UID uid, GameObject* newGameObject) const
     {
@@ -61,23 +61,23 @@ class SceneModule : public Module
         loadedScene != nullptr ? loadedScene->RenderHierarchyUI(hierarchyMenu) : void();
     }
 
-    void RemoveGameObjectHierarchy(UID gameObjectUUID) const
+    void RemoveGameObjectHierarchy(UID gameObjectUID) const
     {
-        loadedScene != nullptr ? loadedScene->RemoveGameObjectHierarchy(gameObjectUUID) : void();
+        loadedScene != nullptr ? loadedScene->RemoveGameObjectHierarchy(gameObjectUID) : void();
     }
 
-    GameObject* GetGameObjectByUUID(UID gameObjectUUID) const
+    GameObject* GetGameObjectByUID(UID gameObjectUID) const
     {
-        return loadedScene != nullptr ? loadedScene->GetGameObjectByUUID(gameObjectUUID) : nullptr;
+        return loadedScene != nullptr ? loadedScene->GetGameObjectByUID(gameObjectUID) : nullptr;
     }
     Component* GetComponentByUID(UID componentUID) const
     {
         return loadedScene != nullptr ? loadedScene->GetComponentByUID(componentUID) : nullptr;
     }
 
-    GameObject* GetSeletedGameObject() const
+    GameObject* GetSelectedGameObject() const
     {
-        return loadedScene != nullptr ? loadedScene->GetSeletedGameObject() : nullptr;
+        return loadedScene != nullptr ? loadedScene->GetSelectedGameObject() : nullptr;
     }
 
     const std::unordered_map<UID, GameObject*>* GetAllGameObjects() const
@@ -98,12 +98,13 @@ class SceneModule : public Module
         return loadedScene != nullptr ? loadedScene->GetTargetForAABBUpdate(uuid) : nullptr;
     }
 
+    bool IsSceneLoaded() const { return loadedScene != nullptr; }
     UID GetSceneUID() const { return loadedScene != nullptr ? loadedScene->GetSceneUID() : CONSTANT_EMPTY_UID; }
     const char* GetSceneName() const { return loadedScene != nullptr ? loadedScene->GetSceneName() : "Not loaded"; }
-    bool IsInPlayMode() const { return bInPlayMode; }
+    bool IsInPlayMode() const { return isPlayMode; }
     LightsConfig* GetLightsConfig() { return loadedScene != nullptr ? loadedScene->GetLightsConfig() : nullptr; }
 
   private:
     Scene* loadedScene = nullptr;
-    bool bInPlayMode   = false;
+    bool isPlayMode   = false;
 };

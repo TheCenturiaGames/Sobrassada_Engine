@@ -9,26 +9,26 @@
 
 GameObject::GameObject(std::string name) : name(name)
 {
-    uuid       = GenerateUID();
-    parentUUID = INVALID_UUID;
+    uid       = GenerateUID();
+    parentUID = INVALID_UID;
     globalAABB.SetNegativeInfinity();
 }
 
-GameObject::GameObject(UID parentUUID, std::string name) : parentUUID(parentUUID), name(name)
+GameObject::GameObject(UID parentUID, std::string name) : parentUID(parentUID), name(name)
 {
-    uuid = GenerateUID();
+    uid = GenerateUID();
     globalAABB.SetNegativeInfinity();
     CreateRootComponent();
 }
 
-GameObject::GameObject(UID parentUUID, std::string name, UID rootComponentUID) : parentUUID(parentUUID), name(name)
+GameObject::GameObject(UID parentUID, std::string name, UID rootComponentUID) : parentUID(parentUID), name(name)
 {
     rootComponent = dynamic_cast<RootComponent*>(App->GetSceneModule()->GetComponentByUID(rootComponentUID));
 }
 
-GameObject::GameObject(const rapidjson::Value& initialState) : uuid(initialState["UID"].GetUint64())
+GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState["UID"].GetUint64())
 {
-    parentUUID = initialState["ParentUID"].GetUint64();
+    parentUID = initialState["ParentUID"].GetUint64();
     name       = initialState["Name"].GetString();
 
     if (initialState.HasMember("Children") && initialState["Children"].IsArray())
@@ -56,7 +56,7 @@ bool GameObject::CreateRootComponent()
 {
 
     rootComponent = dynamic_cast<RootComponent*>(
-        ComponentUtils::CreateEmptyComponent(COMPONENT_ROOT, LCG().IntFast(), uuid, -1, Transform())
+        ComponentUtils::CreateEmptyComponent(COMPONENT_ROOT, LCG().IntFast(), uid, -1, Transform())
     ); // TODO Add the gameObject UUID as parent?
 
     // TODO Replace parentUUID above with the UUID of this gameObject
@@ -90,8 +90,8 @@ void GameObject::OnEditor()
 
 void GameObject::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
 {
-    targetState.AddMember("UID", uuid, allocator);
-    targetState.AddMember("ParentUID", parentUUID, allocator);
+    targetState.AddMember("UID", uid, allocator);
+    targetState.AddMember("ParentUID", parentUID, allocator);
     targetState.AddMember("Name", rapidjson::Value(name.c_str(), allocator), allocator);
 
     rapidjson::Value valChildren(rapidjson::kArrayType);
@@ -116,13 +116,13 @@ void GameObject::RenderHierarchyNode(UID& selectedGameObjectUUID)
     bool hasChildren         = !children.empty();
 
     if (!hasChildren) flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-    if (selectedGameObjectUUID == uuid) flags |= ImGuiTreeNodeFlags_Selected;
+    if (selectedGameObjectUUID == uid) flags |= ImGuiTreeNodeFlags_Selected;
 
-    ImGui::PushID(static_cast<int>(uuid));
+    ImGui::PushID(static_cast<int>(uid));
 
     bool nodeOpen = false;
 
-    if (isRenaming && currentRenamingUID == uuid)
+    if (isRenaming && currentRenamingUID == uid)
     {
         nodeOpen = ImGui::TreeNodeEx("##RenamingNode", flags, "");
         RenameGameObjectHierarchy();
@@ -137,10 +137,10 @@ void GameObject::RenderHierarchyNode(UID& selectedGameObjectUUID)
 
     if (nodeOpen && hasChildren)
     {
-        for (UID childUUID : children)
+        for (UID childUID : children)
         {
-            GameObject* childGameObject = App->GetSceneModule()->GetGameObjectByUUID(childUUID);
-            if (childGameObject && childUUID != uuid)
+            GameObject* childGameObject = App->GetSceneModule()->GetGameObjectByUID(childUID);
+            if (childGameObject && childUID != uid)
             {
                 childGameObject->RenderHierarchyNode(selectedGameObjectUUID);
             }
@@ -156,20 +156,20 @@ void GameObject::HandleNodeClick(UID& selectedGameObjectUUID)
 {
     if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
     {
-        selectedGameObjectUUID = uuid;
+        selectedGameObjectUUID = uid;
     }
 
     if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right))
     {
-        selectedGameObjectUUID = uuid;
-        ImGui::OpenPopup(("##GameObjectContextMenu" + std::to_string(uuid)).c_str());
+        selectedGameObjectUUID = uid;
+        ImGui::OpenPopup(("##GameObjectContextMenu" + std::to_string(uid)).c_str());
     }
 
     // Drag and Drop
 
-    if (uuid != App->GetSceneModule()->GetGameObjectRootUID() && ImGui::BeginDragDropSource())
+    if (uid != App->GetSceneModule()->GetGameObjectRootUID() && ImGui::BeginDragDropSource())
     {
-        ImGui::SetDragDropPayload("DRAG_DROP_GAMEOBJECT", &uuid, sizeof(UID));
+        ImGui::SetDragDropPayload("DRAG_DROP_GAMEOBJECT", &uid, sizeof(UID));
         ImGui::Text("Dragging %s", name.c_str());
         ImGui::EndDragDropSource();
     }
@@ -179,9 +179,9 @@ void GameObject::HandleNodeClick(UID& selectedGameObjectUUID)
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DRAG_DROP_GAMEOBJECT"))
         {
             UID draggedUUID = *reinterpret_cast<const UID*>(payload->Data);
-            if (draggedUUID != uuid)
+            if (draggedUUID != uid)
             {
-                if (UpdateGameObjectHierarchy(draggedUUID, uuid))
+                if (UpdateGameObjectHierarchy(draggedUUID, uid))
                 {
                     ComponentGlobalTransformUpdated();
                     PassAABBUpdateToParent(); // TODO: check if it works
@@ -196,21 +196,21 @@ void GameObject::HandleNodeClick(UID& selectedGameObjectUUID)
 
 void GameObject::RenderContextMenu()
 {
-    if (ImGui::BeginPopup(("##GameObjectContextMenu" + std::to_string(uuid)).c_str()))
+    if (ImGui::BeginPopup(("##GameObjectContextMenu" + std::to_string(uid)).c_str()))
     {
         if (ImGui::MenuItem("New GameObject"))
         {
-            GameObject* newGameObject = new GameObject(uuid, "new Game Object");
-            App->GetSceneModule()->GetGameObjectByUUID(uuid)->AddGameObject(newGameObject->GetUID());
+            GameObject* newGameObject = new GameObject(uid, "new Game Object");
+            App->GetSceneModule()->GetGameObjectByUID(uid)->AddGameObject(newGameObject->GetUID());
             App->GetSceneModule()->AddGameObject(newGameObject->GetUID(), newGameObject);
             ComponentGlobalTransformUpdated();
         }
 
         if (ImGui::MenuItem("Rename"))
         {
-            if (currentRenamingUID != INVALID_UUID && currentRenamingUID != uuid)
+            if (currentRenamingUID != INVALID_UID && currentRenamingUID != uid)
             {
-                GameObject* oldGameObject = App->GetSceneModule()->GetGameObjectByUUID(currentRenamingUID);
+                GameObject* oldGameObject = App->GetSceneModule()->GetGameObjectByUID(currentRenamingUID);
 
                 if (oldGameObject)
                 {
@@ -222,12 +222,12 @@ void GameObject::RenderContextMenu()
             isRenaming = true;
             strncpy_s(renameBuffer, sizeof(renameBuffer), name.c_str(), _TRUNCATE);
 
-            currentRenamingUID = uuid;
+            currentRenamingUID = uid;
         }
 
-        if (uuid != App->GetSceneModule()->GetGameObjectRootUID() && ImGui::MenuItem("Delete"))
+        if (uid != App->GetSceneModule()->GetGameObjectRootUID() && ImGui::MenuItem("Delete"))
         {
-            App->GetSceneModule()->RemoveGameObjectHierarchy(uuid);
+            App->GetSceneModule()->RemoveGameObjectHierarchy(uid);
             // PassAABBUpdateToParent(); //TODO: check if it works
         }
 
@@ -245,7 +245,7 @@ void GameObject::RenameGameObjectHierarchy()
     {
         name               = renameBuffer;
         isRenaming         = false;
-        currentRenamingUID = INVALID_UUID;
+        currentRenamingUID = INVALID_UID;
     }
 
     bool isClickedOutside =
@@ -257,21 +257,21 @@ void GameObject::RenameGameObjectHierarchy()
     {
         name               = renameBuffer;
         isRenaming         = false;
-        currentRenamingUID = INVALID_UUID;
+        currentRenamingUID = INVALID_UID;
     }
 }
 
 bool GameObject::UpdateGameObjectHierarchy(UID sourceUID, UID targetUID)
 {
-    GameObject* sourceGameObject = App->GetSceneModule()->GetGameObjectByUUID(sourceUID);
-    GameObject* targetGameObject = App->GetSceneModule()->GetGameObjectByUUID(targetUID);
+    GameObject* sourceGameObject = App->GetSceneModule()->GetGameObjectByUID(sourceUID);
+    GameObject* targetGameObject = App->GetSceneModule()->GetGameObjectByUID(targetUID);
 
     if (!sourceGameObject || !targetGameObject) return false;
 
-    UID oldParentUUID = sourceGameObject->GetParent();
+    UID oldParentUID = sourceGameObject->GetParent();
     sourceGameObject->SetParent(targetUID);
 
-    GameObject* oldParentGameObject = App->GetSceneModule()->GetGameObjectByUUID(oldParentUUID);
+    GameObject* oldParentGameObject = App->GetSceneModule()->GetGameObjectByUID(oldParentUID);
 
     if (oldParentGameObject)
     {
@@ -314,7 +314,7 @@ void GameObject::PassAABBUpdateToParent()
 
     for (UID child : children)
     {
-        GameObject* gameObject = App->GetSceneModule()->GetGameObjectByUUID(child);
+        GameObject* gameObject = App->GetSceneModule()->GetGameObjectByUID(child);
 
         if (gameObject != nullptr)
         {
@@ -322,9 +322,9 @@ void GameObject::PassAABBUpdateToParent()
         }
     }
 
-    if (parentUUID != INVALID_UUID) // Filters the case of Scene GameObject (which parent is INVALID_UUID)
+    if (parentUID != INVALID_UID) // Filters the case of Scene GameObject (which parent is INVALID_UUID)
     {
-        GameObject* parentGameObject = App->GetSceneModule()->GetGameObjectByUUID(parentUUID);
+        GameObject* parentGameObject = App->GetSceneModule()->GetGameObjectByUID(parentUID);
 
         if (parentGameObject != nullptr)
         {
@@ -343,7 +343,7 @@ void GameObject::ComponentGlobalTransformUpdated()
 
     for (UID child : children)
     {
-        GameObject* childGameObject = App->GetSceneModule()->GetGameObjectByUUID(child);
+        GameObject* childGameObject = App->GetSceneModule()->GetGameObjectByUID(child);
 
         if (childGameObject != nullptr)
         {
@@ -361,7 +361,7 @@ const Transform& GameObject::GetGlobalTransform() const
 
 const Transform& GameObject::GetParentGlobalTransform()
 {
-    GameObject* parent = App->GetSceneModule()->GetGameObjectByUUID(parentUUID);
+    GameObject* parent = App->GetSceneModule()->GetGameObjectByUID(parentUID);
     if (parent != nullptr)
     {
         return parent->GetGlobalTransform();

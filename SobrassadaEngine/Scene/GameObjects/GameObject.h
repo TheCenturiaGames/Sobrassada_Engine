@@ -15,8 +15,8 @@ class GameObject : public AABBUpdatable
 {
   public:
     GameObject(std::string name);
-    GameObject(UID parentUUID, std::string name);
-    GameObject(UID parentUUID, std::string name, UID rootComponent);
+    GameObject(UID parentUID, std::string name);
+    GameObject(UID parentUID, std::string name, UID rootComponent);
     GameObject(const rapidjson::Value& initialState);
     ~GameObject() override;
 
@@ -26,9 +26,9 @@ class GameObject : public AABBUpdatable
     const Transform& GetParentGlobalTransform() override;
 
     bool CreateRootComponent();
-    bool AddGameObject(UID gameObjectUUID);
-    inline void AddChildren(UID childUUID) { children.push_back(childUUID); }
-    bool RemoveGameObject(UID gameObjectUUID);
+    bool AddGameObject(UID gameObjectUID);
+    inline void AddChildren(UID childUID) { children.push_back(childUID); }
+    bool RemoveGameObject(UID gameObjectUID);
 
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
     void SaveToLibrary();
@@ -36,31 +36,31 @@ class GameObject : public AABBUpdatable
     void OnEditor();
     void Render();
     void RenderEditor();
-    void RenderHierarchyNode(UID& selectedGameObjectUUID);
-    void HandleNodeClick(UID& selectedGameObjectUUID);
+    void RenderHierarchyNode(UID& selectedGameObjectUID);
+    void HandleNodeClick(UID& selectedGameObjectUID);
     void RenderContextMenu();
 
     bool UpdateGameObjectHierarchy(UID sourceUID, UID targetUID);
     void RenameGameObjectHierarchy();
 
     inline std::string GetName() const { return name; }
-    inline UID GetUID() const { return uuid; }
+    inline UID GetUID() const { return uid; }
     inline std::vector<UID> GetChildren() { return children; }
-    inline UID GetParent() const { return parentUUID; }
+    inline UID GetParent() const { return parentUID; }
     inline const AABB& GetAABB() const { return globalAABB; };
     RootComponent* GetRootComponent() const { return rootComponent; }
 
     void SetName(std::string newName) { name = newName; }
-    void SetParent(UID newParentUUID) { parentUUID = newParentUUID; }
-    void SetUUID(UID newUUID) { uuid = newUUID; }
+    void SetParent(UID newParentUID) { parentUID = newParentUID; }
+    void SetUUID(UID newUID) { uid = newUID; }
 
   public:
-    inline static UID currentRenamingUID = INVALID_UUID;
+    inline static UID currentRenamingUID = INVALID_UID;
 
   private:
-    UID uuid;
+    UID uid;
     std::string name;
-    UID parentUUID;
+    UID parentUID;
     std::vector<UID> children;
     RootComponent* rootComponent;
     AABB globalAABB;
