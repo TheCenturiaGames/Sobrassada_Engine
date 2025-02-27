@@ -13,8 +13,8 @@
 namespace ModelImporter
 {
     UID ImportModel(
-        const std::vector<tinygltf::Node>& nodes, const std::vector<tinygltf::Skin>& skins,
-        const std::vector<std::vector<std::pair<UID, UID>>>& meshesUIDs, const char* filePath
+        const tinygltf::Model& model, const std::vector<std::vector<std::pair<UID, UID>>>& meshesUIDs,
+        const char* filePath
     )
     {
         // Get Nodes data
@@ -22,21 +22,42 @@ namespace ModelImporter
         std::vector<NodeData> orderedNodes;
 
         GLOG("Start filling nodes")
-        FillNodes(nodes, 0, -1, meshesUIDs, orderedNodes); // -1 parentId for root
+        FillNodes(model.nodes, 0, -1, meshesUIDs, orderedNodes); // -1 parentId for root
         GLOG("Nodes filled");
         newModel.SetNodes(orderedNodes);
 
-
         // Save skin data
         std::vector<Skin> skinsData;
-        for (const tinygltf::Skin& skin : skins)
+        for (const tinygltf::Skin& skin : model.skins)
         {
             Skin newSkin;
             newSkin.rootIndex    = skin.skeleton;
             newSkin.bonesIndices = skin.joints;
+
+            if (skin.inverseBindMatrices != -1)
+            {
+                std::vector<float4x4> inverseBindMatrices;
+
+                const tinygltf::Accessor& matAcc      = model.accessors[skin.inverseBindMatrices];
+                const tinygltf::BufferView& matView   = model.bufferViews[matAcc.bufferView];
+                const tinygltf::Buffer& matBufferData = model.buffers[matView.buffer];
+                const unsigned char* bufferMatrices   = &(matBufferData.data[matAcc.byteOffset + matView.byteOffset]);
+                size_t stride = (matView.byteStride > 0) ? matView.byteStride : sizeof(float4x4);
+
+                for (size_t i = 0; i < matAcc.count; ++i)
+                {
+                    const float4x4 matrix  = *reinterpret_cast<const float4x4*>(bufferMatrices);
+                    bufferMatrices        += stride;
+                    inverseBindMatrices.push_back(matrix);
+                    GLOG("I: %d. %f, %f, %f, %f", i, matrix[0][0], matrix[1][0], matrix[2][0], matrix[3][0]);
+                }
+                GLOG("Bind matrices length: %d", inverseBindMatrices.size());
+
+                newSkin.inverseBindMatrices = inverseBindMatrices;
+            }
+
             skinsData.push_back(newSkin);
         }
-
 
         // Save in JSON format, way easier for this data
         // Create doc JSON
@@ -109,10 +130,24 @@ namespace ModelImporter
             }
             skinDataJSON.AddMember("BonesIndices", valBones, allocator);
 
+            rapidjson::Value valMatrices(rapidjson::kArrayType);
+            for (const float4x4& matrix : skin.inverseBindMatrices)
+            {
+                rapidjson::Value valMatrix(rapidjson::kArrayType);
+                for (int i = 0; i < 4; ++i)
+                {
+                    for (int j = 0; j < 4; ++j)
+                    {
+                        valMatrix.PushBack(matrix[j][i], allocator);
+                    }
+                }
+                valMatrices.PushBack(valMatrix, allocator);
+            }
+            skinDataJSON.AddMember("InverseBindMatrices", valMatrices, allocator);
+
             skinsJSON.PushBack(skinDataJSON, allocator);
         }
         modelJSON.AddMember("Skins", skinsJSON, allocator);
-
 
         doc.AddMember("Model", modelJSON, allocator);
 
@@ -168,16 +203,14 @@ namespace ModelImporter
 
         rapidjson::Value& modelJSON = doc["Model"];
 
-        // Scene values
+        // Deserialize model UID
         UID uid                     = modelJSON["UID"].GetUint64();
 
-        std::vector<NodeData> loadedNodes;
-
         // Deserialize Nodes
+        std::vector<NodeData> loadedNodes;
         if (modelJSON.HasMember("Nodes") && modelJSON["Nodes"].IsArray())
         {
             const rapidjson::Value& nodesJSON = modelJSON["Nodes"];
-
             for (rapidjson::SizeType i = 0; i < nodesJSON.Size(); i++)
             {
                 const rapidjson::Value& nodeJSON = nodesJSON[i];
@@ -222,8 +255,57 @@ namespace ModelImporter
             }
         }
 
+        // Deserialize Skins
+        std::vector<Skin> loadedSkins;
+        if (modelJSON.HasMember("Skins") && modelJSON["Skins"].IsArray())
+        {
+            const rapidjson::Value& skinsJSON = modelJSON["Skins"];
+            for (rapidjson::SizeType i = 0; i < skinsJSON.Size(); i++)
+            {
+                const rapidjson::Value& skinJSON = skinsJSON[i];
+
+                Skin newSkin;
+                newSkin.rootIndex = skinJSON["RootIndex"].GetInt();
+
+                if (skinJSON.HasMember("BonesIndices") && skinJSON["BonesIndices"].IsArray())
+                {
+                    const rapidjson::Value& initBonesIndices = skinJSON["BonesIndices"];
+                    for (int i = 0; i < initBonesIndices.Size(); ++i)
+                    {
+                        newSkin.bonesIndices.push_back(initBonesIndices[i].GetInt());
+                    }
+                }
+
+                if (skinJSON.HasMember("InverseBindMatrices") && skinJSON["InverseBindMatrices"].IsArray())
+                {
+                    const rapidjson::Value& initMatrices = skinJSON["InverseBindMatrices"];
+                    for (int i = 0; i < initMatrices.Size(); ++i)
+                    {
+                        if (initMatrices[i].IsArray() && initMatrices[i].Size() == 16)
+                        {
+                            float4x4 matrix;
+                            for (int i = 0; i < 4; ++i)
+                            {
+                                for (int j = 0; j < 4; ++j)
+                                {
+                                    matrix[j][i] = initMatrices[i + j].GetFloat();
+                                }
+                            }
+                            newSkin.inverseBindMatrices.push_back(matrix);
+                        }
+                    }
+                }
+
+                loadedSkins.push_back(newSkin);
+                GLOG(
+                    "Skin bones count: %d. Matrices count: %d", newSkin.bonesIndices.size(),
+                    newSkin.inverseBindMatrices.size()
+                );
+            }
+        }
+
         ResourceModel* resourceModel = new ResourceModel(uid, FileSystem::GetFileNameWithoutExtension(filePath));
-        resourceModel->SetModelData(Model(uid, loadedNodes));
+        resourceModel->SetModelData(Model(uid, loadedNodes, loadedSkins));
 
         return resourceModel;
     }
@@ -244,7 +326,6 @@ namespace ModelImporter
         if (parentId != -1) parentTransform = outNodes[parentId].transform;
         newNode.transform.position = parentTransform.position + rawTransform.TranslatePart();
         newNode.transform.rotation = parentTransform.rotation + rawTransform.RotatePart().ToEulerXYZ();
-
 
         // Get reference to Mesh and Material UIDs
         if (nodeData.mesh > -1)

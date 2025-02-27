@@ -190,7 +190,7 @@ namespace MeshImporter
                     vertex.joint[1]              = (unsigned int)joints[1];
                     vertex.joint[2]              = (unsigned int)joints[2];
                     vertex.joint[3]              = (unsigned int)joints[3];
-                    GLOG("Joints pre: %d, %d, %d, %d", joints[0], joints[1], joints[2], joints[3]);
+                    //GLOG("Joints pre: %d, %d, %d, %d", joints[0], joints[1], joints[2], joints[3]);
                 }
                 else
                 {
@@ -201,12 +201,12 @@ namespace MeshImporter
                 vertex.normal   = bufferNormal ? *reinterpret_cast<const float3*>(bufferNormal) : float3(0, 0, 0);
                 vertex.texCoord = bufferTexCoord ? *reinterpret_cast<const float2*>(bufferTexCoord) : float2(0, 0);
 
-                GLOG("Joints: %d, %d, %d, %d", vertex.joint[0], vertex.joint[1], vertex.joint[2], vertex.joint[3]);
+                //GLOG("Joints: %d, %d, %d, %d", vertex.joint[0], vertex.joint[1], vertex.joint[2], vertex.joint[3]);
 
-                GLOG(
-                    "Weights: %f, %f, %f, %f", vertex.weights[0], vertex.weights[1], vertex.weights[2],
-                    vertex.weights[3]
-                );
+                //GLOG(
+                //    "Weights: %f, %f, %f, %f", vertex.weights[0], vertex.weights[1], vertex.weights[2],
+                //    vertex.weights[3]
+                //);
 
                 bufferPos += posStride;
                 if (bufferNormal) bufferNormal += normStride;

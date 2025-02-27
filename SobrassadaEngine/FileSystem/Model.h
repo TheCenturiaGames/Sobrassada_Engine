@@ -2,6 +2,7 @@
 
 #include "Globals.h"
 #include "Utils/Transform.h"
+#include "Math/float4x4.h"
 
 #include <vector>
 
@@ -18,14 +19,14 @@ struct Skin
 {
     int rootIndex;
     std::vector<int> bonesIndices;
-    //std::vector<float4x4> inverseBindMatrices;
+    std::vector<float4x4> inverseBindMatrices;
 };
 
 class Model
 {
   public:
     Model() = default;
-    Model(const UID id, const std::vector<NodeData>& nodes) : uid(id), nodes(nodes) {};
+    Model(const UID id, const std::vector<NodeData>& nodes, const std::vector<Skin>& skins) : uid(id), nodes(nodes), skins(skins) {};
 
     const std::vector<NodeData>& GetNodes() const { return nodes; }
     size_t GetNodesCount() const { return nodes.size(); }
