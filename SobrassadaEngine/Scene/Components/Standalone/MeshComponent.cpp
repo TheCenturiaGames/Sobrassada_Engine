@@ -19,8 +19,6 @@ MeshComponent::MeshComponent(
 {
 }
 
-
-
 MeshComponent::MeshComponent(const rapidjson::Value& initialState) : Component(initialState)
 {
     if (initialState.HasMember("Material"))
@@ -91,10 +89,22 @@ void MeshComponent::Render()
 {
     if (enabled && currentMesh != nullptr)
     {
-        unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
+        unsigned int cameraUBO   = App->GetCameraModule()->GetUbo();
         float4x4 localTransform2 = float4x4::identity;
-        localTransform2 = float4x4::FromTRS(localTransform.position, Quat::FromEulerXYZ(localTransform.rotation.x, localTransform.rotation.y, localTransform.rotation.z), localTransform.scale);
-        float4x4 modelMatrix2 = modelMatrix + localTransform2;
+        localTransform2          = float4x4::FromTRS(
+            localTransform.position,
+            Quat::FromEulerXYZ(localTransform.rotation.x, localTransform.rotation.y, localTransform.rotation.z),
+            localTransform.scale
+        );
+
+        float4x4 globalMatrix = float4x4::FromTRS(
+            globalTransform.position,
+            Quat::FromEulerXYZ(globalTransform.rotation.x, globalTransform.rotation.y, globalTransform.rotation.z),
+            globalTransform.scale
+        );
+
+        float4x4 modelMatrix2 = globalMatrix * modelMatrix;
+        
         currentMesh->Render(App->GetResourcesModule()->GetProgram(), modelMatrix2, cameraUBO, currentMaterial);
     }
     Component::Render();
@@ -111,14 +121,14 @@ void MeshComponent::AddMesh(UID resource, bool reloadAABB)
         newMesh->SetMaterial(currentMaterial != nullptr ? currentMaterial->GetUID() : CONSTANT_EMPTY_UID);
         currentMeshName    = newMesh->GetName();
         currentMesh        = newMesh;
-        //check if aabb has transform applied
+        // check if aabb has transform applied
         localComponentAABB = AABB(currentMesh->GetAABB());
 
-        modelMatrix = currentMesh->GetTransform();
+        modelMatrix        = currentMesh->GetTransform();
 
         if (reloadAABB)
         {
-            globalComponentAABB = AABB(currentMesh->GetAABB());
+            globalComponentAABB   = AABB(currentMesh->GetAABB());
             AABBUpdatable* parent = GetParent();
             if (parent != nullptr)
             {

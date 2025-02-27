@@ -1,8 +1,10 @@
 #include "DebugDrawModule.h"
 #include "Application.h"
 #include "CameraModule.h"
+#include "Framebuffer.h"
 #include "Globals.h"
 #include "MathGeoLib.h"
+#include "OpenGLModule.h"
 #include "QaudtreeViewer.h"
 #include "SDL_video.h"
 #include "WindowModule.h"
@@ -20,7 +22,7 @@ class DDRenderInterfaceCoreGL final : public dd::RenderInterface
     // dd::RenderInterface overrides:
     //
 
-    void drawPointList(const dd::DrawVertex *points, int count, bool depthEnabled) override
+    void drawPointList(const dd::DrawVertex* points, int count, bool depthEnabled) override
     {
         assert(points != nullptr);
         assert(count > 0 && count <= DEBUG_DRAW_VERTEX_BUFFER_SIZE);
@@ -28,7 +30,7 @@ class DDRenderInterfaceCoreGL final : public dd::RenderInterface
         glBindVertexArray(linePointVAO);
         glUseProgram(linePointProgram);
 
-        glUniformMatrix4fv(linePointProgram_MvpMatrixLocation, 1, GL_TRUE, reinterpret_cast<float *>(&mvpMatrix));
+        glUniformMatrix4fv(linePointProgram_MvpMatrixLocation, 1, GL_TRUE, reinterpret_cast<float*>(&mvpMatrix));
 
         bool already = glIsEnabled(GL_DEPTH_TEST);
 
@@ -63,7 +65,7 @@ class DDRenderInterfaceCoreGL final : public dd::RenderInterface
         }
     }
 
-    void drawLineList(const dd::DrawVertex *lines, int count, bool depthEnabled) override
+    void drawLineList(const dd::DrawVertex* lines, int count, bool depthEnabled) override
     {
         assert(lines != nullptr);
         assert(count > 0 && count <= DEBUG_DRAW_VERTEX_BUFFER_SIZE);
@@ -71,7 +73,7 @@ class DDRenderInterfaceCoreGL final : public dd::RenderInterface
         glBindVertexArray(linePointVAO);
         glUseProgram(linePointProgram);
 
-        glUniformMatrix4fv(linePointProgram_MvpMatrixLocation, 1, GL_TRUE, reinterpret_cast<const float *>(&mvpMatrix));
+        glUniformMatrix4fv(linePointProgram_MvpMatrixLocation, 1, GL_TRUE, reinterpret_cast<const float*>(&mvpMatrix));
 
         bool already = glIsEnabled(GL_DEPTH_TEST);
 
@@ -106,7 +108,7 @@ class DDRenderInterfaceCoreGL final : public dd::RenderInterface
         }
     }
 
-    void drawGlyphList(const dd::DrawVertex *glyphs, int count, dd::GlyphTextureHandle glyphTex) override
+    void drawGlyphList(const dd::DrawVertex* glyphs, int count, dd::GlyphTextureHandle glyphTex) override
     {
         assert(glyphs != nullptr);
         assert(count > 0 && count <= DEBUG_DRAW_VERTEX_BUFFER_SIZE);
@@ -157,7 +159,7 @@ class DDRenderInterfaceCoreGL final : public dd::RenderInterface
         }
     }
 
-    dd::GlyphTextureHandle createGlyphTexture(int width, int height, const void *pixels) override
+    dd::GlyphTextureHandle createGlyphTexture(int width, int height, const void* pixels) override
     {
         assert(width > 0 && height > 0);
         assert(pixels != nullptr);
@@ -342,7 +344,7 @@ class DDRenderInterfaceCoreGL final : public dd::RenderInterface
                 /* type      = */ GL_FLOAT,
                 /* normalize = */ GL_FALSE,
                 /* stride    = */ sizeof(dd::DrawVertex),
-                /* offset    = */ reinterpret_cast<void *>(offset)
+                /* offset    = */ reinterpret_cast<void*>(offset)
             );
             offset += sizeof(float) * 3;
 
@@ -353,7 +355,7 @@ class DDRenderInterfaceCoreGL final : public dd::RenderInterface
                 /* type      = */ GL_FLOAT,
                 /* normalize = */ GL_FALSE,
                 /* stride    = */ sizeof(dd::DrawVertex),
-                /* offset    = */ reinterpret_cast<void *>(offset)
+                /* offset    = */ reinterpret_cast<void*>(offset)
             );
 
             checkGLError(__FILE__, __LINE__);
@@ -391,7 +393,7 @@ class DDRenderInterfaceCoreGL final : public dd::RenderInterface
                 /* type      = */ GL_FLOAT,
                 /* normalize = */ GL_FALSE,
                 /* stride    = */ sizeof(dd::DrawVertex),
-                /* offset    = */ reinterpret_cast<void *>(offset)
+                /* offset    = */ reinterpret_cast<void*>(offset)
             );
             offset += sizeof(float) * 2;
 
@@ -402,7 +404,7 @@ class DDRenderInterfaceCoreGL final : public dd::RenderInterface
                 /* type      = */ GL_FLOAT,
                 /* normalize = */ GL_FALSE,
                 /* stride    = */ sizeof(dd::DrawVertex),
-                /* offset    = */ reinterpret_cast<void *>(offset)
+                /* offset    = */ reinterpret_cast<void*>(offset)
             );
             offset += sizeof(float) * 2;
 
@@ -413,7 +415,7 @@ class DDRenderInterfaceCoreGL final : public dd::RenderInterface
                 /* type      = */ GL_FLOAT,
                 /* normalize = */ GL_FALSE,
                 /* stride    = */ sizeof(dd::DrawVertex),
-                /* offset    = */ reinterpret_cast<void *>(offset)
+                /* offset    = */ reinterpret_cast<void*>(offset)
             );
 
             checkGLError(__FILE__, __LINE__);
@@ -436,7 +438,7 @@ class DDRenderInterfaceCoreGL final : public dd::RenderInterface
         return reinterpret_cast<dd::GlyphTextureHandle>(temp);
     }
 
-    static void checkGLError(const char *file, const int line)
+    static void checkGLError(const char* file, const int line)
     {
         GLenum err;
         while ((err = glGetError()) != GL_NO_ERROR)
@@ -498,11 +500,11 @@ class DDRenderInterfaceCoreGL final : public dd::RenderInterface
     GLuint textVAO;
     GLuint textVBO;
 
-    static const char *linePointVertShaderSrc;
-    static const char *linePointFragShaderSrc;
+    static const char* linePointVertShaderSrc;
+    static const char* linePointFragShaderSrc;
 
-    static const char *textVertShaderSrc;
-    static const char *textFragShaderSrc;
+    static const char* textVertShaderSrc;
+    static const char* textFragShaderSrc;
 
 }; // class DDRenderInterfaceCoreGL
 
@@ -510,7 +512,7 @@ class DDRenderInterfaceCoreGL final : public dd::RenderInterface
 // Minimal shaders we need for the debug primitives:
 // ========================================================
 
-const char *DDRenderInterfaceCoreGL::linePointVertShaderSrc =
+const char* DDRenderInterfaceCoreGL::linePointVertShaderSrc =
     "\n"
     "#version 150\n"
     "\n"
@@ -527,7 +529,7 @@ const char *DDRenderInterfaceCoreGL::linePointVertShaderSrc =
     "    v_Color      = vec4(in_ColorPointSize.xyz, 1.0);\n"
     "}\n";
 
-const char *DDRenderInterfaceCoreGL::linePointFragShaderSrc = "\n"
+const char* DDRenderInterfaceCoreGL::linePointFragShaderSrc = "\n"
                                                               "#version 150\n"
                                                               "\n"
                                                               "in  vec4 v_Color;\n"
@@ -538,7 +540,7 @@ const char *DDRenderInterfaceCoreGL::linePointFragShaderSrc = "\n"
                                                               "    out_FragColor = v_Color;\n"
                                                               "}\n";
 
-const char *DDRenderInterfaceCoreGL::textVertShaderSrc =
+const char* DDRenderInterfaceCoreGL::textVertShaderSrc =
     "\n"
     "#version 150\n"
     "\n"
@@ -562,7 +564,7 @@ const char *DDRenderInterfaceCoreGL::textVertShaderSrc =
     "    v_Color     = vec4(in_Color, 1.0);\n"
     "}\n";
 
-const char *DDRenderInterfaceCoreGL::textFragShaderSrc =
+const char* DDRenderInterfaceCoreGL::textFragShaderSrc =
     "\n"
     "#version 150\n"
     "\n"
@@ -578,7 +580,7 @@ const char *DDRenderInterfaceCoreGL::textFragShaderSrc =
     "    out_FragColor.a = texture(u_glyphTexture, v_TexCoords).r;\n"
     "}\n";
 
-DDRenderInterfaceCoreGL *DebugDrawModule::implementation = 0;
+DDRenderInterfaceCoreGL* DebugDrawModule::implementation = 0;
 
 DebugDrawModule::DebugDrawModule()
 {
@@ -607,7 +609,7 @@ bool DebugDrawModule::ShutDown()
 
 update_status DebugDrawModule::Render(float deltaTime)
 {
-    //dd::axisTriad(float4x4::identity, 0.1f, 1.0f);
+    // dd::axisTriad(float4x4::identity, 0.1f, 1.0f);
     dd::xzSquareGrid(-10, 10, 0.0f, 1.0f, dd::colors::Blue);
 
     // Probably should go somewhere else, but must go after skybox and meshes
@@ -633,47 +635,48 @@ void DebugDrawModule::Draw()
         dd::frustum(inverseClipMatrix, float3(1.f, 1.f, 1.f));
     }
 
-    SDL_GetWindowSize(App->GetWindowModule()->window, &width, &height);
-    implementation->width     = width;
-    implementation->height    = height;
+    auto framebuffer = App->GetOpenGLModule()->GetFramebuffer();
+    //SDL_GetWindowSize(App->GetWindowModule()->window, &width, &height);
+    implementation->width     = framebuffer->GetTextureWidth();
+    implementation->height    = framebuffer->GetTextureHeight();
     implementation->mvpMatrix = projection * view;
 
     dd::flush();
 }
 
-void DebugDrawModule::Render2DLines(const std::vector<float4> &lines, const float3 &color, float depth)
+void DebugDrawModule::Render2DLines(const std::vector<float4>& lines, const float3& color, float depth)
 {
-    for (auto &line : lines)
+    for (auto& line : lines)
     {
         dd::line(ddVec3(line.x, line.y, depth), ddVec3(line.z, line.w, depth), ddVec3(color.x, color.y, color.z));
     }
 }
 
-void DebugDrawModule::RenderLines(const std::vector<LineSegment> &lines, const float3 &color)
+void DebugDrawModule::RenderLines(const std::vector<LineSegment>& lines, const float3& color)
 {
-    for (auto &line : lines)
+    for (auto& line : lines)
     {
         dd::line(line.a, line.b, color);
     }
 }
 
-void DebugDrawModule::DrawLine(const float3 &origin, const float3 &direction, const float distance, const float3 &color)
+void DebugDrawModule::DrawLine(const float3& origin, const float3& direction, const float distance, const float3& color)
 {
     float3 dir = direction * distance;
     dd::line(origin, dir + origin, color);
 }
 
-void DebugDrawModule::DrawCircle(const float3 &center, const float3 &upVector, const float3 &color, const float radius) 
-{ 
+void DebugDrawModule::DrawCircle(const float3& center, const float3& upVector, const float3& color, const float radius)
+{
     dd::circle(center, upVector, color, radius, 40);
 }
 
-void DebugDrawModule::DrawSphere(const float3& center, const float3 &color, const float radius) 
-{ 
+void DebugDrawModule::DrawSphere(const float3& center, const float3& color, const float radius)
+{
     dd::sphere(center, color, radius);
 }
 
-void DebugDrawModule::Draw(const float4x4 &view, const float4x4 &proj, unsigned width, unsigned height)
+void DebugDrawModule::Draw(const float4x4& view, const float4x4& proj, unsigned width, unsigned height)
 {
     implementation->width     = width;
     implementation->height    = height;
