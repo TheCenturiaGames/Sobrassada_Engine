@@ -6,6 +6,8 @@
 #include <Libs/rapidjson/document.h>
 #include "CameraModule.h"
 
+#define RADTODEG (180.0f / 3.14159265358979323846f)
+
 class CameraComponent : public Component
 {
   public:

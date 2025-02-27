@@ -74,17 +74,31 @@ void CameraComponent::RenderEditorInspector()
 
         if (ImGui::Combo("Projection Type", &currentProjection, projectionTypes, IM_ARRAYSIZE(projectionTypes)))
         {
-            camera.type = (currentProjection == 1) ? OrthographicFrustum : PerspectiveFrustum;
+            camera.type               = (currentProjection == 1) ? OrthographicFrustum : PerspectiveFrustum;
+            matrices.projectionMatrix = camera.ProjectionMatrix();
         }
 
-        
-        //TODO: CHANGE FOV AND UPDATE
         if (camera.type == PerspectiveFrustum)
         {
-            //if (ImGui::DragFloat("FoV", &camera.fov, 0.1f, 1.0f, 179.0f, "%.1f"))
-            //{
-                //camera.fov = std::clamp(camera.fov, 1.0f, 179.0f);
-            //}
+            float hfov = camera.horizontalFov * RADTODEG;
+            if (ImGui::DragFloat("FoV", &hfov, 0.1f, 1.0f, 179.0f, "%.2f"))
+            {
+                camera.horizontalFov = hfov * DEGTORAD;
+                int width            = App->GetWindowModule()->GetWidth();
+                int height           = App->GetWindowModule()->GetHeight();
+                camera.verticalFov   = 2.0f * atanf(tanf(camera.horizontalFov * 0.5f) * ((float)height / (float)width));
+                matrices.projectionMatrix = camera.ProjectionMatrix();
+            }
+        }
+        else if (camera.type == OrthographicFrustum)
+        {
+            if (ImGui::DragFloat("Width", &camera.orthographicWidth, 0.1f, 0.1f, 1000.f, "%.2f"))
+            {
+                int width            = App->GetWindowModule()->GetWidth();
+                int height           = App->GetWindowModule()->GetHeight();
+                camera.orthographicHeight = camera.orthographicWidth / ((float)height / (float)width);
+                matrices.projectionMatrix = camera.ProjectionMatrix();
+            }
         }
     }
 }
