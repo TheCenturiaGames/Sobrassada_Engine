@@ -130,7 +130,7 @@ void Scene::RenderEditorControl()
     ImGui::SameLine();
     if (ImGui::Button("Stop"))
     {
-        stopPlay = true;
+        stopPlaying = true;
         gameTimer->Reset();
     }
     ImGui::SameLine();
@@ -235,32 +235,6 @@ void Scene::RenderHierarchyUI(bool& hierarchyMenu)
     {
         ImGui::End();
         return;
-    }
-
-    if (ImGui::Button("Add GameObject"))
-    {
-        GameObject* newGameObject = new GameObject(selectedGameObjectUID, "new Game Object");
-        UID newUUID               = newGameObject->GetUID();
-
-        GetGameObjectByUID(selectedGameObjectUID)->AddGameObject(newUUID);
-
-        // TODO: change when filesystem defined
-        gameObjectsContainer.insert({newUUID, newGameObject});
-
-        GetGameObjectByUID(newGameObject->GetParent())->ComponentGlobalTransformUpdated();
-    }
-
-    if (selectedGameObjectUID != gameObjectRootUID)
-    {
-        ImGui::SameLine();
-
-        if (ImGui::Button("Delete GameObject"))
-        {
-            UID parentUID                = GetGameObjectByUID(selectedGameObjectUID)->GetParent();
-            GameObject* parentGameObject = GetGameObjectByUID(parentUID);
-            RemoveGameObjectHierarchy(selectedGameObjectUID);
-            // parentGameObject->PassAABBUpdateToParent(); // TODO: check if it works
-        }
     }
 
     GameObject* rootGameObject = GetGameObjectByUID(gameObjectRootUID);

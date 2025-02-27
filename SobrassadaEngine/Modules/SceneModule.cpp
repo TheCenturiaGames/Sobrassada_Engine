@@ -66,7 +66,7 @@ update_status SceneModule::RenderEditor(float deltaTime)
 
 update_status SceneModule::PostUpdate(float deltaTime)
 {
-    if (loadedScene != nullptr && loadedScene->GetStopPlay()) SwitchPlayMode(false);
+    if (loadedScene != nullptr && loadedScene->GetStopPlaying()) SwitchPlayMode(false);
 
     return UPDATE_CONTINUE;
 }
@@ -81,7 +81,7 @@ void SceneModule::CreateScene()
 {
     CloseScene();
 
-    GameObject* sceneGameObject = new GameObject("New Scene");
+    GameObject* sceneGameObject = new GameObject("Scene");
 
     loadedScene                 = new Scene(GenerateUID(), "New Scene", sceneGameObject->GetUID());
 
@@ -124,7 +124,7 @@ void SceneModule::SwitchPlayMode(bool play)
         App->GetLibraryModule()->LoadScene(tmpScene.c_str(), true);
         FileSystem::Delete((SCENES_PATH + tmpScene).c_str());
         isPlayMode = false;
-        loadedScene->SetStopPlay(false);
+        loadedScene->SetStopPlaying(false);
     }
     else
     {

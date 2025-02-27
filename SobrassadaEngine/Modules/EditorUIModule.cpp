@@ -189,8 +189,8 @@ void EditorUIModule::MainMenu()
         ImGui::EndMenu();
     }
 
-    // Windows tab menu
-    if (ImGui::BeginMenu("Window"))
+    // View tab menu
+    if (ImGui::BeginMenu("View"))
     {
         if (ImGui::MenuItem("Console", "", consoleMenu)) consoleMenu = !consoleMenu;
 

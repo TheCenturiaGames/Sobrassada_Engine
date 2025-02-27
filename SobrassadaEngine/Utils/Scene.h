@@ -50,20 +50,20 @@ class Scene
     AABBUpdatable* GetTargetForAABBUpdate(UID uid);
     LightsConfig* GetLightsConfig() { return lightsConfig; }
 
-    bool GetStopPlay() const { return stopPlay; }
+    bool GetStopPlaying() const { return stopPlaying; }
 
-    void SetStopPlay(bool stop) { stopPlay = stop; }
+    void SetStopPlaying(bool stop) { stopPlaying = stop; }
 
   private:
     void CreateSpatialDataStruct();
     void CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects) const;
 
   private:
-    bool stopPlay = false;
     std::string sceneName;
     UID sceneUID;
     UID gameObjectRootUID;
     UID selectedGameObjectUID;
+    bool stopPlaying = false;
 
     std::map<UID, Component*> gameComponents; // TODO Move components to individual gameObjects
     std::unordered_map<UID, GameObject*> gameObjectsContainer;
