@@ -42,14 +42,14 @@ Scene::~Scene()
     delete sceneOctree;
     lightsConfig = nullptr;
 
-    GLOG("%s scene closed", sceneName)
+    GLOG("%s scene closed", sceneName.c_str());
 }
 
 void Scene::Save() const
 {
     if (!App->GetLibraryModule()->SaveScene(SCENES_PATH, SaveMode::Save))
     {
-        GLOG("%s scene saving failed", sceneName)
+        GLOG("%s scene saving failed", sceneName.c_str());
     }
 }
 
@@ -71,7 +71,7 @@ void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGa
     GameObject* root = GetGameObjectByUUID(gameObjectRootUUID);
     if (root != nullptr)
     {
-        GLOG("Init transform and AABB calculation")
+        GLOG("Init transform and AABB calculation");
         root->ComponentGlobalTransformUpdated();
     }
 
