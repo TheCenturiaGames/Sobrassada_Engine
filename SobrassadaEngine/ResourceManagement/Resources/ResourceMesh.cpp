@@ -37,12 +37,12 @@ void ResourceMesh::LoadData(
     this->indexCount        = static_cast<unsigned int>(indices.size());
     unsigned int bufferSize = sizeof(Vertex);
 
-    for (auto vertex : vertices)
-    {
-        GLOG("Joints: %d, %d, %d, %d", vertex.joint[0], vertex.joint[1], vertex.joint[2], vertex.joint[3]);
-
-        GLOG("Weights: %f, %f, %f, %f", vertex.weights[0], vertex.weights[1], vertex.weights[2], vertex.weights[3]);
-    }
+    //for (auto vertex : vertices)
+    //{
+    //    GLOG("Joints: %d, %d, %d, %d", vertex.joint[0], vertex.joint[1], vertex.joint[2], vertex.joint[3]);
+    //
+    //    GLOG("Weights: %f, %f, %f, %f", vertex.weights[0], vertex.weights[1], vertex.weights[2], vertex.weights[3]);
+    //}
 
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);

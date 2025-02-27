@@ -49,7 +49,7 @@ namespace ModelImporter
                     const float4x4 matrix  = *reinterpret_cast<const float4x4*>(bufferMatrices);
                     bufferMatrices        += stride;
                     inverseBindMatrices.push_back(matrix);
-                    GLOG("I: %d. %f, %f, %f, %f", i, matrix[0][0], matrix[1][0], matrix[2][0], matrix[3][0]);
+                    GLOG("I: %d. %f, %f, %f, %f", i, matrix[0][0], matrix[0][1], matrix[0][2], matrix[0][3]);
                 }
                 GLOG("Bind matrices length: %d", inverseBindMatrices.size());
 
@@ -138,7 +138,7 @@ namespace ModelImporter
                 {
                     for (int j = 0; j < 4; ++j)
                     {
-                        valMatrix.PushBack(matrix[j][i], allocator);
+                        valMatrix.PushBack(matrix[i][j], allocator);
                     }
                 }
                 valMatrices.PushBack(valMatrix, allocator);
@@ -283,12 +283,15 @@ namespace ModelImporter
                     {
                         if (initMatrices[i].IsArray() && initMatrices[i].Size() == 16)
                         {
-                            float4x4 matrix;
+                            const rapidjson::Value& initMatrix = initMatrices[i];
+                            float4x4 matrix = float4x4::identity;
+                            int pos                        = 0;
                             for (int i = 0; i < 4; ++i)
                             {
                                 for (int j = 0; j < 4; ++j)
                                 {
-                                    matrix[j][i] = initMatrices[i + j].GetFloat();
+                                    matrix[i][j] = initMatrix[pos].GetFloat();
+                                    ++pos;
                                 }
                             }
                             newSkin.inverseBindMatrices.push_back(matrix);
