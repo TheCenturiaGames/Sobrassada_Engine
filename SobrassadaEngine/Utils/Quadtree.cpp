@@ -5,7 +5,7 @@
 #include <set>
 #include <stack>
 
-Quadtree::Quadtree(const float2 &position, float size, int capacity)
+Quadtree::Quadtree(const float2& position, float size, int capacity)
 {
     float halfSize         = size / 2.f;
     float2 minPosition     = float2(position.x - halfSize, position.y - halfSize);
@@ -21,12 +21,12 @@ Quadtree::~Quadtree()
     delete rootNode;
 }
 
-bool Quadtree::InsertElement(const MockGameObject *gameObject)
+bool Quadtree::InsertElement(const MockGameObject* gameObject)
 {
     if (gameObject == nullptr) return false;
 
     bool inserted = false;
-    std::stack<QuadtreeNode *> nodesToVisit;
+    std::stack<QuadtreeNode*> nodesToVisit;
     nodesToVisit.push(rootNode);
 
     const AABB elementBoundingBox   = gameObject->GetWorldBoundingBox();
@@ -35,7 +35,7 @@ bool Quadtree::InsertElement(const MockGameObject *gameObject)
 
     while (!nodesToVisit.empty())
     {
-        QuadtreeNode *currentNode = nodesToVisit.top();
+        QuadtreeNode* currentNode = nodesToVisit.top();
         nodesToVisit.pop();
 
         if (currentNode->Intersects(quadtreeBoundingBox))
@@ -71,24 +71,24 @@ bool Quadtree::InsertElement(const MockGameObject *gameObject)
     return inserted;
 }
 
-void Quadtree::QueryElements(const AABB &area, std::vector<const MockGameObject *> &foundElements) const
+void Quadtree::QueryElements(const AABB& area, std::vector<const MockGameObject*>& foundElements) const
 {
     std::vector<bool> insertedElements = std::vector<bool>(totalElements, false);
     AABB2D area2D                      = AABB2D(area.minPoint.xz(), area.maxPoint.xz());
 
-    std::stack<const QuadtreeNode *> nodesToVisit;
+    std::stack<const QuadtreeNode*> nodesToVisit;
     nodesToVisit.push(rootNode);
 
     while (!nodesToVisit.empty())
     {
-        const QuadtreeNode *currentNode = nodesToVisit.top();
+        const QuadtreeNode* currentNode = nodesToVisit.top();
         nodesToVisit.pop();
 
         if (currentNode->Intersects(area2D))
         {
             if (currentNode->IsLeaf())
             {
-                for (const auto &element : currentNode->elements)
+                for (const auto& element : currentNode->elements)
                 {
                     if (!insertedElements[element.id])
                     {
@@ -108,13 +108,13 @@ void Quadtree::QueryElements(const AABB &area, std::vector<const MockGameObject 
     }
 }
 
-void Quadtree::GetDrawLines(std::vector<float4> &drawLines, std::vector<float4> &elementLines) const
+void Quadtree::GetDrawLines(std::vector<float4>& drawLines, std::vector<float4>& elementLines) const
 {
     std::set<QuadtreeElement> includedElement;
     drawLines    = std::vector<float4>(totalLeaf * 4, float4(0, 0, 0, 0));
     elementLines = std::vector<float4>(totalElements * 4, float4(0, 0, 0, 0));
 
-    std::stack<const QuadtreeNode *> nodesToVisit;
+    std::stack<const QuadtreeNode*> nodesToVisit;
     nodesToVisit.push(rootNode);
 
     int currentDrawLine    = 0;
@@ -122,7 +122,7 @@ void Quadtree::GetDrawLines(std::vector<float4> &drawLines, std::vector<float4> 
 
     while (!nodesToVisit.empty())
     {
-        const QuadtreeNode *currentNode = nodesToVisit.top();
+        const QuadtreeNode* currentNode = nodesToVisit.top();
         nodesToVisit.pop();
 
         if (currentNode->IsLeaf())
@@ -140,7 +140,7 @@ void Quadtree::GetDrawLines(std::vector<float4> &drawLines, std::vector<float4> 
             drawLines[currentDrawLine++] = float4(bottomLeft.x, bottomLeft.y, bottomRight.x, bottomRight.y);
             drawLines[currentDrawLine++] = float4(topLeft.x, topLeft.y, bottomLeft.x, bottomLeft.y);
 
-            for (auto &element : currentNode->elements)
+            for (auto& element : currentNode->elements)
             {
                 if (includedElement.find(element) == includedElement.end())
                 {
@@ -199,7 +199,7 @@ void Quadtree::QuadtreeNode::Subdivide()
     bottomLeft             = new QuadtreeNode(AABB2D(bottomLeftPoint, center), elementsCapacity);
     bottomRight            = new QuadtreeNode(AABB2D(bottomPoint, rightPoint), elementsCapacity);
 
-    for (auto &element : elements)
+    for (auto& element : elements)
     {
         if (topLeft->Intersects(element.boundingBox)) topLeft->elements.push_back(element);
         if (topRight->Intersects(element.boundingBox)) topRight->elements.push_back(element);

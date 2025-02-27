@@ -13,7 +13,7 @@ ResourceTexture::~ResourceTexture()
 void ResourceTexture::LoadData(const DirectX::TexMetadata& metadata, const DirectX::ScratchImage& scratchImage)
 {
     this->metadata = metadata;
-    //this->scratchImage = scratchImage;
+    // this->scratchImage = scratchImage;
     ConvertMetadata(this->metadata, openGLMetadata);
 }
 
