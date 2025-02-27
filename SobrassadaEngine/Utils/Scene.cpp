@@ -90,13 +90,9 @@ update_status Scene::Render(float deltaTime)
 
 update_status Scene::RenderEditor(float deltaTime)
 {
-    stop = false;
-
     RenderEditorControl();
     RenderScene();
     RenderGame();
-
-    if (stop) return UPDATE_CONTINUE;
 
     RenderSelectedGameObjectUI();
     lightsConfig->EditorParams();
@@ -134,8 +130,7 @@ void Scene::RenderEditorControl()
     ImGui::SameLine();
     if (ImGui::Button("Stop"))
     {
-        stop = true;
-        App->GetSceneModule()->SwitchPlayMode(false);
+        stopPlay = true;
         gameTimer->Reset();
     }
     ImGui::SameLine();

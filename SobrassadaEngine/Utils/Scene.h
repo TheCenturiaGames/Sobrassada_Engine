@@ -50,12 +50,16 @@ class Scene
     AABBUpdatable* GetTargetForAABBUpdate(UID uid);
     LightsConfig* GetLightsConfig() { return lightsConfig; }
 
+    bool GetStopPlay() const { return stopPlay; }
+
+    void SetStopPlay(bool stop) { stopPlay = stop; }
+
   private:
     void CreateSpatialDataStruct();
     void CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects) const;
 
   private:
-    bool stop = false;
+    bool stopPlay = false;
     std::string sceneName;
     UID sceneUID;
     UID gameObjectRootUID;
