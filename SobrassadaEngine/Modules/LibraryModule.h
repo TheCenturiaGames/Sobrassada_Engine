@@ -45,10 +45,6 @@ class LibraryModule : public Module
     const std::unordered_map<std::string, UID> &GetMeshMap() const { return meshMap; }
     const std::unordered_map<std::string, UID>& GetAnimMap() const { return animMap; }
 
-    const std::unordered_map<std::string, UID>& GetTextureMap() const { return textureMap; }
-    const std::unordered_map<std::string, UID>& GetMaterialMap() const { return materialMap; }
-    const std::unordered_map<std::string, UID>& GetMeshMap() const { return meshMap; }
-
   private:
     // maps for user visual
     std::unordered_map<std::string, UID> textureMap;  // UID -> name.dds
