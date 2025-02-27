@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "LibraryModule.h"
+#include "MaterialImporter.h"
 #include "MeshImporter.h"
 #include "TextureImporter.h"
 #include "MaterialImporter.h"

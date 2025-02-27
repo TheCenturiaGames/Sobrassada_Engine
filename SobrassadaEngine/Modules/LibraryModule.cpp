@@ -8,10 +8,10 @@
 #include "Root/RootComponent.h"
 #include "SceneImporter.h"
 #include "SceneModule.h"
+
 #include "document.h"
 #include "prettywriter.h"
 #include "stringbuffer.h"
-
 #include <filesystem>
 
 LibraryModule::LibraryModule()
@@ -107,6 +107,19 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
 
     doc.AddMember("Scene", scene, allocator);
 
+    // Serialize Lights Config
+    LightsConfig* lightConfig = App->GetSceneModule()->GetLightsConfig();
+
+     if (lightConfig != nullptr)
+     {
+        rapidjson::Value lights(rapidjson::kObjectType);
+
+        lightConfig->SaveData(lights, allocator);
+
+        doc.AddMember("Lights Config", lights, allocator);
+
+     } else GLOG("Light Config not found");
+
     // Save file like JSON
     rapidjson::StringBuffer buffer;
     rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
@@ -139,7 +152,7 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
     return true;
 }
 
-bool LibraryModule::LoadScene(const char* path, bool reload)
+bool LibraryModule::LoadScene(const char* path, bool reload) const
 {
     rapidjson::Document doc;
     bool loaded = FileSystem::LoadJSON(path, doc);
@@ -210,6 +223,13 @@ bool LibraryModule::LoadScene(const char* path, bool reload)
 
     App->GetSceneModule()->LoadGameObjects(loadedGameObjects);
 
+    // Deserialize Lights Config
+    if (doc.HasMember("Lights Config") && doc["Lights Config"].IsObject())
+    {
+        LightsConfig* lightConfig           = App->GetSceneModule()->GetLightsConfig();
+        lightConfig->LoadData(doc["Lights Config"]);
+    }
+
     GLOG("%s scene loaded", name.c_str());
     return true;
 }
@@ -229,9 +249,9 @@ bool LibraryModule::LoadLibraryMaps()
             // Generate UID using the function from globals.h
             try
             {
-                UID originalUID      = std::stoull(fileName);
+                UID originalUID = std::stoull(fileName);
 
-                UID prefix           = originalUID / 100000000000000;
+                UID prefix      = originalUID / 100000000000000;
 
                 switch (prefix)
                 {
@@ -254,11 +274,11 @@ bool LibraryModule::LoadLibraryMaps()
                     GLOG("Category: Unknown File Type (10)");
                     break;
                 }
-            } catch (std::invalid_argument& e)
+            }
+            catch (std::invalid_argument&)
             {
                 GLOG("File %s is not an asset file", fileName);
             }
-            
         }
     }
 
