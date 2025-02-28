@@ -44,6 +44,9 @@ class Material
     void SetSpecularFactor(const float3& newSpecularFactor) { specularFactor = newSpecularFactor; }
     void SetGlossinessFactor(float newGlossiness) { glossinessFactor = newGlossiness; }
     void SetOcclusionStrength(float strength) { occlusionStrength = strength; }
+    void SetMetallicFactor(float newMetallicFactor) { metallicFactor = newMetallicFactor; }
+    void SetRoughnessFactor(float newRoughnessFactor) { roughnessFactor = newRoughnessFactor; }
+
 
     void SetSpecularGlossinessTexture(UID texture) { specularGlossinessTexture = texture; }
     void SetNormalTexture(UID texture) { normalTexture = texture; }
@@ -57,6 +60,9 @@ class Material
     float3 specularFactor                 = {1.0f, 1.0f, 1.0f};       // RGB
     float glossinessFactor                = 1.0f;
     float occlusionStrength               = 1.0f;
+    float metallicFactor                  = 0.0f;
+    float roughnessFactor                 = 1.0f;
+
 
     // pointers to the dds paths
     UID diffuseTexture            = CONSTANT_EMPTY_UID;
