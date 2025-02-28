@@ -80,9 +80,20 @@ void LightsConfig::InitSkybox()
 void LightsConfig::RenderSkybox() const
 {
     App->GetOpenGLModule()->SetDepthFunc(false);
+    float4x4 projection;
+    float4x4 view;
 
-    auto projection = App->GetCameraModule()->GetProjectionMatrix();
-    auto view       = App->GetCameraModule()->GetViewMatrix();
+    if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr)
+    {
+        projection = App->GetSceneModule()->GetMainCamera()->GetProjectionMatrix();
+        view       = App->GetSceneModule()->GetMainCamera()->GetViewMatrix();
+    }
+    else
+    {
+        projection = App->GetCameraModule()->GetProjectionMatrix();
+        view       = App->GetCameraModule()->GetViewMatrix();
+    }
+
 
     glUseProgram(skyboxProgram);
     glUniformMatrix4fv(0, 1, GL_TRUE, &projection[0][0]);

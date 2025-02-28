@@ -23,6 +23,8 @@ class CameraComponent : public Component
     const FrustumPlanes& GetFrustrumPlanes() const { return frustumPlanes; }
     const float3& GetCameraPosition() const { return camera.pos; }
     unsigned int GetUbo() const { return ubo; }
+    const float4x4& GetProjectionMatrix() { return camera.ProjectionMatrix(); }
+    const float4x4& GetViewMatrix() { return camera.ViewMatrix(); }
 
   private:
     Frustum camera;
