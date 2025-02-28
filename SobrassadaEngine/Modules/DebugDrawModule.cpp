@@ -7,7 +7,7 @@
 #include "MathGeoLib.h"
 #include "QuadtreeViewer.h"
 #include "WindowModule.h"
-
+#include "OpenGLModule.h"
 #include "SDL_video.h"
 #define DEBUG_DRAW_IMPLEMENTATION
 #include "DebugDraw.h" // Debug Draw API. Notice that we need the DEBUG_DRAW_IMPLEMENTATION macro here!
