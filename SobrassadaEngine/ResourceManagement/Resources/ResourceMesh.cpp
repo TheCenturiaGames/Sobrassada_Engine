@@ -17,8 +17,8 @@ ResourceMesh::ResourceMesh(
 )
     : Resource(uid, name, ResourceType::Mesh)
 {
-    aabb.maxPoint = maxPos;
-    aabb.minPoint = minPos;
+    aabb.maxPoint = transform.MulPos(maxPos);
+    aabb.minPoint = transform.MulPos(minPos);
 }
 
 ResourceMesh::~ResourceMesh()
