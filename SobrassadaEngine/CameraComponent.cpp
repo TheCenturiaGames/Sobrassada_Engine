@@ -2,9 +2,9 @@
 
 #include "Application.h"
 #include "DebugDrawModule.h"
+#include "InputModule.h"
 #include "SceneModule.h"
 #include "WindowModule.h"
-#include "InputModule.h"
 #include "glew.h"
 
 #include "ImGui.h"
@@ -60,7 +60,8 @@ void CameraComponent::RenderEditorInspector()
     {
         ImGui::SeparatorText("Camera");
         bool isMainCamera = false;
-        if (App->GetSceneModule()->GetMainCamera() != nullptr) isMainCamera = (App->GetSceneModule()->GetMainCamera()->GetUbo() == ubo);
+        if (App->GetSceneModule()->GetMainCamera() != nullptr)
+            isMainCamera = (App->GetSceneModule()->GetMainCamera()->GetUbo() == ubo);
         if (ImGui::Checkbox("Main Camera", &isMainCamera))
         {
             if (isMainCamera)
@@ -119,16 +120,14 @@ void CameraComponent::RenderEditorInspector()
 
 void CameraComponent::Update()
 {
-    InputModule* inputModule = App->GetInputModule();
-
-    if (App->GetSceneModule()->GetInPlayMode() && inputModule->GetKey(SDL_SCANCODE_W))
-        camera.pos += camera.front * 2.0f;
-    if (App->GetSceneModule()->GetInPlayMode() && inputModule->GetKey(SDL_SCANCODE_S))
-        camera.pos -= camera.front * 2.0f;
-    if (App->GetSceneModule()->GetInPlayMode() && inputModule->GetKey(SDL_SCANCODE_D))
-        camera.pos += camera.WorldRight() * 2.0f;
-    if (App->GetSceneModule()->GetInPlayMode() && inputModule->GetKey(SDL_SCANCODE_A))
-        camera.pos -= camera.WorldRight() * 2.0f;
+    if (App->GetSceneModule()->GetInPlayMode())
+    {
+        InputModule* inputModule = App->GetInputModule();
+        if (inputModule->GetKey(SDL_SCANCODE_W)) camera.pos += camera.front * 2.0f;
+        if (inputModule->GetKey(SDL_SCANCODE_S)) camera.pos -= camera.front * 2.0f;
+        if (inputModule->GetKey(SDL_SCANCODE_D)) camera.pos += camera.WorldRight() * 2.0f;
+        if (inputModule->GetKey(SDL_SCANCODE_A)) camera.pos -= camera.WorldRight() * 2.0f;
+    }
 
     matrices.projectionMatrix = camera.ProjectionMatrix();
     matrices.viewMatrix       = camera.ViewMatrix();
@@ -142,7 +141,6 @@ void CameraComponent::Update()
 
 void CameraComponent::Render()
 {
-
 
     if (!enabled || !drawGizmos) return;
     DebugDrawModule* debug = App->GetDebugDrawModule();

@@ -82,86 +82,89 @@ void CameraModule::UpdateUBO()
 
 update_status CameraModule::Update(float deltaTime)
 {
-    InputModule* inputModule = App->GetInputModule();
-
-    float finalCameraSpeed   = cameraMoveSpeed * deltaTime;
-
-    if (inputModule->GetKey(SDL_SCANCODE_LSHIFT))
+    if (!App->GetSceneModule()->GetInPlayMode())
     {
-        finalCameraSpeed *= 2;
-    }
+        InputModule* inputModule = App->GetInputModule();
 
-    if (inputModule->GetMouseButtonDown(SDL_BUTTON_RIGHT))
-    {
-        // TRANSLATION
-        if (inputModule->GetKey(SDL_SCANCODE_W))
+        float finalCameraSpeed   = cameraMoveSpeed * deltaTime;
+
+        if (inputModule->GetKey(SDL_SCANCODE_LSHIFT))
         {
-            if (isCameraDetached) detachedCamera.pos += detachedCamera.front * finalCameraSpeed;
-            else camera.pos += camera.front * finalCameraSpeed;
-        }
-        if (inputModule->GetKey(SDL_SCANCODE_S))
-        {
-            if (isCameraDetached) detachedCamera.pos -= detachedCamera.front * finalCameraSpeed;
-            else camera.pos -= camera.front * finalCameraSpeed;
+            finalCameraSpeed *= 2;
         }
 
-        if (inputModule->GetKey(SDL_SCANCODE_A))
+        if (inputModule->GetMouseButtonDown(SDL_BUTTON_RIGHT))
         {
-            if (isCameraDetached) detachedCamera.pos -= detachedCamera.WorldRight() * finalCameraSpeed;
-            else camera.pos -= camera.WorldRight() * finalCameraSpeed;
-        }
-        if (inputModule->GetKey(SDL_SCANCODE_D))
-        {
-            if (isCameraDetached) detachedCamera.pos += detachedCamera.WorldRight() * finalCameraSpeed;
-            else camera.pos += camera.WorldRight() * finalCameraSpeed;
-        }
-
-        if (inputModule->GetKey(SDL_SCANCODE_E))
-        {
-            if (isCameraDetached) detachedCamera.pos += detachedCamera.up * finalCameraSpeed;
-            else camera.pos += camera.up * finalCameraSpeed;
-        }
-        if (inputModule->GetKey(SDL_SCANCODE_Q))
-        {
-            if (isCameraDetached) detachedCamera.pos -= detachedCamera.up * finalCameraSpeed;
-            else camera.pos -= camera.up * finalCameraSpeed;
-        }
-    }
-
-    if (inputModule->GetMouseButtonDown(SDL_BUTTON_RIGHT))
-    {
-        // ZOOMING
-        if (inputModule->GetKey(SDL_SCANCODE_LALT))
-        {
-            float mouseY = -inputModule->GetMouseMotion().y;
-
-            if (mouseY != 0)
+            // TRANSLATION
+            if (inputModule->GetKey(SDL_SCANCODE_W))
             {
-                if (isCameraDetached) detachedCamera.pos += detachedCamera.front * mouseY * finalCameraSpeed;
-                else camera.pos += camera.front * mouseY * finalCameraSpeed;
+                if (isCameraDetached) detachedCamera.pos += detachedCamera.front * finalCameraSpeed;
+                else camera.pos += camera.front * finalCameraSpeed;
+            }
+            if (inputModule->GetKey(SDL_SCANCODE_S))
+            {
+                if (isCameraDetached) detachedCamera.pos -= detachedCamera.front * finalCameraSpeed;
+                else camera.pos -= camera.front * finalCameraSpeed;
+            }
+
+            if (inputModule->GetKey(SDL_SCANCODE_A))
+            {
+                if (isCameraDetached) detachedCamera.pos -= detachedCamera.WorldRight() * finalCameraSpeed;
+                else camera.pos -= camera.WorldRight() * finalCameraSpeed;
+            }
+            if (inputModule->GetKey(SDL_SCANCODE_D))
+            {
+                if (isCameraDetached) detachedCamera.pos += detachedCamera.WorldRight() * finalCameraSpeed;
+                else camera.pos += camera.WorldRight() * finalCameraSpeed;
+            }
+
+            if (inputModule->GetKey(SDL_SCANCODE_E))
+            {
+                if (isCameraDetached) detachedCamera.pos += detachedCamera.up * finalCameraSpeed;
+                else camera.pos += camera.up * finalCameraSpeed;
+            }
+            if (inputModule->GetKey(SDL_SCANCODE_Q))
+            {
+                if (isCameraDetached) detachedCamera.pos -= detachedCamera.up * finalCameraSpeed;
+                else camera.pos -= camera.up * finalCameraSpeed;
             }
         }
-        else
+
+        if (inputModule->GetMouseButtonDown(SDL_BUTTON_RIGHT))
         {
-            // ROTATION WITH MOUSE
+            // ZOOMING
+            if (inputModule->GetKey(SDL_SCANCODE_LALT))
+            {
+                float mouseY = -inputModule->GetMouseMotion().y;
+
+                if (mouseY != 0)
+                {
+                    if (isCameraDetached) detachedCamera.pos += detachedCamera.front * mouseY * finalCameraSpeed;
+                    else camera.pos += camera.front * mouseY * finalCameraSpeed;
+                }
+            }
+            else
+            {
+                // ROTATION WITH MOUSE
+                float mouseX             = inputModule->GetMouseMotion().x;
+                float mouseY             = inputModule->GetMouseMotion().y;
+                float deltaRotationAngle = cameraRotationAngle * deltaTime;
+
+                RotateCamera(-mouseX * deltaRotationAngle, -mouseY * deltaRotationAngle);
+            }
+        }
+
+        // ORBIT
+        if (inputModule->GetMouseButtonDown(SDL_BUTTON_LEFT) && inputModule->GetKey(SDL_SCANCODE_LALT))
+        {
             float mouseX             = inputModule->GetMouseMotion().x;
             float mouseY             = inputModule->GetMouseMotion().y;
             float deltaRotationAngle = cameraRotationAngle * deltaTime;
 
             RotateCamera(-mouseX * deltaRotationAngle, -mouseY * deltaRotationAngle);
+
+            FocusCamera();
         }
-    }
-
-    // ORBIT
-    if (inputModule->GetMouseButtonDown(SDL_BUTTON_LEFT) && inputModule->GetKey(SDL_SCANCODE_LALT))
-    {
-        float mouseX             = inputModule->GetMouseMotion().x;
-        float mouseY             = inputModule->GetMouseMotion().y;
-        float deltaRotationAngle = cameraRotationAngle * deltaTime;
-
-        RotateCamera(-mouseX * deltaRotationAngle, -mouseY * deltaRotationAngle);
-
-        FocusCamera();
     }
 
     viewMatrix         = camera.ViewMatrix();
