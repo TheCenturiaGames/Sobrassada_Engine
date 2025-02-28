@@ -1,17 +1,16 @@
 #include "DebugDrawModule.h"
+
 #include "Application.h"
 #include "CameraModule.h"
 #include "Framebuffer.h"
 #include "Globals.h"
 #include "MathGeoLib.h"
-#include "OpenGLModule.h"
-#include "QaudtreeViewer.h"
-#include "SDL_video.h"
+#include "QuadtreeViewer.h"
 #include "WindowModule.h"
 
+#include "SDL_video.h"
 #define DEBUG_DRAW_IMPLEMENTATION
 #include "DebugDraw.h" // Debug Draw API. Notice that we need the DEBUG_DRAW_IMPLEMENTATION macro here!
-
 #include "glew.h"
 #include "imgui.h"
 

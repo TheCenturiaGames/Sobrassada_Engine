@@ -1,5 +1,6 @@
 ﻿#pragma once
-#include "Mesh.h"
+
+#include "FileSystem/Mesh.h"
 #include "Resource.h"
 #include "Math/float4x4.h"
 
@@ -28,10 +29,8 @@ class ResourceMesh : public Resource
     unsigned int vbo         = 0;
     unsigned int ebo         = 0;
     unsigned int vao         = 0;
-
     unsigned int mode        = 0;
-    UID material      = CONSTANT_EMPTY_UID;
-
+    UID material             = CONSTANT_EMPTY_UID;
     unsigned int vertexCount = 0;
     unsigned int indexCount  = 0;
 

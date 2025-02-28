@@ -10,8 +10,8 @@
 
 namespace SceneImporter
 {
-    void Import(const char *filePath);
-    void ImportGLTF(const char *filePath);
+    void Import(const char* filePath);
+    void ImportGLTF(const char* filePath);
     void CreateLibraryDirectories();
 
     float4x4 GetNodeTransform(const tinygltf::Node& node);

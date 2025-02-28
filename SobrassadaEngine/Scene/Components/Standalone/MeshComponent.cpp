@@ -8,14 +8,14 @@
 #include "LibraryModule.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
-#include "imgui.h"
 
+#include "imgui.h"
 #include <Math/Quat.h>
 
 MeshComponent::MeshComponent(
     const UID uid, const UID uidParent, const UID uidRoot, const Transform& parentGlobalTransform
 )
-    : Component(uid, uidParent, uidRoot, "Mesh component", COMPONENT_MESH, parentGlobalTransform)
+    : Component(uid, uidParent, uidRoot, "Mesh", COMPONENT_MESH, parentGlobalTransform)
 {
 }
 
@@ -114,6 +114,8 @@ void MeshComponent::AddMesh(UID resource, bool reloadAABB)
 {
     if (resource == CONSTANT_EMPTY_UID) return;
 
+    if (currentMesh != nullptr && currentMesh->GetUID() == resource) return;
+
     ResourceMesh* newMesh = dynamic_cast<ResourceMesh*>(App->GetResourcesModule()->RequestResource(resource));
     if (newMesh != nullptr)
     {
@@ -140,6 +142,8 @@ void MeshComponent::AddMesh(UID resource, bool reloadAABB)
 
 void MeshComponent::AddMaterial(UID resource)
 {
+    if (currentMaterial != nullptr && currentMaterial->GetUID() == resource) return;
+
     ResourceMaterial* newMaterial =
         dynamic_cast<ResourceMaterial*>(App->GetResourcesModule()->RequestResource(resource));
     if (newMaterial != nullptr)

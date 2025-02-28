@@ -1,15 +1,21 @@
 #include "ResourceMesh.h"
 
+#include "Application.h"
+#include "CameraModule.h"
+#include "ResourceMaterial.h"
+
 #include <Math/float2.h>
 #include <Math/float4x4.h>
 #include <SDL_assert.h>
 #include <glew.h>
 
+
+ResourceMesh::ResourceMesh(UID uid, const std::string& name, const float3& maxPos, const float3& minPos)
 #include "Application.h"
 #include "CameraModule.h"
 #include "ResourceMaterial.h"
 
-ResourceMesh::ResourceMesh(UID uid, const std::string& name, const float3& maxPos, const float3& minPos, const float4x4& transform)
+ResourceMesh::ResourceMesh(UID uid, const std::string& name, const float3& maxPos, const float3& minPos)
     : Resource(uid, name, ResourceType::Mesh)
 {
     aabb.maxPoint = transform.MulPos(maxPos);
@@ -18,22 +24,22 @@ ResourceMesh::ResourceMesh(UID uid, const std::string& name, const float3& maxPo
 
 ResourceMesh::~ResourceMesh()
 {
-    glDeleteBuffers(1, &vbo);
-    glDeleteBuffers(1, &ebo);
-    glDeleteBuffers(1, &vao);
-}
-
-void ResourceMesh::LoadData(
-    unsigned int mode, const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices,
-    float4x4& transform
-)
-{
 
     this->mode              = mode;
     this->material          = material;
     this->vertexCount       = vertices.size();
     this->indexCount        = indices.size();
     this->currentMeshTransform         = transform;
+
+void ResourceMesh::LoadData(
+    unsigned int mode, const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices,
+    float4x4& transform
+)
+{
+    this->mode = mode;
+    this->material = material;
+    this->vertexCount       = static_cast<unsigned int>(vertices.size());
+    this->indexCount        = static_cast<unsigned int>(indices.size());
     unsigned int bufferSize = sizeof(Vertex);
 
     glGenVertexArrays(1, &vao);
@@ -53,17 +59,17 @@ void ResourceMesh::LoadData(
     glEnableVertexAttribArray(1); // Tangent
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
 
-    glEnableVertexAttribArray(2); // Normal
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 
-    glEnableVertexAttribArray(3); // Texture Coordinates
-    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoord));
 
-    // Unbind VAO
-    glBindVertexArray(0);
+glVertexAttribPointer(
+    3, 4, GL_FLOAT, GL_FALSE, 0,
+    (void *)(sizeof(float) * 3 * vertexCount + sizeof(float) * 2 * textureCoordCount +
+             sizeof(float) * 3 * normalCoordCount)
+);
 }
 
-
+    glBindVertexArray(0);*/
+}
 
 void ResourceMesh::Render(int program, float4x4& modelMatrix, unsigned int cameraUBO, ResourceMaterial* material)
 {

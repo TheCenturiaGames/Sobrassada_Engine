@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include "Globals.h"
 
+#include "Globals.h"
 
 #include <cstdint>
 #include <string>
@@ -15,29 +15,22 @@ enum class ResourceType
 
 class Resource
 {
-public:
-    
-    Resource (UID uid, const std::string& name, ResourceType type);
-
+  public:
+    Resource(UID uid, const std::string& name, ResourceType type);
     virtual ~Resource();
-    
+
+    void AddReference() { referenceCount++; }
+    void RemoveReference() { referenceCount--; }
+
     UID GetUID() const { return uid; }
     const std::string& GetName() const { return name; }
     ResourceType GetType() const { return type; }
-    void AddReference() { referenceCount++; }
-    void RemoveReference() { referenceCount--; }
     unsigned int GetReferenceCount() const { return referenceCount; }
+    static ResourceType GetResourceTypeForUID(UID uid) { return static_cast<ResourceType>(uid / 100000000000000); }
 
-    static ResourceType GetResourceTypeForUID(UID uid)
-    {
-        return static_cast<ResourceType>(uid / 100000000000000);
-    }
-
-protected:
-
+  protected:
     UID uid = CONSTANT_EMPTY_UID;
     std::string name;
-
-    ResourceType type = ResourceType::Unknown;
+    ResourceType type           = ResourceType::Unknown;
     unsigned int referenceCount = 0;
 };
