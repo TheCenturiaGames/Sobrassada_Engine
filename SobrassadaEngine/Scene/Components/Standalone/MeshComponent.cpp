@@ -89,23 +89,24 @@ void MeshComponent::Render()
 {
     if (enabled && currentMesh != nullptr)
     {
-        unsigned int cameraUBO   = App->GetCameraModule()->GetUbo();
-        float4x4 localTransform2 = float4x4::identity;
-        localTransform2          = float4x4::FromTRS(
+        unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
+
+        float4x4 localMatrix   = float4x4::identity;
+        localMatrix            = float4x4::FromTRS(
             localTransform.position,
             Quat::FromEulerXYZ(localTransform.rotation.x, localTransform.rotation.y, localTransform.rotation.z),
             localTransform.scale
         );
-
+        /*
         float4x4 globalMatrix = float4x4::FromTRS(
             globalTransform.position,
             Quat::FromEulerXYZ(globalTransform.rotation.x, globalTransform.rotation.y, globalTransform.rotation.z),
             globalTransform.scale
         );
+        */
+        float4x4 modelWithLocal = localMatrix * modelMatrix;
 
-        float4x4 modelMatrix2 = globalMatrix * modelMatrix;
-        
-        currentMesh->Render(App->GetResourcesModule()->GetProgram(), modelMatrix2, cameraUBO, currentMaterial);
+        currentMesh->Render(App->GetResourcesModule()->GetProgram(), modelWithLocal, cameraUBO, currentMaterial);
     }
     Component::Render();
 }
