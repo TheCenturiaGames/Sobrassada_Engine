@@ -23,7 +23,6 @@ Resource* Importer::Load(UID uid)
         case ResourceType::Mesh:
             return MeshImporter::LoadMesh(uid);
         case ResourceType::Animation:
-            GLOG("HOLA");
             return AnimationImporter::LoadAnimation(uid);
         default:
             GLOG("Unknown resource type: %d", type)
