@@ -6,7 +6,6 @@
 #include "MeshImporter.h"
 #include "TextureImporter.h"
 
-
 #include "Math/Quat.h"
 
 namespace SceneImporter
@@ -66,10 +65,10 @@ namespace SceneImporter
 
             float4x4 localTransform    = float4x4::identity;
 
-            localTransform          = GetNodeTransform(node);
+            localTransform             = GetNodeTransform(node);
 
             nodeTransforms[i]          = nodeTransforms[i] * localTransform;
-            //multiply parent by all children
+            // multiply parent by all children
             if (node.children.size() > 0)
             {
                 for (size_t j = 0; j < node.children.size(); ++j)
@@ -173,7 +172,6 @@ namespace SceneImporter
         }
     }
 
-
     float4x4 GetNodeTransform(const tinygltf::Node& node)
     {
 
@@ -181,9 +179,10 @@ namespace SceneImporter
         {
             // glTF stores matrices in COLUMN-MAJOR order, same as MathGeoLib
             return float4x4(
-                node.matrix[0], node.matrix[1], node.matrix[2], node.matrix[3], node.matrix[4], node.matrix[5],
-                node.matrix[6], node.matrix[7], node.matrix[8], node.matrix[9], node.matrix[10], node.matrix[11],
-                node.matrix[12], node.matrix[13], node.matrix[14], node.matrix[15]
+                (float)node.matrix[0], (float)node.matrix[1], (float)node.matrix[2], (float)node.matrix[3],
+                (float)node.matrix[4], (float)node.matrix[5], (float)node.matrix[6], (float)node.matrix[7],
+                (float)node.matrix[8], (float)node.matrix[9], (float)node.matrix[10], (float)node.matrix[11],
+                (float)node.matrix[12], (float)node.matrix[13], (float)node.matrix[14], (float)node.matrix[15]
             );
         }
 
@@ -193,14 +192,14 @@ namespace SceneImporter
         float3 scale       = float3::one;
 
         if (!node.translation.empty())
-            translation = float3(node.translation[0], node.translation[1], node.translation[2]);
+            translation = float3((float)node.translation[0], (float)node.translation[1], (float)node.translation[2]);
 
         if (!node.rotation.empty())
             rotation = Quat(
-                node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3]
+                (float)node.rotation[0], (float)node.rotation[1], (float)node.rotation[2], (float)node.rotation[3]
             ); // glTF stores as [x, y, z, w]
 
-        if (!node.scale.empty()) scale = float3(node.scale[0], node.scale[1], node.scale[2]);
+        if (!node.scale.empty()) scale = float3((float)node.scale[0], (float)node.scale[1], (float)node.scale[2]);
 
         return float4x4::FromTRS(translation, rotation, scale);
     }
