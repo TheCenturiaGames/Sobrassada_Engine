@@ -2,13 +2,11 @@
 
 #include "Math/float3.h"
 #include "Math/float4.h"
-
 #include <string>
 #include <vector>
 
 struct MaterialStruct
 {
-
     float4 diffuseFactor          = {1.0f, 1.0f, 1.0f, 1.0f}; // RGBA
     float3 specularFactor         = {1.0f, 1.0f, 1.0f};       // RGB
     float glossinessFactor        = 1.0f;

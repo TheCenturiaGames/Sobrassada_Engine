@@ -7,9 +7,14 @@
 #include "Windows.h"
 #include "glew.h"
 
-OpenGLModule::OpenGLModule() { context = nullptr; }
+OpenGLModule::OpenGLModule()
+{
+    context = nullptr;
+}
 
-OpenGLModule::~OpenGLModule() {}
+OpenGLModule::~OpenGLModule()
+{
+}
 
 bool OpenGLModule::Init()
 {
@@ -62,7 +67,10 @@ update_status OpenGLModule::PreUpdate(float deltaTime)
     return UPDATE_CONTINUE;
 }
 
-update_status OpenGLModule::Update(float deltaTime) { return UPDATE_CONTINUE; }
+update_status OpenGLModule::Update(float deltaTime)
+{
+    return UPDATE_CONTINUE;
+}
 
 update_status OpenGLModule::PostUpdate(float deltaTime)
 {
@@ -100,10 +108,22 @@ void OpenGLModule::SetDepthFunc(bool enable)
     else glDepthFunc(GL_ALWAYS);
 }
 
-void OpenGLModule::SetFrontFaceMode(int mode) { glFrontFace(mode); }
+void OpenGLModule::SetFrontFaceMode(int mode)
+{
+    glFrontFace(mode);
+}
 
-void OpenGLModule::SetClearRed(float newValue) { clearColorRed = newValue; }
+void OpenGLModule::SetClearRed(float newValue)
+{
+    clearColorRed = newValue;
+}
 
-void OpenGLModule::SetClearGreen(float newValue) { clearColorGreen = newValue; }
+void OpenGLModule::SetClearGreen(float newValue)
+{
+    clearColorGreen = newValue;
+}
 
-void OpenGLModule::SetClearBlue(float newValue) { clearColorBlue = newValue; }
+void OpenGLModule::SetClearBlue(float newValue)
+{
+    clearColorBlue = newValue;
+}
