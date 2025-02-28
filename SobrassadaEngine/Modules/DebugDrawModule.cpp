@@ -6,6 +6,7 @@
 #include "MathGeoLib.h"
 #include "QuadtreeViewer.h"
 #include "WindowModule.h"
+#include "SceneModule.h"
 
 #include "SDL_video.h"
 #define DEBUG_DRAW_IMPLEMENTATION
@@ -671,6 +672,13 @@ void DebugDrawModule::DrawCircle(const float3& center, const float3& upVector, c
 void DebugDrawModule::DrawSphere(const float3& center, const float3& color, const float radius)
 {
     dd::sphere(center, color, radius);
+}
+
+void DebugDrawModule::DrawFrustrum(float4x4 frustumProj, float4x4 frustumView)
+{
+    float4x4 inverseClipMatrix = frustumProj * frustumView;
+    inverseClipMatrix.Inverse();
+    dd::frustum(inverseClipMatrix, float3(1.f, 1.f, 1.f));
 }
 
 void DebugDrawModule::Draw(const float4x4& view, const float4x4& proj, unsigned width, unsigned height)

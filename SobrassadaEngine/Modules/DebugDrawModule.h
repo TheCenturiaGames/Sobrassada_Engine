@@ -25,6 +25,7 @@ class DebugDrawModule : public Module
     void DrawLine(const float3& origin, const float3& direction, const float distance, const float3& color);
     void DrawCircle(const float3& center, const float3& upVector, const float3& color, const float radius);
     void DrawSphere(const float3& center, const float3& color, const float radius);
+    void DrawFrustrum(float4x4 frustumProj, float4x4 frustumView);
 
   private:
     static DDRenderInterfaceCoreGL* implementation;

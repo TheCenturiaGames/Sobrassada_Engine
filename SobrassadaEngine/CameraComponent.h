@@ -19,10 +19,15 @@ class CameraComponent : public Component
     void Render() override;
     void RenderEditorInspector() override;
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
+
+    const FrustumPlanes& GetFrustrumPlanes() const { return frustumPlanes; }
+    const float3& GetCameraPosition() const { return camera.pos; }
     unsigned int GetUbo() const { return ubo; }
 
   private:
     Frustum camera;
+    FrustumPlanes frustumPlanes;
     CameraMatrices matrices;
-    unsigned int ubo;
+    unsigned int ubo = 0;
+    bool drawGizmos = false;
 };

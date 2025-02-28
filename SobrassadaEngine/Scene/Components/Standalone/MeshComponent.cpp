@@ -90,6 +90,7 @@ void MeshComponent::Render()
     if (enabled && currentMesh != nullptr)
     {
         unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
+        if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr) cameraUBO = App->GetSceneModule()->GetMainCamera()->GetUbo();;
 
         float4x4 model         = float4x4::FromTRS(
             globalTransform.position,

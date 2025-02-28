@@ -13,6 +13,7 @@
 #include <map>
 #include <string>
 #include <unordered_map>
+#include <CameraComponent.h>
 
 class GameObject;
 class Component;
@@ -102,6 +103,9 @@ class SceneModule : public Module
     const char* GetSceneName() const { return loadedScene != nullptr ? loadedScene->GetSceneName() : "Not loaded"; }
     bool IsInPlayMode() const { return bInPlayMode; }
     LightsConfig* GetLightsConfig() { return loadedScene != nullptr ? loadedScene->GetLightsConfig() : nullptr; }
+    bool GetInPlayMode() { return bInPlayMode; }
+    void SetMainCamera(CameraComponent* camera) { loadedScene->SetMainCamera(camera); }
+    CameraComponent* GetMainCamera() { return loadedScene->GetMainCamera(); }
 
   private:
     Scene* loadedScene = nullptr;

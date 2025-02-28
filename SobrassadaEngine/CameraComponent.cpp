@@ -4,6 +4,7 @@
 #include "DebugDrawModule.h"
 #include "SceneModule.h"
 #include "WindowModule.h"
+#include "InputModule.h"
 #include "glew.h"
 
 #include "ImGui.h"
@@ -12,6 +13,7 @@
 CameraComponent::CameraComponent(UID uid, UID uidParent, UID uidRoot, const Transform& parentGlobalTransform)
     : Component(uid, uidParent, uidRoot, "Camera", COMPONENT_CAMERA, parentGlobalTransform)
 {
+
     camera.type               = FrustumType::PerspectiveFrustum;
 
     camera.pos                = float3(0, 1, 5);
@@ -43,6 +45,7 @@ CameraComponent::CameraComponent(const rapidjson::Value& initialState) : Compone
 
 CameraComponent::~CameraComponent()
 {
+    glDeleteBuffers(1, &ubo);
 }
 
 void CameraComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
@@ -56,6 +59,17 @@ void CameraComponent::RenderEditorInspector()
     if (enabled)
     {
         ImGui::SeparatorText("Camera");
+        bool isMainCamera = false;
+        if (App->GetSceneModule()->GetMainCamera() != nullptr) isMainCamera = (App->GetSceneModule()->GetMainCamera()->GetUbo() == ubo);
+        if (ImGui::Checkbox("Main Camera", &isMainCamera))
+        {
+            if (isMainCamera)
+            {
+                App->GetSceneModule()->SetMainCamera(this);
+            }
+        }
+        ImGui::Checkbox("Draw gizmos", &drawGizmos);
+
         if (ImGui::DragFloat("Near Plane", &camera.nearPlaneDistance, 0.01f, 0.01f, camera.farPlaneDistance, "%.2f"))
         {
             float cameraNear         = std::max(0.01f, camera.nearPlaneDistance);
@@ -94,8 +108,8 @@ void CameraComponent::RenderEditorInspector()
         {
             if (ImGui::DragFloat("Width", &camera.orthographicWidth, 0.1f, 0.1f, 1000.f, "%.2f"))
             {
-                int width            = App->GetWindowModule()->GetWidth();
-                int height           = App->GetWindowModule()->GetHeight();
+                int width                 = App->GetWindowModule()->GetWidth();
+                int height                = App->GetWindowModule()->GetHeight();
                 camera.orthographicHeight = camera.orthographicWidth / ((float)height / (float)width);
                 matrices.projectionMatrix = camera.ProjectionMatrix();
             }
@@ -105,8 +119,32 @@ void CameraComponent::RenderEditorInspector()
 
 void CameraComponent::Update()
 {
+    InputModule* inputModule = App->GetInputModule();
+
+    if (App->GetSceneModule()->GetInPlayMode() && inputModule->GetKey(SDL_SCANCODE_W))
+        camera.pos += camera.front * 2.0f;
+    if (App->GetSceneModule()->GetInPlayMode() && inputModule->GetKey(SDL_SCANCODE_S))
+        camera.pos -= camera.front * 2.0f;
+    if (App->GetSceneModule()->GetInPlayMode() && inputModule->GetKey(SDL_SCANCODE_D))
+        camera.pos += camera.WorldRight() * 2.0f;
+    if (App->GetSceneModule()->GetInPlayMode() && inputModule->GetKey(SDL_SCANCODE_A))
+        camera.pos -= camera.WorldRight() * 2.0f;
+
+    matrices.projectionMatrix = camera.ProjectionMatrix();
+    matrices.viewMatrix       = camera.ViewMatrix();
+
+    glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(CameraMatrices), &matrices);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    frustumPlanes.UpdateFrustumPlanes(camera.ViewMatrix(), camera.ProjectionMatrix());
 }
 
 void CameraComponent::Render()
 {
+
+
+    if (!enabled || !drawGizmos) return;
+    DebugDrawModule* debug = App->GetDebugDrawModule();
+    debug->DrawFrustrum(camera.ProjectionMatrix(), camera.ViewMatrix());
 }

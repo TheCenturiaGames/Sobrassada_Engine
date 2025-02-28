@@ -78,6 +78,15 @@ void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGa
     UpdateSpatialDataStruct();
 }
 
+update_status Scene::Update(float deltaTime)
+{
+    for (auto& gameObject : gameComponents)
+    {
+        gameObject.second->Update();
+    }
+    return UPDATE_CONTINUE;
+}
+
 update_status Scene::Render(float deltaTime)
 {
     lightsConfig->RenderSkybox();
@@ -320,7 +329,8 @@ void Scene::UpdateSpatialDataStruct()
 void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects) const
 {
     std::vector<GameObject*> queriedObjects;
-    const FrustumPlanes& frustumPlanes = App->GetCameraModule()->GetFrustrumPlanes();
+    FrustumPlanes frustumPlanes = App->GetCameraModule()->GetFrustrumPlanes();
+    if(App->GetSceneModule()->IsInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr) frustumPlanes = App->GetSceneModule()->GetMainCamera()->GetFrustrumPlanes();
 
     sceneOctree->QueryElements(frustumPlanes, queriedObjects);
 

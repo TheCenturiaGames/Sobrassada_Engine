@@ -11,6 +11,7 @@ class Component;
 class RootComponent;
 class AABBUpdatable;
 class Octree;
+class CameraComponent;
 
 class Scene
 {
@@ -22,6 +23,7 @@ class Scene
     void LoadComponents(const std::map<UID, Component*>& loadedGameComponents);
     void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
 
+    update_status Update(float deltaTime);
     update_status Render(float deltaTime);
     update_status RenderEditor(float deltaTime);
     void RenderScene();
@@ -48,6 +50,8 @@ class Scene
 
     AABBUpdatable* GetTargetForAABBUpdate(UID uuid);
     LightsConfig* GetLightsConfig() { return lightsConfig; }
+    void SetMainCamera(CameraComponent* camera) { mainCamera = camera; }
+    CameraComponent* GetMainCamera() { return mainCamera; }
 
   private:
     void CreateSpatialDataStruct();
@@ -58,6 +62,7 @@ class Scene
     UID sceneUID;
     UID gameObjectRootUUID;
     UID selectedGameObjectUUID;
+    CameraComponent* mainCamera;
 
     std::map<UID, Component*> gameComponents; // TODO Move components to individual gameObjects
     std::unordered_map<UID, GameObject*> gameObjectsContainer;
