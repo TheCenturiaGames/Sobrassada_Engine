@@ -34,6 +34,7 @@ public:
 
     Transform orientedAdd(const Transform& transform) const
     {
+        // transform position is rotated according to the summed angles of the base and transform.rotation and then applied to the base position
         Transform newTransform;
         newTransform.rotation = rotation + transform.rotation;
         const Quat newRotation = Quat::FromEulerXYZ(newTransform.rotation.x, newTransform.rotation.y, newTransform.rotation.z);
@@ -47,18 +48,18 @@ public:
         return newTransform;
     }
 
-    Transform orientedSub(const Transform& transform) const
+    Transform orientedDif(const Transform& transform) const
     {
-        Transform newTransform;
-        newTransform.rotation = rotation + transform.rotation * -1;
-        const Quat newRotation = Quat::FromEulerXYZ(newTransform.rotation.x, newTransform.rotation.y, newTransform.rotation.z);
+        Transform newTransform = transform - *this;
+        Quat newRotation = Quat::FromEulerXYZ(newTransform.rotation.x, newTransform.rotation.y, newTransform.rotation.z);
+        newRotation.Inverse();
         
         //float3 rotatedScale = newRotation.Transform(transform.scale);
         //newTransform.scale.x = rotatedScale.x != 0 ? scale.x / rotatedScale.x : 0;  
         //newTransform.scale.y = rotatedScale.y != 0 ? scale.y / rotatedScale.y : 0;  
         //newTransform.scale.z = rotatedScale.z != 0 ? scale.z / rotatedScale.z : 0;
         
-        newTransform.position = position + newRotation.Transform(transform.position * -1);
+        newTransform.position = newRotation.Transform(newTransform.position);
         return newTransform;
     }
 

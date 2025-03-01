@@ -205,6 +205,16 @@ bool RootComponent::CreateComponent(const ComponentType componentType)
     return false;
 }
 
+const Transform& RootComponent::GetParentGlobalTransform()
+{
+    AABBUpdatable* parentObject = GetParent();
+    if (parentObject != nullptr)
+    {
+        return parentObject->GetParentGlobalTransform(); // parent is the gameObject, so we want to query the parent of this gameObject
+    }
+    return Transform::identity;
+}
+
 Component* RootComponent::GetSelectedComponent()
 {
     if (selectedComponent == nullptr)

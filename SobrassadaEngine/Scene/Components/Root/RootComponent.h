@@ -32,6 +32,8 @@ public:
     bool IsSelectedComponent(UID componentUID) const { return selectedUID == componentUID; }
 
     int GetMobilitySettings() const { return mobilitySettings; }
+    
+    const Transform& GetParentGlobalTransform() override;
 
 private:
 

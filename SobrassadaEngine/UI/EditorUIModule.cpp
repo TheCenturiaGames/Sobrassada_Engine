@@ -59,15 +59,15 @@ bool EditorUIModule::Init()
     startPath      = std::filesystem::current_path().string();
     libraryPath    = startPath + DELIMITER + SCENES_PATH;
 
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_W, [&] { mCurrentGizmoOperation = ImGuizmo::TRANSLATE; });
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_E, [&] { mCurrentGizmoOperation = ImGuizmo::ROTATE; });
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_R, [&] { mCurrentGizmoOperation = ImGuizmo::SCALE; });
+    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_G, [&] { mCurrentGizmoOperation = ImGuizmo::TRANSLATE; });
+    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_H, [&] { mCurrentGizmoOperation = ImGuizmo::ROTATE; });
+    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_J, [&] { mCurrentGizmoOperation = ImGuizmo::SCALE; });
     
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_Y, [&]
+    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_E, [&]
     {
         transformType = ImGuizmo::LOCAL;
     });
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_X, [&]
+    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_R, [&]
     {
         transformType = ImGuizmo::WORLD;
     });
@@ -635,14 +635,14 @@ bool EditorUIModule::RenderTransformWidget(
 
         if (transformType == ImGuizmo::WORLD)
         {
-            localTransform.Set(globalTransform.orientedSub(parentTransform));
+            localTransform.Set(parentTransform.orientedDif(globalTransform));
         }
     }
 
     return positionValueChanged || rotationValueChanged || scaleValueChanged;
 }
 
-bool EditorUIModule::RenderImGuizmo(Transform& gameObjectTransform)
+bool EditorUIModule::RenderImGuizmo(Transform &localTransform, const Transform &globalTransform, const Transform &parentTransform) const
 {
     float4x4 view = float4x4(App->GetCameraModule()->GetViewMatrix());
     view.Transpose();
@@ -650,22 +650,28 @@ bool EditorUIModule::RenderImGuizmo(Transform& gameObjectTransform)
     float4x4 proj = float4x4(App->GetCameraModule()->GetProjectionMatrix());
     proj.Transpose();
 
+    Transform transform = Transform(globalTransform);
     float4x4 gizmoMatrix          = float4x4::identity;
-    gameObjectTransform.rotation *= RAD_DEGREE_CONV;
+    transform.rotation *= RAD_DEGREE_CONV;
     ImGuizmo::RecomposeMatrixFromComponents(
-        gameObjectTransform.position.ptr(), gameObjectTransform.rotation.ptr(), gameObjectTransform.scale.ptr(),
+        transform.position.ptr(), transform.rotation.ptr(), transform.scale.ptr(),
         gizmoMatrix.ptr()
     );
 
     Manipulate(view.ptr(), proj.ptr(), mCurrentGizmoOperation, transformType, gizmoMatrix.ptr());
 
-    ImGuizmo::DecomposeMatrixToComponents(
-        gizmoMatrix.ptr(), gameObjectTransform.position.ptr(), gameObjectTransform.rotation.ptr(),
-        gameObjectTransform.scale.ptr()
-    );
-    gameObjectTransform.rotation /= RAD_DEGREE_CONV;
+    if (ImGuizmo::IsUsing())
+    {
+        ImGuizmo::DecomposeMatrixToComponents(
+        gizmoMatrix.ptr(), transform.position.ptr(), transform.rotation.ptr(),
+        transform.scale.ptr());
+        transform.rotation /= RAD_DEGREE_CONV;
+        
+        localTransform.Set(parentTransform.orientedDif(transform));
 
-    return ImGuizmo::IsUsing();
+        return true;
+    }
+    return false;
 }
 
 void EditorUIModule::RenderBasicTransformModifiers(

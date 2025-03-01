@@ -34,7 +34,7 @@ class EditorUIModule : public Module
     bool ShutDown() override;
 
     bool RenderTransformWidget(Transform &localTransform, Transform &globalTransform, const Transform &parentTransform);
-    bool RenderImGuizmo(Transform& gameObjectTransform);
+    bool RenderImGuizmo(Transform &localTransform, const Transform &globalTransform, const Transform &parentTransform)const;
 
     UID RenderResourceSelectDialog(const char *id, const std::unordered_map<std::string, UID> &availableResources);
 
@@ -95,5 +95,5 @@ class EditorUIModule : public Module
     std::string startPath;
     std::string libraryPath;
     
-    ImGuizmo::OPERATION mCurrentGizmoOperation;
+    ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;;
 };

@@ -143,7 +143,8 @@ bool Component::DeleteChildComponent(const UID componentUID)
 
 void Component::RenderGuizmo()
 {
-    if (App->GetEditorUIModule()->RenderImGuizmo(globalTransform))
+    const Transform& parentTransform = GetParentGlobalTransform();
+    if (App->GetEditorUIModule()->RenderImGuizmo(localTransform, globalTransform, parentTransform))
     {
         AABBUpdatable* parentGameObject = GetParent();
         if (parentGameObject != nullptr)
