@@ -29,6 +29,8 @@ class ResourceMesh : public Resource
     void SetMaterial(UID materialUID) { this->material = materialUID; }
 
   private:
+    float3 TestSkinning();
+
     unsigned int vbo         = 0;
     unsigned int ebo         = 0;
     unsigned int vao         = 0;

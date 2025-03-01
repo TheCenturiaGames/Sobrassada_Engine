@@ -8,6 +8,8 @@
 #include <Libs/rapidjson/document.h>
 #include <cstdint>
 
+class GameObject;
+
 class MeshComponent : public Component
 {
   public:
@@ -22,10 +24,14 @@ class MeshComponent : public Component
     void AddMesh(UID resource, bool reloadAABB = true);
     void AddMaterial(UID resource);
 
+    void SetBones(const std::vector<GameObject*>& bones) { this->bones = bones; }
+
   private:
     std::string currentMeshName       = "Not selected";
     ResourceMesh* currentMesh         = nullptr;
 
     std::string currentTextureName    = "Not selected";
     ResourceMaterial* currentMaterial = nullptr;
+
+    std::vector<GameObject*> bones;
 };

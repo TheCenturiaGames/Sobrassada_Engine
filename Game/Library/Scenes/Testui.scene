@@ -1,0 +1,3923 @@
+{
+    "Scene": {
+        "UID": 3777820472007890755,
+        "Name": "Testui",
+        "RootGameObject": 8186119575285185493,
+        "GameObjects": [
+            {
+                "UID": 10548552451698271696,
+                "ParentUID": 15059080524733059726,
+                "Name": "RightLowerArmFK",
+                "Children": [
+                    6195009829182030145
+                ],
+                "RootComponentUID": 2456095877
+            },
+            {
+                "UID": 8990780211786684259,
+                "ParentUID": 14057485332954248005,
+                "Name": "Hips",
+                "Children": [
+                    4126511566713457543,
+                    7919814542986683649,
+                    17242041572610271224
+                ],
+                "RootComponentUID": 2093398764
+            },
+            {
+                "UID": 17716968282063112039,
+                "ParentUID": 4749987462415651653,
+                "Name": "Stars",
+                "Children": [],
+                "RootComponentUID": 4125261991
+            },
+            {
+                "UID": 15155298598913614450,
+                "ParentUID": 15042269071619633097,
+                "Name": "Gun",
+                "Children": [],
+                "RootComponentUID": 3528617927
+            },
+            {
+                "UID": 11361583591158727459,
+                "ParentUID": 15262111034498345898,
+                "Name": "LeftLowerArmFK",
+                "Children": [
+                    7509497369507206969
+                ],
+                "RootComponentUID": 2645881788
+            },
+            {
+                "UID": 8186119575285185493,
+                "ParentUID": 0,
+                "Name": "SceneModule GameObject",
+                "Children": [
+                    17564575252523914900,
+                    4749987462415651653,
+                    5205801996329179481,
+                    999368129235982292,
+                    18117912675653582488,
+                    15042269071619633097
+                ],
+                "RootComponentUID": 3039788576
+            },
+            {
+                "UID": 4832516961875596730,
+                "ParentUID": 4749987462415651653,
+                "Name": "Wall",
+                "Children": [],
+                "RootComponentUID": 1125297276
+            },
+            {
+                "UID": 1050104489802044120,
+                "ParentUID": 516166545821211105,
+                "Name": "Hat4",
+                "Children": [
+                    2036758588194232168
+                ],
+                "RootComponentUID": 244914230
+            },
+            {
+                "UID": 871812860100574993,
+                "ParentUID": 1000802074556546555,
+                "Name": "Hat2",
+                "Children": [
+                    516166545821211105
+                ],
+                "RootComponentUID": 203054370
+            },
+            {
+                "UID": 10638138761240350914,
+                "ParentUID": 17935943124233479765,
+                "Name": "LeftEar",
+                "Children": [
+                    6466101229146975002
+                ],
+                "RootComponentUID": 2477163179
+            },
+            {
+                "UID": 4749987462415651653,
+                "ParentUID": 8186119575285185493,
+                "Name": "RootNode",
+                "Children": [
+                    4832516961875596730,
+                    17716968282063112039
+                ],
+                "RootComponentUID": 1106499606
+            },
+            {
+                "UID": 16499816315804050772,
+                "ParentUID": 2092942958273796647,
+                "Name": "RightLowerArmIK",
+                "Children": [
+                    12106504048056545757
+                ],
+                "RootComponentUID": 3841871715
+            },
+            {
+                "UID": 17564575252523914900,
+                "ParentUID": 8186119575285185493,
+                "Name": "RootNode",
+                "Children": [
+                    17697938137433876834
+                ],
+                "RootComponentUID": 4089919466
+            },
+            {
+                "UID": 1000802074556546555,
+                "ParentUID": 1419840612560799583,
+                "Name": "Hat1",
+                "Children": [
+                    871812860100574993
+                ],
+                "RootComponentUID": 233087012
+            },
+            {
+                "UID": 9728282989600671693,
+                "ParentUID": 4126511566713457543,
+                "Name": "RightUpperArm",
+                "Children": [
+                    5409725697676966539
+                ],
+                "RootComponentUID": 2265320874
+            },
+            {
+                "UID": 17697938137433876834,
+                "ParentUID": 17564575252523914900,
+                "Name": "Hearse",
+                "Children": [],
+                "RootComponentUID": 4120691948
+            },
+            {
+                "UID": 2092942958273796647,
+                "ParentUID": 4126511566713457543,
+                "Name": "RightUpperArmIK",
+                "Children": [
+                    16499816315804050772
+                ],
+                "RootComponentUID": 487649361
+            },
+            {
+                "UID": 5205801996329179481,
+                "ParentUID": 8186119575285185493,
+                "Name": "RootNode",
+                "Children": [
+                    5309262885755632866,
+                    2975581879840142468,
+                    18220085784160863659
+                ],
+                "RootComponentUID": 1212627197
+            },
+            {
+                "UID": 8047365993834341355,
+                "ParentUID": 8216423878286844459,
+                "Name": "LeftLowerArm",
+                "Children": [
+                    7654641214260757536
+                ],
+                "RootComponentUID": 1873743025
+            },
+            {
+                "UID": 5309262885755632866,
+                "ParentUID": 5205801996329179481,
+                "Name": "Base",
+                "Children": [],
+                "RootComponentUID": 1236298337
+            },
+            {
+                "UID": 2975581879840142468,
+                "ParentUID": 5205801996329179481,
+                "Name": "Sides",
+                "Children": [],
+                "RootComponentUID": 693085128
+            },
+            {
+                "UID": 2887211125876439192,
+                "ParentUID": 3046700372461414328,
+                "Name": "LeftBrow2End",
+                "Children": [],
+                "RootComponentUID": 672370466
+            },
+            {
+                "UID": 18220085784160863659,
+                "ParentUID": 5205801996329179481,
+                "Name": "Planks",
+                "Children": [],
+                "RootComponentUID": 4242542405
+            },
+            {
+                "UID": 15059080524733059726,
+                "ParentUID": 4126511566713457543,
+                "Name": "RightUpperArmFK",
+                "Children": [
+                    10548552451698271696
+                ],
+                "RootComponentUID": 3506354653
+            },
+            {
+                "UID": 4126511566713457543,
+                "ParentUID": 8990780211786684259,
+                "Name": "Spine",
+                "Children": [
+                    17935943124233479765,
+                    11042172497575320789,
+                    15262111034498345898,
+                    3772832843206554039,
+                    9728282989600671693,
+                    15059080524733059726,
+                    2092942958273796647
+                ],
+                "RootComponentUID": 960987207
+            },
+            {
+                "UID": 999368129235982292,
+                "ParentUID": 8186119575285185493,
+                "Name": "RootNode",
+                "Children": [
+                    1105520198599548831
+                ],
+                "RootComponentUID": 233170871
+            },
+            {
+                "UID": 13336606134748794165,
+                "ParentUID": 17935943124233479765,
+                "Name": "HeadEnd",
+                "Children": [],
+                "RootComponentUID": 3105240211
+            },
+            {
+                "UID": 1105520198599548831,
+                "ParentUID": 999368129235982292,
+                "Name": "Clock",
+                "Children": [],
+                "RootComponentUID": 257468600
+            },
+            {
+                "UID": 1952066352959363573,
+                "ParentUID": 1838849433204693509,
+                "Name": "RightWrist_IK",
+                "Children": [],
+                "RootComponentUID": 454640107
+            },
+            {
+                "UID": 18117912675653582488,
+                "ParentUID": 8186119575285185493,
+                "Name": "RootNode",
+                "Children": [
+                    18194760794769070097,
+                    176887036663195642
+                ],
+                "RootComponentUID": 4218822995
+            },
+            {
+                "UID": 2639211983311797648,
+                "ParentUID": 1419840612560799583,
+                "Name": "LeftBrow1",
+                "Children": [
+                    2370281446485680498
+                ],
+                "RootComponentUID": 614698287
+            },
+            {
+                "UID": 18194760794769070097,
+                "ParentUID": 18117912675653582488,
+                "Name": "Zombunny",
+                "Children": [],
+                "RootComponentUID": 4236367487
+            },
+            {
+                "UID": 1508163116079777280,
+                "ParentUID": 1947834027875274754,
+                "Name": "Spine",
+                "Children": [
+                    1419840612560799583,
+                    8460236742858184341,
+                    16582112165255711047
+                ],
+                "RootComponentUID": 351285831
+            },
+            {
+                "UID": 176887036663195642,
+                "ParentUID": 18117912675653582488,
+                "Name": "Ctrl_Grp",
+                "Children": [
+                    14057485332954248005
+                ],
+                "RootComponentUID": 41532827
+            },
+            {
+                "UID": 12106504048056545757,
+                "ParentUID": 16499816315804050772,
+                "Name": "RightWristIK",
+                "Children": [],
+                "RootComponentUID": 2819043613
+            },
+            {
+                "UID": 14057485332954248005,
+                "ParentUID": 176887036663195642,
+                "Name": "Root",
+                "Children": [
+                    8990780211786684259
+                ],
+                "RootComponentUID": 3273291842
+            },
+            {
+                "UID": 7919814542986683649,
+                "ParentUID": 8990780211786684259,
+                "Name": "LeftLeg",
+                "Children": [
+                    3247815708084775185
+                ],
+                "RootComponentUID": 1844114759
+            },
+            {
+                "UID": 17935943124233479765,
+                "ParentUID": 4126511566713457543,
+                "Name": "Head",
+                "Children": [
+                    13336606134748794165,
+                    10638138761240350914,
+                    1862876982139218902
+                ],
+                "RootComponentUID": 4176106803
+            },
+            {
+                "UID": 12963253934507903368,
+                "ParentUID": 17242041572610271224,
+                "Name": "RightFoot",
+                "Children": [],
+                "RootComponentUID": 3018312378
+            },
+            {
+                "UID": 7509497369507206969,
+                "ParentUID": 11361583591158727459,
+                "Name": "LeftWristFK",
+                "Children": [],
+                "RootComponentUID": 1748858832
+            },
+            {
+                "UID": 6466101229146975002,
+                "ParentUID": 10638138761240350914,
+                "Name": "LeftEarEnd",
+                "Children": [],
+                "RootComponentUID": 1505715374
+            },
+            {
+                "UID": 1862876982139218902,
+                "ParentUID": 17935943124233479765,
+                "Name": "RightEar",
+                "Children": [
+                    15503362283216280470
+                ],
+                "RootComponentUID": 433874088
+            },
+            {
+                "UID": 15503362283216280470,
+                "ParentUID": 1862876982139218902,
+                "Name": "RightEarEnd",
+                "Children": [],
+                "RootComponentUID": 3609727440
+            },
+            {
+                "UID": 15262111034498345898,
+                "ParentUID": 4126511566713457543,
+                "Name": "LeftUpperArmFK",
+                "Children": [
+                    11361583591158727459
+                ],
+                "RootComponentUID": 3553695998
+            },
+            {
+                "UID": 11042172497575320789,
+                "ParentUID": 4126511566713457543,
+                "Name": "LeftUpperArm",
+                "Children": [
+                    6106438093260832771
+                ],
+                "RootComponentUID": 2571373855
+            },
+            {
+                "UID": 6106438093260832771,
+                "ParentUID": 11042172497575320789,
+                "Name": "LeftLowerArm",
+                "Children": [
+                    1043919250086570686
+                ],
+                "RootComponentUID": 1421835532
+            },
+            {
+                "UID": 1043919250086570686,
+                "ParentUID": 6106438093260832771,
+                "Name": "LeftWrist",
+                "Children": [],
+                "RootComponentUID": 243126011
+            },
+            {
+                "UID": 3772832843206554039,
+                "ParentUID": 4126511566713457543,
+                "Name": "LeftUpperArmIK",
+                "Children": [
+                    18409652512847841371
+                ],
+                "RootComponentUID": 878779204
+            },
+            {
+                "UID": 18409652512847841371,
+                "ParentUID": 3772832843206554039,
+                "Name": "LeftLowerArmIK",
+                "Children": [
+                    14236717927933776189
+                ],
+                "RootComponentUID": 4286609728
+            },
+            {
+                "UID": 14236717927933776189,
+                "ParentUID": 18409652512847841371,
+                "Name": "LeftWristIK",
+                "Children": [],
+                "RootComponentUID": 3314883440
+            },
+            {
+                "UID": 6195009829182030145,
+                "ParentUID": 10548552451698271696,
+                "Name": "RightWristFK",
+                "Children": [],
+                "RootComponentUID": 1442527367
+            },
+            {
+                "UID": 5409725697676966539,
+                "ParentUID": 9728282989600671693,
+                "Name": "RightLowerArm",
+                "Children": [
+                    932089816238064075
+                ],
+                "RootComponentUID": 1259689158
+            },
+            {
+                "UID": 932089816238064075,
+                "ParentUID": 5409725697676966539,
+                "Name": "RightWrist",
+                "Children": [],
+                "RootComponentUID": 217088692
+            },
+            {
+                "UID": 3247815708084775185,
+                "ParentUID": 7919814542986683649,
+                "Name": "LeftFoot",
+                "Children": [],
+                "RootComponentUID": 756260642
+            },
+            {
+                "UID": 1396034666056006805,
+                "ParentUID": 1419840612560799583,
+                "Name": "LeftBrow3",
+                "Children": [
+                    2579144848317847470
+                ],
+                "RootComponentUID": 325387754
+            },
+            {
+                "UID": 17242041572610271224,
+                "ParentUID": 8990780211786684259,
+                "Name": "RightLeg",
+                "Children": [
+                    12963253934507903368
+                ],
+                "RootComponentUID": 4014545258
+            },
+            {
+                "UID": 15042269071619633097,
+                "ParentUID": 8186119575285185493,
+                "Name": "RootNode",
+                "Children": [
+                    15155298598913614450,
+                    2389410686206734347,
+                    7501620916054877889
+                ],
+                "RootComponentUID": 3502788536
+            },
+            {
+                "UID": 9402041872474561556,
+                "ParentUID": 8460236742858184341,
+                "Name": "LeftUpperArm_FK",
+                "Children": [
+                    9015596505595962932
+                ],
+                "RootComponentUID": 2189153081
+            },
+            {
+                "UID": 2389410686206734347,
+                "ParentUID": 15042269071619633097,
+                "Name": "PlayerCtrl",
+                "Children": [
+                    2754103357569342845,
+                    2921381314297400047
+                ],
+                "RootComponentUID": 557024238
+            },
+            {
+                "UID": 2754103357569342845,
+                "ParentUID": 2389410686206734347,
+                "Name": "Root",
+                "Children": [
+                    1947834027875274754
+                ],
+                "RootComponentUID": 641657383
+            },
+            {
+                "UID": 1947834027875274754,
+                "ParentUID": 2754103357569342845,
+                "Name": "Hips",
+                "Children": [
+                    1508163116079777280,
+                    1846998733172211931,
+                    2219019398952857034
+                ],
+                "RootComponentUID": 453654692
+            },
+            {
+                "UID": 1419840612560799583,
+                "ParentUID": 1508163116079777280,
+                "Name": "Head",
+                "Children": [
+                    1000802074556546555,
+                    1396034666056006805,
+                    3046700372461414328,
+                    2639211983311797648,
+                    2232620651277907155,
+                    3196138588402426316,
+                    7120551749967566594
+                ],
+                "RootComponentUID": 330721645
+            },
+            {
+                "UID": 516166545821211105,
+                "ParentUID": 871812860100574993,
+                "Name": "Hat3",
+                "Children": [
+                    1050104489802044120
+                ],
+                "RootComponentUID": 120318631
+            },
+            {
+                "UID": 2036758588194232168,
+                "ParentUID": 1050104489802044120,
+                "Name": "Hat5",
+                "Children": [
+                    1143474464871653475
+                ],
+                "RootComponentUID": 474498297
+            },
+            {
+                "UID": 1143474464871653475,
+                "ParentUID": 2036758588194232168,
+                "Name": "HatEnd",
+                "Children": [],
+                "RootComponentUID": 266375137
+            },
+            {
+                "UID": 2579144848317847470,
+                "ParentUID": 1396034666056006805,
+                "Name": "LeftBrow3End",
+                "Children": [],
+                "RootComponentUID": 600852060
+            },
+            {
+                "UID": 7654641214260757536,
+                "ParentUID": 8047365993834341355,
+                "Name": "LeftLowerArm2",
+                "Children": [
+                    7885073939302710616
+                ],
+                "RootComponentUID": 1782304661
+            },
+            {
+                "UID": 3046700372461414328,
+                "ParentUID": 1419840612560799583,
+                "Name": "LeftBrow2",
+                "Children": [
+                    2887211125876439192
+                ],
+                "RootComponentUID": 709782934
+            },
+            {
+                "UID": 2370281446485680498,
+                "ParentUID": 2639211983311797648,
+                "Name": "LeftBrow1End",
+                "Children": [],
+                "RootComponentUID": 551943775
+            },
+            {
+                "UID": 2232620651277907155,
+                "ParentUID": 1419840612560799583,
+                "Name": "RightBrow1",
+                "Children": [
+                    2862843010579514876
+                ],
+                "RootComponentUID": 520100987
+            },
+            {
+                "UID": 2862843010579514876,
+                "ParentUID": 2232620651277907155,
+                "Name": "RightBrow1End",
+                "Children": [],
+                "RootComponentUID": 666836064
+            },
+            {
+                "UID": 3196138588402426316,
+                "ParentUID": 1419840612560799583,
+                "Name": "RightBrow2",
+                "Children": [
+                    7042619185570631385
+                ],
+                "RootComponentUID": 744228625
+            },
+            {
+                "UID": 7042619185570631385,
+                "ParentUID": 3196138588402426316,
+                "Name": "RightBrow2End",
+                "Children": [],
+                "RootComponentUID": 1640016041
+            },
+            {
+                "UID": 7120551749967566594,
+                "ParentUID": 1419840612560799583,
+                "Name": "RightBrow3",
+                "Children": [
+                    6981395860998572039
+                ],
+                "RootComponentUID": 1658091510
+            },
+            {
+                "UID": 6981395860998572039,
+                "ParentUID": 7120551749967566594,
+                "Name": "RightBrow3End",
+                "Children": [],
+                "RootComponentUID": 1625552512
+            },
+            {
+                "UID": 8460236742858184341,
+                "ParentUID": 1508163116079777280,
+                "Name": "LeftShoulder",
+                "Children": [
+                    8216423878286844459,
+                    9402041872474561556,
+                    13276893486331821287
+                ],
+                "RootComponentUID": 1970080850
+            },
+            {
+                "UID": 8216423878286844459,
+                "ParentUID": 8460236742858184341,
+                "Name": "LeftUpperArm",
+                "Children": [
+                    8047365993834341355
+                ],
+                "RootComponentUID": 1913104881
+            },
+            {
+                "UID": 7885073939302710616,
+                "ParentUID": 7654641214260757536,
+                "Name": "LeftWrist",
+                "Children": [
+                    8156771416222119882,
+                    9578985904277715409
+                ],
+                "RootComponentUID": 1836095703
+            },
+            {
+                "UID": 8156771416222119882,
+                "ParentUID": 7885073939302710616,
+                "Name": "LeftHand1",
+                "Children": [
+                    8900023298522741660
+                ],
+                "RootComponentUID": 1899424822
+            },
+            {
+                "UID": 8900023298522741660,
+                "ParentUID": 8156771416222119882,
+                "Name": "LeftHand2",
+                "Children": [],
+                "RootComponentUID": 2072546258
+            },
+            {
+                "UID": 9578985904277715409,
+                "ParentUID": 7885073939302710616,
+                "Name": "LeftThumb1",
+                "Children": [
+                    9503521255208873858
+                ],
+                "RootComponentUID": 2230768800
+            },
+            {
+                "UID": 13216977871650229036,
+                "ParentUID": 13276893486331821287,
+                "Name": "LeftLowerArm_IK",
+                "Children": [
+                    14569034314649997652
+                ],
+                "RootComponentUID": 3077456707
+            },
+            {
+                "UID": 9503521255208873858,
+                "ParentUID": 9578985904277715409,
+                "Name": "LeftThumb2",
+                "Children": [],
+                "RootComponentUID": 2212919833
+            },
+            {
+                "UID": 9015596505595962932,
+                "ParentUID": 9402041872474561556,
+                "Name": "LeftLowerArm_FK",
+                "Children": [
+                    14013602807615557492
+                ],
+                "RootComponentUID": 2099246379
+            },
+            {
+                "UID": 14013602807615557492,
+                "ParentUID": 9015596505595962932,
+                "Name": "LeftLowerArm_2_FK",
+                "Children": [
+                    13652275117286703434
+                ],
+                "RootComponentUID": 3262865782
+            },
+            {
+                "UID": 13652275117286703434,
+                "ParentUID": 14013602807615557492,
+                "Name": "LeftWrist_FK",
+                "Children": [],
+                "RootComponentUID": 3178737623
+            },
+            {
+                "UID": 13276893486331821287,
+                "ParentUID": 8460236742858184341,
+                "Name": "LeftUpperArm_IK",
+                "Children": [
+                    13216977871650229036
+                ],
+                "RootComponentUID": 3091476519
+            },
+            {
+                "UID": 14569034314649997652,
+                "ParentUID": 13216977871650229036,
+                "Name": "LeftLowerArm2_IK",
+                "Children": [
+                    16610630686397606241
+                ],
+                "RootComponentUID": 3392465741
+            },
+            {
+                "UID": 16610630686397606241,
+                "ParentUID": 14569034314649997652,
+                "Name": "LeftWrist_IK",
+                "Children": [],
+                "RootComponentUID": 3867881560
+            },
+            {
+                "UID": 16582112165255711047,
+                "ParentUID": 1508163116079777280,
+                "Name": "RightShoulder",
+                "Children": [
+                    16396010144064802838,
+                    16864279353017891863,
+                    17821294608543439037
+                ],
+                "RootComponentUID": 3861032711
+            },
+            {
+                "UID": 16396010144064802838,
+                "ParentUID": 16582112165255711047,
+                "Name": "RightUpperArm",
+                "Children": [
+                    16043055009722552103
+                ],
+                "RootComponentUID": 3817632837
+            },
+            {
+                "UID": 16043055009722552103,
+                "ParentUID": 16396010144064802838,
+                "Name": "RightLowerArm",
+                "Children": [
+                    15914065795266580541
+                ],
+                "RootComponentUID": 3735384445
+            },
+            {
+                "UID": 15914065795266580541,
+                "ParentUID": 16043055009722552103,
+                "Name": "RightLowerArm2",
+                "Children": [
+                    16218057422841413051
+                ],
+                "RootComponentUID": 3705491045
+            },
+            {
+                "UID": 16218057422841413051,
+                "ParentUID": 15914065795266580541,
+                "Name": "RightWrist",
+                "Children": [
+                    16566004977935847604,
+                    16874370271669703190
+                ],
+                "RootComponentUID": 3776269611
+            },
+            {
+                "UID": 16566004977935847604,
+                "ParentUID": 16218057422841413051,
+                "Name": "RightHand1",
+                "Children": [
+                    17076619368188323022
+                ],
+                "RootComponentUID": 3857421706
+            },
+            {
+                "UID": 17076619368188323022,
+                "ParentUID": 16566004977935847604,
+                "Name": "RightHand2",
+                "Children": [],
+                "RootComponentUID": 3976308383
+            },
+            {
+                "UID": 1634846106167502187,
+                "ParentUID": 1749482368117149093,
+                "Name": "RightToe",
+                "Children": [],
+                "RootComponentUID": 380711892
+            },
+            {
+                "UID": 16874370271669703190,
+                "ParentUID": 16218057422841413051,
+                "Name": "RightThumb1",
+                "Children": [
+                    16628165247631481316
+                ],
+                "RootComponentUID": 3928940112
+            },
+            {
+                "UID": 16628165247631481316,
+                "ParentUID": 16874370271669703190,
+                "Name": "RightThumb2",
+                "Children": [],
+                "RootComponentUID": 3871616038
+            },
+            {
+                "UID": 16864279353017891863,
+                "ParentUID": 16582112165255711047,
+                "Name": "RightUpperArm_FK",
+                "Children": [
+                    16710770502952638059
+                ],
+                "RootComponentUID": 3926729879
+            },
+            {
+                "UID": 16710770502952638059,
+                "ParentUID": 16864279353017891863,
+                "Name": "RightLowerArm_FK",
+                "Children": [
+                    16613477402506594716
+                ],
+                "RootComponentUID": 3890849073
+            },
+            {
+                "UID": 16613477402506594716,
+                "ParentUID": 16710770502952638059,
+                "Name": "RightLowerArm2_FK",
+                "Children": [
+                    17523582402253526316
+                ],
+                "RootComponentUID": 3868265878
+            },
+            {
+                "UID": 17523582402253526316,
+                "ParentUID": 16613477402506594716,
+                "Name": "RightWrist_FK",
+                "Children": [],
+                "RootComponentUID": 4080305453
+            },
+            {
+                "UID": 17821294608543439037,
+                "ParentUID": 16582112165255711047,
+                "Name": "RightUpperArm_IK",
+                "Children": [
+                    1411960624293087812
+                ],
+                "RootComponentUID": 4149621978
+            },
+            {
+                "UID": 1411960624293087812,
+                "ParentUID": 17821294608543439037,
+                "Name": "RightLowerArm_IK",
+                "Children": [
+                    1838849433204693509
+                ],
+                "RootComponentUID": 329165426
+            },
+            {
+                "UID": 1838849433204693509,
+                "ParentUID": 1411960624293087812,
+                "Name": "RightLowerArm2_IK",
+                "Children": [
+                    1952066352959363573
+                ],
+                "RootComponentUID": 428349360
+            },
+            {
+                "UID": 1846998733172211931,
+                "ParentUID": 1947834027875274754,
+                "Name": "HipSway",
+                "Children": [
+                    1763460544292030921,
+                    1749482368117149093
+                ],
+                "RootComponentUID": 430107524
+            },
+            {
+                "UID": 1763460544292030921,
+                "ParentUID": 1846998733172211931,
+                "Name": "LeftLeg",
+                "Children": [
+                    1847074489033423598
+                ],
+                "RootComponentUID": 410657274
+            },
+            {
+                "UID": 1847074489033423598,
+                "ParentUID": 1763460544292030921,
+                "Name": "LeftToe",
+                "Children": [],
+                "RootComponentUID": 430125163
+            },
+            {
+                "UID": 1749482368117149093,
+                "ParentUID": 1846998733172211931,
+                "Name": "RightLeg",
+                "Children": [
+                    1634846106167502187
+                ],
+                "RootComponentUID": 407402726
+            },
+            {
+                "UID": 2219019398952857034,
+                "ParentUID": 1947834027875274754,
+                "Name": "Tail1",
+                "Children": [
+                    2849540774429728620
+                ],
+                "RootComponentUID": 516934198
+            },
+            {
+                "UID": 2849540774429728620,
+                "ParentUID": 2219019398952857034,
+                "Name": "Tail2",
+                "Children": [
+                    2813247733946725128
+                ],
+                "RootComponentUID": 663808517
+            },
+            {
+                "UID": 2813247733946725128,
+                "ParentUID": 2849540774429728620,
+                "Name": "Tail3",
+                "Children": [],
+                "RootComponentUID": 655149522
+            },
+            {
+                "UID": 2921381314297400047,
+                "ParentUID": 2389410686206734347,
+                "Name": "Ctrl_Grp",
+                "Children": [
+                    3542334051906743665
+                ],
+                "RootComponentUID": 680465575
+            },
+            {
+                "UID": 3542334051906743665,
+                "ParentUID": 2921381314297400047,
+                "Name": "Gun",
+                "Children": [
+                    7360108735472364829
+                ],
+                "RootComponentUID": 824972780
+            },
+            {
+                "UID": 7360108735472364829,
+                "ParentUID": 3542334051906743665,
+                "Name": "GunBarrelStretch",
+                "Children": [
+                    7627619934398472434
+                ],
+                "RootComponentUID": 1713937338
+            },
+            {
+                "UID": 7627619934398472434,
+                "ParentUID": 7360108735472364829,
+                "Name": "GunBarrelEnd",
+                "Children": [],
+                "RootComponentUID": 1776222142
+            },
+            {
+                "UID": 7501620916054877889,
+                "ParentUID": 15042269071619633097,
+                "Name": "Player",
+                "Children": [],
+                "RootComponentUID": 1746676847
+            }
+        ],
+        "Components": [
+            {
+                "UID": 35806266,
+                "ParentUID": 4236367487,
+                "RootUID": 4236367487,
+                "Type": 2,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Mesh component",
+                "Mesh": 1320827146437916,
+                "Material": 1202152084206313
+            },
+            {
+                "UID": 41532827,
+                "ParentUID": 176887036663195642,
+                "RootUID": 41532827,
+                "Type": 1,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    -0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 120318631,
+                "ParentUID": 516166545821211105,
+                "RootUID": 120318631,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.16233640909194946,
+                    0.2695660889148712,
+                    1.4308462142944336,
+                    2.4783387184143066,
+                    -0.850211501121521,
+                    0.25801360607147217,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 203054370,
+                "ParentUID": 871812860100574993,
+                "RootUID": 203054370,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.16233640909194946,
+                    0.2695660889148712,
+                    1.2230048179626465,
+                    -2.9903926849365234,
+                    -1.0553301572799683,
+                    0.4002971947193146,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 217088692,
+                "ParentUID": 932089816238064075,
+                "RootUID": 217088692,
+                "Type": 1,
+                "LocalTransform": [
+                    0.11839151382446289,
+                    0.07184392958879471,
+                    -0.1030687689781189,
+                    -0.18803770840168,
+                    1.4470196962356567,
+                    -2.922840118408203,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 233087012,
+                "ParentUID": 1000802074556546555,
+                "RootUID": 233087012,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.0959462821483612,
+                    0.2785278558731079,
+                    0.8846023082733154,
+                    -2.41049861907959,
+                    -0.7248086333274841,
+                    -0.38338980078697205,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 233170871,
+                "ParentUID": 999368129235982292,
+                "RootUID": 233170871,
+                "Type": 1,
+                "LocalTransform": [
+                    -20.05611228942871,
+                    0.000004323869688960258,
+                    5.630870819091797,
+                    2.4640212359372526e-7,
+                    -0.21971936523914337,
+                    -3.6167470796044654e-8,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 243126011,
+                "ParentUID": 1043919250086570686,
+                "RootUID": 243126011,
+                "Type": 1,
+                "LocalTransform": [
+                    0.46412193775177,
+                    0.07184391468763351,
+                    0.8753108382225037,
+                    3.0859146118164063,
+                    1.5050830841064453,
+                    -2.852891206741333,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 244914230,
+                "ParentUID": 1050104489802044120,
+                "RootUID": 244914230,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.16233640909194946,
+                    0.2695660889148712,
+                    1.528981328010559,
+                    1.9649136066436768,
+                    -1.1007053852081299,
+                    -0.2758101224899292,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 257468600,
+                "ParentUID": 1105520198599548831,
+                "RootUID": 257468600,
+                "Type": 1,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    -0.1173774003982544,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [
+                    379444592,
+                    2644446401
+                ],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 266375137,
+                "ParentUID": 1143474464871653475,
+                "RootUID": 266375137,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.16233640909194946,
+                    0.2695660889148712,
+                    1.7541542053222656,
+                    1.898443579673767,
+                    -1.5676889419555664,
+                    0.0996333435177803,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 325387754,
+                "ParentUID": 1396034666056006805,
+                "RootUID": 325387754,
+                "Type": 1,
+                "LocalTransform": [
+                    0.010883085429668427,
+                    0.10385750234127045,
+                    0.5992423295974731,
+                    0.015305637381970882,
+                    0.2909374237060547,
+                    -0.13841848075389862,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 329165426,
+                "ParentUID": 1411960624293087812,
+                "RootUID": 329165426,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.18814019858837128,
+                    0.25807827711105347,
+                    0.009646371006965637,
+                    1.8451647758483887,
+                    1.137465476989746,
+                    0.6115626096725464,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 330721645,
+                "ParentUID": 1419840612560799583,
+                "RootUID": 330721645,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.10718108713626862,
+                    0.24911394715309143,
+                    0.33657580614089966,
+                    -1.5041953325271606,
+                    -0.5091643929481506,
+                    -0.1300724744796753,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 351285831,
+                "ParentUID": 1508163116079777280,
+                "RootUID": 351285831,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.10718108713626862,
+                    0.22898513078689575,
+                    0.1042061597108841,
+                    -1.4292855262756348,
+                    -0.6396584510803223,
+                    -1.1515294313430786,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 379444592,
+                "ParentUID": 257468600,
+                "RootUID": 257468600,
+                "Type": 2,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Mesh component",
+                "Mesh": 1373088482001683,
+                "Material": 1233818805628167
+            },
+            {
+                "UID": 380711892,
+                "ParentUID": 1634846106167502187,
+                "RootUID": 380711892,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.30325406789779663,
+                    0.15124958753585815,
+                    0.22520354390144348,
+                    2.683842897415161,
+                    -0.4625455439090729,
+                    0.4589303135871887,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 407402726,
+                "ParentUID": 1749482368117149093,
+                "RootUID": 407402726,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.30325406789779663,
+                    0.15124958753585815,
+                    0.10176579654216766,
+                    1.368416428565979,
+                    -0.4148390293121338,
+                    -2.891608953475952,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 410657274,
+                "ParentUID": 1763460544292030921,
+                "RootUID": 410657274,
+                "Type": 1,
+                "LocalTransform": [
+                    0.03131185472011566,
+                    0.20168089866638184,
+                    0.10685946047306061,
+                    1.3665260076522827,
+                    0.017262190580368042,
+                    -2.8916103839874268,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 428349360,
+                "ParentUID": 1838849433204693509,
+                "RootUID": 428349360,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.1881406456232071,
+                    0.25807830691337585,
+                    -0.057068295776844025,
+                    1.845130205154419,
+                    1.134626865386963,
+                    0.6115624904632568,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 430107524,
+                "ParentUID": 1846998733172211931,
+                "RootUID": 430107524,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.13460859656333923,
+                    0.16361381113529205,
+                    -0.04540376737713814,
+                    0.05888652801513672,
+                    -0.19802938401699066,
+                    0.2455740123987198,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 430125163,
+                "ParentUID": 1847074489033423598,
+                "RootUID": 430125163,
+                "Type": 1,
+                "LocalTransform": [
+                    0.03131185472011566,
+                    0.20168089866638184,
+                    0.23029720783233643,
+                    2.681952476501465,
+                    0.06496869027614594,
+                    0.04103589057922363,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 433874088,
+                "ParentUID": 1862876982139218902,
+                "RootUID": 433874088,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.04840847849845886,
+                    0.07211792469024658,
+                    0.8335472345352173,
+                    -1.8814808130264282,
+                    1.19234037399292,
+                    -1.060947060585022,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 453654692,
+                "ParentUID": 1947834027875274754,
+                "RootUID": 453654692,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.13460859656333923,
+                    0.16361381113529205,
+                    -0.04540376737713814,
+                    -1.511819839477539,
+                    0.0,
+                    -0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 454640107,
+                "ParentUID": 1952066352959363573,
+                "RootUID": 454640107,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.18814021348953247,
+                    0.2580782473087311,
+                    -0.1256994903087616,
+                    2.3357481956481934,
+                    0.9270956516265869,
+                    1.5966976881027222,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 474498297,
+                "ParentUID": 2036758588194232168,
+                "RootUID": 474498297,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.16233640909194946,
+                    0.2695660889148712,
+                    1.6649415493011475,
+                    1.7763698101043701,
+                    -1.4697741270065308,
+                    0.08764005452394485,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 487649361,
+                "ParentUID": 2092942958273796647,
+                "RootUID": 487649361,
+                "Type": 1,
+                "LocalTransform": [
+                    0.11839151382446289,
+                    0.07184392958879471,
+                    0.3861212432384491,
+                    1.4761067628860474,
+                    0.704088568687439,
+                    -1.2440298795700073,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 516934198,
+                "ParentUID": 2219019398952857034,
+                "RootUID": 516934198,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.13364943861961365,
+                    0.29870355129241943,
+                    -0.011088453233242035,
+                    2.8306806087493896,
+                    -0.003404780989512801,
+                    0.004208517726510763,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 520100987,
+                "ParentUID": 2232620651277907155,
+                "RootUID": 520100987,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.22217847406864166,
+                    0.10385744273662567,
+                    0.6005992889404297,
+                    2.9916563034057617,
+                    -0.5006355047225952,
+                    -0.12438458949327469,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 551943775,
+                "ParentUID": 2370281446485680498,
+                "RootUID": 551943775,
+                "Type": 1,
+                "LocalTransform": [
+                    0.010883085429668427,
+                    0.10385750234127045,
+                    0.7832627892494202,
+                    -0.05534418299794197,
+                    -0.5078700184822083,
+                    -0.13483786582946777,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 557024238,
+                "ParentUID": 2389410686206734347,
+                "RootUID": 557024238,
+                "Type": 1,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    -0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 600852060,
+                "ParentUID": 2579144848317847470,
+                "RootUID": 600852060,
+                "Type": 1,
+                "LocalTransform": [
+                    0.010883085429668427,
+                    0.10385750234127045,
+                    0.7836960554122925,
+                    0.16071166098117828,
+                    0.403526246547699,
+                    -0.2086815983057022,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 614698287,
+                "ParentUID": 2639211983311797648,
+                "RootUID": 614698287,
+                "Type": 1,
+                "LocalTransform": [
+                    0.010883085429668427,
+                    0.10385750234127045,
+                    0.5992423295974731,
+                    -0.149824857711792,
+                    -0.49813371896743774,
+                    -0.13576050102710724,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 641657383,
+                "ParentUID": 2754103357569342845,
+                "RootUID": 641657383,
+                "Type": 1,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    -0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 655149522,
+                "ParentUID": 2813247733946725128,
+                "RootUID": 655149522,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.15568237006664276,
+                    0.406971275806427,
+                    0.23647260665893555,
+                    -0.20673292875289917,
+                    -0.0032465271651744843,
+                    -0.0003498825244605541,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 663808517,
+                "ParentUID": 2849540774429728620,
+                "RootUID": 663808517,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.15568237006664276,
+                    0.406971275806427,
+                    0.06351438909769058,
+                    2.8306431770324707,
+                    -0.0032465271651744843,
+                    -0.0003498825244605541,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 666836064,
+                "ParentUID": 2862843010579514876,
+                "RootUID": 666836064,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.22217778861522675,
+                    0.10385730862617493,
+                    0.41657888889312744,
+                    2.9916563034057617,
+                    -0.5006355047225952,
+                    -0.12438458949327469,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 672370466,
+                "ParentUID": 2887211125876439192,
+                "RootUID": 672370466,
+                "Type": 1,
+                "LocalTransform": [
+                    0.007451801560819149,
+                    0.10580901801586151,
+                    0.7834553122520447,
+                    0.08041206747293472,
+                    -0.0024052634835243225,
+                    -0.3400099277496338,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 680465575,
+                "ParentUID": 2921381314297400047,
+                "RootUID": 680465575,
+                "Type": 1,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    -0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 693085128,
+                "ParentUID": 2975581879840142468,
+                "RootUID": 693085128,
+                "Type": 1,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    -0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [
+                    732560235
+                ],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 709782934,
+                "ParentUID": 3046700372461414328,
+                "RootUID": 709782934,
+                "Type": 1,
+                "LocalTransform": [
+                    0.010883085429668427,
+                    0.10385750234127045,
+                    0.5992423295974731,
+                    0.20082151889801025,
+                    -0.10346272587776184,
+                    -0.19977164268493652,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 732560235,
+                "ParentUID": 693085128,
+                "RootUID": 693085128,
+                "Type": 2,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Mesh component",
+                "Mesh": 1307178297308898,
+                "Material": 1288492492577007
+            },
+            {
+                "UID": 744228625,
+                "ParentUID": 3196138588402426316,
+                "RootUID": 744228625,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.22217847406864166,
+                    0.10385744273662567,
+                    0.6005992889404297,
+                    -2.9457411766052246,
+                    -0.1019328236579895,
+                    -0.18720115721225739,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 756260642,
+                "ParentUID": 3247815708084775185,
+                "RootUID": 756260642,
+                "Type": 1,
+                "LocalTransform": [
+                    0.49452584981918335,
+                    -0.049347832798957825,
+                    0.1206224113702774,
+                    0.0887291431427002,
+                    1.4917397499084473,
+                    1.947135090827942,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 824972780,
+                "ParentUID": 3542334051906743665,
+                "RootUID": 824972780,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.4025261700153351,
+                    0.2691025733947754,
+                    -0.18048040568828583,
+                    1.3734008073806763,
+                    0.0,
+                    1.5707963705062866,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 878779204,
+                "ParentUID": 3772832843206554039,
+                "RootUID": 878779204,
+                "Type": 1,
+                "LocalTransform": [
+                    0.46412193775177,
+                    0.07184391468763351,
+                    0.3861212730407715,
+                    -1.838268756866455,
+                    0.9543896913528442,
+                    -1.120529055595398,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 960987207,
+                "ParentUID": 4126511566713457543,
+                "RootUID": 960987207,
+                "Type": 1,
+                "LocalTransform": [
+                    0.29125651717185974,
+                    0.0026668275240808725,
+                    0.19421851634979248,
+                    -1.7995535135269165,
+                    1.2531018257141113,
+                    1.9937101602554321,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 1106499606,
+                "ParentUID": 4749987462415651653,
+                "RootUID": 1106499606,
+                "Type": 1,
+                "LocalTransform": [
+                    -9.820664405822754,
+                    0.0000044633125071413815,
+                    10.441573143005371,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 1125297276,
+                "ParentUID": 4832516961875596730,
+                "RootUID": 1125297276,
+                "Type": 1,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [
+                    1168531917
+                ],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 1168531917,
+                "ParentUID": 1125297276,
+                "RootUID": 1125297276,
+                "Type": 2,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Mesh component",
+                "Mesh": 1364777706732227,
+                "Material": 1278540699627060
+            },
+            {
+                "UID": 1212627197,
+                "ParentUID": 5205801996329179481,
+                "RootUID": 1212627197,
+                "Type": 1,
+                "LocalTransform": [
+                    -11.645940780639648,
+                    -0.4148064851760864,
+                    10.73162841796875,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 1236298337,
+                "ParentUID": 5309262885755632866,
+                "RootUID": 1236298337,
+                "Type": 1,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    -0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [
+                    1348109664
+                ],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 1259689158,
+                "ParentUID": 5409725697676966539,
+                "RootUID": 1259689158,
+                "Type": 1,
+                "LocalTransform": [
+                    0.11839151382446289,
+                    0.07184392958879471,
+                    0.13496023416519165,
+                    -0.18803770840168,
+                    1.4470196962356567,
+                    -2.922840118408203,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 1348109664,
+                "ParentUID": 1236298337,
+                "RootUID": 1236298337,
+                "Type": 2,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Mesh component",
+                "Mesh": 1301111646091176,
+                "Material": 1275179300787140
+            },
+            {
+                "UID": 1421835532,
+                "ParentUID": 6106438093260832771,
+                "RootUID": 1421835532,
+                "Type": 1,
+                "LocalTransform": [
+                    0.46412193775177,
+                    0.07184391468763351,
+                    0.6372823715209961,
+                    3.0859146118164063,
+                    1.4767824411392212,
+                    -2.852891206741333,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 1442527367,
+                "ParentUID": 6195009829182030145,
+                "RootUID": 1442527367,
+                "Type": 1,
+                "LocalTransform": [
+                    0.11839151382446289,
+                    0.07184392958879471,
+                    -0.1030687689781189,
+                    -0.18803770840168,
+                    1.4470196962356567,
+                    -2.922840118408203,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 1505715374,
+                "ParentUID": 6466101229146975002,
+                "RootUID": 1505715374,
+                "Type": 1,
+                "LocalTransform": [
+                    0.6309214234352112,
+                    0.07211795449256897,
+                    1.0472862720489502,
+                    1.1413034200668335,
+                    0.8537773489952087,
+                    -0.9231373071670532,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 1625552512,
+                "ParentUID": 6981395860998572039,
+                "RootUID": 1625552512,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.23032306134700775,
+                    0.10385730862617493,
+                    0.4163256287574768,
+                    -2.9919800758361816,
+                    0.44656139612197876,
+                    -0.1984722763299942,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 1640016041,
+                "ParentUID": 7042619185570631385,
+                "RootUID": 1640016041,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.2187473624944687,
+                    0.10190548747777939,
+                    0.4163869023323059,
+                    -3.0722861289978027,
+                    -0.008688531816005707,
+                    -0.2642081379890442,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 1658091510,
+                "ParentUID": 7120551749967566594,
+                "RootUID": 1658091510,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.22217847406864166,
+                    0.10385744273662567,
+                    0.6005992889404297,
+                    -3.138254404067993,
+                    0.2902706265449524,
+                    -0.1217321902513504,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 1713937338,
+                "ParentUID": 7360108735472364829,
+                "RootUID": 1713937338,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.10911914706230164,
+                    0.269102543592453,
+                    -0.16036339104175568,
+                    1.3734008073806763,
+                    1.3732273578643799,
+                    1.5707963705062866,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 1724833541,
+                "ParentUID": 4236367487,
+                "RootUID": 4236367487,
+                "Type": 2,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Mesh component",
+                "Mesh": 1352577962249159,
+                "Material": 1295485307736968
+            },
+            {
+                "UID": 1746676847,
+                "ParentUID": 7501620916054877889,
+                "RootUID": 1746676847,
+                "Type": 1,
+                "LocalTransform": [
+                    0.0,
+                    0.00028208954608999193,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    -0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [
+                    1799797670
+                ],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 1748858832,
+                "ParentUID": 7509497369507206969,
+                "RootUID": 1748858832,
+                "Type": 1,
+                "LocalTransform": [
+                    0.46412193775177,
+                    0.07184391468763351,
+                    0.8753108382225037,
+                    3.0859146118164063,
+                    1.5050830841064453,
+                    -2.852891206741333,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 1776222142,
+                "ParentUID": 7627619934398472434,
+                "RootUID": 1776222142,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.10911914706230164,
+                    0.269102543592453,
+                    0.47103768587112427,
+                    1.3734008073806763,
+                    1.3734008073806763,
+                    1.1920928955078125e-7,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 1782304661,
+                "ParentUID": 7654641214260757536,
+                "RootUID": 1782304661,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.02621559426188469,
+                    0.25810056924819946,
+                    0.6821085810661316,
+                    -1.5494707822799683,
+                    1.1395419836044312,
+                    -0.6408583521842957,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 1799797670,
+                "ParentUID": 1746676847,
+                "RootUID": 1746676847,
+                "Type": 2,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Mesh component",
+                "Mesh": 1302722888781977,
+                "Material": 1225869285963633
+            },
+            {
+                "UID": 1836095703,
+                "ParentUID": 7885073939302710616,
+                "RootUID": 1836095703,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.02621559426188469,
+                    0.25810056924819946,
+                    0.7507397532463074,
+                    -1.620842695236206,
+                    1.1046984195709229,
+                    -1.052834153175354,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 1844114759,
+                "ParentUID": 7919814542986683649,
+                "RootUID": 1844114759,
+                "Type": 1,
+                "LocalTransform": [
+                    0.445881187915802,
+                    -0.1269170194864273,
+                    0.00040575204184278846,
+                    1.1558164358139038,
+                    1.5012969970703125,
+                    1.964475154876709,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 1873743025,
+                "ParentUID": 8047365993834341355,
+                "RootUID": 1873743025,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.02621559426188469,
+                    0.25810056924819946,
+                    0.6153938174247742,
+                    -1.5494362115859985,
+                    1.1423804759979248,
+                    -0.6408582925796509,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 1899424822,
+                "ParentUID": 8156771416222119882,
+                "RootUID": 1899424822,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.02621559426188469,
+                    0.25810056924819946,
+                    0.841318666934967,
+                    -1.3913800716400146,
+                    1.0460442304611206,
+                    -1.0509158372879028,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 1913104881,
+                "ParentUID": 8216423878286844459,
+                "RootUID": 1913104881,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.02621559426188469,
+                    0.25810056924819946,
+                    0.46566247940063477,
+                    -1.5494670867919922,
+                    1.1409306526184082,
+                    -0.6403151750564575,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 1970080850,
+                "ParentUID": 8460236742858184341,
+                "RootUID": 1970080850,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.023512043058872223,
+                    0.25804078578948975,
+                    0.31273579597473145,
+                    2.8919575214385986,
+                    0.7091562747955322,
+                    0.4996393918991089,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 2072546258,
+                "ParentUID": 8900023298522741660,
+                "RootUID": 2072546258,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.02621559426188469,
+                    0.25810056924819946,
+                    0.9353076815605164,
+                    -1.3913800716400146,
+                    1.0460442304611206,
+                    -1.0509158372879028,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 2093398764,
+                "ParentUID": 8990780211786684259,
+                "RootUID": 2093398764,
+                "Type": 1,
+                "LocalTransform": [
+                    0.2909983694553375,
+                    0.0027264284435659647,
+                    0.0002082364517264068,
+                    -1.9857763051986694,
+                    1.4814980030059814,
+                    1.964475154876709,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 2099246379,
+                "ParentUID": 9015596505595962932,
+                "RootUID": 2099246379,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.02621559426188469,
+                    0.25810056924819946,
+                    0.6153938174247742,
+                    1.0837734937667847,
+                    1.4460971355438232,
+                    2.8808648586273193,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 2189153081,
+                "ParentUID": 9402041872474561556,
+                "RootUID": 2189153081,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.02621559426188469,
+                    0.25810056924819946,
+                    0.46566247940063477,
+                    1.0415736436843872,
+                    1.4577573537826538,
+                    2.881408214569092,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 2212919833,
+                "ParentUID": 9503521255208873858,
+                "RootUID": 2212919833,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.10139554738998413,
+                    0.24144616723060608,
+                    0.8400142192840576,
+                    0.2999018430709839,
+                    0.8378353118896484,
+                    0.1621873527765274,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 2230768800,
+                "ParentUID": 9578985904277715409,
+                "RootUID": 2230768800,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.10139554738998413,
+                    0.24144616723060608,
+                    0.790379524230957,
+                    -0.7376499772071838,
+                    0.42464500665664673,
+                    -0.19772259891033173,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 2265320874,
+                "ParentUID": 9728282989600671693,
+                "RootUID": 2265320874,
+                "Type": 1,
+                "LocalTransform": [
+                    0.11839151382446289,
+                    0.07184392958879471,
+                    0.3861212432384491,
+                    -0.14808401465415955,
+                    1.5139127969741821,
+                    -2.937908887863159,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 2456095877,
+                "ParentUID": 10548552451698271696,
+                "RootUID": 2456095877,
+                "Type": 1,
+                "LocalTransform": [
+                    0.11839151382446289,
+                    0.07184392958879471,
+                    0.13496023416519165,
+                    -0.18803770840168,
+                    1.4470196962356567,
+                    -2.922840118408203,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 2477163179,
+                "ParentUID": 10638138761240350914,
+                "RootUID": 2477163179,
+                "Type": 1,
+                "LocalTransform": [
+                    0.6309214234352112,
+                    0.07211795449256897,
+                    0.8335468769073486,
+                    1.1413034200668335,
+                    0.8537773489952087,
+                    -0.9231373071670532,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 2571373855,
+                "ParentUID": 11042172497575320789,
+                "RootUID": 2571373855,
+                "Type": 1,
+                "LocalTransform": [
+                    0.46412193775177,
+                    0.07184391468763351,
+                    0.3861212730407715,
+                    3.063230514526367,
+                    1.4173375368118286,
+                    -2.836764335632324,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 2644446401,
+                "ParentUID": 257468600,
+                "RootUID": 257468600,
+                "Type": 2,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Mesh component",
+                "Mesh": 1330782408256469,
+                "Material": 1286398680615744
+            },
+            {
+                "UID": 2645881788,
+                "ParentUID": 11361583591158727459,
+                "RootUID": 2645881788,
+                "Type": 1,
+                "LocalTransform": [
+                    0.46412193775177,
+                    0.07184391468763351,
+                    0.6372823715209961,
+                    3.0859146118164063,
+                    1.4767824411392212,
+                    -2.852891206741333,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 2819043613,
+                "ParentUID": 12106504048056545757,
+                "RootUID": 2819043613,
+                "Type": 1,
+                "LocalTransform": [
+                    0.11839151382446289,
+                    0.07184392958879471,
+                    -0.1030687689781189,
+                    1.4761067628860474,
+                    0.0077163297683000565,
+                    1.7012799978256226,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3018312378,
+                "ParentUID": 12963253934507903368,
+                "RootUID": 3018312378,
+                "Type": 1,
+                "LocalTransform": [
+                    0.1262877881526947,
+                    -0.03517749905586243,
+                    -0.23992544412612915,
+                    -3.052863597869873,
+                    1.4917397499084473,
+                    1.947135090827942,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3039788576,
+                "ParentUID": 8186119575285185493,
+                "RootUID": 3039788576,
+                "Type": 1,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3077456707,
+                "ParentUID": 13216977871650229036,
+                "RootUID": 3077456707,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.02621559426188469,
+                    0.25810056924819946,
+                    0.6153938174247742,
+                    -1.5494362115859985,
+                    1.1423804759979248,
+                    -0.6408582925796509,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3091476519,
+                "ParentUID": 13276893486331821287,
+                "RootUID": 3091476519,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.02621559426188469,
+                    0.25810056924819946,
+                    0.46566247940063477,
+                    -1.5494670867919922,
+                    1.1409306526184082,
+                    -0.6403151750564575,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3105240211,
+                "ParentUID": 13336606134748794165,
+                "RootUID": 3105240211,
+                "Type": 1,
+                "LocalTransform": [
+                    0.29125651717185974,
+                    0.0026668275240808725,
+                    0.7849907875061035,
+                    -1.556014060974121,
+                    1.3632711172103882,
+                    1.9104796648025513,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3178737623,
+                "ParentUID": 13652275117286703434,
+                "RootUID": 3178737623,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.02621559426188469,
+                    0.25810056924819946,
+                    0.7507397532463074,
+                    -1.9792330265045166,
+                    1.499938726425171,
+                    1.3097448348999023,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3262865782,
+                "ParentUID": 14013602807615557492,
+                "RootUID": 3262865782,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.02621559426188469,
+                    0.25810056924819946,
+                    0.6821085810661316,
+                    1.083738923072815,
+                    1.448935627937317,
+                    2.8808648586273193,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3273291842,
+                "ParentUID": 14057485332954248005,
+                "RootUID": 3273291842,
+                "Type": 1,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    1.570796251296997,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3314883440,
+                "ParentUID": 14236717927933776189,
+                "RootUID": 3314883440,
+                "Type": 1,
+                "LocalTransform": [
+                    0.46412193775177,
+                    0.07184391468763351,
+                    0.8753108382225037,
+                    -1.838268756866455,
+                    0.6310833692550659,
+                    1.889586329460144,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3392465741,
+                "ParentUID": 14569034314649997652,
+                "RootUID": 3392465741,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.02621559426188469,
+                    0.25810056924819946,
+                    0.6821085810661316,
+                    -1.5494707822799683,
+                    1.1395419836044312,
+                    -0.6408583521842957,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3502788536,
+                "ParentUID": 15042269071619633097,
+                "RootUID": 3502788536,
+                "Type": 1,
+                "LocalTransform": [
+                    3.505675792694092,
+                    0.0,
+                    -3.10359787940979,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3506354653,
+                "ParentUID": 15059080524733059726,
+                "RootUID": 3506354653,
+                "Type": 1,
+                "LocalTransform": [
+                    0.11839151382446289,
+                    0.07184392958879471,
+                    0.3861212432384491,
+                    -0.14808401465415955,
+                    1.5139127969741821,
+                    -2.937908887863159,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3528617927,
+                "ParentUID": 15155298598913614450,
+                "RootUID": 3528617927,
+                "Type": 1,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    -0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [
+                    3634232984
+                ],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3553695998,
+                "ParentUID": 15262111034498345898,
+                "RootUID": 3553695998,
+                "Type": 1,
+                "LocalTransform": [
+                    0.46412193775177,
+                    0.07184391468763351,
+                    0.3861212730407715,
+                    3.063230514526367,
+                    1.4173375368118286,
+                    -2.836764335632324,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3609727440,
+                "ParentUID": 15503362283216280470,
+                "RootUID": 3609727440,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.04840930551290512,
+                    0.07211783528327942,
+                    0.6198089122772217,
+                    -1.8814808130264282,
+                    1.19234037399292,
+                    -1.060947060585022,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3634232984,
+                "ParentUID": 3528617927,
+                "RootUID": 3528617927,
+                "Type": 2,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Mesh component",
+                "Mesh": 1369444636829043,
+                "Material": 1218622399690107
+            },
+            {
+                "UID": 3705491045,
+                "ParentUID": 15914065795266580541,
+                "RootUID": 3705491045,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.1881406456232071,
+                    0.25807830691337585,
+                    -0.057068295776844025,
+                    1.845130205154419,
+                    1.134626865386963,
+                    0.6115624904632568,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3735384445,
+                "ParentUID": 16043055009722552103,
+                "RootUID": 3735384445,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.18814019858837128,
+                    0.25807827711105347,
+                    0.009646371006965637,
+                    1.8451647758483887,
+                    1.137465476989746,
+                    0.6115626096725464,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3776269611,
+                "ParentUID": 16218057422841413051,
+                "RootUID": 3776269611,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.18814021348953247,
+                    0.2580782473087311,
+                    -0.1256994903087616,
+                    2.3357481956481934,
+                    0.9270956516265869,
+                    1.5966976881027222,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3817632837,
+                "ParentUID": 16396010144064802838,
+                "RootUID": 3817632837,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.18814004957675934,
+                    0.25807833671569824,
+                    0.15937724709510803,
+                    0.9926461577415466,
+                    0.9941515922546387,
+                    0.7597247958183289,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3841871715,
+                "ParentUID": 16499816315804050772,
+                "RootUID": 3841871715,
+                "Type": 1,
+                "LocalTransform": [
+                    0.11839151382446289,
+                    0.07184392958879471,
+                    0.13496023416519165,
+                    1.4761067628860474,
+                    -0.3097117841243744,
+                    -1.2440298795700073,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3857421706,
+                "ParentUID": 16566004977935847604,
+                "RootUID": 3857421706,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.1881401538848877,
+                    0.2580779194831848,
+                    -0.2162785530090332,
+                    2.5652108192443848,
+                    0.8684413433074951,
+                    1.5986160039901733,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3861032711,
+                "ParentUID": 16582112165255711047,
+                "RootUID": 3861032711,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.19124987721443176,
+                    0.2580854892730713,
+                    0.3125799298286438,
+                    -0.2496354728937149,
+                    0.7091562747955322,
+                    0.4996393918991089,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3867881560,
+                "ParentUID": 16610630686397606241,
+                "RootUID": 3867881560,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.02621559426188469,
+                    0.25810056924819946,
+                    0.7507397532463074,
+                    -1.620842695236206,
+                    1.1046984195709229,
+                    -1.052834153175354,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3868265878,
+                "ParentUID": 16613477402506594716,
+                "RootUID": 3868265878,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.1881406456232071,
+                    0.25807830691337585,
+                    -0.057068295776844025,
+                    -0.024036278948187828,
+                    0.6872856616973877,
+                    0.5024011731147766,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3871616038,
+                "ParentUID": 16628165247631481316,
+                "RootUID": 3871616038,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.11296024173498154,
+                    0.274732768535614,
+                    -0.21497470140457153,
+                    -2.0266926288604736,
+                    0.660232424736023,
+                    2.8117191791534424,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3890849073,
+                "ParentUID": 16710770502952638059,
+                "RootUID": 3890849073,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.18814019858837128,
+                    0.25807827711105347,
+                    0.009646371006965637,
+                    -0.024001676589250565,
+                    0.6901240348815918,
+                    0.5024012327194214,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3926729879,
+                "ParentUID": 16864279353017891863,
+                "RootUID": 3926729879,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.18814004957675934,
+                    0.25807833671569824,
+                    0.15937724709510803,
+                    -0.0662015974521637,
+                    0.6784636974334717,
+                    0.5029444694519043,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3928940112,
+                "ParentUID": 16874370271669703190,
+                "RootUID": 3928940112,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.11296027153730392,
+                    0.2747325897216797,
+                    -0.1653398871421814,
+                    -3.064244270324707,
+                    0.24704211950302124,
+                    2.4518091678619385,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3976308383,
+                "ParentUID": 17076619368188323022,
+                "RootUID": 3976308383,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.1881401240825653,
+                    0.25807812809944153,
+                    -0.3102673888206482,
+                    2.5652108192443848,
+                    0.8684413433074951,
+                    1.5986160039901733,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 4014545258,
+                "ParentUID": 17242041572610271224,
+                "RootUID": 4014545258,
+                "Type": 1,
+                "LocalTransform": [
+                    0.13611537218093872,
+                    -0.1269165575504303,
+                    0.0004056238103657961,
+                    -1.9857763051986694,
+                    1.5012969970703125,
+                    1.964475154876709,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 4080305453,
+                "ParentUID": 17523582402253526316,
+                "RootUID": 4080305453,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.18814021348953247,
+                    0.2580782473087311,
+                    -0.1256994903087616,
+                    0.054584406316280365,
+                    0.49456748366355896,
+                    2.072873830795288,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 4089919466,
+                "ParentUID": 17564575252523914900,
+                "RootUID": 4089919466,
+                "Type": 1,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 4120691948,
+                "ParentUID": 17697938137433876834,
+                "RootUID": 4120691948,
+                "Type": 1,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [
+                    4206882746
+                ],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 4125261991,
+                "ParentUID": 17716968282063112039,
+                "RootUID": 4125261991,
+                "Type": 1,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [
+                    4205326141
+                ],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 4149621978,
+                "ParentUID": 17821294608543439037,
+                "RootUID": 4149621978,
+                "Type": 1,
+                "LocalTransform": [
+                    -0.18814004957675934,
+                    0.25807833671569824,
+                    0.15937724709510803,
+                    0.9926461577415466,
+                    0.9941515922546387,
+                    0.7597247958183289,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 4176106803,
+                "ParentUID": 17935943124233479765,
+                "RootUID": 4176106803,
+                "Type": 1,
+                "LocalTransform": [
+                    0.29125651717185974,
+                    0.0026668275240808725,
+                    0.42450469732284546,
+                    -1.556014060974121,
+                    1.3632711172103882,
+                    1.9104796648025513,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 4205326141,
+                "ParentUID": 4125261991,
+                "RootUID": 4125261991,
+                "Type": 2,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Mesh component",
+                "Mesh": 1348951311024166,
+                "Material": 1200770811442247
+            },
+            {
+                "UID": 4206882746,
+                "ParentUID": 4120691948,
+                "RootUID": 4120691948,
+                "Type": 2,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Mesh component",
+                "Mesh": 1380682685192080,
+                "Material": 1289497648102410
+            },
+            {
+                "UID": 4218822995,
+                "ParentUID": 18117912675653582488,
+                "RootUID": 4218822995,
+                "Type": 1,
+                "LocalTransform": [
+                    6.043622970581055,
+                    -0.000007022032150416635,
+                    0.20421361923217773,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 4236367487,
+                "ParentUID": 18194760794769070097,
+                "RootUID": 4236367487,
+                "Type": 1,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    -0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [
+                    35806266,
+                    1724833541
+                ],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 4242542405,
+                "ParentUID": 18220085784160863659,
+                "RootUID": 4242542405,
+                "Type": 1,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    -0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [
+                    4282992206
+                ],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 4282992206,
+                "ParentUID": 4242542405,
+                "RootUID": 4242542405,
+                "Type": 2,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Mesh component",
+                "Mesh": 1373917564177539,
+                "Material": 1291413076021110
+            },
+            {
+                "UID": 4286609728,
+                "ParentUID": 18409652512847841371,
+                "RootUID": 4286609728,
+                "Type": 1,
+                "LocalTransform": [
+                    0.46412193775177,
+                    0.07184391468763351,
+                    0.6372823715209961,
+                    -1.838268756866455,
+                    0.9543896913528442,
+                    -1.120529055595398,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            }
+        ]
+    },
+    "Lights Config": {
+        "Ambient Color": [
+            1.0,
+            1.0,
+            1.0
+        ],
+        "Ambient Intensity": 0.20000000298023224,
+        "Skybox UID": 1170799310640544
+    }
+}
