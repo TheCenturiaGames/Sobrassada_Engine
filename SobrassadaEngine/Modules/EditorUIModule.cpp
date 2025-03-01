@@ -684,7 +684,11 @@ bool EditorUIModule::RenderImGuizmo(Transform& gameObjectTransform)
     ImGuizmo::Enable(true);
     ImGuizmo::Manipulate(view.ptr(), proj.ptr(), mCurrentGizmoOperation, ImGuizmo::MODE::LOCAL, gizmoMatrix.ptr());
 
-    if (!ImGuizmo::IsUsing()) return false;
+    if (!ImGuizmo::IsUsing())
+    {
+        gameObjectTransform.rotation /= RAD_DEGREE_CONV;
+        return false;
+    }
 
     if (App->GetSceneModule()->GetDoInputs())
     {
@@ -694,13 +698,15 @@ bool EditorUIModule::RenderImGuizmo(Transform& gameObjectTransform)
         if (newPos.Distance(App->GetCameraModule()->GetCameraPosition()) > maxDistance)
         {
             ImGuizmo::Enable(false);
+            gameObjectTransform.rotation /= RAD_DEGREE_CONV;
             return false;
         }
 
-        gameObjectTransform.position  = newPos;
-        gameObjectTransform.rotation  = newRot;
-        gameObjectTransform.scale     = newScale;
+        gameObjectTransform.position = newPos;
+        gameObjectTransform.rotation = newRot;
+        gameObjectTransform.scale    = newScale;
     }
+
     gameObjectTransform.rotation /= RAD_DEGREE_CONV;
 
     return true;
