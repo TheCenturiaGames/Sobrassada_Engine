@@ -173,30 +173,39 @@ namespace MeshImporter
                 Vertex vertex;
                 vertex.position = *reinterpret_cast<const float3*>(bufferPos);
                 vertex.tangent  = bufferTan ? *reinterpret_cast<const float4*>(bufferTan) : float4(0, 0, 0, 1);
-                // vertex.joint    = bufferJoints ? *reinterpret_cast<const float4*>(bufferJoints) : float4(0, 0, 0, 1);
 
-                if (dataType == UNSIGNED_CHAR)
+                if (bufferJoints)
                 {
-                    const unsigned char* joints = reinterpret_cast<const unsigned char*>(bufferJoints);
-                    vertex.joint[0]             = (unsigned int)joints[0];
-                    vertex.joint[1]             = (unsigned int)joints[1];
-                    vertex.joint[2]             = (unsigned int)joints[2];
-                    vertex.joint[3]             = (unsigned int)joints[3];
-                }
-                else if (dataType == UNSIGNED_SHORT)
-                {
-                    const unsigned short* joints = reinterpret_cast<const unsigned short*>(bufferJoints);
-                    vertex.joint[0]              = (unsigned int)joints[0];
-                    vertex.joint[1]              = (unsigned int)joints[1];
-                    vertex.joint[2]              = (unsigned int)joints[2];
-                    vertex.joint[3]              = (unsigned int)joints[3];
-                    //GLOG("Joints pre: %d, %d, %d, %d", joints[0], joints[1], joints[2], joints[3]);
+                    if (dataType == UNSIGNED_CHAR)
+                    {
+                        const unsigned char* joints = reinterpret_cast<const unsigned char*>(bufferJoints);
+                        vertex.joint[0]             = (unsigned int)joints[0];
+                        vertex.joint[1]             = (unsigned int)joints[1];
+                        vertex.joint[2]             = (unsigned int)joints[2];
+                        vertex.joint[3]             = (unsigned int)joints[3];
+                    }
+                    else if (dataType == UNSIGNED_SHORT)
+                    {
+                        const unsigned short* joints = reinterpret_cast<const unsigned short*>(bufferJoints);
+                        vertex.joint[0]              = (unsigned int)joints[0];
+                        vertex.joint[1]              = (unsigned int)joints[1];
+                        vertex.joint[2]              = (unsigned int)joints[2];
+                        vertex.joint[3]              = (unsigned int)joints[3];
+                        // GLOG("Joints pre: %d, %d, %d, %d", joints[0], joints[1], joints[2], joints[3]);
+                    }
+                    else
+                    {
+                        const unsigned int* joints = reinterpret_cast<const unsigned int*>(bufferJoints);
+                    }
                 }
                 else
                 {
-                    const unsigned int* joints = reinterpret_cast<const unsigned int*>(bufferJoints);
+                    vertex.joint[0] = 0;
+                    vertex.joint[1] = 0;
+                    vertex.joint[2] = 0;
+                    vertex.joint[3] = 1;
                 }
-
+                
                 vertex.weights  = bufferWeights ? *reinterpret_cast<const float4*>(bufferWeights) : float4(0, 0, 0, 1);
                 vertex.normal   = bufferNormal ? *reinterpret_cast<const float3*>(bufferNormal) : float3(0, 0, 0);
                 vertex.texCoord = bufferTexCoord ? *reinterpret_cast<const float2*>(bufferTexCoord) : float2(0, 0);
