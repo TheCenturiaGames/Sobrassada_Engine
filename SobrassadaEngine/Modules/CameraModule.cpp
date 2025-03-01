@@ -3,8 +3,8 @@
 #include "Application.h"
 #include "GameObject.h"
 #include "InputModule.h"
-#include "WindowModule.h"
 #include "SceneModule.h"
+#include "WindowModule.h"
 
 #include "DebugDraw/debugdraw.h"
 #include "Math/Quat.h"
@@ -61,7 +61,7 @@ bool CameraModule::Init()
     detachedViewMatrix               = detachedCamera.ViewMatrix();
     detachedProjectionMatrix         = detachedCamera.ProjectionMatrix();
 
-	glGenBuffers(1, &ubo);
+    glGenBuffers(1, &ubo);
     glBindBuffer(GL_UNIFORM_BUFFER, ubo);
     glBufferData(GL_UNIFORM_BUFFER, sizeof(CameraMatrices), nullptr, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
@@ -183,7 +183,7 @@ void CameraModule::Controls(float deltaTime)
         FocusCamera();
     }
 }
-    
+
 void CameraModule::SetAspectRatio(float newAspectRatio)
 {
     camera.verticalFov         = 2.0f * atanf(tanf(camera.horizontalFov * 0.5f) * newAspectRatio);
@@ -253,7 +253,7 @@ void CameraModule::FocusCamera()
 {
     AABB focusedObjectAABB = App->GetSceneModule()->GetSeletedGameObject()->GetAABB();
     float3 center          = focusedObjectAABB.CenterPoint();
-    
+
     if (IsNan(center.x))
     {
         GLOG("Center of bounding box is NaN")
@@ -261,8 +261,8 @@ void CameraModule::FocusCamera()
     }
 
     // IN CASE THE SELECTED OBJECT SET TO IN OR CLAMP VERY SMALL VALUES TO 0 (errors in float operations)
-    int distance           = (int)(focusedObjectAABB.maxPoint - focusedObjectAABB.minPoint).Length();
-    
+    int distance = (int)(focusedObjectAABB.maxPoint - focusedObjectAABB.minPoint).Length();
+
     if (distance == 0 || distance == FLOAT_INF || distance == -FLOAT_INF) distance = 1;
 
     float3 direction   = camera.front.Normalized();

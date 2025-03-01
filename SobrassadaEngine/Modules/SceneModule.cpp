@@ -2,24 +2,21 @@
 
 #include "CameraModule.h"
 #include "ComponentUtils.h"
+#include "EditorUIModule.h"
 #include "FrustumPlanes.h"
 #include "GameObject.h"
+#include "LibraryModule.h"
 #include "Octree.h"
+#include "Root/RootComponent.h"
+#include "Scene/Components/Standalone/MeshComponent.h"
 
 #include "glew.h"
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl2.h"
-
-#include "Root/RootComponent.h"
-#include "Scene/Components/Standalone/MeshComponent.h"
-
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_EXTERNAL_IMAGE
-#include "EditorUIModule.h"
-#include "LibraryModule.h"
-
 #include <Algorithm/Random/LCG.h>
 #include <tiny_gltf.h>
 
