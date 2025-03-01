@@ -609,7 +609,7 @@ bool DebugDrawModule::ShutDown()
 update_status DebugDrawModule::Render(float deltaTime)
 {
     // dd::axisTriad(float4x4::identity, 0.1f, 1.0f);
-    dd::xzSquareGrid(-10, 10, 0.0f, 1.0f, dd::colors::Blue);
+    if(!App->GetSceneModule()->GetInPlayMode()) dd::xzSquareGrid(-10, 10, 0.0f, 1.0f, dd::colors::Blue);
 
     // Probably should go somewhere else, but must go after skybox and meshes
     App->GetDebugDrawModule()->Draw();

@@ -36,7 +36,11 @@
                     16403395743517970248,
                     11028163903949062387,
                     6180720155454742891,
-                    11607489165223026472
+                    11607489165223026472,
+                    14149529069344130327,
+                    17661947656531593732,
+                    9768527683095242267,
+                    12447974111943526527
                 ],
                 "RootComponentUID": 1769820811
             },
@@ -123,6 +127,34 @@
                 "Name": "new Game Object",
                 "Children": [],
                 "RootComponentUID": 1439061052
+            },
+            {
+                "UID": 14149529069344130327,
+                "ParentUID": 10987272541105985597,
+                "Name": "new Game Object",
+                "Children": [],
+                "RootComponentUID": 3294931307
+            },
+            {
+                "UID": 17661947656531593732,
+                "ParentUID": 10987272541105985597,
+                "Name": "new Game Object",
+                "Children": [],
+                "RootComponentUID": 4112869230
+            },
+            {
+                "UID": 9768527683095242267,
+                "ParentUID": 10987272541105985597,
+                "Name": "new Game Object",
+                "Children": [],
+                "RootComponentUID": 2275108798
+            },
+            {
+                "UID": 12447974111943526527,
+                "ParentUID": 10987272541105985597,
+                "Name": "new Game Object",
+                "Children": [],
+                "RootComponentUID": 2899174897
             }
         ],
         "Components": [
@@ -321,7 +353,7 @@
                 "RootUID": 1439061052,
                 "Type": 1,
                 "LocalTransform": [
-                    -0.748223066329956,
+                    -1.435500144958496,
                     3.7194957733154297,
                     -1.5686017274856567,
                     0.0,
@@ -379,12 +411,15 @@
                     1.0,
                     1.0
                 ],
-                "Children": [],
+                "Children": [
+                    1632647156
+                ],
                 "Enabled": true,
                 "Name": "Root component",
                 "Type": 1,
                 "Mobility": 1
             },
+            {},
             {
                 "UID": 1882537636,
                 "ParentUID": 1439061052,
@@ -453,6 +488,30 @@
                 "Name": "Mesh component",
                 "Mesh": 1341344751864117,
                 "Material": 1223585337969737
+            },
+            {
+                "UID": 2275108798,
+                "ParentUID": 9768527683095242267,
+                "RootUID": 2275108798,
+                "Type": 1,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [
+                    2408760926
+                ],
+                "Enabled": true,
+                "Name": "Root Component",
+                "Type": 1,
+                "Mobility": 1
             },
             {
                 "UID": 2394387324,
@@ -625,6 +684,30 @@
                 "OuterAngle": 20.0
             },
             {
+                "UID": 2899174897,
+                "ParentUID": 12447974111943526527,
+                "RootUID": 2899174897,
+                "Type": 1,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [
+                    1771037337
+                ],
+                "Enabled": true,
+                "Name": "Root Component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
                 "UID": 3288601372,
                 "ParentUID": 2728421465,
                 "RootUID": 2728421465,
@@ -645,6 +728,30 @@
                 "Name": "Mesh component",
                 "Mesh": 1314547413484204,
                 "Material": 1240367201223857
+            },
+            {
+                "UID": 3294931307,
+                "ParentUID": 14149529069344130327,
+                "RootUID": 3294931307,
+                "Type": 1,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [
+                    1031196765
+                ],
+                "Enabled": true,
+                "Name": "Root Component",
+                "Type": 1,
+                "Mobility": 1
             },
             {
                 "UID": 3322004012,
@@ -805,7 +912,40 @@
                 "Name": "Root component",
                 "Type": 1,
                 "Mobility": 1
+            },
+            {
+                "UID": 4112869230,
+                "ParentUID": 17661947656531593732,
+                "RootUID": 4112869230,
+                "Type": 1,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [
+                    1083089776
+                ],
+                "Enabled": true,
+                "Name": "Root Component",
+                "Type": 1,
+                "Mobility": 1
             }
         ]
+    },
+    "Lights Config": {
+        "Ambient Color": [
+            0.5,
+            0.6940000057220459,
+            0.0
+        ],
+        "Ambient Intensity": 0.8579999804496765,
+        "Skybox UID": 1170799310640544
     }
 }

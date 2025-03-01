@@ -31,7 +31,7 @@ void DirectionalLightComponent::Save(rapidjson::Value& targetState, rapidjson::D
 
 void DirectionalLightComponent::Render()
 {
-    if (!enabled || !drawGizmos) return;
+    if (!enabled || !drawGizmos || App->GetSceneModule()->GetInPlayMode()) return;
 
     // Would be more optimal to only update the direction when rotation is modified
     float4x4 rot = float4x4::FromQuat(

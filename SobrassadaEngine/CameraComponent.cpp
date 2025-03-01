@@ -123,10 +123,10 @@ void CameraComponent::Update()
     if (App->GetSceneModule()->GetInPlayMode())
     {
         InputModule* inputModule = App->GetInputModule();
-        if (inputModule->GetKey(SDL_SCANCODE_W)) camera.pos += camera.front * 2.0f;
-        if (inputModule->GetKey(SDL_SCANCODE_S)) camera.pos -= camera.front * 2.0f;
-        if (inputModule->GetKey(SDL_SCANCODE_D)) camera.pos += camera.WorldRight() * 2.0f;
-        if (inputModule->GetKey(SDL_SCANCODE_A)) camera.pos -= camera.WorldRight() * 2.0f;
+        if (inputModule->GetKey(SDL_SCANCODE_W)) camera.pos += camera.front * 1.0f;
+        if (inputModule->GetKey(SDL_SCANCODE_S)) camera.pos -= camera.front * 1.0f;
+        if (inputModule->GetKey(SDL_SCANCODE_D)) camera.pos += camera.WorldRight() * 1.0f;
+        if (inputModule->GetKey(SDL_SCANCODE_A)) camera.pos -= camera.WorldRight() * 1.0f;
     }
 
     matrices.projectionMatrix = camera.ProjectionMatrix();
@@ -142,7 +142,7 @@ void CameraComponent::Update()
 void CameraComponent::Render()
 {
 
-    if (!enabled || !drawGizmos) return;
+    if (!enabled || !drawGizmos || App->GetSceneModule()->GetInPlayMode()) return;
     DebugDrawModule* debug = App->GetDebugDrawModule();
     debug->DrawFrustrum(camera.ProjectionMatrix(), camera.ViewMatrix());
 }
