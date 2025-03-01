@@ -1,8 +1,8 @@
 #include "EditorUIModule.h"
 
 #include "Application.h"
-#include "Component.h"
 #include "CameraModule.h"
+#include "Component.h"
 #include "FileSystem.h"
 #include "GameTimer.h"
 #include "InputModule.h"
@@ -17,15 +17,9 @@
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl2.h"
-#include <string>
-
-
-
-
-
 #include <cstring>
 #include <filesystem>
-
+#include <string>
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_EXTERNAL_IMAGE
@@ -706,8 +700,8 @@ bool EditorUIModule::RenderImGuizmo(Transform& gameObjectTransform)
         gameObjectTransform.position  = newPos;
         gameObjectTransform.rotation  = newRot;
         gameObjectTransform.scale     = newScale;
-        gameObjectTransform.rotation /= RAD_DEGREE_CONV;
     }
+    gameObjectTransform.rotation /= RAD_DEGREE_CONV;
 
     return true;
 }
