@@ -50,16 +50,17 @@ public:
 
     Transform orientedDif(const Transform& transform) const
     {
-        Transform newTransform = transform - *this;
-        Quat newRotation = Quat::FromEulerXYZ(newTransform.rotation.x, newTransform.rotation.y, newTransform.rotation.z);
+        Quat newRotation = Quat::FromEulerXYZ(transform.rotation.x, transform.rotation.y, transform.rotation.z);
         newRotation.Inverse();
         
         //float3 rotatedScale = newRotation.Transform(transform.scale);
         //newTransform.scale.x = rotatedScale.x != 0 ? scale.x / rotatedScale.x : 0;  
         //newTransform.scale.y = rotatedScale.y != 0 ? scale.y / rotatedScale.y : 0;  
         //newTransform.scale.z = rotatedScale.z != 0 ? scale.z / rotatedScale.z : 0;
-        
-        newTransform.position = newRotation.Transform(newTransform.position);
+
+        Transform newTransform;
+        newTransform.position = newRotation.Transform(transform.position - position);
+        newTransform.rotation = transform.rotation - rotation;
         return newTransform;
     }
 
