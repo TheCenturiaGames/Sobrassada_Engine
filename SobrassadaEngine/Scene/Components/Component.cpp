@@ -218,7 +218,6 @@ const Transform& Component::GetParentGlobalTransform()
 void Component::HandleDragNDrop(){
     if (ImGui::BeginDragDropSource())
     {
-        GLOG("Starting component drag n drop for uuid : %d", uid)
         ImGui::SetDragDropPayload("ComponentTreeNode", &uid, sizeof(UID));
         ImGui::Text(name);
         ImGui::EndDragDropSource();
@@ -230,7 +229,6 @@ void Component::HandleDragNDrop(){
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ComponentTreeNode"))
         {
             const UID draggedUID = *(const UID*)payload->Data;
-            GLOG("Receiving component drag n drop for uuid : %d", draggedUID)
             if (draggedUID != uid)
             {
                 Component* draggedComponent = App->GetSceneModule()->GetComponentByUID(draggedUID);
@@ -338,11 +336,7 @@ void Component::PassAABBUpdateToParent()
     {
         globalComponentAABB.Enclose(childComponent->GetGlobalAABB());
     }
-
-    GLOG("AABB updated")
-    GLOG("AABB: (%f, %f, %f), (%f, %f, %f)", globalComponentAABB.minPoint.x, globalComponentAABB.minPoint.y, globalComponentAABB.minPoint.z,
-       globalComponentAABB.maxPoint.x, globalComponentAABB.maxPoint.y, globalComponentAABB.maxPoint.z)
-
+    
     AABBUpdatable* parentObject = GetParent();
     if (parentObject != nullptr)
     {
