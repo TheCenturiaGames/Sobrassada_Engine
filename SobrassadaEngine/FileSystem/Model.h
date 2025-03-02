@@ -29,7 +29,7 @@ class Model
     Model(const UID id, const std::vector<NodeData>& nodes, const std::vector<Skin>& skins) : uid(id), nodes(nodes), skins(skins) {};
 
     const std::vector<NodeData>& GetNodes() const { return nodes; }
-    size_t GetNodesCount() const { return nodes.size(); }
+    const Skin& GetSkin(int skinIndex) const { return skins[skinIndex]; }
 
     void SetUID(const UID uid) { this->uid = uid; }
     void SetNodes(const std::vector<NodeData>& nodes) { this->nodes = nodes; }

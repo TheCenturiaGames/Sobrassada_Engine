@@ -111,6 +111,12 @@ namespace ModelImporter
                 }
                 nodeDataJSON.AddMember("MeshesMaterials", valMeshes, allocator);
             }
+
+            if (node.skinIndex != -1)
+            {
+                nodeDataJSON.AddMember("SkinIndex", node.skinIndex, allocator);
+            }
+            
             nodesJSON.PushBack(nodeDataJSON, allocator);
         }
         modelJSON.AddMember("Nodes", nodesJSON, allocator);
@@ -249,6 +255,15 @@ namespace ModelImporter
                     {
                         newNode.meshes.emplace_back(uids[i].GetUint64(), uids[i + 1].GetUint64());
                     }
+                }
+
+                if (nodeJSON.HasMember("SkinIndex") && nodeJSON["SkinIndex"].IsInt())
+                {
+                    newNode.skinIndex = nodeJSON["SkinIndex"].GetInt();
+                }
+                else
+                {
+                    newNode.skinIndex = -1;
                 }
 
                 loadedNodes.push_back(newNode);
