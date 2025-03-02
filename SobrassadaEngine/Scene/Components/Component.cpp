@@ -146,11 +146,7 @@ void Component::RenderGuizmo()
     const Transform& parentTransform = GetParentGlobalTransform();
     if (App->GetEditorUIModule()->RenderImGuizmo(localTransform, globalTransform, parentTransform))
     {
-        AABBUpdatable* parentGameObject = GetParent();
-        if (parentGameObject != nullptr)
-        {
-            OnTransformUpdate(parentGameObject->GetParentGlobalTransform()); 
-        }
+        OnTransformUpdate(parentTransform); 
     }
 }
 
