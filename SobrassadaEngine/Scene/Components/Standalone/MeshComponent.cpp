@@ -93,7 +93,7 @@ void MeshComponent::Render()
 
         float4x4 model         = float4x4::FromTRS(
             globalTransform.position,
-            Quat::FromEulerXYZ(globalTransform.rotation.x, globalTransform.rotation.y, globalTransform.rotation.z),
+            Quat::FromEulerZYX(globalTransform.rotation.z, globalTransform.rotation.y, globalTransform.rotation.x),
             globalTransform.scale
         );
         currentMesh->Render(App->GetResourcesModule()->GetProgram(), model, cameraUBO, currentMaterial);
