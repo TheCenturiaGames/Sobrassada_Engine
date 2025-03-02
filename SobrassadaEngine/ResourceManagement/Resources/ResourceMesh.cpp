@@ -38,6 +38,9 @@ void ResourceMesh::LoadData(
     this->indexCount        = static_cast<unsigned int>(indices.size());
     unsigned int bufferSize = sizeof(Vertex);
 
+    // Store the vertices in bind pose
+    bindPoseVertices        = vertices;
+
     // for (auto vertex : vertices)
     //{
     //     GLOG("Joints: %d, %d, %d, %d", vertex.joint[0], vertex.joint[1], vertex.joint[2], vertex.joint[3]);
@@ -102,7 +105,8 @@ void ResourceMesh::Render(
     Vertex* vertices = reinterpret_cast<Vertex*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
     for (int i = 0; i < vertexCount; ++i)
     {
-        // float4x4 boneInfluence = TestSkinning(i, vertices[i].weights, bones, bindMatrices);
+        TestSkinning(i, vertices[i], bones, bindMatrices);
+        // float4x4 boneInfluence = TestSkinning(i, vertices[i], bones, bindMatrices);
         // vertices[i].position = finalTransform.TranslatePart() * bindPoseVertices[vertexIndex].position;
         // rotate normals and tangents
     }
@@ -136,6 +140,8 @@ const float4x4& ResourceMesh::TestSkinning(
     const std::vector<float4x4>& bindMatrices
 )
 {
+    if (bones.size() < 4 || bindMatrices.size() < 4) return float4x4::identity;
+
     float4x4 boneInfluence = float4x4::identity;
     for (int i = 0; i < 4; ++i)
     {
@@ -150,6 +156,5 @@ const float4x4& ResourceMesh::TestSkinning(
         // bone weights * bone transform * bone inverse bind matrix * position in bind pose
         boneInfluence += boneMatrix * bindMatrices[vertex.joint[i]].Inverted() * vertex.weights[i];
     }
-
     return boneInfluence;
 }

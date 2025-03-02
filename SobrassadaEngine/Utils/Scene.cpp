@@ -431,6 +431,7 @@ void Scene::LoadModel(const UID modelUID)
                             bones.push_back(gameObjectsArray[index]);
                         }
                         meshComponent->SetBones(bones);
+                        meshComponent->SetBindTransforms(skin.inverseBindMatrices);
                     }
                 }
             }
