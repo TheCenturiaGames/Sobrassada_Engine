@@ -3,6 +3,7 @@
 #include "../LightComponent.h"
 
 #include <Libs/rapidjson/document.h>
+#include <Math/float4x4.h>
 
 class SpotLight : public LightComponent
 {
@@ -21,9 +22,12 @@ class SpotLight : public LightComponent
     float GetInnerAngle() const { return innerAngle; }
     float GetOuterAngle() const { return outerAngle; }
 
+    AABB &TransformUpdated(const Transform &parentGlobalTransform) override;
+    
   private:
     float3 direction;
     float range;
     float innerAngle;
     float outerAngle;
+    float4x4 globalRotationMatrix = float4x4::identity;
 };

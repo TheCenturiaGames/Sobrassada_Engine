@@ -35,13 +35,22 @@ void DirectionalLight::Render()
     if (!enabled || !drawGizmos) return;
 
     // Would be more optimal to only update the direction when rotation is modified
-    float4x4 rot = float4x4::FromQuat(
-        Quat::FromEulerXYZ(globalTransform.rotation.x, globalTransform.rotation.y, globalTransform.rotation.z)
-    );
-    direction              = (rot.RotatePart() * -float3::unitY).Normalized();
+    
+    direction              = (globalRotationMatrix.RotatePart() * -float3::unitY).Normalized();
 
     DebugDrawModule* debug = App->GetDebugDrawModule();
     debug->DrawLine(globalTransform.position, direction, 2, float3(1, 1, 1));
+}
+
+AABB& DirectionalLight::TransformUpdated(const Transform& parentGlobalTransform)
+{
+    AABB& returnValue = LightComponent::TransformUpdated(parentGlobalTransform);
+
+    globalRotationMatrix = float4x4::FromQuat(
+        Quat::FromEulerZYX(globalTransform.rotation.z, globalTransform.rotation.y, globalTransform.rotation.x)
+    );
+    
+    return returnValue;
 }
 
 void DirectionalLight::RenderEditorInspector()

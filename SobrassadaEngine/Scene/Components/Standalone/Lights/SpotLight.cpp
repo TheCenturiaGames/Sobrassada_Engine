@@ -75,6 +75,17 @@ void SpotLight::RenderEditorInspector()
     }
 }
 
+AABB& SpotLight::TransformUpdated(const Transform& parentGlobalTransform)
+{
+    AABB& returnValue = LightComponent::TransformUpdated(parentGlobalTransform);
+
+    globalRotationMatrix = float4x4::FromQuat(
+        Quat::FromEulerZYX(globalTransform.rotation.z, globalTransform.rotation.y, globalTransform.rotation.x)
+    );
+    
+    return returnValue;
+}
+
 void SpotLight::Render()
 {
     if (!enabled || !drawGizmos) return;
@@ -89,17 +100,13 @@ void SpotLight::Render()
     std::vector<float3> outerDirections;
     outerDirections.push_back(float3(Quat::RotateZ(outerRads).Transform(-float3::unitY)));
     outerDirections.push_back(float3(Quat::RotateZ(-outerRads).Transform(-float3::unitY)));
+    
+    direction = (globalRotationMatrix.RotatePart() * -float3::unitY).Normalized(); 
+    innerDirections[0]     = (globalRotationMatrix.RotatePart() * innerDirections[0]); 
+    innerDirections[1]     = (globalRotationMatrix.RotatePart() * innerDirections[1]); 
 
-    // Would be more optimal to only update the direction when rotation is modified
-    float4x4 rot = float4x4::FromQuat(
-        Quat::FromEulerXYZ(globalTransform.rotation.x, globalTransform.rotation.y, globalTransform.rotation.z)
-    );
-    direction = (rot.RotatePart() * -float3::unitY).Normalized(); 
-    innerDirections[0]     = (rot.RotatePart() * innerDirections[0]); 
-    innerDirections[1]     = (rot.RotatePart() * innerDirections[1]); 
-
-    outerDirections[0]     = (rot.RotatePart() * outerDirections[0]); 
-    outerDirections[1]     = (rot.RotatePart() * outerDirections[1]); 
+    outerDirections[0]     = (globalRotationMatrix.RotatePart() * outerDirections[0]); 
+    outerDirections[1]     = (globalRotationMatrix.RotatePart() * outerDirections[1]); 
 
     
 

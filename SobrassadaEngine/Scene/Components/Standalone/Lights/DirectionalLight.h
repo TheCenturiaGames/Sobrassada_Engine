@@ -3,6 +3,7 @@
 #include "../LightComponent.h"
 
 #include <Libs/rapidjson/document.h>
+#include <Math/float4x4.h>
 
 class DirectionalLight : public LightComponent
 {
@@ -19,6 +20,9 @@ class DirectionalLight : public LightComponent
 
     float3 GetDirection() const { return direction; }
 
+    AABB &TransformUpdated(const Transform &parentGlobalTransform) override;
+
   private:
     float3 direction;
+    float4x4 globalRotationMatrix = float4x4::identity;
 };
