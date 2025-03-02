@@ -36,13 +36,13 @@ public:
     {
         // transform position is rotated according to the summed angles of the base and transform.rotation and then applied to the base position
         Transform newTransform;
+
+        newTransform.scale.x = transform.scale.x * scale.x;  
+        newTransform.scale.y = transform.scale.y * scale.y;  
+        newTransform.scale.z = transform.scale.z * scale.z;
+        
         newTransform.rotation = rotation + transform.rotation;
         const Quat newRotation = Quat::FromEulerXYZ(newTransform.rotation.x, newTransform.rotation.y, newTransform.rotation.z);
-
-        //float3 rotatedScale = newRotation.Transform(transform.scale);
-        //newTransform.scale.x = rotatedScale.x != 0 ? scale.x * rotatedScale.x : 0;  
-        //newTransform.scale.y = rotatedScale.y != 0 ? scale.y * rotatedScale.y : 0;  
-        //newTransform.scale.z = rotatedScale.z != 0 ? scale.z * rotatedScale.z : 0;
         
         newTransform.position = position + newRotation.Transform(transform.position);
         return newTransform;
@@ -52,13 +52,13 @@ public:
     {
         Quat newRotation = Quat::FromEulerXYZ(transform.rotation.x, transform.rotation.y, transform.rotation.z);
         newRotation.Inverse();
-        
-        //float3 rotatedScale = newRotation.Transform(transform.scale);
-        //newTransform.scale.x = rotatedScale.x != 0 ? scale.x / rotatedScale.x : 0;  
-        //newTransform.scale.y = rotatedScale.y != 0 ? scale.y / rotatedScale.y : 0;  
-        //newTransform.scale.z = rotatedScale.z != 0 ? scale.z / rotatedScale.z : 0;
 
         Transform newTransform;
+        //float3 rotatedScale = newRotation.Transform(transform.scale);
+        newTransform.scale.x = scale.x != 0 ? transform.scale.x / scale.x : 0;  
+        newTransform.scale.y = scale.y != 0 ? transform.scale.y / scale.y : 0;  
+        newTransform.scale.z = scale.z != 0 ? transform.scale.z / scale.z : 0;
+        
         newTransform.position = newRotation.Transform(transform.position - position);
         newTransform.rotation = transform.rotation - rotation;
         return newTransform;
