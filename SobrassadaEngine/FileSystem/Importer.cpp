@@ -11,7 +11,6 @@
 Resource* Importer::Load(UID uid)
 {
     const ResourceType type = Resource::GetResourceTypeForUID(uid);
-    ResourceAnimation* anim;
 
     switch (type) {
         case ResourceType::Unknown:

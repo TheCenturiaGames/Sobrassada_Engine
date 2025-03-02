@@ -11,7 +11,7 @@ enum class ResourceType
     Texture,
     Material,
     Mesh,
-    Animation,
+    Animation = 15,
 };
 
 class Resource

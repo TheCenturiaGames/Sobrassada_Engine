@@ -181,64 +181,7 @@ namespace AnimationImporter
         animation->SetDuration();
 
         GLOG("Animation duration: %f", animation->GetDuration());
-        for (const auto& channelPair : animation->channels)
-        {
-            const std::string& nodeName = channelPair.first;
-            const Channel& animChannel  = channelPair.second;
-
-            uint32_t posIndex           = 0;
-            uint32_t rotIndex           = 0;
-
-
-            GLOG(
-                "Node: %s, Total Positions: %u, Total Rotations: %u", nodeName.c_str(), animChannel.numPositions,
-                animChannel.numRotations
-            );
-
-            while (posIndex < animChannel.numPositions || rotIndex < animChannel.numRotations)
-            {
-                if (posIndex < animChannel.numPositions &&
-                    (rotIndex >= animChannel.numRotations ||
-                     animChannel.posTimeStamps[posIndex] <= animChannel.rotTimeStamps[rotIndex]))
-                {
-                    const float timestamp  = animChannel.posTimeStamps[posIndex];
-                    const float3& position = animChannel.positions[posIndex];
-
-                    std::string logMessage =
-                        "Keyframe " + std::to_string(posIndex) + ": Time: " + std::to_string(timestamp);
-                    logMessage += ", Translation: (" + std::to_string(position.x) + ", " + std::to_string(position.y) +
-                                  ", " + std::to_string(position.z) + ")";
-
-                    if (rotIndex < animChannel.numRotations &&
-                        animChannel.posTimeStamps[posIndex] == animChannel.rotTimeStamps[rotIndex])
-                    {
-                        const Quat& rotation = animChannel.rotations[rotIndex];
-                        logMessage += ", Rotation: (" + std::to_string(rotation.x) + ", " + std::to_string(rotation.y) +
-                                      ", " + std::to_string(rotation.z) + ", " + std::to_string(rotation.w) + ")";
-                        rotIndex++; 
-                    }
-
-                    GLOG("%s", logMessage.c_str());
-
-                    posIndex++; 
-                }
-                else if (rotIndex < animChannel.numRotations)
-                {
-                    const float timestamp = animChannel.rotTimeStamps[rotIndex];
-                    const Quat& rotation  = animChannel.rotations[rotIndex];
-
-                    std::string logMessage =
-                        "Keyframe " + std::to_string(rotIndex) + ": Time: " + std::to_string(timestamp);
-                    logMessage += ", Rotation: (" + std::to_string(rotation.x) + ", " + std::to_string(rotation.y) +
-                                  ", " + std::to_string(rotation.z) + ", " + std::to_string(rotation.w) + ")";
-
-
-                    GLOG("%s", logMessage.c_str());
-
-                    rotIndex++; 
-                }
-            }
-        }
+       
         return animation;
     }
 }

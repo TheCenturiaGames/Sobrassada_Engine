@@ -273,10 +273,10 @@
     <ClCompile Include="Utils\EngineTimer.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-       <ClCompile Include="ResourceManagement\Resources\ResourceAnimation.cpp">
+    <ClCompile Include="ResourceManagement\Resources\ResourceAnimation.cpp">
       <Filter>Resources</Filter>
     </ClCompile>
-        <ClCompile Include="FileSystem\AnimationImporter.cpp">
+    <ClCompile Include="FileSystem\AnimationImporter.cpp">
       <Filter>FileSystem</Filter>
     </ClCompile>
     <ClCompile Include="Utils\Transform.cpp">
@@ -291,6 +291,7 @@
     <ClCompile Include="Modules\EditorUIModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
+    <ClCompile Include="AnimController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -518,6 +519,7 @@
     <ClInclude Include="FileSystem\AnimationImporter.h">
       <Filter>FileSystem</Filter>
     </ClInclude>
+    <ClInclude Include="AnimController.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl">

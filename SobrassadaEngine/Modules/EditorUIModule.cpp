@@ -25,6 +25,9 @@
 #define TINYGLTF_IMPLEMENTATION /* Only in one of the includes */
 #include <tiny_gltf.h>          // TODO Remove
 
+//ANIMATION TESTING
+#include "AnimController.h"
+
 EditorUIModule::EditorUIModule()
     : width(0), height(0), closeApplication(false), consoleMenu(false), import(false), load(false), save(false),
       editorSettingsMenu(false)
@@ -77,6 +80,17 @@ update_status EditorUIModule::Update(float deltaTime)
 {
     LimitFPS(deltaTime);
     AddFramePlotData(deltaTime);
+
+    //ANIMATION TEST
+    if (App->GetInputModule()->GetKey(SDL_SCANCODE_L))
+    {
+        UID animation = 1508438283161640;
+        AnimController* animController = new AnimController();
+        animController->Play(animation, false);
+        float3 pos;
+        Quat rot;
+        animController->GetTransform("Hips", pos, rot);
+    }
     return UPDATE_CONTINUE;
 }
 

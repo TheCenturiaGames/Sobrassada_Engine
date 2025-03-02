@@ -14,7 +14,7 @@
 #define TINYGLTF_NO_EXTERNAL_IMAGE
 #include <tiny_gltf.h>
 
-ResourceAnimation::ResourceAnimation(UID uid, const std::string& name) : Resource(uid, name, ResourceType::Material)
+ResourceAnimation::ResourceAnimation(UID uid, const std::string& name) : Resource(uid, name, ResourceType::Animation)
 {
 
 }
@@ -44,4 +44,15 @@ void ResourceAnimation::SetDuration()
     }
 
     duration = maxTime;
+}
+
+Channel* ResourceAnimation::GetChannel(const std::string& nodeName)
+{
+    auto it = channels.find(nodeName);
+    if (it != channels.end())
+    {
+        return &it->second;
+    }
+
+    return nullptr; 
 }

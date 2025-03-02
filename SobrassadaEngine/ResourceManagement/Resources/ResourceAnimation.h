@@ -25,6 +25,7 @@ class ResourceAnimation : public Resource
 
     void SetDuration();
     float GetDuration() { return duration; }
+    Channel* GetChannel(const std::string& nodeName);
     
   private:
     
