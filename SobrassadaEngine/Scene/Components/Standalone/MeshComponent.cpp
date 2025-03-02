@@ -96,7 +96,7 @@ void MeshComponent::Render()
             Quat::FromEulerXYZ(globalTransform.rotation.x, globalTransform.rotation.y, globalTransform.rotation.z),
             globalTransform.scale
         );
-        currentMesh->Render(App->GetResourcesModule()->GetProgram(), model, cameraUBO, currentMaterial);
+        currentMesh->Render(App->GetResourcesModule()->GetProgram(), model, cameraUBO, currentMaterial, bones, bindTransforms);
     }
     Component::Render();
 }

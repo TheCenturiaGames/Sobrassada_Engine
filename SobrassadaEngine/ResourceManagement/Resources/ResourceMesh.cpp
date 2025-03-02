@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "CameraModule.h"
+#include "GameObject.h"
 #include "ResourceMaterial.h"
 
 #include <Math/float2.h>
@@ -77,7 +78,10 @@ void ResourceMesh::LoadData(
     glBindVertexArray(0);
 }
 
-void ResourceMesh::Render(int program, float4x4& modelMatrix, unsigned int cameraUBO, ResourceMaterial* material)
+void ResourceMesh::Render(
+    int program, float4x4& modelMatrix, unsigned int cameraUBO, ResourceMaterial* material,
+    const std::vector<GameObject*>& bones, const std::vector<float4x4>& bindMatrices
+)
 {
     glUseProgram(program);
 
@@ -98,7 +102,9 @@ void ResourceMesh::Render(int program, float4x4& modelMatrix, unsigned int camer
     Vertex* vertices = reinterpret_cast<Vertex*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
     for (int i = 0; i < vertexCount; ++i)
     {
-        //vertices[i].position = TestSkinning();
+        // float4x4 boneInfluence = TestSkinning(i, vertices[i].weights, bones, bindMatrices);
+        // vertices[i].position = finalTransform.TranslatePart() * bindPoseVertices[vertexIndex].position;
+        // rotate normals and tangents
     }
 
     glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -125,11 +131,25 @@ void ResourceMesh::Render(int program, float4x4& modelMatrix, unsigned int camer
     glBindVertexArray(0);
 }
 
-float3 ResourceMesh::TestSkinning()
+const float4x4& ResourceMesh::TestSkinning(
+    int vertexIndex, const Vertex& vertex, const std::vector<GameObject*>& bones,
+    const std::vector<float4x4>& bindMatrices
+)
 {
+    float4x4 boneInfluence = float4x4::identity;
     for (int i = 0; i < 4; ++i)
     {
-        
+        const Transform& boneTransform = bones[vertex.joint[i]]->GetGlobalTransform();
+
+        float4x4 boneMatrix            = float4x4::FromTRS(
+            boneTransform.position,
+            float4x4::FromEulerXYZ(boneTransform.rotation.x, boneTransform.rotation.y, boneTransform.rotation.z),
+            boneTransform.scale
+        );
+
+        // bone weights * bone transform * bone inverse bind matrix * position in bind pose
+        boneInfluence += boneMatrix * bindMatrices[vertex.joint[i]].Inverted() * vertex.weights[i];
     }
-    return float3::zero;
+
+    return boneInfluence;
 }
