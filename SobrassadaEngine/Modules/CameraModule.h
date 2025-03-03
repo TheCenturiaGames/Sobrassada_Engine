@@ -15,32 +15,30 @@ constexpr float maximumNegativePitch = -89.f * DEGTORAD;
 
 struct CameraMatrices
 {
-	float4x4 projectionMatrix;
-	float4x4 viewMatrix;
+    float4x4 projectionMatrix;
+    float4x4 viewMatrix;
 };
 
 class CameraModule : public Module
 {
   public:
     CameraModule();
-    ~CameraModule();
+    ~CameraModule() override;
 
     bool Init() override;
     update_status Update(float deltaTime) override;
     bool ShutDown() override;
 
+    void UpdateUBO();
+
+    bool IsCameraDetached() const { return isCameraDetached; }
     const float4x4& GetProjectionMatrix() { return isCameraDetached ? detachedProjectionMatrix : projectionMatrix; }
     const float4x4& GetViewMatrix() { return isCameraDetached ? detachedViewMatrix : viewMatrix; }
-
     const float4x4& GetFrustumViewMatrix() { return viewMatrix; }
     const float4x4& GetFrustumProjectionMatrix() { return projectionMatrix; }
     const FrustumPlanes& GetFrustrumPlanes() const { return frustumPlanes; }
     const float3& GetCameraPosition() const { return isCameraDetached ? detachedCamera.pos : camera.pos; }
-
     unsigned int GetUbo() const { return ubo; }
-    void UpdateUBO();
-
-    bool IsCameraDetached() const { return isCameraDetached; }
 
     void SetAspectRatio(float newAspectRatio);
 

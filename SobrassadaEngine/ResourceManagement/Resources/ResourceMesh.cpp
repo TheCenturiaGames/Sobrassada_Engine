@@ -1,5 +1,9 @@
 #include "ResourceMesh.h"
 
+#include "Application.h"
+#include "CameraModule.h"
+#include "ResourceMaterial.h"
+
 #include <Math/float2.h>
 #include <Math/float4x4.h>
 #include <SDL_assert.h>
