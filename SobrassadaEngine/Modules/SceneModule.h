@@ -38,6 +38,7 @@ class SceneModule : public Module
     void LoadScene(UID sceneUID, const char *sceneName, UID rootGameObject,
     const std::map<UID, Component*> &loadedGameComponents);
     void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
+    void LoadComponents(const std::map<UID, Component*>& loadedGameComponents);
     void CloseScene();
 
     void CheckObjectsToRender();
@@ -69,6 +70,8 @@ class SceneModule : public Module
     void SwitchPlayModeStateTo(bool wantedStatePlayMode);
 
     LightsConfig* GetLightsConfig() { return loadedScene != nullptr ? loadedScene->GetLightsConfig() : nullptr; }
+
+    Scene* GetScene() const { return loadedScene; }
 
     void RegenerateTree() { loadedScene->UpdateSpatialDataStruct(); };
 

@@ -57,9 +57,11 @@ class Component : public AABBUpdatable
 
     int GetType() const { return type; }
 
+    RootComponent* GetRootComponent();
+
+
   protected:
 
-    RootComponent* GetRootComponent();
     AABBUpdatable* GetParent();
     std::vector<Component*>& GetChildComponents();
 

@@ -88,10 +88,12 @@ void SceneModule::CreateScene()
     std::unordered_map<UID, GameObject*> loadedGameObjects;
     loadedGameObjects.insert({sceneGameObject->GetUID(), sceneGameObject});
 
-    loadedScene->LoadComponents(std::map<UID, Component*>());
     loadedScene->LoadGameObjects(loadedGameObjects);
+    loadedScene->LoadComponents(std::map<UID, Component*>());
 
     sceneGameObject->CreateRootComponent();
+
+    loadedScene->UpdateTransformOctree();
 
     // TODO Filesystem: Save this new created level immediatelly
 }
@@ -108,6 +110,11 @@ void SceneModule::LoadScene(
 void SceneModule::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects)
 {
     loadedScene->LoadGameObjects(loadedGameObjects);
+}
+
+void SceneModule::LoadComponents(const std::map<UID, Component*>& loadedGameComponents)
+{
+    loadedScene->LoadComponents(loadedGameComponents);
 }
 
 void SceneModule::CloseScene()

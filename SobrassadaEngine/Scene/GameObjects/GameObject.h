@@ -3,12 +3,14 @@
 #include "Scene/AABBUpdatable.h"
 #include "Transform.h"
 
+#include <map>
 #include <string>
 #include <vector>
 #include <Libs/rapidjson/document.h>
 #include <Geometry/AABB.h>
 
 class RootComponent;
+class Component; 
 
 class GameObject : public AABBUpdatable
 {
@@ -24,6 +26,12 @@ public:
 
 	bool AddGameObject(UID gameObjectUUID);
     bool RemoveGameObject(UID gameObjectUUID);
+
+    bool AddComponent(Component* comp);
+    bool RemoveComponent(UID compUID);
+    Component* GetComponentByUID(UID compUID) const;
+
+    void LoadComponentsInGameObject(Component* component);
 
     bool CreateRootComponent();
 
@@ -54,6 +62,7 @@ public:
 	void SetUUID(UID newUUID) { uuid = newUUID; }
     
     RootComponent* GetRootComponent() const { return rootComponent; }
+    const std::map<UID, Component*>& GetAllComponents() const { return components; }
 
     inline const AABB &GetAABB() const { return globalAABB; };
     
@@ -77,6 +86,7 @@ private:
     std::string name;
 
     RootComponent *rootComponent;
+    std::map<UID, Component*> components;
 
     AABB globalAABB;
 

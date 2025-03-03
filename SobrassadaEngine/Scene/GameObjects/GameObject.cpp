@@ -20,7 +20,7 @@ GameObject::GameObject(UID parentUUID, std::string name) : parentUUID(parentUUID
 {
     uuid = GenerateUID();
     globalAABB.SetNegativeInfinity();
-    CreateRootComponent();
+    //CreateRootComponent();
 }
 
 GameObject::GameObject(UID parentUUID, std::string name, UID rootComponentUID) : parentUUID(parentUUID), name(name)
@@ -84,6 +84,56 @@ bool GameObject::RemoveGameObject(UID gameObjectUUID)
         return true;
     }
     return false;
+}
+
+bool GameObject::AddComponent(Component* comp)
+{
+    if (!comp) return false;
+    
+    UID componentUID = comp->GetUID();
+
+    auto [it, inserted] = components.insert({componentUID, comp});
+
+    return inserted;
+}
+
+bool GameObject::RemoveComponent(UID compUID)
+{
+    auto it = components.find(compUID);
+    if (it == components.end()) return false;
+
+    components.erase(it);
+    return true;
+}
+
+Component* GameObject::GetComponentByUID(UID compUID) const
+{
+    auto it = components.find(compUID);
+
+    if (it == components.end()) return nullptr;
+
+    return it->second;
+}
+
+void GameObject::LoadComponentsInGameObject(Component* component)
+{
+    if (!component) return;
+
+    AddComponent(component);
+
+    for (auto childComponentUID : component->GetChildren())
+    {
+        Component* childComp = App->GetSceneModule()->GetScene()->GetComponentByUID(childComponentUID);
+        if (childComp != nullptr)
+        {
+            /*AddComponent(childComp);*/
+
+            //if (!childComp->GetChildren().empty())
+            //{
+            LoadComponentsInGameObject(childComp);
+            //}
+        }
+    }
 }
 
 void GameObject::OnEditor() {}

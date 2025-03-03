@@ -52,10 +52,11 @@ class Scene
     const char* GetSceneName() const { return sceneName.c_str(); }
 
     void AddGameObject(UID uid, GameObject* newGameObject) { gameObjectsContainer.insert({uid, newGameObject}); }
-    void AddComponent(UID uid, Component* newComponent) { gameComponents.insert({uid, newComponent}); }
+    void AddComponent(UID uid, Component* newComponent);
 
     LightsConfig* GetLightsConfig() { return lightsConfig; }
     
+    void UpdateTransformOctree();
     void UpdateSpatialDataStruct();
 
   private:

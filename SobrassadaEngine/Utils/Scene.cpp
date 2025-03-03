@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "CameraModule.h"
 #include "Component.h"
+#include "../Components/Root/RootComponent.h"
 #include "Framebuffer.h"
 #include "GameObject.h"
 #include "GameTimer.h"
@@ -57,6 +58,7 @@ void Scene::LoadComponents(const std::map<UID, Component*>& loadedGameComponents
 {
     gameComponents.clear();
     gameObjectsContainer.clear();
+
     gameComponents.insert(loadedGameComponents.begin(), loadedGameComponents.end());
 
     // LigthsConfig init here, so scene already exists and can get the existing lights
@@ -68,6 +70,18 @@ void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGa
 {
     gameObjectsContainer.clear();
     gameObjectsContainer.insert(loadedGameObjects.begin(), loadedGameObjects.end());
+
+    for (auto gameObj : gameObjectsContainer)
+    {
+        RootComponent* rootC = gameObj.second->GetRootComponent();
+        if (rootC != nullptr)
+        {
+            for (auto childComponentUID : rootC->GetChildren())
+            {
+                gameObj.second->LoadComponentsInGameObject(GetComponentByUID(childComponentUID));
+            }
+        }
+    }
 
     GameObject* root = GetGameObjectByUUID(gameObjectRootUUID);
     if (root != nullptr)
@@ -220,6 +234,7 @@ void Scene::RenderHierarchyUI(bool& hierarchyMenu)
 
         // TODO: change when filesystem defined
         gameObjectsContainer.insert({newUUID, newGameObject});
+        newGameObject->CreateRootComponent();
 
         GetGameObjectByUUID(newGameObject->GetParent())->ComponentGlobalTransformUpdated();
     }
@@ -312,6 +327,23 @@ void Scene::CreateSpatialDataStruct()
     }
 }
 
+void Scene::AddComponent(UID uid, Component* newComponent)
+{
+    gameComponents.insert({uid, newComponent});
+}
+
+void Scene::UpdateTransformOctree()
+{
+    GameObject* root = GetGameObjectByUUID(gameObjectRootUUID);
+    if (root != nullptr)
+    {
+        GLOG("Init transform and AABB calculation")
+        root->ComponentGlobalTransformUpdated();
+    }
+
+    UpdateSpatialDataStruct();
+}
+
 void Scene::UpdateSpatialDataStruct()
 {
     delete sceneOctree;
@@ -343,7 +375,7 @@ GameObject* Scene::GetGameObjectByUUID(UID gameObjectUUID)
     return nullptr;
 }
 
-Component* Scene::GetComponentByUID(uint64_t componentUID)
+Component* Scene::GetComponentByUID(UID componentUID)
 {
     if (gameComponents.count(componentUID))
     {
