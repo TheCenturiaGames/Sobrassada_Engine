@@ -32,5 +32,5 @@ void MetaFile::Save(const std::string& assetPath) const
     std::string name         = FileSystem::GetFileNameWithoutExtension(assetPath);
     // Save to .meta file
     std::string metaFilePath = savePath + name + META_EXTENSION;
-    FileSystem::Save(metaFilePath.c_str(), buffer.GetString(), buffer.GetSize(), true);
+    FileSystem::Save(metaFilePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), true);
 }

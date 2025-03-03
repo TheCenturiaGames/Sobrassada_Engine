@@ -58,7 +58,7 @@ namespace TextureImporter
         
         savePath = TEXTURES_PATH + fileName + TEXTURE_EXTENSION;
 
-        MetaTexture meta(finalTextureUID, savePath, image.GetMetadata().mipLevels);
+        MetaTexture meta(finalTextureUID, savePath, (int)image.GetMetadata().mipLevels);
         meta.Save(savePath);
 
 
