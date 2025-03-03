@@ -1,4 +1,5 @@
 ﻿#pragma once
+
 #include "ResourceManagement/Resources/Resource.h"
 
 namespace Importer

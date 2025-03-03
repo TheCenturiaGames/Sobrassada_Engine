@@ -2,7 +2,6 @@
 
 #include "document.h"
 #include "istreamwrapper.h"
-
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -17,7 +16,7 @@
 
 namespace FileSystem
 {
-    unsigned int Load(const char *filePath, char **buffer, bool asBinary)
+    unsigned int Load(const char* filePath, char** buffer, bool asBinary)
     {
         std::ifstream file(filePath, std::ios::in | std::ios::ate | (asBinary ? std::ios::binary : 0));
 
@@ -46,7 +45,7 @@ namespace FileSystem
         }
     }
 
-    bool LoadJSON(const char *scenePath, rapidjson::Document &doc)
+    bool LoadJSON(const char* scenePath, rapidjson::Document& doc)
     {
         std::ifstream file(scenePath);
         if (!file.is_open())
@@ -69,7 +68,7 @@ namespace FileSystem
         return true;
     }
 
-    unsigned int Save(const char *filePath, const void *buffer, unsigned int size, bool asBinary, bool append)
+    unsigned int Save(const char* filePath, const void* buffer, unsigned int size, bool asBinary, bool append)
     {
         std::ofstream file(filePath, std::ios::out | (asBinary ? std::ios::binary : 0) | (append ? std::ios::app : 0));
 
@@ -79,7 +78,7 @@ namespace FileSystem
             return 0;
         }
 
-        file.write(static_cast<const char *>(buffer), size);
+        file.write(static_cast<const char*>(buffer), size);
         file.close();
 
         if (!file)
@@ -91,7 +90,7 @@ namespace FileSystem
         return size;
     }
 
-    bool Copy(const char *sourceFilePath, const char *destinationFilePath)
+    bool Copy(const char* sourceFilePath, const char* destinationFilePath)
     {
         if (!Exists(sourceFilePath))
         {
@@ -113,7 +112,7 @@ namespace FileSystem
         return true;
     }
 
-    void GetDrives(std::vector<std::string> &drives)
+    void GetDrives(std::vector<std::string>& drives)
     {
         drives.clear();
 #if defined(_WIN32) || defined(_WIN64)
@@ -135,7 +134,7 @@ namespace FileSystem
         }
 #elif defined(__linux__) || defined(__APPLE__)
         std::string mountPoint = "/mnt";
-        for (const auto &entry : std::filesystem::directory_iterator(mountPoint))
+        for (const auto& entry : std::filesystem::directory_iterator(mountPoint))
         {
             if (std::filesystem::is_directory(entry))
             {
@@ -145,12 +144,12 @@ namespace FileSystem
 #endif
     }
 
-    void GetAllInDirectory(const std::string &path, std::vector<std::string> &files)
+    void GetAllInDirectory(const std::string& path, std::vector<std::string>& files)
     {
         files.clear();
         if (IsDirectory(path.c_str()))
         {
-            for (const auto &entry : std::filesystem::directory_iterator(path))
+            for (const auto& entry : std::filesystem::directory_iterator(path))
             {
                 files.push_back(GetFileNameWithExtension(entry.path().string()));
             }
@@ -161,7 +160,7 @@ namespace FileSystem
         }
     }
 
-    void SplitAccumulatedPath(const std::string &path, std::vector<std::string> &accPaths)
+    void SplitAccumulatedPath(const std::string& path, std::vector<std::string>& accPaths)
     {
         accPaths.clear();
         std::stringstream ss(path);

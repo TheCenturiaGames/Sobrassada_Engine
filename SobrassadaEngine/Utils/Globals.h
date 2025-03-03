@@ -1,15 +1,15 @@
 #pragma once
 #define NOMINMAX
+#include "Algorithm/Random/LCG.h"
 #include <stdio.h>
 #include <vector>
 #include <windows.h>
-#include "Algorithm/Random/LCG.h"
 
-extern std::vector<char *> *Logs;
+extern std::vector<char*>* Logs;
 
 #define GLOG(format, ...) glog(__FILE__, __LINE__, format, __VA_ARGS__);
 
-void glog(const char file[], int line, const char *format, ...);
+void glog(const char file[], int line, const char* format, ...);
 
 enum update_status
 {
@@ -35,14 +35,14 @@ enum update_status
 #define BORDERLESS   false
 #define FULL_DESKTOP false
 #define RESIZABLE    true
-#define FULLSCREEN    false
-#define VSYNC         true
+#define FULLSCREEN   false
+#define VSYNC        true
 
-#define TITLE         "Sobrassada Engine"
+#define TITLE             "Sobrassada Engine"
 #define ENGINE_NAME       "Sobrassada"
 #define ORGANIZATION_NAME "Hound of Ulster"
 #define ENGINE_VERSION    "0.1.0"
-#define HFOV          90
+#define HFOV              90
 
 #ifdef _WIN32
 #define DELIMITER '\\'
@@ -80,23 +80,23 @@ enum update_status
 
 #define UID uint64_t
 
-constexpr UID INVALID_UUID = 0;
-constexpr UID CONSTANT_EMPTY_UID = 0;
+constexpr UID INVALID_UUID                              = 0;
+constexpr UID CONSTANT_EMPTY_UID                        = 0;
 
-constexpr const char* CONSTANT_MESH_SELECT_DIALOG_ID = "mesh-select";
+constexpr const char* CONSTANT_MESH_SELECT_DIALOG_ID    = "mesh-select";
 constexpr const char* CONSTANT_TEXTURE_SELECT_DIALOG_ID = "texture-select";
 
-constexpr uint32_t CONSTANT_NO_MESH_UUID = 0;
-constexpr uint32_t CONSTANT_NO_TEXTURE_UUID = 0;
+constexpr uint32_t CONSTANT_NO_MESH_UUID                = 0;
+constexpr uint32_t CONSTANT_NO_TEXTURE_UUID             = 0;
 
-constexpr float PI = 3.14159265359f;
-constexpr float RAD_DEGREE_CONV = 180.f / PI;
+constexpr float PI                                      = 3.14159265359f;
+constexpr float RAD_DEGREE_CONV                         = 180.f / PI;
 
 inline UID GenerateUID()
 {
     LCG rng;
-    
+
     UID uid = static_cast<UID>(rng.IntFast()) << 32 | rng.IntFast(); // Combine two 32-bit values
-    
+
     return uid;
 }

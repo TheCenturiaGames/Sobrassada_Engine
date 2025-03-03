@@ -5,6 +5,7 @@
 #include "Material.h"
 #include "MetaMaterial.h"
 #include "TextureImporter.h"
+
 #include <FileSystem>
 
 UID MaterialImporter::ImportMaterial(const tinygltf::Model& model, int materialIndex, const char* filePath)
@@ -91,7 +92,6 @@ UID MaterialImporter::ImportMaterial(const tinygltf::Model& model, int materialI
     }
 
     // Normal Map
-
     if (gltfMaterial.normalTexture.index >= 0)
     {
         int texIndex  = gltfMaterial.normalTexture.index;
