@@ -217,10 +217,8 @@ namespace ModelImporter
         newNode.name               = nodeData.name;
 
         float4x4 rawTransform      = GetNodeTransform(nodeData);
-        Transform parentTransform  = Transform::identity;
-        if (parentId != -1) parentTransform = outNodes[parentId].transform;
-        newNode.transform.position = parentTransform.position + rawTransform.TranslatePart();
-        newNode.transform.rotation = parentTransform.rotation + rawTransform.RotatePart().ToEulerXYZ();
+        newNode.transform.position = rawTransform.TranslatePart();
+        newNode.transform.rotation = rawTransform.RotatePart().ToEulerXYZ();
         newNode.parentIndex        = parentId;
 
         // Get reference to Mesh and Material UIDs
@@ -240,7 +238,6 @@ namespace ModelImporter
 
     const float4x4& GetNodeTransform(const tinygltf::Node& node)
     {
-
         if (!node.matrix.empty())
         {
             // glTF stores matrices in COLUMN-MAJOR order, same as MathGeoLib
