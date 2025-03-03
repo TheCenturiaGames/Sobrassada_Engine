@@ -220,7 +220,7 @@ void CameraComponent::RenderEditorInspector()
 
 void CameraComponent::Update()
 {
-    /*Los controles deberian estar en otro script, no aqui (es solo para prueba)*/
+    /*Camera Component Inputs needs to be managed by the user, not by me, this is only to check if ot working*/
     if (App->GetSceneModule()->GetInPlayMode())
     {
         InputModule* inputModule = App->GetInputModule();
