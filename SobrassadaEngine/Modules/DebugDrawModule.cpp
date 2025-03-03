@@ -2,11 +2,12 @@
 
 #include "Application.h"
 #include "CameraModule.h"
+#include "Framebuffer.h"
 #include "Globals.h"
 #include "MathGeoLib.h"
 #include "QuadtreeViewer.h"
 #include "WindowModule.h"
-
+#include "OpenGLModule.h"
 #include "SDL_video.h"
 #define DEBUG_DRAW_IMPLEMENTATION
 #include "DebugDraw.h" // Debug Draw API. Notice that we need the DEBUG_DRAW_IMPLEMENTATION macro here!
@@ -633,9 +634,10 @@ void DebugDrawModule::Draw()
         dd::frustum(inverseClipMatrix, float3(1.f, 1.f, 1.f));
     }
 
-    SDL_GetWindowSize(App->GetWindowModule()->window, &width, &height);
-    implementation->width     = width;
-    implementation->height    = height;
+    auto framebuffer = App->GetOpenGLModule()->GetFramebuffer();
+    //SDL_GetWindowSize(App->GetWindowModule()->window, &width, &height);
+    implementation->width     = framebuffer->GetTextureWidth();
+    implementation->height    = framebuffer->GetTextureHeight();
     implementation->mvpMatrix = projection * view;
 
     dd::flush();

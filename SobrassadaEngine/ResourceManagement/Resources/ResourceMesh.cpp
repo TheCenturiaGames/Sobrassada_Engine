@@ -3,7 +3,6 @@
 #include "Application.h"
 #include "CameraModule.h"
 #include "ResourceMaterial.h"
-
 #include <Math/float2.h>
 #include <Math/float4x4.h>
 #include <SDL_assert.h>
@@ -13,11 +12,13 @@
 #include "CameraModule.h"
 #include "ResourceMaterial.h"
 
-ResourceMesh::ResourceMesh(UID uid, const std::string& name, const float3& maxPos, const float3& minPos, const float4x4& transform)
+ResourceMesh::ResourceMesh(
+    UID uid, const std::string& name, const float3& maxPos, const float3& minPos, const float4x4& transform
+)
     : Resource(uid, name, ResourceType::Mesh)
 {
-    aabb.maxPoint = maxPos;
-    aabb.minPoint = minPos;
+    aabb.maxPoint = transform.MulPos(maxPos);
+    aabb.minPoint = transform.MulPos(minPos);
 }
 
 ResourceMesh::~ResourceMesh()
@@ -33,12 +34,12 @@ void ResourceMesh::LoadData(
 )
 {
 
-    this->mode              = mode;
-    this->material          = material;
-    this->vertexCount       = vertices.size();
-    this->indexCount        = indices.size();
-    this->currentMeshTransform         = transform;
-    unsigned int bufferSize = sizeof(Vertex);
+    this->mode                 = mode;
+    this->material             = material;
+    this->vertexCount          = vertices.size();
+    this->indexCount           = indices.size();
+    this->currentMeshTransform = transform;
+    unsigned int bufferSize    = sizeof(Vertex);
 
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
@@ -66,8 +67,6 @@ void ResourceMesh::LoadData(
     // Unbind VAO
     glBindVertexArray(0);
 }
-
-
 
 void ResourceMesh::Render(int program, float4x4& modelMatrix, unsigned int cameraUBO, ResourceMaterial* material)
 {

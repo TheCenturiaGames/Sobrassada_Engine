@@ -22,7 +22,7 @@ namespace MeshImporter
 {
     UID ImportMesh(
         const tinygltf::Model& model, const tinygltf::Mesh& mesh, const tinygltf::Primitive& primitive,
-        const std::string& name, const char* filePath
+        const std::string& name, const char * filePath, float4x4 transform
     );
     ResourceMesh* LoadMesh(UID meshUID);
 }; // namespace MeshImporter
