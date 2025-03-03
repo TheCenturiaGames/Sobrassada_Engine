@@ -4,7 +4,7 @@
 #include "LightsConfig.h"
 #include "Module.h"
 #include "Scene/AABBUpdatable.h"
-//TMP
+// TMP
 #include "Application.h"
 #include "CameraModule.h"
 #include "DebugDrawModule.h"
@@ -106,6 +106,8 @@ class SceneModule : public Module
     bool GetInPlayMode() { return bInPlayMode; }
     void SetMainCamera(CameraComponent* camera) { loadedScene->SetMainCamera(camera); }
     CameraComponent* GetMainCamera() { return loadedScene->GetMainCamera(); }
+
+    bool GetDoInputs() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() : false; }
 
   private:
     Scene* loadedScene = nullptr;
