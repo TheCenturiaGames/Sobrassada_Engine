@@ -63,11 +63,11 @@ bool EditorUIModule::Init()
     App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_H, [&] { mCurrentGizmoOperation = ImGuizmo::ROTATE; });
     App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_J, [&] { mCurrentGizmoOperation = ImGuizmo::SCALE; });
     
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_E, [&]
+    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_R, [&]
     {
         transformType = ImGuizmo::LOCAL;
     });
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_R, [&]
+    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_T, [&]
     {
         transformType = ImGuizmo::WORLD;
     });
