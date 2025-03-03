@@ -9,7 +9,7 @@ class MetaMesh : public MetaFile
     bool optimizeMesh;
 
   public:
-    MetaMesh(UID uid, const std::string& assetPath, bool generateTangents, bool optimizeMesh);
+    MetaMesh(UID uid, const std::string& assetPath, bool generateTangents);
     void AddImportOptions(rapidjson::Document& doc, rapidjson::Document::AllocatorType& allocator) const override;
 };
 

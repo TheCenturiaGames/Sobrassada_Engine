@@ -74,6 +74,7 @@ enum update_status
 #define TEXTURE_EXTENSION  ".dds"
 #define MATERIAL_EXTENSION ".mat"
 #define SCENE_EXTENSION    ".scene"
+#define META_EXTENSION     ".meta"
 
 #define MAX_COMPONENT_NAME_LENGTH 64;
 

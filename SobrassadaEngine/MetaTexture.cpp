@@ -1,7 +1,7 @@
 #include "MetaTexture.h"
 
-MetaTexture::MetaTexture(UID uid, const std::string& assetPath, bool mipmaps, const std::string& compression)
-    : MetaFile(uid, assetPath), mipmaps(mipmaps), compression(compression)
+MetaTexture::MetaTexture(UID uid, const std::string& assetPath, int mipmaps)
+    : MetaFile(uid, assetPath), mipmaps(mipmaps)
 {
 }
 
@@ -9,6 +9,5 @@ void MetaTexture::AddImportOptions(rapidjson::Document& doc, rapidjson::Document
 {
     rapidjson::Value importOptions(rapidjson::kObjectType);
     importOptions.AddMember("mipmaps", mipmaps, allocator);
-    importOptions.AddMember("compression", rapidjson::Value(compression.c_str(), allocator), allocator);
     doc.AddMember("importOptions", importOptions, allocator);
 }

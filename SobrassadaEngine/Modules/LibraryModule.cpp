@@ -10,6 +10,10 @@
 #include "SceneModule.h"
 #include "document.h"
 #include "prettywriter.h"
+
+#include "Libs/rapidjson/stringbuffer.h"
+#include "Libs/rapidjson/writer.h"
+#include <fstream>
 #include "stringbuffer.h"
 
 #include <filesystem>
@@ -220,32 +224,36 @@ bool LibraryModule::LoadLibraryMaps()
     for (const auto& entry : std::filesystem::recursive_directory_iterator(LIBRARY_PATH))
     {
 
-        if (entry.is_regular_file())
+        if (entry.is_regular_file() && (FileSystem::GetFileExtension(entry.path().string()) == META_EXTENSION))
         {
             std::string filePath = entry.path().string();
 
             std::string fileName = FileSystem::GetFileNameWithoutExtension(filePath);
+            
 
-            // Generate UID using the function from globals.h
             try
             {
-                UID originalUID      = std::stoull(fileName);
+                rapidjson::Document doc;
+                if (!FileSystem::LoadJSON(filePath.c_str(), doc)) continue;
 
-                UID prefix           = originalUID / 100000000000000;
+                UID assetUID         = doc["UID"].GetUint64();
+                std::string originalPath = doc["originalPath"].GetString();
+
+                UID prefix           = assetUID / 100000000000000;
 
                 switch (prefix)
                 {
                 case 13:
-                    AddMesh(originalUID, FileSystem::GetFileNameWithoutExtension(filePath));
-                    AddResource(filePath, originalUID);
+                    AddMesh(assetUID, fileName);
+                    AddResource(originalPath, assetUID);
                     break;
                 case 12:
-                    AddMaterial(originalUID, FileSystem::GetFileNameWithoutExtension(filePath));
-                    AddResource(filePath, originalUID);
+                    AddMaterial(assetUID, fileName);
+                    AddResource(originalPath, assetUID);
                     break;
                 case 11:
-                    AddTexture(originalUID, FileSystem::GetFileNameWithoutExtension(filePath));
-                    AddResource(filePath, originalUID);
+                    AddTexture(assetUID, fileName);
+                    AddResource(originalPath, assetUID);
                     break;
                 default:
                     GLOG("Category: Unknown File Type (10)");
@@ -348,7 +356,10 @@ const std::string& LibraryModule::GetResourcePath(UID resourceID) const
     return emptyString;
 }
 
+
 void LibraryModule::AddResource(const std::string& resourcePath, UID resourceUID)
 {
     resourcePathsMap[resourceUID] = resourcePath;
 }
+
+

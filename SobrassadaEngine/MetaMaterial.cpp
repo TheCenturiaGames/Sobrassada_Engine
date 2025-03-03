@@ -1,7 +1,7 @@
 #include "MetaMaterial.h"
 
-MetaMaterial::MetaMaterial(UID uid, const std::string& assetPath, const std::string& shader, bool useAlpha)
-    : MetaFile(uid, assetPath), shader(shader), useAlpha(useAlpha)
+MetaMaterial::MetaMaterial(UID uid, const std::string& assetPath, const std::string& shader, bool useOcclusion)
+    : MetaFile(uid, assetPath), shader(shader), useOcclusion(useOcclusion)
 {
 }
 
@@ -9,6 +9,6 @@ void MetaMaterial::AddImportOptions(rapidjson::Document& doc, rapidjson::Documen
 {
     rapidjson::Value importOptions(rapidjson::kObjectType);
     importOptions.AddMember("shader", rapidjson::Value(shader.c_str(), allocator), allocator);
-    importOptions.AddMember("useAlpha", useAlpha, allocator);
+    importOptions.AddMember("useOcclusion", useOcclusion, allocator);
     doc.AddMember("importOptions", importOptions, allocator);
 }

@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "FileSystem.h"
 #include "LibraryModule.h"
+#include "MetaMesh.h"
 
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #define TINYGLTF_NO_STB_IMAGE
@@ -26,6 +27,7 @@ namespace MeshImporter
         size_t posStride = 0, tanStride = 0, texStride = 0, normStride = 0;
         float3 minPos     = {0.0f, 0.0f, 0.0f};
         float3 maxPos     = {0.0f, 0.0f, 0.0f};
+        bool generateTangents = false;
 
         const auto& itPos = primitive.attributes.find("POSITION");
         if (itPos != primitive.attributes.end())
@@ -80,6 +82,7 @@ namespace MeshImporter
                 const tinygltf::Buffer& tanBuffer   = model.buffers[tanView.buffer];
                 bufferTan                           = &(tanBuffer.data[tanAcc.byteOffset + tanView.byteOffset]);
                 tanStride                           = tanView.byteStride ? tanView.byteStride : sizeof(float4);
+                generateTangents                    = true;
             }
 
             vertexBuffer.reserve(posAcc.count);
@@ -224,11 +227,16 @@ namespace MeshImporter
 
         UID meshUID                = GenerateUID();
 
-        std::string savePath       = MESHES_PATH + std::string("Mesh") + MESH_EXTENSION;
-        UID finalMeshUID           = App->GetLibraryModule()->AssignFiletypeUID(meshUID, savePath);
-        std::string fileName       = FileSystem::GetFileNameWithoutExtension(filePath);
 
-        savePath                   = MESHES_PATH + std::to_string(finalMeshUID) + MESH_EXTENSION;
+
+        std::string savePath           = MESHES_PATH + name + MESH_EXTENSION;
+
+        UID finalMeshUID             = App->GetLibraryModule()->AssignFiletypeUID(meshUID, savePath);
+        std::string fileName         = FileSystem::GetFileNameWithoutExtension(filePath);
+
+        MetaMesh meta(finalMeshUID, savePath, generateTangents);
+        meta.Save(savePath);
+
 
         unsigned int bytesWritten  = (unsigned int)FileSystem::Save(savePath.c_str(), fileBuffer, size, true);
 

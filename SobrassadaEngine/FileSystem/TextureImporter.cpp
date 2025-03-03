@@ -4,6 +4,7 @@
 #include "DirectXTex/DirectXTex.h"
 #include "FileSystem.h"
 #include "LibraryModule.h"
+#include "MetaTexture.h"
 #include "glew.h"
 #include <string>
 
@@ -56,7 +57,11 @@ namespace TextureImporter
         UID finalTextureUID = App->GetLibraryModule()->AssignFiletypeUID(textureUID, savePath);
         std::string fileName = FileSystem::GetFileNameWithoutExtension(filePath);
         
-        savePath = TEXTURES_PATH + std::to_string(finalTextureUID) + TEXTURE_EXTENSION;
+        savePath = TEXTURES_PATH + fileName + TEXTURE_EXTENSION;
+
+        MetaTexture meta(finalTextureUID, savePath, image.GetMetadata().mipLevels);
+        meta.Save(savePath);
+
 
         unsigned int size =
             FileSystem::Save(savePath.c_str(), blob.GetBufferPointer(), (unsigned int)blob.GetBufferSize());
