@@ -38,32 +38,32 @@ void RaycastController::GetRayIntersections(
             sortedGameObjects.insert({closeDistance, gameObject});
         }
     }
+    float closestDistance = std::numeric_limits<float>::infinity();
 
     // FOREACH GAMEOBJECT INTERSECTING CHECKING AGAINST THE RAY
     for (const auto& pair : sortedGameObjects)
     {
-        LineSegment localRay(ray.a, ray.b);
-
-        Transform globalTransform = pair.second->GetGlobalTransform();
-        Quat rotator      = Quat(globalTransform.rotation.x, globalTransform.rotation.y, globalTransform.rotation.z, 1);
-        float4x4 modelMat = float4x4::FromTRS(globalTransform.position, rotator, globalTransform.scale);
-        modelMat.Inverse();
-        localRay.Transform(modelMat);
-
         Component* currentComponent      = nullptr;
         std::vector<UID> childComponents = pair.second->GetRootComponent()->GetChildren();
-
-        float closestDistance            = std::numeric_limits<float>::infinity();
 
         for (UID componentUID : childComponents)
         {
             currentComponent = App->GetSceneModule()->GetComponentByUID(componentUID);
             if (currentComponent != nullptr && currentComponent->GetType() == ComponentType::COMPONENT_MESH)
             {
+                LineSegment localRay(ray.a, ray.b);
+
                 MeshComponent* meshComponent     = reinterpret_cast<MeshComponent*>(currentComponent);
                 const ResourceMesh* resourceMesh = meshComponent->GetResourceMesh();
 
                 if (resourceMesh == nullptr) continue;
+
+                Transform globalTransform = meshComponent->GetGlobalTransform();
+                Quat rotator =
+                    Quat(globalTransform.rotation.x, globalTransform.rotation.y, globalTransform.rotation.z, 1);
+                float4x4 modelMat = float4x4::FromTRS(globalTransform.position, rotator, globalTransform.scale);
+                modelMat.Inverse();
+                localRay.Transform(modelMat);
 
                 std::vector<Vertex> vertices      = resourceMesh->GetLocalVertices();
                 std::vector<unsigned int> indices = resourceMesh->GetIndices();
@@ -91,8 +91,6 @@ void RaycastController::GetRayIntersections(
             }
         }
     }
-
-    int x = 0;
 }
 
 void RaycastController::GetRayIntersections(

@@ -312,6 +312,7 @@ void Scene::CreateSpatialDataStruct()
 
     for (const auto& objectIterator : gameObjectsContainer)
     {
+        if (objectIterator.second->GetUID() == gameObjectRootUUID) continue;
         AABB objectBB = objectIterator.second->GetAABB();
 
         if (objectBB.Size().x == 0 && objectBB.Size().y == 0 && objectBB.Size().z == 0) continue;
