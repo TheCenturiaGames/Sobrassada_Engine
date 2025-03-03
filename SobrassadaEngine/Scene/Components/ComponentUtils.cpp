@@ -52,6 +52,8 @@ Component* ComponentUtils::CreateExistingComponent(const rapidjson::Value& initi
             return new SpotLightComponent(initialState);
         case COMPONENT_DIRECTIONAL_LIGHT:
             return new DirectionalLightComponent(initialState);
+        case COMPONENT_CAMERA:
+            return new CameraComponent(initialState);
         default:
             return nullptr;
         }

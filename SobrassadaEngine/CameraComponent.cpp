@@ -41,14 +41,65 @@ CameraComponent::CameraComponent(UID uid, UID uidParent, UID uidRoot, const Tran
 
 CameraComponent::CameraComponent(const rapidjson::Value& initialState) : Component(initialState)
 {
+    if (initialState.HasMember("MainCamera"))
+    {
+        isMainCamera = initialState["MainCamera"].GetBool();
+    }
+    if (initialState.HasMember("DrawGizmos"))
+    {
+        drawGizmos = initialState["DrawGizmos"].GetBool();
+    }
+
     if (initialState.HasMember("CameraType"))
     {
-        camera.type = (initialState["Type"].GetInt() == 1) ? OrthographicFrustum : PerspectiveFrustum;
+        camera.type = (initialState["CameraType"].GetInt() == 1) ? OrthographicFrustum : PerspectiveFrustum;
     }
     if (initialState.HasMember("CameraPosition"))
     {
-        //float 3
-        //camera.pos = initialState["Camera position"].GetFloat();
+        const rapidjson::Value& cameraPosArray = initialState["CameraPosition"];
+        camera.pos = {cameraPosArray[0].GetFloat(), cameraPosArray[1].GetFloat(), cameraPosArray[2].GetFloat()};
+    }
+    if (initialState.HasMember("CameraFront"))
+    {
+        const rapidjson::Value& cameraFrontArray = initialState["CameraFront"];
+        camera.front = {cameraFrontArray[0].GetFloat(), cameraFrontArray[1].GetFloat(), cameraFrontArray[2].GetFloat()};
+    }
+    if (initialState.HasMember("CameraUp"))
+    {
+        const rapidjson::Value& cameraUpArray = initialState["CameraUp"];
+        camera.up = {cameraUpArray[0].GetFloat(), cameraUpArray[1].GetFloat(), cameraUpArray[2].GetFloat()};
+    }
+
+    if (initialState.HasMember("CameraNearPlane"))
+    {
+        camera.nearPlaneDistance = initialState["CameraNearPlane"].GetFloat();
+    }
+    if (initialState.HasMember("CameraFarPlane"))
+    {
+        camera.farPlaneDistance = initialState["CameraFarPlane"].GetFloat();
+    }
+
+    if (camera.type == OrthographicFrustum)
+    {
+        if (initialState.HasMember("CameraOrtographicWidth"))
+        {
+            camera.orthographicWidth = initialState["CameraOrtographicWidth"].GetFloat();
+        }
+        if (initialState.HasMember("CameraOrtographicHeight"))
+        {
+            camera.orthographicHeight = initialState["CameraOrtographicHeight"].GetFloat();
+        }
+    }
+    else
+    {
+        if (initialState.HasMember("CameraHFOV"))
+        {
+            camera.horizontalFov = initialState["CameraHFOV"].GetFloat();
+        }
+        if (initialState.HasMember("CameraVFOV"))
+        {
+            camera.verticalFov = initialState["CameraVFOV"].GetFloat();
+        }
     }
 
     matrices.viewMatrix       = camera.ViewMatrix();
@@ -68,14 +119,13 @@ CameraComponent::~CameraComponent()
 void CameraComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
 {
     Component::Save(targetState, allocator);
-    
+
     targetState.AddMember("MainCamera", isMainCamera, allocator);
+    targetState.AddMember("DrawGizmos", drawGizmos, allocator);
     targetState.AddMember("CameraType", (camera.type == OrthographicFrustum) ? 1 : 0, allocator);
 
     rapidjson::Value cameraPos(rapidjson::kArrayType);
-    cameraPos.PushBack(camera.pos.x, allocator)
-        .PushBack(camera.pos.y, allocator)
-        .PushBack(camera.pos.z, allocator);
+    cameraPos.PushBack(camera.pos.x, allocator).PushBack(camera.pos.y, allocator).PushBack(camera.pos.z, allocator);
     targetState.AddMember("CameraPosition", cameraPos, allocator);
 
     rapidjson::Value cameraFront(rapidjson::kArrayType);
@@ -85,9 +135,7 @@ void CameraComponent::Save(rapidjson::Value& targetState, rapidjson::Document::A
     targetState.AddMember("CameraFront", cameraFront, allocator);
 
     rapidjson::Value cameraUp(rapidjson::kArrayType);
-    cameraUp.PushBack(camera.up.x, allocator)
-        .PushBack(camera.up.y, allocator)
-        .PushBack(camera.up.z, allocator);
+    cameraUp.PushBack(camera.up.x, allocator).PushBack(camera.up.y, allocator).PushBack(camera.up.z, allocator);
     targetState.AddMember("CameraUp", cameraUp, allocator);
 
     targetState.AddMember("CameraNearPlane", camera.nearPlaneDistance, allocator);
