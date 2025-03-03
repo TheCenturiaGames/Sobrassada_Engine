@@ -32,4 +32,5 @@ class CameraComponent : public Component
     CameraMatrices matrices;
     unsigned int ubo = 0;
     bool drawGizmos = false;
+    bool isMainCamera = false;
 };

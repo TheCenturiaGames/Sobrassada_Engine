@@ -41,6 +41,23 @@ CameraComponent::CameraComponent(UID uid, UID uidParent, UID uidRoot, const Tran
 
 CameraComponent::CameraComponent(const rapidjson::Value& initialState) : Component(initialState)
 {
+    if (initialState.HasMember("CameraType"))
+    {
+        camera.type = (initialState["Type"].GetInt() == 1) ? OrthographicFrustum : PerspectiveFrustum;
+    }
+    if (initialState.HasMember("CameraPosition"))
+    {
+        //float 3
+        //camera.pos = initialState["Camera position"].GetFloat();
+    }
+
+    matrices.viewMatrix       = camera.ViewMatrix();
+    matrices.projectionMatrix = camera.ProjectionMatrix();
+
+    glGenBuffers(1, &ubo);
+    glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(CameraMatrices), nullptr, GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 CameraComponent::~CameraComponent()
@@ -50,6 +67,42 @@ CameraComponent::~CameraComponent()
 
 void CameraComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
 {
+    Component::Save(targetState, allocator);
+    
+    targetState.AddMember("MainCamera", isMainCamera, allocator);
+    targetState.AddMember("CameraType", (camera.type == OrthographicFrustum) ? 1 : 0, allocator);
+
+    rapidjson::Value cameraPos(rapidjson::kArrayType);
+    cameraPos.PushBack(camera.pos.x, allocator)
+        .PushBack(camera.pos.y, allocator)
+        .PushBack(camera.pos.z, allocator);
+    targetState.AddMember("CameraPosition", cameraPos, allocator);
+
+    rapidjson::Value cameraFront(rapidjson::kArrayType);
+    cameraFront.PushBack(camera.front.x, allocator)
+        .PushBack(camera.front.y, allocator)
+        .PushBack(camera.front.z, allocator);
+    targetState.AddMember("CameraFront", cameraFront, allocator);
+
+    rapidjson::Value cameraUp(rapidjson::kArrayType);
+    cameraUp.PushBack(camera.up.x, allocator)
+        .PushBack(camera.up.y, allocator)
+        .PushBack(camera.up.z, allocator);
+    targetState.AddMember("CameraUp", cameraUp, allocator);
+
+    targetState.AddMember("CameraNearPlane", camera.nearPlaneDistance, allocator);
+    targetState.AddMember("CameraFarPlane", camera.farPlaneDistance, allocator);
+
+    if (camera.type == OrthographicFrustum)
+    {
+        targetState.AddMember("CameraOrtographicWidth", camera.orthographicWidth, allocator);
+        targetState.AddMember("CameraOrtographicHeight", camera.orthographicHeight, allocator);
+    }
+    else
+    {
+        targetState.AddMember("CameraHFOV", camera.horizontalFov, allocator);
+        targetState.AddMember("CameraVFOV", camera.verticalFov, allocator);
+    }
 }
 
 void CameraComponent::RenderEditorInspector()
@@ -59,7 +112,6 @@ void CameraComponent::RenderEditorInspector()
     if (enabled)
     {
         ImGui::SeparatorText("Camera");
-        bool isMainCamera = false;
         if (App->GetSceneModule()->GetMainCamera() != nullptr)
             isMainCamera = (App->GetSceneModule()->GetMainCamera()->GetUbo() == ubo);
         if (ImGui::Checkbox("Main Camera", &isMainCamera))
@@ -120,6 +172,7 @@ void CameraComponent::RenderEditorInspector()
 
 void CameraComponent::Update()
 {
+    /*Los controles deberian estar en otro script, no aqui (es solo para prueba)*/
     if (App->GetSceneModule()->GetInPlayMode())
     {
         InputModule* inputModule = App->GetInputModule();
