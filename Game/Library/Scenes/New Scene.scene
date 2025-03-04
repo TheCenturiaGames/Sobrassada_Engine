@@ -1,69 +1,35 @@
 {
     "Scene": {
-        "UID": 10787570504560728983,
+        "UID": 17044464604366036799,
         "Name": "New Scene",
-        "RootGameObject": 10771124413057753497,
+        "RootGameObject": 17024131251045023515,
         "GameObjects": [
             {
-                "UID": 15008673537663191119,
-                "ParentUID": 10771124413057753497,
-                "Name": "new Game Object",
-                "Children": [],
-                "RootComponentUID": 3495105709
-            },
-            {
-                "UID": 10771124413057753497,
+                "UID": 17024131251045023515,
                 "ParentUID": 0,
                 "Name": "SceneModule GameObject",
-                "Children": [
-                    15008673537663191119
-                ],
-                "RootComponentUID": 3131997788
+                "Children": [],
+                "RootComponentUID": 329977673
             }
         ],
         "Components": [
             {
-                "UID": 3131997788,
-                "ParentUID": 10771124413057753497,
-                "RootUID": 3131997788,
+                "UID": 329977673,
+                "ParentUID": 17024131251045023515,
+                "RootUID": 329977673,
                 "Type": 1,
                 "LocalTransform": [
                     0.0,
                     0.0,
                     0.0,
                     0.0,
-                    -0.0,
+                    0.0,
                     0.0,
                     1.0,
                     1.0,
                     1.0
                 ],
                 "Children": [],
-                "Enabled": true,
-                "Name": "Root Component",
-                "Type": 1,
-                "Mobility": 1
-            },
-            {},
-            {
-                "UID": 3495105709,
-                "ParentUID": 15008673537663191119,
-                "RootUID": 3495105709,
-                "Type": 1,
-                "LocalTransform": [
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    -0.0,
-                    0.0,
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "Children": [
-                    3272726638
-                ],
                 "Enabled": true,
                 "Name": "Root Component",
                 "Type": 1,

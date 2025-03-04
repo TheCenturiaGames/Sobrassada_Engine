@@ -71,7 +71,6 @@ bool CameraModule::Init()
 
 void CameraModule::UpdateUBO()
 {
-
     matrices.projectionMatrix = GetProjectionMatrix();
     matrices.viewMatrix       = GetViewMatrix();
 
@@ -95,7 +94,7 @@ update_status CameraModule::Update(float deltaTime)
 
 bool CameraModule::ShutDown()
 {
-    glDeleteBuffers(1,&ubo);
+    glDeleteBuffers(1, &ubo);
     return true;
 }
 
@@ -107,86 +106,67 @@ void CameraModule::Controls(float deltaTime)
 
     if (inputModule->GetKey(SDL_SCANCODE_LSHIFT))
     {
-        InputModule* inputModule = App->GetInputModule();
+        finalCameraSpeed *= 2;
+    }
 
-        float finalCameraSpeed   = cameraMoveSpeed * deltaTime;
-
-        if (inputModule->GetKey(SDL_SCANCODE_LSHIFT))
+    if (inputModule->GetMouseButtonDown(SDL_BUTTON_RIGHT))
+    {
+        // TRANSLATION
+        if (inputModule->GetKey(SDL_SCANCODE_W))
         {
-            finalCameraSpeed *= 2;
+            if (isCameraDetached) detachedCamera.pos += detachedCamera.front * finalCameraSpeed;
+            else camera.pos += camera.front * finalCameraSpeed;
+        }
+        if (inputModule->GetKey(SDL_SCANCODE_S))
+        {
+            if (isCameraDetached) detachedCamera.pos -= detachedCamera.front * finalCameraSpeed;
+            else camera.pos -= camera.front * finalCameraSpeed;
         }
 
-        if (inputModule->GetMouseButtonDown(SDL_BUTTON_RIGHT))
+        if (inputModule->GetKey(SDL_SCANCODE_A))
         {
-            // TRANSLATION
-            if (inputModule->GetKey(SDL_SCANCODE_W))
-            {
-                if (isCameraDetached) detachedCamera.pos += detachedCamera.front * finalCameraSpeed;
-                else camera.pos += camera.front * finalCameraSpeed;
-            }
-            if (inputModule->GetKey(SDL_SCANCODE_S))
-            {
-                if (isCameraDetached) detachedCamera.pos -= detachedCamera.front * finalCameraSpeed;
-                else camera.pos -= camera.front * finalCameraSpeed;
-            }
-
-            if (inputModule->GetKey(SDL_SCANCODE_A))
-            {
-                if (isCameraDetached) detachedCamera.pos -= detachedCamera.WorldRight() * finalCameraSpeed;
-                else camera.pos -= camera.WorldRight() * finalCameraSpeed;
-            }
-            if (inputModule->GetKey(SDL_SCANCODE_D))
-            {
-                if (isCameraDetached) detachedCamera.pos += detachedCamera.WorldRight() * finalCameraSpeed;
-                else camera.pos += camera.WorldRight() * finalCameraSpeed;
-            }
-
-            if (inputModule->GetKey(SDL_SCANCODE_E))
-            {
-                if (isCameraDetached) detachedCamera.pos += detachedCamera.up * finalCameraSpeed;
-                else camera.pos += camera.up * finalCameraSpeed;
-            }
-            if (inputModule->GetKey(SDL_SCANCODE_Q))
-            {
-                if (isCameraDetached) detachedCamera.pos -= detachedCamera.up * finalCameraSpeed;
-                else camera.pos -= camera.up * finalCameraSpeed;
-            }
+            if (isCameraDetached) detachedCamera.pos -= detachedCamera.WorldRight() * finalCameraSpeed;
+            else camera.pos -= camera.WorldRight() * finalCameraSpeed;
+        }
+        if (inputModule->GetKey(SDL_SCANCODE_D))
+        {
+            if (isCameraDetached) detachedCamera.pos += detachedCamera.WorldRight() * finalCameraSpeed;
+            else camera.pos += camera.WorldRight() * finalCameraSpeed;
         }
 
-        if (inputModule->GetMouseButtonDown(SDL_BUTTON_RIGHT))
+        if (inputModule->GetKey(SDL_SCANCODE_E))
         {
-            // ZOOMING
-            if (inputModule->GetKey(SDL_SCANCODE_LALT))
-            {
-                float mouseY = -inputModule->GetMouseMotion().y;
+            if (isCameraDetached) detachedCamera.pos += detachedCamera.up * finalCameraSpeed;
+            else camera.pos += camera.up * finalCameraSpeed;
+        }
+        if (inputModule->GetKey(SDL_SCANCODE_Q))
+        {
+            if (isCameraDetached) detachedCamera.pos -= detachedCamera.up * finalCameraSpeed;
+            else camera.pos -= camera.up * finalCameraSpeed;
+        }
+    }
 
-                if (mouseY != 0)
-                {
-                    if (isCameraDetached) detachedCamera.pos += detachedCamera.front * mouseY * finalCameraSpeed;
-                    else camera.pos += camera.front * mouseY * finalCameraSpeed;
-                }
-            }
-            else
-            {
-                // ROTATION WITH MOUSE
-                float mouseX             = inputModule->GetMouseMotion().x;
-                float mouseY             = inputModule->GetMouseMotion().y;
-                float deltaRotationAngle = cameraRotationAngle * deltaTime;
+    if (inputModule->GetMouseButtonDown(SDL_BUTTON_RIGHT))
+    {
+        // ZOOMING
+        if (inputModule->GetKey(SDL_SCANCODE_LALT))
+        {
+            float mouseY = -inputModule->GetMouseMotion().y;
 
-                RotateCamera(-mouseX * deltaRotationAngle, -mouseY * deltaRotationAngle);
+            if (mouseY != 0)
+            {
+                if (isCameraDetached) detachedCamera.pos += detachedCamera.front * mouseY * finalCameraSpeed;
+                else camera.pos += camera.front * mouseY * finalCameraSpeed;
             }
         }
-
-        // ORBIT
-        if (inputModule->GetMouseButtonDown(SDL_BUTTON_LEFT) && inputModule->GetKey(SDL_SCANCODE_LALT))
+        else
         {
+            // ROTATION WITH MOUSE
             float mouseX             = inputModule->GetMouseMotion().x;
             float mouseY             = inputModule->GetMouseMotion().y;
             float deltaRotationAngle = cameraRotationAngle * deltaTime;
 
             RotateCamera(-mouseX * deltaRotationAngle, -mouseY * deltaRotationAngle);
-
-            FocusCamera();
         }
     }
 
@@ -261,9 +241,9 @@ void CameraModule::RotateCamera(float yaw, float pitch)
         if ((currentPitchAngle + pitch) > maximumNegativePitch && (currentPitchAngle + pitch) < maximumPositivePitch)
         {
             currentPitchAngle  += pitch;
-            Quat pitchRotation  = Quat::RotateAxisAngle(camera.WorldRight(), pitch);
-            camera.front        = pitchRotation.Mul(camera.front).Normalized();
-            camera.up           = pitchRotation.Mul(camera.up).Normalized();
+            Quat pitchRotation = Quat::RotateAxisAngle(camera.WorldRight(), pitch);
+            camera.front       = pitchRotation.Mul(camera.front).Normalized();
+            camera.up          = pitchRotation.Mul(camera.up).Normalized();
         }
     }
 }

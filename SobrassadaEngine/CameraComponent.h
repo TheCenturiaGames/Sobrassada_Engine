@@ -1,12 +1,10 @@
 #pragma once
 
+#include "CameraModule.h"
 #include "Geometry/Frustum.h"
 #include "Math/float4x4.h"
 #include "Scene/Components/Component.h"
 #include <Libs/rapidjson/document.h>
-#include "CameraModule.h"
-
-#define RADTODEG (180.0f / 3.14159265358979323846f)
 
 class CameraComponent : public Component
 {
@@ -27,10 +25,15 @@ class CameraComponent : public Component
     const float4x4& GetViewMatrix() { return camera.ViewMatrix(); }
 
   private:
+    void ComputeRotation(float yaw, float pitch);
+
+  private:
     Frustum camera;
     FrustumPlanes frustumPlanes;
     CameraMatrices matrices;
-    unsigned int ubo = 0;
-    bool drawGizmos = false;
-    bool isMainCamera = false;
+    unsigned int ubo        = 0;
+    bool drawGizmos         = false;
+    bool isMainCamera       = false;
+    float currentPitchAngle = 0.f;
+    float3 lastRotation;
 };

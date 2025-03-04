@@ -1,0 +1,123 @@
+{
+    "Scene": {
+        "UID": 1002740291571531575,
+        "Name": "cameraaaaaaaaaaaaaa",
+        "RootGameObject": 6910420792545139180,
+        "GameObjects": [
+            {
+                "UID": 6910420792545139180,
+                "ParentUID": 0,
+                "Name": "SceneModule GameObject",
+                "Children": [
+                    12779775424947411357
+                ],
+                "RootComponentUID": 3520408322
+            },
+            {
+                "UID": 12779775424947411357,
+                "ParentUID": 6910420792545139180,
+                "Name": "new Game Object",
+                "Children": [],
+                "RootComponentUID": 2976149926
+            }
+        ],
+        "Components": [
+            {
+                "UID": 2050263677,
+                "ParentUID": 2976149926,
+                "RootUID": 2976149926,
+                "Type": 7,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Camera",
+                "MainCamera": true,
+                "CameraType": 0,
+                "CameraPosition": [
+                    0.0,
+                    1.0,
+                    5.0
+                ],
+                "CameraFront": [
+                    -0.0,
+                    -0.0,
+                    -1.0
+                ],
+                "CameraUp": [
+                    0.0,
+                    1.0,
+                    0.0
+                ],
+                "CameraNearPlane": 5.320000171661377,
+                "CameraFarPlane": 125.19999694824219,
+                "CameraHFOV": 2.001892566680908,
+                "CameraVFOV": 1.440903902053833
+            },
+            {
+                "UID": 2976149926,
+                "ParentUID": 12779775424947411357,
+                "RootUID": 2976149926,
+                "Type": 1,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [
+                    2050263677
+                ],
+                "Enabled": true,
+                "Name": "Root Component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3520408322,
+                "ParentUID": 6910420792545139180,
+                "RootUID": 3520408322,
+                "Type": 1,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root Component",
+                "Type": 1,
+                "Mobility": 1
+            }
+        ]
+    },
+    "Lights Config": {
+        "Ambient Color": [
+            1.0,
+            1.0,
+            1.0
+        ],
+        "Ambient Intensity": 0.20000000298023224,
+        "Skybox UID": 1170799310640544
+    }
+}

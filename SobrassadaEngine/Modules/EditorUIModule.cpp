@@ -665,6 +665,8 @@ bool EditorUIModule::RenderTransformWidget(
 
 bool EditorUIModule::RenderImGuizmo(Transform& gameObjectTransform)
 {
+    if (App->GetSceneModule()->GetInPlayMode()) return false;
+
     float4x4 view = float4x4(App->GetCameraModule()->GetViewMatrix());
     view.Transpose();
 

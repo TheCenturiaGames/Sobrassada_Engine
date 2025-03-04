@@ -90,6 +90,7 @@ constexpr uint32_t CONSTANT_NO_TEXTURE_UUID             = 0;
 
 constexpr float PI                                      = 3.14159265359f;
 constexpr float RAD_DEGREE_CONV                         = 180.f / PI;
+constexpr float DEGREE_RAD_CONV                         = PI / 180.f;
 
 inline UID GenerateUID()
 {

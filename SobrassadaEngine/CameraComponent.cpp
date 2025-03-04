@@ -14,16 +14,18 @@ CameraComponent::CameraComponent(UID uid, UID uidParent, UID uidRoot, const Tran
     : Component(uid, uidParent, uidRoot, "Camera", COMPONENT_CAMERA, parentGlobalTransform)
 {
 
-    camera.type               = FrustumType::PerspectiveFrustum;
+    camera.type  = FrustumType::PerspectiveFrustum;
 
-    camera.pos                = float3(0, 1, 5);
-    camera.front              = -float3::unitZ;
-    camera.up                 = float3::unitY;
-
+    camera.pos   = globalTransform.position;
+    camera.front = -float3::unitZ;
+    camera.up    = float3::unitY;
+    ComputeRotation(globalTransform.rotation.y, globalTransform.rotation.x);
+    lastRotation              = globalTransform.rotation;
+     
     camera.nearPlaneDistance  = 0.1f;
     camera.farPlaneDistance   = 100.f;
 
-    camera.horizontalFov      = (float)HFOV * DEGTORAD;
+    camera.horizontalFov      = (float)HFOV * DEGREE_RAD_CONV;
 
     int width                 = App->GetWindowModule()->GetWidth();
     int height                = App->GetWindowModule()->GetHeight();
@@ -195,10 +197,10 @@ void CameraComponent::RenderEditorInspector()
 
         if (camera.type == PerspectiveFrustum)
         {
-            float hfov = camera.horizontalFov * RADTODEG;
+            float hfov = camera.horizontalFov * RAD_DEGREE_CONV;
             if (ImGui::DragFloat("FoV", &hfov, 0.1f, 1.0f, 179.0f, "%.2f"))
             {
-                camera.horizontalFov = hfov * DEGTORAD;
+                camera.horizontalFov = hfov * DEGREE_RAD_CONV;
                 int width            = App->GetWindowModule()->GetWidth();
                 int height           = App->GetWindowModule()->GetHeight();
                 camera.verticalFov   = 2.0f * atanf(tanf(camera.horizontalFov * 0.5f) * ((float)height / (float)width));
@@ -218,9 +220,29 @@ void CameraComponent::RenderEditorInspector()
     }
 }
 
+void CameraComponent::ComputeRotation(float yaw, float pitch)
+{
+    //float newYaw     = ((yaw + 1.566) / 3.132) * 6.264 - 3.132;
+    Quat yawRotation = Quat::RotateY(yaw);
+
+    camera.front     = yawRotation.Mul(camera.front).Normalized();
+    camera.up        = yawRotation.Mul(camera.up).Normalized();
+
+    if ((currentPitchAngle + pitch) > maximumNegativePitch && (currentPitchAngle + pitch) < maximumPositivePitch)
+    {
+        currentPitchAngle  += pitch;
+        Quat pitchRotation = Quat::RotateAxisAngle(camera.WorldRight(), pitch);
+        camera.front       = pitchRotation.Mul(camera.front).Normalized();
+        camera.up          = pitchRotation.Mul(camera.up).Normalized();
+    }
+
+    lastRotation = globalTransform.rotation;
+}
+
 void CameraComponent::Update()
 {
-    /*Camera Component Inputs needs to be managed by the user, not by me, this is only to check if ot working*/
+    // Camera Component Inputs needs to be managed by the user, not by me, this is only to check if its working
+    /*
     if (App->GetSceneModule()->GetInPlayMode())
     {
         InputModule* inputModule = App->GetInputModule();
@@ -229,6 +251,10 @@ void CameraComponent::Update()
         if (inputModule->GetKey(SDL_SCANCODE_D)) camera.pos += camera.WorldRight() * 1.0f;
         if (inputModule->GetKey(SDL_SCANCODE_A)) camera.pos -= camera.WorldRight() * 1.0f;
     }
+    */
+    
+    camera.pos = globalTransform.position;
+    if ((lastRotation.x != globalTransform.rotation.x) || (lastRotation.y != globalTransform.rotation.y)) ComputeRotation(globalTransform.rotation.y - lastRotation.y, globalTransform.rotation.x - lastRotation.x);
 
     matrices.projectionMatrix = camera.ProjectionMatrix();
     matrices.viewMatrix       = camera.ViewMatrix();
