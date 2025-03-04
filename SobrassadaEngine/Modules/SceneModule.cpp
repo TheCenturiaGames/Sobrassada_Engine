@@ -49,7 +49,7 @@ update_status SceneModule::Update(float deltaTime)
         const KeyState* mouseButtons = App->GetInputModule()->GetMouseButtons();
         if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_UP)
         {
-            GameObject* selectedObject = RaycastController::GetRayIntersection(
+            GameObject* selectedObject = RaycastController::GetRayIntersection<Octree>(
                 App->GetCameraModule()->GetLastCastedRay(), loadedScene->GetOctree()
             );
 
