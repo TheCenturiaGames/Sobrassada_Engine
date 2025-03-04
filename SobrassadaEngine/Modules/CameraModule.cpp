@@ -220,10 +220,6 @@ void CameraModule::Controls(float deltaTime)
 
     frustumPlanes.UpdateFrustumPlanes(viewMatrix, projectionMatrix);
     UpdateUBO();
-
-    // REMOVE
-    std::vector<LineSegment> asd = {lastCastedRay};
-    App->GetDebugDrawModule()->RenderLines(asd, float3(0.f, 1.f, 0.f));
 }
 
 void CameraModule::SetAspectRatio(float newAspectRatio)
