@@ -166,8 +166,8 @@ void Scene::RenderScene()
         if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) ImGui::SetWindowFocus();
 
         // do inputs only if window is focused
-        if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
-            ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows))
+        if (ImGui::IsWindowFocused(ImGuiFocusedFlags_DockHierarchy) &&
+            ImGui::IsWindowHovered(ImGuiFocusedFlags_DockHierarchy))
             doInputs = true;
         else doInputs = false;
 
