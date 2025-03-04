@@ -126,12 +126,7 @@ void GameObject::LoadComponentsInGameObject(Component* component)
         Component* childComp = App->GetSceneModule()->GetScene()->GetComponentByUID(childComponentUID);
         if (childComp != nullptr)
         {
-            /*AddComponent(childComp);*/
-
-            //if (!childComp->GetChildren().empty())
-            //{
             LoadComponentsInGameObject(childComp);
-            //}
         }
     }
 }

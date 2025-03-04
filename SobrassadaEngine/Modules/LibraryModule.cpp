@@ -207,8 +207,7 @@ bool LibraryModule::LoadScene(const char* path, bool reload)
             loadedGameObjects.insert({newGameObject->GetUID(), newGameObject});
         }
     }
-    //App->GetSceneModule()->LoadComponents(loadedGameComponents);
-    App->GetSceneModule()->LoadGameObjects(loadedGameObjects);
+    App->GetSceneModule()->GetScene()->LoadGameObjects(loadedGameObjects);
     App->GetSceneModule()->GetScene()->UpdateTransformOctree();
 
     GLOG("%s scene loaded", name.c_str());
