@@ -77,6 +77,8 @@ void ResourceMaterial::LoadMaterialData(Material mat)
     if (diffTexture != nullptr)
     {
         diffuseTexture.textureID = diffTexture->GetTextureID();
+        diffuseTexture.width     = diffTexture->GetTextureWidth();
+        diffuseTexture.height    = diffTexture->GetTextureHeight();
         hasDiffuseTexture        = true;
     }
 
@@ -84,6 +86,8 @@ void ResourceMaterial::LoadMaterialData(Material mat)
     if (specTexture != nullptr)
     {
         specularTexture.textureID = specTexture->GetTextureID();
+        specularTexture.width     = specTexture->GetTextureWidth();
+        specularTexture.height    = specTexture->GetTextureHeight();
         hasSpecularTexture        = true;
     }
 
@@ -92,6 +96,8 @@ void ResourceMaterial::LoadMaterialData(Material mat)
     {
         GLOG("%s has normal", normTexture->GetName());
         normalTexture.textureID = normTexture->GetTextureID();
+        normalTexture.width     = normTexture->GetTextureWidth();
+        normalTexture.height    = normTexture->GetTextureHeight();
         hasNormalTexture        = true;
         material.hasNormal      = 1;
     }

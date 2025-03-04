@@ -27,7 +27,7 @@ ResourcesModule::~ResourcesModule()
 
 bool ResourcesModule::Init()
 {
-    program = App->GetShaderModule()->GetProgram("./Test/VertexShader.glsl", "./Test/BRDFPhongFragmentShader.glsl");
+    program = App->GetShaderModule()->GetProgram("./Test/VertexShader.glsl", "./Test/BRDFCookTorranceShader.glsl");
 
     return true;
 }
