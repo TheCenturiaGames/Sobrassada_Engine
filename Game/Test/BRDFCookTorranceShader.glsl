@@ -69,9 +69,11 @@ layout(std140, binding = 1) uniform Material
 {
     vec4 diffColor;
     vec3 specColor;
-    float shininess;   
+    float shininess;
     bool shininessInAlpha;  
     bool hasNormal;
+    float metallicFactor;
+    float roughnessFactor;
 };
 
 
@@ -113,12 +115,13 @@ float GGXNormalDistribution(float NdotH, float roughness){
     return roughness2/denominator;
 }
 
-vec3 RenderLight(vec3 L, vec3 N, vec4 specTexColor, vec3 texColor, vec3 Li, float NdotL, float alpha, float roughness)
+vec3 RenderLight(vec3 L, vec3 N, vec4 specTexColor, vec3 texColor, vec3 Li, float NdotL, float alpha)
  {
     float shininessValue;
 	if(shininessInAlpha) shininessValue = exp2(alpha * 7 + 1);
 	else shininessValue = shininess;
 
+    float roughness = 1.0f;
     float normalization = (shininessValue + 2.0) / (2.0 * 3.1415926535);
     vec3 V = normalize(cameraPos - pos);
     vec3 R = reflect(L, N);
@@ -147,25 +150,25 @@ vec3 RenderLight(vec3 L, vec3 N, vec4 specTexColor, vec3 texColor, vec3 Li, floa
     return diffuse + specular;
 }
 
-vec3 RenderPointLight(const int index, const vec3 N, vec4 specTexColor, const vec3 texColor, const float alpha, float roughness)
+vec3 RenderPointLight(const int index, const vec3 N, vec4 specTexColor, const vec3 texColor, const float alpha)
 {
 	float attenuation = PointLightAttenuation(index);
 	vec3 L = normalize(pos - pointLights[index].position.xyz);
 	vec3 Li = pointLights[index].color.rgb * pointLights[index].color.a * attenuation;
 	float NdotL = dot(N, -L);
 
-	if (NdotL > 0 && attenuation > 0) return RenderLight(L, N, specTexColor, texColor, Li, NdotL, alpha, roughness);
+	if (NdotL > 0 && attenuation > 0) return RenderLight(L, N, specTexColor, texColor, Li, NdotL, alpha);
 	else return vec3(0);	
 }
 
-vec3 RenderSpotLight(const int index, const vec3 N, vec4 specTexColor, const vec3 texColor, const float alpha, float roughness)
+vec3 RenderSpotLight(const int index, const vec3 N, vec4 specTexColor, const vec3 texColor, const float alpha)
 {
 	float attenuation = SpotLightAttenuation(index);
 	vec3 L = normalize(pos - spotLights[index].position.xyz);
 	vec3 Li = spotLights[index].color.rgb * spotLights[index].color.a * attenuation;
 	float NdotL = dot(N, -L);
 
-	if (NdotL > 0 && attenuation > 0) return RenderLight(L, N, specTexColor, texColor, Li, NdotL, alpha, roughness);
+	if (NdotL > 0 && attenuation > 0) return RenderLight(L, N, specTexColor, texColor, Li, NdotL, alpha);
 	else return vec3(0);
 }
 
@@ -201,13 +204,13 @@ void main()
     // Point Lights
     for (int i = 0; i < pointLightsCount; ++i)
 	{
-		hdr += RenderPointLight(i, N, specTexColor, texColor, alpha, roughness);
+		hdr += RenderPointLight(i, N, specTexColor, texColor, alpha);
 	}
 
     //Spot Lights
     for (int i = 0; i < spotLightsCount; ++i)
 	{
-		hdr += RenderSpotLight(i, N, specTexColor, texColor, alpha, roughness);
+		hdr += RenderSpotLight(i, N, specTexColor, texColor, alpha);
 	}
 
     // Directional light
@@ -216,7 +219,7 @@ void main()
     float NdotL = dot(N, -L);
     if (NdotL > 0)
     {
-		hdr += RenderLight(L, N, specTexColor, texColor, lightColor, NdotL, alpha, roughness);
+		hdr += RenderLight(L, N, specTexColor, texColor, lightColor, NdotL, alpha);
     }
 
     vec3 ldr = hdr.rgb / (hdr.rgb + vec3(1.0));

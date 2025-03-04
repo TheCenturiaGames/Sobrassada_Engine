@@ -20,7 +20,6 @@ UID MaterialImporter::ImportMaterial(const tinygltf::Model& model, int materialI
     Material material;
     if (it != gltfMaterial.extensions.end())
     {
-
         const tinygltf::Value& specGloss    = it->second;
 
         // Diffuse Factor

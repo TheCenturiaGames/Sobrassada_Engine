@@ -25,7 +25,8 @@ struct MaterialGPU
     float shininess      = 500.0f;
     int shininessInAlpha = 0;
     int hasNormal        = 0;
-    int padding2[2]      = {0, 0};
+    float metallicFactor  = 1.0f;
+    float roughnessFactor = 1.0f;
 };
 
 class ResourceMaterial : public Resource
@@ -46,6 +47,9 @@ class ResourceMaterial : public Resource
 
     TextureInfo specularTexture;
     bool hasSpecularTexture = false;
+
+    TextureInfo metallicTexture;
+    bool hasMetallicTexture = false;
 
     TextureInfo normalTexture;
     bool hasNormalTexture = false;
