@@ -1,0 +1,75 @@
+{
+    "Prefab": {
+        "UID": 13834856960579828706,
+        "Name": "new Game Object",
+        "GameObjects": [
+            {
+                "UID": 8417340108883774326,
+                "ParentUID": 715955870401801530,
+                "Name": "new Game Object",
+                "Children": [
+                    1370549450312024558,
+                    9274405891005409992,
+                    15783854552611599117
+                ],
+                "RootComponentUID": 1960510925
+            },
+            {
+                "UID": 1370549450312024558,
+                "ParentUID": 8417340108883774326,
+                "Name": "new Game Object",
+                "Children": [],
+                "RootComponentUID": 319941362
+            },
+            {
+                "UID": 9274405891005409992,
+                "ParentUID": 8417340108883774326,
+                "Name": "new Game Object",
+                "Children": [
+                    2857825814744041531,
+                    14259414616728921478
+                ],
+                "RootComponentUID": 2159992482
+            },
+            {
+                "UID": 15783854552611599117,
+                "ParentUID": 8417340108883774326,
+                "Name": "new Game Object",
+                "Children": [
+                    4512890635402205355
+                ],
+                "RootComponentUID": 3675800466
+            },
+            {
+                "UID": 2857825814744041531,
+                "ParentUID": 9274405891005409992,
+                "Name": "new Game Object",
+                "Children": [
+                    13302454500887314750
+                ],
+                "RootComponentUID": 666016012
+            },
+            {
+                "UID": 14259414616728921478,
+                "ParentUID": 9274405891005409992,
+                "Name": "new Game Object",
+                "Children": [],
+                "RootComponentUID": 3320655272
+            },
+            {
+                "UID": 4512890635402205355,
+                "ParentUID": 15783854552611599117,
+                "Name": "new Game Object",
+                "Children": [],
+                "RootComponentUID": 1051296199
+            },
+            {
+                "UID": 13302454500887314750,
+                "ParentUID": 2857825814744041531,
+                "Name": "new Game Object",
+                "Children": [],
+                "RootComponentUID": 3097776011
+            }
+        ]
+    }
+}

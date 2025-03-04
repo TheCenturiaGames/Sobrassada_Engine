@@ -169,5 +169,12 @@ namespace SceneImporter
                 GLOG("Failed to create directory: %s", SCENES_PATH);
             }
         }
+        if (!FileSystem::IsDirectory(PREFABS_PATH))
+        {
+            if (!FileSystem::CreateDirectories(PREFABS_PATH))
+            {
+                GLOG("Failed to create directory: %s", PREFABS_PATH);
+            }
+        }
     }
 }; // namespace SceneImporter

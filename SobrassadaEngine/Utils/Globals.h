@@ -68,12 +68,14 @@ enum update_status
 #define TEXTURES_PATH   "Library/Textures/"
 #define MATERIALS_PATH  "Library/Materials/"
 #define SCENES_PATH     "Library/Scenes/"
+#define PREFABS_PATH     "Library/Prefabs/"
 
 #define ASSET_EXTENSION    ".gltf"
 #define MESH_EXTENSION     ".sobrassada"
 #define TEXTURE_EXTENSION  ".dds"
 #define MATERIAL_EXTENSION ".mat"
 #define SCENE_EXTENSION    ".scene"
+#define PREFAB_EXTENSION   ".prefab"
 
 #define MAX_COMPONENT_NAME_LENGTH 64;
 

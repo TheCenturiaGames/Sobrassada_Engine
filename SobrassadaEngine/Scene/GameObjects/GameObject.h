@@ -45,7 +45,7 @@ class GameObject : public AABBUpdatable
 
     inline std::string GetName() const { return name; }
     inline UID GetUID() const { return uuid; }
-    inline std::vector<UID> GetChildren() { return children; }
+    inline std::vector<UID> GetChildren() const { return children; }
     inline UID GetParent() const { return parentUUID; }
     inline const AABB& GetAABB() const { return globalAABB; };
     RootComponent* GetRootComponent() const { return rootComponent; }
@@ -53,6 +53,8 @@ class GameObject : public AABBUpdatable
     void SetName(std::string newName) { name = newName; }
     void SetParent(UID newParentUUID) { parentUUID = newParentUUID; }
     void SetUUID(UID newUUID) { uuid = newUUID; }
+
+    void CreatePrefab() const;
 
   public:
     inline static UID currentRenamingUID = INVALID_UUID;

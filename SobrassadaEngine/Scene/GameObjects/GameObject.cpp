@@ -5,6 +5,8 @@
 #include "Root/RootComponent.h"
 #include "SceneModule.h"
 
+#include "PrefabManager.h"
+
 #include "imgui.h"
 
 GameObject::GameObject(std::string name) : name(name)
@@ -225,6 +227,11 @@ void GameObject::RenderContextMenu()
             currentRenamingUID = uuid;
         }
 
+        if (ImGui::MenuItem("Create Prefab"))
+        {
+            CreatePrefab();
+        }
+
         if (uuid != App->GetSceneModule()->GetGameObjectRootUID() && ImGui::MenuItem("Delete"))
         {
             App->GetSceneModule()->RemoveGameObjectHierarchy(uuid);
@@ -367,4 +374,9 @@ const Transform& GameObject::GetParentGlobalTransform()
         return parent->GetGlobalTransform();
     }
     return Transform::identity;
+}
+
+void GameObject::CreatePrefab() const
+{
+    PrefabManager::SavePrefab(this);
 }
