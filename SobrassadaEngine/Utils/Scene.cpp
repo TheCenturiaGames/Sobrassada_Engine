@@ -341,11 +341,6 @@ void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects)
 
         if (frustumPlanes.Intersects(objectOBB)) outRenderGameObjects.push_back(gameObject);
     }
-
-    std::vector<GameObject*> rayObjects;
-    RaycastController::GetRayIntersections(App->GetCameraModule()->GetLastCastedRay(), sceneOctree, rayObjects);
-
-    int x = 0;
 }
 
 GameObject* Scene::GetGameObjectByUUID(UID gameObjectUUID)

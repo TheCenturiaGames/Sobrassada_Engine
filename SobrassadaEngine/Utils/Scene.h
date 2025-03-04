@@ -35,6 +35,7 @@ class Scene
     void AddComponent(UID uid, Component* newComponent) { gameComponents.insert({uid, newComponent}); }
     void RemoveGameObjectHierarchy(UID gameObjectUUID);
     void RemoveComponent(UID componentUID);
+    bool IsSceneWindowFocused() const { return isWindowFocused; };
 
     const char* GetSceneName() const { return sceneName.c_str(); }
     UID GetSceneUID() const { return sceneUID; }
@@ -50,11 +51,13 @@ class Scene
     AABBUpdatable* GetTargetForAABBUpdate(UID uuid);
     LightsConfig* GetLightsConfig() { return lightsConfig; }
 
-    bool IsSceneWindowFocused() const { return isWindowFocused; };
     const std::tuple<float, float>& GetWindowPosition() const { return sceneWindowPosition; };
     const std::tuple<float, float>& GetWindowSize() const { return sceneWindowSize; };
     const std::tuple<float, float>& GetMousePosition() const { return mousePosition; };
+    const Octree* GetOctree() const { return sceneOctree; }
 
+    void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUUID = newSelectedGameObject; };
+    
   private:
     void CreateSpatialDataStruct();
     void CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects) const;

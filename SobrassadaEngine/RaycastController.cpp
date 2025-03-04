@@ -14,13 +14,12 @@
 #include "Math/float4x4.h"
 #include <map>
 
-void RaycastController::GetRayIntersections(
-    const LineSegment& ray, const Octree* octree, std::vector<GameObject*>& outGameObjects
-)
+GameObject* RaycastController::GetRayIntersection(const LineSegment& ray, const Octree* octree)
 {
-    if (octree == nullptr) return;
-    std::vector<GameObject*> queriedGameObjects;
     GameObject* selectedGameObject = nullptr;
+
+    if (octree == nullptr) return selectedGameObject;
+    std::vector<GameObject*> queriedGameObjects;
 
     // GET ELEMENTS THAT INTERSECT WITH OCTREE
     octree->QueryElements<LineSegment>(ray, queriedGameObjects);
@@ -78,12 +77,12 @@ void RaycastController::GetRayIntersections(
 
                     float distance = std::numeric_limits<float>::infinity();
                     float3 hitPoint;
-                    
+
                     if (localRay.Intersects(currentTriangle, &distance, &hitPoint))
                     {
                         if (distance < closestDistance)
                         {
-                            closestDistance = distance;
+                            closestDistance    = distance;
                             selectedGameObject = pair.second;
                         }
                     }
@@ -91,12 +90,5 @@ void RaycastController::GetRayIntersections(
             }
         }
     }
-}
-
-void RaycastController::GetRayIntersections(
-    const LineSegment& ray, const Quadtree* quadtree, std::vector<GameObject*>& outGameObjects
-)
-{
-    if (quadtree == nullptr) return;
-    quadtree->QueryElements<LineSegment>(ray, outGameObjects);
+    return selectedGameObject;
 }

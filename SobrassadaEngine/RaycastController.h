@@ -10,8 +10,6 @@ class Quadtree;
 class RaycastController
 {
   public:
-    static void
-    GetRayIntersections(const LineSegment& ray, const Octree* octree, std::vector<GameObject*>& outGameObjects);
-    static void
-    GetRayIntersections(const LineSegment& ray, const Quadtree* quadtree, std::vector<GameObject*>& outGameObjects);
+    static GameObject*
+    GetRayIntersection(const LineSegment& ray, const Octree* octree);
 };

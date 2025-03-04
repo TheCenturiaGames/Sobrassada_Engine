@@ -27,8 +27,8 @@ Application::Application()
     modules.push_back(resourcesModule = new ResourcesModule());
     modules.push_back(inputModule = new InputModule());
     modules.push_back(shaderModule = new ShaderModule());
-    modules.push_back(sceneModule = new SceneModule());
     modules.push_back(cameraModule = new CameraModule());
+    modules.push_back(sceneModule = new SceneModule());
     modules.push_back(debugDraw = new DebugDrawModule());
     modules.push_back(editorUIModule = new EditorUIModule());
 

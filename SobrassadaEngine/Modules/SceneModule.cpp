@@ -5,8 +5,10 @@
 #include "EditorUIModule.h"
 #include "FrustumPlanes.h"
 #include "GameObject.h"
+#include "InputModule.h"
 #include "LibraryModule.h"
 #include "Octree.h"
+#include "RaycastController.h"
 #include "Root/RootComponent.h"
 #include "Scene/Components/Standalone/MeshComponent.h"
 
@@ -41,6 +43,19 @@ update_status SceneModule::PreUpdate(float deltaTime)
 
 update_status SceneModule::Update(float deltaTime)
 {
+    // CAST RAY WHEN LEFT CLICK IS RELEASED
+    if (loadedScene != nullptr && loadedScene->IsSceneWindowFocused())
+    {
+        const KeyState* mouseButtons = App->GetInputModule()->GetMouseButtons();
+        if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_UP)
+        {
+            GameObject* selectedObject = RaycastController::GetRayIntersection(
+                App->GetCameraModule()->GetLastCastedRay(), loadedScene->GetOctree()
+            );
+
+            if (selectedObject != nullptr) loadedScene->SetSelectedGameObject(selectedObject->GetUID());
+        }
+    }
     return UPDATE_CONTINUE;
 }
 
