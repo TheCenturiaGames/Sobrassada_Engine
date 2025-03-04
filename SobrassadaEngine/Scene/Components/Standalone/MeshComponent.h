@@ -11,7 +11,7 @@
 class MeshComponent : public Component
 {
 public:
-    MeshComponent(UID uid, UID uidParent, UID uidRoot, const Transform& parentGlobalTransform);
+    MeshComponent(UID uid, UID uidParent, UID uidRoot, const float4x4& parentGlobalTransform);
     
     MeshComponent(const rapidjson::Value &initialState);
     

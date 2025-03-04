@@ -33,8 +33,8 @@ class EditorUIModule : public Module
     update_status PostUpdate(float deltaTime) override;
     bool ShutDown() override;
 
-    bool RenderTransformWidget(Transform &localTransform, Transform &globalTransform, const Transform &parentTransform);
-    bool RenderImGuizmo(Transform &localTransform, const Transform &globalTransform, const Transform &parentTransform)const;
+    bool RenderTransformWidget(float4x4 &localTransform, float4x4 &globalTransform, const float4x4 &parentTransform);
+    bool RenderImGuizmo(float4x4 &localTransform, float4x4 &globalTransform, const float4x4 &parentTransform)const;
 
     UID RenderResourceSelectDialog(const char *id, const std::unordered_map<std::string, UID> &availableResources);
 
@@ -44,7 +44,7 @@ class EditorUIModule : public Module
 
   private:
     void RenderBasicTransformModifiers(
-        Transform &transform, bool &lockScaleAxis, bool &positionValueChanged, bool &rotationValueChanged,
+        float3& outputPosition, float3& outputRotation, float3& outputScale, bool &lockScaleAxis, bool &positionValueChanged, bool &rotationValueChanged,
         bool &scaleValueChanged
     );
 

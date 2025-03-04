@@ -7,7 +7,7 @@
 class PointLight : public LightComponent
 {
   public:
-    PointLight(UID uid, UID uidParent, UID uidRoot, const Transform &parentGlobalTransform);
+    PointLight(UID uid, UID uidParent, UID uidRoot, const float4x4 &parentGlobalTransform);
     PointLight(const rapidjson::Value& initialState);
     ~PointLight();
 

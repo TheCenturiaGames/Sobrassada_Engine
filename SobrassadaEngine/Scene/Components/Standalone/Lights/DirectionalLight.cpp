@@ -5,7 +5,7 @@
 #include "SceneModule.h"
 #include "imgui.h"
 
-DirectionalLight::DirectionalLight(UID uid, UID uidParent, UID uidRoot, const Transform& parentGlobalTransform)
+DirectionalLight::DirectionalLight(UID uid, UID uidParent, UID uidRoot, const float4x4& parentGlobalTransform)
     : LightComponent(uid, uidParent, uidRoot, "Directional Light", COMPONENT_DIRECTIONAL_LIGHT, parentGlobalTransform)
 {
     direction = -float3::unitY;
@@ -36,21 +36,10 @@ void DirectionalLight::Render()
 
     // Would be more optimal to only update the direction when rotation is modified
     
-    direction              = (globalRotationMatrix.RotatePart() * -float3::unitY).Normalized();
+    direction              = (globalTransform.RotatePart() * -float3::unitY).Normalized();
 
     DebugDrawModule* debug = App->GetDebugDrawModule();
-    debug->DrawLine(globalTransform.position, direction, 2, float3(1, 1, 1));
-}
-
-AABB& DirectionalLight::TransformUpdated(const Transform& parentGlobalTransform)
-{
-    AABB& returnValue = LightComponent::TransformUpdated(parentGlobalTransform);
-
-    globalRotationMatrix = float4x4::FromQuat(
-        Quat::FromEulerZYX(globalTransform.rotation.z, globalTransform.rotation.y, globalTransform.rotation.x)
-    );
-    
-    return returnValue;
+    debug->DrawLine(globalTransform.TranslatePart(), direction, 2, float3(1, 1, 1));
 }
 
 void DirectionalLight::RenderEditorInspector()

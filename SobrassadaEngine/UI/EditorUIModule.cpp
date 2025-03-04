@@ -598,51 +598,62 @@ void EditorUIModule::Console(bool& consoleMenu) const
 }
 
 bool EditorUIModule::RenderTransformWidget(
-    Transform& localTransform, Transform& globalTransform, const Transform& parentTransform
+    float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform
 )
 {
-    Transform& outputTransform = transformType == ImGuizmo::LOCAL ? localTransform : globalTransform;
+    float4x4& outputTransform = transformType == ImGuizmo::LOCAL ? localTransform : globalTransform;
+
+    float3 outputPosition, outputRotation, outputScale;
+
+    ImGuizmo::DecomposeMatrixToComponents(
+        outputTransform.ptr(), outputPosition.ptr(), outputRotation.ptr(), outputScale.ptr());
     
     bool positionValueChanged = false, rotationValueChanged = false, scaleValueChanged = false;
     static bool lockScaleAxis = false;
-    float3 originalScale = float3(outputTransform.scale);
+    float3 originalScale = float3(outputScale);
 
     std::string transformName  = std::string(transformType == ImGuizmo::LOCAL ? "Local " : "World ") + "Transform";
     ImGui::SeparatorText(transformName.c_str());
     
-    RenderBasicTransformModifiers(outputTransform, lockScaleAxis, positionValueChanged, rotationValueChanged, scaleValueChanged);
+    RenderBasicTransformModifiers(outputPosition, outputRotation, outputScale, lockScaleAxis, positionValueChanged, rotationValueChanged, scaleValueChanged);
 
     if (positionValueChanged || rotationValueChanged || scaleValueChanged)
     {
         if (scaleValueChanged && lockScaleAxis)
         {
             float scaleFactor = 1;
-            if (outputTransform.scale.x != originalScale.x)
+            if (outputScale.x != originalScale.x)
             {
-                scaleFactor = originalScale.x == 0 ? 1 : outputTransform.scale.x / originalScale.x;
+                scaleFactor = originalScale.x == 0 ? 1 : outputScale.x / originalScale.x;
             }
-            else if (outputTransform.scale.y != originalScale.y)
+            else if (outputScale.y != originalScale.y)
             {
-                scaleFactor = originalScale.y == 0 ? 1 : outputTransform.scale.y / originalScale.y;
+                scaleFactor = originalScale.y == 0 ? 1 : outputScale.y / originalScale.y;
             }
-            else if (outputTransform.scale.z != originalScale.z)
+            else if (outputScale.z != originalScale.z)
             {
-                scaleFactor = originalScale.z == 0 ? 1 : outputTransform.scale.z / originalScale.z;
+                scaleFactor = originalScale.z == 0 ? 1 : outputScale.z / originalScale.z;
             }
             originalScale         *= scaleFactor;
-            outputTransform.scale  = originalScale;
+            outputScale  = originalScale;
         }
+
+        ImGuizmo::RecomposeMatrixFromComponents(
+            outputPosition.ptr(), outputRotation.ptr(), outputScale.ptr(),
+            outputTransform.ptr()
+        );
 
         if (transformType == ImGuizmo::WORLD)
         {
-            localTransform.Set(parentTransform.orientedDif(globalTransform));
+            localTransform = parentTransform.Inverted() * globalTransform;
+            //localTransform.Set(parentTransform.orientedDif(globalTransform));
         }
     }
 
     return positionValueChanged || rotationValueChanged || scaleValueChanged;
 }
 
-bool EditorUIModule::RenderImGuizmo(Transform &localTransform, const Transform &globalTransform, const Transform &parentTransform) const
+bool EditorUIModule::RenderImGuizmo(float4x4 &localTransform, float4x4 &globalTransform, const float4x4 &parentTransform) const
 {
     float4x4 view = float4x4(App->GetCameraModule()->GetViewMatrix());
     view.Transpose();
@@ -650,24 +661,12 @@ bool EditorUIModule::RenderImGuizmo(Transform &localTransform, const Transform &
     float4x4 proj = float4x4(App->GetCameraModule()->GetProjectionMatrix());
     proj.Transpose();
 
-    Transform transform = Transform(globalTransform);
-    float4x4 gizmoMatrix          = float4x4::identity;
-    transform.rotation *= RAD_DEGREE_CONV;
-    ImGuizmo::RecomposeMatrixFromComponents(
-        transform.position.ptr(), transform.rotation.ptr(), transform.scale.ptr(),
-        gizmoMatrix.ptr()
-    );
-
-    Manipulate(view.ptr(), proj.ptr(), mCurrentGizmoOperation, transformType, gizmoMatrix.ptr());
+    Manipulate(view.ptr(), proj.ptr(), mCurrentGizmoOperation, transformType, globalTransform.ptr());
 
     if (ImGuizmo::IsUsing())
     {
-        ImGuizmo::DecomposeMatrixToComponents(
-        gizmoMatrix.ptr(), transform.position.ptr(), transform.rotation.ptr(),
-        transform.scale.ptr());
-        transform.rotation /= RAD_DEGREE_CONV;
-        
-        localTransform.Set(parentTransform.orientedDif(transform));
+        localTransform = parentTransform.Inverted() * globalTransform;
+        //localTransform.Set(parentTransform.orientedDif(transform));
 
         return true;
     }
@@ -675,26 +674,26 @@ bool EditorUIModule::RenderImGuizmo(Transform &localTransform, const Transform &
 }
 
 void EditorUIModule::RenderBasicTransformModifiers(
-    Transform& outputTransform, bool& lockScaleAxis, bool& positionValueChanged, bool& rotationValueChanged,
+    float3& outputPosition, float3& outputRotation, float3& outputScale, bool& lockScaleAxis, bool& positionValueChanged, bool& rotationValueChanged,
     bool& scaleValueChanged
 )
 {
     static bool bUseRad   = true;
 
-    positionValueChanged |= ImGui::InputFloat3("Position", &outputTransform.position[0]);
+    positionValueChanged |= ImGui::InputFloat3("Position", &outputPosition[0]);
 
-    if (!bUseRad)
+    if (bUseRad)
     {
-        outputTransform.rotation *= RAD_DEGREE_CONV;
+        outputRotation /= RAD_DEGREE_CONV;
     }
-    rotationValueChanged |= ImGui::InputFloat3("Rotation", &outputTransform.rotation[0]);
-    if (!bUseRad)
+    rotationValueChanged |= ImGui::InputFloat3("Rotation", &outputRotation[0]);
+    if (bUseRad)
     {
-        outputTransform.rotation /= RAD_DEGREE_CONV;
+        outputRotation *= RAD_DEGREE_CONV;
     }
     ImGui::SameLine();
     ImGui::Checkbox("Radians", &bUseRad);
-    scaleValueChanged |= ImGui::InputFloat3("Scale", &outputTransform.scale[0]);
+    scaleValueChanged |= ImGui::InputFloat3("Scale", &outputScale[0]);
     ImGui::SameLine();
     ImGui::Checkbox("Lock axis", &lockScaleAxis);
 }

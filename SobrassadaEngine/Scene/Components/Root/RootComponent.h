@@ -10,7 +10,7 @@ enum ComponentMobilitySettings
 class RootComponent : public Component
 {
 public:
-    RootComponent(UID uid, UID uidParent, const Transform& parentGlobalTransform);
+    RootComponent(UID uid, UID uidParent, const float4x4& parentGlobalTransform);
 
     RootComponent(const rapidjson::Value &initialState);
 
@@ -18,7 +18,7 @@ public:
 
     void Save(rapidjson::Value &targetState, rapidjson::Document::AllocatorType &allocator) const override;
 
-    AABB & TransformUpdated(const Transform &parentGlobalTransform) override;
+    AABB & TransformUpdated(const float4x4 &parentGlobalTransform) override;
 
     virtual bool CreateComponent(ComponentType componentType);
     
@@ -33,7 +33,7 @@ public:
 
     int GetMobilitySettings() const { return mobilitySettings; }
     
-    const Transform& GetParentGlobalTransform() override;
+    const float4x4& GetParentGlobalTransform() override;
 
 private:
 

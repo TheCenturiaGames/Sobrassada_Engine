@@ -9,7 +9,7 @@
 
 #include <Algorithm/Random/LCG.h>
 
-RootComponent::RootComponent(const UID uid, const UID uidParent, const Transform& parentGlobalTransform)
+RootComponent::RootComponent(const UID uid, const UID uidParent, const float4x4& parentGlobalTransform)
         : Component(uid, uidParent, uid, "Root component", COMPONENT_ROOT, parentGlobalTransform)
 {
     selectedUID = uid;  
@@ -33,7 +33,7 @@ void RootComponent::Save(rapidjson::Value &targetState, rapidjson::Document::All
     targetState.AddMember("Mobility", mobilitySettings, allocator);
 }
 
-AABB & RootComponent::TransformUpdated(const Transform &parentGlobalTransform)
+AABB & RootComponent::TransformUpdated(const float4x4 &parentGlobalTransform)
 {
     AABB& result = Component::TransformUpdated(parentGlobalTransform);
 
@@ -205,14 +205,14 @@ bool RootComponent::CreateComponent(const ComponentType componentType)
     return false;
 }
 
-const Transform& RootComponent::GetParentGlobalTransform()
+const float4x4& RootComponent::GetParentGlobalTransform()
 {
     AABBUpdatable* parentObject = GetParent();
     if (parentObject != nullptr)
     {
         return parentObject->GetParentGlobalTransform(); // parent is the gameObject, so we want to query the parent of this gameObject
     }
-    return Transform::identity;
+    return float4x4::identity;
 }
 
 Component* RootComponent::GetSelectedComponent()

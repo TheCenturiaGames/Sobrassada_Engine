@@ -62,9 +62,9 @@ public:
 
     void PassAABBUpdateToParent() override;
     void ComponentGlobalTransformUpdated() override;
-    const Transform& GetGlobalTransform() const override;
+    const float4x4& GetGlobalTransform() const override;
 
-    const Transform& GetParentGlobalTransform() override;
+    const float4x4& GetParentGlobalTransform() override;
 
     inline static UID currentRenamingUID = INVALID_UUID;
 

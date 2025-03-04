@@ -8,11 +8,12 @@
 #include <Geometry/AABB.h>
 #include <Libs/rapidjson/document.h>
 #include <vector>
+#include <Math/float4x4.h>
 
 class Component : public AABBUpdatable
 {
   public:
-    Component(UID uid, UID uidParent, UID uidRoot, const char *initName, int type, const Transform &parentGlobalTransform);
+    Component(UID uid, UID uidParent, UID uidRoot, const char *initName, int type, const float4x4 &parentGlobalTransform);
 
     Component(const rapidjson::Value &initialState);
 
@@ -30,13 +31,13 @@ class Component : public AABBUpdatable
     virtual void RenderEditorInspector();
     virtual void RenderEditorComponentTree(UID selectedComponentUID);
 
-    virtual void OnTransformUpdate(const Transform &parentGlobalTransform);
-    virtual AABB &TransformUpdated(const Transform &parentGlobalTransform);
+    virtual void OnTransformUpdate(const float4x4 &parentGlobalTransform);
+    virtual AABB &TransformUpdated(const float4x4 &parentGlobalTransform);
     void PassAABBUpdateToParent() override;
 
     void ComponentGlobalTransformUpdated() override {}
 
-    const Transform& GetParentGlobalTransform() override;
+    const float4x4& GetParentGlobalTransform() override;
 
     void HandleDragNDrop();
 
@@ -48,8 +49,8 @@ class Component : public AABBUpdatable
 
     void SetUIDParent(UID newUIDParent);
 
-    const Transform &GetGlobalTransform() const override { return globalTransform; }
-    const Transform &GetLocalTransform() const { return localTransform; }
+    const float4x4 &GetGlobalTransform() const override { return globalTransform; }
+    const float4x4 &GetLocalTransform() const { return localTransform; }
 
     const AABB &GetGlobalAABB() const { return globalComponentAABB; }
 
@@ -74,8 +75,8 @@ class Component : public AABBUpdatable
     char name[64];
     bool enabled;
 
-    Transform localTransform;
-    Transform globalTransform;
+    float4x4 localTransform = float4x4::identity;
+    float4x4 globalTransform = float4x4::identity;
 
     AABB localComponentAABB;
     AABB globalComponentAABB;

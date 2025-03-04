@@ -34,7 +34,7 @@ static const std::map<std::string, ComponentType> standaloneComponents = {
 class ComponentUtils
 {
 public:
-    static Component* CreateEmptyComponent(ComponentType type, UID uid, UID uidParent, UID uidRoot, const Transform& parentGlobalTransform);
+    static Component* CreateEmptyComponent(ComponentType type, UID uid, UID uidParent, UID uidRoot, const float4x4& parentGlobalTransform);
 
     static Component* CreateExistingComponent(const rapidjson::Value &initialState);
 };

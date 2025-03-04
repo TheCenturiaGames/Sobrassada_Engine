@@ -8,7 +8,7 @@
 class SpotLight : public LightComponent
 {
   public:
-    SpotLight(UID uid, UID uidParent, UID uidRoot, const Transform &parentGlobalTransform);
+    SpotLight(UID uid, UID uidParent, UID uidRoot, const float4x4 &parentGlobalTransform);
     SpotLight(const rapidjson::Value& initialState);
     ~SpotLight();
 
@@ -21,13 +21,10 @@ class SpotLight : public LightComponent
     float GetRange() const { return range; }
     float GetInnerAngle() const { return innerAngle; }
     float GetOuterAngle() const { return outerAngle; }
-
-    AABB &TransformUpdated(const Transform &parentGlobalTransform) override;
     
   private:
     float3 direction;
     float range;
     float innerAngle;
     float outerAngle;
-    float4x4 globalRotationMatrix = float4x4::identity;
 };

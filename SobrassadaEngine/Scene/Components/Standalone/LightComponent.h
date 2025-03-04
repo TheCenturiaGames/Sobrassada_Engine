@@ -10,7 +10,7 @@ class LightComponent: public Component
   public:
     LightComponent(
         UID uid, UID uidParent, UID uidRoot, const char *uiName, const ComponentType lightType,
-        const Transform &parentGlobalTransform
+        const float4x4 &parentGlobalTransform
     );
     LightComponent(const rapidjson::Value& initialState);
 
