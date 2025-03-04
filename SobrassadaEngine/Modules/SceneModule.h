@@ -41,7 +41,6 @@ class SceneModule : public Module
     void CloseScene();
     void SwitchPlayModeStateTo(bool wantedStatePlayMode);
     bool IsInPlayMode() const { return bInPlayMode; }
-    bool IsSceneWindowFocused() const { return loadedScene != nullptr ? loadedScene->IsSceneWindowFocused() : false; }
 
     void AddGameObject(UID uid, GameObject* newGameObject) const
     {

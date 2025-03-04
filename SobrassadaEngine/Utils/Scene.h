@@ -35,7 +35,6 @@ class Scene
     void AddComponent(UID uid, Component* newComponent) { gameComponents.insert({uid, newComponent}); }
     void RemoveGameObjectHierarchy(UID gameObjectUUID);
     void RemoveComponent(UID componentUID);
-    bool IsSceneWindowFocused() const { return isWindowFocused; };
 
     const char* GetSceneName() const { return sceneName.c_str(); }
     UID GetSceneUID() const { return sceneUID; }
@@ -77,7 +76,6 @@ class Scene
     Octree* sceneOctree                          = nullptr;
 
     // IMGUI WINDOW DATA
-    bool isWindowFocused                         = false;
     std::tuple<float, float> sceneWindowPosition = std::make_tuple(0.f, 0.f);
     std::tuple<float, float> sceneWindowSize     = std::make_tuple(0.f, 0.f);
     std::tuple<float, float> mousePosition       = std::make_tuple(0.f, 0.f);

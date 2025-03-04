@@ -34,7 +34,7 @@ bool CameraModule::Init()
     camera.nearPlaneDistance         = 0.1f;
     camera.farPlaneDistance          = 100.f;
 
-    camera.horizontalFov     = (float)HFOV / RAD_DEGREE_CONV;
+    camera.horizontalFov             = (float)HFOV / RAD_DEGREE_CONV;
 
     int width                        = App->GetWindowModule()->GetWidth();
     int height                       = App->GetWindowModule()->GetHeight();
@@ -94,14 +94,12 @@ update_status CameraModule::Update(float deltaTime)
 
 bool CameraModule::ShutDown()
 {
-    glDeleteBuffers(1,&ubo);
+    glDeleteBuffers(1, &ubo);
     return true;
 }
 
 void CameraModule::Controls(float deltaTime)
 {
-    InputModule* inputModule = App->GetInputModule();
-
     InputModule* inputModule     = App->GetInputModule();
     const KeyState* keyboard     = inputModule->GetKeyboard();
     const KeyState* mouseButtons = inputModule->GetMouseButtons();
@@ -193,30 +191,28 @@ void CameraModule::Controls(float deltaTime)
     // Handle mouse picking
     else if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_UP)
     {
-        if (App->GetSceneModule()->IsSceneWindowFocused())
-        {
-            auto& windowPosition = App->GetSceneModule()->GetWindowPosition();
-            auto& windowSize     = App->GetSceneModule()->GetWindowSize();
-            auto& mousePos       = App->GetSceneModule()->GetMousePosition();
 
-            float windowMinX     = std::get<0>(windowPosition);
-            float windowMaxX     = std::get<0>(windowPosition) + std::get<0>(windowSize);
+        auto& windowPosition = App->GetSceneModule()->GetWindowPosition();
+        auto& windowSize     = App->GetSceneModule()->GetWindowSize();
+        auto& mousePos       = App->GetSceneModule()->GetMousePosition();
 
-            float windowMinY     = std::get<1>(windowPosition);
-            float windowMaxY     = std::get<1>(windowPosition) + std::get<1>(windowSize);
+        float windowMinX     = std::get<0>(windowPosition);
+        float windowMaxX     = std::get<0>(windowPosition) + std::get<0>(windowSize);
 
-            float percentageX    = (std::get<0>(mousePos) - windowMinX) / (windowMaxX - windowMinX);
-            float percentageY    = (std::get<1>(mousePos) - windowMinY) / (windowMaxY - windowMinY);
+        float windowMinY     = std::get<1>(windowPosition);
+        float windowMaxY     = std::get<1>(windowPosition) + std::get<1>(windowSize);
 
-            float normalizedX    = Lerp(-1, 1, percentageX);
-            float normalizedY    = Lerp(1, -1, percentageY);
+        float percentageX    = (std::get<0>(mousePos) - windowMinX) / (windowMaxX - windowMinX);
+        float percentageY    = (std::get<1>(mousePos) - windowMinY) / (windowMaxY - windowMinY);
 
-            LineSegment ray;
+        float normalizedX    = Lerp(-1, 1, percentageX);
+        float normalizedY    = Lerp(1, -1, percentageY);
 
-            if (isCameraDetached) ray = detachedCamera.UnProjectLineSegment(normalizedX, normalizedY);
-            else ray = camera.UnProjectLineSegment(normalizedX, normalizedY);
-            lastCastedRay = ray;
-        }
+        LineSegment ray;
+
+        if (isCameraDetached) ray = detachedCamera.UnProjectLineSegment(normalizedX, normalizedY);
+        else ray = camera.UnProjectLineSegment(normalizedX, normalizedY);
+        lastCastedRay = ray;
     }
 
     viewMatrix         = camera.ViewMatrix();
@@ -228,13 +224,6 @@ void CameraModule::Controls(float deltaTime)
     // REMOVE
     std::vector<LineSegment> asd = {lastCastedRay};
     App->GetDebugDrawModule()->RenderLines(asd, float3(0.f, 1.f, 0.f));
-
-    return UPDATE_CONTINUE;
-}
-bool CameraModule::ShutDown()
-{
-    glDeleteBuffers(1, &ubo);
-    return true;
 }
 
 void CameraModule::SetAspectRatio(float newAspectRatio)

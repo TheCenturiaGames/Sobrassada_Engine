@@ -44,7 +44,7 @@ update_status SceneModule::PreUpdate(float deltaTime)
 update_status SceneModule::Update(float deltaTime)
 {
     // CAST RAY WHEN LEFT CLICK IS RELEASED
-    if (loadedScene != nullptr && loadedScene->IsSceneWindowFocused())
+    if (loadedScene != nullptr && loadedScene->GetDoInputs())
     {
         const KeyState* mouseButtons = App->GetInputModule()->GetMouseButtons();
         if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_UP)

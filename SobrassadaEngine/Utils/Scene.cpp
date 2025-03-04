@@ -199,7 +199,7 @@ void Scene::RenderScene()
         ImVec2 windowPosition     = ImGui::GetWindowPos();
         ImVec2 imGuimousePosition = ImGui::GetMousePos();
         sceneWindowPosition       = std::make_tuple(windowPosition.x, windowPosition.y);
-        sceneWindowSize           = std::make_tuple(width, height);
+        sceneWindowSize           = std::make_tuple(windowSize.x, windowSize.y);
         mousePosition             = std::make_tuple(imGuimousePosition.x, imGuimousePosition.y);
 
         ImGui::EndChild();
