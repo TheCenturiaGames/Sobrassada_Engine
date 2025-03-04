@@ -34,7 +34,7 @@ bool CameraModule::Init()
     camera.nearPlaneDistance         = 0.1f;
     camera.farPlaneDistance          = 100.f;
 
-    camera.horizontalFov             = (float)HFOV * DEGTORAD;
+    camera.horizontalFov     = (float)HFOV / RAD_DEGREE_CONV;
 
     int width                        = App->GetWindowModule()->GetWidth();
     int height                       = App->GetWindowModule()->GetHeight();
@@ -51,7 +51,7 @@ bool CameraModule::Init()
     detachedCamera.up                = float3::unitY;
     detachedCamera.nearPlaneDistance = 0.1f;
     detachedCamera.farPlaneDistance  = 100.f;
-    detachedCamera.horizontalFov     = (float)HFOV * DEGTORAD;
+    detachedCamera.horizontalFov     = (float)HFOV / RAD_DEGREE_CONV;
     camera.verticalFov               = 2.0f * atanf(tanf(camera.horizontalFov * 0.5f) * ((float)height / (float)width));
 
     detachedViewMatrix               = detachedCamera.ViewMatrix();
@@ -81,7 +81,26 @@ void CameraModule::UpdateUBO()
 
 update_status CameraModule::Update(float deltaTime)
 {
-    if (App->GetSceneModule()->GetSceneUID() == CONSTANT_EMPTY_UID) return UPDATE_CONTINUE;
+    if (App->GetSceneModule()->GetDoInputs()) Controls(deltaTime);
+
+    viewMatrix         = camera.ViewMatrix();
+    detachedViewMatrix = detachedCamera.ViewMatrix();
+
+    frustumPlanes.UpdateFrustumPlanes(viewMatrix, projectionMatrix);
+    UpdateUBO();
+
+    return UPDATE_CONTINUE;
+}
+
+bool CameraModule::ShutDown()
+{
+    glDeleteBuffers(1,&ubo);
+    return true;
+}
+
+void CameraModule::Controls(float deltaTime)
+{
+    InputModule* inputModule = App->GetInputModule();
 
     InputModule* inputModule     = App->GetInputModule();
     const KeyState* keyboard     = inputModule->GetKeyboard();

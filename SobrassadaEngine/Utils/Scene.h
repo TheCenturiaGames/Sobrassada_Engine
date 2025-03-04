@@ -58,6 +58,8 @@ class Scene
 
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUUID = newSelectedGameObject; };
     
+    bool GetDoInputs() const { return doInputs; }
+
   private:
     void CreateSpatialDataStruct();
     void CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects) const;
@@ -79,4 +81,5 @@ class Scene
     std::tuple<float, float> sceneWindowPosition = std::make_tuple(0.f, 0.f);
     std::tuple<float, float> sceneWindowSize     = std::make_tuple(0.f, 0.f);
     std::tuple<float, float> mousePosition       = std::make_tuple(0.f, 0.f);
+    bool doInputs = false;
 };

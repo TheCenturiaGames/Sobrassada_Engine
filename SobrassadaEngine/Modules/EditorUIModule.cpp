@@ -1,6 +1,7 @@
 #include "EditorUIModule.h"
 
 #include "Application.h"
+#include "CameraModule.h"
 #include "Component.h"
 #include "FileSystem.h"
 #include "GameTimer.h"
@@ -36,7 +37,8 @@ EditorUIModule::~EditorUIModule()
 
 bool EditorUIModule::Init()
 {
-    ImGui::CreateContext();
+    ImGuiContext* context = ImGui::CreateContext();
+    ImGuizmo::SetImGuiContext(context);
     ImGuiIO& io     = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
@@ -63,8 +65,12 @@ update_status EditorUIModule::PreUpdate(float deltaTime)
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
-    ImGuizmo::SetOrthographic(false); // TODO Implement orthographic camera
     ImGuizmo::BeginFrame();
+
+    // ImGuizmo::SetOrthographic(false);
+    // ImGuizmo::AllowAxisFlip(false);
+    // ImGuizmo::SetPlaneLimit(0);
+
     ImGui::DockSpaceOverViewport();
 
     return UPDATE_CONTINUE;
@@ -656,22 +662,45 @@ bool EditorUIModule::RenderImGuizmo(Transform& gameObjectTransform)
     float4x4 proj = float4x4(App->GetCameraModule()->GetProjectionMatrix());
     proj.Transpose();
 
-    float4x4 gizmoMatrix          = float4x4::identity;
+    float maxDistance             = App->GetCameraModule()->GetFarPlaneDistance() * 0.9f;
+
     gameObjectTransform.rotation *= RAD_DEGREE_CONV;
+
+    float4x4 gizmoMatrix          = float4x4::identity;
     ImGuizmo::RecomposeMatrixFromComponents(
         gameObjectTransform.position.ptr(), gameObjectTransform.rotation.ptr(), gameObjectTransform.scale.ptr(),
         gizmoMatrix.ptr()
     );
 
-    Manipulate(view.ptr(), proj.ptr(), mCurrentGizmoOperation, ImGuizmo::MODE::LOCAL, gizmoMatrix.ptr());
+    ImGuizmo::Enable(true);
+    ImGuizmo::Manipulate(view.ptr(), proj.ptr(), mCurrentGizmoOperation, ImGuizmo::MODE::LOCAL, gizmoMatrix.ptr());
 
-    ImGuizmo::DecomposeMatrixToComponents(
-        gizmoMatrix.ptr(), gameObjectTransform.position.ptr(), gameObjectTransform.rotation.ptr(),
-        gameObjectTransform.scale.ptr()
-    );
+    if (!ImGuizmo::IsUsing())
+    {
+        gameObjectTransform.rotation /= RAD_DEGREE_CONV;
+        return false;
+    }
+
+    if (App->GetSceneModule()->GetDoInputs())
+    {
+        float3 newPos, newRot, newScale;
+        ImGuizmo::DecomposeMatrixToComponents(gizmoMatrix.ptr(), newPos.ptr(), newRot.ptr(), newScale.ptr());
+
+        if (newPos.Distance(App->GetCameraModule()->GetCameraPosition()) > maxDistance)
+        {
+            ImGuizmo::Enable(false);
+            gameObjectTransform.rotation /= RAD_DEGREE_CONV;
+            return false;
+        }
+
+        gameObjectTransform.position = newPos;
+        gameObjectTransform.rotation = newRot;
+        gameObjectTransform.scale    = newScale;
+    }
+
     gameObjectTransform.rotation /= RAD_DEGREE_CONV;
 
-    return ImGuizmo::IsUsing();
+    return true;
 }
 
 void EditorUIModule::RenderBasicTransformModifiers(

@@ -4,7 +4,7 @@
 #include "LightsConfig.h"
 #include "Module.h"
 #include "Scene/AABBUpdatable.h"
-//TMP
+// TMP
 #include "Application.h"
 #include "CameraModule.h"
 #include "DebugDrawModule.h"
@@ -106,6 +106,8 @@ class SceneModule : public Module
     const std::tuple<float, float>& GetWindowPosition() const { return loadedScene->GetWindowPosition(); };
     const std::tuple<float, float>& GetWindowSize() const { return loadedScene->GetWindowSize(); };
     const std::tuple<float, float>& GetMousePosition() const { return loadedScene->GetMousePosition(); };
+
+    bool GetDoInputs() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() : false; }
 
   private:
     Scene* loadedScene = nullptr;
