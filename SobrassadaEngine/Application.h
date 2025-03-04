@@ -16,6 +16,7 @@ class SceneModule;
 class CameraModule;
 class DebugDrawModule;
 
+
 class EngineTimer;
 class GameTimer;
 
@@ -39,7 +40,7 @@ class Application
     SceneModule* GetSceneModule() { return sceneModule; }
     CameraModule* GetCameraModule() { return cameraModule; }
     DebugDrawModule* GetDebugDrawModule() { return debugDraw; }
-
+   
     GameTimer* GetGameTimer() { return gameTimer; }
 
   private:

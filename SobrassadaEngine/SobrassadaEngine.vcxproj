@@ -105,7 +105,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>.\Tests;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\DirectXTex;.\Libs\Tinygltf;.\Libs\Optick_1.4.0\include;.\;.\Modules;.\UI;.\Utils;.\FileSystem;.\DebugDraw;.\Scene\GameObjects;.\Scene\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Tests;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\ImNodeFlow-1.2.2;.\DirectXTex;.\Libs\Tinygltf;.\Libs\Optick_1.4.0\include;.\;.\Modules;.\UI;.\Utils;.\FileSystem;.\DebugDraw;.\Scene\GameObjects;.\Scene\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -123,7 +123,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>.\Tests;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\DirectXTex;.\Libs\Tinygltf;.\;.\Modules;.\UI;.\Utils;.\FileSystem;.\DebugDraw;.\Scene\GameObjects;.\Scene\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Tests;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuiNodeEditor;.\Libs\ImGuizmo;.\DirectXTex;.\Libs\Tinygltf;.\;.\Modules;.\UI;.\Utils;.\FileSystem;.\DebugDraw;.\Scene\GameObjects;.\Scene\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -137,8 +137,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="Libs\ImNodeFlow-1.2.2\src\ImNodeFlow.cpp" />
+    <ClCompile Include="UI\CustomNode.cpp" />
+    <ClCompile Include="UI\EngineEditorBase.cpp" />
     <ClCompile Include="Modules\CameraModule.cpp" />
     <ClCompile Include="Modules\EditorUIModule.cpp" />
+    <ClCompile Include="Modules\NodeEditor.cpp" />
     <ClCompile Include="Utils\EngineTimer.cpp" />
     <ClCompile Include="FileSystem\Importer.cpp" />
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp" />
@@ -549,12 +553,19 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="Libs\ImNodeFlow-1.2.2\include\ImNodeFlow.h" />
+    <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\context_wrapper.h" />
+    <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_bezier_math.h" />
+    <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_extra_math.h" />
+    <ClInclude Include="UI\CustomNode.h" />
+    <ClInclude Include="UI\EngineEditorBase.h" />
     <ClInclude Include="FileSystem\Importer.h" />
     <ClInclude Include="Libs\ImGuizmo\ImGuizmo.h" />
     <ClInclude Include="Modules\CameraModule.h" />
     <ClInclude Include="Modules\EditorUIModule.h" />
     <ClInclude Include="Modules\ResourcesModule.h" />
     <ClInclude Include="Modules\SceneModule.h" />
+    <ClInclude Include="Modules\NodeEditor.h" />
     <ClInclude Include="ResourceManagement\Resources\Resource.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceMaterial.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceMesh.h" />
@@ -608,7 +619,11 @@
     <ClInclude Include="Modules\WindowModule.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\Users\kille\Downloads\imgui-node-editor-0.9.3\imgui-node-editor-0.9.3\.gitignore" />
     <None Include=".clang-format" />
+    <None Include="Libs\ImNodeFlow-1.2.2\src\imgui_bezier_math.inl" />
+    <None Include="Libs\ImNodeFlow-1.2.2\src\imgui_extra_math.inl" />
+    <None Include="Libs\ImNodeFlow-1.2.2\src\ImNodeFlow.inl" />
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl" />
   </ItemGroup>
   <ItemGroup>

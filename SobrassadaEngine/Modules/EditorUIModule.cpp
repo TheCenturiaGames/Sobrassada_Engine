@@ -89,6 +89,21 @@ update_status EditorUIModule::Update(float deltaTime)
 update_status EditorUIModule::RenderEditor(float deltaTime)
 {
     Draw();
+    for (auto it = openEditors.cbegin(); it != openEditors.cend();)
+    {
+       
+        if (!it->second->RenderEditor())
+        {
+          
+            delete it->second;
+            it = openEditors.erase(it);
+        }
+        else
+        {
+            
+            ++it;
+        }
+    }
 
     if (quadtreeViewerViewport) quadtreeViewer->Render(quadtreeViewerViewport);
 
@@ -215,6 +230,21 @@ void EditorUIModule::MainMenu()
         }
 
         if (ImGui::MenuItem("Quadtree", "", quadtreeViewerViewport)) quadtreeViewerViewport = !quadtreeViewerViewport;
+        if (ImGui::BeginMenu("Engine Editor Window"))
+        {
+
+            if (ImGui::MenuItem("Mockup Base Engine Editor", ""))
+            {
+                
+                OpenEditor(CreateEditor(EditorType::BASE));
+            }
+            if (ImGui::MenuItem("Nodes Engine Editor", ""))
+            {
+
+                OpenEditor(CreateEditor(EditorType::NODES));
+            }
+            ImGui::EndMenu();
+        }
 
         if (ImGui::MenuItem("Editor settings", "", editorSettingsMenu)) editorSettingsMenu = !editorSettingsMenu;
 
@@ -768,6 +798,29 @@ UID EditorUIModule::RenderResourceSelectDialog(
         ImGui::EndPopup();
     }
     return result;
+}
+
+void EditorUIModule::OpenEditor(EngineEditorBase* editorToOpen)
+{
+    if (editorToOpen != nullptr)
+    {
+        openEditors.insert({editorToOpen->GetUID(), editorToOpen});
+    }
+}
+
+EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
+{
+    UID uid = GenerateUID();
+    switch (type)
+    {
+    case EditorType::BASE:
+        return new EngineEditorBase("Base Editor " + std::to_string(uid), uid);
+
+    case EditorType::NODES:
+        return new NodeEditor("Node Editor" + std::to_string(uid), uid);
+    default:
+        return nullptr;
+    }
 }
 
 void EditorUIModule::About(bool& aboutMenu) const

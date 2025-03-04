@@ -285,6 +285,18 @@
     <ClCompile Include="Modules\EditorUIModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
+    <ClCompile Include="UI\EngineEditorBase.cpp">
+      <Filter>UI\EngineEditors</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\NodeEditor.cpp">
+      <Filter>UI\EngineEditors</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\CustomNode.cpp">
+      <Filter>UI\TestNode</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\ImNodeFlow-1.2.2\src\ImNodeFlow.cpp">
+      <Filter>External\ImNodeFlow</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -328,6 +340,15 @@
     </Filter>
     <Filter Include="External\MathGeoLib">
       <UniqueIdentifier>{77ec05ef-e581-4de2-bda3-50c6c7bcc0d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\ImNodeFlow">
+      <UniqueIdentifier>{1f9f488c-b3e9-4b76-b199-4add5ffd5409}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\EngineEditors">
+      <UniqueIdentifier>{b1e95c13-b7d5-4e31-b59b-ee666d4d9d61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\TestNode">
+      <UniqueIdentifier>{e11ef956-be1d-4625-924b-48afb1794b32}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -506,11 +527,42 @@
     <ClInclude Include="Modules\EditorUIModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
+    <ClInclude Include="UI\EngineEditorBase.h">
+      <Filter>UI\EngineEditors</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\NodeEditor.h">
+      <Filter>UI\EngineEditors</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\CustomNode.h">
+      <Filter>UI\TestNode</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\context_wrapper.h">
+      <Filter>External\ImNodeFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_bezier_math.h">
+      <Filter>External\ImNodeFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_extra_math.h">
+      <Filter>External\ImNodeFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\ImNodeFlow-1.2.2\include\ImNodeFlow.h">
+      <Filter>External\ImNodeFlow</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl">
       <Filter>External\MathGeoLib</Filter>
     </None>
     <None Include=".clang-format" />
+    <None Include="..\..\..\Users\kille\Downloads\imgui-node-editor-0.9.3\imgui-node-editor-0.9.3\.gitignore" />
+    <None Include="Libs\ImNodeFlow-1.2.2\src\imgui_bezier_math.inl">
+      <Filter>External\ImNodeFlow</Filter>
+    </None>
+    <None Include="Libs\ImNodeFlow-1.2.2\src\imgui_extra_math.inl">
+      <Filter>External\ImNodeFlow</Filter>
+    </None>
+    <None Include="Libs\ImNodeFlow-1.2.2\src\ImNodeFlow.inl">
+      <Filter>External\ImNodeFlow</Filter>
+    </None>
   </ItemGroup>
 </Project>

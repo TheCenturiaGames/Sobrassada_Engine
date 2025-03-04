@@ -2,6 +2,8 @@
 
 #include "Module.h"
 #include "ResourceManagement/Resources/Resource.h"
+#include "EngineEditorBase.h"
+#include "NodeEditor.h"
 #include "Transform.h"
 
 #include "SDL.h"
@@ -20,7 +22,11 @@ struct CPUFeature
 
 class EditorViewport;
 class QuadtreeViewer;
-
+enum EditorType
+{ BASE,
+  ANIMATION,
+  NODES
+};
 class EditorUIModule : public Module
 {
   public:
@@ -38,6 +44,8 @@ class EditorUIModule : public Module
     bool RenderImGuizmo(Transform& gameObjectTransform);
     UID RenderResourceSelectDialog(const char* id, const std::unordered_map<std::string, UID>& availableResources);
 
+     void OpenEditor(EngineEditorBase* editorToOpen);
+     EngineEditorBase* CreateEditor(EditorType type);
   private:
     void RenderBasicTransformModifiers(
         Transform& transform, bool& lockScaleAxis, bool& positionValueChanged, bool& rotationValueChanged,
@@ -92,4 +100,6 @@ class EditorUIModule : public Module
 
     int transformType = LOCAL;
     ImGuizmo::OPERATION mCurrentGizmoOperation;
+
+    std::unordered_map<UID, EngineEditorBase*> openEditors;
 };
