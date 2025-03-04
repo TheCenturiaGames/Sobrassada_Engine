@@ -61,7 +61,7 @@ class Octree
     void GetDrawLines(std::vector<LineSegment>& drawLines, std::vector<LineSegment>& elementLines) const;
 
     template <typename AreaType>
-    void QueryElements(const AreaType& cameraPlanes, std::vector<GameObject*>& foundElements) const;
+    void QueryElements(const AreaType& queryObject, std::vector<GameObject*>& foundElements) const;
 
   private:
     OctreeNode* rootNode;
