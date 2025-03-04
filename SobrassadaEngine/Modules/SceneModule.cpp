@@ -53,7 +53,11 @@ update_status SceneModule::Update(float deltaTime)
                 App->GetCameraModule()->GetLastCastedRay(), loadedScene->GetOctree()
             );
 
-            if (selectedObject != nullptr) loadedScene->SetSelectedGameObject(selectedObject->GetUID());
+            if (selectedObject != nullptr)
+            {
+                loadedScene->SetSelectedGameObject(selectedObject->GetUID());
+                selectedObject->GetRootComponent()->SetSelectedComponent(selectedObject->GetRootComponent()->GetUID());
+            }
         }
     }
     return UPDATE_CONTINUE;
