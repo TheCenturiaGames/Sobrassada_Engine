@@ -6,6 +6,7 @@
 #include "Framebuffer.h"
 #include "GameObject.h"
 #include "GameTimer.h"
+#include "InputModule.h"
 #include "LibraryModule.h"
 #include "Octree.h"
 #include "OpenGLModule.h"
@@ -15,6 +16,7 @@
 #include "imgui_internal.h"
 // guizmo after imgui include
 #include "./Libs/ImGuizmo/ImGuizmo.h"
+#include "SDL_mouse.h"
 
 Scene::Scene(UID sceneUID, const char* sceneName, UID rootGameObject)
     : sceneUID(sceneUID), sceneName(std::string(sceneName)), gameObjectRootUUID(rootGameObject)
@@ -166,6 +168,7 @@ void Scene::RenderScene()
         if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) ImGui::SetWindowFocus();
 
         // do inputs only if window is focused
+
         if (ImGui::IsWindowFocused(ImGuiFocusedFlags_DockHierarchy) &&
             ImGui::IsWindowHovered(ImGuiFocusedFlags_DockHierarchy))
             doInputs = true;

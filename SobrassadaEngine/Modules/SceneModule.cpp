@@ -16,6 +16,9 @@
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl2.h"
+#include "imgui_internal.h"
+// guizmo after imgui include
+#include "./Libs/ImGuizmo/ImGuizmo.h"
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_EXTERNAL_IMAGE
@@ -43,23 +46,6 @@ update_status SceneModule::PreUpdate(float deltaTime)
 
 update_status SceneModule::Update(float deltaTime)
 {
-    // CAST RAY WHEN LEFT CLICK IS RELEASED
-    if (loadedScene != nullptr && loadedScene->GetDoInputs())
-    {
-        const KeyState* mouseButtons = App->GetInputModule()->GetMouseButtons();
-        if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_UP)
-        {
-            GameObject* selectedObject = RaycastController::GetRayIntersection<Octree>(
-                App->GetCameraModule()->GetLastCastedRay(), loadedScene->GetOctree()
-            );
-
-            if (selectedObject != nullptr)
-            {
-                loadedScene->SetSelectedGameObject(selectedObject->GetUID());
-                selectedObject->GetRootComponent()->SetSelectedComponent(selectedObject->GetRootComponent()->GetUID());
-            }
-        }
-    }
     return UPDATE_CONTINUE;
 }
 
@@ -84,6 +70,23 @@ update_status SceneModule::RenderEditor(float deltaTime)
 
 update_status SceneModule::PostUpdate(float deltaTime)
 {
+    // CAST RAY WHEN LEFT CLICK IS RELEASED
+    if (loadedScene != nullptr && loadedScene->GetDoInputs() && !ImGuizmo::IsUsing())
+    {
+        const KeyState* mouseButtons = App->GetInputModule()->GetMouseButtons();
+        if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_DOWN)
+        {
+            GameObject* selectedObject = RaycastController::GetRayIntersection<Octree>(
+                App->GetCameraModule()->CastCameraRay(), loadedScene->GetOctree()
+            );
+
+            if (selectedObject != nullptr)
+            {
+                loadedScene->SetSelectedGameObject(selectedObject->GetUID());
+                selectedObject->GetRootComponent()->SetSelectedComponent(selectedObject->GetRootComponent()->GetUID());
+            }
+        }
+    }
     return UPDATE_CONTINUE;
 }
 

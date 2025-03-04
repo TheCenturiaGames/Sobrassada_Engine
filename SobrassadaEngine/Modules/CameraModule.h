@@ -32,6 +32,7 @@ class CameraModule : public Module
 
     bool IsCameraDetached() const { return isCameraDetached; }
     void UpdateUBO();
+    LineSegment& CastCameraRay();
 
     const float4x4& GetProjectionMatrix() { return isCameraDetached ? detachedProjectionMatrix : projectionMatrix; }
     const float4x4& GetViewMatrix() { return isCameraDetached ? detachedViewMatrix : viewMatrix; }

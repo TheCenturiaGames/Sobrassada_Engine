@@ -79,6 +79,33 @@ void CameraModule::UpdateUBO()
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
+LineSegment& CameraModule::CastCameraRay()
+{
+    auto& windowPosition = App->GetSceneModule()->GetWindowPosition();
+    auto& windowSize     = App->GetSceneModule()->GetWindowSize();
+    auto& mousePos       = App->GetSceneModule()->GetMousePosition();
+
+    float windowMinX     = std::get<0>(windowPosition);
+    float windowMaxX     = std::get<0>(windowPosition) + std::get<0>(windowSize);
+
+    float windowMinY     = std::get<1>(windowPosition);
+    float windowMaxY     = std::get<1>(windowPosition) + std::get<1>(windowSize);
+
+    float percentageX    = (std::get<0>(mousePos) - windowMinX) / (windowMaxX - windowMinX);
+    float percentageY    = (std::get<1>(mousePos) - windowMinY) / (windowMaxY - windowMinY);
+
+    float normalizedX    = Lerp(-1, 1, percentageX);
+    float normalizedY    = Lerp(1, -1, percentageY);
+
+    LineSegment ray;
+
+    if (isCameraDetached) ray = detachedCamera.UnProjectLineSegment(normalizedX, normalizedY);
+    else ray = camera.UnProjectLineSegment(normalizedX, normalizedY);
+    lastCastedRay = ray;
+
+    return ray;
+}
+
 update_status CameraModule::Update(float deltaTime)
 {
     if (App->GetSceneModule()->GetDoInputs()) Controls(deltaTime);
@@ -187,32 +214,6 @@ void CameraModule::Controls(float deltaTime)
         RotateCamera(-mouseX * deltaRotationAngle, -mouseY * deltaRotationAngle);
 
         FocusCamera();
-    }
-    // Handle mouse picking
-    else if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_UP)
-    {
-
-        auto& windowPosition = App->GetSceneModule()->GetWindowPosition();
-        auto& windowSize     = App->GetSceneModule()->GetWindowSize();
-        auto& mousePos       = App->GetSceneModule()->GetMousePosition();
-
-        float windowMinX     = std::get<0>(windowPosition);
-        float windowMaxX     = std::get<0>(windowPosition) + std::get<0>(windowSize);
-
-        float windowMinY     = std::get<1>(windowPosition);
-        float windowMaxY     = std::get<1>(windowPosition) + std::get<1>(windowSize);
-
-        float percentageX    = (std::get<0>(mousePos) - windowMinX) / (windowMaxX - windowMinX);
-        float percentageY    = (std::get<1>(mousePos) - windowMinY) / (windowMaxY - windowMinY);
-
-        float normalizedX    = Lerp(-1, 1, percentageX);
-        float normalizedY    = Lerp(1, -1, percentageY);
-
-        LineSegment ray;
-
-        if (isCameraDetached) ray = detachedCamera.UnProjectLineSegment(normalizedX, normalizedY);
-        else ray = camera.UnProjectLineSegment(normalizedX, normalizedY);
-        lastCastedRay = ray;
     }
 
     viewMatrix         = camera.ViewMatrix();
