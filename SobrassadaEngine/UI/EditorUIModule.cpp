@@ -604,7 +604,9 @@ bool EditorUIModule::RenderTransformWidget(
     float4x4 outputTransform = float4x4(transformType == ImGuizmo::LOCAL ? localTransform : globalTransform);
 
     float3 outputScale = outputTransform.GetScale();
-    outputTransform.RemoveScale();
+    outputTransform.ScaleCol3(0, outputScale.x != 0 ? 1 / outputScale.x : 1);
+    outputTransform.ScaleCol3(1, outputScale.y != 0 ? 1 / outputScale.y : 1);
+    outputTransform.ScaleCol3(2, outputScale.z != 0 ? 1 / outputScale.z : 1);
     float3 outputPosition = outputTransform.TranslatePart();
     float3 outputRotation = Quat(outputTransform.RotatePart()).ToEulerXYZ();
     
@@ -647,7 +649,7 @@ bool EditorUIModule::RenderTransformWidget(
 
         if (transformType == ImGuizmo::WORLD)
         {
-            localTransform = parentTransform.Inverted() * globalTransform;
+            localTransform = parentTransform.Inverted() * outputTransform;
         } else
         {
             localTransform = outputTransform;
