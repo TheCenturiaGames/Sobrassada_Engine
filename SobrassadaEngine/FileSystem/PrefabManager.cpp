@@ -6,6 +6,7 @@
 #include "ResourceManagement/Resources/ResourcePrefab.h"
 #include "Scene/GameObjects/GameObject.h"
 #include "SceneModule.h"
+#include "Scene/Components/Root/RootComponent.h"
 
 #include "prettywriter.h"
 #include "stringbuffer.h"
@@ -47,8 +48,11 @@ namespace PrefabManager
             currentGameObject->Save(goJSON, allocator);
             gameObjectsJSON.PushBack(goJSON, allocator);
 
-            // TODO: Serialize components after merged with the branch where the gameObjects have an array of
+            // TODO: Serialize the rest of components after merged with the branch where the gameObjects have an array of
             // their components, because right now is quite more complicated to get them
+            //rapidjson::Value componentJSON(rapidjson::kObjectType);
+            //currentGameObject->GetRootComponent()->Save(componentJSON, allocator);
+            //goJSON.AddMember("RootComponent", componentJSON, allocator);
 
             for (UID child : currentGameObject->GetChildren())
             {
@@ -79,7 +83,7 @@ namespace PrefabManager
         App->GetLibraryModule()->AddPrefab(finalPrefabUID, name);
         App->GetLibraryModule()->AddResource(savePath, finalPrefabUID);
 
-        return uid;
+        return finalPrefabUID;
     }
 
     ResourcePrefab* LoadPrefab(UID prefabUID)
@@ -111,12 +115,17 @@ namespace PrefabManager
             for (rapidjson::SizeType i = 0; i < gameObjects.Size(); i++)
             {
                 const rapidjson::Value& gameObject = gameObjects[i];
-                loadedGameObjects.emplace_back(new GameObject(gameObject));
+                GameObject* newObject              = new GameObject(gameObject);
+                newObject->CreateRootComponent();
+
+                // TODO: Deserialize the rest of components and add them to their corresponding gameObject,
+                // once the serialization is also done
+
+                loadedGameObjects.push_back(newObject);
             }
         }
 
-        // TODO: Deserialize components and add them to their corresponding gameObject,
-        // once the serialization is also done
+        
         std::vector<Component*> loadedComponents;
         if (prefab.HasMember("Components") && prefab["Components"].IsArray())
         {

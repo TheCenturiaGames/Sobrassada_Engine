@@ -55,6 +55,7 @@ class GameObject : public AABBUpdatable
     void SetUUID(UID newUUID) { uuid = newUUID; }
 
     void CreatePrefab();
+    void SetPrefabUID(const UID uid) { prefabUid = uid; }
 
   public:
     inline static UID currentRenamingUID = INVALID_UUID;

@@ -131,7 +131,12 @@ void GameObject::RenderHierarchyNode(UID& selectedGameObjectUUID)
     }
     else
     {
-        nodeOpen = ImGui::TreeNodeEx(name.c_str(), flags);
+        std::string objectName = name;
+        if (prefabUid != CONSTANT_EMPTY_UID)
+        {
+            objectName += "(prefab " + std::to_string(prefabUid) + ')';
+        }
+        nodeOpen = ImGui::TreeNodeEx(objectName.c_str(), flags);
     }
 
     HandleNodeClick(selectedGameObjectUUID);

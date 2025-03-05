@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Globals.h"
+#include "ResourceManagement/Resources/ResourcePrefab.h"
 
 class ResourcePrefab;
 class GameObject;

@@ -320,22 +320,23 @@ void EditorUIModule::LoadPrefabDialog(bool& loadPrefab) const
         return;
     }
 
-    UID prefabUid               = CONSTANT_EMPTY_UID;
+    static UID prefabUid               = CONSTANT_EMPTY_UID;
     static char searchText[255] = "";
     ImGui::InputText("Search", searchText, 255);
 
     ImGui::Separator();
     if (ImGui::BeginListBox("##ComponentList", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
     {
-        GLOG("Prefabs count: %d", App->GetLibraryModule()->GetPrefabMap().size());
-
+        static int selected = -1;
+        int i               = 0;
         for (const auto& valuePair : App->GetLibraryModule()->GetPrefabMap())
         {
-            GLOG("prefab name: %s", valuePair.first.c_str());
+            ++i;
             if (valuePair.first.find(searchText) != std::string::npos)
             {
-                if (ImGui::Selectable(valuePair.first.c_str(), false))
+                if (ImGui::Selectable(valuePair.first.c_str(), selected == i))
                 {
+                    selected  = i;
                     prefabUid = valuePair.second;
                 }
             }

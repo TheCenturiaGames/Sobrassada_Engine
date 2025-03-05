@@ -371,15 +371,23 @@ void Scene::LoadPrefab(const UID prefabUid)
         ResourcePrefab* prefab = (ResourcePrefab*)App->GetResourcesModule()->RequestResource(prefabUid);
         const std::vector<GameObject*>& gameObjects = prefab->GetGameObjectsVector();
 
+        // Right now it is loaded to the root gameObject
+        gameObjects[0]->SetParent(GetGameObjectRootUID());
+        gameObjects[0]->SetPrefabUID(prefabUid);
+        GetGameObjectByUUID(GetGameObjectRootUID())->AddGameObject(gameObjects[0]->GetUID());
+        AddGameObject(gameObjects[0]->GetUID(), gameObjects[0]);
+
         // Add the gameObject to the scene. The parents will always be added before the children
-        for (GameObject* gameObject : gameObjects)
+        for (int i = 1; i < gameObjects.size(); ++i)
         {
-            GetGameObjectByUUID(gameObject->GetParent())->AddGameObject(gameObject->GetUID());
-            AddGameObject(gameObject->GetUID(), gameObject);
+            GetGameObjectByUUID(gameObjects[i]->GetParent())->AddGameObject(gameObjects[i]->GetUID());
+            AddGameObject(gameObjects[i]->GetUID(), gameObjects[i]);
 
-            //TODO: Add components
+            // TODO: Add components
 
-            gameObject->PassAABBUpdateToParent();
+            gameObjects[i]->PassAABBUpdateToParent();
         }
     }
+
+    // DELETING A GAMEOBJECT LOADED BY A PREFAB CRASHES, BECAUSE IT DOES NOT HAVE THE ROOT COMPONENT
 }
