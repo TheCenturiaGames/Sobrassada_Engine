@@ -137,10 +137,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
-    <ClCompile Include="MetaFile.cpp" />
-    <ClCompile Include="MetaMaterial.cpp" />
-    <ClCompile Include="MetaMesh.cpp" />
-    <ClCompile Include="MetaTexture.cpp" />
+    <ClCompile Include="FileSystem\MetaFile.cpp" />
+    <ClCompile Include="FileSystem\MetaMaterial.cpp" />
+    <ClCompile Include="FileSystem\MetaMesh.cpp" />
+    <ClCompile Include="FileSystem\MetaTexture.cpp" />
     <ClCompile Include="Modules\CameraModule.cpp" />
     <ClCompile Include="Modules\EditorUIModule.cpp" />
     <ClCompile Include="Utils\EngineTimer.cpp" />
@@ -554,10 +554,10 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="FileSystem\Importer.h" />
     <ClInclude Include="Libs\ImGuizmo\ImGuizmo.h" />
-    <ClInclude Include="MetaFile.h" />
-    <ClInclude Include="MetaMaterial.h" />
-    <ClInclude Include="MetaMesh.h" />
-    <ClInclude Include="MetaTexture.h" />
+    <ClInclude Include="FileSystem\MetaFile.h" />
+    <ClInclude Include="FileSystem\MetaMaterial.h" />
+    <ClInclude Include="FileSystem\MetaMesh.h" />
+    <ClInclude Include="FileSystem\MetaTexture.h" />
     <ClInclude Include="Modules\CameraModule.h" />
     <ClInclude Include="Modules\EditorUIModule.h" />
     <ClInclude Include="Modules\ResourcesModule.h" />
