@@ -35,6 +35,8 @@ class ResourceMaterial : public Resource
     ResourceMaterial(UID uid, const std::string& name);
     ~ResourceMaterial() override;
 
+    const bool GetIsMetallicRoughness() const { return hasMetallicTexture; }
+
     void OnEditorUpdate();
     void LoadMaterialData(Material mat);
     void RenderMaterial(int program) const;
