@@ -58,9 +58,6 @@ class Material
     float3 specularFactor                 = {1.0f, 1.0f, 1.0f};       // RGB
     float glossinessFactor                = 1.0f;
     float occlusionStrength               = 1.0f;
-    float metallicFactor                  = 0.0f;
-    float roughnessFactor                 = 1.0f;
-
 
     // pointers to the dds paths
     UID diffuseTexture            = CONSTANT_EMPTY_UID;
@@ -69,4 +66,9 @@ class Material
     UID occlusionTexture          = CONSTANT_EMPTY_UID;
 
     UID materialUID               = CONSTANT_EMPTY_UID;
+
+    //need to be here for not breaking the .mat existing (when loading) 
+    float metallicFactor                  = 0.0f;
+    float roughnessFactor                 = 1.0f;
+    UID metallicRoughnessTexture  = CONSTANT_EMPTY_UID;
 };
