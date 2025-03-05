@@ -8,7 +8,9 @@
 
 #include <FileSystem>
 
-UID MaterialImporter::ImportMaterial(const tinygltf::Model& model, int materialIndex, const char* filePath)
+UID MaterialImporter::ImportMaterial(
+    const tinygltf::Model& model, int materialIndex, const std::string& name, const char* filePath
+)
 {
     std::string path                       = FileSystem::GetFilePath(filePath);
     bool useOcclusion                      = false;
@@ -150,9 +152,9 @@ UID MaterialImporter::ImportMaterial(const tinygltf::Model& model, int materialI
 
     std::string savePath = MATERIALS_PATH + std::string("Material") + MATERIAL_EXTENSION;
     UID finalMaterialUID = App->GetLibraryModule()->AssignFiletypeUID(materialUID, savePath);
-    std::string fileName = FileSystem::GetFileNameWithoutExtension(filePath);
+
     // we dont have names for auto materials!!
-    savePath             = MATERIALS_PATH + std::to_string(finalMaterialUID) + MATERIAL_EXTENSION;
+    savePath             = MATERIALS_PATH + name + MATERIAL_EXTENSION;
 
     // replace "" with shader used (example)
     UID tmpName          = GenerateUID();

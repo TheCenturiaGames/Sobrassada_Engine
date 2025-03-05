@@ -84,7 +84,7 @@ namespace SceneImporter
                 MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath);
                 matIndex = primitive.material;
 
-                MaterialImporter::ImportMaterial(model, matIndex, filePath);
+                MaterialImporter::ImportMaterial(model, matIndex, name, filePath);
                 n++;
             }
         }

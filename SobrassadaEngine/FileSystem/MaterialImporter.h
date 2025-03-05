@@ -10,6 +10,6 @@
 
 namespace MaterialImporter
 {
-    UID ImportMaterial(const tinygltf::Model& model, int materialIndex, const char* filePath);
+    UID ImportMaterial(const tinygltf::Model& model, int materialIndex, const std::string& name, const char* filePath);
     ResourceMaterial* LoadMaterial(UID materialUID);
 } // namespace MaterialImporter
