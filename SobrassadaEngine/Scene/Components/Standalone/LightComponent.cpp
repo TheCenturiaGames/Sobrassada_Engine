@@ -17,7 +17,6 @@ LightComponent::LightComponent(
 
 LightComponent::LightComponent(const rapidjson::Value& initialState) : Component(initialState)
 {
-{
     if (initialState.HasMember("Intensity"))
     {
         intensity = initialState["Intensity"].GetFloat();
