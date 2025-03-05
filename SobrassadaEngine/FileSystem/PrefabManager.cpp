@@ -4,9 +4,9 @@
 #include "FileSystem.h"
 #include "LibraryModule.h"
 #include "ResourceManagement/Resources/ResourcePrefab.h"
+#include "Scene/Components/Root/RootComponent.h"
 #include "Scene/GameObjects/GameObject.h"
 #include "SceneModule.h"
-#include "Scene/Components/Root/RootComponent.h"
 
 #include "prettywriter.h"
 #include "stringbuffer.h"
@@ -15,7 +15,7 @@
 
 namespace PrefabManager
 {
-    UID SavePrefab(const GameObject* gameObject)
+    UID SavePrefab(const GameObject* gameObject, bool override)
     {
         // Create doc JSON
         rapidjson::Document doc;
@@ -25,9 +25,10 @@ namespace PrefabManager
         rapidjson::Value prefab(rapidjson::kObjectType);
 
         // Scene values
-        UID uid                 = GenerateUID();
-        std::string savePath    = PREFABS_PATH + std::string("Prefab") + PREFAB_EXTENSION;
-        UID finalPrefabUID      = App->GetLibraryModule()->AssignFiletypeUID(uid, savePath);
+        UID uid              = GenerateUID();
+        std::string savePath = PREFABS_PATH + std::string("Prefab") + PREFAB_EXTENSION;
+        UID finalPrefabUID =
+            override ? gameObject->GetPrefabUID() : App->GetLibraryModule()->AssignFiletypeUID(uid, savePath);
         savePath                = PREFABS_PATH + std::to_string(finalPrefabUID) + PREFAB_EXTENSION;
         const std::string& name = gameObject->GetName();
 
@@ -48,11 +49,11 @@ namespace PrefabManager
             currentGameObject->Save(goJSON, allocator);
             gameObjectsJSON.PushBack(goJSON, allocator);
 
-            // TODO: Serialize the rest of components after merged with the branch where the gameObjects have an array of
-            // their components, because right now is quite more complicated to get them
-            //rapidjson::Value componentJSON(rapidjson::kObjectType);
-            //currentGameObject->GetRootComponent()->Save(componentJSON, allocator);
-            //goJSON.AddMember("RootComponent", componentJSON, allocator);
+            // TODO: Serialize the rest of components after merged with the branch where the gameObjects have an array
+            // of their components, because right now is quite more complicated to get them
+            // rapidjson::Value componentJSON(rapidjson::kObjectType);
+            // currentGameObject->GetRootComponent()->Save(componentJSON, allocator);
+            // goJSON.AddMember("RootComponent", componentJSON, allocator);
 
             for (UID child : currentGameObject->GetChildren())
             {
@@ -72,7 +73,8 @@ namespace PrefabManager
         rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
         doc.Accept(writer);
 
-        unsigned int bytesWritten = (unsigned int)FileSystem::Save(savePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
+        unsigned int bytesWritten =
+            (unsigned int)FileSystem::Save(savePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
         if (bytesWritten == 0)
         {
             GLOG("Failed to save prefab file: %s", savePath);
@@ -125,7 +127,6 @@ namespace PrefabManager
             }
         }
 
-        
         std::vector<Component*> loadedComponents;
         if (prefab.HasMember("Components") && prefab["Components"].IsArray())
         {

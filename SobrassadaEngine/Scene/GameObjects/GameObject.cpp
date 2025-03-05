@@ -232,7 +232,8 @@ void GameObject::RenderContextMenu()
             currentRenamingUID = uuid;
         }
 
-        if (ImGui::MenuItem("Create Prefab"))
+        const char* label = prefabUid == CONSTANT_EMPTY_UID ? "Create Prefab" : "Update Prefab";
+        if (ImGui::MenuItem(label))
         {
             CreatePrefab();
         }
@@ -383,5 +384,6 @@ const Transform& GameObject::GetParentGlobalTransform()
 
 void GameObject::CreatePrefab()
 {
-    prefabUid = PrefabManager::SavePrefab(this);
+    bool override = this->prefabUid == CONSTANT_EMPTY_UID ? false : true;
+    prefabUid     = PrefabManager::SavePrefab(this, override);
 }

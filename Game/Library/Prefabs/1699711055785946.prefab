@@ -1,0 +1,50 @@
+{
+    "Prefab": {
+        "UID": 1699711055785946,
+        "Name": "new Game Object",
+        "GameObjects": [
+            {
+                "UID": 5270139579154963390,
+                "ParentUID": 14549612110460835231,
+                "Name": "new Game Object",
+                "Children": [
+                    3528671427799186531,
+                    12601661747215556995
+                ],
+                "RootComponentUID": 2093871346
+            },
+            {
+                "UID": 3528671427799186531,
+                "ParentUID": 5270139579154963390,
+                "Name": "new Game Object",
+                "Children": [
+                    2439549542711878858
+                ],
+                "RootComponentUID": 2105149948
+            },
+            {
+                "UID": 12601661747215556995,
+                "ParentUID": 5270139579154963390,
+                "Name": "new Game Object",
+                "Children": [],
+                "RootComponentUID": 2110650007
+            },
+            {
+                "UID": 2439549542711878858,
+                "ParentUID": 3528671427799186531,
+                "Name": "new Game Object",
+                "Children": [
+                    4922782814978675263
+                ],
+                "RootComponentUID": 568698100
+            },
+            {
+                "UID": 4922782814978675263,
+                "ParentUID": 2439549542711878858,
+                "Name": "new Game Object",
+                "Children": [],
+                "RootComponentUID": 1146801280
+            }
+        ]
+    }
+}

@@ -55,6 +55,7 @@ class GameObject : public AABBUpdatable
     void SetUUID(UID newUUID) { uuid = newUUID; }
 
     void CreatePrefab();
+    UID GetPrefabUID() const { return prefabUid; }
     void SetPrefabUID(const UID uid) { prefabUid = uid; }
 
   public:

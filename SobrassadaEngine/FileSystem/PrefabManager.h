@@ -8,6 +8,6 @@ class GameObject;
 
 namespace PrefabManager
 {
-    UID SavePrefab(const GameObject* gameObject);
+    UID SavePrefab(const GameObject* gameObject, bool override);
     ResourcePrefab* LoadPrefab(UID prefabUID);
 }
