@@ -239,7 +239,7 @@ void LightsConfig::SetPointLightsShaderData() const
         {
             // Fill struct data
             points.emplace_back(Lights::PointLightShaderData(
-                float4(pointLights[i]->GetGlobalTransform().position, pointLights[i]->GetRange()),
+                float4(pointLights[i]->GetGlobalTransform().TranslatePart(), pointLights[i]->GetRange()),
                 float4(pointLights[i]->GetColor(), pointLights[i]->GetIntensity())
             ));
         }
@@ -266,7 +266,7 @@ void LightsConfig::SetSpotLightsShaderData() const
     {
         // Fill struct data
         spots.emplace_back(Lights::SpotLightShaderData(
-            float4(spotLights[i]->GetGlobalTransform().position, spotLights[i]->GetRange()),
+            float4(spotLights[i]->GetGlobalTransform().TranslatePart(), spotLights[i]->GetRange()),
             float4(spotLights[i]->GetColor(), spotLights[i]->GetIntensity()), float3(spotLights[i]->GetDirection()),
             spotLights[i]->GetInnerAngle(), spotLights[i]->GetOuterAngle()
         ));

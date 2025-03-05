@@ -54,6 +54,8 @@ class Scene
 
     void SetStopPlaying(bool stop) { stopPlaying = stop; }
 
+    bool GetDoInputs() const { return doInputs; }
+
   private:
     void CreateSpatialDataStruct();
     void CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects) const;
@@ -70,4 +72,6 @@ class Scene
 
     LightsConfig* lightsConfig = nullptr;
     Octree* sceneOctree        = nullptr;
+
+    bool doInputs                   = false;
 };

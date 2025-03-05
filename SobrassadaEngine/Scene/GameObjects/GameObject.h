@@ -2,7 +2,6 @@
 
 #include "Globals.h"
 #include "Scene/AABBUpdatable.h"
-#include "Transform.h"
 
 #include <Geometry/AABB.h>
 #include <Libs/rapidjson/document.h>
@@ -18,19 +17,23 @@ class GameObject : public AABBUpdatable
     GameObject(UID parentUID, std::string name);
     GameObject(UID parentUID, std::string name, UID rootComponent);
     GameObject(const rapidjson::Value& initialState);
+
     ~GameObject() override;
 
     void PassAABBUpdateToParent() override;
     void ComponentGlobalTransformUpdated() override;
-    const Transform& GetGlobalTransform() const override;
-    const Transform& GetParentGlobalTransform() override;
+    const float4x4& GetGlobalTransform() const override;
+    const float4x4& GetParentGlobalTransform() override;
 
-    bool CreateRootComponent();
     bool AddGameObject(UID gameObjectUID);
-    inline void AddChildren(UID childUID) { children.push_back(childUID); }
     bool RemoveGameObject(UID gameObjectUID);
 
+    bool CreateRootComponent();
+
+    void OnEditor();
+
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
+
     void SaveToLibrary();
 
     void OnEditor();
@@ -47,8 +50,14 @@ class GameObject : public AABBUpdatable
     inline UID GetUID() const { return uid; }
     inline std::vector<UID> GetChildren() { return children; }
     inline UID GetParent() const { return parentUID; }
-    inline const AABB& GetAABB() const { return globalAABB; };
+    void SetParent(UID newParentUUID) { parentUUID = newParentUUID; }
+
+    inline UID GetUID() const { return uuid; }
+    void SetUUID(UID newUUID) { uuid = newUUID; }
+
     RootComponent* GetRootComponent() const { return rootComponent; }
+
+    inline const AABB& GetAABB() const { return globalAABB; };
 
     void SetName(std::string newName) { name = newName; }
     void SetParent(UID newParentUID) { parentUID = newParentUID; }
@@ -59,10 +68,13 @@ class GameObject : public AABBUpdatable
 
   private:
     UID uid;
+    std::vector<UID> children;
+
     std::string name;
     UID parentUID;
     std::vector<UID> children;
     RootComponent* rootComponent;
+
     AABB globalAABB;
 
     bool isRenaming = false;
