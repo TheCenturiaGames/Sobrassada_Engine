@@ -1,14 +1,15 @@
 #pragma once
 
 #include "Globals.h"
-#include "Utils/Transform.h"
+
+#include "Math/float4x4.h"
 
 #include <vector>
 
 struct NodeData
 {
     std::string name;
-    Transform transform;
+    float4x4 transform;
     int parentIndex;
     std::vector<std::pair<UID, UID>> meshes;
 };

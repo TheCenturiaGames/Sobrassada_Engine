@@ -378,14 +378,16 @@ const float4x4& GameObject::GetParentGlobalTransform()
 
 void GameObject::DrawNodes()
 {
-    DebugDrawModule* debug = App->GetDebugDrawModule();           
+    DebugDrawModule* debug = App->GetDebugDrawModule();
 
     debug->DrawLine(
-        GetGlobalTransform().position, GetParentGlobalTransform().position - GetGlobalTransform().position,
-        GetGlobalTransform().position.Distance(GetParentGlobalTransform().position), float3(1, 1, 1), false
+        GetGlobalTransform().TranslatePart(),
+        GetParentGlobalTransform().TranslatePart() - GetGlobalTransform().TranslatePart(),
+        GetGlobalTransform().TranslatePart().Distance(GetParentGlobalTransform().TranslatePart()), float3(1, 1, 1),
+        false
     );
 
-    debug->DrawAxisTriad(float4x4::FromTRS(GetGlobalTransform().position, float4x4::FromEulerXYZ(GetGlobalTransform().rotation.x,GetGlobalTransform().rotation.y, GetGlobalTransform().rotation.z), float3::one), false);
+    debug->DrawAxisTriad(GetGlobalTransform(), false);
 }
 
 void GameObject::OnDrawConnectionsToggle()
@@ -393,8 +395,7 @@ void GameObject::OnDrawConnectionsToggle()
     for (const UID childUID : children)
     {
         GameObject* childObject = App->GetSceneModule()->GetGameObjectByUUID(childUID);
-        childObject->drawNodes = drawNodes;
+        childObject->drawNodes  = drawNodes;
         childObject->OnDrawConnectionsToggle();
-    }    
-    
+    }
 }

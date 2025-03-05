@@ -55,7 +55,7 @@ class Component : public AABBUpdatable
     int GetType() const { return type; }
 
     void RenderGuizmo();
-    void SetLocalTransform(const Transform& newTransform);
+    void SetLocalTransform(const float4x4& newTransform);
 
   protected:
     RootComponent* GetRootComponent();

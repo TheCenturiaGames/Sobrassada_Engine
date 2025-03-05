@@ -2,7 +2,6 @@
 
 #include "Resource.h"
 #include "FileSystem/Model.h"
-#include "Utils/Transform.h"
 
 class ResourceModel : public Resource
 {

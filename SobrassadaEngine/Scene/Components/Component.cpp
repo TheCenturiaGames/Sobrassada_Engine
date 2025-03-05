@@ -375,7 +375,7 @@ void Component::CalculateLocalAABB()
     globalComponentAABB = AABB(globalComponentOBB);
 }
 
-void Component::SetLocalTransform(const Transform& newTransform)
+void Component::SetLocalTransform(const float4x4& newTransform)
 {
     localTransform = newTransform;
     OnTransformUpdate(GetParentGlobalTransform());
