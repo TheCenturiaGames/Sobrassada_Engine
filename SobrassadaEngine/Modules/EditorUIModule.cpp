@@ -674,19 +674,25 @@ bool EditorUIModule::RenderImGuizmo(
 
     float4x4 transform = float4x4(globalTransform);
     transform.Transpose();
-    Manipulate(view.ptr(), proj.ptr(), mCurrentGizmoOperation, transformType, transform.ptr());
+
+    ImGuizmo::Enable(true);
+    float positionSnap[3] = {1.0f, 1.0f, 1.0f};
+    ImGuizmo::Manipulate(
+        view.ptr(), proj.ptr(), mCurrentGizmoOperation, transformType, transform.ptr(), nullptr, positionSnap, nullptr,
+        nullptr
+    );
+    // Manipulate(view.ptr(), proj.ptr(), mCurrentGizmoOperation, transformType, transform.ptr());
 
     if (!ImGuizmo::IsUsing()) return false;
 
     if (App->GetSceneModule()->GetDoInputsScene())
     {
+        transform.Transpose();
         if (transform.TranslatePart().Distance(App->GetCameraModule()->GetCameraPosition()) > maxDistance)
         {
             ImGuizmo::Enable(false);
             return false;
         }
-
-        transform.Transpose();
         localTransform = parentTransform.Inverted() * transform;
     }
 

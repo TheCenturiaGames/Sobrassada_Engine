@@ -1,0 +1,56 @@
+{
+    "Scene": {
+        "UID": 17246035849568202614,
+        "Name": "ah",
+        "RootGameObject": 5474280424684163218,
+        "GameObjects": [
+            {
+                "UID": 5474280424684163218,
+                "ParentUID": 0,
+                "Name": "Scene",
+                "Children": [],
+                "RootComponentUID": 1827129638
+            }
+        ],
+        "Components": [
+            {
+                "UID": 1827129638,
+                "ParentUID": 5474280424684163218,
+                "RootUID": 1827129638,
+                "Type": 1,
+                "LocalTransform": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root Component",
+                "Type": 1,
+                "Mobility": 1
+            }
+        ]
+    },
+    "Lights Config": {
+        "Ambient Color": [
+            1.0,
+            1.0,
+            1.0
+        ],
+        "Ambient Intensity": 0.20000000298023224,
+        "Skybox UID": 1170799310640544
+    }
+}
