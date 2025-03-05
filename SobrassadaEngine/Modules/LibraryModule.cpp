@@ -255,6 +255,9 @@ bool LibraryModule::LoadLibraryMaps()
 
                 switch (prefix)
                 {
+                case 16:
+                    AddPrefab(originalUID, FileSystem::GetFileNameWithoutExtension(filePath));
+                    AddResource(filePath, originalUID);
                 case 13:
                     AddMesh(originalUID, FileSystem::GetFileNameWithoutExtension(filePath));
                     AddResource(filePath, originalUID);
@@ -286,6 +289,10 @@ UID LibraryModule::AssignFiletypeUID(UID originalUID, const std::string& filePat
 {
 
     uint64_t prefix = 10; // Default prefix "99" for unknown files
+    if (FileSystem::GetFileExtension(filePath) == PREFAB_EXTENSION)
+    {
+        prefix = 16;
+    }
     if (FileSystem::GetFileExtension(filePath) == MESH_EXTENSION)
     {
         prefix = 13;
@@ -317,6 +324,11 @@ void LibraryModule::AddMesh(UID meshUID, const std::string& sobPath)
 void LibraryModule::AddMaterial(UID materialUID, const std::string& matPath)
 {
     materialMap[matPath] = materialUID; // Map the texture UID to its DDS path
+}
+
+void LibraryModule::AddPrefab(UID prefabUID, const std::string& prefabPath)
+{
+    prefabMap[prefabPath] = prefabUID; // Map the prefab UID to its path
 }
 
 UID LibraryModule::GetTextureUID(const std::string& texturePath) const

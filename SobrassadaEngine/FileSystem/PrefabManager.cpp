@@ -2,10 +2,10 @@
 
 #include "Application.h"
 #include "FileSystem.h"
+#include "LibraryModule.h"
 #include "ResourceManagement/Resources/ResourcePrefab.h"
 #include "Scene/GameObjects/GameObject.h"
 #include "SceneModule.h"
-#include "LibraryModule.h"
 
 #include "prettywriter.h"
 #include "stringbuffer.h"
@@ -25,10 +25,13 @@ namespace PrefabManager
 
         // Scene values
         UID uid                 = GenerateUID();
+        std::string savePath    = PREFABS_PATH + std::string("Prefab") + PREFAB_EXTENSION;
+        UID finalPrefabUID      = App->GetLibraryModule()->AssignFiletypeUID(uid, savePath);
+        savePath                = PREFABS_PATH + std::to_string(finalPrefabUID) + PREFAB_EXTENSION;
         const std::string& name = gameObject->GetName();
 
         // Create structure
-        prefab.AddMember("UID", uid, allocator);
+        prefab.AddMember("UID", finalPrefabUID, allocator);
         prefab.AddMember("Name", rapidjson::Value(name.c_str(), allocator), allocator);
 
         // Serialize GameObjects
@@ -44,7 +47,7 @@ namespace PrefabManager
             currentGameObject->Save(goJSON, allocator);
             gameObjectsJSON.PushBack(goJSON, allocator);
 
-            // TODO: Serialize components after merged with the branch where the gameObjects have an array of 
+            // TODO: Serialize components after merged with the branch where the gameObjects have an array of
             // their components, because right now is quite more complicated to get them
 
             for (UID child : currentGameObject->GetChildren())
@@ -65,15 +68,16 @@ namespace PrefabManager
         rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
         doc.Accept(writer);
 
-        std::string prefabFilePath = std::filesystem::current_path().string() + DELIMITER + PREFABS_PATH + name + PREFAB_EXTENSION;
-
-        unsigned int bytesWritten = (unsigned int
-        )FileSystem::Save(prefabFilePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
+        unsigned int bytesWritten = (unsigned int)FileSystem::Save(savePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
         if (bytesWritten == 0)
         {
-            GLOG("Failed to save prefab file: %s", prefabFilePath);
+            GLOG("Failed to save prefab file: %s", savePath);
             return CONSTANT_EMPTY_UID;
         }
+
+        // Add the prefab to the resources map
+        App->GetLibraryModule()->AddPrefab(finalPrefabUID, name);
+        App->GetLibraryModule()->AddResource(savePath, finalPrefabUID);
 
         return uid;
     }
@@ -97,8 +101,8 @@ namespace PrefabManager
 
         rapidjson::Value& prefab = doc["Prefab"];
 
-        UID uid = prefab["UID"].GetUint64();
-        std::string name = prefab["Name"].GetString();
+        UID uid                  = prefab["UID"].GetUint64();
+        std::string name         = prefab["Name"].GetString();
 
         std::vector<GameObject*> loadedGameObjects;
         if (prefab.HasMember("GameObjects") && prefab["GameObjects"].IsArray())
@@ -124,7 +128,7 @@ namespace PrefabManager
         }
 
         ResourcePrefab* resourcePrefab = new ResourcePrefab(uid, name);
-        resourcePrefab->LoadData(loadedGameObjects[0]);
+        resourcePrefab->LoadData(loadedGameObjects);
         return resourcePrefab;
     }
 } // namespace PrefabManager

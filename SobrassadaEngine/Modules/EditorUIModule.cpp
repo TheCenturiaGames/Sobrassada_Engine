@@ -171,6 +171,8 @@ void EditorUIModule::Draw()
     if (save) SaveDialog(save);
 
     if (editorSettingsMenu) EditorSettings(editorSettingsMenu);
+
+    if (loadPrefab) LoadPrefabDialog(loadPrefab);
 }
 
 void EditorUIModule::MainMenu()
@@ -221,6 +223,22 @@ void EditorUIModule::MainMenu()
         if (ImGui::MenuItem("About", "", aboutMenu)) aboutMenu = !aboutMenu;
 
         ImGui::EndMenu();
+    }
+
+    // Menu window to load file into scene (useful while a window with the the resources to drag and drop does not
+    // exist)
+    if (App->GetSceneModule()->GetSceneUID() != CONSTANT_EMPTY_UID)
+    {
+        if (ImGui::BeginMenu("Scene"))
+        {
+            if (ImGui::MenuItem("Load Prefab"))
+            {
+                loadPrefab = !loadPrefab;
+                ImGui::OpenPopup(CONSTANT_PREFAB_SELECT_DIALOG_ID);
+            }
+
+            ImGui::EndMenu();
+        }
     }
 
     ImGui::EndMainMenuBar();
@@ -287,6 +305,47 @@ void EditorUIModule::LoadDialog(bool& load)
     {
         inputFile = "";
         load      = false;
+    }
+
+    ImGui::End();
+}
+
+void EditorUIModule::LoadPrefabDialog(bool& loadPrefab) const
+{
+    ImGui::SetNextWindowSize(ImVec2(width * 0.25f, height * 0.4f), ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin("Load Prefab", &loadPrefab, ImGuiWindowFlags_NoCollapse))
+    {
+        ImGui::End();
+        return;
+    }
+
+    UID prefabUid               = CONSTANT_EMPTY_UID;
+    static char searchText[255] = "";
+    ImGui::InputText("Search", searchText, 255);
+
+    ImGui::Separator();
+    if (ImGui::BeginListBox("##ComponentList", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
+    {
+        GLOG("Prefabs count: %d", App->GetLibraryModule()->GetPrefabMap().size());
+
+        for (const auto& valuePair : App->GetLibraryModule()->GetPrefabMap())
+        {
+            GLOG("prefab name: %s", valuePair.first.c_str());
+            if (valuePair.first.find(searchText) != std::string::npos)
+            {
+                if (ImGui::Selectable(valuePair.first.c_str(), false))
+                {
+                    prefabUid = valuePair.second;
+                }
+            }
+        }
+        ImGui::EndListBox();
+    }
+
+    if (ImGui::Button("Ok"))
+    {
+        App->GetSceneModule()->LoadPrefab(prefabUid);
     }
 
     ImGui::End();
@@ -739,7 +798,7 @@ void EditorUIModule::RenderBasicTransformModifiers(
 
 UID EditorUIModule::RenderResourceSelectDialog(
     const char* id, const std::unordered_map<std::string, UID>& availableResources
-)
+) const
 {
     UID result = CONSTANT_EMPTY_UID;
     if (ImGui::BeginPopup(id))

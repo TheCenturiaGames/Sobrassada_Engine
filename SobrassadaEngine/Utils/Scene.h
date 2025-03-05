@@ -50,6 +50,7 @@ class Scene
     LightsConfig* GetLightsConfig() { return lightsConfig; }
 
     bool GetDoInputs() const { return doInputs; }
+    void LoadPrefab(const UID prefabUid);
 
   private:
     void CreateSpatialDataStruct();

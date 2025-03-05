@@ -104,6 +104,7 @@ class SceneModule : public Module
     LightsConfig* GetLightsConfig() { return loadedScene != nullptr ? loadedScene->GetLightsConfig() : nullptr; }
 
     bool GetDoInputs() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() : false; }
+    void LoadPrefab(const UID prefabUid) const { loadedScene != nullptr ? loadedScene->LoadPrefab(prefabUid) : void(); }
 
   private:
     Scene* loadedScene = nullptr;

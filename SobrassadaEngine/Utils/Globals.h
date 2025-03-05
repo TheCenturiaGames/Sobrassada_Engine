@@ -68,7 +68,7 @@ enum update_status
 #define TEXTURES_PATH   "Library/Textures/"
 #define MATERIALS_PATH  "Library/Materials/"
 #define SCENES_PATH     "Library/Scenes/"
-#define PREFABS_PATH     "Library/Prefabs/"
+#define PREFABS_PATH    "Library/Prefabs/"
 
 #define ASSET_EXTENSION    ".gltf"
 #define MESH_EXTENSION     ".sobrassada"
@@ -86,6 +86,7 @@ constexpr UID CONSTANT_EMPTY_UID                        = 0;
 
 constexpr const char* CONSTANT_MESH_SELECT_DIALOG_ID    = "mesh-select";
 constexpr const char* CONSTANT_TEXTURE_SELECT_DIALOG_ID = "texture-select";
+constexpr const char* CONSTANT_PREFAB_SELECT_DIALOG_ID  = "prefab-select";
 
 constexpr uint32_t CONSTANT_NO_MESH_UUID                = 0;
 constexpr uint32_t CONSTANT_NO_TEXTURE_UUID             = 0;

@@ -36,7 +36,7 @@ class EditorUIModule : public Module
 
     bool RenderTransformWidget(Transform& localTransform, Transform& globalTransform, const Transform& parentTransform);
     bool RenderImGuizmo(Transform& gameObjectTransform);
-    UID RenderResourceSelectDialog(const char* id, const std::unordered_map<std::string, UID>& availableResources);
+    UID RenderResourceSelectDialog(const char* id, const std::unordered_map<std::string, UID>& availableResources) const;
 
   private:
     void RenderBasicTransformModifiers(
@@ -65,6 +65,8 @@ class EditorUIModule : public Module
     void Console(bool& consoleMenu) const;
     void About(bool& aboutMenu) const;
 
+    void LoadPrefabDialog(bool& loadPrefab) const;
+
   public:
     bool hierarchyMenu = true;
     bool inspectorMenu = true;
@@ -79,6 +81,8 @@ class EditorUIModule : public Module
     bool editorSettingsMenu     = false;
     bool quadtreeViewerViewport = false;
     bool closeApplication       = false;
+
+    bool loadPrefab             = false;
 
     int maxFPS                  = 60;
     int maximumPlotData         = 50;

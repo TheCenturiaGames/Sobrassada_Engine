@@ -30,6 +30,7 @@ class LibraryModule : public Module
     void AddTexture(UID textureUID, const std::string& ddsPath);
     void AddMesh(UID meshUID, const std::string& matPath);
     void AddMaterial(UID materialUID, const std::string& sobPath);
+    void AddPrefab(UID prefabUID, const std::string& prefabPath);
     void AddResource(const std::string& resourcePath, UID resourceUID);
 
     UID GetTextureUID(const std::string& texturePath) const;
@@ -40,12 +41,14 @@ class LibraryModule : public Module
     const std::unordered_map<std::string, UID>& GetTextureMap() const { return textureMap; }
     const std::unordered_map<std::string, UID>& GetMaterialMap() const { return materialMap; }
     const std::unordered_map<std::string, UID>& GetMeshMap() const { return meshMap; }
+    const std::unordered_map<std::string, UID>& GetPrefabMap() const { return prefabMap; }
 
   private:
     // maps for user visual
     std::unordered_map<std::string, UID> textureMap;  // UID -> name.dds
     std::unordered_map<std::string, UID> materialMap; // UID-> name.mat
     std::unordered_map<std::string, UID> meshMap;     // UID-> name.sob
+    std::unordered_map<std::string, UID> prefabMap;   // UID-> name.prefab
 
     // filled on load and import
     std::unordered_map<UID, std::string> resourcePathsMap; // UID -> all resources path

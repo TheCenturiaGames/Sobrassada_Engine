@@ -11,6 +11,9 @@
 #include "OpenGLModule.h"
 #include "SceneModule.h"
 
+#include "ResourceManagement/Resources/ResourcePrefab.h"
+#include "ResourcesModule.h"
+
 #include "imgui.h"
 #include "imgui_internal.h"
 // guizmo after imgui include
@@ -357,4 +360,26 @@ Component* Scene::GetComponentByUID(uint64_t componentUID)
         return gameComponents[componentUID];
     }
     return nullptr;
+}
+
+void Scene::LoadPrefab(const UID prefabUid)
+{
+    if (prefabUid != CONSTANT_EMPTY_UID)
+    {
+        GLOG("Load prefab %d", prefabUid);
+
+        ResourcePrefab* prefab = (ResourcePrefab*)App->GetResourcesModule()->RequestResource(prefabUid);
+        const std::vector<GameObject*>& gameObjects = prefab->GetGameObjectsVector();
+
+        // Add the gameObject to the scene. The parents will always be added before the children
+        for (GameObject* gameObject : gameObjects)
+        {
+            GetGameObjectByUUID(gameObject->GetParent())->AddGameObject(gameObject->GetUID());
+            AddGameObject(gameObject->GetUID(), gameObject);
+
+            //TODO: Add components
+
+            gameObject->PassAABBUpdateToParent();
+        }
+    }
 }

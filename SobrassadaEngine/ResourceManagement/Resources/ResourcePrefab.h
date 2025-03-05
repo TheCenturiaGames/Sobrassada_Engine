@@ -10,9 +10,11 @@ class ResourcePrefab : public Resource
     ResourcePrefab(UID uid, const std::string& name);
     ~ResourcePrefab() override;
 
-    void LoadData(GameObject* gameObject) { rootGameObject = gameObject; }
+    void LoadData(const std::vector<GameObject*> &objects) { gameObjects = objects; }
+    GameObject* GetRootObject() const { return gameObjects[0]; }
+    const std::vector<GameObject*> GetGameObjectsVector() const { return gameObjects; }
 
   private:
-    GameObject* rootGameObject;
+    std::vector<GameObject*> gameObjects;
     // Maybe store all gameObjects and all components in two lists? With the root gameObject it is all saved anyway
 };
