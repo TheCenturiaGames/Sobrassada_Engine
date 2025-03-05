@@ -9,7 +9,9 @@ GameTimer::GameTimer()
 {
 }
 
-GameTimer::~GameTimer() {}
+GameTimer::~GameTimer()
+{
+}
 
 void GameTimer::Start()
 {
@@ -54,7 +56,10 @@ float GameTimer::Tick()
     return delta;
 }
 
-void GameTimer::TogglePause() { if (isEnabled) isPaused = !isPaused; }
+void GameTimer::TogglePause()
+{
+    if (isEnabled) isPaused = !isPaused;
+}
 
 void GameTimer::Reset()
 {
@@ -91,4 +96,7 @@ float GameTimer::Step()
     else return 0;
 }
 
-float GameTimer::TicksSinceReference() const { return SDL_GetTicks() - referenceTime; }
+float GameTimer::TicksSinceReference() const
+{
+    return SDL_GetTicks() - referenceTime;
+}

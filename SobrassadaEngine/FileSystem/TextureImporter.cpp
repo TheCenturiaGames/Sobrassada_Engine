@@ -1,9 +1,10 @@
 #include "TextureImporter.h"
 
 #include "Application.h"
-#include "DirectXTex/DirectXTex.h"
 #include "FileSystem.h"
 #include "LibraryModule.h"
+
+#include "DirectXTex/DirectXTex.h"
 #include "glew.h"
 #include <string>
 
@@ -53,10 +54,10 @@ namespace TextureImporter
 
         UID textureUID       = GenerateUID();
         std::string savePath = TEXTURES_PATH + std::string("Texture") + TEXTURE_EXTENSION;
-        UID finalTextureUID = App->GetLibraryModule()->AssignFiletypeUID(textureUID, savePath);
+        UID finalTextureUID  = App->GetLibraryModule()->AssignFiletypeUID(textureUID, savePath);
         std::string fileName = FileSystem::GetFileNameWithoutExtension(filePath);
-        
-        savePath = TEXTURES_PATH + std::to_string(finalTextureUID) + TEXTURE_EXTENSION;
+
+        savePath             = TEXTURES_PATH + std::to_string(finalTextureUID) + TEXTURE_EXTENSION;
 
         unsigned int size =
             FileSystem::Save(savePath.c_str(), blob.GetBufferPointer(), (unsigned int)blob.GetBufferSize());
@@ -67,7 +68,6 @@ namespace TextureImporter
             return 0;
         }
 
-        
         // added texture to textures map
         App->GetLibraryModule()->AddTexture(finalTextureUID, fileName);
         App->GetLibraryModule()->AddResource(savePath, finalTextureUID);
@@ -79,12 +79,12 @@ namespace TextureImporter
 
     ResourceTexture* LoadTexture(UID textureUID)
     {
-        std::string path   = App->GetLibraryModule()->GetResourcePath(textureUID);
+        std::string path     = App->GetLibraryModule()->GetResourcePath(textureUID);
 
         std::string fileName = FileSystem::GetFileNameWithoutExtension(path);
-        //const UID loadedTextureUID = std::stoull(fileName);
+        // const UID loadedTextureUID = std::stoull(fileName);
 
-        std::wstring wPath = std::wstring(path.begin(), path.end());
+        std::wstring wPath   = std::wstring(path.begin(), path.end());
 
         DirectX::ScratchImage outImage;
         DirectX::TexMetadata outMetadata;
@@ -132,20 +132,20 @@ namespace TextureImporter
             internalFormat = GL_RGBA8;
             format         = GL_RGBA;
             type           = GL_UNSIGNED_BYTE;
-            //formatName     = "DXGI_FORMAT_R8G8B8A8_UNORM";
+            // formatName     = "DXGI_FORMAT_R8G8B8A8_UNORM";
             break;
         case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:
         case DXGI_FORMAT_B8G8R8A8_UNORM:
             internalFormat = GL_RGBA8;
             format         = GL_BGRA;
             type           = GL_UNSIGNED_BYTE;
-            //formatName     = "DXGI_FORMAT_B8G8R8A8_UNORM";
+            // formatName     = "DXGI_FORMAT_B8G8R8A8_UNORM";
             break;
         case DXGI_FORMAT_B5G6R5_UNORM:
             internalFormat = GL_RGB8;
             format         = GL_BGR;
             type           = GL_UNSIGNED_BYTE;
-            //formatName     = "DXGI_FORMAT_B5G6R5_UNORM";
+            // formatName     = "DXGI_FORMAT_B5G6R5_UNORM";
             break;
         default:
             assert(false && "Unsupported format");
@@ -157,13 +157,19 @@ namespace TextureImporter
             for (size_t i = 0; i < outMetadata.mipLevels; ++i)
             {
                 const DirectX::Image* mip = outImage.GetImage(i, 0, 0);
-                glTexImage2D(GL_TEXTURE_2D, static_cast<GLint>(i), internalFormat, static_cast<GLsizei>(mip->width), static_cast<GLsizei>(mip->height), 0, format, type, mip->pixels);
-		    }
+                glTexImage2D(
+                    GL_TEXTURE_2D, static_cast<GLint>(i), internalFormat, static_cast<GLsizei>(mip->width),
+                    static_cast<GLsizei>(mip->height), 0, format, type, mip->pixels
+                );
+            }
         }
         else
         {
             const DirectX::Image* baseImage = outImage.GetImage(0, 0, 0);
-            glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, static_cast<GLsizei>(outMetadata.width), static_cast<GLsizei>(outMetadata.height), 0, format, type, baseImage->pixels);
+            glTexImage2D(
+                GL_TEXTURE_2D, 0, internalFormat, static_cast<GLsizei>(outMetadata.width),
+                static_cast<GLsizei>(outMetadata.height), 0, format, type, baseImage->pixels
+            );
             glGenerateMipmap(GL_TEXTURE_2D);
         }
 
@@ -189,7 +195,7 @@ namespace TextureImporter
             glGenTextures(1, &textureId);
             glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
 
-            // Sending texture to OpgenGL
+            // Sending texture to OpenGL
             for (int i = 0; i < texMetadata.arraySize; ++i)
             {
                 const DirectX::Image* face = scratchImage.GetImage(0, i, 0);

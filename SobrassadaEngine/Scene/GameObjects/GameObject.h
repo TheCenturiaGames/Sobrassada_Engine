@@ -1,30 +1,34 @@
 #pragma once
+
 #include "Globals.h"
 #include "Scene/AABBUpdatable.h"
-#include "Transform.h"
 
 #include <map>
+#include <Geometry/AABB.h>
+#include <Libs/rapidjson/document.h>
 #include <string>
 #include <vector>
-#include <Libs/rapidjson/document.h>
-#include <Geometry/AABB.h>
 
 class RootComponent;
 class Component; 
 
 class GameObject : public AABBUpdatable
 {
-public:
-
+  public:
     GameObject(std::string name);
     GameObject(UID parentUUID, std::string name);
     GameObject(UID parentUUID, std::string name, UID rootComponent);
 
-    GameObject(const rapidjson::Value &initialState);
+    GameObject(const rapidjson::Value& initialState);
 
-    ~GameObject();
+    ~GameObject() override;
 
-	bool AddGameObject(UID gameObjectUUID);
+    void PassAABBUpdateToParent() override;
+    void ComponentGlobalTransformUpdated() override;
+    const float4x4& GetGlobalTransform() const override;
+    const float4x4& GetParentGlobalTransform() override;
+
+    bool AddGameObject(UID gameObjectUUID);
     bool RemoveGameObject(UID gameObjectUUID);
 
     bool AddComponent(Component* comp);
@@ -37,51 +41,44 @@ public:
 
     void OnEditor();
 
-    void Save(rapidjson::Value &targetState, rapidjson::Document::AllocatorType &allocator)const;
+    void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
 
     void SaveToLibrary();
 
-    void RenderHierarchyNode(UID &selectedGameObjectUUID);
-    void HandleNodeClick(UID &selectedGameObjectUUID);
+    void RenderHierarchyNode(UID& selectedGameObjectUUID);
+    void HandleNodeClick(UID& selectedGameObjectUUID);
     void RenderContextMenu();
 
+    bool UpdateGameObjectHierarchy(UID sourceUID, UID targetUID);
     void RenameGameObjectHierarchy();
 
-    bool UpdateGameObjectHierarchy(UID sourceUID, UID targetUID);
-
-	inline std::string GetName() const { return name; }
+    inline std::string GetName() const { return name; }
     void SetName(std::string newName) { name = newName; }
-    
-	inline std::vector<UID> GetChildren() { return children; }
+
+    inline std::vector<UID> GetChildren() { return children; }
     inline void AddChildren(UID childUUID) { children.push_back(childUUID); }
-    
-	inline UID GetParent() const { return parentUUID; }
+
+    inline UID GetParent() const { return parentUUID; }
     void SetParent(UID newParentUUID) { parentUUID = newParentUUID; }
 
     inline UID GetUID() const { return uuid; }
-	void SetUUID(UID newUUID) { uuid = newUUID; }
-    
+    void SetUUID(UID newUUID) { uuid = newUUID; }
+
     RootComponent* GetRootComponent() const { return rootComponent; }
     const std::map<UID, Component*>& GetAllComponents() const { return components; }
 
-    inline const AABB &GetAABB() const { return globalAABB; };
-    
+    inline const AABB& GetAABB() const { return globalAABB; };
+
     void Render();
     void RenderEditor();
 
-    void PassAABBUpdateToParent() override;
-    void ComponentGlobalTransformUpdated() override;
-    const Transform& GetGlobalTransform() const override;
-
-    const Transform& GetParentGlobalTransform() override;
-
+  public:
     inline static UID currentRenamingUID = INVALID_UUID;
 
-private:
-
-	UID parentUUID;
-	UID uuid;
-	std::vector<UID> children;
+  private:
+    UID parentUUID;
+    UID uuid;
+    std::vector<UID> children;
 
     std::string name;
 
@@ -92,5 +89,4 @@ private:
 
     bool isRenaming = false;
     char renameBuffer[128];
-
 };
