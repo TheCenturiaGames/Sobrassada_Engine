@@ -115,7 +115,7 @@ float GGXNormalDistribution(float NdotH, float roughness){
     return roughness2/denominator;
 }
 
-vec3 RenderLight(vec3 L, vec3 N, vec4 specTexColor, vec3 texColor, vec3 Li, float NdotL, float alpha, float roughness, float metalness)
+vec3 RenderLight(vec3 L, vec3 N, vec3 texColor, vec3 Li, float NdotL, float alpha, float roughness, float metalness)
  {
     float shininessValue;
 	if(shininessInAlpha) shininessValue = exp2(alpha * 7 + 1);
@@ -134,7 +134,6 @@ vec3 RenderLight(vec3 L, vec3 N, vec4 specTexColor, vec3 texColor, vec3 Li, floa
     vec3 Cd = BaseColor * (1 - metalness);
     vec3 RF0 = mix(vec3(0.04), BaseColor, metalness);
     
-    //vec3 RF0 = specTexColor.rgb;
     float cosTheta = max(dot(L, H), 0.0);
     vec3 fresnel = RF0 + (1 - RF0) * pow(1 - cosTheta, 5);
 
@@ -146,25 +145,25 @@ vec3 RenderLight(vec3 L, vec3 N, vec4 specTexColor, vec3 texColor, vec3 Li, floa
     return diffspec;
 }
 
-vec3 RenderPointLight(const int index, const vec3 N, vec4 specTexColor, const vec3 texColor, const float alpha, float roughness, float metalness)
+vec3 RenderPointLight(const int index, const vec3 N, const vec3 texColor, const float alpha, float roughness, float metalness)
 {
 	float attenuation = PointLightAttenuation(index);
 	vec3 L = normalize(pos - pointLights[index].position.xyz);
 	vec3 Li = pointLights[index].color.rgb * pointLights[index].color.a * attenuation;
 	float NdotL = dot(N, -L);
 
-	if (NdotL > 0 && attenuation > 0) return RenderLight(L, N, specTexColor, texColor, Li, NdotL, alpha, roughness, metalness);
+	if (NdotL > 0 && attenuation > 0) return RenderLight(L, N, texColor, Li, NdotL, alpha, roughness, metalness);
 	else return vec3(0);	
 }
 
-vec3 RenderSpotLight(const int index, const vec3 N, vec4 specTexColor, const vec3 texColor, const float alpha, float roughness, float metalness)
+vec3 RenderSpotLight(const int index, const vec3 N, const vec3 texColor, const float alpha, float roughness, float metalness)
 {
 	float attenuation = SpotLightAttenuation(index);
 	vec3 L = normalize(pos - spotLights[index].position.xyz);
 	vec3 Li = spotLights[index].color.rgb * spotLights[index].color.a * attenuation;
 	float NdotL = dot(N, -L);
 
-	if (NdotL > 0 && attenuation > 0) return RenderLight(L, N, specTexColor, texColor, Li, NdotL, alpha, roughness, metalness);
+	if (NdotL > 0 && attenuation > 0) return RenderLight(L, N, texColor, Li, NdotL, alpha, roughness, metalness);
 	else return vec3(0);
 }
 
@@ -179,10 +178,9 @@ vec3 RenderSpotLight(const int index, const vec3 N, vec4 specTexColor, const vec
 void main()
 {
     vec3 texColor = pow(texture(diffuseTexture, uv0).rgb, vec3(2.2f));
-    vec4 specTexColor = texture(metallicRoughnessTexture, uv0);
-    float alpha = specTexColor.a;
+    vec4 metallicRoughnessTexColor = texture(metallicRoughnessTexture, uv0);
+    float alpha = metallicRoughnessTexColor.a;
 
-    alpha = specTexColor.a;
 
     // Ambient light
     vec3 ambient = ambient_color.rgb * ambient_color.a;
@@ -197,16 +195,19 @@ void main()
         N = normalize(final_normal);
     }
 
+    float roughness = roughnessFactor * metallicRoughnessTexColor.y;
+    float metallic = metallicFactor * metallicRoughnessTexColor.z;
+
     // Point Lights
     for (int i = 0; i < pointLightsCount; ++i)
 	{
-		hdr += RenderPointLight(i, N, specTexColor, texColor, alpha, roughnessFactor, metallicFactor);
+		hdr += RenderPointLight(i, N, texColor, alpha, roughness, metallic);
 	}
 
     //Spot Lights
     for (int i = 0; i < spotLightsCount; ++i)
 	{
-		hdr += RenderSpotLight(i, N, specTexColor, texColor, alpha, roughnessFactor, metallicFactor);
+		hdr += RenderSpotLight(i, N, texColor, alpha, roughness, metallic);
 	}
 
     // Directional light
@@ -215,7 +216,7 @@ void main()
     float NdotL = dot(N, -L);
     if (NdotL > 0)
     {
-		hdr += RenderLight(L, N, specTexColor, texColor, lightColor, NdotL, alpha, roughnessFactor, metallicFactor);
+		hdr += RenderLight(L, N, texColor, lightColor, NdotL, alpha, roughness, metallic);
     }
 
     vec3 ldr = hdr.rgb / (hdr.rgb + vec3(1.0));
