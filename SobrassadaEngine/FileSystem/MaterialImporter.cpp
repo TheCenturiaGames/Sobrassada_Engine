@@ -113,7 +113,18 @@ UID MaterialImporter::ImportMaterial(const tinygltf::Model& model, int materialI
             }
         }
 
-        // Metallic i Roughness Factors
+        if (pbr.metallicRoughnessTexture.index >= 0)
+        {
+            int texIndex = pbr.metallicRoughnessTexture.index;
+            UID metallicRoughnessTextureUID =
+                TextureImporter::Import((path + model.images[model.textures[texIndex].source].uri).c_str());
+            if (metallicRoughnessTextureUID != CONSTANT_EMPTY_UID)
+            {
+                material.SetMetallicRoughnessTexture(metallicRoughnessTextureUID);
+            }
+        }
+
+        // Metallic and Roughness Factors
         material.SetMetallicFactor(static_cast<float>(pbr.metallicFactor));
         material.SetRoughnessFactor(static_cast<float>(pbr.roughnessFactor));
     }

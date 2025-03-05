@@ -8,8 +8,8 @@ in vec4 tangent;
 out vec4 outColor;
 
 layout(binding=0) uniform sampler2D diffuseTexture;
-layout(binding=1) uniform sampler2D specularTexture;
-layout(binding = 2) uniform sampler2D normal_map;
+layout(binding=1) uniform sampler2D metallicRoughnessTexture;
+layout(binding=2) uniform sampler2D normal_map;
 
 uniform vec3 cameraPos;
 
@@ -115,13 +115,12 @@ float GGXNormalDistribution(float NdotH, float roughness){
     return roughness2/denominator;
 }
 
-vec3 RenderLight(vec3 L, vec3 N, vec4 specTexColor, vec3 texColor, vec3 Li, float NdotL, float alpha)
+vec3 RenderLight(vec3 L, vec3 N, vec4 specTexColor, vec3 texColor, vec3 Li, float NdotL, float alpha, float roughness, float metalness)
  {
     float shininessValue;
 	if(shininessInAlpha) shininessValue = exp2(alpha * 7 + 1);
 	else shininessValue = shininess;
 
-    float roughness = 1.0f;
     float normalization = (shininessValue + 2.0) / (2.0 * 3.1415926535);
     vec3 V = normalize(cameraPos - pos);
     vec3 R = reflect(L, N);
@@ -132,43 +131,40 @@ vec3 RenderLight(vec3 L, vec3 N, vec4 specTexColor, vec3 texColor, vec3 Li, floa
     float NdotH = dot(N, H);
 
     vec3 BaseColor = diffColor.rgb * texColor;
-    //Cd = BaseColor(1 - metalness);
-    //RF0 = mix(0.04, BaseColor, metalness);
+    vec3 Cd = BaseColor * (1 - metalness);
+    vec3 RF0 = mix(vec3(0.04), BaseColor, metalness);
     
-    vec3 RF0 = specTexColor.rgb;
+    //vec3 RF0 = specTexColor.rgb;
     float cosTheta = max(dot(L, H), 0.0);
     vec3 fresnel = RF0 + (1 - RF0) * pow(1 - cosTheta, 5);
 
     float visibility = VisibilityFunction(NdotL, NdotV, roughness);
     float GGX = GGXNormalDistribution(NdotH, roughness);
 
+    vec3 diffspec = (Cd * (1-RF0) + (1/4) * fresnel * visibility * GGX) * Li * (NdotL);
 
-    vec3 diffspec = (texColor*(1-RF0) + (1/4)*fresnel*visibility*GGX) * Li * (NdotL);
-
-    vec3 diffuse = (1.0 - RF0) / 3.1415926535 * BaseColor * Li * NdotL;
-    vec3 specular = normalization * specColor.rgb * specTexColor.rgb * VR * Li * fresnel;
-    return diffuse + specular;
+    return diffspec;
 }
 
-vec3 RenderPointLight(const int index, const vec3 N, vec4 specTexColor, const vec3 texColor, const float alpha)
+vec3 RenderPointLight(const int index, const vec3 N, vec4 specTexColor, const vec3 texColor, const float alpha, float roughness, float metalness)
 {
 	float attenuation = PointLightAttenuation(index);
 	vec3 L = normalize(pos - pointLights[index].position.xyz);
 	vec3 Li = pointLights[index].color.rgb * pointLights[index].color.a * attenuation;
 	float NdotL = dot(N, -L);
 
-	if (NdotL > 0 && attenuation > 0) return RenderLight(L, N, specTexColor, texColor, Li, NdotL, alpha);
+	if (NdotL > 0 && attenuation > 0) return RenderLight(L, N, specTexColor, texColor, Li, NdotL, alpha, roughness, metalness);
 	else return vec3(0);	
 }
 
-vec3 RenderSpotLight(const int index, const vec3 N, vec4 specTexColor, const vec3 texColor, const float alpha)
+vec3 RenderSpotLight(const int index, const vec3 N, vec4 specTexColor, const vec3 texColor, const float alpha, float roughness, float metalness)
 {
 	float attenuation = SpotLightAttenuation(index);
 	vec3 L = normalize(pos - spotLights[index].position.xyz);
 	vec3 Li = spotLights[index].color.rgb * spotLights[index].color.a * attenuation;
 	float NdotL = dot(N, -L);
 
-	if (NdotL > 0 && attenuation > 0) return RenderLight(L, N, specTexColor, texColor, Li, NdotL, alpha);
+	if (NdotL > 0 && attenuation > 0) return RenderLight(L, N, specTexColor, texColor, Li, NdotL, alpha, roughness, metalness);
 	else return vec3(0);
 }
 
@@ -183,7 +179,7 @@ vec3 RenderSpotLight(const int index, const vec3 N, vec4 specTexColor, const vec
 void main()
 {
     vec3 texColor = pow(texture(diffuseTexture, uv0).rgb, vec3(2.2f));
-    vec4 specTexColor = texture(specularTexture, uv0);
+    vec4 specTexColor = texture(metallicRoughnessTexture, uv0);
     float alpha = specTexColor.a;
 
     alpha = specTexColor.a;
@@ -204,13 +200,13 @@ void main()
     // Point Lights
     for (int i = 0; i < pointLightsCount; ++i)
 	{
-		hdr += RenderPointLight(i, N, specTexColor, texColor, alpha);
+		hdr += RenderPointLight(i, N, specTexColor, texColor, alpha, roughnessFactor, metallicFactor);
 	}
 
     //Spot Lights
     for (int i = 0; i < spotLightsCount; ++i)
 	{
-		hdr += RenderSpotLight(i, N, specTexColor, texColor, alpha);
+		hdr += RenderSpotLight(i, N, specTexColor, texColor, alpha, roughnessFactor, metallicFactor);
 	}
 
     // Directional light
@@ -219,7 +215,7 @@ void main()
     float NdotL = dot(N, -L);
     if (NdotL > 0)
     {
-		hdr += RenderLight(L, N, specTexColor, texColor, lightColor, NdotL, alpha);
+		hdr += RenderLight(L, N, specTexColor, texColor, lightColor, NdotL, alpha, roughnessFactor, metallicFactor);
     }
 
     vec3 ldr = hdr.rgb / (hdr.rgb + vec3(1.0));

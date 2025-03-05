@@ -38,17 +38,32 @@ void ResourceMaterial::OnEditorUpdate()
 
     updated |= ImGui::SliderFloat3("Diffuse Color", &material.diffColor.x, 0.0f, 1.0f);
 
-    if (hasSpecularTexture)
+    if (hasMetallicTexture)
     {
-        ImGui::Text("Specular Texture");
-        ImGui::Image((ImTextureID)(intptr_t)specularTexture.textureID, ImVec2(256, 256));
+        ImGui::Text("Metallic Roughness Texture");
+        ImGui::Image((ImTextureID)(intptr_t)metallicTexture.textureID, ImVec2(256, 256));
         if (ImGui::IsItemHovered())
         {
-            ImGui::SetTooltip("Texture Dimensions: %d, %d", specularTexture.width, specularTexture.height);
+            ImGui::SetTooltip("Texture Dimensions: %d, %d", metallicTexture.width, metallicTexture.height);
         }
+        updated |= ImGui::SliderFloat("Metallic Factor", &material.metallicFactor, 0.0f, 1.0f);
+        updated |= ImGui::SliderFloat("Roughness Factor", &material.roughnessFactor, 0.0f, 1.0f);
     }
 
-    updated |= ImGui::SliderFloat3("Specular Color", &material.specColor.x, 0.0f, 1.0f);
+    else
+    {
+        if (hasSpecularTexture)
+        {
+            ImGui::Text("Specular Texture");
+            ImGui::Image((ImTextureID)(intptr_t)specularTexture.textureID, ImVec2(256, 256));
+            if (ImGui::IsItemHovered())
+            {
+                ImGui::SetTooltip("Texture Dimensions: %d, %d", specularTexture.width, specularTexture.height);
+            }
+        }
+
+        updated |= ImGui::SliderFloat3("Specular Color", &material.specColor.x, 0.0f, 1.0f);
+    }
 
     if (hasNormalTexture)
     {
@@ -70,6 +85,8 @@ void ResourceMaterial::LoadMaterialData(Material mat)
     material.diffColor           = mat.GetDiffuseFactor();
     material.specColor           = mat.GetSpecularFactor();
     material.shininess           = mat.GetGlossinessFactor();
+    material.metallicFactor      = mat.GetMetallicFactor();
+    material.roughnessFactor     = mat.GetRoughnessFactor();
     material.shininessInAlpha    = 1;
     material.hasNormal           = 0;
 
@@ -82,13 +99,25 @@ void ResourceMaterial::LoadMaterialData(Material mat)
         hasDiffuseTexture        = true;
     }
 
-    ResourceTexture* specTexture = TextureImporter::LoadTexture(mat.GetSpecularGlossinessTexture());
-    if (specTexture != nullptr)
+    ResourceTexture* metallicRoughnessTexture = TextureImporter::LoadTexture(mat.GetMetallicRoughnessTexture());
+    if (metallicRoughnessTexture != nullptr)
     {
-        specularTexture.textureID = specTexture->GetTextureID();
-        specularTexture.width     = specTexture->GetTextureWidth();
-        specularTexture.height    = specTexture->GetTextureHeight();
-        hasSpecularTexture        = true;
+        metallicTexture.textureID = metallicRoughnessTexture->GetTextureID();
+        metallicTexture.width     = metallicRoughnessTexture->GetTextureWidth();
+        metallicTexture.height    = metallicRoughnessTexture->GetTextureHeight();
+        hasMetallicTexture        = true;
+    }
+
+    if (hasMetallicTexture == false)
+    {
+        ResourceTexture* specTexture = TextureImporter::LoadTexture(mat.GetSpecularGlossinessTexture());
+        if (specTexture != nullptr)
+        {
+            specularTexture.textureID = specTexture->GetTextureID();
+            specularTexture.width     = specTexture->GetTextureWidth();
+            specularTexture.height    = specTexture->GetTextureHeight();
+            hasSpecularTexture        = true;
+        }
     }
 
     ResourceTexture* normTexture = TextureImporter::LoadTexture(mat.GetNormalTexture());
@@ -117,7 +146,12 @@ void ResourceMaterial::RenderMaterial(int program) const
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, diffuseTexture.textureID);
     }
-    if (hasSpecularTexture)
+    if (hasMetallicTexture)
+    {
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, metallicTexture.textureID);
+    }
+    else if (hasSpecularTexture)
     {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, specularTexture.textureID);
@@ -137,6 +171,7 @@ void ResourceMaterial::RenderMaterial(int program) const
 void ResourceMaterial::FreeMaterials() const
 {
     glDeleteTextures(1, &diffuseTexture.textureID);
+    glDeleteTextures(1, &metallicTexture.textureID);
     glDeleteTextures(1, &specularTexture.textureID);
     glDeleteTextures(1, &normalTexture.textureID);
     glDeleteBuffers(1, &ubo);
