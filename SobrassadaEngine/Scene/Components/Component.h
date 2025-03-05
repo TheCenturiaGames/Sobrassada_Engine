@@ -3,7 +3,6 @@
 #include "ComponentUtils.h"
 #include "Globals.h"
 #include "Scene/AABBUpdatable.h"
-#include "Transform.h"
 
 #include <Geometry/AABB.h>
 #include <Libs/rapidjson/document.h>

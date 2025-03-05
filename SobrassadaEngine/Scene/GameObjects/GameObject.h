@@ -1,7 +1,6 @@
 #pragma once
 #include "Globals.h"
 #include "Scene/AABBUpdatable.h"
-#include "Transform.h"
 
 #include <string>
 #include <vector>

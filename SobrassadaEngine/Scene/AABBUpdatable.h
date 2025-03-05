@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "Transform.h"
 
 class AABBUpdatable
 {
