@@ -90,8 +90,7 @@ void MeshComponent::Render()
     if (enabled && currentMesh != nullptr)
     {
         unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
-        float4x4 transposedView = globalTransform.Transposed();
-        currentMesh->Render(App->GetResourcesModule()->GetProgram(), transposedView, cameraUBO, currentMaterial);
+        currentMesh->Render(App->GetResourcesModule()->GetProgram(), globalTransform, cameraUBO, currentMaterial);
     }
     Component::Render();
 }
