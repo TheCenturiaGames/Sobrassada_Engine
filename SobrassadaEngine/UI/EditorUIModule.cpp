@@ -605,7 +605,7 @@ bool EditorUIModule::RenderTransformWidget(
 
     float3 outputPosition = outputTransform.TranslatePart();
     float3 outputRotation = Quat(outputTransform.RotatePart()).ToEulerXYZ();
-    float3 outputScale = float3(1);
+    float3 outputScale = outputTransform.GetScale();
     
     bool positionValueChanged = false, rotationValueChanged = false, scaleValueChanged = false;
     static bool lockScaleAxis = false;
@@ -637,9 +637,12 @@ bool EditorUIModule::RenderTransformWidget(
             outputScale  = originalScale;
         }
 
-        outputTransform = float4x4::identity;
-        outputTransform.SetTranslatePart(outputPosition);
-        outputTransform.SetRotatePart(Quat::FromEulerXYZ(outputRotation.x, outputRotation.y, outputRotation.z));
+        //outputTransform = float4x4::identity;
+        //outputTransform.SetTranslatePart(outputPosition);
+        //outputTransform.SetRotatePart(Quat::FromEulerXYZ(outputRotation.x, outputRotation.y, outputRotation.z));
+        //outputTransform.ScaleCol(0, outputScale.x);
+        //outputTransform.ScaleCol(1, outputScale.y);
+        //outputTransform.ScaleCol(2, outputScale.z);
 
         if (transformType == ImGuizmo::WORLD)
         {
