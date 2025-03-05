@@ -7,7 +7,7 @@
 #include "ImGui.h"
 #include <vector>
 
-PointLightComponent::PointLightComponent(UID uid, UID uidParent, UID uidRoot, const Transform& parentGlobalTransform)
+PointLightComponent::PointLightComponent(UID uid, UID uidParent, UID uidRoot, const float4x4& parentGlobalTransform)
     : LightComponent(uid, uidParent, uidRoot, "Point Light", COMPONENT_POINT_LIGHT, parentGlobalTransform)
 {
     range                      = 1;
@@ -32,8 +32,8 @@ PointLightComponent::PointLightComponent(const rapidjson::Value& initialState) :
     if (lightsConfig != nullptr) lightsConfig->AddPointLight(this);
 }
 
-
-PointLightComponent::~PointLightComponent() {
+PointLightComponent::~PointLightComponent()
+{
     App->GetSceneModule()->GetLightsConfig()->RemovePointLight(uid);
 }
 
@@ -107,11 +107,11 @@ void PointLightComponent::Render()
     {
         for (int i = 0; i < directions.size(); ++i)
         {
-            debug->DrawLine(globalTransform.position, directions[i], range, float3(1, 1, 1));
+            debug->DrawLine(globalTransform.TranslatePart(), directions[i], range, float3(1, 1, 1));
         }
     }
     else
     {
-        debug->DrawSphere(globalTransform.position, float3(1, 1, 1), range);
+        debug->DrawSphere(globalTransform.TranslatePart(), float3(1, 1, 1), range);
     }
 }
