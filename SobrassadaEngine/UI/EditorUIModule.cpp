@@ -603,10 +603,9 @@ bool EditorUIModule::RenderTransformWidget(
 {
     float4x4& outputTransform = transformType == ImGuizmo::LOCAL ? localTransform : globalTransform;
 
-    float3 outputPosition, outputRotation, outputScale;
-
-    ImGuizmo::DecomposeMatrixToComponents(
-        outputTransform.ptr(), outputPosition.ptr(), outputRotation.ptr(), outputScale.ptr());
+    float3 outputPosition = outputTransform.TranslatePart();
+    float3 outputRotation = Quat(outputTransform.RotatePart()).ToEulerXYZ();
+    float3 outputScale = float3(1);
     
     bool positionValueChanged = false, rotationValueChanged = false, scaleValueChanged = false;
     static bool lockScaleAxis = false;
@@ -638,15 +637,13 @@ bool EditorUIModule::RenderTransformWidget(
             outputScale  = originalScale;
         }
 
-        ImGuizmo::RecomposeMatrixFromComponents(
-            outputPosition.ptr(), outputRotation.ptr(), outputScale.ptr(),
-            outputTransform.ptr()
-        );
+        outputTransform = float4x4::identity;
+        outputTransform.SetTranslatePart(outputPosition);
+        outputTransform.SetRotatePart(Quat::FromEulerXYZ(outputRotation.x, outputRotation.y, outputRotation.z));
 
         if (transformType == ImGuizmo::WORLD)
         {
             localTransform = parentTransform.Inverted() * globalTransform;
-            //localTransform.Set(parentTransform.orientedDif(globalTransform));
         }
     }
 
@@ -661,12 +658,14 @@ bool EditorUIModule::RenderImGuizmo(float4x4 &localTransform, float4x4 &globalTr
     float4x4 proj = float4x4(App->GetCameraModule()->GetProjectionMatrix());
     proj.Transpose();
 
-    Manipulate(view.ptr(), proj.ptr(), mCurrentGizmoOperation, transformType, globalTransform.ptr());
+    float4x4 transform = float4x4(globalTransform);
+    transform.Transpose();
+    Manipulate(view.ptr(), proj.ptr(), mCurrentGizmoOperation, transformType, transform.ptr());
 
     if (ImGuizmo::IsUsing())
     {
-        localTransform = parentTransform.Inverted() * globalTransform;
-        //localTransform.Set(parentTransform.orientedDif(transform));
+        transform.Transpose();
+        localTransform = parentTransform.Inverted() * transform;
 
         return true;
     }
@@ -682,14 +681,14 @@ void EditorUIModule::RenderBasicTransformModifiers(
 
     positionValueChanged |= ImGui::InputFloat3("Position", &outputPosition[0]);
 
-    if (bUseRad)
-    {
-        outputRotation /= RAD_DEGREE_CONV;
-    }
-    rotationValueChanged |= ImGui::InputFloat3("Rotation", &outputRotation[0]);
-    if (bUseRad)
+    if (!bUseRad)
     {
         outputRotation *= RAD_DEGREE_CONV;
+    }
+    rotationValueChanged |= ImGui::InputFloat3("Rotation", &outputRotation[0]);
+    if (!bUseRad)
+    {
+        outputRotation /= RAD_DEGREE_CONV;
     }
     ImGui::SameLine();
     ImGui::Checkbox("Radians", &bUseRad);
