@@ -105,7 +105,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>.\Tests;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\DirectXTex;.\Libs\Tinygltf;.\Libs\Optick_1.4.0\include;.\;.\Modules;.\UI;.\Utils;.\FileSystem;.\DebugDraw;.\Scene\GameObjects;.\Scene\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Tests;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\DirectXTex;.\Libs\Tinygltf;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\;.\Modules;.\UI;.\Utils;.\FileSystem;.\DebugDraw;.\Scene\GameObjects;.\Scene\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -137,6 +137,24 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourAlloc.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourAssert.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourCommon.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourNavMesh.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourNavMeshBuilder.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourNavMeshQuery.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourNode.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\Recast.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastAlloc.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastArea.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastAssert.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastContour.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastFilter.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastLayers.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastMesh.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastMeshDetail.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastRasterization.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastRegion.cpp" />
     <ClCompile Include="Modules\CameraModule.cpp" />
     <ClCompile Include="Modules\EditorUIModule.cpp" />
     <ClCompile Include="Utils\EngineTimer.cpp" />
