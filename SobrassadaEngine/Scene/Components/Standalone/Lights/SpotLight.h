@@ -8,7 +8,7 @@
 class SpotLight : public LightComponent
 {
   public:
-    SpotLight(UID uid, UID uidParent, UID uidRoot, const float4x4 &parentGlobalTransform);
+    SpotLight(UID uid, UID uidParent, UID uidRoot, const float4x4& parentGlobalTransform);
     SpotLight(const rapidjson::Value& initialState);
     ~SpotLight();
 
@@ -21,7 +21,7 @@ class SpotLight : public LightComponent
     float GetRange() const { return range; }
     float GetInnerAngle() const { return innerAngle; }
     float GetOuterAngle() const { return outerAngle; }
-    
+
   private:
     float3 direction;
     float range;

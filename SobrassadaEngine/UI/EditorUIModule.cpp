@@ -62,15 +62,9 @@ bool EditorUIModule::Init()
     App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_G, [&] { mCurrentGizmoOperation = ImGuizmo::TRANSLATE; });
     App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_H, [&] { mCurrentGizmoOperation = ImGuizmo::ROTATE; });
     App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_J, [&] { mCurrentGizmoOperation = ImGuizmo::SCALE; });
-    
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_R, [&]
-    {
-        transformType = ImGuizmo::LOCAL;
-    });
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_T, [&]
-    {
-        transformType = ImGuizmo::WORLD;
-    });
+
+    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_R, [&] { transformType = ImGuizmo::LOCAL; });
+    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_T, [&] { transformType = ImGuizmo::WORLD; });
 
     return true;
 }
@@ -603,21 +597,24 @@ bool EditorUIModule::RenderTransformWidget(
 {
     float4x4 outputTransform = float4x4(transformType == ImGuizmo::LOCAL ? localTransform : globalTransform);
 
-    float3 outputScale = outputTransform.GetScale();
+    float3 outputScale       = outputTransform.GetScale();
     outputTransform.ScaleCol3(0, outputScale.x != 0 ? 1 / outputScale.x : 1);
     outputTransform.ScaleCol3(1, outputScale.y != 0 ? 1 / outputScale.y : 1);
     outputTransform.ScaleCol3(2, outputScale.z != 0 ? 1 / outputScale.z : 1);
-    float3 outputPosition = outputTransform.TranslatePart();
-    float3 outputRotation = Quat(outputTransform.RotatePart()).ToEulerXYZ();
-    
+    float3 outputPosition     = outputTransform.TranslatePart();
+    float3 outputRotation     = Quat(outputTransform.RotatePart()).ToEulerXYZ();
+
     bool positionValueChanged = false, rotationValueChanged = false, scaleValueChanged = false;
     static bool lockScaleAxis = false;
-    float3 originalScale = float3(outputScale);
+    float3 originalScale      = float3(outputScale);
 
-    std::string transformName  = std::string(transformType == ImGuizmo::LOCAL ? "Local " : "World ") + "Transform";
+    std::string transformName = std::string(transformType == ImGuizmo::LOCAL ? "Local " : "World ") + "Transform";
     ImGui::SeparatorText(transformName.c_str());
-    
-    RenderBasicTransformModifiers(outputPosition, outputRotation, outputScale, lockScaleAxis, positionValueChanged, rotationValueChanged, scaleValueChanged);
+
+    RenderBasicTransformModifiers(
+        outputPosition, outputRotation, outputScale, lockScaleAxis, positionValueChanged, rotationValueChanged,
+        scaleValueChanged
+    );
 
     if (positionValueChanged || rotationValueChanged || scaleValueChanged)
     {
@@ -636,8 +633,8 @@ bool EditorUIModule::RenderTransformWidget(
             {
                 scaleFactor = originalScale.z == 0 ? 1 : outputScale.z / originalScale.z;
             }
-            originalScale         *= scaleFactor;
-            outputScale  = originalScale;
+            originalScale *= scaleFactor;
+            outputScale    = originalScale;
         }
 
         outputTransform = float4x4::identity;
@@ -650,7 +647,8 @@ bool EditorUIModule::RenderTransformWidget(
         if (transformType == ImGuizmo::WORLD)
         {
             localTransform = parentTransform.Inverted() * outputTransform;
-        } else
+        }
+        else
         {
             localTransform = outputTransform;
         }
@@ -659,7 +657,9 @@ bool EditorUIModule::RenderTransformWidget(
     return positionValueChanged || rotationValueChanged || scaleValueChanged;
 }
 
-bool EditorUIModule::RenderImGuizmo(float4x4 &localTransform, float4x4 &globalTransform, const float4x4 &parentTransform) const
+bool EditorUIModule::RenderImGuizmo(
+    float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform
+) const
 {
     float4x4 view = float4x4(App->GetCameraModule()->GetViewMatrix());
     view.Transpose();
@@ -682,8 +682,8 @@ bool EditorUIModule::RenderImGuizmo(float4x4 &localTransform, float4x4 &globalTr
 }
 
 void EditorUIModule::RenderBasicTransformModifiers(
-    float3& outputPosition, float3& outputRotation, float3& outputScale, bool& lockScaleAxis, bool& positionValueChanged, bool& rotationValueChanged,
-    bool& scaleValueChanged
+    float3& outputPosition, float3& outputRotation, float3& outputScale, bool& lockScaleAxis,
+    bool& positionValueChanged, bool& rotationValueChanged, bool& scaleValueChanged
 )
 {
     static bool bUseRad   = true;

@@ -1,20 +1,20 @@
 #include "SpotLight.h"
 
-#include "DebugDrawModule.h"
 #include "Application.h"
+#include "DebugDrawModule.h"
 #include "SceneModule.h"
 
 #include "ImGui.h"
 #include "Math/Quat.h"
 
-SpotLight::SpotLight(UID uid, UID uidParent, UID uidRoot, const float4x4 &parentGlobalTransform)
+SpotLight::SpotLight(UID uid, UID uidParent, UID uidRoot, const float4x4& parentGlobalTransform)
     : LightComponent(uid, uidParent, uidRoot, "Spot Light", COMPONENT_SPOT_LIGHT, parentGlobalTransform)
 {
-    direction  = -float3::unitY;
-    range      = 3;
-    innerAngle = 10;
-    outerAngle = 20;
-    
+    direction                  = -float3::unitY;
+    range                      = 3;
+    innerAngle                 = 10;
+    outerAngle                 = 20;
+
     LightsConfig* lightsConfig = App->GetSceneModule()->GetLightsConfig();
     if (lightsConfig != nullptr) lightsConfig->AddSpotLight(this);
 }
@@ -79,8 +79,8 @@ void SpotLight::Render()
 {
     if (!enabled || !drawGizmos) return;
 
-    const float innerRads      = innerAngle * (PI / 180.0f) > PI / 2 ? PI / 2 : innerAngle * (PI / 180.0f);
-    const float outerRads      = outerAngle * (PI / 180.0f) > PI / 2 ? PI / 2 : outerAngle * (PI / 180.0f);
+    const float innerRads = innerAngle * (PI / 180.0f) > PI / 2 ? PI / 2 : innerAngle * (PI / 180.0f);
+    const float outerRads = outerAngle * (PI / 180.0f) > PI / 2 ? PI / 2 : outerAngle * (PI / 180.0f);
 
     std::vector<float3> innerDirections;
     innerDirections.push_back(float3(Quat::RotateX(innerRads).Transform(-float3::unitY)));
@@ -89,25 +89,23 @@ void SpotLight::Render()
     std::vector<float3> outerDirections;
     outerDirections.push_back(float3(Quat::RotateZ(outerRads).Transform(-float3::unitY)));
     outerDirections.push_back(float3(Quat::RotateZ(-outerRads).Transform(-float3::unitY)));
-    
-    direction = (globalTransform.RotatePart() * -float3::unitY).Normalized(); 
-    innerDirections[0]     = (globalTransform.RotatePart() * innerDirections[0]); 
-    innerDirections[1]     = (globalTransform.RotatePart() * innerDirections[1]); 
 
-    outerDirections[0]     = (globalTransform.RotatePart() * outerDirections[0]); 
-    outerDirections[1]     = (globalTransform.RotatePart() * outerDirections[1]); 
+    direction              = (globalTransform.RotatePart() * -float3::unitY).Normalized();
+    innerDirections[0]     = (globalTransform.RotatePart() * innerDirections[0]);
+    innerDirections[1]     = (globalTransform.RotatePart() * innerDirections[1]);
 
-    
+    outerDirections[0]     = (globalTransform.RotatePart() * outerDirections[0]);
+    outerDirections[1]     = (globalTransform.RotatePart() * outerDirections[1]);
 
-    DebugDrawModule *debug = App->GetDebugDrawModule();
+    DebugDrawModule* debug = App->GetDebugDrawModule();
     debug->DrawLine(globalTransform.TranslatePart(), direction, range, float3(1, 1, 1));
 
-    for (const float3 &dir : innerDirections)
+    for (const float3& dir : innerDirections)
     {
         debug->DrawLine(globalTransform.TranslatePart(), dir, range / cos(innerRads), float3(1, 1, 1));
     }
 
-    for (const float3 &dir : outerDirections)
+    for (const float3& dir : outerDirections)
     {
         debug->DrawLine(globalTransform.TranslatePart(), dir, range / cos(outerRads), float3(1, 1, 1));
     }

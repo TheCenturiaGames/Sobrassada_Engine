@@ -6,19 +6,21 @@
 
 #include <Geometry/AABB.h>
 #include <Libs/rapidjson/document.h>
-#include <vector>
 #include <Math/float4x4.h>
+#include <vector>
 
 class Component : public AABBUpdatable
 {
   public:
-    Component(UID uid, UID uidParent, UID uidRoot, const char *initName, int type, const float4x4 &parentGlobalTransform);
+    Component(
+        UID uid, UID uidParent, UID uidRoot, const char* initName, int type, const float4x4& parentGlobalTransform
+    );
 
-    Component(const rapidjson::Value &initialState);
+    Component(const rapidjson::Value& initialState);
 
     ~Component() override;
 
-    virtual void Save(rapidjson::Value &targetState, rapidjson::Document::AllocatorType &allocator) const;
+    virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
 
     virtual void Update() = 0;
     virtual void Render();
@@ -30,8 +32,8 @@ class Component : public AABBUpdatable
     virtual void RenderEditorInspector();
     virtual void RenderEditorComponentTree(UID selectedComponentUID);
 
-    virtual void OnTransformUpdate(const float4x4 &parentGlobalTransform);
-    virtual AABB &TransformUpdated(const float4x4 &parentGlobalTransform);
+    virtual void OnTransformUpdate(const float4x4& parentGlobalTransform);
+    virtual AABB& TransformUpdated(const float4x4& parentGlobalTransform);
     void PassAABBUpdateToParent() override;
 
     void ComponentGlobalTransformUpdated() override {}
@@ -44,14 +46,14 @@ class Component : public AABBUpdatable
 
     UID GetUIDParent() const { return uidParent; }
 
-    const std::vector<UID> &GetChildren() const { return children; }
+    const std::vector<UID>& GetChildren() const { return children; }
 
     void SetUIDParent(UID newUIDParent);
 
-    const float4x4 &GetGlobalTransform() const override { return globalTransform; }
-    const float4x4 &GetLocalTransform() const { return localTransform; }
+    const float4x4& GetGlobalTransform() const override { return globalTransform; }
+    const float4x4& GetLocalTransform() const { return localTransform; }
 
-    const AABB &GetGlobalAABB() const { return globalComponentAABB; }
+    const AABB& GetGlobalAABB() const { return globalComponentAABB; }
 
     void CalculateLocalAABB();
 
@@ -60,7 +62,6 @@ class Component : public AABBUpdatable
     void RenderGuizmo();
 
   protected:
-
     RootComponent* GetRootComponent();
     AABBUpdatable* GetParent();
     std::vector<Component*>& GetChildComponents();
@@ -74,7 +75,7 @@ class Component : public AABBUpdatable
     char name[64];
     bool enabled;
 
-    float4x4 localTransform = float4x4::identity;
+    float4x4 localTransform  = float4x4::identity;
     float4x4 globalTransform = float4x4::identity;
 
     AABB localComponentAABB;
@@ -82,9 +83,8 @@ class Component : public AABBUpdatable
 
     const int type = COMPONENT_NONE;
 
-private:
-    
+  private:
     RootComponent* rootComponent = nullptr;
-    AABBUpdatable* parent = nullptr;
+    AABBUpdatable* parent        = nullptr;
     std::vector<Component*> childComponents;
 };

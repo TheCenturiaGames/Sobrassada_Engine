@@ -11,8 +11,8 @@
 PointLight::PointLight(UID uid, UID uidParent, UID uidRoot, const float4x4& parentGlobalTransform)
     : LightComponent(uid, uidParent, uidRoot, "Point Light", COMPONENT_POINT_LIGHT, parentGlobalTransform)
 {
-    range      = 1;
-    gizmosMode = 0;
+    range                      = 1;
+    gizmosMode                 = 0;
 
     LightsConfig* lightsConfig = App->GetSceneModule()->GetLightsConfig();
     if (lightsConfig != nullptr) lightsConfig->AddPointLight(this);
@@ -33,8 +33,8 @@ PointLight::PointLight(const rapidjson::Value& initialState) : LightComponent(in
     if (lightsConfig != nullptr) lightsConfig->AddPointLight(this);
 }
 
-
-PointLight::~PointLight() {
+PointLight::~PointLight()
+{
     App->GetSceneModule()->GetLightsConfig()->RemovePointLight(uid);
 }
 

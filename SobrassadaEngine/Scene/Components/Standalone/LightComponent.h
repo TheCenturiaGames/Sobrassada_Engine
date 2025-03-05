@@ -1,16 +1,16 @@
 #pragma once
 
-#include "Component.h"
 #include "Application.h"
+#include "Component.h"
 
 #include "Math/float3.h"
 
-class LightComponent: public Component
+class LightComponent : public Component
 {
   public:
     LightComponent(
-        UID uid, UID uidParent, UID uidRoot, const char *uiName, const ComponentType lightType,
-        const float4x4 &parentGlobalTransform
+        UID uid, UID uidParent, UID uidRoot, const char* uiName, const ComponentType lightType,
+        const float4x4& parentGlobalTransform
     );
     LightComponent(const rapidjson::Value& initialState);
 

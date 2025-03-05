@@ -8,7 +8,7 @@ class DirectionalLight : public LightComponent
 {
 
   public:
-    DirectionalLight(UID uid, UID uidParent, UID uidRoot, const float4x4 &parentGlobalTransform);
+    DirectionalLight(UID uid, UID uidParent, UID uidRoot, const float4x4& parentGlobalTransform);
     DirectionalLight(const rapidjson::Value& initialState);
     ~DirectionalLight();
 

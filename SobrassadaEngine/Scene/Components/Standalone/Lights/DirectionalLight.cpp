@@ -8,14 +8,14 @@
 DirectionalLight::DirectionalLight(UID uid, UID uidParent, UID uidRoot, const float4x4& parentGlobalTransform)
     : LightComponent(uid, uidParent, uidRoot, "Directional Light", COMPONENT_DIRECTIONAL_LIGHT, parentGlobalTransform)
 {
-    direction = -float3::unitY;
+    direction                  = -float3::unitY;
     LightsConfig* lightsConfig = App->GetSceneModule()->GetLightsConfig();
     if (lightsConfig != nullptr) lightsConfig->AddDirectionalLight(this);
 }
 
 DirectionalLight::DirectionalLight(const rapidjson::Value& initialState) : LightComponent(initialState)
 {
-    direction = -float3::unitY;
+    direction                  = -float3::unitY;
     LightsConfig* lightsConfig = App->GetSceneModule()->GetLightsConfig();
     if (lightsConfig != nullptr) lightsConfig->AddDirectionalLight(this);
 }
@@ -35,7 +35,7 @@ void DirectionalLight::Render()
     if (!enabled || !drawGizmos) return;
 
     // Would be more optimal to only update the direction when rotation is modified
-    
+
     direction              = (globalTransform.RotatePart() * -float3::unitY).Normalized();
 
     DebugDrawModule* debug = App->GetDebugDrawModule();

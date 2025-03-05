@@ -1,9 +1,9 @@
 #pragma once
 
-#include "imgui_internal.h"
 #include "./Libs/ImGuizmo/ImGuizmo.h"
 #include "Module.h"
 #include "ResourceManagement/Resources/Resource.h"
+#include "imgui_internal.h"
 
 #include "SDL.h"
 #include <deque>
@@ -13,7 +13,7 @@
 struct CPUFeature
 {
     SDL_bool (*check)();
-    const char *name;
+    const char* name;
 };
 
 class EditorViewport;
@@ -32,10 +32,10 @@ class EditorUIModule : public Module
     update_status PostUpdate(float deltaTime) override;
     bool ShutDown() override;
 
-    bool RenderTransformWidget(float4x4 &localTransform, float4x4 &globalTransform, const float4x4 &parentTransform);
-    bool RenderImGuizmo(float4x4 &localTransform, float4x4 &globalTransform, const float4x4 &parentTransform)const;
+    bool RenderTransformWidget(float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform);
+    bool RenderImGuizmo(float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform) const;
 
-    UID RenderResourceSelectDialog(const char *id, const std::unordered_map<std::string, UID> &availableResources);
+    UID RenderResourceSelectDialog(const char* id, const std::unordered_map<std::string, UID>& availableResources);
 
   public:
     bool hierarchyMenu = true;
@@ -43,8 +43,8 @@ class EditorUIModule : public Module
 
   private:
     void RenderBasicTransformModifiers(
-        float3& outputPosition, float3& outputRotation, float3& outputScale, bool &lockScaleAxis, bool &positionValueChanged, bool &rotationValueChanged,
-        bool &scaleValueChanged
+        float3& outputPosition, float3& outputRotation, float3& outputScale, bool& lockScaleAxis,
+        bool& positionValueChanged, bool& rotationValueChanged, bool& scaleValueChanged
     );
 
     void LimitFPS(float deltaTime) const;
@@ -52,47 +52,47 @@ class EditorUIModule : public Module
     void Draw();
 
     void MainMenu();
-    void EditorSettings(bool &editorSettingsMenu);
+    void EditorSettings(bool& editorSettingsMenu);
 
-    void FramePlots(bool &vsync);
-    void WindowConfig(bool &vsync) const;
+    void FramePlots(bool& vsync);
+    void WindowConfig(bool& vsync) const;
     void CameraConfig() const;
     void OpenGLConfig() const;
     void GameTimerConfig() const;
     void HardwareConfig() const;
     void ShowCaps() const;
 
-    void ImportDialog(bool &import);
-    void GetFilesSorted(const std::string &currentPath, std::vector<std::string> &files);
-    void LoadDialog(bool &load);
-    void SaveDialog(bool &save);
-    void Console(bool &consoleMenu) const;
-    void About(bool &aboutMenu) const;
+    void ImportDialog(bool& import);
+    void GetFilesSorted(const std::string& currentPath, std::vector<std::string>& files);
+    void LoadDialog(bool& load);
+    void SaveDialog(bool& save);
+    void Console(bool& consoleMenu) const;
+    void About(bool& aboutMenu) const;
 
   private:
     bool consoleMenu            = true;
-    bool import             = false;
-    bool load               = false;
-    bool save               = false;
-    bool aboutMenu          = false;
-    bool editorSettingsMenu = false;
+    bool import                 = false;
+    bool load                   = false;
+    bool save                   = false;
+    bool aboutMenu              = false;
+    bool editorSettingsMenu     = false;
     bool quadtreeViewerViewport = false;
-    bool closeApplication   = false;
+    bool closeApplication       = false;
 
-    int maxFPS              = 60;
-    int maximumPlotData     = 50;
+    int maxFPS                  = 60;
+    int maximumPlotData         = 50;
     std::deque<float> framerate;
     std::deque<float> frametime;
 
-    ImGuizmo::MODE transformType = ImGuizmo::LOCAL;
+    ImGuizmo::MODE transformType   = ImGuizmo::LOCAL;
 
-    
-    QuadtreeViewer *quadtreeViewer = nullptr;
+    QuadtreeViewer* quadtreeViewer = nullptr;
 
     int width, height;
 
     std::string startPath;
     std::string libraryPath;
-    
-    ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;;
+
+    ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+    ;
 };
