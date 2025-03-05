@@ -27,7 +27,11 @@ class RootComponent : public Component
     void RenderEditorComponentTree(UID selectedComponentUID) override;
     void RenderEditorInspector() override;
 
+    void Update() override;
+
+    void SetSelectedComponent(UID componentUID);
     bool IsSelectedComponent(UID componentUID) const { return selectedUID == componentUID; }
+
     int GetMobilitySettings() const { return mobilitySettings; }
 
     const float4x4& GetParentGlobalTransform() override;

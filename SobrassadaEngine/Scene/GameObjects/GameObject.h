@@ -19,6 +19,8 @@ class GameObject : public AABBUpdatable
 
     GameObject(const rapidjson::Value& initialState);
 
+    ~GameObject() override;
+
     void PassAABBUpdateToParent() override;
     void ComponentGlobalTransformUpdated() override;
     const float4x4& GetGlobalTransform() const override;
@@ -60,12 +62,6 @@ class GameObject : public AABBUpdatable
 
     void Render();
     void RenderEditor();
-
-    void PassAABBUpdateToParent() override;
-    void ComponentGlobalTransformUpdated() override;
-    const float4x4& GetGlobalTransform() const override;
-
-    const float4x4& GetParentGlobalTransform() override;
 
   public:
     inline static UID currentRenamingUID = INVALID_UUID;

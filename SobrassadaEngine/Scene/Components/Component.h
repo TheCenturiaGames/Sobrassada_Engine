@@ -24,14 +24,10 @@ class Component : public AABBUpdatable
     virtual void Render();
     virtual void RenderEditorInspector();
     virtual void RenderEditorComponentTree(UID selectedComponentUID);
-    virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
 
     virtual bool AddChildComponent(UID componentUID);
     virtual bool RemoveChildComponent(UID componentUID);
     virtual bool DeleteChildComponent(UID componentUID);
-
-    virtual void RenderEditorInspector();
-    virtual void RenderEditorComponentTree(UID selectedComponentUID);
 
     virtual void OnTransformUpdate(const float4x4& parentGlobalTransform);
     virtual AABB& TransformUpdated(const float4x4& parentGlobalTransform);
@@ -55,8 +51,6 @@ class Component : public AABBUpdatable
     const float4x4& GetLocalTransform() const { return localTransform; }
 
     const AABB& GetGlobalAABB() const { return globalComponentAABB; }
-
-    void CalculateLocalAABB();
 
     int GetType() const { return type; }
 

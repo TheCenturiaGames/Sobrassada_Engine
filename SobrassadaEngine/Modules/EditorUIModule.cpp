@@ -668,7 +668,7 @@ bool EditorUIModule::RenderImGuizmo(
     float4x4 proj = float4x4(App->GetCameraModule()->GetProjectionMatrix());
     proj.Transpose();
 
-    float maxDistance             = App->GetCameraModule()->GetFarPlaneDistance() * 0.9f;
+    float maxDistance  = App->GetCameraModule()->GetFarPlaneDistance() * 0.9f;
 
     float4x4 transform = float4x4(globalTransform);
     transform.Transpose();
@@ -681,8 +681,8 @@ bool EditorUIModule::RenderImGuizmo(
 
     if (App->GetSceneModule()->GetDoInputs())
     {
-       
-        if (newPos.Distance(App->GetCameraModule()->GetCameraPosition()) > maxDistance)
+
+        if (transform.TranslatePart().Distance(App->GetCameraModule()->GetCameraPosition()) > maxDistance)
         {
             ImGuizmo::Enable(false);
             return false;
