@@ -56,13 +56,6 @@ bool EditorUIModule::Init()
     startPath      = std::filesystem::current_path().string();
     libraryPath    = startPath + DELIMITER + SCENES_PATH;
 
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_G, [&] { mCurrentGizmoOperation = ImGuizmo::TRANSLATE; });
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_H, [&] { mCurrentGizmoOperation = ImGuizmo::ROTATE; });
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_J, [&] { mCurrentGizmoOperation = ImGuizmo::SCALE; });
-
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_R, [&] { transformType = ImGuizmo::LOCAL; });
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_T, [&] { transformType = ImGuizmo::WORLD; });
-
     return true;
 }
 
@@ -84,6 +77,7 @@ update_status EditorUIModule::PreUpdate(float deltaTime)
 
 update_status EditorUIModule::Update(float deltaTime)
 {
+    UpdateGizmoTransformMode();
     LimitFPS(deltaTime);
     AddFramePlotData(deltaTime);
     return UPDATE_CONTINUE;
@@ -120,6 +114,21 @@ bool EditorUIModule::ShutDown()
     delete quadtreeViewer;
 
     return true;
+}
+
+void EditorUIModule::UpdateGizmoTransformMode()
+{
+    if (App->GetSceneModule()->GetDoInputsScene())
+    {
+        const KeyState* keyboard = App->GetInputModule()->GetKeyboard();
+
+        if (keyboard[SDL_SCANCODE_G]) mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+        else if (keyboard[SDL_SCANCODE_H]) mCurrentGizmoOperation = ImGuizmo::ROTATE;
+        else if (keyboard[SDL_SCANCODE_J]) mCurrentGizmoOperation = ImGuizmo::SCALE;
+
+        if (keyboard[SDL_SCANCODE_R]) transformType = ImGuizmo::LOCAL;
+        else if (keyboard[SDL_SCANCODE_T]) transformType = ImGuizmo::WORLD;
+    }
 }
 
 void EditorUIModule::LimitFPS(float deltaTime) const
@@ -667,14 +676,10 @@ bool EditorUIModule::RenderImGuizmo(
     transform.Transpose();
     Manipulate(view.ptr(), proj.ptr(), mCurrentGizmoOperation, transformType, transform.ptr());
 
-    if (!ImGuizmo::IsUsing())
-    {
-        return false;
-    }
+    if (!ImGuizmo::IsUsing()) return false;
 
-    if (App->GetSceneModule()->GetDoInputs())
+    if (App->GetSceneModule()->GetDoInputsScene())
     {
-
         if (transform.TranslatePart().Distance(App->GetCameraModule()->GetCameraPosition()) > maxDistance)
         {
             ImGuizmo::Enable(false);
@@ -963,11 +968,11 @@ void EditorUIModule::EditorSettings(bool& editorSettingsMenu)
         FramePlots(vsync);
     }
 
-    ImGui::Spacing();
-    if (ImGui::CollapsingHeader("Game timer"))
-    {
-        GameTimerConfig();
-    }
+    // ImGui::Spacing();
+    // if (ImGui::CollapsingHeader("Game timer"))
+    //{
+    //     GameTimerConfig();
+    // }
 
     ImGui::Spacing();
 
@@ -988,6 +993,13 @@ void EditorUIModule::EditorSettings(bool& editorSettingsMenu)
         ImGui::Text("Key A: %s", (keyboard[SDL_SCANCODE_A] ? "Pressed" : "Not Pressed"));
         ImGui::Text("Key S: %s", (keyboard[SDL_SCANCODE_S] ? "Pressed" : "Not Pressed"));
         ImGui::Text("Key D: %s", (keyboard[SDL_SCANCODE_D] ? "Pressed" : "Not Pressed"));
+        ImGui::Text("Key F: %s", (keyboard[SDL_SCANCODE_F] ? "Pressed" : "Not Pressed"));
+        ImGui::Text("Key G: %s", (keyboard[SDL_SCANCODE_G] ? "Pressed" : "Not Pressed"));
+        ImGui::Text("Key H: %s", (keyboard[SDL_SCANCODE_H] ? "Pressed" : "Not Pressed"));
+        ImGui::Text("Key J: %s", (keyboard[SDL_SCANCODE_J] ? "Pressed" : "Not Pressed"));
+        ImGui::Text("Key R: %s", (keyboard[SDL_SCANCODE_R] ? "Pressed" : "Not Pressed"));
+        ImGui::Text("Key T: %s", (keyboard[SDL_SCANCODE_T] ? "Pressed" : "Not Pressed"));
+        ImGui::Text("Key O: %s", (keyboard[SDL_SCANCODE_O] ? "Pressed" : "Not Pressed"));
         ImGui::Text("Key LSHIFT: %s", (keyboard[SDL_SCANCODE_LSHIFT] ? "Pressed" : "Not Pressed"));
         ImGui::Text("Key LALT: %s", (keyboard[SDL_SCANCODE_LALT] ? "Pressed" : "Not Pressed"));
 

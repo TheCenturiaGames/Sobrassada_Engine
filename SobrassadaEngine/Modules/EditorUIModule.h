@@ -1,15 +1,16 @@
 #pragma once
 
-#include "imgui_internal.h"
-#include "./Libs/ImGuizmo/ImGuizmo.h"
 #include "Module.h"
 #include "ResourceManagement/Resources/Resource.h"
 
 #include "SDL.h"
+#include "imgui_internal.h"
+#include <Math/float4x4.h>
 #include <deque>
 #include <string>
 #include <unordered_map>
-#include <Math/float4x4.h>
+//imguizmo include after imgui
+#include "./Libs/ImGuizmo/ImGuizmo.h"
 
 struct CPUFeature
 {
@@ -35,7 +36,6 @@ class EditorUIModule : public Module
 
     bool RenderTransformWidget(float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform);
     bool RenderImGuizmo(float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform) const;
-
     UID RenderResourceSelectDialog(const char* id, const std::unordered_map<std::string, UID>& availableResources);
 
   private:
@@ -44,6 +44,7 @@ class EditorUIModule : public Module
         bool& positionValueChanged, bool& rotationValueChanged, bool& scaleValueChanged
     );
 
+    void UpdateGizmoTransformMode();
     void LimitFPS(float deltaTime) const;
     void AddFramePlotData(float deltaTime);
 

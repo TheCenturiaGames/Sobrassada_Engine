@@ -25,15 +25,12 @@ class GameObject : public AABBUpdatable
     const float4x4& GetGlobalTransform() const override;
     const float4x4& GetParentGlobalTransform() override;
 
+
     bool AddGameObject(UID gameObjectUID);
     bool RemoveGameObject(UID gameObjectUID);
-
     bool CreateRootComponent();
 
-    void OnEditor();
-
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
-
     void SaveToLibrary();
 
     void OnEditor();
@@ -50,26 +47,18 @@ class GameObject : public AABBUpdatable
     inline UID GetUID() const { return uid; }
     inline std::vector<UID> GetChildren() { return children; }
     inline UID GetParent() const { return parentUID; }
-    void SetParent(UID newParentUUID) { parentUUID = newParentUUID; }
-
-    inline UID GetUID() const { return uuid; }
-    void SetUUID(UID newUUID) { uuid = newUUID; }
-
     RootComponent* GetRootComponent() const { return rootComponent; }
-
     inline const AABB& GetAABB() const { return globalAABB; };
 
     void SetName(std::string newName) { name = newName; }
     void SetParent(UID newParentUID) { parentUID = newParentUID; }
-    void SetUUID(UID newUID) { uid = newUID; }
+    void SetUID(UID newUID) { uid = newUID; }
 
   public:
     inline static UID currentRenamingUID = INVALID_UID;
 
   private:
     UID uid;
-    std::vector<UID> children;
-
     std::string name;
     UID parentUID;
     std::vector<UID> children;

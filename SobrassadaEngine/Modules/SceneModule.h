@@ -104,7 +104,7 @@ class SceneModule : public Module
     bool IsInPlayMode() const { return isPlayMode; }
     LightsConfig* GetLightsConfig() { return loadedScene != nullptr ? loadedScene->GetLightsConfig() : nullptr; }
 
-    bool GetDoInputs() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() : false; }
+    bool GetDoInputsScene() const { return loadedScene != nullptr ? loadedScene->GetDoInputsScene() : false; }
 
   private:
     Scene* loadedScene = nullptr;

@@ -54,7 +54,7 @@ class Scene
 
     void SetStopPlaying(bool stop) { stopPlaying = stop; }
 
-    bool GetDoInputs() const { return doInputs; }
+    bool GetDoInputsScene() const { return doInputsScene; }
 
   private:
     void CreateSpatialDataStruct();
@@ -73,5 +73,6 @@ class Scene
     LightsConfig* lightsConfig = nullptr;
     Octree* sceneOctree        = nullptr;
 
-    bool doInputs                   = false;
+    bool doInputsScene         = false;
+    bool doInputsGame          = false;
 };

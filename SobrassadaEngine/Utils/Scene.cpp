@@ -144,6 +144,9 @@ void Scene::RenderEditorControl()
         ImGui::Text("Game time: %.3f", gameTimer->GetTime() / 1000.0f);
         ImGui::SameLine();
         ImGui::Text("Delta time: %.3f", gameTimer->GetDeltaTime() / 1000.0f);
+        //ImGui::Text("Unscaled game time: %.3f", gameTimer->GetUnscaledTime() / 1000.0f);
+        //ImGui::Text("Unscaled delta time: %.3f", gameTimer->GetUnscaledDeltaTime() / 1000.0f);
+        //ImGui::Text("Reference time: %.3f", gameTimer->GetReferenceTime() / 1000.0f);
     }
     ImGui::End();
 }
@@ -159,11 +162,11 @@ void Scene::RenderScene()
     // right click focus window
     if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) ImGui::SetWindowFocus();
 
-    // do inputs only if window is focused
+    // do inputs scene only if window is focused
     if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
         ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows))
-        doInputs = true;
-    else doInputs = false;
+        doInputsScene = true;
+    else doInputsScene = false;
 
     const auto& framebuffer = App->GetOpenGLModule()->GetFramebuffer();
 
@@ -201,9 +204,16 @@ void Scene::RenderGame()
         return;
     }
 
-    const auto& framebuffer = App->GetOpenGLModule()->GetFramebuffer();
+    // right click focus window
+    if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) ImGui::SetWindowFocus();
 
-        const auto& framebuffer = App->GetOpenGLModule()->GetFramebuffer();
+    // do inputs game only if window is focused
+    if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
+        ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows))
+        doInputsGame = true;
+    else doInputsGame = false;
+
+    const auto& framebuffer = App->GetOpenGLModule()->GetFramebuffer();
 
     ImGui::SetCursorPos(ImVec2(0.f, 0.f));
 
@@ -216,9 +226,9 @@ void Scene::RenderGame()
     ImGuizmo::SetOrthographic(false);
     ImGuizmo::SetDrawlist(); // ImGui::GetWindowDrawList()
 
-        ImGuizmo::SetRect(
-            ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight()
-        );
+    ImGuizmo::SetRect(
+        ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight()
+    );
 
     ImVec2 windowSize = ImGui::GetWindowSize();
     if (framebuffer->GetTextureWidth() != windowSize.x || framebuffer->GetTextureHeight() != windowSize.y)
