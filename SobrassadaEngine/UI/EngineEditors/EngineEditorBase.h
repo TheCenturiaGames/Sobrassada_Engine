@@ -4,21 +4,17 @@
 
 #include <string>
 
-class EngineEditorBase 
+class EngineEditorBase
 {
-public:
-    
-    EngineEditorBase(const std::string& editorName, const UID uid): name(editorName), uid(uid)
-    {
-    }
+  public:
+    EngineEditorBase(const std::string& editorName, const UID uid) : name(editorName), uid(uid) {}
 
-    virtual ~EngineEditorBase(){}
+    virtual ~EngineEditorBase();
     virtual bool RenderEditor();
-    
-     UID GetUID() const { return uid; }
-protected:
+
+    UID GetUID() const { return uid; }
+
+  protected:
     std::string name = "EngineEditor";
     UID uid;
-
-    
 };

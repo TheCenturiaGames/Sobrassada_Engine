@@ -10,8 +10,6 @@ bool EngineEditorBase::RenderEditor()
         ImGui::End();
         return stillOpen;
     }
-  ImGui::End();
+    ImGui::End();
     return stillOpen;
 }
-
-

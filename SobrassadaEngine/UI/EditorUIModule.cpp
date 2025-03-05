@@ -38,7 +38,7 @@ EditorUIModule::EditorUIModule()
 
 EditorUIModule::~EditorUIModule()
 {
-    for (auto values: openEditors)
+    for (auto values : openEditors)
     {
         delete values.second;
     }
@@ -98,11 +98,10 @@ update_status EditorUIModule::RenderEditor(float deltaTime)
         if (!it->second->RenderEditor())
         {
             delete it->second;
-            it = openEditors.erase(it); 
+            it = openEditors.erase(it);
         }
         else
         {
-            
             ++it;
         }
     }
@@ -110,8 +109,6 @@ update_status EditorUIModule::RenderEditor(float deltaTime)
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-    
 
     return UPDATE_CONTINUE;
 }
@@ -189,8 +186,6 @@ void EditorUIModule::Draw()
     if (save) SaveDialog(save);
 
     if (editorSettingsMenu) EditorSettings(editorSettingsMenu);
-
-   
 }
 
 void EditorUIModule::MainMenu()
@@ -236,16 +231,15 @@ void EditorUIModule::MainMenu()
 
         if (ImGui::MenuItem("Quadtree", "", quadtreeViewerViewport)) quadtreeViewerViewport = !quadtreeViewerViewport;
 
-       if (ImGui::BeginMenu("Engine Editor Window"))
-       {
-           
-           if (ImGui::MenuItem("Mockup Base Engine Editor", ""))
-           {
-               //GENERATE ENGINE EDITOR OUTSIDE AND CALL THE OPENEDITOR FUNCTION.
-               OpenEditor(CreateEditor(EditorType::BASE));
-           }
-           ImGui::EndMenu();
-       }
+        if (ImGui::BeginMenu("Engine Editor Window"))
+        {
+
+            if (ImGui::MenuItem("Mockup Base Engine Editor", ""))
+            {
+                OpenEditor(CreateEditor(EditorType::BASE));
+            }
+            ImGui::EndMenu();
+        }
 
         if (ImGui::MenuItem("Editor settings", "", editorSettingsMenu)) editorSettingsMenu = !editorSettingsMenu;
 
@@ -256,7 +250,6 @@ void EditorUIModule::MainMenu()
 
     ImGui::EndMainMenuBar();
 }
-
 
 void EditorUIModule::LoadDialog(bool& load)
 {
@@ -598,8 +591,6 @@ void EditorUIModule::GetFilesSorted(const std::string& currentPath, std::vector<
         }
     );
 }
-
-
 
 void EditorUIModule::Console(bool& consoleMenu) const
 {
@@ -987,7 +978,7 @@ EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
     switch (type)
     {
     case EditorType::BASE:
-        return  new EngineEditorBase("Base Editor " + std::to_string(uid), uid);
+        return new EngineEditorBase("Base Editor " + std::to_string(uid), uid);
 
     default:
         return nullptr;
