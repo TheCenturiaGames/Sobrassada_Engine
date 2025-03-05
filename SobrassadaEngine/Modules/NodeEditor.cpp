@@ -16,6 +16,8 @@ bool NodeEditor::RenderEditor()
 
     myGrid->update();
 
+    
+
       myGrid->rightClickPopUpContent(
         [this](ImFlow::BaseNode* node)
         {
@@ -23,13 +25,9 @@ bool NodeEditor::RenderEditor()
             {
                 if (ImGui::MenuItem("Add Node"))
                 {
-                    // Add a small random offset to prevent exact positioning
+                   
                     ImVec2 mousePos  = ImGui::GetMousePos();
                     ImVec2 gridPos   = myGrid->screen2grid(mousePos);
-
-                    gridPos.x       += static_cast<float>(rand() % 10);
-                    gridPos.y       += static_cast<float>(rand() % 10);
-
                     auto newNode     = myGrid->placeNodeAt<CustomNode>(gridPos);
                 }
             }
@@ -59,6 +57,8 @@ bool NodeEditor::RenderEditor()
             }
         }
     );
+
+
     ImGui::End();
     return true;
    
@@ -67,6 +67,8 @@ bool NodeEditor::RenderEditor()
     
    
 }
+
+
 
 
 

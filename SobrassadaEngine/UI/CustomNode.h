@@ -5,25 +5,34 @@ class CustomNode : public ImFlow::BaseNode
   public:
     CustomNode()
     {
-        inputPin  = addIN<float>("Input", 1.0f, [](ImFlow::Pin*, ImFlow::Pin*) { return true; });
-        outputPin = addOUT<float>("Output");
-
-       
-        outputPin->behaviour([this]() { return this->getInVal<float>("Input") * 2.0f; });
+        setTitle("Simple sum");
+        setStyle(ImFlow::NodeStyle::green());
+        inputPin = addIN<int>("IN_VAL", 0, ImFlow::ConnectionFilter::SameType());
+        outputPin = addOUT<int>("OUT_VAL");
+        outputPin->behaviour([this]() { return getInVal<int>("IN_VAL") + m_valB; });
        
     }
 
     void draw() override
     {
       
-        showIN<float>("Input", 1.0f, [](ImFlow::Pin*, ImFlow::Pin*) { return true; });
-        showOUT<float>("Output", [this]() { return this->getInVal<float>("Input") * 2.0f; });
+        ImGui::SetNextItemWidth(100.f);
+        ImGui::InputInt("##ValB", &m_valB);
+
+         
+         ImGui::Text("Resultado: %d",getInVal<int>("IN_VAL") + m_valB);
+     
+
     }
-    std::shared_ptr<ImFlow::InPin<float>> getInputPin() { return inputPin; }
-    std::shared_ptr<ImFlow::OutPin<float>> getOutputPin() { return outputPin; }
+
+   
+
+    std::shared_ptr<ImFlow::InPin<int>> getInputPin() { return inputPin; }
+    std::shared_ptr<ImFlow::OutPin<int>> getOutputPin() { return outputPin; }
 
   private:
-    std::shared_ptr<ImFlow::InPin<float>> inputPin;
-    std::shared_ptr<ImFlow::OutPin<float>> outputPin;
+    int m_valB = 0;
+    std::shared_ptr<ImFlow::InPin<int>> inputPin;
+    std::shared_ptr<ImFlow::OutPin<int>> outputPin;
 
 };
