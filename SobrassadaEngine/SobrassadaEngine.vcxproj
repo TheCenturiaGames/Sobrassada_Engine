@@ -321,9 +321,9 @@
     <ClCompile Include="FileSystem\MaterialImporter.cpp" />
     <ClCompile Include="Scene\Components\Component.cpp" />
     <ClCompile Include="Scene\Components\Standalone\LightComponent.cpp" />
-    <ClCompile Include="Scene\Components\Standalone\Lights\PointLight.cpp" />
-    <ClCompile Include="Scene\Components\Standalone\Lights\SpotLight.cpp" />
-    <ClCompile Include="Scene\Components\Standalone\Lights\DirectionalLight.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\Lights\PointLightComponent.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\Lights\SpotLightComponent.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\Lights\DirectionalLightComponent.cpp" />
     <ClCompile Include="FileSystem\TextureImporter.cpp" />
     <ClCompile Include="Utils\FrustumPlanes.cpp" />
     <ClCompile Include="Utils\Octree.cpp" />
@@ -545,7 +545,6 @@
     <ClCompile Include="Modules\OpenGLModule.cpp" />
     <ClCompile Include="Modules\ShaderModule.cpp" />
     <ClCompile Include="Utils\Scene.cpp" />
-    <ClCompile Include="Utils\Transform.cpp" />
     <ClCompile Include="Utils\GameTimer.cpp" />
     <ClCompile Include="Modules\WindowModule.cpp" />
   </ItemGroup>
@@ -575,9 +574,9 @@
     <ClInclude Include="Utils\EngineTimer.h" />
     <ClInclude Include="Scene\Components\Component.h" />
     <ClInclude Include="Scene\Components\Standalone\LightComponent.h" />
-    <ClInclude Include="Scene\Components\Standalone\Lights\PointLight.h" />
-    <ClInclude Include="Scene\Components\Standalone\Lights\SpotLight.h" />
-    <ClInclude Include="Scene\Components\Standalone\Lights\DirectionalLight.h" />
+    <ClInclude Include="Scene\Components\Standalone\Lights\PointLightComponent.h" />
+    <ClInclude Include="Scene\Components\Standalone\Lights\SpotLightComponent.h" />
+    <ClInclude Include="Scene\Components\Standalone\Lights\DirectionalLightComponent.h" />
     <ClInclude Include="FileSystem\TextureImporter.h" />
     <ClInclude Include="Utils\FrustumPlanes.h" />
     <ClInclude Include="Utils\Octree.h" />
@@ -607,7 +606,6 @@
     <ClInclude Include="Modules\OpenGLModule.h" />
     <ClInclude Include="Modules\ShaderModule.h" />
     <ClInclude Include="Utils\Scene.h" />
-    <ClInclude Include="Utils\Transform.h" />
     <ClInclude Include="Utils\LightsConfig.h" />
     <ClInclude Include="Utils\GameTimer.h" />
     <ClInclude Include="Modules\WindowModule.h" />

@@ -16,7 +16,7 @@
 
 Component::Component(
     const UID uid, const UID uidParent, const UID uidRoot, const char* initName, int type,
-    const Transform& parentGlobalTransform
+    const float4x4& parentGlobalTransform
 )
     : uid(uid), uidParent(uidParent), uidRoot(uidRoot), type(type), enabled(true),
       globalTransform(parentGlobalTransform)
@@ -34,18 +34,17 @@ Component::Component(const rapidjson::Value& initialState)
     enabled   = initialState["Enabled"].GetBool();
 
     if (initialState.HasMember("LocalTransform") && initialState["LocalTransform"].IsArray() &&
-        initialState["LocalTransform"].Size() == 9)
+        initialState["LocalTransform"].Size() == 16)
     {
         const rapidjson::Value& initLocalTransform = initialState["LocalTransform"];
 
-        localTransform                             = Transform(
-            float3(
-                initLocalTransform[0].GetFloat(), initLocalTransform[1].GetFloat(), initLocalTransform[2].GetFloat()
-            ),
-            float3(
-                initLocalTransform[3].GetFloat(), initLocalTransform[4].GetFloat(), initLocalTransform[5].GetFloat()
-            ),
-            float3(initLocalTransform[6].GetFloat(), initLocalTransform[7].GetFloat(), initLocalTransform[8].GetFloat())
+        localTransform                             = float4x4(
+            initLocalTransform[0].GetFloat(), initLocalTransform[1].GetFloat(), initLocalTransform[2].GetFloat(),
+            initLocalTransform[3].GetFloat(), initLocalTransform[4].GetFloat(), initLocalTransform[5].GetFloat(),
+            initLocalTransform[6].GetFloat(), initLocalTransform[7].GetFloat(), initLocalTransform[8].GetFloat(),
+            initLocalTransform[9].GetFloat(), initLocalTransform[10].GetFloat(), initLocalTransform[11].GetFloat(),
+            initLocalTransform[12].GetFloat(), initLocalTransform[13].GetFloat(), initLocalTransform[14].GetFloat(),
+            initLocalTransform[15].GetFloat()
         );
     }
 
@@ -94,15 +93,22 @@ void Component::Save(rapidjson::Value& targetState, rapidjson::Document::Allocat
     targetState.AddMember("Type", type, allocator);
 
     rapidjson::Value valLocalTransform(rapidjson::kArrayType);
-    valLocalTransform.PushBack(localTransform.position.x, allocator)
-        .PushBack(localTransform.position.y, allocator)
-        .PushBack(localTransform.position.z, allocator)
-        .PushBack(localTransform.rotation.x, allocator)
-        .PushBack(localTransform.rotation.y, allocator)
-        .PushBack(localTransform.rotation.z, allocator)
-        .PushBack(localTransform.scale.x, allocator)
-        .PushBack(localTransform.scale.y, allocator)
-        .PushBack(localTransform.scale.z, allocator);
+    valLocalTransform.PushBack(localTransform.ptr()[0], allocator)
+        .PushBack(localTransform.ptr()[1], allocator)
+        .PushBack(localTransform.ptr()[2], allocator)
+        .PushBack(localTransform.ptr()[3], allocator)
+        .PushBack(localTransform.ptr()[4], allocator)
+        .PushBack(localTransform.ptr()[5], allocator)
+        .PushBack(localTransform.ptr()[6], allocator)
+        .PushBack(localTransform.ptr()[7], allocator)
+        .PushBack(localTransform.ptr()[8], allocator)
+        .PushBack(localTransform.ptr()[9], allocator)
+        .PushBack(localTransform.ptr()[10], allocator)
+        .PushBack(localTransform.ptr()[11], allocator)
+        .PushBack(localTransform.ptr()[12], allocator)
+        .PushBack(localTransform.ptr()[13], allocator)
+        .PushBack(localTransform.ptr()[14], allocator)
+        .PushBack(localTransform.ptr()[15], allocator);
 
     targetState.AddMember("LocalTransform", valLocalTransform, allocator);
 
@@ -160,6 +166,15 @@ bool Component::DeleteChildComponent(const UID componentUID)
     return false;
 }
 
+void Component::RenderGuizmo()
+{
+    const float4x4& parentTransform = GetParentGlobalTransform();
+    if (App->GetEditorUIModule()->RenderImGuizmo(localTransform, globalTransform, parentTransform))
+    {
+        OnTransformUpdate(parentTransform);
+    }
+}
+
 void Component::RenderEditorInspector()
 {
     ImGui::InputText("Name", name, sizeof(name));
@@ -169,7 +184,7 @@ void Component::RenderEditorInspector()
     {
         ImGui::Separator();
 
-        const Transform& parentTransform = GetParentGlobalTransform();
+        const float4x4& parentTransform = GetParentGlobalTransform();
         if (App->GetEditorUIModule()->RenderTransformWidget(localTransform, globalTransform, parentTransform))
         {
             OnTransformUpdate(parentTransform);
@@ -211,21 +226,20 @@ void Component::RenderEditorComponentTree(const UID selectedComponentUID)
     }
 }
 
-const Transform& Component::GetParentGlobalTransform()
+const float4x4& Component::GetParentGlobalTransform()
 {
     AABBUpdatable* parentObject = GetParent();
     if (parentObject != nullptr)
     {
         return parentObject->GetGlobalTransform();
     }
-    return Transform::identity;
+    return float4x4::identity;
 }
 
 void Component::HandleDragNDrop()
 {
     if (ImGui::BeginDragDropSource())
     {
-        GLOG("Starting component drag n drop for uuid : %d", uid)
         ImGui::SetDragDropPayload("ComponentTreeNode", &uid, sizeof(UID));
         ImGui::Text(name);
         ImGui::EndDragDropSource();
@@ -236,7 +250,6 @@ void Component::HandleDragNDrop()
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ComponentTreeNode"))
         {
             const UID draggedUID = *(const UID*)payload->Data;
-            GLOG("Receiving component drag n drop for uuid : %d", draggedUID)
             if (draggedUID != uid)
             {
                 Component* draggedComponent = App->GetSceneModule()->GetComponentByUID(draggedUID);
@@ -266,7 +279,7 @@ void Component::SetUIDParent(UID newUIDParent)
     parent    = nullptr;
 }
 
-void Component::OnTransformUpdate(const Transform& parentGlobalTransform)
+void Component::OnTransformUpdate(const float4x4& parentGlobalTransform)
 {
     TransformUpdated(parentGlobalTransform);
 
@@ -277,9 +290,9 @@ void Component::OnTransformUpdate(const Transform& parentGlobalTransform)
     }
 }
 
-AABB& Component::TransformUpdated(const Transform& parentGlobalTransform)
+AABB& Component::TransformUpdated(const float4x4& parentGlobalTransform)
 {
-    globalTransform = parentGlobalTransform + localTransform;
+    globalTransform = parentGlobalTransform * localTransform;
 
     CalculateLocalAABB();
 
@@ -347,13 +360,6 @@ void Component::PassAABBUpdateToParent()
         globalComponentAABB.Enclose(childComponent->GetGlobalAABB());
     }
 
-    GLOG("AABB updated")
-    GLOG(
-        "AABB: (%f, %f, %f), (%f, %f, %f)", globalComponentAABB.minPoint.x, globalComponentAABB.minPoint.y,
-        globalComponentAABB.minPoint.z, globalComponentAABB.maxPoint.x, globalComponentAABB.maxPoint.y,
-        globalComponentAABB.maxPoint.z
-    )
-
     AABBUpdatable* parentObject = GetParent();
     if (parentObject != nullptr)
     {
@@ -364,11 +370,7 @@ void Component::PassAABBUpdateToParent()
 void Component::CalculateLocalAABB()
 {
     OBB globalComponentOBB = OBB(localComponentAABB);
-    globalComponentOBB.Transform(float4x4::FromTRS(
-        globalTransform.position,
-        Quat::FromEulerXYZ(globalTransform.rotation.x, globalTransform.rotation.y, globalTransform.rotation.z),
-        globalTransform.scale
-    )); // TODO Testing once the aabb debug renderer is available
+    globalComponentOBB.Transform(globalTransform); // TODO Testing once the aabb debug renderer is available
 
     globalComponentAABB = AABB(globalComponentOBB);
 }

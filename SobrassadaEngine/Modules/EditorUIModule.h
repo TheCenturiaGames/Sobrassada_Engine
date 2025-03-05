@@ -1,16 +1,15 @@
 #pragma once
 
+#include "imgui_internal.h"
+#include "./Libs/ImGuizmo/ImGuizmo.h"
 #include "Module.h"
 #include "ResourceManagement/Resources/Resource.h"
-#include "Transform.h"
 
 #include "SDL.h"
-#include "imgui_internal.h"
 #include <deque>
 #include <string>
 #include <unordered_map>
-// guizmo after imgui include
-#include "./Libs/ImGuizmo/ImGuizmo.h"
+#include <Math/float4x4.h>
 
 struct CPUFeature
 {
@@ -34,14 +33,15 @@ class EditorUIModule : public Module
     update_status PostUpdate(float deltaTime) override;
     bool ShutDown() override;
 
-    bool RenderTransformWidget(Transform& localTransform, Transform& globalTransform, const Transform& parentTransform);
-    bool RenderImGuizmo(Transform& gameObjectTransform);
+    bool RenderTransformWidget(float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform);
+    bool RenderImGuizmo(float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform) const;
+
     UID RenderResourceSelectDialog(const char* id, const std::unordered_map<std::string, UID>& availableResources);
 
   private:
     void RenderBasicTransformModifiers(
-        Transform& transform, bool& lockScaleAxis, bool& positionValueChanged, bool& rotationValueChanged,
-        bool& scaleValueChanged
+        float3& outputPosition, float3& outputRotation, float3& outputScale, bool& lockScaleAxis,
+        bool& positionValueChanged, bool& rotationValueChanged, bool& scaleValueChanged
     );
 
     void LimitFPS(float deltaTime) const;
@@ -58,6 +58,7 @@ class EditorUIModule : public Module
     void GameTimerConfig() const;
     void HardwareConfig() const;
     void ShowCaps() const;
+
     void ImportDialog(bool& import);
     void GetFilesSorted(const std::string& currentPath, std::vector<std::string>& files);
     void LoadDialog(bool& load);
@@ -88,11 +89,13 @@ class EditorUIModule : public Module
     std::deque<float> framerate;
     std::deque<float> frametime;
 
+    ImGuizmo::MODE transformType   = ImGuizmo::LOCAL;
+
     QuadtreeViewer* quadtreeViewer = nullptr;
 
     std::string startPath;
     std::string libraryPath;
 
-    int transformType = LOCAL;
-    ImGuizmo::OPERATION mCurrentGizmoOperation;
+    ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+    ;
 };

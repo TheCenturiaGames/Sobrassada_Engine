@@ -13,9 +13,9 @@
 #include <Math/Quat.h>
 
 MeshComponent::MeshComponent(
-    const UID uid, const UID uidParent, const UID uidRoot, const Transform& parentGlobalTransform
+    const UID uid, const UID uidParent, const UID uidRoot, const float4x4& parentGlobalTransform
 )
-    : Component(uid, uidParent, uidRoot, "Mesh component", COMPONENT_MESH, parentGlobalTransform)
+    : Component(uid, uidParent, uidRoot, "Mesh", COMPONENT_MESH, parentGlobalTransform)
 {
 }
 
@@ -90,13 +90,7 @@ void MeshComponent::Render()
     if (enabled && currentMesh != nullptr)
     {
         unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
-
-        float4x4 model         = float4x4::FromTRS(
-            globalTransform.position,
-            Quat::FromEulerXYZ(globalTransform.rotation.x, globalTransform.rotation.y, globalTransform.rotation.z),
-            globalTransform.scale
-        );
-        currentMesh->Render(App->GetResourcesModule()->GetProgram(), model, cameraUBO, currentMaterial);
+        currentMesh->Render(App->GetResourcesModule()->GetProgram(), globalTransform, cameraUBO, currentMaterial);
     }
     Component::Render();
 }
@@ -104,6 +98,8 @@ void MeshComponent::Render()
 void MeshComponent::AddMesh(UID resource, bool reloadAABB)
 {
     if (resource == CONSTANT_EMPTY_UID) return;
+
+    if (currentMesh != nullptr && currentMesh->GetUID() == resource) return;
 
     ResourceMesh* newMesh = dynamic_cast<ResourceMesh*>(App->GetResourcesModule()->RequestResource(resource));
     if (newMesh != nullptr)
@@ -128,6 +124,8 @@ void MeshComponent::AddMesh(UID resource, bool reloadAABB)
 
 void MeshComponent::AddMaterial(UID resource)
 {
+    if (currentMaterial != nullptr && currentMaterial->GetUID() == resource) return;
+
     ResourceMaterial* newMaterial =
         dynamic_cast<ResourceMaterial*>(App->GetResourcesModule()->RequestResource(resource));
     if (newMaterial != nullptr)

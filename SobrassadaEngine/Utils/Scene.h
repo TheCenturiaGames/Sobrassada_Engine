@@ -50,6 +50,7 @@ class Scene
     AABBUpdatable* GetTargetForAABBUpdate(UID uuid);
     LightsConfig* GetLightsConfig() { return lightsConfig; }
 
+    bool GetDoInputs() const { return doInputs; }
     void LoadModel(const UID modelUID);
 
   private:
@@ -67,4 +68,6 @@ class Scene
 
     LightsConfig* lightsConfig = nullptr;
     Octree* sceneOctree        = nullptr;
+
+    bool doInputs                   = false;
 };

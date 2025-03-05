@@ -6,7 +6,7 @@
 
 LightComponent::LightComponent(
     const UID uid, const UID uidParent, const UID uidRoot, const char* uiName, const ComponentType lightType,
-    const Transform& parentGlobalTransform
+    const float4x4& parentGlobalTransform
 )
     : Component(uid, uidParent, uidRoot, uiName, lightType, parentGlobalTransform)
 {
@@ -59,6 +59,8 @@ void LightComponent::RenderEditorInspector()
         ImGui::SeparatorText("Light");
         ImGui::SliderFloat3("Color", &color[0], 0.0f, 1.0f);
         ImGui::SliderFloat("Intensity", &intensity, 0.0f, 100.0f);
+        ImGui::Checkbox("Draw gizmos", &drawGizmos);
+        ImGui::Spacing();
     }
 }
 

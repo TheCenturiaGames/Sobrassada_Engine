@@ -8,8 +8,10 @@
 
 #include "imgui.h"
 
-RootComponent::RootComponent(const UID uid, const UID uidParent, const Transform& parentGlobalTransform)
-    : Component(uid, uidParent, uid, "Root component", COMPONENT_ROOT, parentGlobalTransform)
+#include <Algorithm/Random/LCG.h>
+
+RootComponent::RootComponent(const UID uid, const UID uidParent, const float4x4& parentGlobalTransform)
+    : Component(uid, uidParent, uid, "Root Component", COMPONENT_ROOT, parentGlobalTransform)
 {
     selectedUID = uid;
 }
@@ -32,7 +34,7 @@ void RootComponent::Save(rapidjson::Value& targetState, rapidjson::Document::All
     targetState.AddMember("Mobility", mobilitySettings, allocator);
 }
 
-AABB& RootComponent::TransformUpdated(const Transform& parentGlobalTransform)
+AABB& RootComponent::TransformUpdated(const float4x4& parentGlobalTransform)
 {
     AABB& result                = Component::TransformUpdated(parentGlobalTransform);
 
@@ -47,7 +49,9 @@ AABB& RootComponent::TransformUpdated(const Transform& parentGlobalTransform)
 
 void RootComponent::RenderComponentEditor()
 {
-    Component* selectedComponent = App->GetSceneModule()->GetComponentByUID(selectedUID);
+    Component* selectedComponent = GetSelectedComponent();
+    // TODO Replace nullptr checks with asserts (Components aquired by uid must never be nullptr, if they are, there is
+    // a bug elsewhere)
 
     if (!ImGui::Begin("Inspector", &App->GetEditorUIModule()->inspectorMenu))
     {
@@ -124,6 +128,11 @@ void RootComponent::RenderComponentEditor()
     ImGui::PopStyleVar();
 
     ImGui::End();
+
+    if (selectedComponent != nullptr)
+    {
+        selectedComponent->RenderGuizmo();
+    }
 }
 
 void RootComponent::RenderEditorComponentTree(const UID selectedComponentUID)
@@ -173,29 +182,14 @@ void RootComponent::RenderEditorInspector()
     }
 }
 
-void RootComponent::RenderGuizmo()
-{
-    if (selectedUID == uid)
-    {
-        if (App->GetEditorUIModule()->RenderImGuizmo(localTransform))
-        {
-            AABBUpdatable* parentGameObject = GetParent();
-            if (parentGameObject != nullptr)
-            {
-                OnTransformUpdate(parentGameObject->GetParentGlobalTransform()
-                ); // Step up two parents to get the correct transform
-            }
-        }
-    }
-}
-
 void RootComponent::Update()
 {
 }
 
 void RootComponent::SetSelectedComponent(const UID componentUID)
 {
-    selectedUID = componentUID;
+    selectedComponent = nullptr;
+    selectedUID       = componentUID;
 }
 
 bool RootComponent::CreateComponent(const ComponentType componentType)
@@ -216,4 +210,28 @@ bool RootComponent::CreateComponent(const ComponentType componentType)
         }
     }
     return false;
+}
+
+const float4x4& RootComponent::GetParentGlobalTransform()
+{
+    AABBUpdatable* parentObject = GetParent();
+    if (parentObject != nullptr)
+    {
+        return parentObject->GetParentGlobalTransform(
+        ); // parent is the gameObject, so we want to query the parent of this gameObject
+    }
+    return float4x4::identity;
+}
+
+Component* RootComponent::GetSelectedComponent()
+{
+    if (selectedComponent == nullptr)
+    {
+        selectedComponent = App->GetSceneModule()->GetComponentByUID(selectedUID);
+        if (selectedComponent == nullptr)
+        {
+            // GLOG("Could not load parent with UID: %s - Object does not exist", uidParent)
+        }
+    }
+    return selectedComponent;
 }
