@@ -56,7 +56,7 @@ bool GameObject::CreateRootComponent()
 {
 
     rootComponent = dynamic_cast<RootComponent*>(
-        ComponentUtils::CreateEmptyComponent(COMPONENT_ROOT, LCG().IntFast(), uuid, -1, Transform())
+        ComponentUtils::CreateEmptyComponent(COMPONENT_ROOT, LCG().IntFast(), uuid, -1, float4x4::identity)
     ); // TODO Add the gameObject UUID as parent?
 
     // TODO Replace parentUUID above with the UUID of this gameObject
@@ -173,7 +173,7 @@ void GameObject::HandleNodeClick(UID& selectedGameObjectUUID)
         ImGui::Text("Dragging %s", name.c_str());
         ImGui::EndDragDropSource();
     }
-    
+
     if (ImGui::BeginDragDropTarget())
     {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DRAG_DROP_GAMEOBJECT"))
@@ -191,7 +191,6 @@ void GameObject::HandleNodeClick(UID& selectedGameObjectUUID)
 
         ImGui::EndDragDropTarget();
     }
-    
 }
 
 void GameObject::RenderContextMenu()
@@ -298,7 +297,6 @@ void GameObject::RenderEditor()
         if (rootComponent != nullptr)
         {
             rootComponent->RenderComponentEditor();
-            rootComponent->RenderGuizmo();
         }
     }
     if (App->GetEditorUIModule()->hierarchyMenu)
@@ -348,23 +346,23 @@ void GameObject::ComponentGlobalTransformUpdated()
         if (childGameObject != nullptr)
         {
             globalAABB.Enclose(childGameObject->rootComponent->TransformUpdated(
-                rootComponent == nullptr ? Transform::identity : rootComponent->GetGlobalTransform()
+                rootComponent == nullptr ? float4x4::identity : rootComponent->GetGlobalTransform()
             ));
         }
     }
 }
 
-const Transform& GameObject::GetGlobalTransform() const
+const float4x4& GameObject::GetGlobalTransform() const
 {
     return rootComponent->GetGlobalTransform();
 }
 
-const Transform& GameObject::GetParentGlobalTransform()
+const float4x4& GameObject::GetParentGlobalTransform()
 {
     GameObject* parent = App->GetSceneModule()->GetGameObjectByUUID(parentUUID);
     if (parent != nullptr)
     {
         return parent->GetGlobalTransform();
     }
-    return Transform::identity;
+    return float4x4::identity;
 }

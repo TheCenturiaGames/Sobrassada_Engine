@@ -6,7 +6,7 @@
 
 LightComponent::LightComponent(
     const UID uid, const UID uidParent, const UID uidRoot, const char* uiName, const ComponentType lightType,
-    const Transform& parentGlobalTransform
+    const float4x4& parentGlobalTransform
 )
     : Component(uid, uidParent, uidRoot, uiName, lightType, parentGlobalTransform)
 {
@@ -71,4 +71,3 @@ void LightComponent::Update()
 void LightComponent::Render()
 {
 }
-
