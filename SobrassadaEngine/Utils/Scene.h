@@ -68,4 +68,6 @@ class Scene
     Octree* sceneOctree        = nullptr;
 
     bool doInputs                   = false;
+
+    bool litActivated               = false;
 };

@@ -145,6 +145,14 @@ void Scene::RenderScene()
         ImGui::SameLine();
         if (ImGui::SliderFloat("Time scale", &timeScale, 0, 4)) gameTimer->SetTimeScale(timeScale);
 
+        ImGui::SameLine();
+        if (ImGui::BeginMenu("Render options"))
+        {
+            if (ImGui::MenuItem("Lit", "", litActivated)) litActivated = !litActivated;
+
+            ImGui::EndMenu();
+        }
+
         if (App->GetSceneModule()->IsInPlayMode())
         {
             ImGui::SeparatorText("Playing");
