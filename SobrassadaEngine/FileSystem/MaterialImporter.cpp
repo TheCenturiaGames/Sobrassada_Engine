@@ -18,6 +18,7 @@ UID MaterialImporter::ImportMaterial(const tinygltf::Model& model, int materialI
     // ADD OLD LOADING
 
     Material material;
+    //KHR_materials_pbrSpecularGlossiness extension
     if (it != gltfMaterial.extensions.end())
     {
 
@@ -88,6 +89,34 @@ UID MaterialImporter::ImportMaterial(const tinygltf::Model& model, int materialI
                 material.SetSpecularGlossinessTexture(specularGlossinessUID);
             }
         }
+    }
+    //pbrMetallicRoughness extension
+    else if (gltfMaterial.pbrMetallicRoughness.baseColorFactor.size() == 4)
+    {
+        const auto& pbr = gltfMaterial.pbrMetallicRoughness;
+
+        // Base Color Factor
+        float4 baseColorFactor(
+            static_cast<float>(pbr.baseColorFactor[0]), static_cast<float>(pbr.baseColorFactor[1]),
+            static_cast<float>(pbr.baseColorFactor[2]), static_cast<float>(pbr.baseColorFactor[3])
+        );
+        material.SetDiffuseFactor(baseColorFactor);
+
+        // Base Color Texture
+        if (pbr.baseColorTexture.index >= 0)
+        {
+            int texIndex = pbr.baseColorTexture.index;
+            UID diffuseUID =
+                TextureImporter::Import((path + model.images[model.textures[texIndex].source].uri).c_str());
+            if (diffuseUID != CONSTANT_EMPTY_UID)
+            {
+                material.SetDiffuseTexture(diffuseUID);
+            }
+        }
+
+        // Metallic i Roughness Factors
+        material.SetMetallicFactor(static_cast<float>(pbr.metallicFactor));
+        material.SetRoughnessFactor(static_cast<float>(pbr.roughnessFactor));
     }
 
     // Normal Map
