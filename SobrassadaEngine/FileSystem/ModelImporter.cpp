@@ -59,22 +59,18 @@ namespace ModelImporter
         for (const NodeData& node : orderedNodes)
         {
             rapidjson::Value nodeDataJSON(rapidjson::kObjectType);
-
             nodeDataJSON.AddMember("Name", rapidjson::Value(node.name.c_str(), allocator), allocator);
 
             rapidjson::Value valTransform(rapidjson::kArrayType);
-            valTransform.PushBack(node.transform.position.x, allocator)
-                .PushBack(node.transform.position.y, allocator)
-                .PushBack(node.transform.position.z, allocator)
-                .PushBack(node.transform.rotation.x, allocator)
-                .PushBack(node.transform.rotation.y, allocator)
-                .PushBack(node.transform.rotation.z, allocator)
-                .PushBack(node.transform.scale.x, allocator)
-                .PushBack(node.transform.scale.y, allocator)
-                .PushBack(node.transform.scale.z, allocator);
+            for (int i = 0; i < 4; ++i)
+            {
+                for (int j = 0; j < 4; ++j)
+                {
+                    valTransform.PushBack(node.transform[i][j], allocator);
+                }
+            }
 
             nodeDataJSON.AddMember("Transform", valTransform, allocator);
-
             nodeDataJSON.AddMember("ParentIndex", node.parentIndex, allocator);
 
             // Save mesh and material UID in same array
@@ -164,24 +160,18 @@ namespace ModelImporter
                 newNode.name = nodeJSON["Name"].GetString();
 
                 if (nodeJSON.HasMember("Transform") && nodeJSON["Transform"].IsArray() &&
-                    nodeJSON["Transform"].Size() == 9)
+                    nodeJSON["Transform"].Size() == 16)
                 {
                     const rapidjson::Value& initLocalTransform = nodeJSON["Transform"];
-
-                    newNode.transform                          = Transform(
-                        float3(
-                            initLocalTransform[0].GetFloat(), initLocalTransform[1].GetFloat(),
-                            initLocalTransform[2].GetFloat()
-                        ),
-                        float3(
-                            initLocalTransform[3].GetFloat(), initLocalTransform[4].GetFloat(),
-                            initLocalTransform[5].GetFloat()
-                        ),
-                        float3(
-                            initLocalTransform[6].GetFloat(), initLocalTransform[7].GetFloat(),
-                            initLocalTransform[8].GetFloat()
-                        )
-                    );
+                    int counter                                = 0;
+                    for (int i = 0; i < 4; ++i)
+                    {
+                        for (int j = 0; j < 4; ++j)
+                        {
+                            newNode.transform[i][j] = initLocalTransform[counter].GetFloat();
+                            ++counter;
+                        }
+                    }
                 }
 
                 newNode.parentIndex = nodeJSON["ParentIndex"].GetInt();
@@ -216,9 +206,7 @@ namespace ModelImporter
         NodeData newNode;
         newNode.name               = nodeData.name;
 
-        float4x4 rawTransform      = GetNodeTransform(nodeData);
-        newNode.transform.position = rawTransform.TranslatePart();
-        newNode.transform.rotation = rawTransform.RotatePart().ToEulerXYZ();
+        newNode.transform          = GetNodeTransform(nodeData);
         newNode.parentIndex        = parentId;
 
         // Get reference to Mesh and Material UIDs
