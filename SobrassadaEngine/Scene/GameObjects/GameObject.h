@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Globals.h"
 #include "Scene/AABBUpdatable.h"
 
@@ -18,7 +19,10 @@ class GameObject : public AABBUpdatable
 
     GameObject(const rapidjson::Value& initialState);
 
-    ~GameObject();
+    void PassAABBUpdateToParent() override;
+    void ComponentGlobalTransformUpdated() override;
+    const float4x4& GetGlobalTransform() const override;
+    const float4x4& GetParentGlobalTransform() override;
 
     bool AddGameObject(UID gameObjectUUID);
     bool RemoveGameObject(UID gameObjectUUID);
@@ -35,9 +39,8 @@ class GameObject : public AABBUpdatable
     void HandleNodeClick(UID& selectedGameObjectUUID);
     void RenderContextMenu();
 
-    void RenameGameObjectHierarchy();
-
     bool UpdateGameObjectHierarchy(UID sourceUID, UID targetUID);
+    void RenameGameObjectHierarchy();
 
     inline std::string GetName() const { return name; }
     void SetName(std::string newName) { name = newName; }
@@ -64,6 +67,7 @@ class GameObject : public AABBUpdatable
 
     const float4x4& GetParentGlobalTransform() override;
 
+  public:
     inline static UID currentRenamingUID = INVALID_UUID;
 
   private:

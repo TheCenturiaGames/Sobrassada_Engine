@@ -137,6 +137,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="Modules\CameraModule.cpp" />
+    <ClCompile Include="Modules\EditorUIModule.cpp" />
     <ClCompile Include="Utils\EngineTimer.cpp" />
     <ClCompile Include="FileSystem\Importer.cpp" />
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp" />
@@ -317,9 +319,9 @@
     <ClCompile Include="FileSystem\MaterialImporter.cpp" />
     <ClCompile Include="Scene\Components\Component.cpp" />
     <ClCompile Include="Scene\Components\Standalone\LightComponent.cpp" />
-    <ClCompile Include="Scene\Components\Standalone\Lights\PointLight.cpp" />
-    <ClCompile Include="Scene\Components\Standalone\Lights\SpotLight.cpp" />
-    <ClCompile Include="Scene\Components\Standalone\Lights\DirectionalLight.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\Lights\PointLightComponent.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\Lights\SpotLightComponent.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\Lights\DirectionalLightComponent.cpp" />
     <ClCompile Include="FileSystem\TextureImporter.cpp" />
     <ClCompile Include="Utils\FrustumPlanes.cpp" />
     <ClCompile Include="Utils\Octree.cpp" />
@@ -494,9 +496,7 @@
     <ClCompile Include="Scene\Components\ComponentUtils.cpp" />
     <ClCompile Include="Scene\GameObjects\GameObject.cpp" />
     <ClCompile Include="Utils\Framebuffer.cpp" />
-    <ClCompile Include="Tests\CameraModule.cpp" />
     <ClCompile Include="Modules\DebugDrawModule.cpp" />
-    <ClCompile Include="UI\EditorUIModule.cpp" />
     <ClCompile Include="Modules\InputModule.cpp" />
     <ClCompile Include="Libs\ImGui\imgui.cpp" />
     <ClCompile Include="Libs\ImGui\imgui_demo.cpp" />
@@ -550,6 +550,8 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="FileSystem\Importer.h" />
     <ClInclude Include="Libs\ImGuizmo\ImGuizmo.h" />
+    <ClInclude Include="Modules\CameraModule.h" />
+    <ClInclude Include="Modules\EditorUIModule.h" />
     <ClInclude Include="Modules\ResourcesModule.h" />
     <ClInclude Include="Modules\SceneModule.h" />
     <ClInclude Include="ResourceManagement\Resources\Resource.h" />
@@ -559,17 +561,17 @@
     <ClInclude Include="Scene\AABBUpdatable.h" />
     <ClInclude Include="FileSystem\FileSystem.h" />
     <ClInclude Include="Modules\LibraryModule.h" />
-    <ClInclude Include="Material.h" />
+    <ClInclude Include="FileSystem\Material.h" />
     <ClInclude Include="FileSystem\MaterialImporter.h" />
-    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="FileSystem\Mesh.h" />
     <ClInclude Include="FileSystem\MeshImporter.h" />
     <ClInclude Include="FileSystem\SceneImporter.h" />
     <ClInclude Include="Utils\EngineTimer.h" />
     <ClInclude Include="Scene\Components\Component.h" />
     <ClInclude Include="Scene\Components\Standalone\LightComponent.h" />
-    <ClInclude Include="Scene\Components\Standalone\Lights\PointLight.h" />
-    <ClInclude Include="Scene\Components\Standalone\Lights\SpotLight.h" />
-    <ClInclude Include="Scene\Components\Standalone\Lights\DirectionalLight.h" />
+    <ClInclude Include="Scene\Components\Standalone\Lights\PointLightComponent.h" />
+    <ClInclude Include="Scene\Components\Standalone\Lights\SpotLightComponent.h" />
+    <ClInclude Include="Scene\Components\Standalone\Lights\DirectionalLightComponent.h" />
     <ClInclude Include="FileSystem\TextureImporter.h" />
     <ClInclude Include="Utils\FrustumPlanes.h" />
     <ClInclude Include="Utils\Octree.h" />
@@ -580,13 +582,10 @@
     <ClInclude Include="Scene\Components\Standalone\MeshComponent.h" />
     <ClInclude Include="Scene\Components\ComponentUtils.h" />
     <ClInclude Include="Scene\GameObjects\GameObject.h" />
-    <ClInclude Include="Utils\BoundingBox.h" />
     <ClInclude Include="Utils\Framebuffer.h" />
-    <ClInclude Include="Tests\CameraModule.h" />
     <ClInclude Include="DebugDraw\debugdraw.h" />
     <ClInclude Include="Modules\DebugDrawModule.h" />
     <ClInclude Include="DebugDraw\debug_draw.hpp" />
-    <ClInclude Include="UI\EditorUIModule.h" />
     <ClInclude Include="Utils\Globals.h" />
     <ClInclude Include="Modules\InputModule.h" />
     <ClInclude Include="Libs\ImGui\imconfig.h" />

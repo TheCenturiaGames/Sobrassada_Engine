@@ -3,9 +3,13 @@
 #include "Globals.h"
 #include "SDL.h"
 
-EngineTimer::EngineTimer() : time(0), startTime(0), deltaTime(0), isEnabled(false) {}
+EngineTimer::EngineTimer() : time(0), startTime(0), deltaTime(0), isEnabled(false)
+{
+}
 
-EngineTimer::~EngineTimer() {}
+EngineTimer::~EngineTimer()
+{
+}
 
 void EngineTimer::Start()
 {
@@ -20,4 +24,7 @@ float EngineTimer::Tick()
     return deltaTime;
 }
 
-float EngineTimer::TicksSinceStartup() const { return SDL_GetTicks() - startTime; }
+float EngineTimer::TicksSinceStartup() const
+{
+    return SDL_GetTicks() - startTime;
+}

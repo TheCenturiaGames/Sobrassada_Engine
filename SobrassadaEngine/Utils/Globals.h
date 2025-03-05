@@ -5,9 +5,6 @@
 #include <vector>
 #include <windows.h>
 
-#include <Math/Quat.h>
-#include <Math/float4x4.h>
-
 extern std::vector<char*>* Logs;
 
 #define GLOG(format, ...) glog(__FILE__, __LINE__, format, __VA_ARGS__);

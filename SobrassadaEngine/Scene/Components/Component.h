@@ -15,15 +15,16 @@ class Component : public AABBUpdatable
     Component(
         UID uid, UID uidParent, UID uidRoot, const char* initName, int type, const float4x4& parentGlobalTransform
     );
-
     Component(const rapidjson::Value& initialState);
-
     ~Component() override;
 
     virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
 
     virtual void Update() = 0;
     virtual void Render();
+    virtual void RenderEditorInspector();
+    virtual void RenderEditorComponentTree(UID selectedComponentUID);
+    virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
 
     virtual bool AddChildComponent(UID componentUID);
     virtual bool RemoveChildComponent(UID componentUID);
@@ -41,9 +42,9 @@ class Component : public AABBUpdatable
     const float4x4& GetParentGlobalTransform() override;
 
     void HandleDragNDrop();
+    void CalculateLocalAABB();
 
     UID GetUID() const { return uid; }
-
     UID GetUIDParent() const { return uidParent; }
 
     const std::vector<UID>& GetChildren() const { return children; }

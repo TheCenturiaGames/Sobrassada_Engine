@@ -11,9 +11,9 @@
 #include "TextureImporter.h"
 #include "imgui.h"
 
-#include "../Scene/Components/Standalone/Lights/DirectionalLight.h"
-#include "../Scene/Components/Standalone/Lights/PointLight.h"
-#include "../Scene/Components/Standalone/Lights/SpotLight.h"
+#include "../Scene/Components/Standalone/Lights/DirectionalLightComponent.h"
+#include "../Scene/Components/Standalone/Lights/PointLightComponent.h"
+#include "../Scene/Components/Standalone/Lights/SpotLightComponent.h"
 #include "glew.h"
 #include <cstddef>
 
@@ -285,11 +285,11 @@ void LightsConfig::SetSpotLightsShaderData() const
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, spotBufferId);
 }
 
-void LightsConfig::AddDirectionalLight(DirectionalLight* newDirectional)
+void LightsConfig::AddDirectionalLight(DirectionalLightComponent* newDirectional)
 {
     if (directionalLight == nullptr) directionalLight = newDirectional;
 }
-void LightsConfig::AddPointLight(PointLight* newPoint)
+void LightsConfig::AddPointLight(PointLightComponent* newPoint)
 {
     // Add point light to vector and resize buffer
     pointLights.push_back(newPoint);
@@ -303,7 +303,7 @@ void LightsConfig::AddPointLight(PointLight* newPoint)
         bufferSize
     );
 }
-void LightsConfig::AddSpotLight(SpotLight* newSpot)
+void LightsConfig::AddSpotLight(SpotLightComponent* newSpot)
 {
     spotLights.push_back(newSpot);
 
@@ -346,6 +346,7 @@ void LightsConfig::RemovePointLight(UID pointUid)
 
     GLOG("Point lights size: %d. Buffer size: %d", pointLights.size(), bufferSize);
 }
+
 void LightsConfig::RemoveSpotLight(UID spotUid)
 {
     GLOG("Remove spot light with UID: %d", spotUid);
@@ -390,7 +391,7 @@ void LightsConfig::GetAllPointLights()
             if (component.second->GetType() == COMPONENT_POINT_LIGHT)
             {
                 GLOG("Add point light");
-                pointLights.push_back(static_cast<PointLight*>(component.second));
+                pointLights.push_back(static_cast<PointLightComponent*>(component.second));
             }
         }
     }
@@ -411,7 +412,7 @@ void LightsConfig::GetAllSpotLights()
             if (component.second->GetType() == COMPONENT_SPOT_LIGHT)
             {
                 GLOG("Add spotlight")
-                spotLights.push_back(static_cast<SpotLight*>(component.second));
+                spotLights.push_back(static_cast<SpotLightComponent*>(component.second));
             }
         }
     }
@@ -431,7 +432,7 @@ void LightsConfig::GetDirectionalLight()
             if (component.second->GetType() == COMPONENT_DIRECTIONAL_LIGHT)
             {
                 GLOG("Add directional light");
-                directionalLight = static_cast<DirectionalLight*>(component.second);
+                directionalLight = static_cast<DirectionalLightComponent*>(component.second);
                 break;
             }
         }

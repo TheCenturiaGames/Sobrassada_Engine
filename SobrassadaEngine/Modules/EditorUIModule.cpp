@@ -1,6 +1,8 @@
 #include "EditorUIModule.h"
 
 #include "Application.h"
+#include "CameraModule.h"
+#include "Component.h"
 #include "FileSystem.h"
 #include "GameTimer.h"
 #include "InputModule.h"
@@ -11,24 +13,18 @@
 #include "SceneModule.h"
 #include "WindowModule.h"
 
-#include "Component.h"
-
 #include "glew.h"
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl2.h"
-#include <string>
-
 #include <cstring>
 #include <filesystem>
-
+#include <string>
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_EXTERNAL_IMAGE
 #define TINYGLTF_IMPLEMENTATION /* Only in one of the includes */
 #include <tiny_gltf.h>          // TODO Remove
-
-#include "InputModule.h"
 
 EditorUIModule::EditorUIModule()
     : width(0), height(0), closeApplication(false), consoleMenu(false), import(false), load(false), save(false),
@@ -42,7 +38,8 @@ EditorUIModule::~EditorUIModule()
 
 bool EditorUIModule::Init()
 {
-    ImGui::CreateContext();
+    ImGuiContext* context = ImGui::CreateContext();
+    ImGuizmo::SetImGuiContext(context);
     ImGuiIO& io     = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
@@ -74,8 +71,12 @@ update_status EditorUIModule::PreUpdate(float deltaTime)
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
-    ImGuizmo::SetOrthographic(false); // TODO Implement orthographic camera
     ImGuizmo::BeginFrame();
+
+    // ImGuizmo::SetOrthographic(false);
+    // ImGuizmo::AllowAxisFlip(false);
+    // ImGuizmo::SetPlaneLimit(0);
+
     ImGui::DockSpaceOverViewport();
 
     return UPDATE_CONTINUE;
@@ -179,7 +180,7 @@ void EditorUIModule::MainMenu()
 {
     ImGui::BeginMainMenuBar();
 
-    // File menu
+    // File tab menu
     if (ImGui::BeginMenu("File"))
     {
         if (ImGui::MenuItem("Create", "")) App->GetSceneModule()->CreateScene();
@@ -203,7 +204,7 @@ void EditorUIModule::MainMenu()
         ImGui::EndMenu();
     }
 
-    // Windows menu
+    // Windows tab menu
     if (ImGui::BeginMenu("Window"))
     {
         if (ImGui::MenuItem("Console", "", consoleMenu)) consoleMenu = !consoleMenu;
@@ -245,7 +246,7 @@ void EditorUIModule::LoadDialog(bool& load)
 
     if (FileSystem::Exists(libraryPath.c_str()))
     {
-        // Only scenes for now
+        // Only scenes library folder for now
         if (ImGui::TreeNode("Scenes/"))
         {
             GetFilesSorted(libraryPath, files);
@@ -667,18 +668,31 @@ bool EditorUIModule::RenderImGuizmo(
     float4x4 proj = float4x4(App->GetCameraModule()->GetProjectionMatrix());
     proj.Transpose();
 
+    float maxDistance             = App->GetCameraModule()->GetFarPlaneDistance() * 0.9f;
+
     float4x4 transform = float4x4(globalTransform);
     transform.Transpose();
     Manipulate(view.ptr(), proj.ptr(), mCurrentGizmoOperation, transformType, transform.ptr());
 
-    if (ImGuizmo::IsUsing())
+    if (!ImGuizmo::IsUsing())
     {
+        return false;
+    }
+
+    if (App->GetSceneModule()->GetDoInputs())
+    {
+       
+        if (newPos.Distance(App->GetCameraModule()->GetCameraPosition()) > maxDistance)
+        {
+            ImGuizmo::Enable(false);
+            return false;
+        }
+
         transform.Transpose();
         localTransform = parentTransform.Inverted() * transform;
-
-        return true;
     }
-    return false;
+
+    return true;
 }
 
 void EditorUIModule::RenderBasicTransformModifiers(

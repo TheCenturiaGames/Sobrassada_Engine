@@ -6,6 +6,7 @@
 #include "imgui_internal.h"
 
 #include "SDL.h"
+#include "imgui_internal.h"
 #include <deque>
 #include <string>
 #include <unordered_map>
@@ -37,10 +38,6 @@ class EditorUIModule : public Module
 
     UID RenderResourceSelectDialog(const char* id, const std::unordered_map<std::string, UID>& availableResources);
 
-  public:
-    bool hierarchyMenu = true;
-    bool inspectorMenu = true;
-
   private:
     void RenderBasicTransformModifiers(
         float3& outputPosition, float3& outputRotation, float3& outputScale, bool& lockScaleAxis,
@@ -49,8 +46,8 @@ class EditorUIModule : public Module
 
     void LimitFPS(float deltaTime) const;
     void AddFramePlotData(float deltaTime);
-    void Draw();
 
+    void Draw();
     void MainMenu();
     void EditorSettings(bool& editorSettingsMenu);
 
@@ -69,7 +66,12 @@ class EditorUIModule : public Module
     void Console(bool& consoleMenu) const;
     void About(bool& aboutMenu) const;
 
+  public:
+    bool hierarchyMenu = true;
+    bool inspectorMenu = true;
+
   private:
+    int width, height;
     bool consoleMenu            = true;
     bool import                 = false;
     bool load                   = false;
@@ -87,8 +89,6 @@ class EditorUIModule : public Module
     ImGuizmo::MODE transformType   = ImGuizmo::LOCAL;
 
     QuadtreeViewer* quadtreeViewer = nullptr;
-
-    int width, height;
 
     std::string startPath;
     std::string libraryPath;
