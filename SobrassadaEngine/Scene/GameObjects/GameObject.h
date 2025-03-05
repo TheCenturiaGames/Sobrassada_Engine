@@ -54,7 +54,7 @@ class GameObject : public AABBUpdatable
     void SetParent(UID newParentUUID) { parentUUID = newParentUUID; }
     void SetUUID(UID newUUID) { uuid = newUUID; }
 
-    void CreatePrefab() const;
+    void CreatePrefab();
 
   public:
     inline static UID currentRenamingUID = INVALID_UUID;
@@ -69,4 +69,6 @@ class GameObject : public AABBUpdatable
 
     bool isRenaming = false;
     char renameBuffer[128];
+
+    UID prefabUid = CONSTANT_EMPTY_UID;
 };

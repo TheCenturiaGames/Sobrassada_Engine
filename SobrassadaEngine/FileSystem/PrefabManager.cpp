@@ -5,6 +5,7 @@
 #include "ResourceManagement/Resources/ResourcePrefab.h"
 #include "Scene/GameObjects/GameObject.h"
 #include "SceneModule.h"
+#include "LibraryModule.h"
 
 #include "prettywriter.h"
 #include "stringbuffer.h"
@@ -39,10 +40,12 @@ namespace PrefabManager
         {
             const GameObject* currentGameObject = queue.front();
 
-            // DO whatever
             rapidjson::Value goJSON(rapidjson::kObjectType);
             currentGameObject->Save(goJSON, allocator);
             gameObjectsJSON.PushBack(goJSON, allocator);
+
+            // TODO: Serialize components after merged with the branch where the gameObjects have an array of 
+            // their components, because right now is quite more complicated to get them
 
             for (UID child : currentGameObject->GetChildren())
             {
@@ -54,24 +57,6 @@ namespace PrefabManager
 
         // Add gameObjects to scene
         prefab.AddMember("GameObjects", gameObjectsJSON, allocator);
-
-        // Serialize Components
-        // rapidjson::Value componentsJSON(rapidjson::kArrayType);
-        //
-        // for (auto it = components->begin(); it != components->end(); ++it)
-        //{
-        //    if (it->second != nullptr)
-        //    {
-        //        rapidjson::Value componentJSON(rapidjson::kObjectType);
-        //
-        //        it->second->Save(componentJSON, allocator);
-        //
-        //        componentsJSON.PushBack(componentJSON, allocator);
-        //    }
-        //}
-        //
-        //// Add components to scene
-        // scene.AddMember("Components", componentsJSON, allocator);
 
         doc.AddMember("Prefab", prefab, allocator);
 
@@ -95,6 +80,51 @@ namespace PrefabManager
 
     ResourcePrefab* LoadPrefab(UID prefabUID)
     {
-        return nullptr;
+        rapidjson::Document doc;
+        std::string filepath = App->GetLibraryModule()->GetResourcePath(prefabUID);
+
+        bool loaded          = FileSystem::LoadJSON(filepath.c_str(), doc);
+        if (!loaded)
+        {
+            GLOG("Failed to load prefab file: %s", filepath.c_str());
+            return nullptr;
+        }
+        if (!doc.HasMember("Prefab") || !doc["Prefab"].IsObject())
+        {
+            GLOG("Invalid prefab format: %s", filepath.c_str());
+            return nullptr;
+        }
+
+        rapidjson::Value& prefab = doc["Prefab"];
+
+        UID uid = prefab["UID"].GetUint64();
+        std::string name = prefab["Name"].GetString();
+
+        std::vector<GameObject*> loadedGameObjects;
+        if (prefab.HasMember("GameObjects") && prefab["GameObjects"].IsArray())
+        {
+            const rapidjson::Value& gameObjects = prefab["GameObjects"];
+            for (rapidjson::SizeType i = 0; i < gameObjects.Size(); i++)
+            {
+                const rapidjson::Value& gameObject = gameObjects[i];
+                loadedGameObjects.emplace_back(new GameObject(gameObject));
+            }
+        }
+
+        // TODO: Deserialize components and add them to their corresponding gameObject,
+        // once the serialization is also done
+        std::vector<Component*> loadedComponents;
+        if (prefab.HasMember("Components") && prefab["Components"].IsArray())
+        {
+            const rapidjson::Value& components = prefab["Components"];
+            for (rapidjson::SizeType i = 0; i < components.Size(); i++)
+            {
+                const rapidjson::Value& component = components[i];
+            }
+        }
+
+        ResourcePrefab* resourcePrefab = new ResourcePrefab(uid, name);
+        resourcePrefab->LoadData(loadedGameObjects[0]);
+        return resourcePrefab;
     }
 } // namespace PrefabManager

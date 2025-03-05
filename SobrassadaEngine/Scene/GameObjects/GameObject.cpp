@@ -376,7 +376,7 @@ const Transform& GameObject::GetParentGlobalTransform()
     return Transform::identity;
 }
 
-void GameObject::CreatePrefab() const
+void GameObject::CreatePrefab()
 {
-    PrefabManager::SavePrefab(this);
+    prefabUid = PrefabManager::SavePrefab(this);
 }
