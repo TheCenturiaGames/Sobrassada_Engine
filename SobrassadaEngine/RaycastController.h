@@ -4,14 +4,11 @@
 #include "ComponentUtils.h"
 #include "GameObject.h"
 #include "Geometry/LineSegment.h"
-#include "Octree.h"
-#include "Quadtree.h"
 #include "Root/RootComponent.h"
 #include "SceneModule.h"
 #include "Standalone/MeshComponent.h"
 
 #include "Geometry/Triangle.h"
-#include "Math/Quat.h"
 #include "Math/float4x4.h"
 #include <map>
 #include <vector>
@@ -68,12 +65,9 @@ inline GameObject* RaycastController::GetRayIntersection(const LineSegment& ray,
 
                 if (resourceMesh == nullptr) continue;
 
-                Transform globalTransform = meshComponent->GetGlobalTransform();
-                Quat rotator =
-                    Quat(globalTransform.rotation.x, globalTransform.rotation.y, globalTransform.rotation.z, 1);
-                float4x4 modelMat = float4x4::FromTRS(globalTransform.position, rotator, globalTransform.scale);
-                modelMat.Inverse();
-                localRay.Transform(modelMat);
+                float4x4 globalTransform = meshComponent->GetGlobalTransform();
+                globalTransform.Inverse();
+                localRay.Transform(globalTransform);
 
                 std::vector<Vertex> vertices      = resourceMesh->GetLocalVertices();
                 std::vector<unsigned int> indices = resourceMesh->GetIndices();

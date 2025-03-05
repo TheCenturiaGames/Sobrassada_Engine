@@ -213,14 +213,8 @@
     <ClCompile Include="Utils\LightsConfig.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="UI\QuadtreeViewer.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
     <ClCompile Include="Utils\Quadtree.cpp">
       <Filter>Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="Tests\MockGameObject.cpp">
-      <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="Utils\Octree.cpp">
       <Filter>Utils</Filter>
@@ -233,9 +227,6 @@
     </ClCompile>
     <ClCompile Include="Modules\SceneModule.cpp">
       <Filter>Modules</Filter>
-    </ClCompile>
-    <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp">
-      <Filter>ImGuizmo</Filter>
     </ClCompile>
     <ClCompile Include="Scene\Components\Standalone\MeshComponent.cpp">
       <Filter>Scene\Components</Filter>
@@ -264,9 +255,6 @@
     <ClCompile Include="Utils\EngineTimer.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Utils\Transform.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
     <ClCompile Include="Modules\DebugDrawModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
@@ -279,9 +267,7 @@
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp">
       <Filter>External\ImGuizmo</Filter>
     </ClCompile>
-    <ClCompile Include="RaycastController.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
+    <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -406,9 +392,6 @@
     </ClInclude>
     <ClInclude Include="Scene\Components\Component.h">
       <Filter>Scene\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils\Transform.h">
-      <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="Scene\GameObjects\GameObject.h">
       <Filter>Scene\GameObjects</Filter>
