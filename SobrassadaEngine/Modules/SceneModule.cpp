@@ -71,7 +71,7 @@ update_status SceneModule::RenderEditor(float deltaTime)
 update_status SceneModule::PostUpdate(float deltaTime)
 {
     // CAST RAY WHEN LEFT CLICK IS RELEASED
-    if (loadedScene != nullptr && loadedScene->GetDoInputs() && !ImGuizmo::IsUsing())
+    if (loadedScene != nullptr && loadedScene->GetDoInputs() && !ImGuizmo::IsUsingAny())
     {
         const KeyState* mouseButtons = App->GetInputModule()->GetMouseButtons();
         if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_DOWN)
