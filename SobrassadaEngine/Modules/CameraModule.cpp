@@ -79,7 +79,7 @@ void CameraModule::UpdateUBO()
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-LineSegment& CameraModule::CastCameraRay()
+const LineSegment& CameraModule::CastCameraRay()
 {
     auto& windowPosition = App->GetSceneModule()->GetWindowPosition();
     auto& windowSize     = App->GetSceneModule()->GetWindowSize();
@@ -103,18 +103,12 @@ LineSegment& CameraModule::CastCameraRay()
     else ray = camera.UnProjectLineSegment(normalizedX, normalizedY);
     lastCastedRay = ray;
 
-    return ray;
+    return lastCastedRay;
 }
 
 update_status CameraModule::Update(float deltaTime)
 {
     if (App->GetSceneModule()->GetDoInputs()) Controls(deltaTime);
-
-    viewMatrix         = camera.ViewMatrix();
-    detachedViewMatrix = detachedCamera.ViewMatrix();
-
-    frustumPlanes.UpdateFrustumPlanes(viewMatrix, projectionMatrix);
-    UpdateUBO();
 
     return UPDATE_CONTINUE;
 }
