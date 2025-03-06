@@ -1,6 +1,7 @@
 #include "Quadtree.h"
 
 #include "GameObject.h"
+#include "Standalone/MeshComponent.h"
 
 #include <set>
 
@@ -24,11 +25,14 @@ bool Quadtree::InsertElement(GameObject* gameObject)
 {
     if (gameObject == nullptr) return false;
 
+    const MeshComponent* meshComponent = gameObject->GetMeshComponent();
+    if (meshComponent == nullptr) return false;
+
     bool inserted = false;
     std::stack<QuadtreeNode*> nodesToVisit;
     nodesToVisit.push(rootNode);
 
-    const AABB elementBoundingBox   = gameObject->GetAABB();
+    const AABB elementBoundingBox   = meshComponent->GetGlobalAABB();
     QuadtreeElement quadtreeElement = QuadtreeElement(elementBoundingBox, gameObject, totalElements);
 
     while (!nodesToVisit.empty())

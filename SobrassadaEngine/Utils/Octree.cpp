@@ -1,7 +1,7 @@
 #include "Octree.h"
 
-#include "FrustumPlanes.h"
 #include "GameObject.h"
+#include "Standalone/MeshComponent.h"
 
 #include <set>
 #include <stack>
@@ -83,11 +83,14 @@ bool Octree::InsertElement(GameObject* gameObject)
 {
     if (gameObject == nullptr) return false;
 
+    const MeshComponent* meshComponent = gameObject->GetMeshComponent();
+    if (meshComponent == nullptr) return false;
+
     bool inserted = false;
     std::stack<OctreeNode*> nodesToVisit;
     nodesToVisit.push(rootNode);
 
-    const AABB objectBoundingBox = gameObject->GetAABB();
+    const AABB objectBoundingBox = meshComponent->GetGlobalAABB();
     OctreeElement octreeElement  = OctreeElement(objectBoundingBox, gameObject, totalElements);
 
     while (!nodesToVisit.empty())
