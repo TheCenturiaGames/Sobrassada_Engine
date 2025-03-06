@@ -266,7 +266,7 @@ const MeshComponent* GameObject::GetMeshComponent() const
     if (rootComponent == nullptr) return nullptr;
 
     Component* currentComponent      = nullptr;
-    std::vector<UID> childComponents = rootComponent->GetChildren();
+    const std::vector<UID>& childComponents = rootComponent->GetChildren();
 
     for (UID componentUID : childComponents)
     {
