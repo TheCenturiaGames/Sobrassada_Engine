@@ -191,8 +191,6 @@ void EditorUIModule::MainMenu()
 
         if (ImGui::MenuItem("Load", "", load)) load = !load;
 
-        if (ImGui::MenuItem("Load Model", "", loadModel)) loadModel = !loadModel;
-
         if (ImGui::MenuItem("Save"))
         {
             if (!App->GetLibraryModule()->SaveScene(libraryPath.c_str(), SaveMode::Save))
