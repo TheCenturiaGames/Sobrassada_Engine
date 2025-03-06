@@ -18,18 +18,34 @@ GameObject::GameObject(UID parentUUID, std::string name) : parentUUID(parentUUID
 {
     uuid = GenerateUID();
     globalAABB.SetNegativeInfinity();
-    //CreateRootComponent();
 }
 
 GameObject::GameObject(UID parentUUID, std::string name, UID rootComponentUID) : parentUUID(parentUUID), name(name)
 {
-    rootComponent = dynamic_cast<RootComponent*>(App->GetSceneModule()->GetComponentByUID(rootComponentUID));
+    
 }
 
 GameObject::GameObject(const rapidjson::Value& initialState) : uuid(initialState["UID"].GetUint64())
 {
-    parentUUID = initialState["ParentUID"].GetUint64();
-    name       = initialState["Name"].GetString();
+    parentUUID                  = initialState["ParentUID"].GetUint64();
+    name                        = initialState["Name"].GetString();
+    selectedComponentIndex      = COMPONENT_NONE;
+    mobilitySettings            = initialState["Mobility"].GetInt();
+
+    if (initialState.HasMember("LocalTransform") && initialState["LocalTransform"].IsArray() &&
+        initialState["LocalTransform"].Size() == 16)
+    {
+        const rapidjson::Value& initLocalTransform = initialState["LocalTransform"];
+
+        localTransform                             = float4x4(
+            initLocalTransform[0].GetFloat(), initLocalTransform[1].GetFloat(), initLocalTransform[2].GetFloat(),
+            initLocalTransform[3].GetFloat(), initLocalTransform[4].GetFloat(), initLocalTransform[5].GetFloat(),
+            initLocalTransform[6].GetFloat(), initLocalTransform[7].GetFloat(), initLocalTransform[8].GetFloat(),
+            initLocalTransform[9].GetFloat(), initLocalTransform[10].GetFloat(), initLocalTransform[11].GetFloat(),
+            initLocalTransform[12].GetFloat(), initLocalTransform[13].GetFloat(), initLocalTransform[14].GetFloat(),
+            initLocalTransform[15].GetFloat()
+        );
+    }
 
     if (initialState.HasMember("Children") && initialState["Children"].IsArray())
     {
@@ -40,28 +56,11 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uuid(initialState
             children.push_back(initChildren[i].GetUint64());
         }
     }
-    rootComponent = dynamic_cast<RootComponent*>(
-        App->GetSceneModule()->GetComponentByUID(initialState["RootComponentUID"].GetUint64())
-    );
 }
 
 GameObject::~GameObject()
 {
-    App->GetSceneModule()->RemoveComponent(rootComponent->GetUID());
-    delete rootComponent;
-    rootComponent = nullptr;
-}
-
-bool GameObject::CreateRootComponent()
-{
-
-    rootComponent = dynamic_cast<RootComponent*>(
-        ComponentUtils::CreateEmptyComponent(COMPONENT_ROOT, LCG().IntFast(), uuid, -1, float4x4::identity)
-    ); // TODO Add the gameObject UUID as parent?
-
-    // TODO Replace parentUUID above with the UUID of this gameObject
-    App->GetSceneModule()->AddComponent(rootComponent->GetUID(), rootComponent);
-    return true;
+    
 }
 
 bool GameObject::AddGameObject(UID gameObjectUUID)
@@ -84,35 +83,6 @@ bool GameObject::RemoveGameObject(UID gameObjectUUID)
     return false;
 }
 
-bool GameObject::AddComponent(Component* comp)
-{
-    if (!comp) return false;
-    
-    UID componentUID = comp->GetUID();
-
-    auto [it, inserted] = components.insert({componentUID, comp});
-
-    return inserted;
-}
-
-bool GameObject::RemoveComponent(UID compUID)
-{
-    auto it = components.find(compUID);
-    if (it == components.end()) return false;
-
-    components.erase(it);
-    return true;
-}
-
-Component* GameObject::GetComponentByUID(UID compUID) const
-{
-    auto it = components.find(compUID);
-
-    if (it == components.end()) return nullptr;
-
-    return it->second;
-}
-
 void GameObject::LoadComponentsInGameObject(Component* component)
 {
     if (!component) return;
@@ -129,13 +99,32 @@ void GameObject::LoadComponentsInGameObject(Component* component)
     }
 }
 
-void GameObject::OnEditor() {}
-
 void GameObject::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
 {
     targetState.AddMember("UID", uuid, allocator);
     targetState.AddMember("ParentUID", parentUUID, allocator);
     targetState.AddMember("Name", rapidjson::Value(name.c_str(), allocator), allocator);
+
+    targetState.AddMember("Mobility", mobilitySettings, allocator);
+    rapidjson::Value valLocalTransform(rapidjson::kArrayType);
+    valLocalTransform.PushBack(localTransform.ptr()[0], allocator)
+        .PushBack(localTransform.ptr()[1], allocator)
+        .PushBack(localTransform.ptr()[2], allocator)
+        .PushBack(localTransform.ptr()[3], allocator)
+        .PushBack(localTransform.ptr()[4], allocator)
+        .PushBack(localTransform.ptr()[5], allocator)
+        .PushBack(localTransform.ptr()[6], allocator)
+        .PushBack(localTransform.ptr()[7], allocator)
+        .PushBack(localTransform.ptr()[8], allocator)
+        .PushBack(localTransform.ptr()[9], allocator)
+        .PushBack(localTransform.ptr()[10], allocator)
+        .PushBack(localTransform.ptr()[11], allocator)
+        .PushBack(localTransform.ptr()[12], allocator)
+        .PushBack(localTransform.ptr()[13], allocator)
+        .PushBack(localTransform.ptr()[14], allocator)
+        .PushBack(localTransform.ptr()[15], allocator);
+
+    targetState.AddMember("LocalTransform", valLocalTransform, allocator);
 
     rapidjson::Value valChildren(rapidjson::kArrayType);
 
@@ -145,11 +134,92 @@ void GameObject::Save(rapidjson::Value& targetState, rapidjson::Document::Alloca
     }
 
     targetState.AddMember("Children", valChildren, allocator);
-    targetState.AddMember("RootComponentUID", rootComponent->GetUID(), allocator);
 }
 
-void GameObject::SaveToLibrary()
+void GameObject::RenderEditorInspector()
 {
+    if (!ImGui::Begin("Inspector", &App->GetEditorUIModule()->inspectorMenu))
+    {
+        ImGui::End();
+        return;
+    }
+
+    ImGui::Text(name.c_str());
+
+    if (ImGui::Button("Add Component"
+        )) // TODO Get selected component to add the new one at the correct location (By UUID)
+    {
+        ImGui::OpenPopup("ComponentSelection");
+    }
+
+    if (ImGui::BeginPopup("ComponentSelection"))
+    {
+        static char searchText[255] = "";
+        ImGui::InputText("Search", searchText, 255);
+
+        ImGui::Separator();
+        if (ImGui::BeginListBox("##ComponentList", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
+        {
+            for (const auto& componentPair : standaloneComponents)
+            {
+                {
+                    if (componentPair.first.find(searchText) != std::string::npos)
+                    {
+                        if (ImGui::Selectable(componentPair.first.c_str(), false))
+                        {
+                            CreateComponent(componentPair.second);
+                            ImGui::CloseCurrentPopup();
+                        }
+                    }
+                }
+            }
+            ImGui::EndListBox();
+        }
+        ImGui::EndPopup();
+    }
+
+    if (selectedComponentIndex != COMPONENT_NONE)
+    {
+        ImGui::SameLine();
+        if (ImGui::Button("Remove Component"))
+        {
+            RemoveComponent(selectedComponentIndex);
+        }
+    }
+
+    ImGui::Spacing();
+
+    const float4x4& parentTransform = GetParentGlobalTransform();
+    if (App->GetEditorUIModule()->RenderTransformWidget(localTransform, globalTransform, parentTransform))
+    {
+        OnTransformUpdate(parentTransform);
+    }
+
+    ImGui::SeparatorText("Component configuration");
+
+    ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
+    ImGui::BeginChild("ComponentInspectorWrapper", ImVec2(0, 200), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeY);
+
+    if (components.find(selectedComponentIndex) != components.end())
+    {
+        components.at(selectedComponentIndex)->RenderEditorInspector();
+    }
+
+    ImGui::EndChild();
+    ImGui::PopStyleVar();
+
+    ImGui::End();
+    
+    // Casting to use ImGui to set values and at the same type keep the enum type for the variable
+    ImGui::SeparatorText("Mobility");
+    ImGui::RadioButton("Static", &mobilitySettings, STATIC);
+    ImGui::SameLine();
+    ImGui::RadioButton("Dynamic", &mobilitySettings, DYNAMIC);
+
+    if (App->GetEditorUIModule()->RenderImGuizmo(localTransform, globalTransform, parentTransform))
+    {
+        OnTransformUpdate(parentTransform);
+    }
 }
 
 void GameObject::RenderHierarchyNode(UID& selectedGameObjectUUID)
@@ -408,4 +478,30 @@ const float4x4& GameObject::GetParentGlobalTransform()
         return parent->GetGlobalTransform();
     }
     return float4x4::identity;
+}
+
+bool GameObject::CreateComponent(const ComponentType componentType)
+{
+    if (components.find(componentType) == components.end()) // TODO Allow override of components after displaying an info box
+    {
+        Component* createdComponent = ComponentUtils::CreateEmptyComponent(componentType, LCG().IntFast());
+        if (createdComponent != nullptr)
+        {
+            components.insert({componentType, createdComponent});
+            selectedComponentIndex = componentType;
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+bool GameObject::RemoveComponent(ComponentType componentType)
+{
+    if (components.find(componentType) != components.end()) 
+    {
+        delete components.at(componentType);
+        components.erase(componentType);
+    }
+    return false;
 }

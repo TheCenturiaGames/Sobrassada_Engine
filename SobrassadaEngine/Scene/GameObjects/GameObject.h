@@ -1,16 +1,23 @@
 #pragma once
 
+#include "ComponentUtils.h"
 #include "Globals.h"
 #include "Scene/AABBUpdatable.h"
 
-#include <map>
 #include <Geometry/AABB.h>
 #include <Libs/rapidjson/document.h>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 class RootComponent;
-class Component; 
+class Component;
+
+enum ComponentMobilitySettings
+{
+    STATIC  = 0,
+    DYNAMIC = 1,
+};
 
 class GameObject : public AABBUpdatable
 {
@@ -25,29 +32,19 @@ class GameObject : public AABBUpdatable
 
     void PassAABBUpdateToParent() override;
     void ComponentGlobalTransformUpdated() override;
-    const float4x4& GetGlobalTransform() const override;
     const float4x4& GetParentGlobalTransform() override;
 
     bool AddGameObject(UID gameObjectUUID);
     bool RemoveGameObject(UID gameObjectUUID);
 
-    bool AddComponent(Component* comp);
-    bool RemoveComponent(UID compUID);
-    Component* GetComponentByUID(UID compUID) const;
-
     void LoadComponentsInGameObject(Component* component);
 
-    bool CreateRootComponent();
-
-    void OnEditor();
-
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
-
-    void SaveToLibrary();
 
     void RenderHierarchyNode(UID& selectedGameObjectUUID);
     void HandleNodeClick(UID& selectedGameObjectUUID);
     void RenderContextMenu();
+    void RenderEditorInspector();
 
     bool UpdateGameObjectHierarchy(UID sourceUID, UID targetUID);
     void RenameGameObjectHierarchy();
@@ -64,13 +61,16 @@ class GameObject : public AABBUpdatable
     inline UID GetUID() const { return uuid; }
     void SetUUID(UID newUUID) { uuid = newUUID; }
 
-    RootComponent* GetRootComponent() const { return rootComponent; }
-    const std::map<UID, Component*>& GetAllComponents() const { return components; }
-
     inline const AABB& GetAABB() const { return globalAABB; };
 
     void Render();
     void RenderEditor();
+
+    const float4x4& GetGlobalTransform() const override { return globalTransform; }
+    const float4x4& GetLocalTransform() const { return localTransform; }
+    
+    bool CreateComponent(ComponentType componentType);
+    bool RemoveComponent(ComponentType componentType);
 
   public:
     inline static UID currentRenamingUID = INVALID_UUID;
@@ -82,11 +82,16 @@ class GameObject : public AABBUpdatable
 
     std::string name;
 
-    RootComponent *rootComponent;
-    std::map<UID, Component*> components;
+    std::unordered_map<ComponentType, Component*> components;  
 
     AABB globalAABB;
 
     bool isRenaming = false;
     char renameBuffer[128];
+
+    float4x4 localTransform  = float4x4::identity;
+    float4x4 globalTransform = float4x4::identity;
+
+    ComponentType selectedComponentIndex;
+    int mobilitySettings         = DYNAMIC;
 };

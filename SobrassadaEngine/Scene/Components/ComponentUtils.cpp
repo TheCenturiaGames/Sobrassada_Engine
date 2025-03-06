@@ -10,7 +10,7 @@
 #include <cstdint>
 
 Component* ComponentUtils::CreateEmptyComponent(
-    ComponentType type, UID uid, UID uidParent, UID uidRoot, const float4x4& parentGlobalTransform
+    ComponentType type, UID uid
 )
 {
     switch (type)

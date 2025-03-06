@@ -23,11 +23,6 @@ class Component : public AABBUpdatable
     virtual void Update() = 0;
     virtual void Render();
     virtual void RenderEditorInspector();
-    virtual void RenderEditorComponentTree(UID selectedComponentUID);
-
-    virtual bool AddChildComponent(UID componentUID);
-    virtual bool RemoveChildComponent(UID componentUID);
-    virtual bool DeleteChildComponent(UID componentUID);
 
     virtual void OnTransformUpdate(const float4x4& parentGlobalTransform);
     virtual AABB& TransformUpdated(const float4x4& parentGlobalTransform);
@@ -37,53 +32,21 @@ class Component : public AABBUpdatable
 
     const float4x4& GetParentGlobalTransform() override;
 
-    void HandleDragNDrop();
     void CalculateLocalAABB();
-
     UID GetUID() const { return uid; }
-    UID GetUIDParent() const { return uidParent; }
-
-    const std::vector<UID>& GetChildren() const { return children; }
-
-    void SetUIDParent(UID newUIDParent);
-
-    const float4x4& GetGlobalTransform() const override { return globalTransform; }
-    const float4x4& GetLocalTransform() const { return localTransform; }
 
     const AABB& GetGlobalAABB() const { return globalComponentAABB; }
 
     int GetType() const { return type; }
 
-    RootComponent* GetRootComponent();
-
-
-  protected:
-
-    void RenderGuizmo();
-
-  protected:
-    AABBUpdatable* GetParent();
-    std::vector<Component*>& GetChildComponents();
-
   protected:
     const UID uid;
-    const UID uidRoot;
-    UID uidParent;
-    std::vector<UID> children;
 
     char name[64];
     bool enabled;
-
-    float4x4 localTransform  = float4x4::identity;
-    float4x4 globalTransform = float4x4::identity;
 
     AABB localComponentAABB;
     AABB globalComponentAABB;
 
     const int type = COMPONENT_NONE;
-
-  private:
-    RootComponent* rootComponent = nullptr;
-    AABBUpdatable* parent        = nullptr;
-    std::vector<Component*> childComponents;
 };

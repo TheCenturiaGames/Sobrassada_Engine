@@ -22,7 +22,9 @@ enum ComponentType
     COMPONENT_MESH              = 2,
     COMPONENT_POINT_LIGHT       = 4,
     COMPONENT_SPOT_LIGHT        = 5,
-    COMPONENT_DIRECTIONAL_LIGHT = 6
+    COMPONENT_DIRECTIONAL_LIGHT = 6,
+    FIRST = COMPONENT_NONE,
+    LAST = COMPONENT_DIRECTIONAL_LIGHT
 };
 
 static const std::map<std::string, ComponentType> standaloneComponents = {
@@ -35,9 +37,7 @@ static const std::map<std::string, ComponentType> standaloneComponents = {
 class ComponentUtils
 {
   public:
-    static Component* CreateEmptyComponent(
-        ComponentType type, UID uid, UID uidParent, UID uidRoot, const float4x4& parentGlobalTransform
-    );
+    static Component* CreateEmptyComponent(ComponentType type, UID uid);
 
     static Component* CreateExistingComponent(const rapidjson::Value& initialState);
 };
