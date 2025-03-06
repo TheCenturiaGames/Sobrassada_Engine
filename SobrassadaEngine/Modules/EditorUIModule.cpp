@@ -232,7 +232,7 @@ void EditorUIModule::MainMenu()
     // resources to drag and drop does not exist)
     if (App->GetSceneModule()->GetSceneUID() != CONSTANT_EMPTY_UID)
     {
-        if (ImGui::BeginMenu("Scene"))
+        if (ImGui::BeginMenu("Resource Loader"))
         {
             if (ImGui::MenuItem("Load Model"))
             {
@@ -328,7 +328,7 @@ void EditorUIModule::LoadModelDialog(bool& loadModel)
     ImGui::InputText("Search", searchText, 255);
 
     ImGui::Separator();
-    if (ImGui::BeginListBox("##ComponentList", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
+    if (ImGui::BeginListBox("##ModelsList", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
     {
         static int selected = -1;
         int i               = 0;
