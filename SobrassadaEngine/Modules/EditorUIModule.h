@@ -1,16 +1,23 @@
 #pragma once
-
 #include "imgui_internal.h"
 #include "./Libs/ImGuizmo/ImGuizmo.h"
 #include "Module.h"
 #include "ResourceManagement/Resources/Resource.h"
+#include "EngineEditors/EngineEditorBase.h"
+
 
 #include "SDL.h"
+#include <Math/float4x4.h>
 #include <deque>
 #include <string>
 #include <unordered_map>
-#include <Math/float4x4.h>
 
+enum EditorType
+{
+    BASE,
+    ANIMATION,
+    NODE
+};
 struct CPUFeature
 {
     SDL_bool (*check)();
@@ -66,6 +73,9 @@ class EditorUIModule : public Module
     void Console(bool& consoleMenu) const;
     void About(bool& aboutMenu) const;
 
+    void OpenEditor(EngineEditorBase* editorToOpen);
+    EngineEditorBase* CreateEditor(EditorType type);
+
   public:
     bool hierarchyMenu = true;
     bool inspectorMenu = true;
@@ -94,5 +104,5 @@ class EditorUIModule : public Module
     std::string libraryPath;
 
     ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
-    ;
+    std::unordered_map<UID, EngineEditorBase*> openEditors;
 };

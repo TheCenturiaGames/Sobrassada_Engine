@@ -33,8 +33,7 @@ class Application
     WindowModule* GetWindowModule() { return windowModule; }
     OpenGLModule* GetOpenGLModule() { return openGLModule; }
     ResourcesModule* GetResourcesModule() { return resourcesModule; }
-    Timer *GetGameTimer() { return gameTimer; }
-
+    
     InputModule* GetInputModule() { return inputModule; }
     ShaderModule* GetShaderModule() { return shaderModule; }
     LibraryModule* GetLibraryModule() { return libraryModule; }

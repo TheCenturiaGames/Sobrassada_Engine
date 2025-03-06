@@ -1,6 +1,10 @@
 #include "EngineEditorBase.h"
 
 #include "imgui.h"
+EngineEditorBase::~EngineEditorBase()
+{
+
+}
 
 bool EngineEditorBase::RenderEditor()
 {

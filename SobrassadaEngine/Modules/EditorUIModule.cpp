@@ -779,6 +779,7 @@ UID EditorUIModule::RenderResourceSelectDialog(
     return result;
 }
 
+
 void EditorUIModule::OpenEditor(EngineEditorBase* editorToOpen)
 {
     if (editorToOpen != nullptr)
