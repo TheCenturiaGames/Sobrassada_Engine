@@ -1,15 +1,17 @@
 #pragma once
 
-#include "imgui_internal.h"
-#include "./Libs/ImGuizmo/ImGuizmo.h"
 #include "Module.h"
 #include "ResourceManagement/Resources/Resource.h"
 
 #include "SDL.h"
+#include "imgui_internal.h"
+#include <Math/float4x4.h>
 #include <deque>
 #include <string>
 #include <unordered_map>
-#include <Math/float4x4.h>
+
+// imguizmo after imgui
+#include "./Libs/ImGuizmo/ImGuizmo.h"
 
 struct CPUFeature
 {

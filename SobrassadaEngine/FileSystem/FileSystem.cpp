@@ -2,11 +2,11 @@
 
 #include "document.h"
 #include "istreamwrapper.h"
-#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <sys/stat.h>
 #if defined(_WIN32) || defined(_WIN64)
 #include <Windows.h>
 #elif defined(__linux__) || defined(__APPLE__)
