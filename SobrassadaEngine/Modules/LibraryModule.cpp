@@ -14,9 +14,9 @@
 
 #include "Libs/rapidjson/stringbuffer.h"
 #include "Libs/rapidjson/writer.h"
-#include <fstream>
 #include "stringbuffer.h"
 #include <filesystem>
+#include <fstream>
 
 LibraryModule::LibraryModule()
 {
@@ -114,15 +114,15 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
     // Serialize Lights Config
     LightsConfig* lightConfig = App->GetSceneModule()->GetLightsConfig();
 
-     if (lightConfig != nullptr)
-     {
+    if (lightConfig != nullptr)
+    {
         rapidjson::Value lights(rapidjson::kObjectType);
 
         lightConfig->SaveData(lights, allocator);
 
         doc.AddMember("Lights Config", lights, allocator);
-
-     } else GLOG("Light Config not found");
+    }
+    else GLOG("Light Config not found");
 
     // Save file like JSON
     rapidjson::StringBuffer buffer;
@@ -230,7 +230,7 @@ bool LibraryModule::LoadScene(const char* path, bool reload) const
     // Deserialize Lights Config
     if (doc.HasMember("Lights Config") && doc["Lights Config"].IsObject())
     {
-        LightsConfig* lightConfig           = App->GetSceneModule()->GetLightsConfig();
+        LightsConfig* lightConfig = App->GetSceneModule()->GetLightsConfig();
         lightConfig->LoadData(doc["Lights Config"]);
     }
 
@@ -249,40 +249,32 @@ bool LibraryModule::LoadLibraryMaps()
             std::string filePath = entry.path().string();
 
             std::string fileName = FileSystem::GetFileNameWithoutExtension(filePath);
-            
 
-            try
+            rapidjson::Document doc;
+            if (!FileSystem::LoadJSON(filePath.c_str(), doc)) continue;
+
+            UID assetUID             = doc["UID"].GetUint64();
+            std::string originalPath = doc["originalPath"].GetString();
+
+            UID prefix               = assetUID / 100000000000000;
+
+            switch (prefix)
             {
-                rapidjson::Document doc;
-                if (!FileSystem::LoadJSON(filePath.c_str(), doc)) continue;
-
-                UID assetUID         = doc["UID"].GetUint64();
-                std::string originalPath = doc["originalPath"].GetString();
-
-                UID prefix           = assetUID / 100000000000000;
-
-                switch (prefix)
-                {
-                case 13:
-                    AddMesh(assetUID, fileName);
-                    AddResource(originalPath, assetUID);
-                    break;
-                case 12:
-                    AddMaterial(assetUID, fileName);
-                    AddResource(originalPath, assetUID);
-                    break;
-                case 11:
-                    AddTexture(assetUID, fileName);
-                    AddResource(originalPath, assetUID);
-                    break;
-                default:
-                    GLOG("Category: Unknown File Type (10)");
-                    break;
-                }
-            }
-            catch (std::invalid_argument&)
-            {
-                GLOG("File %s is not an asset file", fileName);
+            case 13:
+                AddMesh(assetUID, fileName);
+                AddResource(originalPath, assetUID);
+                break;
+            case 12:
+                AddMaterial(assetUID, fileName);
+                AddResource(originalPath, assetUID);
+                break;
+            case 11:
+                AddTexture(assetUID, fileName);
+                AddResource(originalPath, assetUID);
+                break;
+            default:
+                GLOG("Category: Unknown File Type (10)");
+                break;
             }
         }
     }
@@ -376,10 +368,7 @@ const std::string& LibraryModule::GetResourcePath(UID resourceID) const
     return emptyString;
 }
 
-
 void LibraryModule::AddResource(const std::string& resourcePath, UID resourceUID)
 {
     resourcePathsMap[resourceUID] = resourcePath;
 }
-
-

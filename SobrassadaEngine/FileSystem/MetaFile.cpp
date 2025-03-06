@@ -1,6 +1,8 @@
 #include "MetaFile.h"
 #include "FileSystem.h"
 #include "Globals.h"
+
+#include "Libs/rapidjson/prettywriter.h"
 #include "Libs/rapidjson/stringbuffer.h"
 #include "Libs/rapidjson/writer.h"
 
@@ -25,12 +27,15 @@ void MetaFile::Save(const std::string& assetPath) const
     AddImportOptions(doc, allocator);
 
     rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
     doc.Accept(writer);
 
     std::string savePath     = FileSystem::GetFilePath(assetPath);
     std::string name         = FileSystem::GetFileNameWithoutExtension(assetPath);
     // Save to .meta file
     std::string metaFilePath = savePath + name + META_EXTENSION;
-    FileSystem::Save(metaFilePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), true);
+    unsigned int bytesWritten =
+        (unsigned int)FileSystem::Save(metaFilePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
+
+    if (bytesWritten == 0) GLOG("Failed to save meta file: %s", assetPath.c_str());
 }

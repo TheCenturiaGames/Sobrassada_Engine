@@ -227,8 +227,6 @@ namespace MeshImporter
 
         UID meshUID                = GenerateUID();
 
-
-
         std::string savePath           = MESHES_PATH + name + MESH_EXTENSION;
 
         UID finalMeshUID             = App->GetLibraryModule()->AssignFiletypeUID(meshUID, savePath);
