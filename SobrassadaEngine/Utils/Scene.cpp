@@ -13,7 +13,7 @@
 
 #include "imgui.h"
 #include "imgui_internal.h"
-
+// guizmo after imgui include
 #include "./Libs/ImGuizmo/ImGuizmo.h"
 
 Scene::Scene(UID sceneUID, const char* sceneName, UID rootGameObject)
@@ -42,24 +42,22 @@ Scene::~Scene()
     delete sceneOctree;
     lightsConfig = nullptr;
 
-    GLOG("%s scene closed", sceneName)
+    GLOG("%s scene closed", sceneName.c_str());
 }
 
 void Scene::Save() const
 {
     if (!App->GetLibraryModule()->SaveScene(SCENES_PATH, SaveMode::Save))
     {
-        GLOG("%s scene saving failed", sceneName)
+        GLOG("%s scene saving failed", sceneName.c_str());
     }
 }
 
 void Scene::LoadComponents(const std::map<UID, Component*>& loadedGameComponents)
 {
     gameComponents.clear();
-    gameObjectsContainer.clear();
     gameComponents.insert(loadedGameComponents.begin(), loadedGameComponents.end());
 
-    // LigthsConfig init here, so scene already exists and can get the existing lights
     lightsConfig->InitSkybox();
     lightsConfig->InitLightBuffers();
 }
@@ -72,7 +70,7 @@ void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGa
     GameObject* root = GetGameObjectByUUID(gameObjectRootUUID);
     if (root != nullptr)
     {
-        GLOG("Init transform and AABB calculation")
+        GLOG("Init transform and AABB calculation");
         root->ComponentGlobalTransformUpdated();
     }
 
@@ -81,7 +79,6 @@ void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGa
 
 update_status Scene::Render(float deltaTime)
 {
-    // Render skybox and lights
     lightsConfig->RenderSkybox();
     lightsConfig->RenderLights();
 
@@ -160,10 +157,20 @@ void Scene::RenderScene()
 
         ImGui::EndChild();
     }
+
     if (ImGui::BeginChild(
             "##SceneChild", ImVec2(0.f, 0.f), NULL, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar
         ))
     {
+        // right click focus window
+        if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) ImGui::SetWindowFocus();
+
+        // do inputs only if window is focused
+        if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
+            ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows))
+            doInputs = true;
+        else doInputs = false;
+
         const auto& framebuffer = App->GetOpenGLModule()->GetFramebuffer();
 
         ImGui::SetCursorPos(ImVec2(0.f, 0.f));
@@ -177,9 +184,9 @@ void Scene::RenderScene()
         ImGuizmo::SetOrthographic(false);
         ImGuizmo::SetDrawlist(); // ImGui::GetWindowDrawList()
 
-        float width  = ImGui::GetWindowWidth();
-        float height = ImGui::GetWindowHeight();
-        ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, width, height);
+        ImGuizmo::SetRect(
+            ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight()
+        );
 
         ImVec2 windowSize = ImGui::GetWindowSize();
         if (framebuffer->GetTextureWidth() != windowSize.x || framebuffer->GetTextureHeight() != windowSize.y)

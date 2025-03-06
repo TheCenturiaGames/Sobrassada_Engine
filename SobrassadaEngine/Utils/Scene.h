@@ -16,11 +16,9 @@ class Scene
 {
   public:
     Scene(UID sceneUID, const char* sceneName, UID rootGameObject);
-
     ~Scene();
 
     void Save() const;
-
     void LoadComponents(const std::map<UID, Component*>& loadedGameComponents);
     void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
 
@@ -28,35 +26,30 @@ class Scene
     update_status RenderEditor(float deltaTime);
     void RenderScene();
     void RenderSelectedGameObjectUI();
-
-
     void RenderHierarchyUI(bool& hierarchyMenu);
 
+    void UpdateSpatialDataStruct();
+
+    void AddGameObject(UID uid, GameObject* newGameObject) { gameObjectsContainer.insert({uid, newGameObject}); }
+    void AddComponent(UID uid, Component* newComponent) { gameComponents.insert({uid, newComponent}); }
     void RemoveGameObjectHierarchy(UID gameObjectUUID);
+    void RemoveComponent(UID componentUID);
 
-    // TODO: Change when filesystem defined
-    GameObject* GetGameObjectByUUID(UID gameObjectUUID);
-    Component* GetComponentByUID(UID componentUID);
-
+    const char* GetSceneName() const { return sceneName.c_str(); }
+    UID GetSceneUID() const { return sceneUID; }
+    UID GetGameObjectRootUID() const { return gameObjectRootUUID; }
     GameObject* GetSeletedGameObject() { return GetGameObjectByUUID(selectedGameObjectUUID); }
 
     const std::unordered_map<UID, GameObject*>& GetAllGameObjects() const { return gameObjectsContainer; }
     const std::map<UID, Component*>& GetAllComponents() const { return gameComponents; }
-    UID GetGameObjectRootUID() const { return gameObjectRootUUID; }
 
-    void RemoveComponent(UID componentUID);
+    GameObject* GetGameObjectByUUID(UID gameObjectUUID); // TODO: Change when filesystem defined
+    Component* GetComponentByUID(UID componentUID);
 
     AABBUpdatable* GetTargetForAABBUpdate(UID uuid);
-
-    UID GetSceneUID() const { return sceneUID; }
-    const char* GetSceneName() const { return sceneName.c_str(); }
-
-    void AddGameObject(UID uid, GameObject* newGameObject) { gameObjectsContainer.insert({uid, newGameObject}); }
-    void AddComponent(UID uid, Component* newComponent) { gameComponents.insert({uid, newComponent}); }
-
     LightsConfig* GetLightsConfig() { return lightsConfig; }
-    
-    void UpdateSpatialDataStruct();
+
+    bool GetDoInputs() const { return doInputs; }
 
   private:
     void CreateSpatialDataStruct();
@@ -66,7 +59,6 @@ class Scene
     std::string sceneName;
     UID sceneUID;
     UID gameObjectRootUUID;
-
     UID selectedGameObjectUUID;
 
     std::map<UID, Component*> gameComponents; // TODO Move components to individual gameObjects
@@ -74,4 +66,6 @@ class Scene
 
     LightsConfig* lightsConfig = nullptr;
     Octree* sceneOctree        = nullptr;
+
+    bool doInputs                   = false;
 };

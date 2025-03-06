@@ -11,9 +11,9 @@
 #include "TextureImporter.h"
 #include "imgui.h"
 
-#include "../Scene/Components/Standalone/Lights/DirectionalLight.h"
-#include "../Scene/Components/Standalone/Lights/PointLight.h"
-#include "../Scene/Components/Standalone/Lights/SpotLight.h"
+#include "../Scene/Components/Standalone/Lights/DirectionalLightComponent.h"
+#include "../Scene/Components/Standalone/Lights/PointLightComponent.h"
+#include "../Scene/Components/Standalone/Lights/SpotLightComponent.h"
 #include "glew.h"
 #include <cstddef>
 
@@ -99,11 +99,32 @@ void LightsConfig::RenderSkybox() const
     App->GetOpenGLModule()->SetDepthFunc(true);
 }
 
-unsigned int LightsConfig::LoadSkyboxTexture(UID cubemapUid) const
+unsigned int LightsConfig::LoadSkyboxTexture(UID cubemapUid)
 {
     std::string stringPath = App->GetLibraryModule()->GetResourcePath(cubemapUid);
-
+    skyboxUID              = cubemapUid;
     return TextureImporter::LoadCubemap(stringPath.c_str());
+}
+
+void LightsConfig::SaveData(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
+{
+    rapidjson::Value ambientColorArray(rapidjson::kArrayType);
+    ambientColorArray.PushBack(ambientColor.x, allocator)
+        .PushBack(ambientColor.y, allocator)
+        .PushBack(ambientColor.z, allocator);
+
+    // Add to Light
+    targetState.AddMember("Ambient Color", ambientColorArray, allocator);
+    targetState.AddMember("Ambient Intensity", ambientIntensity, allocator);
+    targetState.AddMember("Skybox UID", skyboxUID, allocator);
+}
+
+void LightsConfig::LoadData(rapidjson::Value& lights)
+{
+    rapidjson::Value& ambientColorArray = lights["Ambient Color"];
+    ambientColor = {ambientColorArray[0].GetFloat(), ambientColorArray[1].GetFloat(), ambientColorArray[2].GetFloat()};
+    ambientIntensity = lights["Ambient Intensity"].GetFloat();
+    skyboxTexture    = LoadSkyboxTexture(lights["Skybox UID"].GetUint64());
 }
 
 void LightsConfig::AddSkyboxTexture(UID resource)
@@ -218,7 +239,7 @@ void LightsConfig::SetPointLightsShaderData() const
         {
             // Fill struct data
             points.emplace_back(Lights::PointLightShaderData(
-                float4(pointLights[i]->GetGlobalTransform().position, pointLights[i]->GetRange()),
+                float4(pointLights[i]->GetGlobalTransform().TranslatePart(), pointLights[i]->GetRange()),
                 float4(pointLights[i]->GetColor(), pointLights[i]->GetIntensity())
             ));
         }
@@ -245,7 +266,7 @@ void LightsConfig::SetSpotLightsShaderData() const
     {
         // Fill struct data
         spots.emplace_back(Lights::SpotLightShaderData(
-            float4(spotLights[i]->GetGlobalTransform().position, spotLights[i]->GetRange()),
+            float4(spotLights[i]->GetGlobalTransform().TranslatePart(), spotLights[i]->GetRange()),
             float4(spotLights[i]->GetColor(), spotLights[i]->GetIntensity()), float3(spotLights[i]->GetDirection()),
             spotLights[i]->GetInnerAngle(), spotLights[i]->GetOuterAngle()
         ));
@@ -264,11 +285,11 @@ void LightsConfig::SetSpotLightsShaderData() const
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, spotBufferId);
 }
 
-void LightsConfig::AddDirectionalLight(DirectionalLight* newDirectional)
+void LightsConfig::AddDirectionalLight(DirectionalLightComponent* newDirectional)
 {
     if (directionalLight == nullptr) directionalLight = newDirectional;
 }
-void LightsConfig::AddPointLight(PointLight* newPoint)
+void LightsConfig::AddPointLight(PointLightComponent* newPoint)
 {
     // Add point light to vector and resize buffer
     pointLights.push_back(newPoint);
@@ -282,13 +303,14 @@ void LightsConfig::AddPointLight(PointLight* newPoint)
         bufferSize
     );
 }
-void LightsConfig::AddSpotLight(SpotLight* newSpot)
+void LightsConfig::AddSpotLight(SpotLightComponent* newSpot)
 {
     spotLights.push_back(newSpot);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, spotBufferId);
-    int bufferSize =
-        static_cast<int>((sizeof(Lights::SpotLightShaderData) + 12) * spotLights.size() + 16); // 12 bytes offset between spotlights
+    int bufferSize = static_cast<int>(
+        (sizeof(Lights::SpotLightShaderData) + 12) * spotLights.size() + 16
+    ); // 12 bytes offset between spotlights
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize, nullptr, GL_STATIC_DRAW);
 
     GLOG(
@@ -324,6 +346,7 @@ void LightsConfig::RemovePointLight(UID pointUid)
 
     GLOG("Point lights size: %d. Buffer size: %d", pointLights.size(), bufferSize);
 }
+
 void LightsConfig::RemoveSpotLight(UID spotUid)
 {
     GLOG("Remove spot light with UID: %d", spotUid);
@@ -341,8 +364,9 @@ void LightsConfig::RemoveSpotLight(UID spotUid)
 
     // Resize lights buffer
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, spotBufferId);
-    int bufferSize =
-        static_cast<int>((sizeof(Lights::SpotLightShaderData) + 12) * spotLights.size() + 16); // 12 bytes offset between spotlights
+    int bufferSize = static_cast<int>(
+        (sizeof(Lights::SpotLightShaderData) + 12) * spotLights.size() + 16
+    ); // 12 bytes offset between spotlights
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize, nullptr, GL_STATIC_DRAW);
 
     GLOG("Spot lights size: %d. Buffer size: %d", spotLights.size(), bufferSize);
@@ -367,7 +391,7 @@ void LightsConfig::GetAllPointLights()
             if (component.second->GetType() == COMPONENT_POINT_LIGHT)
             {
                 GLOG("Add point light");
-                pointLights.push_back(static_cast<PointLight*>(component.second));
+                pointLights.push_back(static_cast<PointLightComponent*>(component.second));
             }
         }
     }
@@ -388,7 +412,7 @@ void LightsConfig::GetAllSpotLights()
             if (component.second->GetType() == COMPONENT_SPOT_LIGHT)
             {
                 GLOG("Add spotlight")
-                spotLights.push_back(static_cast<SpotLight*>(component.second));
+                spotLights.push_back(static_cast<SpotLightComponent*>(component.second));
             }
         }
     }
@@ -408,7 +432,7 @@ void LightsConfig::GetDirectionalLight()
             if (component.second->GetType() == COMPONENT_DIRECTIONAL_LIGHT)
             {
                 GLOG("Add directional light");
-                directionalLight = static_cast<DirectionalLight*>(component.second);
+                directionalLight = static_cast<DirectionalLightComponent*>(component.second);
                 break;
             }
         }

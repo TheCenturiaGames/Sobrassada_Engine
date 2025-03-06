@@ -1,24 +1,23 @@
-#include "PointLight.h"
+#include "PointLightComponent.h"
 
 #include "Application.h"
+#include "DebugDrawModule.h"
 #include "SceneModule.h"
 
-#include "DebugDrawModule.h"
 #include "ImGui.h"
-
 #include <vector>
 
-PointLight::PointLight(UID uid, UID uidParent, UID uidRoot, const Transform& parentGlobalTransform)
+PointLightComponent::PointLightComponent(UID uid, UID uidParent, UID uidRoot, const float4x4& parentGlobalTransform)
     : LightComponent(uid, uidParent, uidRoot, "Point Light", COMPONENT_POINT_LIGHT, parentGlobalTransform)
 {
-    range      = 1;
-    gizmosMode = 0;
+    range                      = 1;
+    gizmosMode                 = 0;
 
     LightsConfig* lightsConfig = App->GetSceneModule()->GetLightsConfig();
     if (lightsConfig != nullptr) lightsConfig->AddPointLight(this);
 }
 
-PointLight::PointLight(const rapidjson::Value& initialState) : LightComponent(initialState)
+PointLightComponent::PointLightComponent(const rapidjson::Value& initialState) : LightComponent(initialState)
 {
 
     if (initialState.HasMember("Range"))
@@ -33,12 +32,12 @@ PointLight::PointLight(const rapidjson::Value& initialState) : LightComponent(in
     if (lightsConfig != nullptr) lightsConfig->AddPointLight(this);
 }
 
-
-PointLight::~PointLight() {
+PointLightComponent::~PointLightComponent()
+{
     App->GetSceneModule()->GetLightsConfig()->RemovePointLight(uid);
 }
 
-void PointLight::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
+void PointLightComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
 {
     LightComponent::Save(targetState, allocator);
 
@@ -46,7 +45,7 @@ void PointLight::Save(rapidjson::Value& targetState, rapidjson::Document::Alloca
     targetState.AddMember("GizmosMode", gizmosMode, allocator);
 }
 
-void PointLight::RenderEditorInspector()
+void PointLightComponent::RenderEditorInspector()
 {
     LightComponent::RenderEditorInspector();
 
@@ -54,9 +53,6 @@ void PointLight::RenderEditorInspector()
     {
         ImGui::Text("Point light parameters");
         ImGui::SliderFloat("Range", &range, 0.0f, 10.0f);
-
-        ImGui::SeparatorText("Gizmos");
-        ImGui::Checkbox("Draw gizmos", &drawGizmos);
 
         ImGui::Text("Gizmos mode");
         if (ImGui::RadioButton("Lines", &gizmosMode, 0))
@@ -69,7 +65,7 @@ void PointLight::RenderEditorInspector()
     }
 }
 
-void PointLight::Render()
+void PointLightComponent::Render()
 {
     if (!enabled || !drawGizmos) return;
 
@@ -111,11 +107,11 @@ void PointLight::Render()
     {
         for (int i = 0; i < directions.size(); ++i)
         {
-            debug->DrawLine(globalTransform.position, directions[i], range, float3(1, 1, 1));
+            debug->DrawLine(globalTransform.TranslatePart(), directions[i], range, float3(1, 1, 1));
         }
     }
     else
     {
-        debug->DrawSphere(globalTransform.position, float3(1, 1, 1), range);
+        debug->DrawSphere(globalTransform.TranslatePart(), float3(1, 1, 1), range);
     }
 }
