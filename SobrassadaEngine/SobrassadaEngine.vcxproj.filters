@@ -271,16 +271,16 @@
       <Filter>External\ImGuizmo</Filter>
     </ClCompile>
     <ClCompile Include="FileSystem\MetaFile.cpp">
-      <Filter>FileSystem</Filter>
+      <Filter>FileSystem\Meta</Filter>
     </ClCompile>
     <ClCompile Include="FileSystem\MetaMaterial.cpp">
-      <Filter>FileSystem</Filter>
+      <Filter>FileSystem\Meta</Filter>
     </ClCompile>
     <ClCompile Include="FileSystem\MetaMesh.cpp">
-      <Filter>FileSystem</Filter>
+      <Filter>FileSystem\Meta</Filter>
     </ClCompile>
     <ClCompile Include="FileSystem\MetaTexture.cpp">
-      <Filter>FileSystem</Filter>
+      <Filter>FileSystem\Meta</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -319,6 +319,9 @@
     </Filter>
     <Filter Include="External\MathGeoLib">
       <UniqueIdentifier>{77ec05ef-e581-4de2-bda3-50c6c7bcc0d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FileSystem\Meta">
+      <UniqueIdentifier>{0325771a-d106-4c90-8e61-78de9e68b286}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -491,16 +494,16 @@
     <ClInclude Include="Tests\MockGameObject.h" />
     <ClInclude Include="UI\QuadtreeViewer.h" />
     <ClInclude Include="FileSystem\MetaFile.h">
-      <Filter>FileSystem</Filter>
+      <Filter>FileSystem\Meta</Filter>
     </ClInclude>
     <ClInclude Include="FileSystem\MetaMaterial.h">
-      <Filter>FileSystem</Filter>
+      <Filter>FileSystem\Meta</Filter>
     </ClInclude>
     <ClInclude Include="FileSystem\MetaMesh.h">
-      <Filter>FileSystem</Filter>
+      <Filter>FileSystem\Meta</Filter>
     </ClInclude>
     <ClInclude Include="FileSystem\MetaTexture.h">
-      <Filter>FileSystem</Filter>
+      <Filter>FileSystem\Meta</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -232,7 +232,7 @@ namespace MeshImporter
         UID finalMeshUID             = App->GetLibraryModule()->AssignFiletypeUID(meshUID, savePath);
         std::string fileName         = FileSystem::GetFileNameWithoutExtension(filePath);
 
-        MetaMesh meta(finalMeshUID, savePath, generateTangents);
+        MetaMesh meta(finalMeshUID, filePath, generateTangents);
         meta.Save(savePath);
 
 
