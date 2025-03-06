@@ -230,6 +230,22 @@ void EditorUIModule::MainMenu()
         ImGui::EndMenu();
     }
 
+    // Menu window to load files into scene (useful while a window with the
+    // resources to drag and drop does not exist)
+    if (App->GetSceneModule()->GetSceneUID() != CONSTANT_EMPTY_UID)
+    {
+        if (ImGui::BeginMenu("Scene"))
+        {
+            if (ImGui::MenuItem("Load Model"))
+            {
+                loadModel = !loadModel;
+                ImGui::OpenPopup(CONSTANT_MODEL_SELECT_DIALOG_ID);
+            }
+
+            ImGui::EndMenu();
+        }
+    }
+
     ImGui::EndMainMenuBar();
 }
 
@@ -301,7 +317,7 @@ void EditorUIModule::LoadDialog(bool& load)
 
 void EditorUIModule::LoadModelDialog(bool& loadModel)
 {
-    //ImGui::SetNextWindowSize(ImVec2(width * 0.25f, height * 0.4f), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(width * 0.25f, height * 0.4f), ImGuiCond_FirstUseEver);
 
     if (!ImGui::Begin("Load Model", &loadModel, ImGuiWindowFlags_NoCollapse))
     {
@@ -309,14 +325,33 @@ void EditorUIModule::LoadModelDialog(bool& loadModel)
         return;
     }
 
-    if (ImGui::Button("Select Model"))
+    static UID modelUid        = CONSTANT_EMPTY_UID;
+    static char searchText[255] = "";
+    ImGui::InputText("Search", searchText, 255);
+
+    ImGui::Separator();
+    if (ImGui::BeginListBox("##ComponentList", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
     {
-        ImGui::OpenPopup("model-select");
+        static int selected = -1;
+        int i               = 0;
+        for (const auto& valuePair : App->GetLibraryModule()->GetModelMap())
+        {
+            ++i;
+            if (valuePair.first.find(searchText) != std::string::npos)
+            {
+                if (ImGui::Selectable(valuePair.first.c_str(), selected == i))
+                {
+                    selected  = i;
+                    modelUid = valuePair.second;
+                }
+            }
+        }
+        ImGui::EndListBox();
     }
 
-    if (ImGui::IsPopupOpen("model-select"))
+    if (ImGui::Button("Ok"))
     {
-        App->GetSceneModule()->LoadModel(RenderResourceSelectDialog("model-select", App->GetLibraryModule()->GetModelMap()));
+        App->GetSceneModule()->LoadModel(modelUid);
     }
 
     ImGui::End();
