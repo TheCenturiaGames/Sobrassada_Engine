@@ -22,7 +22,6 @@ class Scene
     void LoadComponents(const std::map<UID, Component*>& loadedGameComponents);
     void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
 
-    update_status Update(float deltaTime);
     update_status Render(float deltaTime);
     update_status RenderEditor(float deltaTime);
     void RenderScene();
@@ -69,5 +68,5 @@ class Scene
     LightsConfig* lightsConfig = nullptr;
     Octree* sceneOctree        = nullptr;
 
-    bool doInputs                   = false;
+    bool doInputs              = false;
 };

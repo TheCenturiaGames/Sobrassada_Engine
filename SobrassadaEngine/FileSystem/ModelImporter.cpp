@@ -224,16 +224,17 @@ namespace ModelImporter
         }
     }
 
-    const float4x4& GetNodeTransform(const tinygltf::Node& node)
+    const float4x4 GetNodeTransform(const tinygltf::Node& node)
     {
         if (!node.matrix.empty())
         {
             // glTF stores matrices in COLUMN-MAJOR order, same as MathGeoLib
-            return float4x4(
+            float4x4 matrix = float4x4(
                 node.matrix[0], node.matrix[1], node.matrix[2], node.matrix[3], node.matrix[4], node.matrix[5],
                 node.matrix[6], node.matrix[7], node.matrix[8], node.matrix[9], node.matrix[10], node.matrix[11],
                 node.matrix[12], node.matrix[13], node.matrix[14], node.matrix[15]
             );
+            return matrix;
         }
 
         // Default values
@@ -251,6 +252,7 @@ namespace ModelImporter
 
         if (!node.scale.empty()) scale = float3(node.scale[0], node.scale[1], node.scale[2]);
 
-        return float4x4::FromTRS(translation, rotation, scale);
+        float4x4 matrix = float4x4::FromTRS(translation, rotation, scale);
+        return matrix;
     }
 } // namespace ModelImporter
