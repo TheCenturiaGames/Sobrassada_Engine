@@ -46,7 +46,6 @@ Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUI
             const rapidjson::Value& gameObject = gameObjects[i];
 
             GameObject* newGameObject          = new GameObject(gameObject);
-
             gameObjectsContainer.insert({newGameObject->GetUID(), newGameObject});
         }
     }

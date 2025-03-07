@@ -25,7 +25,7 @@ MeshComponent::MeshComponent(const rapidjson::Value& initialState) : Component(i
     }
     if (initialState.HasMember("Mesh"))
     {
-        AddMesh(initialState["Mesh"].GetUint64());
+        AddMesh(initialState["Mesh"].GetUint64(), false);
     }
 }
 
@@ -92,7 +92,7 @@ void MeshComponent::Render()
     }
 }
 
-void MeshComponent::AddMesh(UID resource)
+void MeshComponent::AddMesh(UID resource, bool updateParent)
 {
     if (resource == CONSTANT_EMPTY_UID) return;
 

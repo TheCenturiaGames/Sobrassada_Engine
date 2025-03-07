@@ -66,6 +66,8 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
         }
     }
 
+    OnAABBUpdated();
+
     if (initialState.HasMember("Children") && initialState["Children"].IsArray())
     {
         const rapidjson::Value& initChildren = initialState["Children"];
@@ -150,6 +152,15 @@ void GameObject::Save(rapidjson::Value& targetState, rapidjson::Document::Alloca
 
     // Add components to scene
     targetState.AddMember("Components", componentsJSON, allocator);
+
+    rapidjson::Value valChildren(rapidjson::kArrayType);
+
+    for (const UID child : children)
+    {
+        valChildren.PushBack(child, allocator);
+    }
+
+    targetState.AddMember("Children", valChildren, allocator);
 }
 
 void GameObject::RenderEditorInspector()
@@ -182,6 +193,20 @@ void GameObject::RenderEditorInspector()
         }
     }
 
+    ImGui::Spacing();
+
+    const float4x4& parentTransform = GetParentGlobalTransform();
+    if (App->GetEditorUIModule()->RenderTransformWidget(localTransform, globalTransform, parentTransform))
+    {
+        UpdateTransformForGOBranch();
+    }
+
+    // Casting to use ImGui to set values and at the same type keep the enum type for the variable
+    ImGui::SeparatorText("Mobility");
+    ImGui::RadioButton("Static", &mobilitySettings, STATIC);
+    ImGui::SameLine();
+    ImGui::RadioButton("Dynamic", &mobilitySettings, DYNAMIC);
+
     ImGui::SeparatorText("Component hierarchy");
 
     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
@@ -211,16 +236,10 @@ void GameObject::RenderEditorInspector()
 
     ImGui::Spacing();
 
-    const float4x4& parentTransform = GetParentGlobalTransform();
-    if (App->GetEditorUIModule()->RenderTransformWidget(localTransform, globalTransform, parentTransform))
-    {
-        UpdateTransformForGOBranch();
-    }
-
     ImGui::SeparatorText("Component configuration");
 
     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
-    ImGui::BeginChild("ComponentInspectorWrapper", ImVec2(0, 200), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeY);
+    ImGui::BeginChild("ComponentInspectorWrapper", ImVec2(0, 50), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeY);
 
     if (components.find(selectedComponentIndex) != components.end())
     {
@@ -229,12 +248,6 @@ void GameObject::RenderEditorInspector()
 
     ImGui::EndChild();
     ImGui::PopStyleVar();
-
-    // Casting to use ImGui to set values and at the same type keep the enum type for the variable
-    ImGui::SeparatorText("Mobility");
-    ImGui::RadioButton("Static", &mobilitySettings, STATIC);
-    ImGui::SameLine();
-    ImGui::RadioButton("Dynamic", &mobilitySettings, DYNAMIC);
 
     ImGui::End();
 
@@ -447,7 +460,7 @@ void GameObject::OnAABBUpdated()
     {
         localAABB.Enclose(component.second->GetLocalAABB());
     }
-    
+    OnTransformUpdated();
 }
 
 void GameObject::Render() const

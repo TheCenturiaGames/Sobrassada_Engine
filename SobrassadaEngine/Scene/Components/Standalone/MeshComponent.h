@@ -22,7 +22,7 @@ class MeshComponent : public Component
     void Render() override;
 
   private:
-    void AddMesh(UID resource);
+    void AddMesh(UID resource, bool updateParent = true);
     void AddMaterial(UID resource);
 
   private:
