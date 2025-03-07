@@ -23,10 +23,13 @@ struct MaterialGPU
     float4 diffColor     = {1.0f, 0.0f, 0.0f, 1.0f};
     float3 specColor     = {1.0f, 0.0f, 0.0f};
     float shininess      = 500.0f;
-    int shininessInAlpha = 0;
-    int hasNormal        = 0;
+    bool shininessInAlpha = false;
     float metallicFactor  = 1.0f;
     float roughnessFactor = 1.0f;
+    uint64_t diffuseTex = 0;
+    uint64_t specularTex = 0;
+    uint64_t metallicTex = 0;
+    uint64_t normalTex = 0;
 };
 
 class ResourceMaterial : public Resource
@@ -35,7 +38,7 @@ class ResourceMaterial : public Resource
     ResourceMaterial(UID uid, const std::string& name);
     ~ResourceMaterial() override;
 
-    const bool GetIsMetallicRoughness() const { return hasMetallicTexture; }
+    const bool GetIsMetallicRoughness() const { return metallicTexture.textureID != 0 ? true : false; }
 
     void OnEditorUpdate();
     void LoadMaterialData(Material mat);
@@ -45,16 +48,9 @@ class ResourceMaterial : public Resource
 
   private:
     TextureInfo diffuseTexture;
-    bool hasDiffuseTexture = false;
-
     TextureInfo specularTexture;
-    bool hasSpecularTexture = false;
-
     TextureInfo metallicTexture;
-    bool hasMetallicTexture = false;
-
     TextureInfo normalTexture;
-    bool hasNormalTexture = false;
 
     MaterialGPU material;
 

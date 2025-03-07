@@ -1,5 +1,7 @@
 #version 460
 
+#extension GL_ARB_bindless_texture : require
+
 in vec3 pos;
 in vec2 uv0;
 in vec3 normal;
@@ -7,14 +9,9 @@ in vec4 tangent;
 
 out vec4 outColor;
 
-layout(binding=0) uniform sampler2D diffuseTexture;
-layout(binding=1) uniform sampler2D metallicRoughnessTexture;
-layout(binding=2) uniform sampler2D normal_map;
-
 uniform vec3 cameraPos;
 
 #define PI 3.14159265359
-
 
 // Lights data structures
 struct DirectionalLight
@@ -70,10 +67,13 @@ layout(std140, binding = 1) uniform Material
     vec4 diffColor;
     vec3 specColor;
     float shininess;
-    bool shininessInAlpha;  
-    bool hasNormal;
+    bool shininessInAlpha;
     float metallicFactor;
     float roughnessFactor;
+    uvec2 diffuseTex;
+    uvec2 specularTex;
+    uvec2 metallicTex;
+    uvec2 normalTex;
 };
 
 
@@ -170,8 +170,8 @@ vec3 RenderSpotLight(const int index, const vec3 N, const vec3 texColor, const f
 
 void main()
 {
-    vec3 texColor = pow(texture(diffuseTexture, uv0).rgb, vec3(2.2f));
-    vec4 metallicRoughnessTexColor = texture(metallicRoughnessTexture, uv0);
+    vec3 texColor = pow(texture(sampler2D(diffuseTex), uv0).rgb, vec3(2.2f));
+    vec4 metallicRoughnessTexColor = texture(sampler2D(metallicTex), uv0);
     float alpha = metallicRoughnessTexColor.a;
 
 
@@ -181,9 +181,9 @@ void main()
 
     vec3 N = normalize(normal);
     // Retrive normal for normal map
-    if (hasNormal) {
+    if (normalTex != 0) {
         mat3 space = CreateTBN();
-        vec3 texNormal = (texture(normal_map, uv0).xyz*2.0-1.0);
+        vec3 texNormal = (texture(sampler2D(normalTex), uv0).xyz*2.0-1.0);
         vec3 final_normal = space * texNormal;
         N = normalize(final_normal);
     }
