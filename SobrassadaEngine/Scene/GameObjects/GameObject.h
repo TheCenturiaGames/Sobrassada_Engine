@@ -10,9 +10,6 @@
 #include <unordered_map>
 #include <vector>
 
-class Component;
-class ComponentUtils;
-
 enum ComponentMobilitySettings
 {
     STATIC  = 0,
@@ -56,14 +53,15 @@ class GameObject
     UID GetUID() const { return uid; }
     void SetUID(UID newUID) { uid = newUID; }
 
-    const AABB& GetLocalAABB() const { return localAABB; };
+    const AABB& GetLocalAABB() const { return localAABB; }
 
-    const AABB& GetGlobalAABB() const { return globalAABB; };
+    const AABB& GetGlobalAABB() const { return globalAABB; }
+    const OBB& GetGlobalOBB() const { return globalOBB; }
 
     void OnAABBUpdated();
 
     void Render() const;
-    void RenderEditor() const;
+    void RenderEditor();
 
     const float4x4& GetGlobalTransform() const { return globalTransform; }
     const float4x4& GetLocalTransform() const { return localTransform; }
@@ -94,6 +92,7 @@ private:
 
     AABB localAABB;
     AABB globalAABB;
+    OBB globalOBB;
 
     bool isRenaming = false;
     char renameBuffer[128];

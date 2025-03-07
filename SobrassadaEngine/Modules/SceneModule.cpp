@@ -73,6 +73,7 @@ void SceneModule::CreateScene()
     CloseScene();
     
     loadedScene = new Scene("New Scene");
+    loadedScene->Init();
 }
 
 void SceneModule::LoadScene(const rapidjson::Value& initialState, const bool forceReload)
@@ -87,6 +88,7 @@ void SceneModule::LoadScene(const rapidjson::Value& initialState, const bool for
     CloseScene();
     
     loadedScene = new Scene(initialState, extractedSceneUID);
+    loadedScene->Init();
 }
 
 void SceneModule::CloseScene()

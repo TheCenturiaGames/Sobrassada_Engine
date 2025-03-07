@@ -36,7 +36,8 @@ class EditorUIModule : public Module
     bool RenderTransformWidget(float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform);
     bool RenderImGuizmo(float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform) const;
 
-    template <typename T> T RenderResourceSelectDialog(const char* id, const std::unordered_map<std::string, T>& availableResources, const T& defaultResource);
+    template <typename T>
+    T RenderResourceSelectDialog(const char* id, const std::unordered_map<std::string, T>& availableResources, const T& defaultResource);
 
   private:
     void RenderBasicTransformModifiers(
@@ -96,3 +97,4 @@ class EditorUIModule : public Module
     ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
     ;
 };
+

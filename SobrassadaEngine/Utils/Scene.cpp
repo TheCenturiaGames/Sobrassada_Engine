@@ -27,8 +27,6 @@ Scene::Scene(const char* sceneName)
     
     gameObjectsContainer.insert({sceneGameObject->GetUID(), sceneGameObject});
 
-    UpdateSpatialDataStruct();
-
     lightsConfig           = new LightsConfig();
 }
 
@@ -53,19 +51,11 @@ Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUI
         }
     }
 
-    GameObject* root = GetGameObjectByUID(gameObjectRootUID);
-    if (root != nullptr)
-    {
-        root->UpdateTransformForGOBranch();
-    }
-    
-    UpdateSpatialDataStruct();
-
     // Deserialize Lights Config
     if (initialState.HasMember("Lights Config") && initialState["Lights Config"].IsObject())
     {
-        LightsConfig* lightConfig           = App->GetSceneModule()->GetLightsConfig();
-        lightConfig->LoadData(initialState["Lights Config"]);
+        lightsConfig           = new LightsConfig();
+        lightsConfig->LoadData(initialState["Lights Config"]);
     }
     
     GLOG("%s scene loaded", sceneName);
@@ -85,6 +75,17 @@ Scene::~Scene()
     sceneOctree = nullptr;
 
     GLOG("%s scene closed", sceneName);
+}
+
+void Scene::Init()
+{
+    GameObject* root = GetGameObjectByUID(gameObjectRootUID);
+    if (root != nullptr)
+    {
+        root->UpdateTransformForGOBranch();
+    }
+    
+    UpdateSpatialDataStruct();
 }
 
 const char* Scene::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const

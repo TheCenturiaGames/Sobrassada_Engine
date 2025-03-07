@@ -6,10 +6,9 @@
 #include "FileSystem/MeshImporter.h"
 #include "LibraryModule.h"
 #include "ResourcesModule.h"
-#include "SceneModule.h"
+//#include "Scene/GameObjects/GameObject.h"
 
 #include "imgui.h"
-#include "Scene/GameObjects/GameObject.h"
 
 #include <Math/Quat.h>
 
@@ -56,7 +55,7 @@ void MeshComponent::RenderEditorInspector()
 
         if (ImGui::IsPopupOpen(CONSTANT_MESH_SELECT_DIALOG_ID))
         {
-            AddMesh(App->GetEditorUIModule()->RenderResourceSelectDialog(
+            AddMesh(App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
                 CONSTANT_MESH_SELECT_DIALOG_ID, App->GetLibraryModule()->GetMeshMap(), INVALID_UUID
             ));
         }
@@ -71,7 +70,7 @@ void MeshComponent::RenderEditorInspector()
 
         if (ImGui::IsPopupOpen(CONSTANT_TEXTURE_SELECT_DIALOG_ID))
         {
-            AddMaterial(App->GetEditorUIModule()->RenderResourceSelectDialog(
+            AddMaterial(App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
                 CONSTANT_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetMaterialMap(), INVALID_UUID
             ));
         }
@@ -107,7 +106,7 @@ void MeshComponent::AddMesh(UID resource)
         currentMeshName    = newMesh->GetName();
         currentMesh        = newMesh;
         localComponentAABB = AABB(currentMesh->GetAABB());
-        GameObject* parent = App->GetSceneModule()->GetGameObjectByUUID(parentUID);
+        GameObject* parent = GetParent();
         if (parent != nullptr)
         {
             parent->OnAABBUpdated();

@@ -14,14 +14,16 @@ GameObject::GameObject(std::string name) : name(name)
     uid       = GenerateUID();
     parentUID = INVALID_UUID;
     localAABB = AABB(DEFAULT_GAME_OBJECT_AABB);
-    globalAABB = AABB(localAABB);
+    globalOBB = OBB(localAABB);
+    globalAABB = AABB(globalOBB);
 }
 
 GameObject::GameObject(UID parentUUID, std::string name) : parentUID(parentUUID), name(name)
 {
     uid = GenerateUID();
     localAABB = AABB(DEFAULT_GAME_OBJECT_AABB);
-    globalAABB = AABB(localAABB);
+    globalOBB = OBB(localAABB);
+    globalAABB = AABB(globalOBB);
 }
 
 GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState["UID"].GetUint64())
@@ -160,24 +162,15 @@ void GameObject::RenderEditorInspector()
 
     ImGui::Text(name.c_str());
 
-    if (ImGui::Button("Add Component"
-        )) // TODO Get selected component to add the new one at the correct location (By UUID)
+    if (ImGui::Button("Add Component"))
     {
         ImGui::OpenPopup("ComponentSelection");
     }
 
-    if (ImGui::BeginPopup("ComponentSelection"))
+    ComponentType selectedType = App->GetEditorUIModule()->RenderResourceSelectDialog<ComponentType>("ComponentSelection", standaloneComponents, COMPONENT_NONE);
+    if (selectedType != COMPONENT_NONE)
     {
-        static char searchText[255] = "";
-        ImGui::InputText("Search", searchText, 255);
-
-        ImGui::Separator();
-
-        ComponentType selectedType = App->GetEditorUIModule()->RenderResourceSelectDialog("##ComponentList", standaloneComponents, COMPONENT_NONE);
-        if (selectedType != COMPONENT_NONE)
-        {
-            CreateComponent(selectedType);
-        }
+        CreateComponent(selectedType);
     }
 
     if (selectedComponentIndex != COMPONENT_NONE)
@@ -188,6 +181,33 @@ void GameObject::RenderEditorInspector()
             RemoveComponent(selectedComponentIndex);
         }
     }
+
+    ImGui::SeparatorText("Component hierarchy");
+
+    ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
+    ImGui::BeginChild("ComponentHierarchyWrapper", ImVec2(0, 200), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeY);
+    ImGuiTreeNodeFlags base_flags =
+        ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Leaf;
+
+    for (const auto& component : components)
+    {
+        ImGuiTreeNodeFlags node_flag = base_flags;
+        if (selectedComponentIndex == component.first)
+        {
+            node_flag |= ImGuiTreeNodeFlags_Selected;
+        }
+        if (ImGui::TreeNodeEx((void*)component.second->GetUID(), node_flag, component.second->GetName()))
+        {
+            if (ImGui::IsItemClicked())
+            {
+                selectedComponentIndex == component.first ? selectedComponentIndex = COMPONENT_NONE : selectedComponentIndex = component.first;
+            }
+            ImGui::TreePop();
+        }
+    }
+    
+    ImGui::EndChild();
+    ImGui::PopStyleVar();
 
     ImGui::Spacing();
 
@@ -210,13 +230,13 @@ void GameObject::RenderEditorInspector()
     ImGui::EndChild();
     ImGui::PopStyleVar();
 
-    ImGui::End();
-    
     // Casting to use ImGui to set values and at the same type keep the enum type for the variable
     ImGui::SeparatorText("Mobility");
     ImGui::RadioButton("Static", &mobilitySettings, STATIC);
     ImGui::SameLine();
     ImGui::RadioButton("Dynamic", &mobilitySettings, DYNAMIC);
+
+    ImGui::End();
 
     if (App->GetEditorUIModule()->RenderImGuizmo(localTransform, globalTransform, parentTransform))
     {
@@ -247,7 +267,8 @@ void GameObject::UpdateTransformForGOBranch() const
 void GameObject::OnTransformUpdated()
 {
     globalTransform = GetParentGlobalTransform() * localTransform;
-    globalAABB = AABB(localAABB.Transform(globalTransform));
+    globalOBB = localAABB.Transform(globalTransform);
+    globalAABB = AABB(globalOBB);
 }
 
 void GameObject::RenderHierarchyNode(UID& selectedGameObjectUUID)
@@ -338,7 +359,7 @@ void GameObject::RenderContextMenu()
         {
             GameObject* newGameObject = new GameObject(uid, "new Game Object");
             App->GetSceneModule()->AddGameObject(newGameObject->GetUID(), newGameObject);
-            App->GetSceneModule()->RegenerateTree(); // TODO Check if necessary
+            App->GetSceneModule()->RegenerateTree();
         }
 
         if (ImGui::MenuItem("Rename"))
@@ -437,15 +458,11 @@ void GameObject::Render() const
     }
 }
 
-void GameObject::RenderEditor() const
+void GameObject::RenderEditor()
 {
     if (App->GetEditorUIModule()->inspectorMenu)
     {
-        Component* selectedComponent = components.at(selectedComponentIndex);
-        if (selectedComponent != nullptr)
-        {
-            selectedComponent->RenderEditorInspector();
-        }
+        RenderEditorInspector();
     }
     if (App->GetEditorUIModule()->hierarchyMenu)
     {
@@ -485,6 +502,7 @@ bool GameObject::RemoveComponent(ComponentType componentType)
     {
         delete components.at(componentType);
         components.erase(componentType);
+        selectedComponentIndex = COMPONENT_NONE;
     }
     return false;
 }

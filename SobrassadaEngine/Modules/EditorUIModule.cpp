@@ -695,6 +695,9 @@ bool EditorUIModule::RenderImGuizmo(
     return true;
 }
 
+template UID EditorUIModule::RenderResourceSelectDialog<UID>(const char* id, const std::unordered_map<std::string, UID>& availableResources, const UID& defaultResource);
+template ComponentType EditorUIModule::RenderResourceSelectDialog<ComponentType>(const char* id, const std::unordered_map<std::string, ComponentType>& availableResources, const ComponentType& defaultResource);
+
 void EditorUIModule::RenderBasicTransformModifiers(
     float3& outputPosition, float3& outputRotation, float3& outputScale, bool& lockScaleAxis,
     bool& positionValueChanged, bool& rotationValueChanged, bool& scaleValueChanged

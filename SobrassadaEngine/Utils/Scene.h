@@ -18,7 +18,8 @@ class Scene
     Scene(const rapidjson::Value& initialState, UID loadedSceneUID);
 
     ~Scene();
-    
+
+    void Init();
     const char* Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
     
     void LoadComponents() const;

@@ -2,7 +2,6 @@
 
 #include "Application.h"
 #include "ComponentUtils.h"
-#include "GameObject.h"
 #include "SceneModule.h"
 
 #include "imgui.h"
@@ -28,6 +27,7 @@ Component::Component(const rapidjson::Value& initialState)
 void Component::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
 {
     targetState.AddMember("UID", uid, allocator);
+    targetState.AddMember("ParentUID", parentUID, allocator);
     targetState.AddMember("Type", type, allocator);
     
     targetState.AddMember("Enabled", enabled, allocator);
