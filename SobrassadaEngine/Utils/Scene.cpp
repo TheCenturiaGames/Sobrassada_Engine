@@ -3,12 +3,14 @@
 #include "Application.h"
 #include "CameraModule.h"
 #include "Component.h"
+#include "EditorUIModule.h"
 #include "Framebuffer.h"
 #include "GameObject.h"
 #include "GameTimer.h"
 #include "LibraryModule.h"
 #include "Octree.h"
 #include "OpenGLModule.h"
+#include "ResourcesModule.h"
 #include "SceneModule.h"
 
 #include "imgui.h"
@@ -90,9 +92,9 @@ update_status Scene::Render(float deltaTime)
 
 update_status Scene::RenderEditor(float deltaTime)
 {
-    RenderEditorControl();
+    if (App->GetEditorUIModule()->editorControlMenu) RenderEditorControl(App->GetEditorUIModule()->editorControlMenu);
+
     RenderScene();
-    RenderGame();
 
     RenderSelectedGameObjectUI();
     lightsConfig->EditorParams();
@@ -100,9 +102,9 @@ update_status Scene::RenderEditor(float deltaTime)
     return UPDATE_CONTINUE;
 }
 
-void Scene::RenderEditorControl()
+void Scene::RenderEditorControl(bool& editorControlMenu)
 {
-    if (!ImGui::Begin("Editor Control"))
+    if (!ImGui::Begin("Editor Control", &editorControlMenu))
     {
         ImGui::End();
         return;
@@ -134,6 +136,7 @@ void Scene::RenderEditorControl()
         gameTimer->Reset();
     }
     ImGui::SameLine();
+    ImGui::SetNextItemWidth(100.0f);
     if (ImGui::SliderFloat("Time scale", &timeScale, 0, 4)) gameTimer->SetTimeScale(timeScale);
 
     if (App->GetSceneModule()->IsInPlayMode())
@@ -144,9 +147,9 @@ void Scene::RenderEditorControl()
         ImGui::Text("Game time: %.3f", gameTimer->GetTime() / 1000.0f);
         ImGui::SameLine();
         ImGui::Text("Delta time: %.3f", gameTimer->GetDeltaTime() / 1000.0f);
-        //ImGui::Text("Unscaled game time: %.3f", gameTimer->GetUnscaledTime() / 1000.0f);
-        //ImGui::Text("Unscaled delta time: %.3f", gameTimer->GetUnscaledDeltaTime() / 1000.0f);
-        //ImGui::Text("Reference time: %.3f", gameTimer->GetReferenceTime() / 1000.0f);
+        // ImGui::Text("Unscaled game time: %.3f", gameTimer->GetUnscaledTime() / 1000.0f);
+        // ImGui::Text("Unscaled delta time: %.3f", gameTimer->GetUnscaledDeltaTime() / 1000.0f);
+        // ImGui::Text("Reference time: %.3f", gameTimer->GetReferenceTime() / 1000.0f);
     }
     ImGui::End();
 }
@@ -165,8 +168,8 @@ void Scene::RenderScene()
     // do inputs scene only if window is focused
     if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
         ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows))
-        doInputsScene = true;
-    else doInputsScene = false;
+        doInputs = true;
+    else doInputs = false;
 
     const auto& framebuffer = App->GetOpenGLModule()->GetFramebuffer();
 
@@ -184,51 +187,6 @@ void Scene::RenderScene()
     float width  = ImGui::GetWindowWidth();
     float height = ImGui::GetWindowHeight();
     ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, width, height);
-
-    ImVec2 windowSize = ImGui::GetWindowSize();
-    if (framebuffer->GetTextureWidth() != windowSize.x || framebuffer->GetTextureHeight() != windowSize.y)
-    {
-        float aspectRatio = windowSize.y / windowSize.x;
-        App->GetCameraModule()->SetAspectRatio(aspectRatio);
-        framebuffer->Resize((int)windowSize.x, (int)windowSize.y);
-    }
-
-    ImGui::End();
-}
-
-void Scene::RenderGame()
-{
-    if (!ImGui::Begin("Game", nullptr, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar))
-    {
-        ImGui::End();
-        return;
-    }
-
-    // right click focus window
-    if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) ImGui::SetWindowFocus();
-
-    // do inputs game only if window is focused
-    if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
-        ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows))
-        doInputsGame = true;
-    else doInputsGame = false;
-
-    const auto& framebuffer = App->GetOpenGLModule()->GetFramebuffer();
-
-    ImGui::SetCursorPos(ImVec2(0.f, 0.f));
-
-    ImGui::Image(
-        (ImTextureID)framebuffer->GetTextureID(),
-        ImVec2((float)framebuffer->GetTextureWidth(), (float)framebuffer->GetTextureHeight()), ImVec2(0.f, 1.f),
-        ImVec2(1.f, 0.f)
-    );
-
-    ImGuizmo::SetOrthographic(false);
-    ImGuizmo::SetDrawlist(); // ImGui::GetWindowDrawList()
-
-    ImGuizmo::SetRect(
-        ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight()
-    );
 
     ImVec2 windowSize = ImGui::GetWindowSize();
     if (framebuffer->GetTextureWidth() != windowSize.x || framebuffer->GetTextureHeight() != windowSize.y)

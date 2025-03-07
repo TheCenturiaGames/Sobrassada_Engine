@@ -27,8 +27,8 @@
 #include <tiny_gltf.h>          // TODO Remove
 
 EditorUIModule::EditorUIModule()
-    : width(0), height(0), closeApplication(false), consoleMenu(false), import(false), load(false), save(false),
-      editorSettingsMenu(false)
+    : width(0), height(0), closeApplication(false), consoleMenu(false), importMenu(false), loadMenu(false),
+      saveMenu(false), editorSettingsMenu(false)
 {
 }
 
@@ -118,7 +118,7 @@ bool EditorUIModule::ShutDown()
 
 void EditorUIModule::UpdateGizmoTransformMode()
 {
-    if (App->GetSceneModule()->GetDoInputsScene())
+    if (App->GetSceneModule()->GetDoInputs())
     {
         const KeyState* keyboard = App->GetInputModule()->GetKeyboard();
 
@@ -175,11 +175,11 @@ void EditorUIModule::Draw()
 
     if (aboutMenu) About(aboutMenu);
 
-    if (import) ImportDialog(import);
+    if (importMenu) ImportDialog(importMenu);
 
-    if (load) LoadDialog(load);
+    if (loadMenu) LoadDialog(loadMenu);
 
-    if (save) SaveDialog(save);
+    if (saveMenu) SaveDialog(saveMenu);
 
     if (editorSettingsMenu) EditorSettings(editorSettingsMenu);
 }
@@ -193,14 +193,14 @@ void EditorUIModule::MainMenu()
     {
         if (ImGui::MenuItem("Create", "")) App->GetSceneModule()->CreateScene();
 
-        if (ImGui::MenuItem("Import", "", import)) import = !import;
+        if (ImGui::MenuItem("Import", "", importMenu)) importMenu = !importMenu;
 
-        if (ImGui::MenuItem("Load", "", load)) load = !load;
+        if (ImGui::MenuItem("Load", "", loadMenu)) loadMenu = !loadMenu;
 
         if (ImGui::MenuItem("Save"))
-            if (!App->GetLibraryModule()->SaveScene(libraryPath.c_str(), SaveMode::Save)) save = !save;
+            if (!App->GetLibraryModule()->SaveScene(libraryPath.c_str(), SaveMode::Save)) saveMenu = !saveMenu;
 
-        if (ImGui::MenuItem("Save as", "", save)) save = !save;
+        if (ImGui::MenuItem("Save as", "", saveMenu)) saveMenu = !saveMenu;
 
         if (ImGui::MenuItem("Quit")) closeApplication = true;
 
@@ -210,12 +210,17 @@ void EditorUIModule::MainMenu()
     // View tab menu
     if (ImGui::BeginMenu("View"))
     {
+        bool sceneMenus = App->GetSceneModule()->IsSceneLoaded();
+
         if (ImGui::MenuItem("Console", "", consoleMenu)) consoleMenu = !consoleMenu;
 
         if (ImGui::BeginMenu("Scene"))
         {
+            ImGui::BeginDisabled(!sceneMenus);
+            if (ImGui::MenuItem("Editor Control", "", editorControlMenu)) editorControlMenu = !editorControlMenu;
             if (ImGui::MenuItem("Hierarchy", "", hierarchyMenu)) hierarchyMenu = !hierarchyMenu;
             if (ImGui::MenuItem("Inspector", "", inspectorMenu)) inspectorMenu = !inspectorMenu;
+            ImGui::EndDisabled();
 
             ImGui::EndMenu();
         }
@@ -232,11 +237,11 @@ void EditorUIModule::MainMenu()
     ImGui::EndMainMenuBar();
 }
 
-void EditorUIModule::LoadDialog(bool& load)
+void EditorUIModule::LoadDialog(bool& loadMenu)
 {
     ImGui::SetNextWindowSize(ImVec2(width * 0.25f, height * 0.4f), ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin("Load Scene", &load, ImGuiWindowFlags_NoCollapse))
+    if (!ImGui::Begin("Load Scene", &loadMenu, ImGuiWindowFlags_NoCollapse))
     {
         ImGui::End();
         return;
@@ -283,7 +288,7 @@ void EditorUIModule::LoadDialog(bool& load)
             App->GetLibraryModule()->LoadScene(inputFile.c_str());
         }
         inputFile = "";
-        load      = false;
+        loadMenu  = false;
     }
 
     ImGui::SameLine();
@@ -291,17 +296,17 @@ void EditorUIModule::LoadDialog(bool& load)
     if (ImGui::Button("Cancel", ImVec2(0, 0)))
     {
         inputFile = "";
-        load      = false;
+        loadMenu  = false;
     }
 
     ImGui::End();
 }
 
-void EditorUIModule::SaveDialog(bool& save)
+void EditorUIModule::SaveDialog(bool& saveMenu)
 {
     ImGui::SetNextWindowSize(ImVec2(width * 0.25f, height * 0.4f), ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin("Save Scene", &save, ImGuiWindowFlags_NoCollapse))
+    if (!ImGui::Begin("Save Scene", &saveMenu, ImGuiWindowFlags_NoCollapse))
     {
         ImGui::End();
         return;
@@ -344,7 +349,7 @@ void EditorUIModule::SaveDialog(bool& save)
             App->GetLibraryModule()->SaveScene(savePath.c_str(), SaveMode::SaveAs);
         }
         inputFile[0] = '\0';
-        save         = false;
+        saveMenu     = false;
     }
 
     ImGui::SameLine();
@@ -352,17 +357,17 @@ void EditorUIModule::SaveDialog(bool& save)
     if (ImGui::Button("Cancel", ImVec2(0, 0)))
     {
         inputFile[0] = '\0';
-        save         = false;
+        saveMenu     = false;
     }
 
     ImGui::End();
 }
 
-void EditorUIModule::ImportDialog(bool& import)
+void EditorUIModule::ImportDialog(bool& importMenu)
 {
     ImGui::SetNextWindowSize(ImVec2(width * 0.4f, height * 0.4f), ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin("Import Asset", &import, ImGuiWindowFlags_NoCollapse))
+    if (!ImGui::Begin("Import Asset", &importMenu, ImGuiWindowFlags_NoCollapse))
     {
         ImGui::End();
         return;
@@ -528,7 +533,7 @@ void EditorUIModule::ImportDialog(bool& import)
     {
         inputFile      = "";
         currentPath    = startPath;
-        import         = false;
+        importMenu         = false;
         showDrives     = false;
         searchQuery[0] = '\0';
         loadFiles      = true;
@@ -545,7 +550,7 @@ void EditorUIModule::ImportDialog(bool& import)
         }
         inputFile      = "";
         currentPath    = startPath;
-        import         = false;
+        importMenu     = false;
         showDrives     = false;
         searchQuery[0] = '\0';
         loadFiles      = true;
@@ -685,7 +690,7 @@ bool EditorUIModule::RenderImGuizmo(
 
     if (!ImGuizmo::IsUsing()) return false;
 
-    if (App->GetSceneModule()->GetDoInputsScene())
+    if (App->GetSceneModule()->GetDoInputs())
     {
         transform.Transpose();
         if (transform.TranslatePart().Distance(App->GetCameraModule()->GetCameraPosition()) > maxDistance)
@@ -973,12 +978,6 @@ void EditorUIModule::EditorSettings(bool& editorSettingsMenu)
         ImGui::SeparatorText("Ms and Fps Graph");
         FramePlots(vsync);
     }
-
-    // ImGui::Spacing();
-    // if (ImGui::CollapsingHeader("Game timer"))
-    //{
-    //     GameTimerConfig();
-    // }
 
     ImGui::Spacing();
 

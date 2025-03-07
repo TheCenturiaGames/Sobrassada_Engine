@@ -23,9 +23,9 @@ class Scene
 
     update_status Render(float deltaTime);
     update_status RenderEditor(float deltaTime);
-    void RenderEditorControl();
+
+    void RenderEditorControl(bool& editorControlMenu);
     void RenderScene();
-    void RenderGame();
     void RenderSelectedGameObjectUI();
     void RenderHierarchyUI(bool& hierarchyMenu);
 
@@ -54,7 +54,7 @@ class Scene
 
     void SetStopPlaying(bool stop) { stopPlaying = stop; }
 
-    bool GetDoInputsScene() const { return doInputsScene; }
+    bool GetDoInputs() const { return doInputs; }
 
   private:
     void CreateSpatialDataStruct();
@@ -73,6 +73,5 @@ class Scene
     LightsConfig* lightsConfig = nullptr;
     Octree* sceneOctree        = nullptr;
 
-    bool doInputsScene         = false;
-    bool doInputsGame          = false;
+    bool doInputs              = false;
 };

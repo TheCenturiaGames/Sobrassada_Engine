@@ -1,5 +1,7 @@
 #include "SceneModule.h"
 
+#include "Application.h"
+#include "ResourcesModule.h"
 #include "CameraModule.h"
 #include "ComponentUtils.h"
 #include "EditorUIModule.h"
@@ -27,7 +29,8 @@ SceneModule::SceneModule()
 
 SceneModule::~SceneModule()
 {
-    CloseScene();
+    delete loadedScene;
+    loadedScene = nullptr;
 }
 
 bool SceneModule::Init()
@@ -98,7 +101,6 @@ void SceneModule::LoadScene(
     UID sceneUID, const char* sceneName, UID rootGameObject, const std::map<UID, Component*>& loadedGameComponents
 )
 {
-    CloseScene();
     loadedScene = new Scene(sceneUID, sceneName, rootGameObject);
     loadedScene->LoadComponents(loadedGameComponents);
 }
@@ -112,6 +114,7 @@ void SceneModule::CloseScene()
 {
     delete loadedScene;
     loadedScene = nullptr;
+    if (App->GetResourcesModule() != nullptr) App->GetResourcesModule()->UnloadAllResources();
 }
 
 void SceneModule::SwitchPlayMode(bool play)

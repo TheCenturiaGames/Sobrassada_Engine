@@ -25,7 +25,7 @@ LibraryModule::~LibraryModule()
 bool LibraryModule::Init()
 {
     SceneImporter::CreateLibraryDirectories();
-    LibraryModule::LoadLibraryMaps();
+    LoadLibraryMaps();
 
     return true;
 }
@@ -183,6 +183,8 @@ bool LibraryModule::LoadScene(const char* file, bool reload) const
         return false;
     }
 
+     App->GetSceneModule()->CloseScene();
+
     std::map<UID, Component*> loadedGameComponents;
     std::unordered_map<UID, GameObject*> loadedGameObjects;
 
@@ -273,7 +275,7 @@ bool LibraryModule::LoadLibraryMaps()
             }
             catch (std::invalid_argument&)
             {
-                GLOG("File %s is not an asset file", fileName);
+                GLOG("File %s is not an asset file", fileName.c_str());
             }
         }
     }

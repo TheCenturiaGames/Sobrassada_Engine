@@ -27,8 +27,6 @@ ResourcesModule::~ResourcesModule()
 
 bool ResourcesModule::Init()
 {
-    program = App->GetShaderModule()->GetProgram("./Test/VertexShader.glsl", "./Test/BRDFPhongFragmentShader.glsl");
-
     return true;
 }
 
@@ -69,6 +67,15 @@ void ResourcesModule::ReleaseResource(const Resource* resource)
             }
         }
     }
+}
+
+void ResourcesModule::UnloadAllResources()
+{
+    for (auto resource : resources)
+    {
+        delete resource.second;
+    }
+    resources.clear();
 }
 
 Resource* ResourcesModule::CreateNewResource(UID uid)

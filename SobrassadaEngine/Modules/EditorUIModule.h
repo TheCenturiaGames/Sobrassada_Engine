@@ -9,7 +9,7 @@
 #include <deque>
 #include <string>
 #include <unordered_map>
-//imguizmo include after imgui
+// imguizmo include after imgui
 #include "./Libs/ImGuizmo/ImGuizmo.h"
 
 struct CPUFeature
@@ -60,23 +60,24 @@ class EditorUIModule : public Module
     void HardwareConfig() const;
     void ShowCaps() const;
 
-    void ImportDialog(bool& import);
+    void ImportDialog(bool& importMenu);
     void GetFilesSorted(const std::string& currentPath, std::vector<std::string>& files);
-    void LoadDialog(bool& load);
-    void SaveDialog(bool& save);
+    void LoadDialog(bool& loadMenu);
+    void SaveDialog(bool& saveMenu);
     void Console(bool& consoleMenu) const;
     void About(bool& aboutMenu) const;
 
   public:
+    bool editorControlMenu = true;
     bool hierarchyMenu = true;
     bool inspectorMenu = true;
 
   private:
     int width, height;
-    bool consoleMenu            = true;
-    bool import                 = false;
-    bool load                   = false;
-    bool save                   = false;
+    bool consoleMenu            = false;
+    bool importMenu             = false;
+    bool loadMenu               = false;
+    bool saveMenu               = false;
     bool aboutMenu              = false;
     bool editorSettingsMenu     = false;
     bool quadtreeViewerViewport = false;

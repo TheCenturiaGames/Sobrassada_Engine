@@ -8,6 +8,7 @@
 #include "LibraryModule.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
+#include "ShaderModule.h"
 
 #include "imgui.h"
 #include <Math/Quat.h>
@@ -90,7 +91,7 @@ void MeshComponent::Render()
     if (enabled && currentMesh != nullptr)
     {
         unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
-        currentMesh->Render(App->GetResourcesModule()->GetProgram(), globalTransform, cameraUBO, currentMaterial);
+        currentMesh->Render(App->GetShaderModule()->GetProgramID(), globalTransform, cameraUBO, currentMaterial);
     }
     Component::Render();
 }
