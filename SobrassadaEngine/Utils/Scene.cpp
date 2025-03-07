@@ -9,14 +9,13 @@
 #include "LibraryModule.h"
 #include "Octree.h"
 #include "OpenGLModule.h"
-#include "SceneModule.h"
-
-#include "ResourcesModule.h"
-#include "ResourceManagement/Resources/ResourceModel.h"
 #include "ResourceManagement/Resources/Resource.h"
-#include "Scene/Components/Root/RootComponent.h"
+#include "ResourceManagement/Resources/ResourceModel.h"
+#include "ResourcesModule.h"
 #include "Scene/Components/ComponentUtils.h"
+#include "Scene/Components/Root/RootComponent.h"
 #include "Scene/Components/Standalone/MeshComponent.h"
+#include "SceneModule.h"
 
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -378,13 +377,13 @@ void Scene::LoadModel(const UID modelUID)
         GLOG("Load model %d", modelUID);
 
         ResourceModel* newModel            = (ResourceModel*)App->GetResourcesModule()->RequestResource(modelUID);
-        const Model& model = newModel->GetModelData();
+        const Model& model                 = newModel->GetModelData();
         const std::vector<NodeData>& nodes = model.GetNodes();
 
-        GameObject* object = new GameObject(GetGameObjectRootUID() , nodes[0].name);
+        GameObject* object                 = new GameObject(GetGameObjectRootUID(), nodes[0].name);
         object->GetRootComponent()->SetLocalTransform(nodes[0].transform);
 
-        // Add the gameObject to 
+        // Add the gameObject to
         GetGameObjectByUUID(GetGameObjectRootUID())->AddGameObject(object->GetUID());
         AddGameObject(object->GetUID(), object);
 
@@ -403,7 +402,7 @@ void Scene::LoadModel(const UID modelUID)
                 {
                     MeshComponent* meshComponent =
                         reinterpret_cast<MeshComponent*>(ComponentUtils::CreateEmptyComponent(
-                            COMPONENT_MESH, LCG().IntFast(), gameObject->GetRootComponent()->GetUID(),
+                            COMPONENT_MESH, GenerateUID(), gameObject->GetRootComponent()->GetUID(),
                             gameObject->GetRootComponent()->GetUID(),
                             gameObject->GetRootComponent()->GetGlobalTransform()
                         ));
@@ -412,10 +411,9 @@ void Scene::LoadModel(const UID modelUID)
 
                     meshComponent->AddMesh(mesh.first, true);
                     meshComponent->AddMaterial(mesh.second);
-
                 }
             }
-            gameObjectsArray.emplace_back(gameObject); 
+            gameObjectsArray.emplace_back(gameObject);
             GetGameObjectByUUID(gameObjectsArray[nodes[i].parentIndex]->GetUID())->AddGameObject(gameObject->GetUID());
             AddGameObject(gameObject->GetUID(), gameObject);
 
@@ -424,4 +422,3 @@ void Scene::LoadModel(const UID modelUID)
         }
     }
 }
-

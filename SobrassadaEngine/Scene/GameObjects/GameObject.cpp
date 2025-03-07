@@ -1,11 +1,10 @@
 #include "GameObject.h"
 
 #include "Application.h"
+#include "DebugDrawModule.h"
 #include "EditorUIModule.h"
 #include "Root/RootComponent.h"
 #include "SceneModule.h"
-
-#include "DebugDrawModule.h"
 
 #include "imgui.h"
 
@@ -50,7 +49,7 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uuid(initialState
 GameObject::~GameObject()
 {
     App->GetSceneModule()->RemoveComponent(rootComponent->GetUID());
-    if (rootComponent != nullptr) delete rootComponent;
+    delete rootComponent;
     rootComponent = nullptr;
 }
 

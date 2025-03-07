@@ -2,11 +2,10 @@
 
 #include "Application.h"
 #include "LibraryModule.h"
+#include "ResourceManagement/Resources/ResourceModel.h"
 
 #include "Math/Quat.h"
 #include "Math/float4x4.h"
-#include "ResourceManagement/Resources/ResourceModel.h"
-
 #include "prettywriter.h"
 #include "stringbuffer.h"
 
@@ -108,23 +107,7 @@ namespace ModelImporter
 
         GLOG("%s saved as model", name.c_str());
 
-        // Testing
-        // LoadModel(finalModelUID);
-
         return finalModelUID;
-
-        // unsigned int size = sizeof(Model);
-        // char* fileBuffer  = new char[size];
-        // memcpy(fileBuffer, &newModel, size);
-        // unsigned int bytesWritten = (unsigned int)FileSystem::Save(savePath.c_str(), fileBuffer, size, true);
-        //
-        // delete[] fileBuffer;
-
-        // if (bytesWritten == 0)
-        //{
-        //     GLOG("Failed to save model: %s", savePath.c_str());
-        //     return 0;
-        // }
     }
 
     ResourceModel* LoadModel(UID modelUID)
@@ -132,7 +115,7 @@ namespace ModelImporter
         rapidjson::Document doc;
         const std::string filePath = App->GetLibraryModule()->GetResourcePath(modelUID);
 
-        FileSystem::LoadJSON(filePath.c_str(), doc);
+        if (!FileSystem::LoadJSON(filePath.c_str(), doc)) return nullptr;
 
         if (!doc.HasMember("Model") || !doc["Model"].IsObject())
         {
@@ -204,10 +187,10 @@ namespace ModelImporter
         // Fill node data
         const tinygltf::Node& nodeData = nodesList[nodeId];
         NodeData newNode;
-        newNode.name               = nodeData.name;
+        newNode.name        = nodeData.name;
 
-        newNode.transform          = GetNodeTransform(nodeData);
-        newNode.parentIndex        = parentId;
+        newNode.transform   = GetNodeTransform(nodeData);
+        newNode.parentIndex = parentId;
 
         // Get reference to Mesh and Material UIDs
         if (nodeData.mesh > -1)

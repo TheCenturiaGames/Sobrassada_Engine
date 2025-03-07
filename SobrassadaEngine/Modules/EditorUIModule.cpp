@@ -230,7 +230,7 @@ void EditorUIModule::MainMenu()
 
     // Menu window to load files into scene (useful while a window with the
     // resources to drag and drop does not exist)
-    if (App->GetSceneModule()->GetSceneUID() != CONSTANT_EMPTY_UID)
+    if (App->GetSceneModule()->GetSceneUID() != INVALID_UUID)
     {
         if (ImGui::BeginMenu("Resource Loader"))
         {
@@ -323,7 +323,7 @@ void EditorUIModule::LoadModelDialog(bool& loadModel)
         return;
     }
 
-    static UID modelUid        = CONSTANT_EMPTY_UID;
+    static UID modelUid         = INVALID_UUID;
     static char searchText[255] = "";
     ImGui::InputText("Search", searchText, 255);
 
@@ -339,7 +339,7 @@ void EditorUIModule::LoadModelDialog(bool& loadModel)
             {
                 if (ImGui::Selectable(valuePair.first.c_str(), selected == i))
                 {
-                    selected  = i;
+                    selected = i;
                     modelUid = valuePair.second;
                 }
             }
@@ -355,7 +355,7 @@ void EditorUIModule::LoadModelDialog(bool& loadModel)
     ImGui::End();
 }
 
-void EditorUIModule::SaveDialog(bool &save)
+void EditorUIModule::SaveDialog(bool& save)
 {
     ImGui::SetNextWindowSize(ImVec2(width * 0.25f, height * 0.4f), ImGuiCond_FirstUseEver);
 

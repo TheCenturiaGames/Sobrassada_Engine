@@ -110,15 +110,15 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
     // Serialize Lights Config
     LightsConfig* lightConfig = App->GetSceneModule()->GetLightsConfig();
 
-     if (lightConfig != nullptr)
-     {
+    if (lightConfig != nullptr)
+    {
         rapidjson::Value lights(rapidjson::kObjectType);
 
         lightConfig->SaveData(lights, allocator);
 
         doc.AddMember("Lights Config", lights, allocator);
-
-     } else GLOG("Light Config not found");
+    }
+    else GLOG("Light Config not found");
 
     // Save file like JSON
     rapidjson::StringBuffer buffer;
@@ -226,7 +226,7 @@ bool LibraryModule::LoadScene(const char* path, bool reload) const
     // Deserialize Lights Config
     if (doc.HasMember("Lights Config") && doc["Lights Config"].IsObject())
     {
-        LightsConfig* lightConfig           = App->GetSceneModule()->GetLightsConfig();
+        LightsConfig* lightConfig = App->GetSceneModule()->GetLightsConfig();
         lightConfig->LoadData(doc["Lights Config"]);
     }
 
@@ -342,7 +342,7 @@ UID LibraryModule::GetTextureUID(const std::string& texturePath) const
         return it->second;
     }
 
-    return 0;
+    return INVALID_UUID;
 }
 
 UID LibraryModule::GetMeshUID(const std::string& meshPath) const
@@ -354,7 +354,7 @@ UID LibraryModule::GetMeshUID(const std::string& meshPath) const
         return it->second;
     }
 
-    return 0;
+    return INVALID_UUID;
 }
 
 UID LibraryModule::GetMaterialUID(const std::string& materialPath) const
@@ -366,7 +366,7 @@ UID LibraryModule::GetMaterialUID(const std::string& materialPath) const
         return it->second;
     }
 
-    return 0;
+    return INVALID_UUID;
 }
 
 UID LibraryModule::GetModelUID(const std::string& modelPath) const
@@ -377,7 +377,7 @@ UID LibraryModule::GetModelUID(const std::string& modelPath) const
         return it->second;
     }
 
-    return 0;
+    return INVALID_UUID;
 }
 
 const std::string& LibraryModule::GetResourcePath(UID resourceID) const

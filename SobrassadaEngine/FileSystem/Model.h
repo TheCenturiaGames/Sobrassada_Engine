@@ -3,7 +3,6 @@
 #include "Globals.h"
 
 #include "Math/float4x4.h"
-
 #include <vector>
 
 struct NodeData
