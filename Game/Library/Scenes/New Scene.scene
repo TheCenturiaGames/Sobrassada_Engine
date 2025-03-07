@@ -1,35 +1,161 @@
 {
     "Scene": {
-        "UID": 17044464604366036799,
+        "UID": 10958387043419758468,
         "Name": "New Scene",
-        "RootGameObject": 17024131251045023515,
+        "RootGameObject": 10932970350694750039,
         "GameObjects": [
             {
-                "UID": 17024131251045023515,
+                "UID": 10932970350694750039,
                 "ParentUID": 0,
                 "Name": "SceneModule GameObject",
+                "Children": [
+                    12316647409545659087
+                ],
+                "RootComponentUID": 322652225
+            },
+            {
+                "UID": 12316647409545659087,
+                "ParentUID": 10932970350694750039,
+                "Name": "new Game Object",
                 "Children": [],
-                "RootComponentUID": 329977673
+                "RootComponentUID": 2869503090
             }
         ],
         "Components": [
             {
-                "UID": 329977673,
-                "ParentUID": 17024131251045023515,
-                "RootUID": 329977673,
-                "Type": 1,
+                "UID": 250695964,
+                "ParentUID": 2869503090,
+                "RootUID": 2869503090,
+                "Type": 2,
                 "LocalTransform": [
+                    1.0,
                     0.0,
                     0.0,
+                    2.2807669639587402,
+                    0.0,
+                    1.0,
                     0.0,
                     0.0,
                     0.0,
                     0.0,
                     1.0,
-                    1.0,
+                    -7.037595272064209,
+                    0.0,
+                    0.0,
+                    0.0,
                     1.0
                 ],
                 "Children": [],
+                "Enabled": true,
+                "Name": "Mesh",
+                "Mesh": 1352358048786012,
+                "Material": 1289788650159993
+            },
+            {
+                "UID": 322652225,
+                "ParentUID": 10932970350694750039,
+                "RootUID": 322652225,
+                "Type": 1,
+                "LocalTransform": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root Component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 1487755237,
+                "ParentUID": 2869503090,
+                "RootUID": 2869503090,
+                "Type": 7,
+                "LocalTransform": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Camera",
+                "MainCamera": true,
+                "DrawGizmos": true,
+                "CameraType": 0,
+                "CameraPosition": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "CameraFront": [
+                    -0.0,
+                    -0.0,
+                    -1.0
+                ],
+                "CameraUp": [
+                    0.0,
+                    1.0,
+                    0.0
+                ],
+                "CameraNearPlane": 0.10000000149011612,
+                "CameraFarPlane": 100.0,
+                "CameraHFOV": 1.5707963705062866,
+                "CameraVFOV": 1.024778962135315
+            },
+            {
+                "UID": 2869503090,
+                "ParentUID": 12316647409545659087,
+                "RootUID": 2869503090,
+                "Type": 1,
+                "LocalTransform": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "Children": [
+                    1487755237,
+                    250695964
+                ],
                 "Enabled": true,
                 "Name": "Root Component",
                 "Type": 1,
