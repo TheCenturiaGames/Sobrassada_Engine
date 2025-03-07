@@ -10,18 +10,19 @@
 #include "ImGui.h"
 #include <vector>
 
-CameraComponent::CameraComponent(UID uid, UID uidParent, UID uidRoot, const Transform& parentGlobalTransform)
+CameraComponent::CameraComponent(UID uid, UID uidParent, UID uidRoot, const float4x4& parentGlobalTransform)
     : Component(uid, uidParent, uidRoot, "Camera", COMPONENT_CAMERA, parentGlobalTransform)
 {
 
-    camera.type  = FrustumType::PerspectiveFrustum;
+    camera.type                = FrustumType::PerspectiveFrustum;
+    parentlocalglobalTransform = globalTransform + localTransform;
+    camera.pos =
+        float3(parentlocalglobalTransform[0][3], parentlocalglobalTransform[1][3], parentlocalglobalTransform[2][3]);
+    camera.front =
+        -float3(parentlocalglobalTransform[2][0], parentlocalglobalTransform[2][1], parentlocalglobalTransform[2][2]);
+    camera.up =
+        float3(parentlocalglobalTransform[1][0], parentlocalglobalTransform[1][1], parentlocalglobalTransform[1][2]);
 
-    camera.pos   = globalTransform.position;
-    camera.front = -float3::unitZ;
-    camera.up    = float3::unitY;
-    ComputeRotation(globalTransform.rotation.y, globalTransform.rotation.x);
-    lastRotation              = globalTransform.rotation;
-     
     camera.nearPlaneDistance  = 0.1f;
     camera.farPlaneDistance   = 100.f;
 
@@ -39,6 +40,12 @@ CameraComponent::CameraComponent(UID uid, UID uidParent, UID uidRoot, const Tran
     glBindBuffer(GL_UNIFORM_BUFFER, ubo);
     glBufferData(GL_UNIFORM_BUFFER, sizeof(CameraMatrices), nullptr, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    horizontalFov      = camera.horizontalFov;
+    verticalFov        = camera.verticalFov;
+
+    orthographicWidth  = 10.0f;
+    orthographicHeight = orthographicWidth / ((float)height / (float)width);
 }
 
 CameraComponent::CameraComponent(const rapidjson::Value& initialState) : Component(initialState)
@@ -81,6 +88,9 @@ CameraComponent::CameraComponent(const rapidjson::Value& initialState) : Compone
         camera.farPlaneDistance = initialState["CameraFarPlane"].GetFloat();
     }
 
+    int width  = App->GetWindowModule()->GetWidth();
+    int height = App->GetWindowModule()->GetHeight();
+
     if (camera.type == OrthographicFrustum)
     {
         if (initialState.HasMember("CameraOrtographicWidth"))
@@ -91,6 +101,8 @@ CameraComponent::CameraComponent(const rapidjson::Value& initialState) : Compone
         {
             camera.orthographicHeight = initialState["CameraOrtographicHeight"].GetFloat();
         }
+        horizontalFov = (float)HFOV * DEGREE_RAD_CONV;
+        verticalFov   = 2.0f * atanf(tanf(camera.horizontalFov * 0.5f) * ((float)height / (float)width));
     }
     else
     {
@@ -102,6 +114,9 @@ CameraComponent::CameraComponent(const rapidjson::Value& initialState) : Compone
         {
             camera.verticalFov = initialState["CameraVFOV"].GetFloat();
         }
+
+        orthographicWidth  = 100.0f;
+        orthographicHeight = 100.0f / ((float)height / (float)width);
     }
 
     matrices.viewMatrix       = camera.ViewMatrix();
@@ -191,8 +206,30 @@ void CameraComponent::RenderEditorInspector()
 
         if (ImGui::Combo("Projection Type", &currentProjection, projectionTypes, IM_ARRAYSIZE(projectionTypes)))
         {
-            camera.type               = (currentProjection == 1) ? OrthographicFrustum : PerspectiveFrustum;
-            matrices.projectionMatrix = camera.ProjectionMatrix();
+            if (currentProjection == 1)
+            {
+                //Save locally perspective data
+                horizontalFov = camera.horizontalFov;
+                verticalFov   = camera.verticalFov;
+
+                //Set ortographic Data
+                camera.type = OrthographicFrustum;
+                camera.orthographicWidth    = orthographicWidth;
+                camera.orthographicHeight   = orthographicHeight;
+                camera.nearPlaneDistance   = 50.0f;
+            }
+            else
+            {
+                //Save locally ortographic data
+                orthographicWidth    = camera.orthographicWidth;
+                orthographicHeight   = camera.orthographicHeight;
+
+                //Set perspective Data
+                camera.type          = PerspectiveFrustum;
+                camera.horizontalFov = horizontalFov;
+                camera.verticalFov   = verticalFov;
+                camera.nearPlaneDistance   = 0.10f;
+            }
         }
 
         if (camera.type == PerspectiveFrustum)
@@ -204,57 +241,30 @@ void CameraComponent::RenderEditorInspector()
                 int width            = App->GetWindowModule()->GetWidth();
                 int height           = App->GetWindowModule()->GetHeight();
                 camera.verticalFov   = 2.0f * atanf(tanf(camera.horizontalFov * 0.5f) * ((float)height / (float)width));
-                matrices.projectionMatrix = camera.ProjectionMatrix();
             }
         }
         else if (camera.type == OrthographicFrustum)
         {
-            if (ImGui::DragFloat("Width", &camera.orthographicWidth, 0.1f, 0.1f, 1000.f, "%.2f"))
+            if (ImGui::DragFloat("Width", &camera.orthographicWidth, 0.1f, 0.1f, 200.f, "%.2f"))
             {
                 int width                 = App->GetWindowModule()->GetWidth();
                 int height                = App->GetWindowModule()->GetHeight();
                 camera.orthographicHeight = camera.orthographicWidth / ((float)height / (float)width);
-                matrices.projectionMatrix = camera.ProjectionMatrix();
             }
         }
     }
 }
 
-void CameraComponent::ComputeRotation(float yaw, float pitch)
-{
-    //float newYaw     = ((yaw + 1.566) / 3.132) * 6.264 - 3.132;
-    Quat yawRotation = Quat::RotateY(yaw);
-
-    camera.front     = yawRotation.Mul(camera.front).Normalized();
-    camera.up        = yawRotation.Mul(camera.up).Normalized();
-
-    if ((currentPitchAngle + pitch) > maximumNegativePitch && (currentPitchAngle + pitch) < maximumPositivePitch)
-    {
-        currentPitchAngle  += pitch;
-        Quat pitchRotation = Quat::RotateAxisAngle(camera.WorldRight(), pitch);
-        camera.front       = pitchRotation.Mul(camera.front).Normalized();
-        camera.up          = pitchRotation.Mul(camera.up).Normalized();
-    }
-
-    lastRotation = globalTransform.rotation;
-}
-
 void CameraComponent::Update()
 {
-    // Camera Component Inputs needs to be managed by the user, not by me, this is only to check if its working
-    /*
-    if (App->GetSceneModule()->GetInPlayMode())
-    {
-        InputModule* inputModule = App->GetInputModule();
-        if (inputModule->GetKey(SDL_SCANCODE_W)) camera.pos += camera.front * 1.0f;
-        if (inputModule->GetKey(SDL_SCANCODE_S)) camera.pos -= camera.front * 1.0f;
-        if (inputModule->GetKey(SDL_SCANCODE_D)) camera.pos += camera.WorldRight() * 1.0f;
-        if (inputModule->GetKey(SDL_SCANCODE_A)) camera.pos -= camera.WorldRight() * 1.0f;
-    }
-    */
-    
-    camera.pos = globalTransform.position;
-    if ((lastRotation.x != globalTransform.rotation.x) || (lastRotation.y != globalTransform.rotation.y)) ComputeRotation(globalTransform.rotation.y - lastRotation.y, globalTransform.rotation.x - lastRotation.x);
+
+    parentlocalglobalTransform = globalTransform + localTransform;
+    camera.pos =
+        float3(parentlocalglobalTransform[0][3], parentlocalglobalTransform[1][3], parentlocalglobalTransform[2][3]);
+    camera.front =
+        -float3(parentlocalglobalTransform[2][0], parentlocalglobalTransform[2][1], parentlocalglobalTransform[2][2]);
+    camera.up =
+        float3(parentlocalglobalTransform[1][0], parentlocalglobalTransform[1][1], parentlocalglobalTransform[1][2]);
 
     matrices.projectionMatrix = camera.ProjectionMatrix();
     matrices.viewMatrix       = camera.ViewMatrix();

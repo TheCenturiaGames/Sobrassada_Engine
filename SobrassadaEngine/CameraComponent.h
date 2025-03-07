@@ -9,7 +9,7 @@
 class CameraComponent : public Component
 {
   public:
-    CameraComponent(UID uid, UID uidParent, UID uidRoot, const Transform& parentGlobalTransform);
+    CameraComponent(UID uid, UID uidParent, UID uidRoot, const float4x4& parentGlobalTransform);
     CameraComponent(const rapidjson::Value& initialState);
     ~CameraComponent();
 
@@ -25,15 +25,18 @@ class CameraComponent : public Component
     const float4x4& GetViewMatrix() { return camera.ViewMatrix(); }
 
   private:
-    void ComputeRotation(float yaw, float pitch);
-
-  private:
     Frustum camera;
     FrustumPlanes frustumPlanes;
     CameraMatrices matrices;
     unsigned int ubo        = 0;
     bool drawGizmos         = false;
     bool isMainCamera       = false;
-    float currentPitchAngle = 0.f;
-    float3 lastRotation;
+
+    float horizontalFov;
+    float verticalFov;
+
+    float orthographicWidth;
+    float orthographicHeight;
+
+    float4x4 parentlocalglobalTransform;
 };
