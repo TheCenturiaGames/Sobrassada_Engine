@@ -2,8 +2,8 @@
 
 #include "Application.h"
 #include "CameraModule.h"
-#include "ResourceMaterial.h"
 #include "GameObject.h"
+#include "ResourceMaterial.h"
 
 #include <Math/float2.h>
 #include <Math/float4x4.h>
@@ -100,19 +100,26 @@ void ResourceMesh::Render(
     glUniform3fv(glGetUniformLocation(program, "cameraPos"), 1, &cameraPos[0]);
 
     // CPU Skinning
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-    Vertex* vertices = reinterpret_cast<Vertex*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
-    for (unsigned int i = 0; i < vertexCount; ++i)
-    {
-        TestSkinning(i, vertices[i], bones, bindMatrices);
-         float4x4 boneInfluence = TestSkinning(i, vertices[i], bones, bindMatrices);
-         vertices[i].position = finalTransform.TranslatePart() * bindPoseVertices[vertexIndex].position;
-        // rotate normals and tangents
-    }
-
-    glUnmapBuffer(GL_ARRAY_BUFFER);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+   //if (bones.size() > 0 && bindMatrices.size() > 0)
+   //{
+   //    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+   //
+   //    Vertex* vertices = reinterpret_cast<Vertex*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
+   //    for (unsigned int i = 0; i < vertexCount; ++i)
+   //    {
+   //        float4x4 boneInfluence = TestSkinning(i, vertices[i], bones, bindMatrices);
+   //        vertices[i].position   = (boneInfluence * float4((bindPoseVertices[i].position), 1.0f)).xyz();
+   //        // GLOG(
+   //        //     "Translate part: %f, %f, %f", boneInfluence.TranslatePart().x, boneInfluence.TranslatePart().y,
+   //        //     boneInfluence.TranslatePart().z
+   //        //);
+   //        // GLOG("Vertex pos: %f, %f, %f", vertices[i].position.x, vertices[i].position.y, vertices[i].position.z);
+   //        //   rotate normals and tangents
+   //    }
+   //
+   //    glUnmapBuffer(GL_ARRAY_BUFFER);
+   //    glBindBuffer(GL_ARRAY_BUFFER, 0);
+   //}
 
     if (material != nullptr)
     {
@@ -140,15 +147,36 @@ const float4x4 ResourceMesh::TestSkinning(
     const std::vector<float4x4>& bindMatrices
 )
 {
-    if (bones.size() < 4 || bindMatrices.size() < 4) return float4x4::identity;
-
-    float4x4 boneInfluence = float4x4::identity;
+    float4x4 boneInfluence = float4x4::zero;
     for (int i = 0; i < 4; ++i)
     {
-        const float4x4& boneTransform = bones[vertex.joint[i]]->GetGlobalTransform();
-
-        // bone weights * bone transform * bone inverse bind matrix * position in bind pose
-        boneInfluence += boneTransform * bindMatrices[vertex.joint[i]].Inverted() * vertex.weights[i];
+        const float4x4& boneTransform  = bones[vertex.joint[i]]->GetGlobalTransform();
+        boneInfluence                 += boneTransform * bindMatrices[vertex.joint[i]].Inverted() * vertex.weights[i];
+        // GLOG(
+        //     "Bone pos: %f, %f, %f", bones[vertex.joint[i]]->GetGlobalTransform().TranslatePart().x,
+        //     bones[vertex.joint[i]]->GetGlobalTransform().TranslatePart().y,
+        //     bones[vertex.joint[i]]->GetGlobalTransform().TranslatePart().z
+        //)
+        // GLOG("Weight: %f", vertex.weights[i]);
+        // GLOG(
+        //     "Bind matrices: %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f",
+        //     bindMatrices[vertex.joint[i]].Inverted()[0][0], bindMatrices[vertex.joint[i]].Inverted()[0][1],
+        //     bindMatrices[vertex.joint[i]].Inverted()[0][2], bindMatrices[vertex.joint[i]].Inverted()[0][3],
+        //     bindMatrices[vertex.joint[i]].Inverted()[1][0], bindMatrices[vertex.joint[i]].Inverted()[1][1],
+        //     bindMatrices[vertex.joint[i]].Inverted()[1][2], bindMatrices[vertex.joint[i]].Inverted()[1][3],
+        //     bindMatrices[vertex.joint[i]].Inverted()[2][0], bindMatrices[vertex.joint[i]].Inverted()[2][1],
+        //     bindMatrices[vertex.joint[i]].Inverted()[2][2], bindMatrices[vertex.joint[i]].Inverted()[2][3],
+        //     bindMatrices[vertex.joint[i]].Inverted()[3][0], bindMatrices[vertex.joint[i]].Inverted()[3][1],
+        //     bindMatrices[vertex.joint[i]].Inverted()[3][2], bindMatrices[vertex.joint[i]].Inverted()[3][3]
+        //)
+        // GLOG(
+        //    "Bone influence: %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f", boneInfluence[0][0],
+        //    boneInfluence.Inverted()[0][1], boneInfluence[0][2], boneInfluence.Inverted()[0][3], boneInfluence[1][0],
+        //    boneInfluence.Inverted()[1][1], boneInfluence[1][2], boneInfluence.Inverted()[1][3], boneInfluence[2][0],
+        //    boneInfluence.Inverted()[2][1], boneInfluence[2][2], boneInfluence.Inverted()[2][3], boneInfluence[3][0],
+        //    boneInfluence.Inverted()[3][1], boneInfluence[3][2], boneInfluence.Inverted()[3][3]
+        //)
     }
+
     return boneInfluence;
 }

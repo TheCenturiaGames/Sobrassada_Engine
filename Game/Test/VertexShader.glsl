@@ -21,7 +21,8 @@ out vec3 fragViewPos;
 
 void main()
 {
-	pos = vec3(model * vec4(vertex_position, 1.0));
+	//pos = vec3(model * vec4(vertex_position, 1.0));
+    pos = vertex_position;
     mat3 normalMatrix = mat3(transpose(inverse(model)));
     normal = normalMatrix * vertex_normal;
     uv0 = vertex_uv0;
@@ -30,5 +31,6 @@ void main()
     //Camera position in World Space
     fragViewPos = vec3(inverse(viewMatrix)[3]);
 
-	gl_Position = projMatrix * viewMatrix * model * vec4(vertex_position, 1.0f);
+	//gl_Position = projMatrix * viewMatrix * model * vec4(vertex_position, 1.0f);
+    gl_Position = projMatrix * viewMatrix * vec4(vertex_position, 1.0f);
 }

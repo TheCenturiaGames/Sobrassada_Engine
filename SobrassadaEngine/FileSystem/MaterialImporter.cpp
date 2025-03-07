@@ -10,6 +10,9 @@
 
 UID MaterialImporter::ImportMaterial(const tinygltf::Model& model, int materialIndex, const char* filePath)
 {
+    // If it has no materials exit
+    if (materialIndex == -1) return INVALID_UUID;
+
     std::string path                       = FileSystem::GetFilePath(filePath);
     const tinygltf::Material& gltfMaterial = model.materials[materialIndex];
     const std::string materialName         = gltfMaterial.name;
@@ -18,7 +21,7 @@ UID MaterialImporter::ImportMaterial(const tinygltf::Model& model, int materialI
     // ADD OLD LOADING
 
     Material material;
-    //KHR_materials_pbrSpecularGlossiness extension
+    // KHR_materials_pbrSpecularGlossiness extension
     if (it != gltfMaterial.extensions.end())
     {
 
@@ -90,7 +93,7 @@ UID MaterialImporter::ImportMaterial(const tinygltf::Model& model, int materialI
             }
         }
     }
-    //pbrMetallicRoughness extension
+    // pbrMetallicRoughness extension
     else if (gltfMaterial.pbrMetallicRoughness.baseColorFactor.size() == 4)
     {
         const auto& pbr = gltfMaterial.pbrMetallicRoughness;
