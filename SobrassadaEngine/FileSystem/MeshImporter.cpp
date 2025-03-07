@@ -176,6 +176,21 @@ namespace MeshImporter
                 vertex.texCoord = bufferTexCoord ? *reinterpret_cast<const float2*>(bufferTexCoord) : float2(0, 0);
                 vertex.weights  = bufferWeights ? *reinterpret_cast<const float4*>(bufferWeights) : float4(0, 0, 0, 1);
 
+                // Check all weights don't add up to more than 1
+                float totalWeight = 0;
+                for (int i = 0; i < 4; ++i)
+                {
+                    totalWeight += vertex.weights[i];
+                }
+                // If not, renormalize them
+                if (totalWeight > 1)
+                {
+                    for (int i = 0; i < 4; ++i)
+                    {
+                        vertex.weights[i] /= totalWeight;
+                    }
+                }
+
                 if (bufferJoints)
                 {
                     if (dataType == UNSIGNED_CHAR)

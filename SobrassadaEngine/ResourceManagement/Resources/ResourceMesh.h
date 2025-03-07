@@ -33,7 +33,7 @@ class ResourceMesh : public Resource
     void SetMaterial(UID materialUID) { this->material = materialUID; }
 
   private:
-    const float4x4& TestSkinning(
+    const float4x4 TestSkinning(
         int vertexIndex, const Vertex& vertex, const std::vector<GameObject*>& bones,
         const std::vector<float4x4>& bindMatrices
     );

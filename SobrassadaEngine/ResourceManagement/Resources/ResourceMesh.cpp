@@ -103,11 +103,11 @@ void ResourceMesh::Render(
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
     Vertex* vertices = reinterpret_cast<Vertex*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
-    for (int i = 0; i < vertexCount; ++i)
+    for (unsigned int i = 0; i < vertexCount; ++i)
     {
-        //TestSkinning(i, vertices[i], bones, bindMatrices);
-        // float4x4 boneInfluence = TestSkinning(i, vertices[i], bones, bindMatrices);
-        // vertices[i].position = finalTransform.TranslatePart() * bindPoseVertices[vertexIndex].position;
+        TestSkinning(i, vertices[i], bones, bindMatrices);
+         float4x4 boneInfluence = TestSkinning(i, vertices[i], bones, bindMatrices);
+         vertices[i].position = finalTransform.TranslatePart() * bindPoseVertices[vertexIndex].position;
         // rotate normals and tangents
     }
 
@@ -135,7 +135,7 @@ void ResourceMesh::Render(
     glBindVertexArray(0);
 }
 
-const float4x4& ResourceMesh::TestSkinning(
+const float4x4 ResourceMesh::TestSkinning(
     int vertexIndex, const Vertex& vertex, const std::vector<GameObject*>& bones,
     const std::vector<float4x4>& bindMatrices
 )
