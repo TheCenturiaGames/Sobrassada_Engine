@@ -117,30 +117,23 @@ float GGXNormalDistribution(float NdotH, float roughness){
 
 vec3 RenderLight(vec3 L, vec3 N, vec3 texColor, vec3 Li, float NdotL, float alpha, float roughness, float metalness)
  {
-    float shininessValue;
-	if(shininessInAlpha) shininessValue = exp2(alpha * 7 + 1);
-	else shininessValue = shininess;
-
-    float normalization = (shininessValue + 2.0) / (2.0 * 3.1415926535);
     vec3 V = normalize(cameraPos - pos);
-    vec3 R = reflect(L, N);
-    float VR = pow(max(dot(V, R), 0.0f), shininessValue);
-
     vec3 H = normalize(V + L);
-    float NdotV = dot(N, V);
-    float NdotH = dot(N, H);
+
+    float NdotV = max(dot(N, V), 0.0001);
+    float NdotH = max(dot(N, H), 0.0001);
 
     vec3 BaseColor = diffColor.rgb * texColor;
     vec3 Cd = BaseColor * (1 - metalness);
     vec3 RF0 = mix(vec3(0.04), BaseColor, metalness);
     
-    float cosTheta = max(dot(L, H), 0.0);
+    float cosTheta = max(dot(L, H), 0.0001);
     vec3 fresnel = RF0 + (1 - RF0) * pow(1 - cosTheta, 5);
 
     float visibility = VisibilityFunction(NdotL, NdotV, roughness);
     float GGX = GGXNormalDistribution(NdotH, roughness);
 
-    vec3 diffspec = (Cd * (1-RF0) + (1/4) * fresnel * visibility * GGX) * Li * (NdotL);
+    vec3 diffspec = (Cd * (1-RF0) + 0.25 * fresnel * visibility * GGX) * Li * NdotL;
 
     return diffspec;
 }
@@ -196,6 +189,7 @@ void main()
     }
 
     float roughness = roughnessFactor * metallicRoughnessTexColor.y;
+    roughness = roughness * roughness;
     float metallic = metallicFactor * metallicRoughnessTexColor.z;
 
     // Point Lights
@@ -213,7 +207,7 @@ void main()
     // Directional light
     vec3 lightColor = directional_color.rgb * directional_color.a;
     vec3 L = normalize(directional_dir.xyz);
-    float NdotL = dot(N, -L);
+    float NdotL = max(dot(N, -L), 0.001f);
     if (NdotL > 0)
     {
 		hdr += RenderLight(L, N, texColor, lightColor, NdotL, alpha, roughness, metallic);
