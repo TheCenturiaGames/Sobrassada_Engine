@@ -273,9 +273,6 @@
     <ClCompile Include="Utils\EngineTimer.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Utils\Transform.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
     <ClCompile Include="Modules\DebugDrawModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
@@ -475,9 +472,6 @@
     </ClInclude>
     <ClInclude Include="Scene\Components\Component.h">
       <Filter>Scene\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils\Transform.h">
-      <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="Scene\GameObjects\GameObject.h">
       <Filter>Scene\GameObjects</Filter>
