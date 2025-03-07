@@ -1,6 +1,9 @@
 #include "EngineEditorBase.h"
 
 #include "imgui.h"
+EngineEditorBase::EngineEditorBase(const std::string& editorName, const UID uid) : name(editorName), uid(uid)
+{
+}
 EngineEditorBase::~EngineEditorBase()
 {
 

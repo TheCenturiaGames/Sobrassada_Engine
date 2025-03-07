@@ -7,8 +7,8 @@
 class EngineEditorBase
 {
   public:
-    EngineEditorBase(const std::string& editorName, const UID uid) : name(editorName), uid(uid) {}
-
+   
+    EngineEditorBase(const std::string& editorName, const UID uid);
     virtual ~EngineEditorBase();
     virtual bool RenderEditor();
 
