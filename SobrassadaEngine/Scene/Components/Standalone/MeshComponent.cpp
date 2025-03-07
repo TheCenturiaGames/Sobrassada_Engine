@@ -90,7 +90,9 @@ void MeshComponent::Render()
     if (enabled && currentMesh != nullptr)
     {
         unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
-        currentMesh->Render(App->GetResourcesModule()->GetProgram(), globalTransform, cameraUBO, currentMaterial);
+        currentMesh->Render(
+            App->GetResourcesModule()->GetProgram(), globalTransform, cameraUBO, currentMaterial, bones, bindTransforms
+        );
     }
     Component::Render();
 }

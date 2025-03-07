@@ -5,6 +5,7 @@
 #include "ResourceManagement/Resources/ResourceMesh.h"
 #include "Scene/Components/Component.h"
 
+#include "Math/float4x4.h"
 #include <Libs/rapidjson/document.h>
 #include <cstdint>
 
@@ -24,10 +25,16 @@ class MeshComponent : public Component
     void AddMesh(UID resource, bool reloadAABB = true);
     void AddMaterial(UID resource);
 
+    void SetBones(const std::vector<GameObject*>& bones) { this->bones = bones; }
+    void SetBindTransforms(std::vector<float4x4>& bindTransforms) { this->bindTransforms = bindTransforms; }
+
   private:
     std::string currentMeshName       = "Not selected";
     ResourceMesh* currentMesh         = nullptr;
 
     std::string currentTextureName    = "Not selected";
     ResourceMaterial* currentMaterial = nullptr;
+
+    std::vector<GameObject*> bones;
+    std::vector<float4x4> bindTransforms;
 };

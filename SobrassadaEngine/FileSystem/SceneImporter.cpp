@@ -125,7 +125,7 @@ namespace SceneImporter
         GLOG("Total .gltf meshes: %d", gltfMeshes.size());
 
         // Import Model
-        ModelImporter::ImportModel(model.nodes, gltfMeshes, filePath);
+        ModelImporter::ImportModel(model, gltfMeshes, filePath);
 
     }
 

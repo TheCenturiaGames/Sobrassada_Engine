@@ -23,9 +23,56 @@ namespace MeshImporter
         std::vector<unsigned char> indexBufferChar;
         std::vector<unsigned short> indexBufferShort;
         std::vector<unsigned int> indexBufferInt;
-        size_t posStride = 0, tanStride = 0, texStride = 0, normStride = 0;
-        float3 minPos     = {0.0f, 0.0f, 0.0f};
-        float3 maxPos     = {0.0f, 0.0f, 0.0f};
+        size_t posStride = 0, tanStride = 0, texStride = 0, normStride = 0, jointStride = 0, weightsStride = 0;
+        float3 minPos         = {0.0f, 0.0f, 0.0f};
+        float3 maxPos         = {0.0f, 0.0f, 0.0f};
+
+        // First get the indices, the type is needed for the joints later
+        const auto& itIndices = primitive.indices;
+        if (itIndices != -1)
+        {
+            const tinygltf::Accessor& indexAcc      = model.accessors[itIndices];
+            const tinygltf::BufferView& indexView   = model.bufferViews[indexAcc.bufferView];
+            const tinygltf::Buffer& indexBufferData = model.buffers[indexView.buffer];
+            const unsigned char* bufferIndices = &(indexBufferData.data[indexAcc.byteOffset + indexView.byteOffset]);
+            size_t stride                      = (indexView.byteStride > 0) ? indexView.byteStride : 0;
+
+            if (indexAcc.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE)
+            {
+                indexBufferChar.reserve(indexAcc.count);
+                stride   = (stride > 0) ? stride : sizeof(unsigned char);
+                dataType = UNSIGNED_CHAR;
+                for (size_t i = 0; i < indexAcc.count; ++i)
+                {
+                    indexMode = 0;
+                    indexBufferChar.push_back(bufferIndices[i]);
+                }
+            }
+            else if (indexAcc.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT)
+            {
+                indexBufferShort.reserve(indexAcc.count);
+                stride   = (stride > 0) ? stride : sizeof(unsigned short);
+                dataType = UNSIGNED_SHORT;
+                for (size_t i = 0; i < indexAcc.count; ++i)
+                {
+                    indexMode            = 1;
+                    unsigned short index = *reinterpret_cast<const unsigned short*>(bufferIndices + i * stride);
+                    indexBufferShort.push_back(index);
+                }
+            }
+            else if (indexAcc.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT)
+            {
+                indexBufferInt.reserve(indexAcc.count);
+                stride   = (stride > 0) ? stride : sizeof(unsigned int);
+                dataType = UNSIGNED_INT;
+                for (size_t i = 0; i < indexAcc.count; ++i)
+                {
+                    indexMode          = 2;
+                    unsigned int index = *reinterpret_cast<const unsigned int*>(bufferIndices + i * stride);
+                    indexBufferInt.push_back(index);
+                }
+            }
+        }
 
         const auto& itPos = primitive.attributes.find("POSITION");
         if (itPos != primitive.attributes.end())
@@ -82,68 +129,92 @@ namespace MeshImporter
                 tanStride                           = tanView.byteStride ? tanView.byteStride : sizeof(float4);
             }
 
+            const auto& itJoints              = primitive.attributes.find("JOINTS_0");
+            const unsigned char* bufferJoints = nullptr;
+            if (itJoints != primitive.attributes.end())
+            {
+                GLOG("GET JOINTS");
+                const tinygltf::Accessor& jointAcc    = model.accessors[itJoints->second];
+                const tinygltf::BufferView& jointView = model.bufferViews[jointAcc.bufferView];
+                const tinygltf::Buffer& jointBuffer   = model.buffers[jointView.buffer];
+                bufferJoints                          = &(jointBuffer.data[jointAcc.byteOffset + jointView.byteOffset]);
+
+                switch (dataType)
+                {
+                case (UNSIGNED_CHAR):
+                    jointStride = jointView.byteStride ? jointView.byteStride : sizeof(unsigned char) * 4;
+                    break;
+                case (UNSIGNED_SHORT):
+                    jointStride = jointView.byteStride ? jointView.byteStride : sizeof(unsigned short) * 4;
+                    break;
+                case (UNSIGNED_INT):
+                    jointStride = jointView.byteStride ? jointView.byteStride : sizeof(unsigned int) * 4;
+                    break;
+                }
+            }
+
+            const auto& itWeights              = primitive.attributes.find("WEIGHTS_0");
+            const unsigned char* bufferWeights = nullptr;
+            if (itWeights != primitive.attributes.end())
+            {
+                GLOG("GET WEIGHTS");
+                const tinygltf::Accessor& weightsAcc    = model.accessors[itWeights->second];
+                const tinygltf::BufferView& weightsView = model.bufferViews[weightsAcc.bufferView];
+                const tinygltf::Buffer& weightsBuffer   = model.buffers[weightsView.buffer];
+                bufferWeights = &(weightsBuffer.data[weightsAcc.byteOffset + weightsView.byteOffset]);
+                weightsStride = weightsView.byteStride ? weightsView.byteStride : sizeof(float4);
+            }
+
             vertexBuffer.reserve(posAcc.count);
 
             for (size_t i = 0; i < posAcc.count; ++i)
             {
                 Vertex vertex;
-                vertex.position  = *reinterpret_cast<const float3*>(bufferPos);
-                vertex.tangent   = bufferTan ? *reinterpret_cast<const float4*>(bufferTan) : float4(0, 0, 0, 1);
-                vertex.normal    = bufferNormal ? *reinterpret_cast<const float3*>(bufferNormal) : float3(0, 0, 0);
-                vertex.texCoord  = bufferTexCoord ? *reinterpret_cast<const float2*>(bufferTexCoord) : float2(0, 0);
+                vertex.position = *reinterpret_cast<const float3*>(bufferPos);
+                vertex.tangent  = bufferTan ? *reinterpret_cast<const float4*>(bufferTan) : float4(0, 0, 0, 1);
+                vertex.normal   = bufferNormal ? *reinterpret_cast<const float3*>(bufferNormal) : float3(0, 0, 0);
+                vertex.texCoord = bufferTexCoord ? *reinterpret_cast<const float2*>(bufferTexCoord) : float2(0, 0);
+                vertex.weights  = bufferWeights ? *reinterpret_cast<const float4*>(bufferWeights) : float4(0, 0, 0, 1);
 
-                bufferPos       += posStride;
+                if (bufferJoints)
+                {
+                    if (dataType == UNSIGNED_CHAR)
+                    {
+                        const unsigned char* joints = reinterpret_cast<const unsigned char*>(bufferJoints);
+                        vertex.joint[0]             = (unsigned int)joints[0];
+                        vertex.joint[1]             = (unsigned int)joints[1];
+                        vertex.joint[2]             = (unsigned int)joints[2];
+                        vertex.joint[3]             = (unsigned int)joints[3];
+                    }
+                    else if (dataType == UNSIGNED_SHORT)
+                    {
+                        const unsigned short* joints = reinterpret_cast<const unsigned short*>(bufferJoints);
+                        vertex.joint[0]              = (unsigned int)joints[0];
+                        vertex.joint[1]              = (unsigned int)joints[1];
+                        vertex.joint[2]              = (unsigned int)joints[2];
+                        vertex.joint[3]              = (unsigned int)joints[3];
+                    }
+                    else
+                    {
+                        const unsigned int* joints = reinterpret_cast<const unsigned int*>(bufferJoints);
+                    }
+                }
+                else
+                {
+                    vertex.joint[0] = 0;
+                    vertex.joint[1] = 0;
+                    vertex.joint[2] = 0;
+                    vertex.joint[3] = 1;
+                }
+
+                bufferPos += posStride;
                 if (bufferNormal) bufferNormal += normStride;
                 if (bufferTexCoord) bufferTexCoord += texStride;
                 if (bufferTan) bufferTan += tanStride;
+                if (bufferJoints) bufferJoints += jointStride;
+                if (bufferWeights) bufferWeights += weightsStride;
 
                 vertexBuffer.push_back(vertex);
-            }
-        }
-
-        const auto& itIndices = primitive.indices;
-        if (itIndices != -1)
-        {
-            const tinygltf::Accessor& indexAcc      = model.accessors[itIndices];
-            const tinygltf::BufferView& indexView   = model.bufferViews[indexAcc.bufferView];
-            const tinygltf::Buffer& indexBufferData = model.buffers[indexView.buffer];
-            const unsigned char* bufferIndices = &(indexBufferData.data[indexAcc.byteOffset + indexView.byteOffset]);
-            size_t stride                      = (indexView.byteStride > 0) ? indexView.byteStride : 0;
-
-            if (indexAcc.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE)
-            {
-                indexBufferChar.reserve(indexAcc.count);
-                stride   = (stride > 0) ? stride : sizeof(unsigned char);
-                dataType = UNSIGNED_CHAR;
-                for (size_t i = 0; i < indexAcc.count; ++i)
-                {
-                    indexMode = 0;
-                    indexBufferChar.push_back(bufferIndices[i]);
-                }
-            }
-            else if (indexAcc.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT)
-            {
-                indexBufferShort.reserve(indexAcc.count);
-                stride   = (stride > 0) ? stride : sizeof(unsigned short);
-                dataType = UNSIGNED_SHORT;
-                for (size_t i = 0; i < indexAcc.count; ++i)
-                {
-                    indexMode            = 1;
-                    unsigned short index = *reinterpret_cast<const unsigned short*>(bufferIndices + i * stride);
-                    indexBufferShort.push_back(index);
-                }
-            }
-            else if (indexAcc.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT)
-            {
-                indexBufferInt.reserve(indexAcc.count);
-                stride   = (stride > 0) ? stride : sizeof(unsigned int);
-                dataType = UNSIGNED_INT;
-                for (size_t i = 0; i < indexAcc.count; ++i)
-                {
-                    indexMode          = 2;
-                    unsigned int index = *reinterpret_cast<const unsigned int*>(bufferIndices + i * stride);
-                    indexBufferInt.push_back(index);
-                }
             }
         }
 
@@ -198,7 +269,7 @@ namespace MeshImporter
         memcpy(cursor, header, sizeof(header));
         cursor += sizeof(header);
 
-        // interleaved vertex data (position + tangent + normal + texCoord)
+        // interleaved vertex data (position + tangent + joints + weights + normal + texCoord)
         memcpy(cursor, vertexBuffer.data(), sizeof(Vertex) * vertexBuffer.size());
         cursor += sizeof(Vertex) * vertexBuffer.size();
 

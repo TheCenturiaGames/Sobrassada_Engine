@@ -394,31 +394,54 @@ void Scene::LoadModel(const UID modelUID)
         {
             GameObject* gameObject = new GameObject(gameObjectsArray[nodes[i].parentIndex]->GetUID(), nodes[i].name);
 
-            if (nodes[i].meshes.size() > 0)
-            {
-                GLOG("Node %s has %d meshes", nodes[i].name.c_str(), nodes[i].meshes.size());
-
-                for (const auto& mesh : nodes[i].meshes)
-                {
-                    MeshComponent* meshComponent =
-                        reinterpret_cast<MeshComponent*>(ComponentUtils::CreateEmptyComponent(
-                            COMPONENT_MESH, GenerateUID(), gameObject->GetRootComponent()->GetUID(),
-                            gameObject->GetRootComponent()->GetUID(),
-                            gameObject->GetRootComponent()->GetGlobalTransform()
-                        ));
-                    AddComponent(meshComponent->GetUID(), meshComponent);
-                    gameObject->GetRootComponent()->AddChildComponent(meshComponent->GetUID());
-
-                    meshComponent->AddMesh(mesh.first, true);
-                    meshComponent->AddMaterial(mesh.second);
-                }
-            }
             gameObjectsArray.emplace_back(gameObject);
             GetGameObjectByUUID(gameObjectsArray[nodes[i].parentIndex]->GetUID())->AddGameObject(gameObject->GetUID());
             AddGameObject(gameObject->GetUID(), gameObject);
 
             gameObject->GetRootComponent()->SetLocalTransform(nodes[i].transform);
             gameObject->PassAABBUpdateToParent();
+        }
+
+        // Iterate again to add the meshes and skins. Can't be done in the same loop because the bones have
+        // to be already created
+        for (int i = 0; i < nodes.size(); ++i)
+        {
+            // If mesh has skin, add the reference here
+            if (nodes[i].meshes.size() > 0)
+            {
+                const GameObject* currentGameObject = gameObjectsArray[i];
+                GLOG("Node %s has %d meshes", nodes[i].name.c_str(), nodes[i].meshes.size());
+
+                for (const auto& mesh : nodes[i].meshes)
+                {
+                    MeshComponent* meshComponent =
+                        reinterpret_cast<MeshComponent*>(ComponentUtils::CreateEmptyComponent(
+                            COMPONENT_MESH, GenerateUID(), currentGameObject->GetRootComponent()->GetUID(),
+                            currentGameObject->GetRootComponent()->GetUID(),
+                            currentGameObject->GetRootComponent()->GetGlobalTransform()
+                        ));
+                    AddComponent(meshComponent->GetUID(), meshComponent);
+                    currentGameObject->GetRootComponent()->AddChildComponent(meshComponent->GetUID());
+
+                    meshComponent->AddMesh(mesh.first, true);
+                    meshComponent->AddMaterial(mesh.second);
+
+                    // Add skin to meshComponent
+                    if (nodes[i].skinIndex != -1)
+                    {
+                        GLOG("Node %s has skin index: %d", nodes[i].name.c_str(), nodes[i].skinIndex);
+                        Skin skin = model.GetSkin(nodes[i].skinIndex);
+
+                        std::vector<GameObject*> bones;
+                        for (int index : skin.bonesIndices)
+                        {
+                            bones.push_back(gameObjectsArray[index]);
+                        }
+                        meshComponent->SetBones(bones);
+                        meshComponent->SetBindTransforms(skin.inverseBindMatrices);
+                    }
+                }
+            }
         }
     }
 }
