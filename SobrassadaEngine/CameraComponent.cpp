@@ -15,13 +15,12 @@ CameraComponent::CameraComponent(UID uid, UID uidParent, UID uidRoot, const floa
 {
 
     camera.type                = FrustumType::PerspectiveFrustum;
-    parentlocalglobalTransform = globalTransform + localTransform;
     camera.pos =
-        float3(parentlocalglobalTransform[0][3], parentlocalglobalTransform[1][3], parentlocalglobalTransform[2][3]);
+        float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
     camera.front =
-        -float3(parentlocalglobalTransform[2][0], parentlocalglobalTransform[2][1], parentlocalglobalTransform[2][2]);
+        -float3(globalTransform[2][0], globalTransform[2][1], globalTransform[2][2]);
     camera.up =
-        float3(parentlocalglobalTransform[1][0], parentlocalglobalTransform[1][1], parentlocalglobalTransform[1][2]);
+        float3(globalTransform[1][0], globalTransform[1][1], globalTransform[1][2]);
 
     camera.nearPlaneDistance  = 0.1f;
     camera.farPlaneDistance   = 100.f;
@@ -257,14 +256,12 @@ void CameraComponent::RenderEditorInspector()
 
 void CameraComponent::Update()
 {
-
-    parentlocalglobalTransform = globalTransform + localTransform;
     camera.pos =
-        float3(parentlocalglobalTransform[0][3], parentlocalglobalTransform[1][3], parentlocalglobalTransform[2][3]);
+        float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
     camera.front =
-        -float3(parentlocalglobalTransform[2][0], parentlocalglobalTransform[2][1], parentlocalglobalTransform[2][2]);
+        -float3(globalTransform[2][0], globalTransform[2][1], globalTransform[2][2]);
     camera.up =
-        float3(parentlocalglobalTransform[1][0], parentlocalglobalTransform[1][1], parentlocalglobalTransform[1][2]);
+        float3(globalTransform[1][0], globalTransform[1][1], globalTransform[1][2]);
 
     matrices.projectionMatrix = camera.ProjectionMatrix();
     matrices.viewMatrix       = camera.ViewMatrix();

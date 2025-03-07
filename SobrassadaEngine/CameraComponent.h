@@ -37,6 +37,4 @@ class CameraComponent : public Component
 
     float orthographicWidth;
     float orthographicHeight;
-
-    float4x4 parentlocalglobalTransform;
 };
