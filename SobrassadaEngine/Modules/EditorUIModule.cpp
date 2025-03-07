@@ -118,7 +118,7 @@ bool EditorUIModule::ShutDown()
 
 void EditorUIModule::UpdateGizmoTransformMode()
 {
-    if (App->GetSceneModule()->GetDoInputsEditor())
+    if (App->GetSceneModule()->GetDoInputsScene())
     {
         const KeyState* keyboard = App->GetInputModule()->GetKeyboard();
 
@@ -690,7 +690,7 @@ bool EditorUIModule::RenderImGuizmo(
 
     if (!ImGuizmo::IsUsing()) return false;
 
-    if (App->GetSceneModule()->GetDoInputsEditor())
+    if (App->GetSceneModule()->GetDoInputsScene())
     {
         transform.Transpose();
         if (transform.TranslatePart().Distance(App->GetCameraModule()->GetCameraPosition()) > maxDistance)
