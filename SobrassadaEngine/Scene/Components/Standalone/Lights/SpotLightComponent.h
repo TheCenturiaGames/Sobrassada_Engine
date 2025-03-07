@@ -7,7 +7,7 @@
 class SpotLightComponent : public LightComponent
 {
   public:
-    SpotLightComponent(UID uid, UID uidParent, UID uidRoot, const Transform &parentGlobalTransform);
+    SpotLightComponent(UID uid, UID uidParent, UID uidRoot, const float4x4 &parentGlobalTransform);
     SpotLightComponent(const rapidjson::Value& initialState);
     ~SpotLightComponent();
 

@@ -1,4 +1,4 @@
-﻿#include "MeshComponent.h"
+#include "MeshComponent.h"
 
 #include "../Root/RootComponent.h"
 #include "Application.h"
@@ -13,7 +13,7 @@
 #include <Math/Quat.h>
 
 MeshComponent::MeshComponent(
-    const UID uid, const UID uidParent, const UID uidRoot, const Transform& parentGlobalTransform
+    const UID uid, const UID uidParent, const UID uidRoot, const float4x4& parentGlobalTransform
 )
     : Component(uid, uidParent, uidRoot, "Mesh", COMPONENT_MESH, parentGlobalTransform)
 {
@@ -90,14 +90,7 @@ void MeshComponent::Render()
     if (enabled && currentMesh != nullptr)
     {
         unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
-        if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr) cameraUBO = App->GetSceneModule()->GetMainCamera()->GetUbo();
-
-        float4x4 model         = float4x4::FromTRS(
-            globalTransform.position,
-            Quat::FromEulerXYZ(globalTransform.rotation.x, globalTransform.rotation.y, globalTransform.rotation.z),
-            globalTransform.scale
-        );
-        currentMesh->Render(App->GetResourcesModule()->GetProgram(), model, cameraUBO, currentMaterial);
+        currentMesh->Render(App->GetResourcesModule()->GetProgram(), globalTransform, cameraUBO, currentMaterial);
     }
     Component::Render();
 }
