@@ -102,10 +102,10 @@ class SceneModule : public Module
     UID GetSceneUID() const { return loadedScene != nullptr ? loadedScene->GetSceneUID() : CONSTANT_EMPTY_UID; }
     const char* GetSceneName() const { return loadedScene != nullptr ? loadedScene->GetSceneName() : "Not loaded"; }
     bool IsInPlayMode() const { return isPlayMode; }
-    LightsConfig* GetLightsConfig() { return loadedScene != nullptr ? loadedScene->GetLightsConfig() : nullptr; }
+    LightsConfig* GetLightsConfig() const { return loadedScene != nullptr ? loadedScene->GetLightsConfig() : nullptr; }
 
-    bool GetDoInputsScene() { return loadedScene != nullptr ? loadedScene->GetDoInputs() && !isPlayMode : false; }
-    bool GetDoInputsGame() { return loadedScene != nullptr ? loadedScene->GetDoInputs() && isPlayMode : false; }
+    bool GetDoInputsScene() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() && !isPlayMode : false; }
+    bool GetDoInputsGame() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() && isPlayMode : false; }
 
   private:
     Scene* loadedScene = nullptr;
