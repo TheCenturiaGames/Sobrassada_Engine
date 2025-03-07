@@ -18,9 +18,9 @@ CameraComponent::CameraComponent(UID uid, UID uidParent, UID uidRoot, const floa
     camera.pos =
         float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
     camera.front =
-        -float3(globalTransform[2][0], globalTransform[2][1], globalTransform[2][2]);
+        -float3(globalTransform[0][2], globalTransform[1][2], globalTransform[2][2]);
     camera.up =
-        float3(globalTransform[1][0], globalTransform[1][1], globalTransform[1][2]);
+        float3(globalTransform[0][1], globalTransform[1][1], globalTransform[2][1]);
 
     camera.nearPlaneDistance  = 0.1f;
     camera.farPlaneDistance   = 100.f;
@@ -259,9 +259,9 @@ void CameraComponent::Update()
     camera.pos =
         float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
     camera.front =
-        -float3(globalTransform[2][0], globalTransform[2][1], globalTransform[2][2]);
+        -float3(globalTransform[0][2], globalTransform[1][2], globalTransform[2][2]);
     camera.up =
-        float3(globalTransform[1][0], globalTransform[1][1], globalTransform[1][2]);
+        float3(globalTransform[0][1], globalTransform[1][1], globalTransform[2][1]);
 
     matrices.projectionMatrix = camera.ProjectionMatrix();
     matrices.viewMatrix       = camera.ViewMatrix();
