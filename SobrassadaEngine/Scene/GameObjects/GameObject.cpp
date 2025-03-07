@@ -1,33 +1,32 @@
 #include "GameObject.h"
 
 #include "Application.h"
+#include "Component.h"
 #include "EditorUIModule.h"
-#include "Root/RootComponent.h"
 #include "SceneModule.h"
 
 #include "imgui.h"
 
+#include <stack>
+
 GameObject::GameObject(std::string name) : name(name)
 {
-    uuid       = GenerateUID();
-    parentUUID = INVALID_UUID;
-    globalAABB.SetNegativeInfinity();
+    uid       = GenerateUID();
+    parentUID = INVALID_UUID;
+    localAABB = AABB(DEFAULT_GAME_OBJECT_AABB);
+    globalAABB = AABB(localAABB);
 }
 
-GameObject::GameObject(UID parentUUID, std::string name) : parentUUID(parentUUID), name(name)
+GameObject::GameObject(UID parentUUID, std::string name) : parentUID(parentUUID), name(name)
 {
-    uuid = GenerateUID();
-    globalAABB.SetNegativeInfinity();
+    uid = GenerateUID();
+    localAABB = AABB(DEFAULT_GAME_OBJECT_AABB);
+    globalAABB = AABB(localAABB);
 }
 
-GameObject::GameObject(UID parentUUID, std::string name, UID rootComponentUID) : parentUUID(parentUUID), name(name)
+GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState["UID"].GetUint64())
 {
-    
-}
-
-GameObject::GameObject(const rapidjson::Value& initialState) : uuid(initialState["UID"].GetUint64())
-{
-    parentUUID                  = initialState["ParentUID"].GetUint64();
+    parentUID                  = initialState["ParentUID"].GetUint64();
     name                        = initialState["Name"].GetString();
     selectedComponentIndex      = COMPONENT_NONE;
     mobilitySettings            = initialState["Mobility"].GetInt();
@@ -47,6 +46,24 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uuid(initialState
         );
     }
 
+    // Deserialize Components
+    if (initialState.HasMember("Components") && initialState["Components"].IsArray())
+    {
+        const rapidjson::Value& jsonComponents = initialState["Components"];
+
+        for (rapidjson::SizeType i = 0; i < jsonComponents.Size(); i++)
+        {
+            const rapidjson::Value& jsonComponent = jsonComponents[i];
+
+            Component* newComponent           = ComponentUtils::CreateExistingComponent(jsonComponent);
+
+            if (newComponent != nullptr)
+            {
+                components.insert({newComponent->GetType(), newComponent});
+            }
+        }
+    }
+
     if (initialState.HasMember("Children") && initialState["Children"].IsArray())
     {
         const rapidjson::Value& initChildren = initialState["Children"];
@@ -60,7 +77,11 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uuid(initialState
 
 GameObject::~GameObject()
 {
-    
+    for (auto& component : components)
+    {
+        delete component.second;
+    }
+    components.clear();
 }
 
 bool GameObject::AddGameObject(UID gameObjectUUID)
@@ -83,26 +104,10 @@ bool GameObject::RemoveGameObject(UID gameObjectUUID)
     return false;
 }
 
-void GameObject::LoadComponentsInGameObject(Component* component)
-{
-    if (!component) return;
-
-    AddComponent(component);
-
-    for (auto childComponentUID : component->GetChildren())
-    {
-        Component* childComp = App->GetSceneModule()->GetScene()->GetComponentByUID(childComponentUID);
-        if (childComp != nullptr)
-        {
-            LoadComponentsInGameObject(childComp);
-        }
-    }
-}
-
 void GameObject::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
 {
-    targetState.AddMember("UID", uuid, allocator);
-    targetState.AddMember("ParentUID", parentUUID, allocator);
+    targetState.AddMember("UID", uid, allocator);
+    targetState.AddMember("ParentUID", parentUID, allocator);
     targetState.AddMember("Name", rapidjson::Value(name.c_str(), allocator), allocator);
 
     targetState.AddMember("Mobility", mobilitySettings, allocator);
@@ -126,14 +131,23 @@ void GameObject::Save(rapidjson::Value& targetState, rapidjson::Document::Alloca
 
     targetState.AddMember("LocalTransform", valLocalTransform, allocator);
 
-    rapidjson::Value valChildren(rapidjson::kArrayType);
+    // Serialize Components
+    rapidjson::Value componentsJSON(rapidjson::kArrayType);
 
-    for (const UID child : children)
+    for (auto it = components.begin(); it != components.end(); ++it)
     {
-        valChildren.PushBack(child, allocator);
+        if (it->second != nullptr)
+        {
+            rapidjson::Value componentJSON(rapidjson::kObjectType);
+
+            it->second->Save(componentJSON, allocator);
+
+            componentsJSON.PushBack(componentJSON, allocator);
+        }
     }
 
-    targetState.AddMember("Children", valChildren, allocator);
+    // Add components to scene
+    targetState.AddMember("Components", componentsJSON, allocator);
 }
 
 void GameObject::RenderEditorInspector()
@@ -158,24 +172,12 @@ void GameObject::RenderEditorInspector()
         ImGui::InputText("Search", searchText, 255);
 
         ImGui::Separator();
-        if (ImGui::BeginListBox("##ComponentList", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
+
+        ComponentType selectedType = App->GetEditorUIModule()->RenderResourceSelectDialog("##ComponentList", standaloneComponents, COMPONENT_NONE);
+        if (selectedType != COMPONENT_NONE)
         {
-            for (const auto& componentPair : standaloneComponents)
-            {
-                {
-                    if (componentPair.first.find(searchText) != std::string::npos)
-                    {
-                        if (ImGui::Selectable(componentPair.first.c_str(), false))
-                        {
-                            CreateComponent(componentPair.second);
-                            ImGui::CloseCurrentPopup();
-                        }
-                    }
-                }
-            }
-            ImGui::EndListBox();
+            CreateComponent(selectedType);
         }
-        ImGui::EndPopup();
     }
 
     if (selectedComponentIndex != COMPONENT_NONE)
@@ -192,7 +194,7 @@ void GameObject::RenderEditorInspector()
     const float4x4& parentTransform = GetParentGlobalTransform();
     if (App->GetEditorUIModule()->RenderTransformWidget(localTransform, globalTransform, parentTransform))
     {
-        OnTransformUpdate(parentTransform);
+        UpdateTransformForGOBranch();
     }
 
     ImGui::SeparatorText("Component configuration");
@@ -218,8 +220,34 @@ void GameObject::RenderEditorInspector()
 
     if (App->GetEditorUIModule()->RenderImGuizmo(localTransform, globalTransform, parentTransform))
     {
-        OnTransformUpdate(parentTransform);
+        UpdateTransformForGOBranch();
     }
+}
+
+void GameObject::UpdateTransformForGOBranch() const
+{
+    std::stack<UID> childrenBuffer;
+    childrenBuffer.push(uid);
+
+    while (!childrenBuffer.empty())
+    {
+        GameObject* gameObject = App->GetSceneModule()->GetGameObjectByUUID(childrenBuffer.top());
+        childrenBuffer.pop();
+        if (gameObject != nullptr)
+        {
+            gameObject->OnTransformUpdated();
+            for (UID child : gameObject->GetChildren())
+                childrenBuffer.push(child);
+        }
+    }
+    
+    App->GetSceneModule()->RegenerateTree();
+}
+
+void GameObject::OnTransformUpdated()
+{
+    globalTransform = GetParentGlobalTransform() * localTransform;
+    globalAABB = AABB(localAABB.Transform(globalTransform));
 }
 
 void GameObject::RenderHierarchyNode(UID& selectedGameObjectUUID)
@@ -229,13 +257,13 @@ void GameObject::RenderHierarchyNode(UID& selectedGameObjectUUID)
     bool hasChildren         = !children.empty();
 
     if (!hasChildren) flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-    if (selectedGameObjectUUID == uuid) flags |= ImGuiTreeNodeFlags_Selected;
+    if (selectedGameObjectUUID == uid) flags |= ImGuiTreeNodeFlags_Selected;
 
-    ImGui::PushID(static_cast<int>(uuid));
+    ImGui::PushID(static_cast<int>(uid));
 
     bool nodeOpen = false;
 
-    if (isRenaming && currentRenamingUID == uuid)
+    if (isRenaming && currentRenamingUID == uid)
     {
         nodeOpen = ImGui::TreeNodeEx("##RenamingNode", flags, "");
         RenameGameObjectHierarchy();
@@ -253,7 +281,7 @@ void GameObject::RenderHierarchyNode(UID& selectedGameObjectUUID)
         for (UID childUUID : children)
         {
             GameObject* childGameObject = App->GetSceneModule()->GetGameObjectByUUID(childUUID);
-            if (childGameObject && childUUID != uuid)
+            if (childGameObject && childUUID != uid)
             {
                 childGameObject->RenderHierarchyNode(selectedGameObjectUUID);
             }
@@ -269,20 +297,20 @@ void GameObject::HandleNodeClick(UID& selectedGameObjectUUID)
 {
     if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
     {
-        selectedGameObjectUUID = uuid;
+        selectedGameObjectUUID = uid;
     }
 
     if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right))
     {
-        selectedGameObjectUUID = uuid;
-        ImGui::OpenPopup(("##GameObjectContextMenu" + std::to_string(uuid)).c_str());
+        selectedGameObjectUUID = uid;
+        ImGui::OpenPopup(("##GameObjectContextMenu" + std::to_string(uid)).c_str());
     }
 
     // Drag and Drop
 
-    if (uuid != App->GetSceneModule()->GetGameObjectRootUID() && ImGui::BeginDragDropSource())
+    if (uid != App->GetSceneModule()->GetGameObjectRootUID() && ImGui::BeginDragDropSource())
     {
-        ImGui::SetDragDropPayload("DRAG_DROP_GAMEOBJECT", &uuid, sizeof(UID));
+        ImGui::SetDragDropPayload("DRAG_DROP_GAMEOBJECT", &uid, sizeof(UID));
         ImGui::Text("Dragging %s", name.c_str());
         ImGui::EndDragDropSource();
     }
@@ -291,14 +319,10 @@ void GameObject::HandleNodeClick(UID& selectedGameObjectUUID)
     {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DRAG_DROP_GAMEOBJECT"))
         {
-            UID draggedUUID = *reinterpret_cast<const UID*>(payload->Data);
-            if (draggedUUID != uuid)
+            UID draggedUUID = *static_cast<const UID*>(payload->Data);
+            if (draggedUUID != uid)
             {
-                if (UpdateGameObjectHierarchy(draggedUUID, uuid))
-                {
-                    ComponentGlobalTransformUpdated();
-                    PassAABBUpdateToParent(); // TODO: check if it works
-                }
+                UpdateGameObjectHierarchy(draggedUUID);
             }
         }
 
@@ -308,19 +332,18 @@ void GameObject::HandleNodeClick(UID& selectedGameObjectUUID)
 
 void GameObject::RenderContextMenu()
 {
-    if (ImGui::BeginPopup(("##GameObjectContextMenu" + std::to_string(uuid)).c_str()))
+    if (ImGui::BeginPopup(("##GameObjectContextMenu" + std::to_string(uid)).c_str()))
     {
         if (ImGui::MenuItem("New GameObject"))
         {
-            GameObject* newGameObject = new GameObject(uuid, "new Game Object");
-            App->GetSceneModule()->GetGameObjectByUUID(uuid)->AddGameObject(newGameObject->GetUID());
+            GameObject* newGameObject = new GameObject(uid, "new Game Object");
             App->GetSceneModule()->AddGameObject(newGameObject->GetUID(), newGameObject);
-            ComponentGlobalTransformUpdated();
+            App->GetSceneModule()->RegenerateTree(); // TODO Check if necessary
         }
 
         if (ImGui::MenuItem("Rename"))
         {
-            if (currentRenamingUID != INVALID_UUID && currentRenamingUID != uuid)
+            if (currentRenamingUID != INVALID_UUID && currentRenamingUID != uid)
             {
                 GameObject* oldGameObject = App->GetSceneModule()->GetGameObjectByUUID(currentRenamingUID);
 
@@ -334,12 +357,12 @@ void GameObject::RenderContextMenu()
             isRenaming = true;
             strncpy_s(renameBuffer, sizeof(renameBuffer), name.c_str(), _TRUNCATE);
 
-            currentRenamingUID = uuid;
+            currentRenamingUID = uid;
         }
 
-        if (uuid != App->GetSceneModule()->GetGameObjectRootUID() && ImGui::MenuItem("Delete"))
+        if (uid != App->GetSceneModule()->GetGameObjectRootUID() && ImGui::MenuItem("Delete"))
         {
-            App->GetSceneModule()->RemoveGameObjectHierarchy(uuid);
+            App->GetSceneModule()->RemoveGameObjectHierarchy(uid);
             // PassAABBUpdateToParent(); //TODO: check if it works
         }
 
@@ -373,43 +396,55 @@ void GameObject::RenameGameObjectHierarchy()
     }
 }
 
-bool GameObject::UpdateGameObjectHierarchy(UID sourceUID, UID targetUID)
+void GameObject::UpdateGameObjectHierarchy(UID sourceUID)
 {
     GameObject* sourceGameObject = App->GetSceneModule()->GetGameObjectByUUID(sourceUID);
-    GameObject* targetGameObject = App->GetSceneModule()->GetGameObjectByUUID(targetUID);
 
-    if (!sourceGameObject || !targetGameObject) return false;
-
-    UID oldParentUUID = sourceGameObject->GetParent();
-    sourceGameObject->SetParent(targetUID);
-
-    GameObject* oldParentGameObject = App->GetSceneModule()->GetGameObjectByUUID(oldParentUUID);
-
-    if (oldParentGameObject)
+    if (sourceGameObject != nullptr)
     {
-        oldParentGameObject->RemoveGameObject(sourceGameObject->GetUID());
+        UID oldParentUUID = sourceGameObject->GetParent();
+        sourceGameObject->SetParent(uid);
+
+        GameObject* oldParentGameObject = App->GetSceneModule()->GetGameObjectByUUID(oldParentUUID);
+
+        if (oldParentGameObject)
+        {
+            oldParentGameObject->RemoveGameObject(sourceGameObject->GetUID());
+        }
+
+        AddGameObject(sourceGameObject->GetUID());
+
+        sourceGameObject->UpdateTransformForGOBranch();
     }
-
-    targetGameObject->AddGameObject(sourceGameObject->GetUID());
-
-    return true;
 }
 
-void GameObject::Render()
+void GameObject::OnAABBUpdated()
 {
-    if (rootComponent != nullptr)
+    localAABB = AABB(DEFAULT_GAME_OBJECT_AABB);
+
+    for (auto& component : components)
     {
-        rootComponent->Render();
+        localAABB.Enclose(component.second->GetLocalAABB());
+    }
+    
+}
+
+void GameObject::Render() const
+{
+    for (auto& component : components)
+    {
+        component.second->Render();
     }
 }
 
-void GameObject::RenderEditor()
+void GameObject::RenderEditor() const
 {
     if (App->GetEditorUIModule()->inspectorMenu)
     {
-        if (rootComponent != nullptr)
+        Component* selectedComponent = components.at(selectedComponentIndex);
+        if (selectedComponent != nullptr)
         {
-            rootComponent->RenderComponentEditor();
+            selectedComponent->RenderEditorInspector();
         }
     }
     if (App->GetEditorUIModule()->hierarchyMenu)
@@ -418,61 +453,9 @@ void GameObject::RenderEditor()
     }
 }
 
-void GameObject::PassAABBUpdateToParent()
+const float4x4& GameObject::GetParentGlobalTransform() const
 {
-    // TODO Update AABBs further up the gameObject tree
-    globalAABB = AABB(rootComponent->GetGlobalAABB());
-
-    for (UID child : children)
-    {
-        GameObject* gameObject = App->GetSceneModule()->GetGameObjectByUUID(child);
-
-        if (gameObject != nullptr)
-        {
-            globalAABB.Enclose(gameObject->GetAABB());
-        }
-    }
-
-    if (parentUUID != INVALID_UUID) // Filters the case of Scene GameObject (which parent is INVALID_UUID)
-    {
-        GameObject* parentGameObject = App->GetSceneModule()->GetGameObjectByUUID(parentUUID);
-
-        if (parentGameObject != nullptr)
-        {
-            parentGameObject->PassAABBUpdateToParent();
-        }
-    }
-    else
-    {
-        App->GetSceneModule()->RegenerateTree();
-    }
-}
-
-void GameObject::ComponentGlobalTransformUpdated()
-{
-    if (rootComponent != nullptr) globalAABB = AABB(rootComponent->GetGlobalAABB());
-
-    for (UID child : children)
-    {
-        GameObject* childGameObject = App->GetSceneModule()->GetGameObjectByUUID(child);
-
-        if (childGameObject != nullptr)
-        {
-            globalAABB.Enclose(childGameObject->rootComponent->TransformUpdated(
-                rootComponent == nullptr ? float4x4::identity : rootComponent->GetGlobalTransform()
-            ));
-        }
-    }
-}
-
-const float4x4& GameObject::GetGlobalTransform() const
-{
-    return rootComponent->GetGlobalTransform();
-}
-
-const float4x4& GameObject::GetParentGlobalTransform()
-{
-    GameObject* parent = App->GetSceneModule()->GetGameObjectByUUID(parentUUID);
+    GameObject* parent = App->GetSceneModule()->GetGameObjectByUUID(parentUID);
     if (parent != nullptr)
     {
         return parent->GetGlobalTransform();
@@ -484,7 +467,7 @@ bool GameObject::CreateComponent(const ComponentType componentType)
 {
     if (components.find(componentType) == components.end()) // TODO Allow override of components after displaying an info box
     {
-        Component* createdComponent = ComponentUtils::CreateEmptyComponent(componentType, LCG().IntFast());
+        Component* createdComponent = ComponentUtils::CreateEmptyComponent(componentType, LCG().IntFast(), uid);
         if (createdComponent != nullptr)
         {
             components.insert({componentType, createdComponent});

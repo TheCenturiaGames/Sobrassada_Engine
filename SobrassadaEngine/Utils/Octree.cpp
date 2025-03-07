@@ -87,7 +87,7 @@ bool Octree::InsertElement(GameObject* gameObject)
     std::stack<OctreeNode*> nodesToVisit;
     nodesToVisit.push(rootNode);
 
-    const AABB objectBoundingBox = gameObject->GetAABB();
+    const AABB objectBoundingBox = gameObject->GetGlobalAABB();
     OctreeElement octreeElement  = OctreeElement(objectBoundingBox, gameObject, totalElements);
 
     while (!nodesToVisit.empty())

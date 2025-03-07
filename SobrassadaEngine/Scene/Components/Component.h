@@ -2,51 +2,49 @@
 
 #include "ComponentUtils.h"
 #include "Globals.h"
-#include "Scene/AABBUpdatable.h"
 
 #include <Geometry/AABB.h>
 #include <Libs/rapidjson/document.h>
-#include <Math/float4x4.h>
-#include <vector>
 
-class Component : public AABBUpdatable
+class GameObject;
+
+class Component
 {
   public:
-    Component(
-        UID uid, UID uidParent, UID uidRoot, const char* initName, int type, const float4x4& parentGlobalTransform
-    );
+    Component(UID uid, UID parentUID, const char* initName, ComponentType type);
     Component(const rapidjson::Value& initialState);
-    ~Component() override;
+    virtual ~Component() = default;
 
     virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
 
     virtual void Update() = 0;
-    virtual void Render();
+    virtual void Render() = 0;
     virtual void RenderEditorInspector();
 
-    virtual void OnTransformUpdate(const float4x4& parentGlobalTransform);
-    virtual AABB& TransformUpdated(const float4x4& parentGlobalTransform);
-    void PassAABBUpdateToParent() override;
-
-    void ComponentGlobalTransformUpdated() override {}
-
-    const float4x4& GetParentGlobalTransform() override;
-
-    void CalculateLocalAABB();
     UID GetUID() const { return uid; }
 
-    const AABB& GetGlobalAABB() const { return globalComponentAABB; }
+    const AABB& GetLocalAABB() const { return localComponentAABB; }
 
-    int GetType() const { return type; }
+    ComponentType GetType() const { return type; }
+
+    const float4x4& GetGlobalTransform();
+
+protected:
+
+    GameObject* GetParent();
 
   protected:
     const UID uid;
+    const UID parentUID;
 
     char name[64];
     bool enabled;
 
     AABB localComponentAABB;
-    AABB globalComponentAABB;
 
-    const int type = COMPONENT_NONE;
+    const ComponentType type = COMPONENT_NONE;
+
+private:
+    
+    GameObject* parent = nullptr;
 };

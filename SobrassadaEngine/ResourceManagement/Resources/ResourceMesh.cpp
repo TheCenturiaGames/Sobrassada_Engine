@@ -64,7 +64,7 @@ void ResourceMesh::LoadData(
     glBindVertexArray(0);
 }
 
-void ResourceMesh::Render(int program, float4x4& modelMatrix, unsigned int cameraUBO, ResourceMaterial* material)
+void ResourceMesh::Render(int program, const float4x4& modelMatrix, unsigned int cameraUBO, const ResourceMaterial* material) const
 {
     glUseProgram(program);
 
@@ -74,7 +74,7 @@ void ResourceMesh::Render(int program, float4x4& modelMatrix, unsigned int camer
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, cameraUBO);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-    glUniformMatrix4fv(2, 1, GL_TRUE, &modelMatrix[0][0]);
+    glUniformMatrix4fv(2, 1, GL_TRUE, modelMatrix.ptr());
 
     float3 lightDir         = float3(-1.0f, -0.3f, 2.0f);
     float3 lightColor       = float3(1.0f, 1.0f, 1.0f);

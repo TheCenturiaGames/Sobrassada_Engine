@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <vector>
 #include <windows.h>
+#include <Geometry/AABB.h>
 
 extern std::vector<char*>* Logs;
 
@@ -99,3 +100,5 @@ inline UID GenerateUID()
 
     return uid;
 }
+
+static AABB DEFAULT_GAME_OBJECT_AABB = AABB(float3(-1, -1, -1), float3(1, 1, 1));

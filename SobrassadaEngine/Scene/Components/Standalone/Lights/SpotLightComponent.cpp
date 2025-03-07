@@ -2,13 +2,14 @@
 
 #include "Application.h"
 #include "DebugDrawModule.h"
+#include "GameObject.h"
 #include "SceneModule.h"
 
 #include "ImGui.h"
 #include "Math/Quat.h"
 
-SpotLightComponent::SpotLightComponent(UID uid, UID uidParent, UID uidRoot, const float4x4& parentGlobalTransform)
-    : LightComponent(uid, uidParent, uidRoot, "Spot Light", COMPONENT_SPOT_LIGHT, parentGlobalTransform)
+SpotLightComponent::SpotLightComponent(UID uid, UID uidParent)
+    : LightComponent(uid, uidParent, "Spot Light", COMPONENT_SPOT_LIGHT)
 {
     range                      = 3;
     innerAngle                 = 10;
@@ -86,6 +87,8 @@ void SpotLightComponent::Render()
     outerDirections.emplace_back(Quat::RotateZ(outerRads).Transform(-float3::unitY));
     outerDirections.emplace_back(Quat::RotateZ(-outerRads).Transform(-float3::unitY));
 
+    const float4x4& globalTransform = GetParent()->GetGlobalTransform();
+
     const float3 direction = (globalTransform.RotatePart() * -float3::unitY).Normalized();
     innerDirections[0]     = (globalTransform.RotatePart() * innerDirections[0]);
     innerDirections[1]     = (globalTransform.RotatePart() * innerDirections[1]);
@@ -112,7 +115,7 @@ void SpotLightComponent::Render()
     debug->DrawCircle(center, -direction, float3(1, 1, 1), outerCathetus);
 }
 
-float3 SpotLightComponent::GetDirection() const
+const float3 SpotLightComponent::GetDirection()
 {
-    return (globalTransform.RotatePart() * -float3::unitY).Normalized();
+    return (GetParent()->GetGlobalTransform().RotatePart() * -float3::unitY).Normalized();
 }

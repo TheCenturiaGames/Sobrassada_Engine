@@ -5,7 +5,6 @@
 #include "ComponentUtils.h"
 #include "FileSystem.h"
 #include "GameObject.h"
-#include "Root/RootComponent.h"
 #include "SceneImporter.h"
 #include "SceneModule.h"
 
@@ -34,122 +33,51 @@ bool LibraryModule::Init()
 // SaveAs = all path + name.scene
 bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
 {
-    SceneModule* sceneModule = App->GetSceneModule();
-    if (sceneModule == nullptr)
+    Scene* loadedScene = App->GetSceneModule()->GetScene();
+    if (loadedScene != nullptr)
     {
-        GLOG("Scene module not found");
-        return false;
-    }
+        // Create doc JSON
+        rapidjson::Document doc;
+        doc.SetObject();
+        rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
 
-    UID sceneUID = (saveMode == SaveMode::Save) ? sceneModule->GetSceneUID() : GenerateUID();
-    const std::string& sceneName =
-        (saveMode == SaveMode::Save) ? sceneModule->GetSceneName() : FileSystem::GetFileNameWithoutExtension(path);
+        rapidjson::Value scene(rapidjson::kObjectType);
 
-    if (sceneUID == 0 && saveMode == SaveMode::Save) return false;
+        const char* sceneName = loadedScene->Save(scene, allocator);
 
-    UID gameObjectRootUID   = sceneModule->GetGameObjectRootUID();
+        doc.AddMember("Scene", scene, allocator);
 
-    const auto* gameObjects = sceneModule->GetAllGameObjects();
-    const auto* components  = sceneModule->GetAllComponents();
+        // Save file like JSON
+        rapidjson::StringBuffer buffer;
+        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+        doc.Accept(writer);
 
-    // Create doc JSON
-    rapidjson::Document doc;
-    doc.SetObject();
-    rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
+        std::string sceneFilePath;
+        std::string fileName;
 
-    rapidjson::Value scene(rapidjson::kObjectType);
-
-    // Scene values
-    UID uid                 = sceneUID;
-    const std::string& name = sceneName;
-    UID rootGameObject      = gameObjectRootUID;
-
-    // Create structure
-    scene.AddMember("UID", uid, allocator);
-    scene.AddMember("Name", rapidjson::Value(name.c_str(), allocator), allocator);
-    scene.AddMember("RootGameObject", rootGameObject, allocator);
-
-    // Serialize GameObjects
-    rapidjson::Value gameObjectsJSON(rapidjson::kArrayType);
-
-    for (auto it = gameObjects->begin(); it != gameObjects->end(); ++it)
-    {
-        if (it->second != nullptr)
+        if (saveMode == SaveMode::Save)
         {
-            rapidjson::Value goJSON(rapidjson::kObjectType);
-
-            it->second->Save(goJSON, allocator);
-
-            gameObjectsJSON.PushBack(goJSON, allocator);
+            sceneFilePath = std::string(path) + sceneName + SCENE_EXTENSION;
+            fileName      = sceneName;
         }
-    }
-
-    // Add gameObjects to scene
-    scene.AddMember("GameObjects", gameObjectsJSON, allocator);
-
-    // Serialize Components
-    rapidjson::Value componentsJSON(rapidjson::kArrayType);
-
-    for (auto it = components->begin(); it != components->end(); ++it)
-    {
-        if (it->second != nullptr)
+        else
         {
-            rapidjson::Value componentJSON(rapidjson::kObjectType);
-
-            it->second->Save(componentJSON, allocator);
-
-            componentsJSON.PushBack(componentJSON, allocator);
+            fileName      = FileSystem::GetFileNameWithoutExtension(path);
+            sceneFilePath = FileSystem::GetFilePath(path) + fileName + SCENE_EXTENSION;
         }
+
+        unsigned int bytesWritten = (unsigned int
+        )FileSystem::Save(sceneFilePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
+        if (bytesWritten == 0)
+        {
+            GLOG("Failed to save scene file: %s", path);
+            return false;
+        }
+
+        GLOG("%s saved as scene", fileName.c_str());
     }
-
-    // Add components to scene
-    scene.AddMember("Components", componentsJSON, allocator);
-
-    doc.AddMember("Scene", scene, allocator);
-
-    // Serialize Lights Config
-    LightsConfig* lightConfig = App->GetSceneModule()->GetLightsConfig();
-
-     if (lightConfig != nullptr)
-     {
-        rapidjson::Value lights(rapidjson::kObjectType);
-
-        lightConfig->SaveData(lights, allocator);
-
-        doc.AddMember("Lights Config", lights, allocator);
-
-     } else GLOG("Light Config not found");
-
-    // Save file like JSON
-    rapidjson::StringBuffer buffer;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-    doc.Accept(writer);
-
-    std::string sceneFilePath;
-    std::string fileName;
-
-    if (saveMode == SaveMode::Save)
-    {
-        sceneFilePath = std::string(path) + sceneName + SCENE_EXTENSION;
-        fileName      = sceneName;
-    }
-    else
-    {
-        fileName      = FileSystem::GetFileNameWithoutExtension(path);
-        sceneFilePath = FileSystem::GetFilePath(path) + fileName + SCENE_EXTENSION;
-    }
-
-    unsigned int bytesWritten = (unsigned int
-    )FileSystem::Save(sceneFilePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
-    if (bytesWritten == 0)
-    {
-        GLOG("Failed to save scene file: %s", path);
-        return false;
-    }
-
-    GLOG("%s saved as scene", fileName.c_str());
-
-    return true;
+    
+    return false;
 }
 
 bool LibraryModule::LoadScene(const char* path, bool reload) const
@@ -171,66 +99,7 @@ bool LibraryModule::LoadScene(const char* path, bool reload) const
 
     rapidjson::Value& scene = doc["Scene"];
 
-    // Scene values
-    UID sceneUID            = scene["UID"].GetUint64();
-    std::string name        = scene["Name"].GetString();
-    UID rootGameObject      = scene["RootGameObject"].GetUint64();
-
-    if (sceneUID == App->GetSceneModule()->GetSceneUID() && !reload)
-    {
-        GLOG("Scene already loaded: %s", name.c_str());
-        return false;
-    }
-
-    App->GetSceneModule()->CloseScene();
-
-    std::map<UID, Component*> loadedGameComponents;
-    std::unordered_map<UID, GameObject*> loadedGameObjects;
-
-    // Deserialize Components
-    if (scene.HasMember("Components") && scene["Components"].IsArray())
-    {
-        const rapidjson::Value& components = scene["Components"];
-
-        for (rapidjson::SizeType i = 0; i < components.Size(); i++)
-        {
-            const rapidjson::Value& component = components[i];
-
-            Component* newComponent           = ComponentUtils::CreateExistingComponent(component);
-
-            if (newComponent != nullptr)
-            {
-                loadedGameComponents.insert({newComponent->GetUID(), newComponent});
-            }
-        }
-    }
-
-    App->GetSceneModule()->LoadScene(sceneUID, name.c_str(), rootGameObject, loadedGameComponents);
-
-    // Deserialize GameObjects
-    if (scene.HasMember("GameObjects") && scene["GameObjects"].IsArray())
-    {
-        const rapidjson::Value& gameObjects = scene["GameObjects"];
-        for (rapidjson::SizeType i = 0; i < gameObjects.Size(); i++)
-        {
-            const rapidjson::Value& gameObject = gameObjects[i];
-
-            GameObject* newGameObject          = new GameObject(gameObject);
-
-            loadedGameObjects.insert({newGameObject->GetUID(), newGameObject});
-        }
-    }
-    App->GetSceneModule()->GetScene()->LoadGameObjects(loadedGameObjects);
-    App->GetSceneModule()->GetScene()->UpdateTransformOctree();
-
-    // Deserialize Lights Config
-    if (doc.HasMember("Lights Config") && doc["Lights Config"].IsObject())
-    {
-        LightsConfig* lightConfig           = App->GetSceneModule()->GetLightsConfig();
-        lightConfig->LoadData(doc["Lights Config"]);
-    }
-
-    GLOG("%s scene loaded", name.c_str());
+    App->GetSceneModule()->LoadScene(scene);
     return true;
 }
 

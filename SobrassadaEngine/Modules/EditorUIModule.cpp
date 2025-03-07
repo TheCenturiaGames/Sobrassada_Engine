@@ -720,11 +720,12 @@ void EditorUIModule::RenderBasicTransformModifiers(
     ImGui::Checkbox("Lock axis", &lockScaleAxis);
 }
 
-UID EditorUIModule::RenderResourceSelectDialog(
-    const char* id, const std::unordered_map<std::string, UID>& availableResources
+template <typename T>
+T EditorUIModule::RenderResourceSelectDialog(
+    const char* id, const std::unordered_map<std::string, T>& availableResources, const T& defaultResource
 )
 {
-    UID result = CONSTANT_EMPTY_UID;
+    T result = defaultResource;
     if (ImGui::BeginPopup(id))
     {
         static char searchText[255] = "";

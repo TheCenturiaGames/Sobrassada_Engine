@@ -1,27 +1,21 @@
 #include "SceneModule.h"
 
-#include "CameraModule.h"
 #include "ComponentUtils.h"
 #include "EditorUIModule.h"
-#include "FrustumPlanes.h"
-#include "GameObject.h"
 #include "LibraryModule.h"
 #include "Octree.h"
-#include "Root/RootComponent.h"
-#include "Scene/Components/Standalone/MeshComponent.h"
 
-#include "glew.h"
-#include "imgui.h"
-#include "imgui_impl_opengl3.h"
-#include "imgui_impl_sdl2.h"
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_EXTERNAL_IMAGE
-#include <Algorithm/Random/LCG.h>
+#include "Application.h"
+
+#include <filesystem>
 #include <tiny_gltf.h>
 
-SceneModule::SceneModule()
+SceneModule::SceneModule() : sceneLibraryPath(std::filesystem::current_path().string() + DELIMITER + SCENES_PATH)
 {
+    
 }
 
 SceneModule::~SceneModule()
@@ -77,45 +71,27 @@ bool SceneModule::ShutDown()
 void SceneModule::CreateScene()
 {
     CloseScene();
-
-    GameObject* sceneGameObject = new GameObject("SceneModule GameObject");
-
-    loadedScene                 = new Scene(GenerateUID(), "New Scene", sceneGameObject->GetUID());
-
-    std::unordered_map<UID, GameObject*> loadedGameObjects;
-    loadedGameObjects.insert({sceneGameObject->GetUID(), sceneGameObject});
-
-    loadedScene->LoadGameObjects(loadedGameObjects);
-    loadedScene->LoadComponents(std::map<UID, Component*>());
-
-    sceneGameObject->CreateRootComponent();
-
-    loadedScene->UpdateTransformOctree();
-
-    // TODO Filesystem: Save this new created level immediatelly
+    
+    loadedScene = new Scene("New Scene");
 }
 
-void SceneModule::LoadScene(
-    UID sceneUID, const char* sceneName, UID rootGameObject, const std::map<UID, Component*>& loadedGameComponents
-)
+void SceneModule::LoadScene(const rapidjson::Value& initialState, const bool forceReload)
 {
+    const UID extractedSceneUID = initialState["UID"].GetUint64();
+    if (!forceReload && loadedScene != nullptr && loadedScene->GetSceneUID() == extractedSceneUID)
+    {
+        GLOG("Scene already loaded: %s", loadedScene->GetSceneName());
+        return;
+    }
+    
     CloseScene();
-    loadedScene = new Scene(sceneUID, sceneName, rootGameObject);
-    loadedScene->LoadComponents(loadedGameComponents);
-}
-
-void SceneModule::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects)
-{
-    loadedScene->LoadGameObjects(loadedGameObjects);
-}
-
-void SceneModule::LoadComponents(const std::map<UID, Component*>& loadedGameComponents)
-{
-    loadedScene->LoadComponents(loadedGameComponents);
+    
+    loadedScene = new Scene(initialState, extractedSceneUID);
 }
 
 void SceneModule::CloseScene()
 {
+    // TODO Warning dialog before closing scene without saving
     delete loadedScene;
     loadedScene = nullptr;
 }
@@ -128,18 +104,16 @@ void SceneModule::SwitchPlayModeStateTo(bool wantedStatePlayMode)
     {
         if (loadedScene != nullptr)
         {
-            App->GetLibraryModule()->LoadScene(
+            bInPlayMode = !App->GetLibraryModule()->LoadScene(
                 std::string(SCENES_PATH + std::string(loadedScene->GetSceneName()) + SCENE_EXTENSION).c_str(), true
             );
-            bInPlayMode = false;
         }
     }
     else
     {
         if (loadedScene != nullptr)
         {
-            loadedScene->Save();
-            bInPlayMode = true;
+            bInPlayMode = App->GetLibraryModule()->SaveScene(sceneLibraryPath.c_str(), SaveMode::Save);
         }
     }
 }

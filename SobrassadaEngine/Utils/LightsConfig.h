@@ -8,6 +8,8 @@
 #include <memory>
 #include <Libs/rapidjson/document.h>
 
+class Component;
+
 namespace Math
 {
     class float4x4;
@@ -85,15 +87,15 @@ class LightsConfig
     void RemoveSpotLight(UID spotUid);
 
     void SaveData(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
-    void LoadData(rapidjson::Value& lights);
+    void LoadData(const rapidjson::Value& lights);
 
   private:
     unsigned int LoadSkyboxTexture(UID cubemapUID);
 
     void GetAllSceneLights();
-    void GetAllPointLights();
-    void GetAllSpotLights();
-    void GetDirectionalLight();
+    void GetAllPointLights(const std::unordered_map<UID, Component*>& components);
+    void GetAllSpotLights(const std::unordered_map<UID, Component*>& components);
+    void GetDirectionalLight(const std::unordered_map<UID, Component*>& components);
 
     void SetDirectionalLightShaderData() const;
     void SetPointLightsShaderData() const;
