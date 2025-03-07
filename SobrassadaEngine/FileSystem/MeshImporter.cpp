@@ -227,13 +227,14 @@ namespace MeshImporter
 
         UID meshUID                = GenerateUID();
 
-        std::string savePath           = MESHES_PATH + name + MESH_EXTENSION;
+        std::string fileType            = std::string("name") + MESH_EXTENSION;
 
-        UID finalMeshUID             = App->GetLibraryModule()->AssignFiletypeUID(meshUID, savePath);
-        std::string fileName         = FileSystem::GetFileNameWithoutExtension(filePath);
+        UID finalMeshUID             = App->GetLibraryModule()->AssignFiletypeUID(meshUID, fileType);
 
-        MetaMesh meta(finalMeshUID, filePath, generateTangents);
-        meta.Save(savePath);
+        std::string savePath           = MESHES_PATH + std::to_string(finalMeshUID) + MESH_EXTENSION;
+
+        MetaMesh meta(finalMeshUID, savePath, generateTangents);
+        meta.Save(name, savePath);
 
 
         unsigned int bytesWritten  = (unsigned int)FileSystem::Save(savePath.c_str(), fileBuffer, size, true);
@@ -250,7 +251,7 @@ namespace MeshImporter
         App->GetLibraryModule()->AddMesh(finalMeshUID, name);
         App->GetLibraryModule()->AddResource(savePath, finalMeshUID);
 
-        GLOG("%s saved as binary", fileName.c_str());
+        GLOG("%s saved as binary", name);
 
         return finalMeshUID;
     }
@@ -260,6 +261,7 @@ namespace MeshImporter
         char* buffer          = nullptr;
 
         std::string path      = App->GetLibraryModule()->GetResourcePath(meshUID);
+        std::string name      = App->GetLibraryModule()->GetResourceName(meshUID);
 
         unsigned int fileSize = FileSystem::Load(path.c_str(), &buffer);
 
@@ -337,7 +339,8 @@ namespace MeshImporter
         float3 maxPos       = *reinterpret_cast<float3*>(cursor);
         cursor             += sizeof(float3);
 
-        ResourceMesh* mesh  = new ResourceMesh(meshUID, FileSystem::GetFileNameWithoutExtension(path), maxPos, minPos);
+
+        ResourceMesh* mesh  = new ResourceMesh(meshUID, name, maxPos, minPos);
 
         mesh->LoadData(mode, tmpVertices, tmpIndices);
 

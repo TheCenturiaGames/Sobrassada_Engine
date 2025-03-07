@@ -248,12 +248,12 @@ bool LibraryModule::LoadLibraryMaps()
         {
             std::string filePath = entry.path().string();
 
-            std::string fileName = FileSystem::GetFileNameWithoutExtension(filePath);
 
             rapidjson::Document doc;
             if (!FileSystem::LoadJSON(filePath.c_str(), doc)) continue;
 
             UID assetUID             = doc["UID"].GetUint64();
+            std::string assetName    = doc["name"].GetString();
             std::string originalPath = doc["originalPath"].GetString();
 
             UID prefix               = assetUID / 100000000000000;
@@ -261,15 +261,18 @@ bool LibraryModule::LoadLibraryMaps()
             switch (prefix)
             {
             case 13:
-                AddMesh(assetUID, fileName);
+                AddMesh(assetUID, assetName);
+                AddName(assetName, assetUID);
                 AddResource(originalPath, assetUID);
                 break;
             case 12:
-                AddMaterial(assetUID, fileName);
+                AddMaterial(assetUID, assetName);
+                AddName(assetName, assetUID);
                 AddResource(originalPath, assetUID);
                 break;
             case 11:
-                AddTexture(assetUID, fileName);
+                AddTexture(assetUID, assetName);
+                AddName(assetName, assetUID);
                 AddResource(originalPath, assetUID);
                 break;
             default:
@@ -284,7 +287,7 @@ bool LibraryModule::LoadLibraryMaps()
 
 UID LibraryModule::AssignFiletypeUID(UID originalUID, const std::string& filePath)
 {
-
+    
     uint64_t prefix = 10; // Default prefix "99" for unknown files
     if (FileSystem::GetFileExtension(filePath) == MESH_EXTENSION)
     {
@@ -317,6 +320,11 @@ void LibraryModule::AddMesh(UID meshUID, const std::string& sobPath)
 void LibraryModule::AddMaterial(UID materialUID, const std::string& matPath)
 {
     materialMap[matPath] = materialUID; // Map the texture UID to its DDS path
+}
+
+void LibraryModule::AddName(const std::string& resourceName, UID resourceUID)
+{
+    namesMap[resourceUID] = resourceName;
 }
 
 UID LibraryModule::GetTextureUID(const std::string& texturePath) const
@@ -362,6 +370,19 @@ const std::string& LibraryModule::GetResourcePath(UID resourceID) const
     {
         GLOG("requested uid: %llu", resourceID);
         GLOG("obtained path: %s", it->second.c_str());
+        return it->second;
+    }
+    static const std::string emptyString = "";
+    return emptyString;
+}
+
+const std::string& LibraryModule::GetResourceName(UID resourceID) const
+{
+    auto it = namesMap.find(resourceID);
+    if (it != namesMap.end())
+    {
+        GLOG("requested uid: %llu", resourceID);
+        GLOG("obtained name: %s", it->second.c_str());
         return it->second;
     }
     static const std::string emptyString = "";

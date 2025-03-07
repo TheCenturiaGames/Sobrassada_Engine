@@ -13,7 +13,7 @@ class MetaFile
     virtual ~MetaFile() = default;
 
     virtual void AddImportOptions(rapidjson::Document& doc, rapidjson::Document::AllocatorType& allocator) const = 0;
-    void Save(const std::string& assetPath) const;
+    void Save(const std::string& name, const std::string& assetPath) const;
 
   private:
     UID assetUID;

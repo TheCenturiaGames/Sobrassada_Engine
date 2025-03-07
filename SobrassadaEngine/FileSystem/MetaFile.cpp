@@ -12,17 +12,21 @@ MetaFile::MetaFile(UID uid, const std::string& assetPath)
 {
 }
 
-void MetaFile::Save(const std::string& assetPath) const
+void MetaFile::Save(const std::string& name, const std::string& assetPath) const
 {
     rapidjson::Document doc;
     doc.SetObject();
     rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
+
+    rapidjson::Value nameValue;
+    nameValue.SetString(name.c_str(), static_cast<rapidjson::SizeType>(name.length()), allocator);
 
     rapidjson::Value pathValue;
     pathValue.SetString(assetPath.c_str(), static_cast<rapidjson::SizeType>(assetPath.length()), allocator);
 
     // Common metadata fields
     doc.AddMember("UID", assetUID, allocator);
+    doc.AddMember("name", nameValue, allocator);
     doc.AddMember("lastModifiedDate", static_cast<uint64_t>(lastModified), allocator);
     doc.AddMember("originalPath", pathValue, allocator);
     AddImportOptions(doc, allocator);
@@ -32,9 +36,9 @@ void MetaFile::Save(const std::string& assetPath) const
     doc.Accept(writer);
 
     std::string savePath     = FileSystem::GetFilePath(assetPath);
-    std::string name         = FileSystem::GetFileNameWithoutExtension(assetPath);
+    std::string saveName     = FileSystem ::GetFileNameWithoutExtension(assetPath);
     // Save to .meta file
-    std::string metaFilePath = savePath + name + META_EXTENSION;
+    std::string metaFilePath = savePath + saveName + META_EXTENSION;
     unsigned int bytesWritten =
         (unsigned int)FileSystem::Save(metaFilePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
 

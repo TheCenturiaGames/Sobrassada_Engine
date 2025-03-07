@@ -21,7 +21,7 @@ UID MaterialImporter::ImportMaterial(
     // ADD OLD LOADING
 
     Material material;
-    //KHR_materials_pbrSpecularGlossiness extension
+    // KHR_materials_pbrSpecularGlossiness extension
     if (it != gltfMaterial.extensions.end())
     {
 
@@ -93,7 +93,7 @@ UID MaterialImporter::ImportMaterial(
             }
         }
     }
-    //pbrMetallicRoughness extension
+    // pbrMetallicRoughness extension
     else if (gltfMaterial.pbrMetallicRoughness.baseColorFactor.size() == 4)
     {
         const auto& pbr = gltfMaterial.pbrMetallicRoughness;
@@ -148,20 +148,19 @@ UID MaterialImporter::ImportMaterial(
         }
     }
 
-    UID materialUID      = GenerateUID();
+    UID materialUID           = GenerateUID();
 
-    std::string savePath = MATERIALS_PATH + std::string("Material") + MATERIAL_EXTENSION;
-    UID finalMaterialUID = App->GetLibraryModule()->AssignFiletypeUID(materialUID, savePath);
+    std::string fileType      = std::string("Material") + MATERIAL_EXTENSION;
+    UID finalMaterialUID      = App->GetLibraryModule()->AssignFiletypeUID(materialUID, fileType);
 
-    // we dont have names for auto materials!!
-    savePath             = MATERIALS_PATH + name + MATERIAL_EXTENSION;
+    std::string savePath      = MATERIALS_PATH + std::to_string(finalMaterialUID) + MATERIAL_EXTENSION;
 
     // replace "" with shader used (example)
-    UID tmpName          = GenerateUID();
+    UID tmpName               = GenerateUID();
     std::string tmpNameString = std::to_string(tmpName);
 
     MetaMaterial meta(finalMaterialUID, savePath, tmpNameString, useOcclusion);
-    meta.Save(savePath);
+    meta.Save(name, savePath);
 
     material.SetMaterialUID(finalMaterialUID);
     unsigned int size = sizeof(Material);
@@ -191,6 +190,7 @@ ResourceMaterial* MaterialImporter::LoadMaterial(UID materialUID)
     char* buffer          = nullptr;
 
     std::string path      = App->GetLibraryModule()->GetResourcePath(materialUID);
+    std::string name      = App->GetLibraryModule()->GetResourceName(materialUID);
 
     unsigned int fileSize = FileSystem::Load(path.c_str(), &buffer);
 
@@ -205,7 +205,7 @@ ResourceMaterial* MaterialImporter::LoadMaterial(UID materialUID)
     // Create Mesh
     Material mat               = *reinterpret_cast<Material*>(cursor);
 
-    ResourceMaterial* material = new ResourceMaterial(materialUID, FileSystem::GetFileNameWithoutExtension(path));
+    ResourceMaterial* material = new ResourceMaterial(materialUID, name);
 
     material->LoadMaterialData(mat);
 

@@ -52,15 +52,17 @@ namespace TextureImporter
         }
 
         UID textureUID       = GenerateUID();
-        std::string savePath = TEXTURES_PATH + std::string("Texture") + TEXTURE_EXTENSION;
-        UID finalTextureUID  = App->GetLibraryModule()->AssignFiletypeUID(textureUID, savePath);
+
         std::string fileName = FileSystem::GetFileNameWithoutExtension(filePath);
-        
-        savePath = TEXTURES_PATH + fileName + TEXTURE_EXTENSION;
+
+        std::string fileType = fileName + TEXTURE_EXTENSION;
+
+        UID finalTextureUID  = App->GetLibraryModule()->AssignFiletypeUID(textureUID, fileType);
+
+        std::string savePath = TEXTURES_PATH + std::to_string(finalTextureUID) + TEXTURE_EXTENSION;
 
         MetaTexture meta(finalTextureUID, savePath, (int)image.GetMetadata().mipLevels);
-        meta.Save(savePath);
-
+        meta.Save(fileName, savePath);
 
         unsigned int size =
             FileSystem::Save(savePath.c_str(), blob.GetBufferPointer(), (unsigned int)blob.GetBufferSize());

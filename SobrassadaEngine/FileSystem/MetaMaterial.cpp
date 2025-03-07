@@ -1,6 +1,8 @@
 #include "MetaMaterial.h"
 
-MetaMaterial::MetaMaterial(UID uid, const std::string& assetPath, const std::string& shader, bool useOcclusion)
+MetaMaterial::MetaMaterial(
+    UID uid, const std::string& assetPath, const std::string& shader, bool useOcclusion
+)
     : MetaFile(uid, assetPath), shader(shader), useOcclusion(useOcclusion)
 {
 }
