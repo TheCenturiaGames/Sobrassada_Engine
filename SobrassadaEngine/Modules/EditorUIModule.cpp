@@ -61,6 +61,10 @@ bool EditorUIModule::Init()
     App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_E, [&] { mCurrentGizmoOperation = ImGuizmo::ROTATE; });
     App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_R, [&] { mCurrentGizmoOperation = ImGuizmo::SCALE; });
 
+
+    //ANIMATIONTEST
+    animController = new AnimController();
+
     return true;
 }
 
@@ -82,11 +86,17 @@ update_status EditorUIModule::Update(float deltaTime)
     AddFramePlotData(deltaTime);
 
     //ANIMATION TEST
+    update_status returnStatus     = animController->Update(deltaTime);
     if (App->GetInputModule()->GetKey(SDL_SCANCODE_L))
     {
-        UID animation = 1508438283161640;
-        AnimController* animController = new AnimController();
+        UID animation                  = 1541456130771893;
+
         animController->Play(animation, false);
+        playAnimation = true;
+
+    }
+    if (playAnimation)
+    {
         float3 pos;
         Quat rot;
         animController->GetTransform("Hips", pos, rot);

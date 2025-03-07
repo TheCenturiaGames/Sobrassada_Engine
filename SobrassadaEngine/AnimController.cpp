@@ -1,6 +1,7 @@
 #include "AnimController.h"
 #include "ResourcesModule.h"
 #include "Application.h"
+#include <chrono>
 
 AnimController::AnimController() : resource(0), currentTime(0), loop(false)
 {
@@ -9,74 +10,9 @@ AnimController::AnimController() : resource(0), currentTime(0), loop(false)
 void AnimController::Play(UID newResource, bool shouldLoop)
 {
     resource    = newResource;
-    currentTime = 12.56;
+    currentTime = 0;
     loop        = shouldLoop;
     playAnimation = true;
-    ResourceAnimation* animation =
-        static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
-
-    if (!animation)
-    {
-        GLOG("ERROR: No se encontró la animación con UID: %llu", resource);
-        return; // Evita el crash
-    }
-
-    for (const auto& channelPair : animation->channels)
-    {
-        const std::string& nodeName = channelPair.first;
-        const Channel& animChannel  = channelPair.second;
-
-        uint32_t posIndex           = 0;
-        uint32_t rotIndex           = 0;
-
-        GLOG(
-            "Node: %s, Total Positions: %u, Total Rotations: %u", nodeName.c_str(), animChannel.numPositions,
-            animChannel.numRotations
-        );
-
-        while (posIndex < animChannel.numPositions || rotIndex < animChannel.numRotations)
-        {
-            if (posIndex < animChannel.numPositions &&
-                (rotIndex >= animChannel.numRotations ||
-                 animChannel.posTimeStamps[posIndex] <= animChannel.rotTimeStamps[rotIndex]))
-            {
-                const float timestamp  = animChannel.posTimeStamps[posIndex];
-                const float3& position = animChannel.positions[posIndex];
-
-                std::string logMessage =
-                    "Keyframe " + std::to_string(posIndex) + ": Time: " + std::to_string(timestamp);
-                logMessage += ", Translation: (" + std::to_string(position.x) + ", " + std::to_string(position.y) +
-                              ", " + std::to_string(position.z) + ")";
-
-                if (rotIndex < animChannel.numRotations &&
-                    animChannel.posTimeStamps[posIndex] == animChannel.rotTimeStamps[rotIndex])
-                {
-                    const Quat& rotation = animChannel.rotations[rotIndex];
-                    logMessage += ", Rotation: (" + std::to_string(rotation.x) + ", " + std::to_string(rotation.y) +
-                                  ", " + std::to_string(rotation.z) + ", " + std::to_string(rotation.w) + ")";
-                    rotIndex++;
-                }
-
-                GLOG("%s", logMessage.c_str());
-
-                posIndex++;
-            }
-            else if (rotIndex < animChannel.numRotations)
-            {
-                const float timestamp = animChannel.rotTimeStamps[rotIndex];
-                const Quat& rotation  = animChannel.rotations[rotIndex];
-
-                std::string logMessage =
-                    "Keyframe " + std::to_string(rotIndex) + ": Time: " + std::to_string(timestamp);
-                logMessage += ", Rotation: (" + std::to_string(rotation.x) + ", " + std::to_string(rotation.y) + ", " +
-                              std::to_string(rotation.z) + ", " + std::to_string(rotation.w) + ")";
-
-                GLOG("%s", logMessage.c_str());
-
-                rotIndex++;
-            }
-        }
-    }
 }
 
 void AnimController::Stop()
@@ -87,9 +23,13 @@ void AnimController::Stop()
     playAnimation = false;
 }
 
-update_status AnimController::Update()
+update_status AnimController::Update(float deltaTime)
 {
-    if (resource == 0) return UPDATE_CONTINUE; 
+
+    if (resource == 0) return UPDATE_CONTINUE;
+    
+
+    if (playAnimation == false) return UPDATE_CONTINUE;
 
     ResourceAnimation* animation =
         static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
@@ -98,25 +38,30 @@ update_status AnimController::Update()
     float duration = animation->GetDuration();
     if (duration <= 0.0f) return UPDATE_CONTINUE;
 
-   // currentTime += deltatime;
+    float delta_time   = (clock() * 1000.0f) / CLOCKS_PER_SEC;
+
+    currentTime        = delta_time / 1000.0f;
+
 
     if (currentTime > duration)
     {
         if (loop)
         {
-            
+            currentTime = 0; 
         }
         else
         {
-            //currentTime = duration; 
+            currentTime = duration; 
         }
     }
-
+    GLOG("CURRENTIME: %f", currentTime);
+    
     return UPDATE_CONTINUE;
 }
 
 void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat& rot)
 {
+
     ResourceAnimation* animation =
         static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
 
@@ -128,36 +73,99 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
     {
         if (animChannel->numPositions == 1)
         {
-            pos = animChannel->positions[0]; 
+            pos = animChannel->positions[0];
         }
         else
         {
             auto upper = std::upper_bound(
-                animChannel->posTimeStamps.get(), animChannel->posTimeStamps.get() + animChannel->numPositions, currentTime
+                animChannel->posTimeStamps.get(), animChannel->posTimeStamps.get() + animChannel->numPositions,
+                currentTime
             );
 
             size_t index = upper - animChannel->posTimeStamps.get();
 
-             if (index == 0)
+            if (index == 0)
             {
-               pos = animChannel->positions[0]; 
+                pos = animChannel->positions[0];
             }
             else if (index >= animChannel->numPositions)
             {
-                pos =
-                    animChannel->positions[animChannel->numPositions - 1]; 
+                pos = animChannel->positions[animChannel->numPositions - 1];
             }
             else
             {
-                float lambda = (currentTime - animChannel->posTimeStamps[index-1]) /
-                               (animChannel->posTimeStamps[index] - animChannel->posTimeStamps[index-1]);
+                float lambda = (currentTime - animChannel->posTimeStamps[index - 1]) /
+                               (animChannel->posTimeStamps[index] - animChannel->posTimeStamps[index - 1]);
                 float3 interpolation =
                     PosInterpolate(animChannel->positions[index], animChannel->positions[index - 1], lambda);
                 GLOG(
-                    "CURRENTTime: %f y position: (%f,%f,%f)", currentTime,interpolation.x, interpolation.y,
+                    "CURRENTTime: %f y position: (%f,%f,%f)", currentTime, interpolation.x, interpolation.y,
                     interpolation.z
                 );
             }
         }
     }
+    if (animChannel->rotations && animChannel->numRotations > 0)
+    {
+        if (animChannel->numRotations == 1)
+        {
+            rot = animChannel->rotations[0];
+        }
+        else
+        {
+            auto upper = std::upper_bound(
+                animChannel->rotTimeStamps.get(), animChannel->rotTimeStamps.get() + animChannel->numRotations,
+                currentTime
+            );
+
+            size_t index = upper - animChannel->rotTimeStamps.get();
+
+            if (index == 0)
+            {
+                rot = animChannel->rotations[0];
+            }
+            else if (index >= animChannel->numRotations)
+            {
+                rot = animChannel->rotations[animChannel->numRotations - 1];
+            }
+            else
+            {
+                float lambda = (currentTime - animChannel->rotTimeStamps[index - 1]) /
+                               (animChannel->rotTimeStamps[index] - animChannel->rotTimeStamps[index - 1]);
+                Quat interpolation =
+                    QuatInterpolate(animChannel->rotations[index], animChannel->rotations[index - 1], lambda);
+                GLOG(
+                    "CURRENTTime: %f y rotation: (%f,%f,%f,%f)", currentTime, interpolation.x, interpolation.y,
+                    interpolation.z, interpolation.w
+                );
+            }
+        }
+    }
+}
+
+float3 AnimController::PosInterpolate(const float3& first, const float3& second, float lambda)
+{
+    return first * (1.0f - lambda) + second * lambda;
+}
+
+Quat AnimController::QuatInterpolate(const Quat& first, const Quat& second, float lambda)
+{
+    Quat result;
+    float dot = first.Dot(second);
+    if (dot >= 0.0f)
+    {
+        result.x = first.x * (1.0f - lambda) + second.x * lambda;
+        result.y = first.y * (1.0f - lambda) + second.y * lambda;
+        result.z = first.z * (1.0f - lambda) + second.z * lambda;
+        result.w = first.w * (1.0f - lambda) + second.w * lambda;
+    }
+    else
+    {
+        result.x = first.x * (1.0f - lambda) - second.x * lambda;
+        result.y = first.y * (1.0f - lambda) - second.y * lambda;
+        result.z = first.z * (1.0f - lambda) - second.z * lambda;
+        result.w = first.w * (1.0f - lambda) - second.w * lambda;
+    }
+    result.Normalize();
+    return result;
 }

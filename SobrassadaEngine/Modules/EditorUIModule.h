@@ -12,6 +12,9 @@
 // guizmo after imgui include
 #include "./Libs/ImGuizmo/ImGuizmo.h"
 
+//Animation test
+#include "AnimController.h"
+
 struct CPUFeature
 {
     SDL_bool (*check)();
@@ -92,4 +95,8 @@ class EditorUIModule : public Module
 
     int transformType = LOCAL;
     ImGuizmo::OPERATION mCurrentGizmoOperation;
+
+    //Test animation
+    bool playAnimation = false;
+    AnimController* animController = nullptr;
 };
