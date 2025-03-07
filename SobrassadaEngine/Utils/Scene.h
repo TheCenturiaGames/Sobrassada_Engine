@@ -25,7 +25,7 @@ class Scene
     void LoadComponents() const;
     void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
 
-    update_status Render(float deltaTime);
+    update_status Render(float deltaTime) const;
     update_status RenderEditor(float deltaTime);
     void RenderScene();
     void RenderSelectedGameObjectUI();

@@ -153,7 +153,7 @@ void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGa
     UpdateSpatialDataStruct();
 }
 
-update_status Scene::Render(float deltaTime)
+update_status Scene::Render(float deltaTime) const
 {
     lightsConfig->RenderSkybox();
     lightsConfig->RenderLights();
