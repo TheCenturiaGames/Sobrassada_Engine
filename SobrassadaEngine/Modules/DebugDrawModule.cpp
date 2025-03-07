@@ -4,9 +4,9 @@
 #include "CameraModule.h"
 #include "Globals.h"
 #include "MathGeoLib.h"
+#include "OpenGLModule.h"
 #include "QuadtreeViewer.h"
 #include "WindowModule.h"
-#include "OpenGLModule.h"
 
 #include "SDL_video.h"
 #define DEBUG_DRAW_IMPLEMENTATION
@@ -619,10 +619,10 @@ update_status DebugDrawModule::Render(float deltaTime)
 
 void DebugDrawModule::Draw()
 {
-    auto projection = App->GetCameraModule()->GetProjectionMatrix();
-    auto view       = App->GetCameraModule()->GetViewMatrix();
-    int width       = 0;
-    int height      = 0;
+    const float4x4& projection = App->GetCameraModule()->GetProjectionMatrix();
+    const float4x4& view       = App->GetCameraModule()->GetViewMatrix();
+    int width                  = 0;
+    int height                 = 0;
 
     if (App->GetCameraModule()->IsCameraDetached())
     {
