@@ -76,7 +76,7 @@ void CameraModule::UpdateUBO()
 
 update_status CameraModule::Update(float deltaTime)
 {
-    if (App->GetSceneModule()->GetDoInputs()) Controls(deltaTime);
+    if (App->GetSceneModule()->GetDoInputsEditor()) Controls(deltaTime);
 
     viewMatrix         = camera.ViewMatrix();
     detachedViewMatrix = detachedCamera.ViewMatrix();

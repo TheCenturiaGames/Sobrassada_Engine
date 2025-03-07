@@ -103,7 +103,10 @@ class SceneModule : public Module
     const char* GetSceneName() const { return loadedScene != nullptr ? loadedScene->GetSceneName() : "Not loaded"; }
     bool IsInPlayMode() const { return isPlayMode; }
     LightsConfig* GetLightsConfig() { return loadedScene != nullptr ? loadedScene->GetLightsConfig() : nullptr; }
+
     bool GetDoInputs() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() : false; }
+    bool GetDoInputsEditor() { return loadedScene != nullptr ? loadedScene->GetDoInputs() && !isPlayMode : false; }
+    bool GetDoInputsGame() { return loadedScene != nullptr ? loadedScene->GetDoInputs() && isPlayMode : false; }
 
   private:
     Scene* loadedScene = nullptr;
