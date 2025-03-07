@@ -63,6 +63,7 @@ void ResourceMaterial::OnEditorUpdate()
         }
 
         updated |= ImGui::SliderFloat3("Specular Color", &material.specColor.x, 0.0f, 1.0f);
+        if (!material.shininessInAlpha) updated |= ImGui::SliderFloat("Shininess", &material.shininess, 0.0f, 500.0f);
     }
 
     if (normalTexture.textureID != 0)
@@ -74,8 +75,6 @@ void ResourceMaterial::OnEditorUpdate()
             ImGui::SetTooltip("Texture Dimensions: %d, %d", normalTexture.width, normalTexture.height);
         }
     }
-
-    if (!material.shininessInAlpha) updated |= ImGui::SliderFloat("Shininess", &material.shininess, 0.0f, 500.0f);
 
     if (updated) UpdateUBO();
 }
