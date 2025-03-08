@@ -9,18 +9,16 @@
 
 namespace TextureImporter
 {
-    UID Import(const char* filePath)
+    UID Import(const char* sourceFilePath)
     {
         // Copy image to Assets folder
+        std::string copyPath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
+        if (!FileSystem::Exists(copyPath.c_str()))
         {
-            std::string copyPath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(filePath);
-            if (!FileSystem::Exists(copyPath.c_str()))
-            {
-                FileSystem::Copy(filePath, copyPath.c_str());
-            }
+            FileSystem::Copy(sourceFilePath, copyPath.c_str());
         }
 
-        std::string textureStr = std::string(filePath);
+        std::string textureStr = std::string(sourceFilePath);
         std::wstring wPath     = std::wstring(textureStr.begin(), textureStr.end());
 
         DirectX::ScratchImage image;
@@ -34,7 +32,7 @@ namespace TextureImporter
                 hr = DirectX::LoadFromDDSFile(wPath.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, image);
                 if (FAILED(hr))
                 {
-                    GLOG("Failed to load texture: %s", filePath);
+                    GLOG("Failed to load texture: %s", sourceFilePath);
                     return 0;
                 }
             }
@@ -47,35 +45,30 @@ namespace TextureImporter
 
         if (FAILED(hr))
         {
-            GLOG("Failed to save texture in memory: %s", filePath);
+            GLOG("Failed to save texture in memory: %s", sourceFilePath);
             return 0;
         }
 
-        UID textureUID       = GenerateUID();
+        UID textureUID        = GenerateUID();
+        UID finalTextureUID   = App->GetLibraryModule()->AssignFiletypeUID(textureUID, FileType::Texture);
 
-        std::string fileName = FileSystem::GetFileNameWithoutExtension(filePath);
+        std::string fileName  = FileSystem::GetFileNameWithExtension(sourceFilePath);
+        MetaTexture meta(finalTextureUID, copyPath, (int)image.GetMetadata().mipLevels);
+        meta.Save(fileName, copyPath);
 
-        std::string fileType = fileName + TEXTURE_EXTENSION;
+        std::string saveFilePath = TEXTURES_PATH + std::to_string(finalTextureUID) + TEXTURE_EXTENSION;
+        unsigned int bytesWritten =
+            FileSystem::Save(saveFilePath.c_str(), blob.GetBufferPointer(), (unsigned int)blob.GetBufferSize());
 
-        UID finalTextureUID  = App->GetLibraryModule()->AssignFiletypeUID(textureUID, fileType);
-
-        std::string savePath = TEXTURES_PATH + std::to_string(finalTextureUID) + TEXTURE_EXTENSION;
-
-        MetaTexture meta(finalTextureUID, savePath, (int)image.GetMetadata().mipLevels);
-        meta.Save(fileName, savePath);
-
-        unsigned int size =
-            FileSystem::Save(savePath.c_str(), blob.GetBufferPointer(), (unsigned int)blob.GetBufferSize());
-
-        if (size == 0)
+        if (bytesWritten == 0)
         {
-            GLOG("Failed to save DDS file: %s", savePath.c_str());
+            GLOG("Failed to save DDS file: %s", fileName.c_str());
             return 0;
         }
 
         // added texture to textures map
         App->GetLibraryModule()->AddTexture(finalTextureUID, fileName);
-        App->GetLibraryModule()->AddResource(savePath, finalTextureUID);
+        App->GetLibraryModule()->AddResource(saveFilePath, finalTextureUID);
 
         GLOG("%s saved as dds", fileName.c_str());
 

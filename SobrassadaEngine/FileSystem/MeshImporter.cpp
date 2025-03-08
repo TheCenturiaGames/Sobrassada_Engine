@@ -15,7 +15,7 @@ namespace MeshImporter
 
     UID ImportMesh(
         const tinygltf::Model& model, const tinygltf::Mesh& mesh, const tinygltf::Primitive& primitive,
-        const std::string& name, const char* filePath
+        const std::string& name, const char* sourceFilePath
     )
     {
         enum DataType dataType = UNSIGNED_CHAR;
@@ -25,11 +25,11 @@ namespace MeshImporter
         std::vector<unsigned short> indexBufferShort;
         std::vector<unsigned int> indexBufferInt;
         size_t posStride = 0, tanStride = 0, texStride = 0, normStride = 0;
-        float3 minPos     = {0.0f, 0.0f, 0.0f};
-        float3 maxPos     = {0.0f, 0.0f, 0.0f};
+        float3 minPos         = {0.0f, 0.0f, 0.0f};
+        float3 maxPos         = {0.0f, 0.0f, 0.0f};
         bool generateTangents = false;
 
-        const auto& itPos = primitive.attributes.find("POSITION");
+        const auto& itPos     = primitive.attributes.find("POSITION");
         if (itPos != primitive.attributes.end())
         {
             const tinygltf::Accessor& posAcc    = model.accessors[itPos->second];
@@ -223,35 +223,31 @@ namespace MeshImporter
         memcpy(cursor, &minPos, sizeof(float3));
         cursor += sizeof(float3);
         memcpy(cursor, &maxPos, sizeof(float3));
-        cursor                    += sizeof(float3);
+        cursor                += sizeof(float3);
 
-        UID meshUID                = GenerateUID();
+        UID meshUID            = GenerateUID();
+        UID finalMeshUID       = App->GetLibraryModule()->AssignFiletypeUID(meshUID, FileType::Mesh);
 
-        std::string fileType            = std::string("name") + MESH_EXTENSION;
+        std::string assetPath   = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
+        MetaMesh meta(finalMeshUID, assetPath, generateTangents);
+        meta.Save(name, assetPath);
 
-        UID finalMeshUID             = App->GetLibraryModule()->AssignFiletypeUID(meshUID, fileType);
-
-        std::string savePath           = MESHES_PATH + std::to_string(finalMeshUID) + MESH_EXTENSION;
-
-        MetaMesh meta(finalMeshUID, savePath, generateTangents);
-        meta.Save(name, savePath);
-
-
-        unsigned int bytesWritten  = (unsigned int)FileSystem::Save(savePath.c_str(), fileBuffer, size, true);
+        std::string saveFilePath  = MESHES_PATH + std::to_string(finalMeshUID) + MESH_EXTENSION;
+        unsigned int bytesWritten = (unsigned int)FileSystem::Save(saveFilePath.c_str(), fileBuffer, size, true);
 
         delete[] fileBuffer;
 
         if (bytesWritten == 0)
         {
-            GLOG("Failed to save mesh file: %s", savePath.c_str());
+            GLOG("Failed to save mesh file: %s", saveFilePath.c_str());
             return 0;
         }
 
         // added mesh to meshes map
         App->GetLibraryModule()->AddMesh(finalMeshUID, name);
-        App->GetLibraryModule()->AddResource(savePath, finalMeshUID);
+        App->GetLibraryModule()->AddResource(saveFilePath, finalMeshUID);
 
-        GLOG("%s saved as binary", name);
+        GLOG("%s saved as binary", name.c_str());
 
         return finalMeshUID;
     }
@@ -338,7 +334,6 @@ namespace MeshImporter
         cursor             += sizeof(float3);
         float3 maxPos       = *reinterpret_cast<float3*>(cursor);
         cursor             += sizeof(float3);
-
 
         ResourceMesh* mesh  = new ResourceMesh(meshUID, name, maxPos, minPos);
 

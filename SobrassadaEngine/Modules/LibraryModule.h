@@ -12,6 +12,14 @@ enum class SaveMode
     SaveAs
 };
 
+enum class FileType
+{
+    Texture,
+    Material,
+    Mesh,
+    Scene
+};
+
 class LibraryModule : public Module
 {
 
@@ -25,7 +33,7 @@ class LibraryModule : public Module
     bool LoadScene(const char* path, bool reload = false) const;
 
     bool LoadLibraryMaps();
-    UID AssignFiletypeUID(UID originalUID, const std::string& filePath);
+    UID AssignFiletypeUID(UID originalUID, FileType fileType);
 
     void AddTexture(UID textureUID, const std::string& ddsPath);
     void AddMesh(UID meshUID, const std::string& matPath);

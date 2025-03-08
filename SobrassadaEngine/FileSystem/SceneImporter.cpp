@@ -25,20 +25,9 @@ namespace SceneImporter
 
     void ImportGLTF(const char* filePath)
     {
-        // Copy gltf to Assets folder
-        {
-            std::string copyPath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(filePath);
-
-            if (!FileSystem::Exists(copyPath.c_str()))
-            {
-                FileSystem::Copy(filePath, copyPath.c_str());
-            }
-        }
-
         tinygltf::TinyGLTF gltfContext;
         tinygltf::Model model;
         std::string err, warn, name;
-        int n    = 0;
 
         bool ret = gltfContext.LoadASCIIFromFile(&model, &err, &warn, std::string(filePath));
         if (!ret)
@@ -59,33 +48,39 @@ namespace SceneImporter
             }
         }
 
-        std::string path = FileSystem::GetFilePath(filePath);
-
-        // Copy bin to Assets folder
-        for (const auto& srcBuffers : model.buffers)
         {
-            std::string binPath  = path + srcBuffers.uri;
-            std::string copyPath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(binPath);
-            if (!FileSystem::Exists(copyPath.c_str()))
+            // Copy gltf to Assets folder
+            std::string copyPath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(filePath);
+            if (!FileSystem::Exists(copyPath.c_str())) FileSystem::Copy(filePath, copyPath.c_str());
+        }
+        {
+            std::string path = FileSystem::GetFilePath(filePath);
+
+            // Copy bin to Assets folder
+            for (const auto& srcBuffers : model.buffers)
             {
-                FileSystem::Copy(binPath.c_str(), copyPath.c_str());
+                std::string binPath     = path + srcBuffers.uri;
+                std::string copyBinPath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(binPath);
+                if (!FileSystem::Exists(copyBinPath.c_str())) FileSystem::Copy(binPath.c_str(), copyBinPath.c_str());
             }
         }
 
-        for (const auto &srcMesh : model.meshes)
+        std::vector<int> matIndices;
+        for (const auto& srcMesh : model.meshes)
         {
             name         = srcMesh.name;
-            n            = 0;
-            int matIndex = 0;
+            int matIndex = -1;
             for (const auto& primitive : srcMesh.primitives)
             {
-                name += std::to_string(n);
-
                 MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath);
-                matIndex = primitive.material;
 
-                MaterialImporter::ImportMaterial(model, matIndex, name, filePath);
-                n++;
+                matIndex = primitive.material;
+                if (matIndex == -1) GLOG("Material index invalid for mesh: %s", name.c_str())
+                else if (std::find(matIndices.begin(), matIndices.end(), matIndex) == matIndices.end())
+                {
+                    MaterialImporter::ImportMaterial(model, matIndex, name, filePath);
+                    matIndices.push_back(matIndex);
+                }
             }
         }
     }
@@ -97,6 +92,13 @@ namespace SceneImporter
             if (!FileSystem::CreateDirectories(ASSETS_PATH))
             {
                 GLOG("Failed to create directory: %s", ASSETS_PATH);
+            }
+        }
+        if (!FileSystem::IsDirectory(METADATA_PATH))
+        {
+            if (!FileSystem::CreateDirectories(METADATA_PATH))
+            {
+                GLOG("Failed to create directory: %s", METADATA_PATH);
             }
         }
         if (!FileSystem::IsDirectory(ANIMATIONS_PATH))

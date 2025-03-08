@@ -27,7 +27,7 @@ void MetaFile::Save(const std::string& name, const std::string& assetPath) const
     // Common metadata fields
     doc.AddMember("UID", assetUID, allocator);
     doc.AddMember("name", nameValue, allocator);
-    doc.AddMember("lastModifiedDate", static_cast<uint64_t>(lastModified), allocator);
+    doc.AddMember("lastModifiedDate", static_cast<UID>(lastModified), allocator);
     doc.AddMember("originalPath", pathValue, allocator);
     AddImportOptions(doc, allocator);
 
@@ -35,12 +35,9 @@ void MetaFile::Save(const std::string& name, const std::string& assetPath) const
     rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
     doc.Accept(writer);
 
-    std::string savePath     = FileSystem::GetFilePath(assetPath);
-    std::string saveName     = FileSystem ::GetFileNameWithoutExtension(assetPath);
-    // Save to .meta file
-    std::string metaFilePath = savePath + saveName + META_EXTENSION;
+    std::string savePath = METADATA_PATH + name + META_EXTENSION;
     unsigned int bytesWritten =
-        (unsigned int)FileSystem::Save(metaFilePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
+        (unsigned int)FileSystem::Save(savePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
 
     if (bytesWritten == 0) GLOG("Failed to save meta file: %s", assetPath.c_str());
 }

@@ -100,7 +100,7 @@ namespace FileSystem
 
         std::error_code errorCode;
         std::filesystem::copy(
-            sourceFilePath, destinationFilePath, std::filesystem::copy_options::overwrite_existing, errorCode
+            sourceFilePath, destinationFilePath, std::filesystem::copy_options::update_existing, errorCode
         );
 
         if (errorCode)

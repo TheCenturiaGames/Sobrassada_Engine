@@ -9,10 +9,10 @@
 #include <FileSystem>
 
 UID MaterialImporter::ImportMaterial(
-    const tinygltf::Model& model, int materialIndex, const std::string& name, const char* filePath
+    const tinygltf::Model& model, int materialIndex, const std::string& name, const char* sourceFilePath
 )
 {
-    std::string path                       = FileSystem::GetFilePath(filePath);
+    std::string path                       = FileSystem::GetFilePath(sourceFilePath);
     bool useOcclusion                      = false;
     const tinygltf::Material& gltfMaterial = model.materials[materialIndex];
     const std::string materialName         = gltfMaterial.name;
@@ -148,37 +148,35 @@ UID MaterialImporter::ImportMaterial(
         }
     }
 
-    UID materialUID           = GenerateUID();
-
-    std::string fileType      = std::string("Material") + MATERIAL_EXTENSION;
-    UID finalMaterialUID      = App->GetLibraryModule()->AssignFiletypeUID(materialUID, fileType);
-
-    std::string savePath      = MATERIALS_PATH + std::to_string(finalMaterialUID) + MATERIAL_EXTENSION;
-
-    // replace "" with shader used (example)
-    UID tmpName               = GenerateUID();
-    std::string tmpNameString = std::to_string(tmpName);
-
-    MetaMaterial meta(finalMaterialUID, savePath, tmpNameString, useOcclusion);
-    meta.Save(name, savePath);
+    UID materialUID      = GenerateUID();
+    UID finalMaterialUID = App->GetLibraryModule()->AssignFiletypeUID(materialUID, FileType::Material);
 
     material.SetMaterialUID(finalMaterialUID);
     unsigned int size = sizeof(Material);
     char* fileBuffer  = new char[size];
     memcpy(fileBuffer, &material, sizeof(Material));
 
-    unsigned int bytesWritten = (unsigned int)FileSystem::Save(savePath.c_str(), fileBuffer, size, true);
+    // replace "" with shader used (example)
+    UID tmpName               = GenerateUID();
+    std::string tmpNameString = std::to_string(tmpName);
+
+    std::string assetPath     = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
+    MetaMaterial meta(finalMaterialUID, assetPath, tmpNameString, useOcclusion);
+    meta.Save(materialName, assetPath);
+
+    std::string saveFilePath  = MATERIALS_PATH + std::to_string(finalMaterialUID) + MATERIAL_EXTENSION;
+    unsigned int bytesWritten = (unsigned int)FileSystem::Save(saveFilePath.c_str(), fileBuffer, size, true);
 
     delete[] fileBuffer;
 
     if (bytesWritten == 0)
     {
-        GLOG("Failed to save material: %s", savePath.c_str());
+        GLOG("Failed to save material: %s", materialName.c_str());
         return 0;
     }
 
     App->GetLibraryModule()->AddMaterial(finalMaterialUID, materialName);
-    App->GetLibraryModule()->AddResource(savePath, finalMaterialUID);
+    App->GetLibraryModule()->AddResource(saveFilePath, finalMaterialUID);
 
     GLOG("%s saved as material", materialName.c_str());
 

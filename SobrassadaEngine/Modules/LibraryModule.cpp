@@ -285,24 +285,27 @@ bool LibraryModule::LoadLibraryMaps()
     return true;
 }
 
-UID LibraryModule::AssignFiletypeUID(UID originalUID, const std::string& filePath)
+UID LibraryModule::AssignFiletypeUID(UID originalUID, FileType fileType)
 {
-    
-    uint64_t prefix = 10; // Default prefix "99" for unknown files
-    if (FileSystem::GetFileExtension(filePath) == MESH_EXTENSION)
+    UID prefix = 10; // Default prefix "99" for unknown files
+    switch (fileType)
     {
+    case FileType::Mesh:
         prefix = 13;
-    }
-    if (FileSystem::GetFileExtension(filePath) == MATERIAL_EXTENSION)
-    {
+        break;
+    case FileType::Material:
         prefix = 12;
-    }
-    if (FileSystem::GetFileExtension(filePath) == TEXTURE_EXTENSION)
-    {
+        break;
+    case FileType::Texture:
         prefix = 11;
+        break;
+    default:
+        GLOG("Category: Unknown File Type (10)");
+        break;
     }
+
     // GLOG("%llu", prefix)
-    uint64_t final = (prefix * 100000000000000) + (originalUID % 100000000000000);
+    UID final = (prefix * 100000000000000) + (originalUID % 100000000000000);
     GLOG("%llu", final);
     return final;
 }

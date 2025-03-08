@@ -60,6 +60,7 @@ enum update_status
 #define DEFAULT_CAMERA_ZOOM_SENSITIVITY      5.f;
 
 #define ASSETS_PATH     "Assets/"
+#define METADATA_PATH   "Assets/Metadata/"
 #define LIBRARY_PATH    "Library/"
 #define ANIMATIONS_PATH "Library/Animations/"
 #define AUDIO_PATH      "Library/Audio/"
@@ -95,8 +96,6 @@ constexpr float RAD_DEGREE_CONV                         = 180.f / PI;
 inline UID GenerateUID()
 {
     LCG rng;
-
     UID uid = static_cast<UID>(rng.IntFast()) << 32 | rng.IntFast(); // Combine two 32-bit values
-
     return uid;
 }
