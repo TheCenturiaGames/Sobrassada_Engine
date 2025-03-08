@@ -77,6 +77,7 @@ class GameObject
 private:
 
     void OnTransformUpdated();
+    void UpdateLocalTransform(const float4x4& parentGlobalTransform);
 
   public:
     inline static UID currentRenamingUID = INVALID_UUID;

@@ -284,6 +284,11 @@ void GameObject::OnTransformUpdated()
     globalAABB = AABB(globalOBB);
 }
 
+void GameObject::UpdateLocalTransform(const float4x4& parentGlobalTransform)
+{
+    localTransform = parentGlobalTransform.Inverted() * globalTransform;
+}
+
 void GameObject::RenderHierarchyNode(UID& selectedGameObjectUUID)
 {
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
@@ -448,6 +453,7 @@ void GameObject::UpdateGameObjectHierarchy(UID sourceUID)
 
         AddGameObject(sourceGameObject->GetUID());
 
+        sourceGameObject->UpdateLocalTransform(globalTransform);
         sourceGameObject->UpdateTransformForGOBranch();
     }
 }
