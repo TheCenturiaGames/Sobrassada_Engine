@@ -26,14 +26,11 @@ class ResourceMesh : public Resource
     const AABB& GetAABB() const { return aabb; }
     int GetIndexCount() const { return indexCount; }
 
-    void SetMaterial(UID materialUID) { this->material = materialUID; }
-
   private:
     unsigned int vbo         = 0;
     unsigned int ebo         = 0;
     unsigned int vao         = 0;
     unsigned int mode        = 0;
-    UID material             = CONSTANT_EMPTY_UID;
     unsigned int vertexCount = 0;
     unsigned int indexCount  = 0;
     AABB aabb;

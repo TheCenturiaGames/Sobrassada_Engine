@@ -54,13 +54,13 @@ class LibraryModule : public Module
     const std::unordered_map<std::string, UID>& GetMeshMap() const { return meshMap; }
 
   private:
-    // maps for user visual
-    std::unordered_map<std::string, UID> textureMap;  // name.dds -> UID
-    std::unordered_map<std::string, UID> materialMap; // name.mat -> UID
-    std::unordered_map<std::string, UID> meshMap;     // name.sob -> UID
-
-    std::unordered_map<UID, std::string> namesMap;  // UID -> name
+    // maps for user visuals | name -> UID
+    std::unordered_map<std::string, UID> textureMap;
+    std::unordered_map<std::string, UID> materialMap;
+    std::unordered_map<std::string, UID> meshMap;     
+    // inversed map          | UID -> name
+    std::unordered_map<UID, std::string> namesMap;
 
     // filled on load and import
-    std::unordered_map<UID, std::string> resourcePathsMap; // UID -> all resources path
+    std::unordered_map<UID, std::string> resourcePathsMap; // UID -> library path
 };

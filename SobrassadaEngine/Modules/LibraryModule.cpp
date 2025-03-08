@@ -240,40 +240,41 @@ bool LibraryModule::LoadScene(const char* path, bool reload) const
 
 bool LibraryModule::LoadLibraryMaps()
 {
-
-    for (const auto& entry : std::filesystem::recursive_directory_iterator(LIBRARY_PATH))
+    for (const auto& entry : std::filesystem::recursive_directory_iterator(METADATA_PATH))
     {
-
         if (entry.is_regular_file() && (FileSystem::GetFileExtension(entry.path().string()) == META_EXTENSION))
         {
             std::string filePath = entry.path().string();
 
-
             rapidjson::Document doc;
             if (!FileSystem::LoadJSON(filePath.c_str(), doc)) continue;
 
-            UID assetUID             = doc["UID"].GetUint64();
-            std::string assetName    = doc["name"].GetString();
-            std::string originalPath = doc["originalPath"].GetString();
+            UID assetUID          = doc["UID"].GetUint64();
+            std::string assetName = doc["name"].GetString();
+            std::string assetPath = doc["assetPath"].GetString();
 
-            UID prefix               = assetUID / 100000000000000;
+            UID prefix            = assetUID / UID_PREFIX_DIVISOR;
+            std::string libraryPath;
 
             switch (prefix)
             {
             case 13:
                 AddMesh(assetUID, assetName);
                 AddName(assetName, assetUID);
-                AddResource(originalPath, assetUID);
+                libraryPath = MESHES_PATH + std::to_string(assetUID) + MESH_EXTENSION;
+                if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 break;
             case 12:
                 AddMaterial(assetUID, assetName);
                 AddName(assetName, assetUID);
-                AddResource(originalPath, assetUID);
+                libraryPath = MATERIALS_PATH + std::to_string(assetUID) + MATERIAL_EXTENSION;
+                if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 break;
             case 11:
                 AddTexture(assetUID, assetName);
                 AddName(assetName, assetUID);
-                AddResource(originalPath, assetUID);
+                libraryPath = TEXTURES_PATH + std::to_string(assetUID) + TEXTURE_EXTENSION;
+                if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 break;
             default:
                 GLOG("Category: Unknown File Type (10)");
@@ -305,24 +306,24 @@ UID LibraryModule::AssignFiletypeUID(UID originalUID, FileType fileType)
     }
 
     // GLOG("%llu", prefix)
-    UID final = (prefix * 100000000000000) + (originalUID % 100000000000000);
+    UID final = (prefix * UID_PREFIX_DIVISOR) + (originalUID % UID_PREFIX_DIVISOR);
     GLOG("%llu", final);
     return final;
 }
 
-void LibraryModule::AddTexture(UID textureUID, const std::string& ddsPath)
+void LibraryModule::AddTexture(UID textureUID, const std::string& textureName)
 {
-    textureMap[ddsPath] = textureUID; // Map the texture UID to its DDS path
+    textureMap[textureName] = textureUID;
 }
 
-void LibraryModule::AddMesh(UID meshUID, const std::string& sobPath)
+void LibraryModule::AddMesh(UID meshUID, const std::string& meshName)
 {
-    meshMap[sobPath] = meshUID; // Map the texture UID to its DDS path
+    meshMap[meshName] = meshUID;
 }
 
-void LibraryModule::AddMaterial(UID materialUID, const std::string& matPath)
+void LibraryModule::AddMaterial(UID materialUID, const std::string& matName)
 {
-    materialMap[matPath] = materialUID; // Map the texture UID to its DDS path
+    materialMap[matName] = materialUID;
 }
 
 void LibraryModule::AddName(const std::string& resourceName, UID resourceUID)
@@ -332,38 +333,35 @@ void LibraryModule::AddName(const std::string& resourceName, UID resourceUID)
 
 UID LibraryModule::GetTextureUID(const std::string& texturePath) const
 {
-
     auto it = textureMap.find(texturePath);
     if (it != textureMap.end())
     {
         return it->second;
     }
 
-    return 0;
+    return INVALID_UUID;
 }
 
 UID LibraryModule::GetMeshUID(const std::string& meshPath) const
 {
-
     auto it = meshMap.find(meshPath);
     if (it != meshMap.end())
     {
         return it->second;
     }
 
-    return 0;
+    return INVALID_UUID;
 }
 
 UID LibraryModule::GetMaterialUID(const std::string& materialPath) const
 {
-
     auto it = materialMap.find(materialPath);
     if (it != materialMap.end())
     {
         return it->second;
     }
 
-    return 0;
+    return INVALID_UUID;
 }
 
 const std::string& LibraryModule::GetResourcePath(UID resourceID) const

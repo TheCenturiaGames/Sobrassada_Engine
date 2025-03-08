@@ -26,7 +26,7 @@ class Resource
     const std::string& GetName() const { return name; }
     ResourceType GetType() const { return type; }
     unsigned int GetReferenceCount() const { return referenceCount; }
-    static ResourceType GetResourceTypeForUID(UID uid) { return static_cast<ResourceType>(uid / 100000000000000); }
+    static ResourceType GetResourceTypeForUID(UID uid) { return static_cast<ResourceType>(uid / UID_PREFIX_DIVISOR); }
 
   protected:
     UID uid = CONSTANT_EMPTY_UID;

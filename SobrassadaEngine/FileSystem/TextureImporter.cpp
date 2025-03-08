@@ -52,7 +52,7 @@ namespace TextureImporter
         UID textureUID        = GenerateUID();
         UID finalTextureUID   = App->GetLibraryModule()->AssignFiletypeUID(textureUID, FileType::Texture);
 
-        std::string fileName  = FileSystem::GetFileNameWithExtension(sourceFilePath);
+        std::string fileName  = FileSystem::GetFileNameWithoutExtension(sourceFilePath);
         MetaTexture meta(finalTextureUID, copyPath, (int)image.GetMetadata().mipLevels);
         meta.Save(fileName, copyPath);
 

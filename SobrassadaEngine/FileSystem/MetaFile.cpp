@@ -27,8 +27,8 @@ void MetaFile::Save(const std::string& name, const std::string& assetPath) const
     // Common metadata fields
     doc.AddMember("UID", assetUID, allocator);
     doc.AddMember("name", nameValue, allocator);
+    doc.AddMember("assetPath", pathValue, allocator);
     doc.AddMember("lastModifiedDate", static_cast<UID>(lastModified), allocator);
-    doc.AddMember("originalPath", pathValue, allocator);
     AddImportOptions(doc, allocator);
 
     rapidjson::StringBuffer buffer;

@@ -60,6 +60,7 @@ enum update_status
 #define DEFAULT_CAMERA_ZOOM_SENSITIVITY      5.f;
 
 #define ASSETS_PATH     "Assets/"
+#define SCENES_PATH     "Assets/Scenes/"
 #define METADATA_PATH   "Assets/Metadata/"
 #define LIBRARY_PATH    "Library/"
 #define ANIMATIONS_PATH "Library/Animations/"
@@ -68,7 +69,6 @@ enum update_status
 #define MESHES_PATH     "Library/Meshes/"
 #define TEXTURES_PATH   "Library/Textures/"
 #define MATERIALS_PATH  "Library/Materials/"
-#define SCENES_PATH     "Library/Scenes/"
 
 #define ASSET_EXTENSION    ".gltf"
 #define MESH_EXTENSION     ".sobrassada"
@@ -81,6 +81,7 @@ enum update_status
 
 #define UID uint64_t
 
+constexpr UID UID_PREFIX_DIVISOR                        = 100000000000000;
 constexpr UID INVALID_UUID                              = 0;
 constexpr UID CONSTANT_EMPTY_UID                        = 0;
 

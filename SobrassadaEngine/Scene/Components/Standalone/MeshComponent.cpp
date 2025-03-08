@@ -105,7 +105,6 @@ void MeshComponent::AddMesh(UID resource, bool reloadAABB)
     if (newMesh != nullptr)
     {
         App->GetResourcesModule()->ReleaseResource(currentMesh);
-        newMesh->SetMaterial(currentMaterial != nullptr ? currentMaterial->GetUID() : CONSTANT_EMPTY_UID);
         currentMeshName    = newMesh->GetName();
         currentMesh        = newMesh;
         localComponentAABB = AABB(currentMesh->GetAABB());
