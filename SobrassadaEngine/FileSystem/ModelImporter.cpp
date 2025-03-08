@@ -47,7 +47,7 @@ namespace ModelImporter
                 {
                     const float4x4 matrix  = *reinterpret_cast<const float4x4*>(bufferMatrices);
                     bufferMatrices        += stride;
-                    inverseBindMatrices.push_back(matrix);
+                    inverseBindMatrices.push_back(matrix.Transposed());
                     GLOG("I: %d. %f, %f, %f, %f", i, matrix[0][0], matrix[0][1], matrix[0][2], matrix[0][3]);
                 }
                 GLOG("Bind matrices length: %d", inverseBindMatrices.size());
@@ -339,7 +339,7 @@ namespace ModelImporter
                 (float)node.matrix[8], (float)node.matrix[9], (float)node.matrix[10], (float)node.matrix[11],
                 (float)node.matrix[12], (float)node.matrix[13], (float)node.matrix[14], (float)node.matrix[15]
             );
-            return matrix;
+            return matrix.Transposed(); // Probably need the Transposed(), but has not been tested
         }
 
         // Default values

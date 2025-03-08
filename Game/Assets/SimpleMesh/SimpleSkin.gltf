@@ -12,12 +12,15 @@
 			"name": "RootNode"
 		},{
     "skin" : 0,
-    "mesh" : 0
+    "mesh" : 0,
+    "name": "Mesh"
   }, {
-    "children" : [ 3 ]
+    "children" : [ 3 ],
+    "name": "Bone 1"
   }, {
     "translation" : [ 0.0, 1.0, 0.0 ],
-    "rotation" : [ 0.0, 0.0, 0.0, 1.0 ]
+    "rotation" : [ 0.0, 0.0, 0.0, 1.0 ],
+    "name": "Bone 2"
   } ],
   
   "meshes" : [ {
@@ -33,7 +36,7 @@
 
   "skins" : [ {
     "inverseBindMatrices" : 4,
-    "joints" : [ 1, 2 ]
+    "joints" : [ 2, 3 ]
   } ],
   
   "animations" : [ {
