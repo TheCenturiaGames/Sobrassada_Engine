@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="Modules\WindowModule.cpp">
@@ -264,10 +264,24 @@
     <ClCompile Include="Modules\EditorUIModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
+    <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp" />
+    <ClCompile Include="Tests\MockGameObject.cpp" />
+    <ClCompile Include="UI\QuadtreeViewer.cpp" />
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp">
       <Filter>External\ImGuizmo</Filter>
     </ClCompile>
-    <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp" />
+    <ClCompile Include="FileSystem\MetaFile.cpp">
+      <Filter>FileSystem\Meta</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\MetaMaterial.cpp">
+      <Filter>FileSystem\Meta</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\MetaMesh.cpp">
+      <Filter>FileSystem\Meta</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\MetaTexture.cpp">
+      <Filter>FileSystem\Meta</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -305,6 +319,9 @@
     </Filter>
     <Filter Include="External\MathGeoLib">
       <UniqueIdentifier>{77ec05ef-e581-4de2-bda3-50c6c7bcc0d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FileSystem\Meta">
+      <UniqueIdentifier>{0325771a-d106-4c90-8e61-78de9e68b286}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -473,6 +490,18 @@
     </ClInclude>
     <ClInclude Include="Modules\EditorUIModule.h">
       <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\MetaFile.h">
+      <Filter>FileSystem\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\MetaMaterial.h">
+      <Filter>FileSystem\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\MetaMesh.h">
+      <Filter>FileSystem\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\MetaTexture.h">
+      <Filter>FileSystem\Meta</Filter>
     </ClInclude>
     <ClInclude Include="RaycastController.h">
       <Filter>Utils</Filter>

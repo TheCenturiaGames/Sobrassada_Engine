@@ -28,14 +28,11 @@ class ResourceMesh : public Resource
     const std::vector<Vertex>& GetLocalVertices() const { return vertices; }
     const std::vector<unsigned int>& GetIndices() const { return indices; }
 
-    void SetMaterial(UID materialUID) { this->material = materialUID; }
-
   private:
     unsigned int vbo         = 0;
     unsigned int ebo         = 0;
     unsigned int vao         = 0;
     unsigned int mode        = 0;
-    UID material             = CONSTANT_EMPTY_UID;
     unsigned int vertexCount = 0;
     unsigned int indexCount  = 0;
     AABB aabb;

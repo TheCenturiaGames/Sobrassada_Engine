@@ -47,14 +47,14 @@ class GameObject : public AABBUpdatable
     bool UpdateGameObjectHierarchy(UID sourceUID, UID targetUID);
     void RenameGameObjectHierarchy();
 
-    inline void AddChildren(UID childUUID) { children.push_back(childUUID); }
+    void AddChildren(UID childUUID) { children.push_back(childUUID); }
 
-    inline UID GetUID() const { return uuid; }
-    inline UID GetParent() const { return parentUUID; }
-    inline std::string GetName() const { return name; }
-    inline std::vector<UID> GetChildren() { return children; }
+    UID GetUID() const { return uuid; }
+    UID GetParent() const { return parentUUID; }
+    std::string GetName() const { return name; }
+    std::vector<UID> GetChildren() { return children; }
     RootComponent* GetRootComponent() const { return rootComponent; }
-    inline const AABB& GetAABB() const { return globalAABB; };
+    const AABB& GetAABB() const { return globalAABB; };
     const MeshComponent* GetMeshComponent() const;
 
     void SetName(std::string newName) { name = newName; }

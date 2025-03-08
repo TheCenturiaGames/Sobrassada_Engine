@@ -62,8 +62,9 @@ bool CameraModule::Init()
     glBufferData(GL_UNIFORM_BUFFER, sizeof(CameraMatrices), nullptr, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-    // REMOVE
     lastCastedRay = LineSegment(float3::zero, float3::zero);
+
+    UpdateUBO();
 
     return true;
 }
@@ -226,6 +227,7 @@ void CameraModule::SetAspectRatio(float newAspectRatio)
     detachedProjectionMatrix   = detachedCamera.ProjectionMatrix();
 
     frustumPlanes.UpdateFrustumPlanes(viewMatrix, projectionMatrix);
+    UpdateUBO();
 }
 
 void CameraModule::TriggerFocusCamera()

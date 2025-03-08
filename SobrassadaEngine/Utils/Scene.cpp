@@ -95,6 +95,7 @@ update_status Scene::Render(float deltaTime)
         }
     }
 
+
     return UPDATE_CONTINUE;
 }
 
