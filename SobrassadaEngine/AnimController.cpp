@@ -55,7 +55,6 @@ update_status AnimController::Update(float deltaTime)
             currentTime = duration; 
         }
     }
-    GLOG("CURRENTIME: %f", currentTime);
     
     return UPDATE_CONTINUE;
 }

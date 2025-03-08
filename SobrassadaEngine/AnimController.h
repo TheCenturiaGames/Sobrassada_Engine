@@ -8,8 +8,7 @@ class AnimController
   public:
     AnimController();
     ~AnimController() = default;
-
-    void SetAnimation(ResourceAnimation* animation);                                      
+                                    
     void GetTransform(const std::string& nodeName, float3& pos, Quat& rot); 
 
     update_status Update(float deltaTime);  
