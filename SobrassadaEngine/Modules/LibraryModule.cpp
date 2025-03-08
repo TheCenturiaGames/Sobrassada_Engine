@@ -240,8 +240,6 @@ bool LibraryModule::LoadScene(const char* path, bool reload) const
 
 bool LibraryModule::LoadLibraryMaps()
 {
-    std::vector<std::string> files;
-    FileSystem::GetAllInDirectory(METADATA_PATH, files);
     for (const auto& entry : std::filesystem::recursive_directory_iterator(METADATA_PATH))
     {
         if (entry.is_regular_file() && (FileSystem::GetFileExtension(entry.path().string()) == META_EXTENSION))
