@@ -25,6 +25,8 @@ class ResourceMesh : public Resource
 
     const AABB& GetAABB() const { return aabb; }
     int GetIndexCount() const { return indexCount; }
+    const std::vector<Vertex>& GetLocalVertices() const { return vertices; }
+    const std::vector<unsigned int>& GetIndices() const { return indices; }
 
   private:
     unsigned int vbo         = 0;
@@ -34,4 +36,7 @@ class ResourceMesh : public Resource
     unsigned int vertexCount = 0;
     unsigned int indexCount  = 0;
     AABB aabb;
+
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> indices;
 };

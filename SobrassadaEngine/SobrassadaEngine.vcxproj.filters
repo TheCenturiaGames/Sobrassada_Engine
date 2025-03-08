@@ -491,8 +491,6 @@
     <ClInclude Include="Modules\EditorUIModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
-    <ClInclude Include="Tests\MockGameObject.h" />
-    <ClInclude Include="UI\QuadtreeViewer.h" />
     <ClInclude Include="FileSystem\MetaFile.h">
       <Filter>FileSystem\Meta</Filter>
     </ClInclude>
@@ -504,6 +502,9 @@
     </ClInclude>
     <ClInclude Include="FileSystem\MetaTexture.h">
       <Filter>FileSystem\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="RaycastController.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

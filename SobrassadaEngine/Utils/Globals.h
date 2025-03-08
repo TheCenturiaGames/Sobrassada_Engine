@@ -98,6 +98,8 @@ constexpr uint32_t CONSTANT_NO_TEXTURE_UUID             = 0;
 constexpr float PI                                      = 3.14159265359f;
 constexpr float RAD_DEGREE_CONV                         = 180.f / PI;
 
+constexpr float MINIMUM_TREE_LEAF_SIZE = 1.f;
+
 inline UID GenerateUID()
 {
     LCG rng;

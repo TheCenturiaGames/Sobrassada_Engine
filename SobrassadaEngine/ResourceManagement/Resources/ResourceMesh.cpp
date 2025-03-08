@@ -61,6 +61,9 @@ void ResourceMesh::LoadData(
 
     // Unbind VAO
     glBindVertexArray(0);
+
+    this->vertices = vertices;
+    this->indices = indices;
 }
 
 void ResourceMesh::Render(int program, float4x4& modelMatrix, unsigned int cameraUBO, ResourceMaterial* material)
