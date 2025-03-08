@@ -144,17 +144,39 @@
     <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourNavMeshBuilder.cpp" />
     <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourNavMeshQuery.cpp" />
     <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourNode.cpp" />
-    <ClCompile Include="Libs\RecastDetour\Recast\Source\Recast.cpp" />
-    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastAlloc.cpp" />
-    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastArea.cpp" />
-    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastAssert.cpp" />
-    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastContour.cpp" />
-    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastFilter.cpp" />
-    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastLayers.cpp" />
-    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastMesh.cpp" />
-    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastMeshDetail.cpp" />
-    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastRasterization.cpp" />
-    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastRegion.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\Recast.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastAlloc.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastArea.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastAssert.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastContour.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastFilter.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastLayers.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastMesh.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastMeshDetail.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastRasterization.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastRegion.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Modules\CameraModule.cpp" />
     <ClCompile Include="Modules\EditorUIModule.cpp" />
     <ClCompile Include="Utils\EngineTimer.cpp" />
