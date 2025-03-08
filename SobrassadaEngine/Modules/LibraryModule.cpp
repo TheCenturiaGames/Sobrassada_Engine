@@ -49,7 +49,7 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
     const std::string& sceneName =
         (saveMode == SaveMode::Save) ? sceneModule->GetSceneName() : FileSystem::GetFileNameWithoutExtension(path);
 
-    if (sceneUID == 0 && saveMode == SaveMode::Save) return false;
+    if (sceneName == DEFAULT_SCENE_NAME && saveMode == SaveMode::Save) return false;
 
     UID gameObjectRootUID   = sceneModule->GetGameObjectRootUID();
 
@@ -256,7 +256,6 @@ bool LibraryModule::LoadLibraryMaps()
             UID prefix            = assetUID / UID_PREFIX_DIVISOR;
             std::string libraryPath;
 
-            // order matters
             switch (prefix)
             {
             case 11:

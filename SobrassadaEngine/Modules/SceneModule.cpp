@@ -80,7 +80,7 @@ void SceneModule::CreateScene()
 
     GameObject* sceneGameObject = new GameObject("SceneModule GameObject");
 
-    loadedScene                 = new Scene(GenerateUID(), "New Scene", sceneGameObject->GetUID());
+    loadedScene                 = new Scene(GenerateUID(), DEFAULT_SCENE_NAME, sceneGameObject->GetUID());
 
     std::unordered_map<UID, GameObject*> loadedGameObjects;
     loadedGameObjects.insert({sceneGameObject->GetUID(), sceneGameObject});

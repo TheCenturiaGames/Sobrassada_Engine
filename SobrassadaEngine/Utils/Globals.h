@@ -52,6 +52,7 @@ enum update_status
 #endif
 
 #define FILENAME_SEPARATOR "_"
+#define DEFAULT_SCENE_NAME "New Scene"
 
 #define DEFAULT_GL_CLEAR_COLOR_RED   0.5f
 #define DEFAULT_GL_CLEAR_COLOR_GREEN 0.5f
