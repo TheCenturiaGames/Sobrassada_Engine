@@ -272,9 +272,9 @@ void CameraComponent::Update()
         firstTime = false;
     }
 
-    camera.pos                = float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
-    camera.front              = -float3(globalTransform[0][2], globalTransform[1][2], globalTransform[2][2]);
-    camera.up                 = float3(globalTransform[0][1], globalTransform[1][1], globalTransform[2][1]);
+    camera.pos         = float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
+    camera.front       = -float3(localTransform[0][2], localTransform[1][2], localTransform[2][2]).Normalized();
+    camera.up          = float3(localTransform[0][1], localTransform[1][1], localTransform[2][1]).Normalized();
 
     matrices.projectionMatrix = camera.ProjectionMatrix();
     matrices.viewMatrix       = camera.ViewMatrix();
