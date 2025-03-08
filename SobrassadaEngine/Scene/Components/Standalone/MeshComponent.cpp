@@ -29,6 +29,12 @@ MeshComponent::MeshComponent(const rapidjson::Value& initialState) : Component(i
     }
 }
 
+MeshComponent::~MeshComponent()
+{
+    App->GetResourcesModule()->ReleaseResource(currentMaterial);
+    App->GetResourcesModule()->ReleaseResource(currentMesh);
+}
+
 void MeshComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
 {
     Component::Save(targetState, allocator);

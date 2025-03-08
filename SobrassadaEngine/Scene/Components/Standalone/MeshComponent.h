@@ -15,6 +15,8 @@ class MeshComponent : public Component
 
     MeshComponent(const rapidjson::Value& initialState);
 
+    ~MeshComponent() override;
+
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
 
     void RenderEditorInspector() override;
