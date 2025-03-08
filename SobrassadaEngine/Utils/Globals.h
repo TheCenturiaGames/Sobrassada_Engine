@@ -1,4 +1,5 @@
 #pragma once
+
 #define NOMINMAX
 #include "Algorithm/Random/LCG.h"
 #include <stdio.h>
@@ -49,6 +50,8 @@ enum update_status
 #else
 #define DELIMITER '/'
 #endif
+
+#define FILENAME_SEPARATOR "_"
 
 #define DEFAULT_GL_CLEAR_COLOR_RED   0.5f
 #define DEFAULT_GL_CLEAR_COLOR_GREEN 0.5f

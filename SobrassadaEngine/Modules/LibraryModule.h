@@ -14,9 +14,9 @@ enum class SaveMode
 
 enum class FileType
 {
+    Mesh,
     Texture,
     Material,
-    Mesh,
     Scene
 };
 

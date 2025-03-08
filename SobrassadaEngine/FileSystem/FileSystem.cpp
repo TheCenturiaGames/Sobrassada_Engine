@@ -160,6 +160,24 @@ namespace FileSystem
         }
     }
 
+    void GetFilesSorted(const std::string& currentPath, std::vector<std::string>& files)
+    {
+        // files & dir in the current directory
+        GetAllInDirectory(currentPath, files);
+
+        std::sort(
+            files.begin(), files.end(),
+            [&](const std::string& a, const std::string& b)
+            {
+                bool isDirA = FileSystem::IsDirectory((currentPath + DELIMITER + a).c_str());
+                bool isDirB = FileSystem::IsDirectory((currentPath + DELIMITER + b).c_str());
+
+                if (isDirA != isDirB) return isDirA > isDirB;
+                return a < b;
+            }
+        );
+    }
+
     void SplitAccumulatedPath(const std::string& path, std::vector<std::string>& accPaths)
     {
         accPaths.clear();

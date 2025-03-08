@@ -62,7 +62,6 @@ class EditorUIModule : public Module
     void ShowCaps() const;
 
     void ImportDialog(bool& import);
-    void GetFilesSorted(const std::string& currentPath, std::vector<std::string>& files);
     void LoadDialog(bool& load);
     void SaveDialog(bool& save);
     void Console(bool& consoleMenu) const;
@@ -93,7 +92,7 @@ class EditorUIModule : public Module
     QuadtreeViewer* quadtreeViewer = nullptr;
 
     std::string startPath;
-    std::string libraryPath;
+    std::string scenesPath;
 
     ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
     ;

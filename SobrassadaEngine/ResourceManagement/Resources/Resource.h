@@ -5,12 +5,13 @@
 #include <cstdint>
 #include <string>
 
+// order matters
 enum class ResourceType
 {
     Unknown = 10,
-    Texture,
-    Material,
-    Mesh,
+    Mesh,    // 11
+    Texture, // 12
+    Material // 13
 };
 
 class Resource

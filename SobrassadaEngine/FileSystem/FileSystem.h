@@ -17,6 +17,7 @@ namespace FileSystem
     void GetDrives(std::vector<std::string> &drives);
     void SplitAccumulatedPath(const std::string &path, std::vector<std::string> &accPaths);
     void GetAllInDirectory(const std::string &path, std::vector<std::string> &files);
+    void GetFilesSorted(const std::string& currentPath, std::vector<std::string>& files);
     time_t GetLastModifiedTime(const std::string& path);
 
     inline size_t GetFileSize(const char* filePath)

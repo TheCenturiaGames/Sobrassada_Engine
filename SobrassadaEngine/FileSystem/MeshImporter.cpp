@@ -5,17 +5,12 @@
 #include "LibraryModule.h"
 #include "MetaMesh.h"
 
-#define TINYGLTF_NO_STB_IMAGE_WRITE
-#define TINYGLTF_NO_STB_IMAGE
-#define TINYGLTF_NO_EXTERNAL_IMAGE
-#include "tiny_gltf.h"
-
 namespace MeshImporter
 {
 
     UID ImportMesh(
         const tinygltf::Model& model, const tinygltf::Mesh& mesh, const tinygltf::Primitive& primitive,
-        const std::string& name, const char* sourceFilePath
+        const std::string& name, const char* sourceFilePath, UID sourceUID
     )
     {
         enum DataType dataType = UNSIGNED_CHAR;
@@ -223,14 +218,19 @@ namespace MeshImporter
         memcpy(cursor, &minPos, sizeof(float3));
         cursor += sizeof(float3);
         memcpy(cursor, &maxPos, sizeof(float3));
-        cursor                += sizeof(float3);
+        cursor += sizeof(float3);
 
-        UID meshUID            = GenerateUID();
-        UID finalMeshUID       = App->GetLibraryModule()->AssignFiletypeUID(meshUID, FileType::Mesh);
+        UID finalMeshUID;
+        if (sourceUID == INVALID_UUID)
+        {
+            UID meshUID           = GenerateUID();
+            finalMeshUID          = App->GetLibraryModule()->AssignFiletypeUID(meshUID, FileType::Mesh);
 
-        std::string assetPath   = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
-        MetaMesh meta(finalMeshUID, assetPath, generateTangents);
-        meta.Save(name, assetPath);
+            std::string assetPath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
+            MetaMesh meta(finalMeshUID, assetPath, generateTangents);
+            meta.Save(name, assetPath);
+        }
+        else finalMeshUID = sourceUID;
 
         std::string saveFilePath  = MESHES_PATH + std::to_string(finalMeshUID) + MESH_EXTENSION;
         unsigned int bytesWritten = (unsigned int)FileSystem::Save(saveFilePath.c_str(), fileBuffer, size, true);
@@ -250,6 +250,12 @@ namespace MeshImporter
         GLOG("%s saved as binary", name.c_str());
 
         return finalMeshUID;
+    }
+
+    UID ImportMeshFromMetadata(const std::string& filePath, const std::string& name, UID sourceUID)
+    {
+
+        return 0;
     }
 
     ResourceMesh* LoadMesh(UID meshUID)

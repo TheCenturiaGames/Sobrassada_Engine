@@ -9,7 +9,7 @@
 
 namespace TextureImporter
 {
-    UID Import(const char* sourceFilePath)
+    UID Import(const char* sourceFilePath, UID sourceUID)
     {
         // Copy image to Assets folder
         std::string copyPath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
@@ -49,12 +49,18 @@ namespace TextureImporter
             return 0;
         }
 
-        UID textureUID        = GenerateUID();
-        UID finalTextureUID   = App->GetLibraryModule()->AssignFiletypeUID(textureUID, FileType::Texture);
+        std::string fileName = FileSystem::GetFileNameWithoutExtension(sourceFilePath);
 
-        std::string fileName  = FileSystem::GetFileNameWithoutExtension(sourceFilePath);
-        MetaTexture meta(finalTextureUID, copyPath, (int)image.GetMetadata().mipLevels);
-        meta.Save(fileName, copyPath);
+        UID finalTextureUID;
+        if (sourceUID == INVALID_UUID)
+        {
+            UID textureUID  = GenerateUID();
+            finalTextureUID = App->GetLibraryModule()->AssignFiletypeUID(textureUID, FileType::Texture);
+
+            MetaTexture meta(finalTextureUID, copyPath, (int)image.GetMetadata().mipLevels);
+            meta.Save(fileName, copyPath);
+        }
+        else finalTextureUID = sourceUID;
 
         std::string saveFilePath = TEXTURES_PATH + std::to_string(finalTextureUID) + TEXTURE_EXTENSION;
         unsigned int bytesWritten =
@@ -80,7 +86,6 @@ namespace TextureImporter
         std::string path     = App->GetLibraryModule()->GetResourcePath(textureUID);
 
         std::string fileName = FileSystem::GetFileNameWithoutExtension(path);
-        // const UID loadedTextureUID = std::stoull(fileName);
 
         std::wstring wPath   = std::wstring(path.begin(), path.end());
 

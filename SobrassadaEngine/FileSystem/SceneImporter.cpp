@@ -1,15 +1,9 @@
 #include "SceneImporter.h"
 
 #include "FileSystem.h"
-#include "Globals.h"
 #include "MaterialImporter.h"
 #include "MeshImporter.h"
 #include "TextureImporter.h"
-
-#define TINYGLTF_NO_STB_IMAGE_WRITE
-#define TINYGLTF_NO_STB_IMAGE
-#define TINYGLTF_NO_EXTERNAL_IMAGE
-#include "tiny_gltf.h"
 
 namespace SceneImporter
 {
@@ -25,9 +19,36 @@ namespace SceneImporter
 
     void ImportGLTF(const char* filePath)
     {
+        tinygltf::Model model = LoadModelGLTF(filePath);
+
+        std::vector<int> matIndices;
+        for (const auto& srcMesh : model.meshes)
+        {
+            std::string name = srcMesh.name;
+            int n            = 0;
+            int matIndex     = -1;
+            for (const auto& primitive : srcMesh.primitives)
+            {
+                name += std::to_string(n);
+                MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath);
+                n++;
+
+                matIndex = primitive.material;
+                if (matIndex == -1) GLOG("Material index invalid for mesh: %s", name.c_str())
+                else if (std::find(matIndices.begin(), matIndices.end(), matIndex) == matIndices.end())
+                {
+                    MaterialImporter::ImportMaterial(model, matIndex, filePath);
+                    matIndices.push_back(matIndex);
+                }
+            }
+        }
+    }
+
+    tinygltf::Model LoadModelGLTF(const char* filePath)
+    {
         tinygltf::TinyGLTF gltfContext;
         tinygltf::Model model;
-        std::string err, warn, name;
+        std::string err, warn;
 
         bool ret = gltfContext.LoadASCIIFromFile(&model, &err, &warn, std::string(filePath));
         if (!ret)
@@ -65,22 +86,41 @@ namespace SceneImporter
             }
         }
 
-        std::vector<int> matIndices;
+        return model;
+    }
+
+    void ImportMeshFromMetadata(const std::string& filePath, const std::string& name, UID sourceUID)
+    {
+        tinygltf::Model model = LoadModelGLTF(filePath.c_str());
+
+        std::string nameNoExt = name;
+        if (!name.empty()) nameNoExt.pop_back(); // remove last character (extension)
+
+        // find mesh name that equals to name
         for (const auto& srcMesh : model.meshes)
         {
-            name         = srcMesh.name;
-            int matIndex = -1;
-            for (const auto& primitive : srcMesh.primitives)
+            if (srcMesh.name == nameNoExt)
             {
-                MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath);
-
-                matIndex = primitive.material;
-                if (matIndex == -1) GLOG("Material index invalid for mesh: %s", name.c_str())
-                else if (std::find(matIndices.begin(), matIndices.end(), matIndex) == matIndices.end())
+                for (const auto& primitive : srcMesh.primitives)
                 {
-                    MaterialImporter::ImportMaterial(model, matIndex, name, filePath);
-                    matIndices.push_back(matIndex);
+                    MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath.c_str(), sourceUID);
+                    return; // only one mesh with the same name
                 }
+            }
+        }
+    }
+
+    void ImportMaterialFromMetadata(const std::string& filePath, const std::string& name, UID sourceUID)
+    {
+        tinygltf::Model model = LoadModelGLTF(filePath.c_str());
+
+        // find material name that equals to name
+        for (int i = 0; i < model.materials.size(); i++)
+        {
+            if (model.materials[i].name == name)
+            {
+                MaterialImporter::ImportMaterial(model, i, filePath.c_str(), sourceUID);
+                return; // only one material with the same name
             }
         }
     }

@@ -1,0 +1,155 @@
+{
+    "Scene": {
+        "UID": 8888411618969162749,
+        "Name": "myHouse",
+        "RootGameObject": 15081340270832425529,
+        "GameObjects": [
+            {
+                "UID": 15081340270832425529,
+                "ParentUID": 0,
+                "Name": "SuperScene",
+                "Children": [
+                    17832189459320472536
+                ],
+                "RootComponentUID": 1068416780
+            },
+            {
+                "UID": 17832189459320472536,
+                "ParentUID": 15081340270832425529,
+                "Name": "myLittleHouse",
+                "Children": [],
+                "RootComponentUID": 4152437117
+            }
+        ],
+        "Components": [
+            {
+                "UID": 143876939,
+                "ParentUID": 4152437117,
+                "RootUID": 4152437117,
+                "Type": 2,
+                "LocalTransform": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "House",
+                "Mesh": 1182765139846973,
+                "Material": 1338753819838605
+            },
+            {
+                "UID": 1068416780,
+                "ParentUID": 15081340270832425529,
+                "RootUID": 1068416780,
+                "Type": 1,
+                "LocalTransform": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root Component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3616875325,
+                "ParentUID": 4152437117,
+                "RootUID": 4152437117,
+                "Type": 2,
+                "LocalTransform": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Chimney",
+                "Mesh": 1147808744225546,
+                "Material": 1338753819838605
+            },
+            {
+                "UID": 4152437117,
+                "ParentUID": 17832189459320472536,
+                "RootUID": 4152437117,
+                "Type": 1,
+                "LocalTransform": [
+                    100.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    100.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    100.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "Children": [
+                    3616875325,
+                    143876939
+                ],
+                "Enabled": true,
+                "Name": "House_parent",
+                "Type": 1,
+                "Mobility": 1
+            }
+        ]
+    },
+    "Lights Config": {
+        "Ambient Color": [
+            1.0,
+            1.0,
+            1.0
+        ],
+        "Ambient Intensity": 0.20000000298023224,
+        "Skybox UID": 1297284056072525
+    }
+}

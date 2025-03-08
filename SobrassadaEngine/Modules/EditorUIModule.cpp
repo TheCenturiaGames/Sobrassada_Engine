@@ -54,7 +54,7 @@ bool EditorUIModule::Init()
     height         = App->GetWindowModule()->GetHeight();
 
     startPath      = std::filesystem::current_path().string();
-    libraryPath    = startPath + DELIMITER + SCENES_PATH;
+    scenesPath     = startPath + DELIMITER + SCENES_PATH;
 
     App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_G, [&] { mCurrentGizmoOperation = ImGuizmo::TRANSLATE; });
     App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_H, [&] { mCurrentGizmoOperation = ImGuizmo::ROTATE; });
@@ -191,7 +191,7 @@ void EditorUIModule::MainMenu()
 
         if (ImGui::MenuItem("Save"))
         {
-            if (!App->GetLibraryModule()->SaveScene(libraryPath.c_str(), SaveMode::Save))
+            if (!App->GetLibraryModule()->SaveScene(scenesPath.c_str(), SaveMode::Save))
             {
                 save = !save;
             }
@@ -244,12 +244,12 @@ void EditorUIModule::LoadDialog(bool& load)
 
     ImGui::BeginChild("scrollFiles", ImVec2(0, -30), ImGuiChildFlags_Borders);
 
-    if (FileSystem::Exists(libraryPath.c_str()))
+    if (FileSystem::Exists(scenesPath.c_str()))
     {
         // Only scenes library folder for now
-        if (ImGui::TreeNode("Scenes/"))
+        if (ImGui::TreeNodeEx("Scenes/", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            GetFilesSorted(libraryPath, files);
+            FileSystem::GetFilesSorted(scenesPath, files);
 
             static int selected = -1;
 
@@ -310,11 +310,11 @@ void EditorUIModule::SaveDialog(bool& save)
 
     ImGui::BeginChild("scrollFiles", ImVec2(0, -30), ImGuiChildFlags_Borders);
 
-    if (FileSystem::Exists(libraryPath.c_str()))
+    if (FileSystem::Exists(scenesPath.c_str()))
     {
-        if (ImGui::TreeNode("Scenes/"))
+        if (ImGui::TreeNodeEx("Scenes/", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            GetFilesSorted(libraryPath, files);
+            FileSystem::GetFilesSorted(scenesPath, files);
 
             for (int i = 0; i < files.size(); i++)
             {
@@ -338,7 +338,7 @@ void EditorUIModule::SaveDialog(bool& save)
     {
         if (strlen(inputFile) > 0)
         {
-            std::string savePath = libraryPath + inputFile + SCENE_EXTENSION;
+            std::string savePath = scenesPath + inputFile + SCENE_EXTENSION;
             App->GetLibraryModule()->SaveScene(savePath.c_str(), SaveMode::SaveAs);
         }
         inputFile[0] = '\0';
@@ -447,7 +447,7 @@ void EditorUIModule::ImportDialog(bool& import)
 
         if (files.empty() || loadFiles)
         {
-            GetFilesSorted(currentPath, files);
+            FileSystem::GetFilesSorted(currentPath, files);
 
             files.insert(files.begin(), "..");
 
@@ -492,7 +492,7 @@ void EditorUIModule::ImportDialog(bool& import)
                     currentPath = FileSystem::GetParentPath(currentPath);
                     inputFile   = "";
                     selected    = -1;
-                    GetFilesSorted(currentPath, files);
+                    FileSystem::GetFilesSorted(currentPath, files);
                     searchQuery[0] = '\0';
                     loadFiles      = true;
                     loadButtons    = true;
@@ -502,7 +502,7 @@ void EditorUIModule::ImportDialog(bool& import)
                     currentPath = filePath;
                     inputFile   = "";
                     selected    = -1;
-                    GetFilesSorted(currentPath, files);
+                    FileSystem::GetFilesSorted(currentPath, files);
                     searchQuery[0] = '\0';
                     loadFiles      = true;
                     loadButtons    = true;
@@ -550,24 +550,6 @@ void EditorUIModule::ImportDialog(bool& import)
     }
 
     ImGui::End();
-}
-
-void EditorUIModule::GetFilesSorted(const std::string& currentPath, std::vector<std::string>& files)
-{
-    // files & dir in the current directory
-    FileSystem::GetAllInDirectory(currentPath, files);
-
-    std::sort(
-        files.begin(), files.end(),
-        [&](const std::string& a, const std::string& b)
-        {
-            bool isDirA = FileSystem::IsDirectory((currentPath + DELIMITER + a).c_str());
-            bool isDirB = FileSystem::IsDirectory((currentPath + DELIMITER + b).c_str());
-
-            if (isDirA != isDirB) return isDirA > isDirB;
-            return a < b;
-        }
-    );
 }
 
 void EditorUIModule::Console(bool& consoleMenu) const
