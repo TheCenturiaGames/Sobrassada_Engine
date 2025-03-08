@@ -1,5 +1,6 @@
 #pragma once
 #include "ResourceManagement/Resources/ResourceAnimation.h"
+#include <chrono>
 
 
 class AnimController
@@ -24,4 +25,5 @@ class AnimController
     float currentTime                    = 0; 
     bool loop                       = false;
     bool playAnimation                      = false;
+    clock_t startTime                    = 0;
 };

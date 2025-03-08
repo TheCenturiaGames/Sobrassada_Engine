@@ -25,8 +25,6 @@
 #define TINYGLTF_IMPLEMENTATION /* Only in one of the includes */
 #include <tiny_gltf.h>          // TODO Remove
 
-//ANIMATION TESTING
-#include "AnimController.h"
 
 EditorUIModule::EditorUIModule()
     : width(0), height(0), closeApplication(false), consoleMenu(false), import(false), load(false), save(false),
@@ -62,9 +60,6 @@ bool EditorUIModule::Init()
     App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_R, [&] { mCurrentGizmoOperation = ImGuizmo::SCALE; });
 
 
-    //ANIMATIONTEST
-    animController = new AnimController();
-
     return true;
 }
 
@@ -85,22 +80,6 @@ update_status EditorUIModule::Update(float deltaTime)
     LimitFPS(deltaTime);
     AddFramePlotData(deltaTime);
 
-    //ANIMATION TEST
-    update_status returnStatus     = animController->Update(deltaTime);
-    if (App->GetInputModule()->GetKey(SDL_SCANCODE_L))
-    {
-        UID animation                  = 1541456130771893;
-
-        animController->Play(animation, false);
-        playAnimation = true;
-
-    }
-    if (playAnimation)
-    {
-        float3 pos;
-        Quat rot;
-        animController->GetTransform("Hips", pos, rot);
-    }
     return UPDATE_CONTINUE;
 }
 

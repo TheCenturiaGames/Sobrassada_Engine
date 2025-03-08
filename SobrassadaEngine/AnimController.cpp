@@ -13,6 +13,7 @@ void AnimController::Play(UID newResource, bool shouldLoop)
     currentTime = 0;
     loop        = shouldLoop;
     playAnimation = true;
+    startTime     = clock();
 }
 
 void AnimController::Stop()
@@ -38,15 +39,15 @@ update_status AnimController::Update(float deltaTime)
     float duration = animation->GetDuration();
     if (duration <= 0.0f) return UPDATE_CONTINUE;
 
-    float delta_time   = (clock() * 1000.0f) / CLOCKS_PER_SEC;
-
-    currentTime        = delta_time / 1000.0f;
+    float delta_time = (clock() - startTime) * 1000.0f / CLOCKS_PER_SEC;
+    currentTime      = delta_time / 1000.0f;
 
 
     if (currentTime > duration)
     {
         if (loop)
         {
+            startTime   = clock();
             currentTime = 0; 
         }
         else

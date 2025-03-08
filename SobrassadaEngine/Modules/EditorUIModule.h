@@ -96,7 +96,4 @@ class EditorUIModule : public Module
     int transformType = LOCAL;
     ImGuizmo::OPERATION mCurrentGizmoOperation;
 
-    //Test animation
-    bool playAnimation = false;
-    AnimController* animController = nullptr;
 };
