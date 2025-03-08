@@ -83,6 +83,9 @@ void Scene::Init()
     {
         root->UpdateTransformForGOBranch();
     }
+
+    lightsConfig->InitSkybox();
+    lightsConfig->InitLightBuffers();
     
     UpdateSpatialDataStruct();
 }
