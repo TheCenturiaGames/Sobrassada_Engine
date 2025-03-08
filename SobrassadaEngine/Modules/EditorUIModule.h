@@ -17,9 +17,6 @@ struct CPUFeature
     const char* name;
 };
 
-class EditorViewport;
-class QuadtreeViewer;
-
 class EditorUIModule : public Module
 {
   public:
@@ -87,8 +84,6 @@ class EditorUIModule : public Module
     std::deque<float> frametime;
 
     ImGuizmo::MODE transformType   = ImGuizmo::LOCAL;
-
-    QuadtreeViewer* quadtreeViewer = nullptr;
 
     std::string startPath;
     std::string libraryPath;

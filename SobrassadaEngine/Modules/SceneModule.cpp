@@ -5,8 +5,10 @@
 #include "EditorUIModule.h"
 #include "FrustumPlanes.h"
 #include "GameObject.h"
+#include "InputModule.h"
 #include "LibraryModule.h"
 #include "Octree.h"
+#include "RaycastController.h"
 #include "Root/RootComponent.h"
 #include "Scene/Components/Standalone/MeshComponent.h"
 
@@ -14,6 +16,9 @@
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl2.h"
+#include "imgui_internal.h"
+// guizmo after imgui include
+#include "./Libs/ImGuizmo/ImGuizmo.h"
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_EXTERNAL_IMAGE
@@ -65,6 +70,24 @@ update_status SceneModule::RenderEditor(float deltaTime)
 
 update_status SceneModule::PostUpdate(float deltaTime)
 {
+    // CAST RAY WHEN LEFT CLICK IS RELEASED
+    if (loadedScene != nullptr && loadedScene->GetDoInputs() && !ImGuizmo::IsUsingAny())
+    {
+        const KeyState* mouseButtons = App->GetInputModule()->GetMouseButtons();
+        const KeyState* keyboard = App->GetInputModule()->GetKeyboard();
+        if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_DOWN && !keyboard[SDL_SCANCODE_LALT])
+        {
+            GameObject* selectedObject = RaycastController::GetRayIntersection<Octree>(
+                App->GetCameraModule()->CastCameraRay(), loadedScene->GetOctree()
+            );
+
+            if (selectedObject != nullptr)
+            {
+                loadedScene->SetSelectedGameObject(selectedObject->GetUID());
+                selectedObject->GetRootComponent()->SetSelectedComponent(selectedObject->GetRootComponent()->GetUID());
+            }
+        }
+    }
     return UPDATE_CONTINUE;
 }
 

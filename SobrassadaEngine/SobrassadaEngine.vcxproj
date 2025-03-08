@@ -325,9 +325,7 @@
     <ClCompile Include="FileSystem\TextureImporter.cpp" />
     <ClCompile Include="Utils\FrustumPlanes.cpp" />
     <ClCompile Include="Utils\Octree.cpp" />
-    <ClCompile Include="Tests\MockGameObject.cpp" />
     <ClCompile Include="Utils\Quadtree.cpp" />
-    <ClCompile Include="UI\QuadtreeViewer.cpp" />
     <ClCompile Include="Scene\Components\Root\RootComponent.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -554,6 +552,7 @@
     <ClInclude Include="Modules\EditorUIModule.h" />
     <ClInclude Include="Modules\ResourcesModule.h" />
     <ClInclude Include="Modules\SceneModule.h" />
+    <ClInclude Include="RaycastController.h" />
     <ClInclude Include="ResourceManagement\Resources\Resource.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceMaterial.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceMesh.h" />
@@ -575,9 +574,7 @@
     <ClInclude Include="FileSystem\TextureImporter.h" />
     <ClInclude Include="Utils\FrustumPlanes.h" />
     <ClInclude Include="Utils\Octree.h" />
-    <ClInclude Include="Tests\MockGameObject.h" />
     <ClInclude Include="Utils\Quadtree.h" />
-    <ClInclude Include="UI\QuadtreeViewer.h" />
     <ClInclude Include="Scene\Components\Root\RootComponent.h" />
     <ClInclude Include="Scene\Components\Standalone\MeshComponent.h" />
     <ClInclude Include="Scene\Components\ComponentUtils.h" />

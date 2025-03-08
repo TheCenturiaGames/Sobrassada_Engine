@@ -6,6 +6,7 @@
 #include "Framebuffer.h"
 #include "GameObject.h"
 #include "GameTimer.h"
+#include "InputModule.h"
 #include "LibraryModule.h"
 #include "Octree.h"
 #include "OpenGLModule.h"
@@ -15,6 +16,7 @@
 #include "imgui_internal.h"
 // guizmo after imgui include
 #include "./Libs/ImGuizmo/ImGuizmo.h"
+#include "SDL_mouse.h"
 
 Scene::Scene(UID sceneUID, const char* sceneName, UID rootGameObject)
     : sceneUID(sceneUID), sceneName(std::string(sceneName)), gameObjectRootUUID(rootGameObject)
@@ -166,8 +168,9 @@ void Scene::RenderScene()
         if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) ImGui::SetWindowFocus();
 
         // do inputs only if window is focused
-        if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
-            ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows))
+
+        if (ImGui::IsWindowFocused(ImGuiFocusedFlags_DockHierarchy) &&
+            ImGui::IsWindowHovered(ImGuiFocusedFlags_DockHierarchy))
             doInputs = true;
         else doInputs = false;
 
@@ -195,6 +198,12 @@ void Scene::RenderScene()
             App->GetCameraModule()->SetAspectRatio(aspectRatio);
             framebuffer->Resize((int)windowSize.x, (int)windowSize.y);
         }
+
+        ImVec2 windowPosition     = ImGui::GetWindowPos();
+        ImVec2 imGuimousePosition = ImGui::GetMousePos();
+        sceneWindowPosition       = std::make_tuple(windowPosition.x, windowPosition.y);
+        sceneWindowSize           = std::make_tuple(windowSize.x, windowSize.y);
+        mousePosition             = std::make_tuple(imGuimousePosition.x, imGuimousePosition.y);
 
         ImGui::EndChild();
     }
@@ -311,6 +320,7 @@ void Scene::CreateSpatialDataStruct()
 
     for (const auto& objectIterator : gameObjectsContainer)
     {
+        if (objectIterator.second->GetUID() == gameObjectRootUUID) continue;
         AABB objectBB = objectIterator.second->GetAABB();
 
         if (objectBB.Size().x == 0 && objectBB.Size().y == 0 && objectBB.Size().z == 0) continue;
@@ -331,7 +341,7 @@ void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects)
     std::vector<GameObject*> queriedObjects;
     const FrustumPlanes& frustumPlanes = App->GetCameraModule()->GetFrustrumPlanes();
 
-    sceneOctree->QueryElements(frustumPlanes, queriedObjects);
+    sceneOctree->QueryElements<FrustumPlanes>(frustumPlanes, queriedObjects);
 
     for (auto gameObject : queriedObjects)
     {
