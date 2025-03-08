@@ -29,7 +29,7 @@ class CameraComponent : public Component
     FrustumPlanes frustumPlanes;
     CameraMatrices matrices;
     unsigned int ubo        = 0;
-    bool drawGizmos         = false;
+    bool drawGizmos         = true;
     bool isMainCamera       = false;
 
     float horizontalFov;
@@ -37,4 +37,6 @@ class CameraComponent : public Component
 
     float orthographicWidth;
     float orthographicHeight;
+
+    bool firstTime = true;
 };

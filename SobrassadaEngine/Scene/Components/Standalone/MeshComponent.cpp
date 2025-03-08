@@ -90,7 +90,7 @@ void MeshComponent::Render()
     if (enabled && currentMesh != nullptr)
     {
         unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
-        if (App->GetSceneModule()->IsInPlayMode()) cameraUBO = App->GetSceneModule()->GetMainCamera()->GetUbo();
+        if (App->GetSceneModule()->IsInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr) cameraUBO = App->GetSceneModule()->GetMainCamera()->GetUbo();
         
         currentMesh->Render(App->GetResourcesModule()->GetProgram(), globalTransform, cameraUBO, currentMaterial);
     }

@@ -14,16 +14,13 @@ CameraComponent::CameraComponent(UID uid, UID uidParent, UID uidRoot, const floa
     : Component(uid, uidParent, uidRoot, "Camera", COMPONENT_CAMERA, parentGlobalTransform)
 {
 
-    camera.type                = FrustumType::PerspectiveFrustum;
-    camera.pos =
-        float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
-    camera.front =
-        -float3(globalTransform[0][2], globalTransform[1][2], globalTransform[2][2]);
-    camera.up =
-        float3(globalTransform[0][1], globalTransform[1][1], globalTransform[2][1]);
+    camera.type               = FrustumType::PerspectiveFrustum;
+    camera.pos                = float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
+    camera.front              = -float3(globalTransform[0][2], globalTransform[1][2], globalTransform[2][2]);
+    camera.up                 = float3(globalTransform[0][1], globalTransform[1][1], globalTransform[2][1]);
 
     camera.nearPlaneDistance  = 0.1f;
-    camera.farPlaneDistance   = 100.f;
+    camera.farPlaneDistance   = 50.f;
 
     camera.horizontalFov      = (float)HFOV * DEGREE_RAD_CONV;
 
@@ -40,11 +37,20 @@ CameraComponent::CameraComponent(UID uid, UID uidParent, UID uidRoot, const floa
     glBufferData(GL_UNIFORM_BUFFER, sizeof(CameraMatrices), nullptr, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-    horizontalFov      = camera.horizontalFov;
-    verticalFov        = camera.verticalFov;
+    horizontalFov       = camera.horizontalFov;
+    verticalFov         = camera.verticalFov;
 
-    orthographicWidth  = 10.0f;
-    orthographicHeight = orthographicWidth / ((float)height / (float)width);
+    orthographicWidth   = 10.0f;
+    orthographicHeight  = orthographicWidth / ((float)height / (float)width);
+
+    localComponentAABB  = AABB({0.0f, 0.0f, 0.0f}, {0.01f, 0.01f, 0.01f});
+    globalComponentAABB = AABB({0.0f, 0.0f, 0.0f}, {0.01f, 0.01f, 0.01f});
+
+    if (App->GetSceneModule()->GetMainCamera() == nullptr)
+    {
+        isMainCamera = true;
+        App->GetSceneModule()->SetMainCamera(this);
+    }
 }
 
 CameraComponent::CameraComponent(const rapidjson::Value& initialState) : Component(initialState)
@@ -207,27 +213,27 @@ void CameraComponent::RenderEditorInspector()
         {
             if (currentProjection == 1)
             {
-                //Save locally perspective data
-                horizontalFov = camera.horizontalFov;
-                verticalFov   = camera.verticalFov;
+                // Save locally perspective data
+                horizontalFov             = camera.horizontalFov;
+                verticalFov               = camera.verticalFov;
 
-                //Set ortographic Data
-                camera.type = OrthographicFrustum;
-                camera.orthographicWidth    = orthographicWidth;
-                camera.orthographicHeight   = orthographicHeight;
-                camera.nearPlaneDistance   = 50.0f;
+                // Set ortographic Data
+                camera.type               = OrthographicFrustum;
+                camera.orthographicWidth  = orthographicWidth;
+                camera.orthographicHeight = orthographicHeight;
+                camera.nearPlaneDistance  = 50.0f;
             }
             else
             {
-                //Save locally ortographic data
-                orthographicWidth    = camera.orthographicWidth;
-                orthographicHeight   = camera.orthographicHeight;
+                // Save locally ortographic data
+                orthographicWidth        = camera.orthographicWidth;
+                orthographicHeight       = camera.orthographicHeight;
 
-                //Set perspective Data
-                camera.type          = PerspectiveFrustum;
-                camera.horizontalFov = horizontalFov;
-                camera.verticalFov   = verticalFov;
-                camera.nearPlaneDistance   = 0.10f;
+                // Set perspective Data
+                camera.type              = PerspectiveFrustum;
+                camera.horizontalFov     = horizontalFov;
+                camera.verticalFov       = verticalFov;
+                camera.nearPlaneDistance = 0.10f;
             }
         }
 
@@ -256,12 +262,19 @@ void CameraComponent::RenderEditorInspector()
 
 void CameraComponent::Update()
 {
-    camera.pos =
-        float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
-    camera.front =
-        -float3(globalTransform[0][2], globalTransform[1][2], globalTransform[2][2]);
-    camera.up =
-        float3(globalTransform[0][1], globalTransform[1][1], globalTransform[2][1]);
+    if (firstTime)
+    {
+        AABBUpdatable* parent = GetParent();
+        if (parent != nullptr)
+        {
+            parent->PassAABBUpdateToParent();
+        }
+        firstTime = false;
+    }
+
+    camera.pos                = float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
+    camera.front              = -float3(globalTransform[0][2], globalTransform[1][2], globalTransform[2][2]);
+    camera.up                 = float3(globalTransform[0][1], globalTransform[1][1], globalTransform[2][1]);
 
     matrices.projectionMatrix = camera.ProjectionMatrix();
     matrices.viewMatrix       = camera.ViewMatrix();
@@ -275,7 +288,6 @@ void CameraComponent::Update()
 
 void CameraComponent::Render()
 {
-
     if (!enabled || !drawGizmos || App->GetSceneModule()->GetInPlayMode()) return;
     DebugDrawModule* debug = App->GetDebugDrawModule();
     debug->DrawFrustrum(camera.ProjectionMatrix(), camera.ViewMatrix());
