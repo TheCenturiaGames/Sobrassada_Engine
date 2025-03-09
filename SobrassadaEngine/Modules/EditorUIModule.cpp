@@ -8,7 +8,6 @@
 #include "InputModule.h"
 #include "LibraryModule.h"
 #include "OpenGLModule.h"
-#include "QuadtreeViewer.h"
 #include "SceneImporter.h"
 #include "SceneModule.h"
 #include "WindowModule.h"
@@ -48,13 +47,11 @@ bool EditorUIModule::Init()
     ImGui_ImplSDL2_InitForOpenGL(App->GetWindowModule()->window, App->GetOpenGLModule()->GetContext());
     ImGui_ImplOpenGL3_Init("#version 460");
 
-    quadtreeViewer = new QuadtreeViewer();
-
     width          = App->GetWindowModule()->GetWidth();
     height         = App->GetWindowModule()->GetHeight();
 
     startPath      = std::filesystem::current_path().string();
-    libraryPath    = startPath + DELIMITER + SCENES_PATH;
+    scenesPath     = startPath + DELIMITER + SCENES_PATH;
 
     App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_G, [&] { mCurrentGizmoOperation = ImGuizmo::TRANSLATE; });
     App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_H, [&] { mCurrentGizmoOperation = ImGuizmo::ROTATE; });
@@ -93,8 +90,6 @@ update_status EditorUIModule::RenderEditor(float deltaTime)
 {
     Draw();
 
-    if (quadtreeViewerViewport) quadtreeViewer->Render(quadtreeViewerViewport);
-
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -117,8 +112,6 @@ bool EditorUIModule::ShutDown()
 
     framerate.clear();
     frametime.clear();
-
-    delete quadtreeViewer;
 
     return true;
 }
@@ -191,7 +184,7 @@ void EditorUIModule::MainMenu()
 
         if (ImGui::MenuItem("Save"))
         {
-            if (!App->GetLibraryModule()->SaveScene(libraryPath.c_str(), SaveMode::Save))
+            if (!App->GetLibraryModule()->SaveScene(scenesPath.c_str(), SaveMode::Save))
             {
                 save = !save;
             }
@@ -216,8 +209,6 @@ void EditorUIModule::MainMenu()
 
             ImGui::EndMenu();
         }
-
-        if (ImGui::MenuItem("Quadtree", "", quadtreeViewerViewport)) quadtreeViewerViewport = !quadtreeViewerViewport;
 
         if (ImGui::MenuItem("Editor settings", "", editorSettingsMenu)) editorSettingsMenu = !editorSettingsMenu;
 
@@ -244,12 +235,12 @@ void EditorUIModule::LoadDialog(bool& load)
 
     ImGui::BeginChild("scrollFiles", ImVec2(0, -30), ImGuiChildFlags_Borders);
 
-    if (FileSystem::Exists(libraryPath.c_str()))
+    if (FileSystem::Exists(scenesPath.c_str()))
     {
         // Only scenes library folder for now
-        if (ImGui::TreeNode("Scenes/"))
+        if (ImGui::TreeNodeEx("Scenes/", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            GetFilesSorted(libraryPath, files);
+            FileSystem::GetFilesSorted(scenesPath, files);
 
             static int selected = -1;
 
@@ -310,11 +301,11 @@ void EditorUIModule::SaveDialog(bool& save)
 
     ImGui::BeginChild("scrollFiles", ImVec2(0, -30), ImGuiChildFlags_Borders);
 
-    if (FileSystem::Exists(libraryPath.c_str()))
+    if (FileSystem::Exists(scenesPath.c_str()))
     {
-        if (ImGui::TreeNode("Scenes/"))
+        if (ImGui::TreeNodeEx("Scenes/", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            GetFilesSorted(libraryPath, files);
+            FileSystem::GetFilesSorted(scenesPath, files);
 
             for (int i = 0; i < files.size(); i++)
             {
@@ -338,7 +329,7 @@ void EditorUIModule::SaveDialog(bool& save)
     {
         if (strlen(inputFile) > 0)
         {
-            std::string savePath = libraryPath + inputFile + SCENE_EXTENSION;
+            std::string savePath = scenesPath + inputFile + SCENE_EXTENSION;
             App->GetLibraryModule()->SaveScene(savePath.c_str(), SaveMode::SaveAs);
         }
         inputFile[0] = '\0';
@@ -447,7 +438,7 @@ void EditorUIModule::ImportDialog(bool& import)
 
         if (files.empty() || loadFiles)
         {
-            GetFilesSorted(currentPath, files);
+            FileSystem::GetFilesSorted(currentPath, files);
 
             files.insert(files.begin(), "..");
 
@@ -492,7 +483,7 @@ void EditorUIModule::ImportDialog(bool& import)
                     currentPath = FileSystem::GetParentPath(currentPath);
                     inputFile   = "";
                     selected    = -1;
-                    GetFilesSorted(currentPath, files);
+                    FileSystem::GetFilesSorted(currentPath, files);
                     searchQuery[0] = '\0';
                     loadFiles      = true;
                     loadButtons    = true;
@@ -502,7 +493,7 @@ void EditorUIModule::ImportDialog(bool& import)
                     currentPath = filePath;
                     inputFile   = "";
                     selected    = -1;
-                    GetFilesSorted(currentPath, files);
+                    FileSystem::GetFilesSorted(currentPath, files);
                     searchQuery[0] = '\0';
                     loadFiles      = true;
                     loadButtons    = true;
@@ -550,24 +541,6 @@ void EditorUIModule::ImportDialog(bool& import)
     }
 
     ImGui::End();
-}
-
-void EditorUIModule::GetFilesSorted(const std::string& currentPath, std::vector<std::string>& files)
-{
-    // files & dir in the current directory
-    FileSystem::GetAllInDirectory(currentPath, files);
-
-    std::sort(
-        files.begin(), files.end(),
-        [&](const std::string& a, const std::string& b)
-        {
-            bool isDirA = FileSystem::IsDirectory((currentPath + DELIMITER + a).c_str());
-            bool isDirB = FileSystem::IsDirectory((currentPath + DELIMITER + b).c_str());
-
-            if (isDirA != isDirB) return isDirA > isDirB;
-            return a < b;
-        }
-    );
 }
 
 void EditorUIModule::Console(bool& consoleMenu) const

@@ -1,7 +1,7 @@
 #include "Octree.h"
 
-#include "FrustumPlanes.h"
 #include "GameObject.h"
+#include "Standalone/MeshComponent.h"
 
 #include <set>
 #include <stack>
@@ -83,11 +83,14 @@ bool Octree::InsertElement(GameObject* gameObject)
 {
     if (gameObject == nullptr) return false;
 
+    const MeshComponent* meshComponent = gameObject->GetMeshComponent();
+    if (meshComponent == nullptr) return false;
+
     bool inserted = false;
     std::stack<OctreeNode*> nodesToVisit;
     nodesToVisit.push(rootNode);
 
-    const AABB objectBoundingBox = gameObject->GetAABB();
+    const AABB objectBoundingBox = meshComponent->GetGlobalAABB();
     OctreeElement octreeElement  = OctreeElement(objectBoundingBox, gameObject, totalElements);
 
     while (!nodesToVisit.empty())
@@ -99,7 +102,7 @@ bool Octree::InsertElement(GameObject* gameObject)
         {
             if (currentNode->IsLeaf())
             {
-                if (currentNode->currentArea.HalfSize().x <= MinimumLeafSize)
+                if (currentNode->currentArea.HalfSize().x <= MINIMUM_TREE_LEAF_SIZE)
                 {
                     currentNode->elements.push_back(octreeElement);
                     inserted = true;
@@ -132,86 +135,6 @@ bool Octree::InsertElement(GameObject* gameObject)
     return inserted;
 
     return false;
-}
-
-void Octree::QueryElements(const AABB& area, std::vector<GameObject*>& foundElements) const
-{
-    std::vector<bool> insertedElements = std::vector<bool>(totalElements, false);
-
-    std::stack<OctreeNode*> nodesToVisit;
-    nodesToVisit.push(rootNode);
-
-    while (!nodesToVisit.empty())
-    {
-        const OctreeNode* currentNode = nodesToVisit.top();
-        nodesToVisit.pop();
-
-        if (currentNode->Intersects(area))
-        {
-            if (currentNode->IsLeaf())
-            {
-                for (const auto& element : currentNode->elements)
-                {
-                    if (!insertedElements[element.id])
-                    {
-                        insertedElements[element.id] = true;
-                        foundElements.push_back(element.gameObject);
-                    }
-                }
-            }
-            else
-            {
-                nodesToVisit.push(currentNode->topLeftFront);
-                nodesToVisit.push(currentNode->topRightFront);
-                nodesToVisit.push(currentNode->bottomLeftFront);
-                nodesToVisit.push(currentNode->bottomRightFront);
-                nodesToVisit.push(currentNode->topLeftBack);
-                nodesToVisit.push(currentNode->topRightBack);
-                nodesToVisit.push(currentNode->bottomLeftBack);
-                nodesToVisit.push(currentNode->bottomRightBack);
-            }
-        }
-    }
-}
-
-void Octree::QueryElements(const FrustumPlanes& cameraPlanes, std::vector<GameObject*>& foundElements) const
-{
-    std::vector<bool> insertedElements = std::vector<bool>(totalElements, false);
-
-    std::stack<OctreeNode*> nodesToVisit;
-    nodesToVisit.push(rootNode);
-
-    while (!nodesToVisit.empty())
-    {
-        const OctreeNode* currentNode = nodesToVisit.top();
-        nodesToVisit.pop();
-
-        if (cameraPlanes.Intersects(currentNode->currentArea))
-        {
-            if (currentNode->IsLeaf())
-            {
-                for (const auto& element : currentNode->elements)
-                {
-                    if (!insertedElements[element.id])
-                    {
-                        insertedElements[element.id] = true;
-                        foundElements.push_back(element.gameObject);
-                    }
-                }
-            }
-            else
-            {
-                nodesToVisit.push(currentNode->topLeftFront);
-                nodesToVisit.push(currentNode->topRightFront);
-                nodesToVisit.push(currentNode->bottomLeftFront);
-                nodesToVisit.push(currentNode->bottomRightFront);
-                nodesToVisit.push(currentNode->topLeftBack);
-                nodesToVisit.push(currentNode->topRightBack);
-                nodesToVisit.push(currentNode->bottomLeftBack);
-                nodesToVisit.push(currentNode->bottomRightBack);
-            }
-        }
-    }
 }
 
 void Octree::GetDrawLines(std::vector<LineSegment>& drawLines, std::vector<LineSegment>& elementLines) const

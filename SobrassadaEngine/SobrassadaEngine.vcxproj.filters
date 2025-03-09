@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="Modules\WindowModule.cpp">
@@ -141,14 +141,8 @@
     <ClCompile Include="Utils\Framebuffer.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="UI\QuadtreeViewer.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
     <ClCompile Include="Utils\Quadtree.cpp">
       <Filter>Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="Tests\MockGameObject.cpp">
-      <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="Utils\Octree.cpp">
       <Filter>Utils</Filter>
@@ -198,9 +192,6 @@
     <ClCompile Include="ResourceManagement\Resources\ResourceTexture.cpp">
       <Filter>Resources</Filter>
     </ClCompile>
-    <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp">
-      <Filter>External\ImGuizmo</Filter>
-    </ClCompile>
     <ClCompile Include="ResourceManagement\Resources\Resource.cpp">
       <Filter>Resources</Filter>
     </ClCompile>
@@ -222,14 +213,8 @@
     <ClCompile Include="Utils\LightsConfig.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="UI\QuadtreeViewer.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
     <ClCompile Include="Utils\Quadtree.cpp">
       <Filter>Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="Tests\MockGameObject.cpp">
-      <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="Utils\Octree.cpp">
       <Filter>Utils</Filter>
@@ -242,9 +227,6 @@
     </ClCompile>
     <ClCompile Include="Modules\SceneModule.cpp">
       <Filter>Modules</Filter>
-    </ClCompile>
-    <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp">
-      <Filter>ImGuizmo</Filter>
     </ClCompile>
     <ClCompile Include="Scene\Components\Standalone\MeshComponent.cpp">
       <Filter>Scene\Components</Filter>
@@ -273,9 +255,6 @@
     <ClCompile Include="Utils\EngineTimer.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Utils\Transform.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
     <ClCompile Include="Modules\DebugDrawModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
@@ -285,8 +264,23 @@
     <ClCompile Include="Modules\EditorUIModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
-    <ClCompile Include="CameraComponent.cpp">
-      <Filter>Scene\Components</Filter>
+    <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp" />
+    <ClCompile Include="Tests\MockGameObject.cpp" />
+    <ClCompile Include="UI\QuadtreeViewer.cpp" />
+    <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp">
+      <Filter>External\ImGuizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\MetaFile.cpp">
+      <Filter>FileSystem\Meta</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\MetaMaterial.cpp">
+      <Filter>FileSystem\Meta</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\MetaMesh.cpp">
+      <Filter>FileSystem\Meta</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\MetaTexture.cpp">
+      <Filter>FileSystem\Meta</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -295,12 +289,6 @@
     </Filter>
     <Filter Include="Utils">
       <UniqueIdentifier>{2cd12f8e-4d83-4137-a3bb-33b6ec3804a8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Tests">
-      <UniqueIdentifier>{27fbe6cb-da01-4a99-989c-de397f7946c3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="UI">
-      <UniqueIdentifier>{b3f5d97a-4296-47c2-80a3-75724af69446}</UniqueIdentifier>
     </Filter>
     <Filter Include="Scene">
       <UniqueIdentifier>{17967f25-7595-4f99-b9c6-c6a1934b81a7}</UniqueIdentifier>
@@ -331,6 +319,9 @@
     </Filter>
     <Filter Include="External\MathGeoLib">
       <UniqueIdentifier>{77ec05ef-e581-4de2-bda3-50c6c7bcc0d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FileSystem\Meta">
+      <UniqueIdentifier>{0325771a-d106-4c90-8e61-78de9e68b286}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -419,9 +410,6 @@
     <ClInclude Include="Scene\Components\Component.h">
       <Filter>Scene\Components</Filter>
     </ClInclude>
-    <ClInclude Include="Utils\Transform.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Scene\GameObjects\GameObject.h">
       <Filter>Scene\GameObjects</Filter>
     </ClInclude>
@@ -473,14 +461,8 @@
     <ClInclude Include="Utils\LightsConfig.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="UI\QuadtreeViewer.h">
-      <Filter>UI</Filter>
-    </ClInclude>
     <ClInclude Include="Utils\Quadtree.h">
       <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="Tests\MockGameObject.h">
-      <Filter>Tests</Filter>
     </ClInclude>
     <ClInclude Include="Utils\Octree.h">
       <Filter>Utils</Filter>
@@ -509,8 +491,20 @@
     <ClInclude Include="Modules\EditorUIModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
-    <ClInclude Include="CameraComponent.h">
-      <Filter>Scene\Components</Filter>
+    <ClInclude Include="FileSystem\MetaFile.h">
+      <Filter>FileSystem\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\MetaMaterial.h">
+      <Filter>FileSystem\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\MetaMesh.h">
+      <Filter>FileSystem\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\MetaTexture.h">
+      <Filter>FileSystem\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="RaycastController.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

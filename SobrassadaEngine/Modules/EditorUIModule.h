@@ -1,24 +1,23 @@
 #pragma once
 
-#include "imgui_internal.h"
-#include "./Libs/ImGuizmo/ImGuizmo.h"
 #include "Module.h"
 #include "ResourceManagement/Resources/Resource.h"
 
 #include "SDL.h"
+#include "imgui_internal.h"
+#include <Math/float4x4.h>
 #include <deque>
 #include <string>
 #include <unordered_map>
-#include <Math/float4x4.h>
+
+// imguizmo after imgui
+#include "./Libs/ImGuizmo/ImGuizmo.h"
 
 struct CPUFeature
 {
     SDL_bool (*check)();
     const char* name;
 };
-
-class EditorViewport;
-class QuadtreeViewer;
 
 class EditorUIModule : public Module
 {
@@ -60,7 +59,6 @@ class EditorUIModule : public Module
     void ShowCaps() const;
 
     void ImportDialog(bool& import);
-    void GetFilesSorted(const std::string& currentPath, std::vector<std::string>& files);
     void LoadDialog(bool& load);
     void SaveDialog(bool& save);
     void Console(bool& consoleMenu) const;
@@ -88,10 +86,8 @@ class EditorUIModule : public Module
 
     ImGuizmo::MODE transformType   = ImGuizmo::LOCAL;
 
-    QuadtreeViewer* quadtreeViewer = nullptr;
-
     std::string startPath;
-    std::string libraryPath;
+    std::string scenesPath;
 
     ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
     ;

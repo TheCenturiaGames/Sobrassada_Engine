@@ -63,9 +63,9 @@ void MeshComponent::RenderEditorInspector()
         }
 
         ImGui::SeparatorText("Material");
-        ImGui::Text(currentTextureName.c_str());
+        ImGui::Text(currentMaterialName.c_str());
         ImGui::SameLine();
-        if (ImGui::Button("Select texture"))
+        if (ImGui::Button("Select material"))
         {
             ImGui::OpenPopup(CONSTANT_TEXTURE_SELECT_DIALOG_ID);
         }
@@ -107,7 +107,6 @@ void MeshComponent::AddMesh(UID resource, bool reloadAABB)
     if (newMesh != nullptr)
     {
         App->GetResourcesModule()->ReleaseResource(currentMesh);
-        newMesh->SetMaterial(currentMaterial != nullptr ? currentMaterial->GetUID() : CONSTANT_EMPTY_UID);
         currentMeshName    = newMesh->GetName();
         currentMesh        = newMesh;
         localComponentAABB = AABB(currentMesh->GetAABB());
@@ -134,6 +133,6 @@ void MeshComponent::AddMaterial(UID resource)
     {
         App->GetResourcesModule()->ReleaseResource(currentMaterial);
         currentMaterial    = newMaterial;
-        currentTextureName = currentMaterial->GetName();
+        currentMaterialName = currentMaterial->GetName();
     }
 }
