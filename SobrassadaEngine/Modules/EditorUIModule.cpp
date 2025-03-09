@@ -23,6 +23,8 @@
 #define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_EXTERNAL_IMAGE
 #define TINYGLTF_IMPLEMENTATION /* Only in one of the includes */
+#include "ProjectModule.h"
+
 #include <tiny_gltf.h>          // TODO Remove
 
 EditorUIModule::EditorUIModule()
@@ -50,8 +52,7 @@ bool EditorUIModule::Init()
     width          = App->GetWindowModule()->GetWidth();
     height         = App->GetWindowModule()->GetHeight();
 
-    startPath      = std::filesystem::current_path().string();
-    scenesPath     = startPath + DELIMITER + SCENES_PATH;
+    scenesPath     = App->GetProjectModule()->GetLoadedProjectPath() + DELIMITER + SCENES_PATH;
 
     App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_G, [&] { mCurrentGizmoOperation = ImGuizmo::TRANSLATE; });
     App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_H, [&] { mCurrentGizmoOperation = ImGuizmo::ROTATE; });
@@ -268,7 +269,7 @@ void EditorUIModule::LoadDialog(bool& load)
     {
         if (!inputFile.empty())
         {
-            std::string loadPath = SCENES_PATH + inputFile;
+            std::string loadPath = App->GetProjectModule()->GetLoadedProjectPath() + DELIMITER + SCENES_PATH + inputFile;
             App->GetLibraryModule()->LoadScene(loadPath.c_str());
         }
         inputFile = "";
@@ -357,7 +358,7 @@ void EditorUIModule::ImportDialog(bool& import)
         return;
     }
 
-    static std::string currentPath = startPath;
+    static std::string currentPath = App->GetProjectModule()->GetLoadedProjectPath();
     static std::vector<std::string> accPaths;
     static bool loadButtons = true;
 
@@ -516,7 +517,7 @@ void EditorUIModule::ImportDialog(bool& import)
     if (ImGui::Button("Cancel", ImVec2(0, 0)))
     {
         inputFile      = "";
-        currentPath    = startPath;
+        currentPath    = App->GetProjectModule()->GetLoadedProjectPath();
         import         = false;
         showDrives     = false;
         searchQuery[0] = '\0';
@@ -533,7 +534,7 @@ void EditorUIModule::ImportDialog(bool& import)
             SceneImporter::Import(importPath.c_str());
         }
         inputFile      = "";
-        currentPath    = startPath;
+        currentPath    = App->GetProjectModule()->GetLoadedProjectPath();
         import         = false;
         showDrives     = false;
         searchQuery[0] = '\0';

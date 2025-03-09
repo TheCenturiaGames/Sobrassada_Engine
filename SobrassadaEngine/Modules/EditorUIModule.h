@@ -86,7 +86,6 @@ class EditorUIModule : public Module
 
     ImGuizmo::MODE transformType   = ImGuizmo::LOCAL;
 
-    std::string startPath;
     std::string scenesPath;
 
     ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;

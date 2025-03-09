@@ -63,6 +63,7 @@ enum update_status
 #define DEFAULT_CAMERA_MOUSE_SENSITIVITY     0.5f;
 #define DEFAULT_CAMERA_ZOOM_SENSITIVITY      5.f;
 
+#define DEFAULT_PROJECTS_PATH     "Projects"
 #define ASSETS_PATH     "Assets/"
 #define SCENES_PATH     "Assets/Scenes/"
 #define METADATA_PATH   "Assets/Metadata/"

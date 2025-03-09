@@ -9,6 +9,7 @@
 #include "InputModule.h"
 #include "LibraryModule.h"
 #include "OpenGLModule.h"
+#include "ProjectModule.h"
 #include "ResourcesModule.h"
 #include "Root/RootComponent.h"
 #include "SceneModule.h"
@@ -23,6 +24,7 @@ Application::Application()
 {
     modules.push_back(windowModule = new WindowModule());
     modules.push_back(openGLModule = new OpenGLModule());
+    modules.push_back(projectModule = new ProjectModule());
     modules.push_back(libraryModule = new LibraryModule());
     modules.push_back(resourcesModule = new ResourcesModule());
     modules.push_back(inputModule = new InputModule());
