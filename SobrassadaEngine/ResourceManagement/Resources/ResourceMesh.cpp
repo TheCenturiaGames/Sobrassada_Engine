@@ -66,7 +66,7 @@ void ResourceMesh::LoadData(
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
 
     glEnableVertexAttribArray(2); // Joint
-    glVertexAttribPointer(2, 4, GL_UNSIGNED_INT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, joint));
+    glVertexAttribIPointer(2, 4, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, joint));
 
     glEnableVertexAttribArray(3); // Weights
     glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, weights));
@@ -131,6 +131,11 @@ void ResourceMesh::Render(
         }
         GLsizei length = (GLsizei)bones.size();
         glUniformMatrix4fv(glGetUniformLocation(program, "palette"), length, GL_FALSE, palette[0].ptr());
+        glUniform1i(4, 1); // Tell the shader the mesh has bones
+    }
+    else
+    {
+        glUniform1i(4, 0); // Tell the shader the mesh has no bones
     }
 
     if (material != nullptr)
