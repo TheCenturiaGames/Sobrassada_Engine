@@ -13,6 +13,7 @@
 #include <map>
 #include <string>
 #include <unordered_map>
+#include <tuple>
 
 class GameObject;
 class Component;
@@ -38,8 +39,8 @@ class SceneModule : public Module
     );
     void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
     void CloseScene();
-    void CheckObjectsToRender();
     void SwitchPlayModeStateTo(bool wantedStatePlayMode);
+    bool IsInPlayMode() const { return bInPlayMode; }
 
     void AddGameObject(UID uid, GameObject* newGameObject) const
     {
@@ -100,8 +101,10 @@ class SceneModule : public Module
 
     UID GetSceneUID() const { return loadedScene != nullptr ? loadedScene->GetSceneUID() : CONSTANT_EMPTY_UID; }
     const char* GetSceneName() const { return loadedScene != nullptr ? loadedScene->GetSceneName() : "Not loaded"; }
-    bool IsInPlayMode() const { return bInPlayMode; }
     LightsConfig* GetLightsConfig() { return loadedScene != nullptr ? loadedScene->GetLightsConfig() : nullptr; }
+    const std::tuple<float, float>& GetWindowPosition() const { return loadedScene->GetWindowPosition(); };
+    const std::tuple<float, float>& GetWindowSize() const { return loadedScene->GetWindowSize(); };
+    const std::tuple<float, float>& GetMousePosition() const { return loadedScene->GetMousePosition(); };
 
     bool GetDoInputs() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() : false; }
 
