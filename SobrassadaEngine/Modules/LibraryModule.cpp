@@ -40,6 +40,7 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
     Scene* loadedScene = App->GetSceneModule()->GetScene();
     if (loadedScene != nullptr)
     {
+        const char* sceneName = loadedScene->GetSceneName();
         if (sceneName == DEFAULT_SCENE_NAME && saveMode == SaveMode::Save) return false;
         // Create doc JSON
         rapidjson::Document doc;
@@ -48,7 +49,7 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
 
         rapidjson::Value scene(rapidjson::kObjectType);
 
-        const char* sceneName = loadedScene->Save(scene, allocator);
+        loadedScene->Save(scene, allocator);
 
         doc.AddMember("Scene", scene, allocator);
 

@@ -10,6 +10,8 @@
 #include <unordered_map>
 #include <vector>
 
+class MeshComponent;
+
 enum ComponentMobilitySettings
 {
     STATIC  = 0,
@@ -73,6 +75,8 @@ class GameObject
     void UpdateTransformForGOBranch() const;
 
     const std::unordered_map<ComponentType, Component*>& GetComponents() const { return components; }
+
+    const MeshComponent* GetMeshComponent() const;
 
   private:
     void OnTransformUpdated();

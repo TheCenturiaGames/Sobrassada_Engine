@@ -21,7 +21,7 @@ class Scene
     ~Scene();
 
     void Init();
-    const char* Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
+    void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
 
     void LoadComponents() const;
     void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
@@ -53,7 +53,7 @@ class Scene
     const std::tuple<float, float>& GetMousePosition() const { return mousePosition; };
     const Octree* GetOctree() const { return sceneOctree; }
 
-    void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUUID = newSelectedGameObject; };
+    void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
     
     bool GetDoInputs() const { return doInputs; }
 

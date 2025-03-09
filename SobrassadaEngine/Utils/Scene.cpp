@@ -91,7 +91,7 @@ void Scene::Init()
     UpdateSpatialDataStruct();
 }
 
-const char* Scene::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
+void Scene::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
 {
     // Create structure
     targetState.AddMember("UID", sceneUID, allocator);
@@ -128,8 +128,6 @@ const char* Scene::Save(rapidjson::Value& targetState, rapidjson::Document::Allo
         targetState.AddMember("Lights Config", lights, allocator);
     }
     else GLOG("Light Config not found");
-
-    return sceneName;
 }
 
 void Scene::LoadComponents() const

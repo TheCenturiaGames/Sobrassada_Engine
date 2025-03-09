@@ -74,7 +74,6 @@ update_status SceneModule::PostUpdate(float deltaTime)
             if (selectedObject != nullptr)
             {
                 loadedScene->SetSelectedGameObject(selectedObject->GetUID());
-                selectedObject->GetRootComponent()->SetSelectedComponent(selectedObject->GetRootComponent()->GetUID());
             }
         }
     }
