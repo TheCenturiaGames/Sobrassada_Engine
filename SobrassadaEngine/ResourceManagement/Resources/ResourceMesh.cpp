@@ -102,35 +102,34 @@ void ResourceMesh::Render(
     // CPU Skinning
     if (bones.size() > 0 && bindMatrices.size() > 0)
     {
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-        Vertex* vertices = reinterpret_cast<Vertex*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
-        for (unsigned int i = 0; i < vertexCount; ++i)
-        {
-            float4x4 boneInfluence = float4x4::zero;
-            for (int j = 0; j < 4; ++j)
-            {
-                const float4x4& boneTransform  = bones[vertices[i].joint[j]]->GetGlobalTransform();
-                float4x4 skinSpace             = boneTransform * bindMatrices[vertices[i].joint[j]];
-                boneInfluence                 += skinSpace * vertices[i].weights[j];
-            }
-            vertices[i].position = boneInfluence.MulPos(bindPoseVertices[i].position);
-
-            // TODO: rotate normals and tangents
-            vertices[i].normal   = boneInfluence.MulDir(bindPoseVertices[i].normal);
-            vertices[i].tangent  = boneInfluence * bindPoseVertices[i].tangent;
-        }
-
-        glUnmapBuffer(GL_ARRAY_BUFFER);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        //glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        //
+        //Vertex* vertices = reinterpret_cast<Vertex*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
+        //for (unsigned int i = 0; i < vertexCount; ++i)
+        //{
+        //    float4x4 boneInfluence = float4x4::zero;
+        //    for (int j = 0; j < 4; ++j)
+        //    {
+        //        const float4x4& boneTransform  = bones[vertices[i].joint[j]]->GetGlobalTransform();
+        //        float4x4 skinSpace             = boneTransform * bindMatrices[vertices[i].joint[j]];
+        //        boneInfluence                 += skinSpace * vertices[i].weights[j];
+        //    }
+        //    vertices[i].position = boneInfluence.MulPos(bindPoseVertices[i].position);
+        //
+        //    // TODO: rotate normals and tangents
+        //    vertices[i].normal   = boneInfluence.MulDir(bindPoseVertices[i].normal);
+        //    vertices[i].tangent  = boneInfluence * bindPoseVertices[i].tangent;
+        //}
+        //
+        //glUnmapBuffer(GL_ARRAY_BUFFER);
+        //glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         float4x4 palette[64];
         for (size_t i = 0; i < bones.size(); ++i)
         {
             palette[i] = bones[i]->GetGlobalTransform() * bindMatrices[i];
         }
-        GLsizei length = (GLsizei)bones.size();
-        glUniformMatrix4fv(glGetUniformLocation(program, "palette"), length, GL_FALSE, palette[0].ptr());
+        glUniformMatrix4fv(glGetUniformLocation(program, "palette"), bones.size(), GL_TRUE, palette[0].ptr());
         glUniform1i(4, 1); // Tell the shader the mesh has bones
     }
     else

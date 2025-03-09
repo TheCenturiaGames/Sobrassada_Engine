@@ -25,26 +25,30 @@ out vec3 fragViewPos;
 
 void main()
 {
+    //Camera position in World Space
+    fragViewPos = vec3(inverse(viewMatrix)[3]);
+    uv0 = vertex_uv0;
+
+    mat4 finalModel = model;
+
+    mat3 normalMatrix = mat3(transpose(inverse(model)));
+    normal = normalMatrix * vertex_normal;
+    tangent = vec4(normalMatrix * vertex_tangent.xyz, vertex_tangent.w);
+
     // Indexing with a float is crashing
     if (hasBones) 
     {
+        mat4 skin_t = palette[vertex_joint[0]] * vertex_weights[0] + palette[vertex_joint[1]] * vertex_weights[1] +             
+                      palette[vertex_joint[2]] * vertex_weights[2] + palette[vertex_joint[3]] * vertex_weights[3];
 
+        pos      = (skin_t*vec4(vertex_position, 1.0)).xyz;
+        normal   = (skin_t*vec4(vertex_normal, 0.0)).xyz;        // 0.0 avoid translation
+        tangent = vec4((skin_t*vec4(tangent.xyz, 0.0)).xyz, tangent.w); // 0.0 avoid translation
+    } 
+    else 
+    {
+        pos = vec3(model * vec4(vertex_position, 1.0));
     }
-    
 
-    
-    pos = vec3(model * vec4(vertex_position, 1.0));
-    pos = vertex_position;
-    mat3 normalMatrix = mat3(transpose(inverse(model)));
-    normal = normalMatrix * vertex_normal;
-    uv0 = vertex_uv0;
-    tangent = vec4(normalMatrix * vertex_tangent.xyz, vertex_tangent.w);
-
-    //Camera position in World Space
-    fragViewPos = vec3(inverse(viewMatrix)[3]);
-
-	//gl_Position = projMatrix * viewMatrix * model * vec4(vertex_position, 1.0f);
-    gl_Position = projMatrix * viewMatrix * vec4(vertex_position, 1.0f); 
-
-	
+    gl_Position = projMatrix * viewMatrix * vec4(pos, 1.0f); 
 }
