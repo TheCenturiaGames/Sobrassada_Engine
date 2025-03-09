@@ -180,12 +180,16 @@ void GameObject::HandleNodeClick(UID& selectedGameObjectUUID)
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DRAG_DROP_GAMEOBJECT"))
         {
             UID draggedUUID = *reinterpret_cast<const UID*>(payload->Data);
-            if (draggedUUID != uuid)
+            
+            if (TargetIsChildren(draggedUUID))
             {
-                if (UpdateGameObjectHierarchy(draggedUUID, uuid))
+                if (draggedUUID != uuid)
                 {
-                    ComponentGlobalTransformUpdated();
-                    PassAABBUpdateToParent(); // TODO: check if it works
+                    if (UpdateGameObjectHierarchy(draggedUUID, uuid))
+                    {
+                        ComponentGlobalTransformUpdated();
+                        PassAABBUpdateToParent(); // TODO: check if it works
+                    }
                 }
             }
         }
@@ -259,6 +263,28 @@ void GameObject::RenameGameObjectHierarchy()
         isRenaming         = false;
         currentRenamingUID = INVALID_UUID;
     }
+}
+
+bool GameObject::TargetIsChildren(UID uidTarget)
+{
+    bool isGOChildren = false;
+
+    if (children.size() <= 0) return isGOChildren;
+
+    for (auto childUID : children)
+    {
+        if (childUID == uidTarget)
+        {
+            isGOChildren = true;
+            break;
+        }
+        else
+        {
+            GameObject* childGO = App->GetSceneModule()->GetGameObjectByUUID(childUID);
+            isGOChildren        = TargetIsChildren(childUID);
+        }
+    }
+    return isGOChildren;
 }
 
 const MeshComponent* GameObject::GetMeshComponent() const

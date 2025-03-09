@@ -46,6 +46,7 @@ class GameObject : public AABBUpdatable
 
     bool UpdateGameObjectHierarchy(UID sourceUID, UID targetUID);
     void RenameGameObjectHierarchy();
+    bool TargetIsChildren(UID uidTarget);
 
     void AddChildren(UID childUUID) { children.push_back(childUUID); }
 
