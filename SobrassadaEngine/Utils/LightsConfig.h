@@ -5,8 +5,8 @@
 
 #include "Math/float3.h"
 #include "Math/float4.h"
-#include <memory>
 #include <Libs/rapidjson/document.h>
+#include <memory>
 
 class Component;
 
@@ -110,10 +110,10 @@ class LightsConfig
     unsigned int pointBufferId;
     unsigned int spotBufferId;
 
-    DirectionalLightComponent *directionalLight = nullptr;
+    DirectionalLightComponent* directionalLight = nullptr;
     std::vector<PointLightComponent*> pointLights;
     std::vector<SpotLightComponent*> spotLights;
 
     ResourceTexture* currentTexture = nullptr;
-    std::string currentTextureName = "Not selected";
+    std::string currentTextureName  = "Not selected";
 };

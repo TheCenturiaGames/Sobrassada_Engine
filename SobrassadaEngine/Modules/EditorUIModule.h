@@ -36,7 +36,9 @@ class EditorUIModule : public Module
     bool RenderImGuizmo(float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform) const;
 
     template <typename T>
-    T RenderResourceSelectDialog(const char* id, const std::unordered_map<std::string, T>& availableResources, const T& defaultResource);
+    T RenderResourceSelectDialog(
+        const char* id, const std::unordered_map<std::string, T>& availableResources, const T& defaultResource
+    );
 
   private:
     void RenderBasicTransformModifiers(
@@ -85,7 +87,7 @@ class EditorUIModule : public Module
     std::deque<float> framerate;
     std::deque<float> frametime;
 
-    ImGuizmo::MODE transformType   = ImGuizmo::LOCAL;
+    ImGuizmo::MODE transformType = ImGuizmo::LOCAL;
 
     std::string startPath;
     std::string scenesPath;
@@ -93,4 +95,3 @@ class EditorUIModule : public Module
     ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
     ;
 };
-

@@ -47,11 +47,11 @@ bool EditorUIModule::Init()
     ImGui_ImplSDL2_InitForOpenGL(App->GetWindowModule()->window, App->GetOpenGLModule()->GetContext());
     ImGui_ImplOpenGL3_Init("#version 460");
 
-    width          = App->GetWindowModule()->GetWidth();
-    height         = App->GetWindowModule()->GetHeight();
+    width      = App->GetWindowModule()->GetWidth();
+    height     = App->GetWindowModule()->GetHeight();
 
-    startPath      = std::filesystem::current_path().string();
-    scenesPath     = startPath + DELIMITER + SCENES_PATH;
+    startPath  = std::filesystem::current_path().string();
+    scenesPath = startPath + DELIMITER + SCENES_PATH;
 
     App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_G, [&] { mCurrentGizmoOperation = ImGuizmo::TRANSLATE; });
     App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_H, [&] { mCurrentGizmoOperation = ImGuizmo::ROTATE; });
@@ -668,8 +668,13 @@ bool EditorUIModule::RenderImGuizmo(
     return true;
 }
 
-template UID EditorUIModule::RenderResourceSelectDialog<UID>(const char* id, const std::unordered_map<std::string, UID>& availableResources, const UID& defaultResource);
-template ComponentType EditorUIModule::RenderResourceSelectDialog<ComponentType>(const char* id, const std::unordered_map<std::string, ComponentType>& availableResources, const ComponentType& defaultResource);
+template UID EditorUIModule::RenderResourceSelectDialog<UID>(
+    const char* id, const std::unordered_map<std::string, UID>& availableResources, const UID& defaultResource
+);
+template ComponentType EditorUIModule::RenderResourceSelectDialog<ComponentType>(
+    const char* id, const std::unordered_map<std::string, ComponentType>& availableResources,
+    const ComponentType& defaultResource
+);
 
 void EditorUIModule::RenderBasicTransformModifiers(
     float3& outputPosition, float3& outputRotation, float3& outputScale, bool& lockScaleAxis,

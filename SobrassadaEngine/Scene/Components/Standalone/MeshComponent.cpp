@@ -129,7 +129,7 @@ void MeshComponent::AddMaterial(UID resource)
     if (newMaterial != nullptr)
     {
         App->GetResourcesModule()->ReleaseResource(currentMaterial);
-        currentMaterial    = newMaterial;
+        currentMaterial     = newMaterial;
         currentMaterialName = currentMaterial->GetName();
     }
 }

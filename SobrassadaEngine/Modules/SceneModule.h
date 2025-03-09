@@ -8,8 +8,8 @@
 #include "Scene.h"
 
 #include <map>
-#include <unordered_map>
 #include <tuple>
+#include <unordered_map>
 
 class GameObject;
 class Component;
@@ -82,7 +82,7 @@ class SceneModule : public Module
     const std::tuple<float, float>& GetMousePosition() const { return loadedScene->GetMousePosition(); };
 
     Scene* GetScene() const { return loadedScene; }
-    
+
     bool GetDoInputs() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() : false; }
 
   private:

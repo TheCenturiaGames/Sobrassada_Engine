@@ -64,7 +64,7 @@ update_status SceneModule::PostUpdate(float deltaTime)
     if (loadedScene != nullptr && loadedScene->GetDoInputs() && !ImGuizmo::IsUsingAny())
     {
         const KeyState* mouseButtons = App->GetInputModule()->GetMouseButtons();
-        const KeyState* keyboard = App->GetInputModule()->GetKeyboard();
+        const KeyState* keyboard     = App->GetInputModule()->GetKeyboard();
         if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_DOWN && !keyboard[SDL_SCANCODE_LALT])
         {
             GameObject* selectedObject = RaycastController::GetRayIntersection<Octree>(

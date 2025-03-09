@@ -54,7 +54,7 @@ class Scene
     const Octree* GetOctree() const { return sceneOctree; }
 
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
-    
+
     bool GetDoInputs() const { return doInputs; }
 
     const std::unordered_map<UID, Component*> GetAllComponents() const;
@@ -78,5 +78,5 @@ class Scene
     std::tuple<float, float> sceneWindowPosition = std::make_tuple(0.f, 0.f);
     std::tuple<float, float> sceneWindowSize     = std::make_tuple(0.f, 0.f);
     std::tuple<float, float> mousePosition       = std::make_tuple(0.f, 0.f);
-    bool doInputs              = false;
+    bool doInputs                                = false;
 };
