@@ -1,0 +1,87 @@
+{
+    "Scene": {
+        "UID": 5176711887379193768,
+        "Name": "aramari.scene",
+        "RootGameObject": 1251115937072386960,
+        "GameObjects": [
+            {
+                "UID": 1251115937072386960,
+                "ParentUID": 0,
+                "Name": "SceneModule GameObject",
+                "Children": [],
+                "RootComponentUID": 708203074
+            }
+        ],
+        "Components": [
+            {
+                "UID": 708203074,
+                "ParentUID": 1251115937072386960,
+                "RootUID": 708203074,
+                "Type": 1,
+                "LocalTransform": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "Children": [
+                    1649063642
+                ],
+                "Enabled": true,
+                "Name": "Root Component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 1649063642,
+                "ParentUID": 708203074,
+                "RootUID": 708203074,
+                "Type": 2,
+                "LocalTransform": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Mesh",
+                "Mesh": 1312433069259191,
+                "Material": 1219145535970458
+            }
+        ]
+    },
+    "Lights Config": {
+        "Ambient Color": [
+            1.0,
+            1.0,
+            1.0
+        ],
+        "Ambient Intensity": 0.20000000298023224,
+        "Skybox UID": 1170799310640544
+    }
+}

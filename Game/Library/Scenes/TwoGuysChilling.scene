@@ -1,0 +1,117 @@
+{
+    "Scene": {
+        "UID": 9546741125071653080,
+        "Name": "TwoGuysChilling",
+        "RootGameObject": 15104258652253078691,
+        "GameObjects": [
+            {
+                "UID": 15104258652253078691,
+                "ParentUID": 0,
+                "Name": "SceneModule GameObject",
+                "Children": [],
+                "RootComponentUID": 4191493578
+            }
+        ],
+        "Components": [
+            {
+                "UID": 1680516106,
+                "ParentUID": 4191493578,
+                "RootUID": 4191493578,
+                "Type": 2,
+                "LocalTransform": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    -2.5517239570617676,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.2620687484741211,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Mesh",
+                "Mesh": 1366270466801380,
+                "Material": 1288801174897226
+            },
+            {
+                "UID": 3631345303,
+                "ParentUID": 4191493578,
+                "RootUID": 4191493578,
+                "Type": 2,
+                "LocalTransform": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    1.7241342067718506,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.3310370445251465,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Mesh",
+                "Mesh": 1366270466801380,
+                "Material": 1288801174897226
+            },
+            {
+                "UID": 4191493578,
+                "ParentUID": 15104258652253078691,
+                "RootUID": 4191493578,
+                "Type": 1,
+                "LocalTransform": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "Children": [
+                    1680516106,
+                    3631345303
+                ],
+                "Enabled": true,
+                "Name": "Root Component",
+                "Type": 1,
+                "Mobility": 1
+            }
+        ]
+    },
+    "Lights Config": {
+        "Ambient Color": [
+            1.0,
+            1.0,
+            1.0
+        ],
+        "Ambient Intensity": 0.20000000298023224,
+        "Skybox UID": 1170799310640544
+    }
+}

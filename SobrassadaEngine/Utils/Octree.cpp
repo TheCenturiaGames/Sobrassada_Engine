@@ -81,57 +81,73 @@ Octree::~Octree()
 
 bool Octree::InsertElement(GameObject* gameObject)
 {
+
     if (gameObject == nullptr) return false;
 
     bool inserted = false;
-    std::stack<OctreeNode*> nodesToVisit;
-    nodesToVisit.push(rootNode);
-
     const AABB objectBoundingBox = gameObject->GetAABB();
     OctreeElement octreeElement  = OctreeElement(objectBoundingBox, gameObject, totalElements);
-
-    while (!nodesToVisit.empty())
+    
+    struct InsertionData
     {
-        OctreeNode* currentNode = nodesToVisit.top();
-        nodesToVisit.pop();
+        Octree::OctreeNode* node;
+        Octree::OctreeElement element;
+    };
 
-        if (currentNode->Intersects(objectBoundingBox))
+    std::stack<InsertionData> dataToVisit;
+    dataToVisit.push({rootNode, octreeElement});
+
+
+     while (!dataToVisit.empty())
+    {
+        InsertionData current = dataToVisit.top();
+        dataToVisit.pop();
+
+        // Si l'AABB de l'element interseca amb l'espai del node
+        if (current.node->Intersects(current.element.boundingBox))
         {
-            if (currentNode->IsLeaf())
+            if (current.node->IsLeaf())
             {
-                if (currentNode->currentArea.HalfSize().x <= MinimumLeafSize)
+                // Si el node ha arribat a la mida mínima o encara té capacitat, s'insereix
+                if (current.node->currentArea.HalfSize().x <= MinimumLeafSize ||
+                    current.node->elements.size() < current.node->elementsCapacity)
                 {
-                    currentNode->elements.push_back(octreeElement);
-                    inserted = true;
-                }
-                else if (currentNode->elements.size() < currentNode->elementsCapacity)
-                {
-                    currentNode->elements.push_back(octreeElement);
+                    current.node->elements.push_back(current.element);
                     inserted = true;
                 }
                 else
                 {
-                    currentNode->Subdivide();
-                    totalLeaf += 7;
+                    // Si el node és fulla i està ple: subdivideix
+                    current.node->Subdivide();
+                    totalLeaf += 7; // actualitzem el nombre de fulles
+
+                    // Reinserim l'element en tots els fills
+                    dataToVisit.push({current.node->topLeftFront, current.element});
+                    dataToVisit.push({current.node->topRightFront, current.element});
+                    dataToVisit.push({current.node->bottomLeftFront, current.element});
+                    dataToVisit.push({current.node->bottomRightFront, current.element});
+                    dataToVisit.push({current.node->topLeftBack, current.element});
+                    dataToVisit.push({current.node->topRightBack, current.element});
+                    dataToVisit.push({current.node->bottomLeftBack, current.element});
+                    dataToVisit.push({current.node->bottomRightBack, current.element});
                 }
             }
-            if (!currentNode->IsLeaf())
+            else
             {
-                nodesToVisit.push(currentNode->topLeftFront);
-                nodesToVisit.push(currentNode->topRightFront);
-                nodesToVisit.push(currentNode->bottomLeftFront);
-                nodesToVisit.push(currentNode->bottomRightFront);
-                nodesToVisit.push(currentNode->topLeftBack);
-                nodesToVisit.push(currentNode->topRightBack);
-                nodesToVisit.push(currentNode->bottomLeftBack);
-                nodesToVisit.push(currentNode->bottomRightBack);
+                // Si el node ja té fills, ens assegurem de processar tots els fills
+                dataToVisit.push({current.node->topLeftFront, current.element});
+                dataToVisit.push({current.node->topRightFront, current.element});
+                dataToVisit.push({current.node->bottomLeftFront, current.element});
+                dataToVisit.push({current.node->bottomRightFront, current.element});
+                dataToVisit.push({current.node->topLeftBack, current.element});
+                dataToVisit.push({current.node->topRightBack, current.element});
+                dataToVisit.push({current.node->bottomLeftBack, current.element});
+                dataToVisit.push({current.node->bottomRightBack, current.element});
             }
         }
     }
     if (inserted) ++totalElements;
     return inserted;
-
-    return false;
 }
 
 void Octree::QueryElements(const AABB& area, std::vector<GameObject*>& foundElements) const
