@@ -4,6 +4,7 @@
 #include "LightsConfig.h"
 
 #include <map>
+#include <tuple>
 #include <unordered_map>
 
 class GameObject;
@@ -50,11 +51,15 @@ class Scene
     AABBUpdatable* GetTargetForAABBUpdate(UID uid);
     LightsConfig* GetLightsConfig() { return lightsConfig; }
 
+    const std::tuple<float, float>& GetWindowPosition() const { return sceneWindowPosition; };
+    const std::tuple<float, float>& GetWindowSize() const { return sceneWindowSize; };
+    const std::tuple<float, float>& GetMousePosition() const { return mousePosition; };
+    const Octree* GetOctree() const { return sceneOctree; }
     bool GetStopPlaying() const { return stopPlaying; }
-
-    void SetStopPlaying(bool stop) { stopPlaying = stop; }
-
     bool GetDoInputs() const { return doInputs; }
+
+    void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
+    void SetStopPlaying(bool stop) { stopPlaying = stop; }
 
   private:
     void CreateSpatialDataStruct();
@@ -70,8 +75,12 @@ class Scene
     std::map<UID, Component*> gameComponents; // TODO Move components to individual gameObjects
     std::unordered_map<UID, GameObject*> gameObjectsContainer;
 
-    LightsConfig* lightsConfig = nullptr;
-    Octree* sceneOctree        = nullptr;
+    LightsConfig* lightsConfig                   = nullptr;
+    Octree* sceneOctree                          = nullptr;
 
-    bool doInputs              = false;
+    // IMGUI WINDOW DATA
+    std::tuple<float, float> sceneWindowPosition = std::make_tuple(0.f, 0.f);
+    std::tuple<float, float> sceneWindowSize     = std::make_tuple(0.f, 0.f);
+    std::tuple<float, float> mousePosition       = std::make_tuple(0.f, 0.f);
+    bool doInputs = false;
 };

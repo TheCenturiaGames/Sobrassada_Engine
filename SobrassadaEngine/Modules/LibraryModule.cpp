@@ -8,11 +8,15 @@
 #include "Root/RootComponent.h"
 #include "SceneImporter.h"
 #include "SceneModule.h"
+#include "TextureImporter.h"
 
+#include "Libs/rapidjson/stringbuffer.h"
+#include "Libs/rapidjson/writer.h"
 #include "document.h"
 #include "prettywriter.h"
 #include "stringbuffer.h"
 #include <filesystem>
+#include <fstream>
 
 LibraryModule::LibraryModule()
 {
@@ -60,7 +64,7 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
         break;
     }
 
-    if (sceneUID == CONSTANT_EMPTY_UID && saveMode == SaveMode::Save) return false;
+    if (sceneName == DEFAULT_SCENE_NAME && saveMode == SaveMode::Save) return false;
 
     UID gameObjectRootUID   = sceneModule->GetGameObjectRootUID();
     const auto* gameObjects = sceneModule->GetAllGameObjects();
@@ -237,45 +241,48 @@ bool LibraryModule::LoadScene(const char* file, bool reload) const
 
 bool LibraryModule::LoadLibraryMaps()
 {
-
-    for (const auto& entry : std::filesystem::recursive_directory_iterator(LIBRARY_PATH))
+    for (const auto& entry : std::filesystem::recursive_directory_iterator(METADATA_PATH))
     {
-
-        if (entry.is_regular_file())
+        if (entry.is_regular_file() && (FileSystem::GetFileExtension(entry.path().string()) == META_EXTENSION))
         {
             std::string filePath = entry.path().string();
 
-            std::string fileName = FileSystem::GetFileNameWithoutExtension(filePath);
+            rapidjson::Document doc;
+            if (!FileSystem::LoadJSON(filePath.c_str(), doc)) continue;
 
-            // Generate UID using the function from globals.h
-            try
+            UID assetUID          = doc["UID"].GetUint64();
+            std::string assetName = doc["name"].GetString();
+            std::string assetPath = doc["assetPath"].GetString();
+
+            UID prefix            = assetUID / UID_PREFIX_DIVISOR;
+            std::string libraryPath;
+
+            switch (prefix)
             {
-                UID originalUID = std::stoull(fileName);
-
-                UID prefix      = originalUID / 100000000000000;
-
-                switch (prefix)
-                {
-                case 13:
-                    AddMesh(originalUID, FileSystem::GetFileNameWithoutExtension(filePath));
-                    AddResource(filePath, originalUID);
-                    break;
-                case 12:
-                    AddMaterial(originalUID, FileSystem::GetFileNameWithoutExtension(filePath));
-                    AddResource(filePath, originalUID);
-                    break;
-                case 11:
-                    AddTexture(originalUID, FileSystem::GetFileNameWithoutExtension(filePath));
-                    AddResource(filePath, originalUID);
-                    break;
-                default:
-                    GLOG("Category: Unknown File Type (10)");
-                    break;
-                }
-            }
-            catch (std::invalid_argument&)
-            {
-                GLOG("File %s is not an asset file", fileName.c_str());
+            case 11:
+                AddMesh(assetUID, assetName);
+                AddName(assetName, assetUID);
+                libraryPath = MESHES_PATH + std::to_string(assetUID) + MESH_EXTENSION;
+                if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
+                else SceneImporter::ImportMeshFromMetadata(assetPath, assetName, assetUID);
+                break;
+            case 12: 
+                AddTexture(assetUID, assetName);
+                AddName(assetName, assetUID);
+                libraryPath = TEXTURES_PATH + std::to_string(assetUID) + TEXTURE_EXTENSION;
+                if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
+                else TextureImporter::Import(assetPath.c_str(), assetUID);
+                break;
+            case 13:
+                AddMaterial(assetUID, assetName);
+                AddName(assetName, assetUID);
+                libraryPath = MATERIALS_PATH + std::to_string(assetUID) + MATERIAL_EXTENSION;
+                if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
+                else SceneImporter::ImportMaterialFromMetadata(assetPath, assetName, assetUID);
+                break;
+            default:
+                GLOG("Unknown UID prefix (%s) for: %s", std::to_string(prefix).c_str(), assetName.c_str());
+                continue;
             }
         }
     }
@@ -283,77 +290,82 @@ bool LibraryModule::LoadLibraryMaps()
     return true;
 }
 
-UID LibraryModule::AssignFiletypeUID(UID originalUID, const std::string& filePath)
+UID LibraryModule::AssignFiletypeUID(UID originalUID, FileType fileType)
 {
-
-    uint64_t prefix = 10; // Default prefix "99" for unknown files
-    if (FileSystem::GetFileExtension(filePath) == MESH_EXTENSION)
+    UID prefix = 10; // Default prefix "99" for unknown files
+    switch (fileType)
     {
-        prefix = 13;
-    }
-    if (FileSystem::GetFileExtension(filePath) == MATERIAL_EXTENSION)
-    {
-        prefix = 12;
-    }
-    if (FileSystem::GetFileExtension(filePath) == TEXTURE_EXTENSION)
-    {
+    case FileType::Mesh:
         prefix = 11;
+        break;
+    case FileType::Texture:
+        prefix = 12;
+        break;
+    case FileType::Material:
+        prefix = 13;
+        break;
+    default:
+        GLOG("Category: Unknown File Type (10)");
+        break;
     }
+
     // GLOG("%llu", prefix)
-    uint64_t final = (prefix * 100000000000000) + (originalUID % 100000000000000);
+    UID final = (prefix * UID_PREFIX_DIVISOR) + (originalUID % UID_PREFIX_DIVISOR);
     GLOG("%llu", final);
     return final;
 }
 
-void LibraryModule::AddTexture(UID textureUID, const std::string& ddsPath)
+void LibraryModule::AddTexture(UID textureUID, const std::string& textureName)
 {
-    textureMap[ddsPath] = textureUID; // Map the texture UID to its DDS path
+    textureMap[textureName] = textureUID;
 }
 
-void LibraryModule::AddMesh(UID meshUID, const std::string& sobPath)
+void LibraryModule::AddMesh(UID meshUID, const std::string& meshName)
 {
-    meshMap[sobPath] = meshUID; // Map the texture UID to its DDS path
+    meshMap[meshName] = meshUID;
 }
 
-void LibraryModule::AddMaterial(UID materialUID, const std::string& matPath)
+void LibraryModule::AddMaterial(UID materialUID, const std::string& matName)
 {
-    materialMap[matPath] = materialUID; // Map the texture UID to its DDS path
+    materialMap[matName] = materialUID;
+}
+
+void LibraryModule::AddName(const std::string& resourceName, UID resourceUID)
+{
+    namesMap[resourceUID] = resourceName;
 }
 
 UID LibraryModule::GetTextureUID(const std::string& texturePath) const
 {
-
     auto it = textureMap.find(texturePath);
     if (it != textureMap.end())
     {
         return it->second;
     }
 
-    return 0;
+    return INVALID_UID;
 }
 
 UID LibraryModule::GetMeshUID(const std::string& meshPath) const
 {
-
     auto it = meshMap.find(meshPath);
     if (it != meshMap.end())
     {
         return it->second;
     }
 
-    return 0;
+    return INVALID_UID;
 }
 
 UID LibraryModule::GetMaterialUID(const std::string& materialPath) const
 {
-
     auto it = materialMap.find(materialPath);
     if (it != materialMap.end())
     {
         return it->second;
     }
 
-    return 0;
+    return INVALID_UID;
 }
 
 const std::string& LibraryModule::GetResourcePath(UID resourceID) const
@@ -363,6 +375,19 @@ const std::string& LibraryModule::GetResourcePath(UID resourceID) const
     {
         GLOG("requested uid: %llu", resourceID);
         GLOG("obtained path: %s", it->second.c_str());
+        return it->second;
+    }
+    static const std::string emptyString = "";
+    return emptyString;
+}
+
+const std::string& LibraryModule::GetResourceName(UID resourceID) const
+{
+    auto it = namesMap.find(resourceID);
+    if (it != namesMap.end())
+    {
+        GLOG("requested uid: %llu", resourceID);
+        GLOG("obtained name: %s", it->second.c_str());
         return it->second;
     }
     static const std::string emptyString = "";

@@ -9,6 +9,7 @@
 #include <vector>
 
 class RootComponent;
+class MeshComponent;
 
 class GameObject : public AABBUpdatable
 {
@@ -43,12 +44,15 @@ class GameObject : public AABBUpdatable
     bool UpdateGameObjectHierarchy(UID sourceUID, UID targetUID);
     void RenameGameObjectHierarchy();
 
-    inline std::string GetName() const { return name; }
-    inline UID GetUID() const { return uid; }
-    inline std::vector<UID> GetChildren() { return children; }
-    inline UID GetParent() const { return parentUID; }
+    void AddChildren(UID childUID) { children.push_back(childUID); }
+
+    UID GetUID() const { return uid; }
+    UID GetParent() const { return parentUID; }
+    std::string GetName() const { return name; }
+    std::vector<UID> GetChildren() { return children; }
     RootComponent* GetRootComponent() const { return rootComponent; }
-    inline const AABB& GetAABB() const { return globalAABB; };
+    const AABB& GetAABB() const { return globalAABB; };
+    const MeshComponent* GetMeshComponent() const;
 
     void SetName(std::string newName) { name = newName; }
     void SetParent(UID newParentUID) { parentUID = newParentUID; }

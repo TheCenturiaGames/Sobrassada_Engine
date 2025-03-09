@@ -18,9 +18,6 @@ struct CPUFeature
     const char* name;
 };
 
-class EditorViewport;
-class QuadtreeViewer;
-
 class EditorUIModule : public Module
 {
   public:
@@ -60,10 +57,9 @@ class EditorUIModule : public Module
     void HardwareConfig() const;
     void ShowCaps() const;
 
-    void ImportDialog(bool& importMenu);
-    void GetFilesSorted(const std::string& currentPath, std::vector<std::string>& files);
-    void LoadDialog(bool& loadMenu);
-    void SaveDialog(bool& saveMenu);
+    void ImportDialog(bool& import);
+    void LoadDialog(bool& load);
+    void SaveDialog(bool& save);
     void Console(bool& consoleMenu) const;
     void About(bool& aboutMenu) const;
 
@@ -90,10 +86,8 @@ class EditorUIModule : public Module
 
     ImGuizmo::MODE transformType   = ImGuizmo::LOCAL;
 
-    QuadtreeViewer* quadtreeViewer = nullptr;
-
     std::string startPath;
-    std::string libraryPath;
+    std::string scenesPath;
 
     ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
     ;

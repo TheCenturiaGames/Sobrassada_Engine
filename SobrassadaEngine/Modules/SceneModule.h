@@ -13,6 +13,7 @@
 #include <map>
 #include <string>
 #include <unordered_map>
+#include <tuple>
 
 class GameObject;
 class Component;
@@ -33,12 +34,11 @@ class SceneModule : public Module
     bool ShutDown() override;
 
     void CreateScene();
+    void CloseScene();
     void LoadScene(
         UID sceneUID, const char* sceneName, UID rootGameObject, const std::map<UID, Component*>& loadedGameComponents
     );
     void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
-    void CloseScene();
-    void CheckObjectsToRender();
     void SwitchPlayMode(bool play);
 
     void AddGameObject(UID uid, GameObject* newGameObject) const
@@ -99,10 +99,13 @@ class SceneModule : public Module
     }
 
     bool IsSceneLoaded() const { return loadedScene != nullptr; }
+    bool IsInPlayMode() const { return isPlayMode; }
     UID GetSceneUID() const { return loadedScene != nullptr ? loadedScene->GetSceneUID() : CONSTANT_EMPTY_UID; }
     const char* GetSceneName() const { return loadedScene != nullptr ? loadedScene->GetSceneName() : "Not loaded"; }
-    bool IsInPlayMode() const { return isPlayMode; }
-    LightsConfig* GetLightsConfig() const { return loadedScene != nullptr ? loadedScene->GetLightsConfig() : nullptr; }
+    LightsConfig* GetLightsConfig() { return loadedScene != nullptr ? loadedScene->GetLightsConfig() : nullptr; }
+    const std::tuple<float, float>& GetWindowPosition() const { return loadedScene->GetWindowPosition(); };
+    const std::tuple<float, float>& GetWindowSize() const { return loadedScene->GetWindowSize(); };
+    const std::tuple<float, float>& GetMousePosition() const { return loadedScene->GetMousePosition(); };
 
     bool GetDoInputsScene() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() && !isPlayMode : false; }
     bool GetDoInputsGame() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() && isPlayMode : false; }

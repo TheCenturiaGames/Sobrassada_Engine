@@ -70,8 +70,8 @@ void LightsConfig::InitSkybox()
 
     glBindVertexArray(0);
 
-    // skyboxTexture = LoadSkyboxTexture("Test/cubemap.dds");
-    skyboxTexture = LoadSkyboxTexture(App->GetLibraryModule()->GetTextureUID("1170799310640544"));
+    // default skybox texture
+    skyboxTexture = LoadSkyboxTexture(App->GetLibraryModule()->GetTextureUID("cubemap"));
 
     // Load the skybox shaders
     skyboxProgram = App->GetShaderModule()->CreateShaderProgram("Test/skyboxVertex.glsl", "Test/skyboxFragment.glsl");
@@ -81,12 +81,12 @@ void LightsConfig::RenderSkybox() const
 {
     App->GetOpenGLModule()->SetDepthFunc(false);
 
-    auto projection = App->GetCameraModule()->GetProjectionMatrix();
-    auto view       = App->GetCameraModule()->GetViewMatrix();
+    const float4x4& projection = App->GetCameraModule()->GetProjectionMatrix();
+    const float4x4& view       = App->GetCameraModule()->GetViewMatrix();
 
     glUseProgram(skyboxProgram);
-    glUniformMatrix4fv(0, 1, GL_TRUE, &projection[0][0]);
-    glUniformMatrix4fv(1, 1, GL_TRUE, &view[0][0]);
+    glUniformMatrix4fv(0, 1, GL_TRUE, projection.ptr());
+    glUniformMatrix4fv(1, 1, GL_TRUE, view.ptr());
 
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
@@ -103,6 +103,7 @@ unsigned int LightsConfig::LoadSkyboxTexture(UID cubemapUid)
 {
     std::string stringPath = App->GetLibraryModule()->GetResourcePath(cubemapUid);
     skyboxUID              = cubemapUid;
+    currentTextureName     = App->GetLibraryModule()->GetResourceName(cubemapUid);
     return TextureImporter::LoadCubemap(stringPath.c_str());
 }
 
@@ -125,17 +126,6 @@ void LightsConfig::LoadData(rapidjson::Value& lights)
     ambientColor = {ambientColorArray[0].GetFloat(), ambientColorArray[1].GetFloat(), ambientColorArray[2].GetFloat()};
     ambientIntensity = lights["Ambient Intensity"].GetFloat();
     skyboxTexture    = LoadSkyboxTexture(lights["Skybox UID"].GetUint64());
-}
-
-void LightsConfig::AddSkyboxTexture(UID resource)
-{
-    ResourceTexture* newTexture = dynamic_cast<ResourceTexture*>(App->GetResourcesModule()->RequestResource(resource));
-    if (newTexture != nullptr)
-    {
-        App->GetResourcesModule()->ReleaseResource(currentTexture);
-        currentTexture     = newTexture;
-        currentTextureName = currentTexture->GetName();
-    }
 }
 
 void LightsConfig::EditorParams()
