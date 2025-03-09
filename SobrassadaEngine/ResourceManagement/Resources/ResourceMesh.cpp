@@ -94,7 +94,7 @@ void ResourceMesh::Render(
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, cameraUBO);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-    glUniformMatrix4fv(2, 1, GL_TRUE, &modelMatrix[0][0]);
+    glUniformMatrix4fv(3, 1, GL_TRUE, &modelMatrix[0][0]);
 
     float3 cameraPos = App->GetCameraModule()->GetCameraPosition();
     glUniform3fv(glGetUniformLocation(program, "cameraPos"), 1, &cameraPos[0]);
@@ -123,6 +123,14 @@ void ResourceMesh::Render(
 
         glUnmapBuffer(GL_ARRAY_BUFFER);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        float4x4 palette[64];
+        for (size_t i = 0; i < bones.size(); ++i)
+        {
+            palette[i] = bones[i]->GetGlobalTransform() * bindMatrices[i];
+        }
+        GLsizei length = (GLsizei)bones.size();
+        glUniformMatrix4fv(glGetUniformLocation(program, "palette"), length, GL_FALSE, palette[0].ptr());
     }
 
     if (material != nullptr)

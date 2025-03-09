@@ -6,7 +6,10 @@ layout(location=3) in vec4 vertex_weights;
 layout(location=4) in vec3 vertex_normal;
 layout(location=5) in vec2 vertex_uv0;
 
-layout(location=2) uniform mat4 model;
+layout(location=3) uniform mat4 model;
+
+uniform mat4 palette[64];
+
 layout(std140, row_major, binding = 0) uniform CameraMatrices
 {
     mat4 projMatrix;
