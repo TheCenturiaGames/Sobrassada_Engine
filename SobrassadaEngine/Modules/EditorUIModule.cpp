@@ -1,6 +1,7 @@
 #include "EditorUIModule.h"
 
 #include "Application.h"
+#include "CameraModule.h"
 #include "Component.h"
 #include "FileSystem.h"
 #include "GameTimer.h"
@@ -38,7 +39,8 @@ EditorUIModule::~EditorUIModule()
 
 bool EditorUIModule::Init()
 {
-    ImGui::CreateContext();
+    ImGuiContext* context = ImGui::CreateContext();
+    ImGuizmo::SetImGuiContext(context);
     ImGuiIO& io     = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
@@ -55,9 +57,12 @@ bool EditorUIModule::Init()
     startPath      = std::filesystem::current_path().string();
     libraryPath    = startPath + DELIMITER + SCENES_PATH;
 
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_W, [&] { mCurrentGizmoOperation = ImGuizmo::TRANSLATE; });
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_E, [&] { mCurrentGizmoOperation = ImGuizmo::ROTATE; });
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_R, [&] { mCurrentGizmoOperation = ImGuizmo::SCALE; });
+    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_G, [&] { mCurrentGizmoOperation = ImGuizmo::TRANSLATE; });
+    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_H, [&] { mCurrentGizmoOperation = ImGuizmo::ROTATE; });
+    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_J, [&] { mCurrentGizmoOperation = ImGuizmo::SCALE; });
+
+    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_R, [&] { transformType = ImGuizmo::LOCAL; });
+    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_T, [&] { transformType = ImGuizmo::WORLD; });
 
 
     return true;
@@ -68,8 +73,12 @@ update_status EditorUIModule::PreUpdate(float deltaTime)
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
-    ImGuizmo::SetOrthographic(false); // TODO Implement orthographic camera
     ImGuizmo::BeginFrame();
+
+    // ImGuizmo::SetOrthographic(false);
+    // ImGuizmo::AllowAxisFlip(false);
+    // ImGuizmo::SetPlaneLimit(0);
+
     ImGui::DockSpaceOverViewport();
 
     return UPDATE_CONTINUE;
@@ -587,80 +596,74 @@ void EditorUIModule::Console(bool& consoleMenu) const
 }
 
 bool EditorUIModule::RenderTransformWidget(
-    Transform& localTransform, Transform& globalTransform, const Transform& parentTransform
+    float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform
 )
 {
-    bool positionValueChanged = false;
-    bool rotationValueChanged = false;
-    bool scaleValueChanged    = false;
+    float4x4 outputTransform = float4x4(transformType == ImGuizmo::LOCAL ? localTransform : globalTransform);
+
+    float3 outputScale       = outputTransform.GetScale();
+    outputTransform.ScaleCol3(0, outputScale.x != 0 ? 1 / outputScale.x : 1);
+    outputTransform.ScaleCol3(1, outputScale.y != 0 ? 1 / outputScale.y : 1);
+    outputTransform.ScaleCol3(2, outputScale.z != 0 ? 1 / outputScale.z : 1);
+    float3 outputPosition     = outputTransform.TranslatePart();
+    float3 outputRotation     = Quat(outputTransform.RotatePart()).ToEulerXYZ();
+
+    bool positionValueChanged = false, rotationValueChanged = false, scaleValueChanged = false;
     static bool lockScaleAxis = false;
-    static int transformType  = LOCAL;
-    static int pivotType      = OBJECT;
-    float3 originalScale;
+    float3 originalScale      = float3(outputScale);
 
-    ImGui::SeparatorText("Transform");
-    ImGui::RadioButton("Use object pivot", &pivotType, OBJECT);
-    // TODO Add later if necessary
-    // ImGui::SameLine();
-    // ImGui::RadioButton("Use root pivot", &pivotType, ROOT);
+    std::string transformName = std::string(transformType == ImGuizmo::LOCAL ? "Local " : "World ") + "Transform";
+    ImGui::SeparatorText(transformName.c_str());
 
-    ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
-    if (ImGui::BeginTabBar("TransformType##", tab_bar_flags))
-    {
-        if (ImGui::BeginTabItem("Local transform"))
-        {
-            transformType = LOCAL;
-            originalScale = float3(localTransform.scale);
-            RenderBasicTransformModifiers(
-                localTransform, lockScaleAxis, positionValueChanged, rotationValueChanged, scaleValueChanged
-            );
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Global transform"))
-        {
-            transformType = GLOBAL;
-            originalScale = float3(globalTransform.scale);
-            RenderBasicTransformModifiers(
-                globalTransform, lockScaleAxis, positionValueChanged, rotationValueChanged, scaleValueChanged
-            );
-            ImGui::EndTabItem();
-        }
-        ImGui::EndTabBar();
-    }
-
-    Transform& outputTransform = transformType == LOCAL ? localTransform : globalTransform;
+    RenderBasicTransformModifiers(
+        outputPosition, outputRotation, outputScale, lockScaleAxis, positionValueChanged, rotationValueChanged,
+        scaleValueChanged
+    );
 
     if (positionValueChanged || rotationValueChanged || scaleValueChanged)
     {
         if (scaleValueChanged && lockScaleAxis)
         {
             float scaleFactor = 1;
-            if (outputTransform.scale.x != originalScale.x)
+            if (outputScale.x != originalScale.x)
             {
-                scaleFactor = originalScale.x == 0 ? 1 : outputTransform.scale.x / originalScale.x;
+                scaleFactor = originalScale.x == 0 ? 1 : outputScale.x / originalScale.x;
             }
-            else if (outputTransform.scale.y != originalScale.y)
+            else if (outputScale.y != originalScale.y)
             {
-                scaleFactor = originalScale.y == 0 ? 1 : outputTransform.scale.y / originalScale.y;
+                scaleFactor = originalScale.y == 0 ? 1 : outputScale.y / originalScale.y;
             }
-            else if (outputTransform.scale.z != originalScale.z)
+            else if (outputScale.z != originalScale.z)
             {
-                scaleFactor = originalScale.z == 0 ? 1 : outputTransform.scale.z / originalScale.z;
+                scaleFactor = originalScale.z == 0 ? 1 : outputScale.z / originalScale.z;
             }
-            originalScale         *= scaleFactor;
-            outputTransform.scale  = originalScale;
+            originalScale *= scaleFactor;
+            outputScale    = originalScale;
         }
 
-        if (transformType == GLOBAL)
+        outputTransform = float4x4::identity;
+        outputTransform.SetTranslatePart(outputPosition);
+        outputTransform.SetRotatePart(Quat::FromEulerXYZ(outputRotation.x, outputRotation.y, outputRotation.z));
+        outputTransform.ScaleCol3(0, outputScale.x);
+        outputTransform.ScaleCol3(1, outputScale.y);
+        outputTransform.ScaleCol3(2, outputScale.z);
+
+        if (transformType == ImGuizmo::WORLD)
         {
-            localTransform.Set(globalTransform - parentTransform);
+            localTransform = parentTransform.Inverted() * outputTransform;
+        }
+        else
+        {
+            localTransform = outputTransform;
         }
     }
 
     return positionValueChanged || rotationValueChanged || scaleValueChanged;
 }
 
-bool EditorUIModule::RenderImGuizmo(Transform& gameObjectTransform)
+bool EditorUIModule::RenderImGuizmo(
+    float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform
+) const
 {
     float4x4 view = float4x4(App->GetCameraModule()->GetViewMatrix());
     view.Transpose();
@@ -668,45 +671,54 @@ bool EditorUIModule::RenderImGuizmo(Transform& gameObjectTransform)
     float4x4 proj = float4x4(App->GetCameraModule()->GetProjectionMatrix());
     proj.Transpose();
 
-    float4x4 gizmoMatrix          = float4x4::identity;
-    gameObjectTransform.rotation *= RAD_DEGREE_CONV;
-    ImGuizmo::RecomposeMatrixFromComponents(
-        gameObjectTransform.position.ptr(), gameObjectTransform.rotation.ptr(), gameObjectTransform.scale.ptr(),
-        gizmoMatrix.ptr()
-    );
+    float maxDistance  = App->GetCameraModule()->GetFarPlaneDistance() * 0.9f;
 
-    Manipulate(view.ptr(), proj.ptr(), mCurrentGizmoOperation, ImGuizmo::MODE::LOCAL, gizmoMatrix.ptr());
+    float4x4 transform = float4x4(globalTransform);
+    transform.Transpose();
+    Manipulate(view.ptr(), proj.ptr(), mCurrentGizmoOperation, transformType, transform.ptr());
 
-    ImGuizmo::DecomposeMatrixToComponents(
-        gizmoMatrix.ptr(), gameObjectTransform.position.ptr(), gameObjectTransform.rotation.ptr(),
-        gameObjectTransform.scale.ptr()
-    );
-    gameObjectTransform.rotation /= RAD_DEGREE_CONV;
+    if (!ImGuizmo::IsUsing())
+    {
+        return false;
+    }
 
-    return ImGuizmo::IsUsing();
+    if (App->GetSceneModule()->GetDoInputs())
+    {
+
+        if (transform.TranslatePart().Distance(App->GetCameraModule()->GetCameraPosition()) > maxDistance)
+        {
+            ImGuizmo::Enable(false);
+            return false;
+        }
+
+        transform.Transpose();
+        localTransform = parentTransform.Inverted() * transform;
+    }
+
+    return true;
 }
 
 void EditorUIModule::RenderBasicTransformModifiers(
-    Transform& outputTransform, bool& lockScaleAxis, bool& positionValueChanged, bool& rotationValueChanged,
-    bool& scaleValueChanged
+    float3& outputPosition, float3& outputRotation, float3& outputScale, bool& lockScaleAxis,
+    bool& positionValueChanged, bool& rotationValueChanged, bool& scaleValueChanged
 )
 {
     static bool bUseRad   = true;
 
-    positionValueChanged |= ImGui::InputFloat3("Position", &outputTransform.position[0]);
+    positionValueChanged |= ImGui::InputFloat3("Position", &outputPosition[0]);
 
     if (!bUseRad)
     {
-        outputTransform.rotation *= RAD_DEGREE_CONV;
+        outputRotation *= RAD_DEGREE_CONV;
     }
-    rotationValueChanged |= ImGui::InputFloat3("Rotation", &outputTransform.rotation[0]);
+    rotationValueChanged |= ImGui::InputFloat3("Rotation", &outputRotation[0]);
     if (!bUseRad)
     {
-        outputTransform.rotation /= RAD_DEGREE_CONV;
+        outputRotation /= RAD_DEGREE_CONV;
     }
     ImGui::SameLine();
     ImGui::Checkbox("Radians", &bUseRad);
-    scaleValueChanged |= ImGui::InputFloat3("Scale", &outputTransform.scale[0]);
+    scaleValueChanged |= ImGui::InputFloat3("Scale", &outputScale[0]);
     ImGui::SameLine();
     ImGui::Checkbox("Lock axis", &lockScaleAxis);
 }

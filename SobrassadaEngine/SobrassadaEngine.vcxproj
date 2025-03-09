@@ -546,7 +546,6 @@
     <ClCompile Include="Modules\OpenGLModule.cpp" />
     <ClCompile Include="Modules\ShaderModule.cpp" />
     <ClCompile Include="Utils\Scene.cpp" />
-    <ClCompile Include="Utils\Transform.cpp" />
     <ClCompile Include="Utils\GameTimer.cpp" />
     <ClCompile Include="Modules\WindowModule.cpp" />
   </ItemGroup>
@@ -608,7 +607,6 @@
     <ClInclude Include="Modules\OpenGLModule.h" />
     <ClInclude Include="Modules\ShaderModule.h" />
     <ClInclude Include="Utils\Scene.h" />
-    <ClInclude Include="Utils\Transform.h" />
     <ClInclude Include="Utils\LightsConfig.h" />
     <ClInclude Include="Utils\GameTimer.h" />
     <ClInclude Include="Modules\WindowModule.h" />
