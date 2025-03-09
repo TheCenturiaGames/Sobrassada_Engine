@@ -13,7 +13,7 @@
 #include <Math/Quat.h>
 
 MeshComponent::MeshComponent(
-    const UID uid, const UID uidParent, const UID uidRoot, const Transform& parentGlobalTransform
+    const UID uid, const UID uidParent, const UID uidRoot, const float4x4& parentGlobalTransform
 )
     : Component(uid, uidParent, uidRoot, "Mesh", COMPONENT_MESH, parentGlobalTransform)
 {
@@ -63,9 +63,9 @@ void MeshComponent::RenderEditorInspector()
         }
 
         ImGui::SeparatorText("Material");
-        ImGui::Text(currentTextureName.c_str());
+        ImGui::Text(currentMaterialName.c_str());
         ImGui::SameLine();
-        if (ImGui::Button("Select texture"))
+        if (ImGui::Button("Select material"))
         {
             ImGui::OpenPopup(CONSTANT_TEXTURE_SELECT_DIALOG_ID);
         }
@@ -90,13 +90,7 @@ void MeshComponent::Render()
     if (enabled && currentMesh != nullptr)
     {
         unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
-
-        float4x4 model         = float4x4::FromTRS(
-            globalTransform.position,
-            Quat::FromEulerXYZ(globalTransform.rotation.x, globalTransform.rotation.y, globalTransform.rotation.z),
-            globalTransform.scale
-        );
-        currentMesh->Render(App->GetResourcesModule()->GetProgram(), model, cameraUBO, currentMaterial);
+        currentMesh->Render(App->GetResourcesModule()->GetProgram(), globalTransform, cameraUBO, currentMaterial);
     }
     Component::Render();
 }
@@ -111,7 +105,6 @@ void MeshComponent::AddMesh(UID resource, bool reloadAABB)
     if (newMesh != nullptr)
     {
         App->GetResourcesModule()->ReleaseResource(currentMesh);
-        newMesh->SetMaterial(currentMaterial != nullptr ? currentMaterial->GetUID() : CONSTANT_EMPTY_UID);
         currentMeshName    = newMesh->GetName();
         currentMesh        = newMesh;
         localComponentAABB = AABB(currentMesh->GetAABB());
@@ -138,6 +131,6 @@ void MeshComponent::AddMaterial(UID resource)
     {
         App->GetResourcesModule()->ReleaseResource(currentMaterial);
         currentMaterial    = newMaterial;
-        currentTextureName = currentMaterial->GetName();
+        currentMaterialName = currentMaterial->GetName();
     }
 }

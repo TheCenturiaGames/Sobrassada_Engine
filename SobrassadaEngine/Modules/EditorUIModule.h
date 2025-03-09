@@ -2,14 +2,15 @@
 
 #include "Module.h"
 #include "ResourceManagement/Resources/Resource.h"
-#include "Transform.h"
 
 #include "SDL.h"
 #include "imgui_internal.h"
+#include <Math/float4x4.h>
 #include <deque>
 #include <string>
 #include <unordered_map>
-// guizmo after imgui include
+
+// imguizmo after imgui
 #include "./Libs/ImGuizmo/ImGuizmo.h"
 
 struct CPUFeature
@@ -17,9 +18,6 @@ struct CPUFeature
     SDL_bool (*check)();
     const char* name;
 };
-
-class EditorViewport;
-class QuadtreeViewer;
 
 class EditorUIModule : public Module
 {
@@ -34,14 +32,15 @@ class EditorUIModule : public Module
     update_status PostUpdate(float deltaTime) override;
     bool ShutDown() override;
 
-    bool RenderTransformWidget(Transform& localTransform, Transform& globalTransform, const Transform& parentTransform);
-    bool RenderImGuizmo(Transform& gameObjectTransform);
+    bool RenderTransformWidget(float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform);
+    bool RenderImGuizmo(float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform) const;
+
     UID RenderResourceSelectDialog(const char* id, const std::unordered_map<std::string, UID>& availableResources);
 
   private:
     void RenderBasicTransformModifiers(
-        Transform& transform, bool& lockScaleAxis, bool& positionValueChanged, bool& rotationValueChanged,
-        bool& scaleValueChanged
+        float3& outputPosition, float3& outputRotation, float3& outputScale, bool& lockScaleAxis,
+        bool& positionValueChanged, bool& rotationValueChanged, bool& scaleValueChanged
     );
 
     void LimitFPS(float deltaTime) const;
@@ -58,8 +57,8 @@ class EditorUIModule : public Module
     void GameTimerConfig() const;
     void HardwareConfig() const;
     void ShowCaps() const;
+
     void ImportDialog(bool& import);
-    void GetFilesSorted(const std::string& currentPath, std::vector<std::string>& files);
     void LoadDialog(bool& load);
     void SaveDialog(bool& save);
     void Console(bool& consoleMenu) const;
@@ -85,11 +84,11 @@ class EditorUIModule : public Module
     std::deque<float> framerate;
     std::deque<float> frametime;
 
-    QuadtreeViewer* quadtreeViewer = nullptr;
+    ImGuizmo::MODE transformType   = ImGuizmo::LOCAL;
 
     std::string startPath;
-    std::string libraryPath;
+    std::string scenesPath;
 
-    int transformType = LOCAL;
-    ImGuizmo::OPERATION mCurrentGizmoOperation;
+    ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+    ;
 };
