@@ -22,27 +22,40 @@ namespace SceneImporter
     {
         tinygltf::Model model = LoadModelGLTF(filePath);
 
+        std::vector<std::vector<std::pair<UID, UID>>> gltfMeshes;
         std::vector<int> matIndices;
         for (const auto& srcMesh : model.meshes)
         {
             std::string name = srcMesh.name;
             int n            = 0;
             int matIndex     = -1;
+            std::vector<std::pair<UID, UID>> primitives;
+
             for (const auto& primitive : srcMesh.primitives)
             {
                 name += std::to_string(n);
-                MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath);
+                UID meshUID = MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath);
                 n++;
 
+                UID matUID = INVALID_UUID;
                 matIndex = primitive.material;
                 if (matIndex == -1) GLOG("Material index invalid for mesh: %s", name.c_str())
                 else if (std::find(matIndices.begin(), matIndices.end(), matIndex) == matIndices.end())
                 {
-                    MaterialImporter::ImportMaterial(model, matIndex, filePath);
+                    matUID = MaterialImporter::ImportMaterial(model, matIndex, filePath);
                     matIndices.push_back(matIndex);
                 }
+
+                primitives.emplace_back(meshUID, matUID);
+                GLOG("New primitive with mesh UID: %d and Material UID: %d", meshUID, matUID);
             }
+            gltfMeshes.emplace_back(primitives);
         }
+
+         GLOG("Total .gltf meshes: %d", gltfMeshes.size());
+
+        // Import Model
+        ModelImporter::ImportModel(model.nodes, gltfMeshes, filePath);
     }
 
     tinygltf::Model LoadModelGLTF(const char* filePath)
@@ -123,15 +136,22 @@ namespace SceneImporter
                 MaterialImporter::ImportMaterial(model, i, filePath.c_str(), sourceUID);
                 return; // only one material with the same name
             }
-
-            gltfMeshes.emplace_back(primitives);
         }
+    }
 
-        GLOG("Total .gltf meshes: %d", gltfMeshes.size());
+    void ImportModelFromMetadata(const std::string& filePath, const std::string& name, UID sourceUID)
+    {
+        tinygltf::Model model = LoadModelGLTF(filePath.c_str());
 
-        // Import Model
-        ModelImporter::ImportModel(model.nodes, gltfMeshes, filePath);
-
+        // find material name that equals to name
+        for (int i = 0; i < model.materials.size(); i++)
+        {
+            if (model.materials[i].name == name)
+            {
+                MaterialImporter::ImportMaterial(model, i, filePath.c_str(), sourceUID);
+                return; // only one material with the same name
+            }
+        }
     }
 
     void CreateLibraryDirectories()

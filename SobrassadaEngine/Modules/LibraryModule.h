@@ -17,7 +17,8 @@ enum class FileType
     Mesh,
     Texture,
     Material,
-    Scene
+    Scene,
+    Model
 };
 
 class LibraryModule : public Module
