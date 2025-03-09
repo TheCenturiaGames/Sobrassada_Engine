@@ -35,9 +35,8 @@ void MetaFile::Save(const std::string& name, const std::string& assetPath) const
     rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
     doc.Accept(writer);
 
-    //UID prefix           = assetUID / UID_PREFIX_DIVISOR;
-    //std::string savePath = METADATA_PATH + std::to_string(prefix) + FILENAME_SEPARATOR + name + META_EXTENSION;
-    std::string savePath = METADATA_PATH + std::to_string(assetUID) + META_EXTENSION;
+    UID prefix           = assetUID / UID_PREFIX_DIVISOR;
+    std::string savePath = METADATA_PATH + std::to_string(prefix) + FILENAME_SEPARATOR + name + META_EXTENSION;
     unsigned int bytesWritten =
         (unsigned int)FileSystem::Save(savePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
 
