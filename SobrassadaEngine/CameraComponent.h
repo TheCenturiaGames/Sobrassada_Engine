@@ -29,6 +29,7 @@ class CameraComponent : public Component
     FrustumPlanes frustumPlanes;
     CameraMatrices matrices;
     unsigned int ubo        = 0;
+
     bool drawGizmos         = true;
     bool isMainCamera       = false;
 

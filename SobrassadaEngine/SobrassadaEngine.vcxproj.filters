@@ -265,8 +265,6 @@
       <Filter>Modules</Filter>
     </ClCompile>
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp" />
-    <ClCompile Include="Tests\MockGameObject.cpp" />
-    <ClCompile Include="UI\QuadtreeViewer.cpp" />
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp">
       <Filter>External\ImGuizmo</Filter>
     </ClCompile>
@@ -281,6 +279,9 @@
     </ClCompile>
     <ClCompile Include="FileSystem\MetaTexture.cpp">
       <Filter>FileSystem\Meta</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraComponent.cpp">
+      <Filter>Scene\Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -505,6 +506,9 @@
     </ClInclude>
     <ClInclude Include="RaycastController.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraComponent.h">
+      <Filter>Scene\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
