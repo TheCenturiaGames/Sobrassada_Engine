@@ -15,7 +15,6 @@
 
 SceneModule::SceneModule() : sceneLibraryPath(std::filesystem::current_path().string() + DELIMITER + SCENES_PATH)
 {
-    
 }
 
 SceneModule::~SceneModule()
@@ -71,7 +70,7 @@ bool SceneModule::ShutDown()
 void SceneModule::CreateScene()
 {
     CloseScene();
-    
+
     loadedScene = new Scene("New Scene");
     loadedScene->Init();
 }
@@ -84,9 +83,9 @@ void SceneModule::LoadScene(const rapidjson::Value& initialState, const bool for
         GLOG("Scene already loaded: %s", loadedScene->GetSceneName());
         return;
     }
-    
+
     CloseScene();
-    
+
     loadedScene = new Scene(initialState, extractedSceneUID);
     loadedScene->Init();
 }

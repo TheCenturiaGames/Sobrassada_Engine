@@ -11,34 +11,34 @@
 
 GameObject::GameObject(std::string name) : name(name)
 {
-    uid = GenerateUID();
-    parentUID = INVALID_UUID;
-    localAABB = AABB(DEFAULT_GAME_OBJECT_AABB);
-    globalOBB = OBB(localAABB);
+    uid        = GenerateUID();
+    parentUID  = INVALID_UUID;
+    localAABB  = AABB(DEFAULT_GAME_OBJECT_AABB);
+    globalOBB  = OBB(localAABB);
     globalAABB = AABB(globalOBB);
 }
 
 GameObject::GameObject(UID parentUUID, std::string name) : parentUID(parentUUID), name(name)
 {
-    uid = GenerateUID();
-    localAABB = AABB(DEFAULT_GAME_OBJECT_AABB);
-    globalOBB = OBB(localAABB);
+    uid        = GenerateUID();
+    localAABB  = AABB(DEFAULT_GAME_OBJECT_AABB);
+    globalOBB  = OBB(localAABB);
     globalAABB = AABB(globalOBB);
 }
 
 GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState["UID"].GetUint64())
 {
-    parentUID = initialState["ParentUID"].GetUint64();
-    name = initialState["Name"].GetString();
+    parentUID              = initialState["ParentUID"].GetUint64();
+    name                   = initialState["Name"].GetString();
     selectedComponentIndex = COMPONENT_NONE;
-    mobilitySettings = initialState["Mobility"].GetInt();
+    mobilitySettings       = initialState["Mobility"].GetInt();
 
     if (initialState.HasMember("LocalTransform") && initialState["LocalTransform"].IsArray() &&
         initialState["LocalTransform"].Size() == 16)
     {
         const rapidjson::Value& initLocalTransform = initialState["LocalTransform"];
 
-        localTransform = float4x4(
+        localTransform                             = float4x4(
             initLocalTransform[0].GetFloat(), initLocalTransform[1].GetFloat(), initLocalTransform[2].GetFloat(),
             initLocalTransform[3].GetFloat(), initLocalTransform[4].GetFloat(), initLocalTransform[5].GetFloat(),
             initLocalTransform[6].GetFloat(), initLocalTransform[7].GetFloat(), initLocalTransform[8].GetFloat(),
@@ -57,7 +57,7 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
         {
             const rapidjson::Value& jsonComponent = jsonComponents[i];
 
-            Component* newComponent = ComponentUtils::CreateExistingComponent(jsonComponent);
+            Component* newComponent               = ComponentUtils::CreateExistingComponent(jsonComponent);
 
             if (newComponent != nullptr)
             {
@@ -117,21 +117,21 @@ void GameObject::Save(rapidjson::Value& targetState, rapidjson::Document::Alloca
     targetState.AddMember("Mobility", mobilitySettings, allocator);
     rapidjson::Value valLocalTransform(rapidjson::kArrayType);
     valLocalTransform.PushBack(localTransform.ptr()[0], allocator)
-                     .PushBack(localTransform.ptr()[1], allocator)
-                     .PushBack(localTransform.ptr()[2], allocator)
-                     .PushBack(localTransform.ptr()[3], allocator)
-                     .PushBack(localTransform.ptr()[4], allocator)
-                     .PushBack(localTransform.ptr()[5], allocator)
-                     .PushBack(localTransform.ptr()[6], allocator)
-                     .PushBack(localTransform.ptr()[7], allocator)
-                     .PushBack(localTransform.ptr()[8], allocator)
-                     .PushBack(localTransform.ptr()[9], allocator)
-                     .PushBack(localTransform.ptr()[10], allocator)
-                     .PushBack(localTransform.ptr()[11], allocator)
-                     .PushBack(localTransform.ptr()[12], allocator)
-                     .PushBack(localTransform.ptr()[13], allocator)
-                     .PushBack(localTransform.ptr()[14], allocator)
-                     .PushBack(localTransform.ptr()[15], allocator);
+        .PushBack(localTransform.ptr()[1], allocator)
+        .PushBack(localTransform.ptr()[2], allocator)
+        .PushBack(localTransform.ptr()[3], allocator)
+        .PushBack(localTransform.ptr()[4], allocator)
+        .PushBack(localTransform.ptr()[5], allocator)
+        .PushBack(localTransform.ptr()[6], allocator)
+        .PushBack(localTransform.ptr()[7], allocator)
+        .PushBack(localTransform.ptr()[8], allocator)
+        .PushBack(localTransform.ptr()[9], allocator)
+        .PushBack(localTransform.ptr()[10], allocator)
+        .PushBack(localTransform.ptr()[11], allocator)
+        .PushBack(localTransform.ptr()[12], allocator)
+        .PushBack(localTransform.ptr()[13], allocator)
+        .PushBack(localTransform.ptr()[14], allocator)
+        .PushBack(localTransform.ptr()[15], allocator);
 
     targetState.AddMember("LocalTransform", valLocalTransform, allocator);
 
@@ -181,7 +181,8 @@ void GameObject::RenderEditorInspector()
         }
 
         auto selectedType = App->GetEditorUIModule()->RenderResourceSelectDialog<ComponentType>(
-            "ComponentSelection", standaloneComponents, COMPONENT_NONE);
+            "ComponentSelection", standaloneComponents, COMPONENT_NONE
+        );
         if (selectedType != COMPONENT_NONE)
         {
             CreateComponent(selectedType);
@@ -214,11 +215,11 @@ void GameObject::RenderEditorInspector()
         ImGui::SeparatorText("Component hierarchy");
 
         ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
-        ImGui::BeginChild("ComponentHierarchyWrapper", ImVec2(0, 200),
-                          ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeY);
-        ImGuiTreeNodeFlags base_flags =
-            ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth |
-            ImGuiTreeNodeFlags_Leaf;
+        ImGui::BeginChild(
+            "ComponentHierarchyWrapper", ImVec2(0, 200), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeY
+        );
+        ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick |
+                                        ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Leaf;
 
         for (const auto& component : components)
         {
@@ -231,9 +232,8 @@ void GameObject::RenderEditorInspector()
             {
                 if (ImGui::IsItemClicked())
                 {
-                    selectedComponentIndex == component.first
-                        ? selectedComponentIndex = COMPONENT_NONE
-                        : selectedComponentIndex = component.first;
+                    selectedComponentIndex == component.first ? selectedComponentIndex = COMPONENT_NONE
+                                                              : selectedComponentIndex = component.first;
                 }
                 ImGui::TreePop();
             }
@@ -247,8 +247,9 @@ void GameObject::RenderEditorInspector()
         ImGui::SeparatorText("Component configuration");
 
         ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
-        ImGui::BeginChild("ComponentInspectorWrapper", ImVec2(0, 50),
-                          ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeY);
+        ImGui::BeginChild(
+            "ComponentInspectorWrapper", ImVec2(0, 50), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeY
+        );
 
         if (components.find(selectedComponentIndex) != components.end())
         {
@@ -264,7 +265,8 @@ void GameObject::RenderEditorInspector()
         {
             UpdateTransformForGOBranch();
         }
-    } else
+    }
+    else
     {
         ImGui::End();
     }
@@ -293,8 +295,8 @@ void GameObject::UpdateTransformForGOBranch() const
 void GameObject::OnTransformUpdated()
 {
     globalTransform = GetParentGlobalTransform() * localTransform;
-    globalOBB = localAABB.Transform(globalTransform);
-    globalAABB = AABB(globalOBB);
+    globalOBB       = localAABB.Transform(globalTransform);
+    globalAABB      = AABB(globalOBB);
 }
 
 void GameObject::UpdateLocalTransform(const float4x4& parentGlobalTransform)
@@ -306,7 +308,7 @@ void GameObject::RenderHierarchyNode(UID& selectedGameObjectUUID)
 {
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
 
-    bool hasChildren = !children.empty();
+    bool hasChildren         = !children.empty();
 
     if (!hasChildren) flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
     if (selectedGameObjectUUID == uid) flags |= ImGuiTreeNodeFlags_Selected;
@@ -401,7 +403,7 @@ void GameObject::RenderContextMenu()
 
                 if (oldGameObject)
                 {
-                    oldGameObject->name = oldGameObject->renameBuffer;
+                    oldGameObject->name       = oldGameObject->renameBuffer;
                     oldGameObject->isRenaming = false;
                 }
             }
@@ -427,11 +429,11 @@ void GameObject::RenameGameObjectHierarchy()
     ImGui::SameLine();
 
     if (ImGui::InputText(
-        "##RenameInput", renameBuffer, IM_ARRAYSIZE(renameBuffer), ImGuiInputTextFlags_EnterReturnsTrue
-    ))
+            "##RenameInput", renameBuffer, IM_ARRAYSIZE(renameBuffer), ImGuiInputTextFlags_EnterReturnsTrue
+        ))
     {
-        name = renameBuffer;
-        isRenaming = false;
+        name               = renameBuffer;
+        isRenaming         = false;
         currentRenamingUID = INVALID_UUID;
     }
 
@@ -442,8 +444,8 @@ void GameObject::RenameGameObjectHierarchy()
 
     if (isClickedOutside)
     {
-        name = renameBuffer;
-        isRenaming = false;
+        name               = renameBuffer;
+        isRenaming         = false;
         currentRenamingUID = INVALID_UUID;
     }
 }
@@ -486,7 +488,7 @@ void GameObject::Render() const
 {
     for (auto& component : components)
     {
-        component.second->Render(); 
+        component.second->Render();
     }
 }
 

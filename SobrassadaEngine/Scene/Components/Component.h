@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 #include "ComponentUtils.h"
-#include "Scene/GameObjects/GameObject.h"
 #include "Globals.h"
+#include "Scene/GameObjects/GameObject.h"
 
 #include <Geometry/AABB.h>
 #include <Libs/rapidjson/document.h>
@@ -29,8 +29,7 @@ class Component
 
     const float4x4& GetGlobalTransform();
 
-protected:
-
+  protected:
     GameObject* GetParent();
 
   protected:
@@ -44,7 +43,6 @@ protected:
 
     const ComponentType type = COMPONENT_NONE;
 
-private:
-    
+  private:
     GameObject* parent = nullptr;
 };

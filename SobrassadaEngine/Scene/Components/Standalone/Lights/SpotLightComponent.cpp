@@ -89,13 +89,13 @@ void SpotLightComponent::Render()
 
     const float4x4& globalTransform = GetParent()->GetGlobalTransform();
 
-    const float3 direction = (globalTransform.RotatePart() * -float3::unitY).Normalized();
-    innerDirections[0]     = (globalTransform.RotatePart() * innerDirections[0]);
-    innerDirections[1]     = (globalTransform.RotatePart() * innerDirections[1]);
-    outerDirections[0]     = (globalTransform.RotatePart() * outerDirections[0]);
-    outerDirections[1]     = (globalTransform.RotatePart() * outerDirections[1]);
+    const float3 direction          = (globalTransform.RotatePart() * -float3::unitY).Normalized();
+    innerDirections[0]              = (globalTransform.RotatePart() * innerDirections[0]);
+    innerDirections[1]              = (globalTransform.RotatePart() * innerDirections[1]);
+    outerDirections[0]              = (globalTransform.RotatePart() * outerDirections[0]);
+    outerDirections[1]              = (globalTransform.RotatePart() * outerDirections[1]);
 
-    DebugDrawModule* debug = App->GetDebugDrawModule();
+    DebugDrawModule* debug          = App->GetDebugDrawModule();
     debug->DrawLine(globalTransform.TranslatePart(), direction, range, float3(1, 1, 1));
 
     for (const float3& dir : innerDirections)

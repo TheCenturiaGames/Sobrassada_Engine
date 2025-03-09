@@ -65,17 +65,16 @@ class GameObject
 
     const float4x4& GetGlobalTransform() const { return globalTransform; }
     const float4x4& GetLocalTransform() const { return localTransform; }
-    
+
     bool CreateComponent(ComponentType componentType);
     bool RemoveComponent(ComponentType componentType);
-    
-    // Updates the transform for this game object and all descending children 
+
+    // Updates the transform for this game object and all descending children
     void UpdateTransformForGOBranch() const;
 
     const std::unordered_map<ComponentType, Component*>& GetComponents() const { return components; }
 
-private:
-
+  private:
     void OnTransformUpdated();
     void UpdateLocalTransform(const float4x4& parentGlobalTransform);
 
@@ -89,7 +88,7 @@ private:
 
     std::string name;
 
-    std::unordered_map<ComponentType, Component*> components;  
+    std::unordered_map<ComponentType, Component*> components;
 
     AABB localAABB;
     AABB globalAABB;
@@ -98,11 +97,9 @@ private:
     bool isRenaming = false;
     char renameBuffer[128];
 
-    float4x4 localTransform  = float4x4::identity;
-    float4x4 globalTransform = float4x4::identity;
+    float4x4 localTransform              = float4x4::identity;
+    float4x4 globalTransform             = float4x4::identity;
 
     ComponentType selectedComponentIndex = COMPONENT_NONE;
-    int mobilitySettings         = DYNAMIC;
+    int mobilitySettings                 = DYNAMIC;
 };
-
-

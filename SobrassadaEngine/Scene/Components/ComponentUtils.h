@@ -3,11 +3,11 @@
 #include "Globals.h"
 
 #include <Libs/rapidjson/document.h>
+#include <Math/float4x4.h>
 #include <cstdint>
 #include <map>
 #include <string>
 #include <unordered_map>
-#include <Math/float4x4.h>
 
 class Component;
 
@@ -21,7 +21,7 @@ enum ComponentType
     COMPONENT_SPOT_LIGHT,
     COMPONENT_DIRECTIONAL_LIGHT,
     FIRST = COMPONENT_NONE,
-    LAST = COMPONENT_DIRECTIONAL_LIGHT
+    LAST  = COMPONENT_DIRECTIONAL_LIGHT
 };
 
 static const std::unordered_map<std::string, ComponentType> standaloneComponents = {

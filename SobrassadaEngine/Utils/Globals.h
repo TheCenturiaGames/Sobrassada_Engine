@@ -1,10 +1,10 @@
 #pragma once
 #define NOMINMAX
 #include "Algorithm/Random/LCG.h"
+#include <Geometry/AABB.h>
 #include <stdio.h>
 #include <vector>
 #include <windows.h>
-#include <Geometry/AABB.h>
 
 extern std::vector<char*>* Logs;
 

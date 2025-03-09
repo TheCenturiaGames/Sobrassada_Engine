@@ -6,14 +6,13 @@
 #include "FileSystem/MeshImporter.h"
 #include "LibraryModule.h"
 #include "ResourcesModule.h"
-//#include "Scene/GameObjects/GameObject.h"
+// #include "Scene/GameObjects/GameObject.h"
 
 #include "imgui.h"
 
 #include <Math/Quat.h>
 
-MeshComponent::MeshComponent(const UID uid, const UID uidParent)
-    : Component(uid, uidParent, "Mesh", COMPONENT_MESH)
+MeshComponent::MeshComponent(const UID uid, const UID uidParent) : Component(uid, uidParent, "Mesh", COMPONENT_MESH)
 {
 }
 
@@ -94,7 +93,9 @@ void MeshComponent::Render()
     if (enabled && currentMesh != nullptr)
     {
         unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
-        currentMesh->Render(App->GetResourcesModule()->GetProgram(), GetParent()->GetGlobalTransform(), cameraUBO, currentMaterial);
+        currentMesh->Render(
+            App->GetResourcesModule()->GetProgram(), GetParent()->GetGlobalTransform(), cameraUBO, currentMaterial
+        );
     }
 }
 

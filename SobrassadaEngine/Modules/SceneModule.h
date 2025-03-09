@@ -40,7 +40,7 @@ class SceneModule : public Module
     {
         loadedScene != nullptr ? loadedScene->AddGameObject(uid, newGameObject) : void();
     }
-    
+
     void RegenerateTree() const { loadedScene->UpdateSpatialDataStruct(); }
 
     void RenderHierarchyUI(bool& hierarchyMenu) const
@@ -67,7 +67,7 @@ class SceneModule : public Module
     {
         return loadedScene != nullptr ? &loadedScene->GetAllGameObjects() : nullptr;
     }
-    
+
     UID GetGameObjectRootUID() const
     {
         return loadedScene != nullptr ? loadedScene->GetGameObjectRootUID() : CONSTANT_EMPTY_UID;

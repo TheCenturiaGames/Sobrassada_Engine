@@ -76,7 +76,7 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
 
         GLOG("%s saved as scene", fileName.c_str());
     }
-    
+
     return false;
 }
 

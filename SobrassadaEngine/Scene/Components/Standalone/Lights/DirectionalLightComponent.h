@@ -15,5 +15,4 @@ class DirectionalLightComponent : public LightComponent
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
 
     const float3 GetDirection();
-
 };

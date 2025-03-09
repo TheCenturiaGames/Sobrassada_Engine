@@ -34,8 +34,8 @@ void DirectionalLightComponent::Render()
 
     DebugDrawModule* debug = App->GetDebugDrawModule();
     debug->DrawLine(
-        GetParent()->GetGlobalTransform().TranslatePart(), (GetParent()->GetGlobalTransform().RotatePart() * -float3::unitY).Normalized(), 2,
-        float3(1, 1, 1)
+        GetParent()->GetGlobalTransform().TranslatePart(),
+        (GetParent()->GetGlobalTransform().RotatePart() * -float3::unitY).Normalized(), 2, float3(1, 1, 1)
     );
 }
 

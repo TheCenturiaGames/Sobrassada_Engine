@@ -21,7 +21,7 @@ class Scene
 
     void Init();
     const char* Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
-    
+
     void LoadComponents() const;
     void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
 
@@ -66,5 +66,5 @@ class Scene
     LightsConfig* lightsConfig = nullptr;
     Octree* sceneOctree        = nullptr;
 
-    bool doInputs                   = false;
+    bool doInputs              = false;
 };

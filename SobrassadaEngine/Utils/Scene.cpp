@@ -14,27 +14,26 @@
 #include "imgui.h"
 #include "imgui_internal.h"
 // guizmo after imgui include
-#include "Importer.h"
 #include "./Libs/ImGuizmo/ImGuizmo.h"
+#include "Importer.h"
 
-Scene::Scene(const char* sceneName)
-    : sceneUID(GenerateUID())
+Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 {
     memcpy(this->sceneName, sceneName, strlen(sceneName));
-    
+
     GameObject* sceneGameObject = new GameObject("SceneModule GameObject");
     selectedGameObjectUID = gameObjectRootUID = sceneGameObject->GetUID();
-    
+
     gameObjectsContainer.insert({sceneGameObject->GetUID(), sceneGameObject});
 
-    lightsConfig           = new LightsConfig();
+    lightsConfig = new LightsConfig();
 }
 
 Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUID(loadedSceneUID)
 {
     const char* initName = initialState["Name"].GetString();
     memcpy(sceneName, initName, strlen(initName));
-    gameObjectRootUID      = initialState["RootGameObject"].GetUint64();
+    gameObjectRootUID     = initialState["RootGameObject"].GetUint64();
     selectedGameObjectUID = gameObjectRootUID;
 
     // Deserialize GameObjects
@@ -53,10 +52,10 @@ Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUI
     // Deserialize Lights Config
     if (initialState.HasMember("Lights Config") && initialState["Lights Config"].IsObject())
     {
-        lightsConfig           = new LightsConfig();
+        lightsConfig = new LightsConfig();
         lightsConfig->LoadData(initialState["Lights Config"]);
     }
-    
+
     GLOG("%s scene loaded", sceneName);
 }
 
@@ -71,7 +70,7 @@ Scene::~Scene()
     delete lightsConfig;
     delete sceneOctree;
     lightsConfig = nullptr;
-    sceneOctree = nullptr;
+    sceneOctree  = nullptr;
 
     GLOG("%s scene closed", sceneName);
 }
@@ -86,7 +85,7 @@ void Scene::Init()
 
     lightsConfig->InitSkybox();
     lightsConfig->InitLightBuffers();
-    
+
     UpdateSpatialDataStruct();
 }
 
@@ -114,7 +113,7 @@ const char* Scene::Save(rapidjson::Value& targetState, rapidjson::Document::Allo
 
     // Add gameObjects to scene
     targetState.AddMember("GameObjects", gameObjectsJSON, allocator);
-    
+
     // Serialize Lights Config
     LightsConfig* lightConfig = App->GetSceneModule()->GetLightsConfig();
 
@@ -125,8 +124,8 @@ const char* Scene::Save(rapidjson::Value& targetState, rapidjson::Document::Allo
         lightConfig->SaveData(lights, allocator);
 
         targetState.AddMember("Lights Config", lights, allocator);
-
-    } else GLOG("Light Config not found");
+    }
+    else GLOG("Light Config not found");
 
     return sceneName;
 }

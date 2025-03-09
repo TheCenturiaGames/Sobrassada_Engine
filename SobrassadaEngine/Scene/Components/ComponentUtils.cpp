@@ -8,9 +8,7 @@
 
 #include <cstdint>
 
-Component* ComponentUtils::CreateEmptyComponent(
-    ComponentType type, UID uid, UID uidParent
-)
+Component* ComponentUtils::CreateEmptyComponent(ComponentType type, UID uid, UID uidParent)
 {
     switch (type)
     {

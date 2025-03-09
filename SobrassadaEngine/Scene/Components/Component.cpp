@@ -8,18 +8,18 @@
 #include <Math/float4x4.h>
 #include <string>
 
-Component::Component(UID uid, UID parentUID, const char* initName, ComponentType type): uid(uid), parentUID(parentUID), type(type), enabled(true)
+Component::Component(UID uid, UID parentUID, const char* initName, ComponentType type)
+    : uid(uid), parentUID(parentUID), type(type), enabled(true)
 {
     memcpy(name, initName, strlen(initName));
 }
 
 Component::Component(const rapidjson::Value& initialState)
-    : uid(initialState["UID"].GetUint64()),
-        parentUID(initialState["ParentUID"].GetUint64()),
+    : uid(initialState["UID"].GetUint64()), parentUID(initialState["ParentUID"].GetUint64()),
       type(static_cast<ComponentType>(initialState["Type"].GetInt()))
 {
-    enabled   = initialState["Enabled"].GetBool();
-    
+    enabled              = initialState["Enabled"].GetBool();
+
     const char* initName = initialState["Name"].GetString();
     memcpy(name, initName, strlen(initName));
 }
@@ -29,7 +29,7 @@ void Component::Save(rapidjson::Value& targetState, rapidjson::Document::Allocat
     targetState.AddMember("UID", uid, allocator);
     targetState.AddMember("ParentUID", parentUID, allocator);
     targetState.AddMember("Type", type, allocator);
-    
+
     targetState.AddMember("Enabled", enabled, allocator);
     targetState.AddMember("Name", rapidjson::Value(std::string(name).c_str(), allocator), allocator);
 }
@@ -63,4 +63,3 @@ GameObject* Component::GetParent()
     }
     return parent;
 }
-
