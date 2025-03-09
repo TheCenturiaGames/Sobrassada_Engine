@@ -32,7 +32,6 @@ void ResourceMesh::LoadData(
 )
 {
     this->mode              = mode;
-    this->material          = material;
     this->vertexCount       = static_cast<unsigned int>(vertices.size());
     this->indexCount        = static_cast<unsigned int>(indices.size());
     unsigned int bufferSize = sizeof(Vertex);
@@ -62,6 +61,9 @@ void ResourceMesh::LoadData(
 
     // Unbind VAO
     glBindVertexArray(0);
+
+    this->vertices = vertices;
+    this->indices = indices;
 }
 
 void ResourceMesh::Render(int program, const float4x4& modelMatrix, unsigned int cameraUBO, const ResourceMaterial* material) const

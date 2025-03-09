@@ -4,6 +4,7 @@
 #include "LightsConfig.h"
 
 #include <map>
+#include <tuple>
 #include <unordered_map>
 
 class GameObject;
@@ -47,6 +48,13 @@ class Scene
 
     LightsConfig* GetLightsConfig() { return lightsConfig; }
 
+    const std::tuple<float, float>& GetWindowPosition() const { return sceneWindowPosition; };
+    const std::tuple<float, float>& GetWindowSize() const { return sceneWindowSize; };
+    const std::tuple<float, float>& GetMousePosition() const { return mousePosition; };
+    const Octree* GetOctree() const { return sceneOctree; }
+
+    void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUUID = newSelectedGameObject; };
+    
     bool GetDoInputs() const { return doInputs; }
 
     const std::unordered_map<UID, Component*> GetAllComponents() const;
@@ -63,8 +71,12 @@ class Scene
 
     std::unordered_map<UID, GameObject*> gameObjectsContainer;
 
-    LightsConfig* lightsConfig = nullptr;
-    Octree* sceneOctree        = nullptr;
+    LightsConfig* lightsConfig                   = nullptr;
+    Octree* sceneOctree                          = nullptr;
 
+    // IMGUI WINDOW DATA
+    std::tuple<float, float> sceneWindowPosition = std::make_tuple(0.f, 0.f);
+    std::tuple<float, float> sceneWindowSize     = std::make_tuple(0.f, 0.f);
+    std::tuple<float, float> mousePosition       = std::make_tuple(0.f, 0.f);
     bool doInputs              = false;
 };

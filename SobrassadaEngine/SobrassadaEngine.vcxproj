@@ -70,6 +70,12 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+        <OutDir>$(ShortProjectName)\$(Platform)\$(Configuration)\</OutDir>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+        <OutDir>$(ShortProjectName)\$(Platform)\$(Configuration)\</OutDir>
+    </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -137,6 +143,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="FileSystem\MetaFile.cpp" />
+    <ClCompile Include="FileSystem\MetaMaterial.cpp" />
+    <ClCompile Include="FileSystem\MetaMesh.cpp" />
+    <ClCompile Include="FileSystem\MetaTexture.cpp" />
     <ClCompile Include="Modules\CameraModule.cpp" />
     <ClCompile Include="Modules\EditorUIModule.cpp" />
     <ClCompile Include="Utils\EngineTimer.cpp" />
@@ -325,9 +335,7 @@
     <ClCompile Include="FileSystem\TextureImporter.cpp" />
     <ClCompile Include="Utils\FrustumPlanes.cpp" />
     <ClCompile Include="Utils\Octree.cpp" />
-    <ClCompile Include="Tests\MockGameObject.cpp" />
     <ClCompile Include="Utils\Quadtree.cpp" />
-    <ClCompile Include="UI\QuadtreeViewer.cpp" />
     <ClCompile Include="Scene\Components\Standalone\MeshComponent.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -468,10 +476,15 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="FileSystem\Importer.h" />
     <ClInclude Include="Libs\ImGuizmo\ImGuizmo.h" />
+    <ClInclude Include="FileSystem\MetaFile.h" />
+    <ClInclude Include="FileSystem\MetaMaterial.h" />
+    <ClInclude Include="FileSystem\MetaMesh.h" />
+    <ClInclude Include="FileSystem\MetaTexture.h" />
     <ClInclude Include="Modules\CameraModule.h" />
     <ClInclude Include="Modules\EditorUIModule.h" />
     <ClInclude Include="Modules\ResourcesModule.h" />
     <ClInclude Include="Modules\SceneModule.h" />
+    <ClInclude Include="RaycastController.h" />
     <ClInclude Include="ResourceManagement\Resources\Resource.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceMaterial.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceMesh.h" />
@@ -492,9 +505,7 @@
     <ClInclude Include="FileSystem\TextureImporter.h" />
     <ClInclude Include="Utils\FrustumPlanes.h" />
     <ClInclude Include="Utils\Octree.h" />
-    <ClInclude Include="Tests\MockGameObject.h" />
     <ClInclude Include="Utils\Quadtree.h" />
-    <ClInclude Include="UI\QuadtreeViewer.h" />
     <ClInclude Include="Scene\Components\Standalone\MeshComponent.h" />
     <ClInclude Include="Scene\Components\ComponentUtils.h" />
     <ClInclude Include="Scene\GameObjects\GameObject.h" />

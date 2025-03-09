@@ -23,6 +23,8 @@ class MeshComponent : public Component
     void Update() override;
     void Render() override;
 
+    const ResourceMesh* GetResourceMesh() const { return currentMesh; }
+
   private:
     void AddMesh(UID resource, bool updateParent = true);
     void AddMaterial(UID resource);
@@ -31,6 +33,6 @@ class MeshComponent : public Component
     std::string currentMeshName       = "Not selected";
     ResourceMesh* currentMesh         = nullptr;
 
-    std::string currentTextureName    = "Not selected";
+    std::string currentMaterialName   = "Not selected";
     ResourceMaterial* currentMaterial = nullptr;
 };
