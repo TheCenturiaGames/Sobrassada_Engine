@@ -49,6 +49,8 @@ inline GameObject* RaycastController::GetRayIntersection(const LineSegment& ray,
         LineSegment localRay(ray.a, ray.b);
 
         const MeshComponent* meshComponent = pair.second->GetMeshComponent();
+        if (meshComponent == nullptr) continue; // TODO Happens occasionally, figure out why
+        
         const ResourceMesh* resourceMesh = meshComponent->GetResourceMesh();
 
         if (resourceMesh == nullptr) continue;
