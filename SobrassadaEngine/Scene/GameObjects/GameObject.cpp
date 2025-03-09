@@ -415,7 +415,7 @@ void GameObject::RenderContextMenu()
         if (uid != App->GetSceneModule()->GetGameObjectRootUID() && ImGui::MenuItem("Delete"))
         {
             App->GetSceneModule()->RemoveGameObjectHierarchy(uid);
-            // PassAABBUpdateToParent(); //TODO: check if it works
+            App->GetSceneModule()->RegenerateTree();
         }
 
         ImGui::EndPopup();
@@ -486,7 +486,7 @@ void GameObject::Render() const
 {
     for (auto& component : components)
     {
-        component.second->Render();
+        component.second->Render(); 
     }
 }
 

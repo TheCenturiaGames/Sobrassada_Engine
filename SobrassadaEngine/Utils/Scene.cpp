@@ -318,6 +318,7 @@ void Scene::RenderHierarchyUI(bool& hierarchyMenu)
         if (ImGui::Button("Delete GameObject"))
         {
             RemoveGameObjectHierarchy(selectedGameObjectUID);
+            App->GetSceneModule()->RegenerateTree();
         }
     }
 
