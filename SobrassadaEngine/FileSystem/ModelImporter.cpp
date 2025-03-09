@@ -44,7 +44,7 @@ namespace ModelImporter
 
         UID modelUID         = GenerateUID();
         std::string savePath = MODELS_PATH + std::string("Model") + MODEL_EXTENSION;
-        UID finalModelUID    = App->GetLibraryModule()->AssignFiletypeUID(modelUID, savePath);
+        UID finalModelUID    = App->GetLibraryModule()->AssignFiletypeUID(modelUID, FileType::Model);
         savePath             = MODELS_PATH + std::to_string(finalModelUID) + MODEL_EXTENSION;
         std::string name     = FileSystem::GetFileNameWithoutExtension(filePath);
         newModel.SetUID(finalModelUID);
