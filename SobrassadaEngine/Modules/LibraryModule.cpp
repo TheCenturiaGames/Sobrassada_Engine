@@ -273,25 +273,27 @@ bool LibraryModule::LoadLibraryMaps()
                 else TextureImporter::Import(assetPath.c_str(), assetUID);
                 break;
             case 13:
-                AddModel(assetUID, assetName);
-                AddResource(assetName, assetUID);
+                AddMaterial(assetUID, assetName);
+                AddName(assetName, assetUID);
                 libraryPath = MATERIALS_PATH + std::to_string(assetUID) + MATERIAL_EXTENSION;
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 else SceneImporter::ImportMaterialFromMetadata(assetPath, assetName, assetUID);
                 break;
-            case 14:
-                AddMaterial(assetUID, assetName);
-                AddName(assetName, assetUID);
-                libraryPath = MODELS_PATH + std::to_string(assetUID) + MODEL_EXTENSION;
-                if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
-                else SceneImporter::ImportMaterialFromMetadata(assetPath, assetName, assetUID);
-                break;
+            //case 14:
+            //    AddMaterial(assetUID, assetName);
+            //    AddName(assetName, assetUID);
+            //    libraryPath = MODELS_PATH + std::to_string(assetUID) + MODEL_EXTENSION;
+            //    if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
+            //    else SceneImporter::ImportMaterialFromMetadata(assetPath, assetName, assetUID);
+            //    break;
             default:
                 GLOG("Unknown UID prefix (%s) for: %s", std::to_string(prefix).c_str(), assetName.c_str());
                 continue;
             }
         }
     }
+
+    GLOG("MODELS MAP SIZE: %d", modelMap.size());
 
     return true;
 }

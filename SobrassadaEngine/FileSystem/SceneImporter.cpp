@@ -139,21 +139,6 @@ namespace SceneImporter
         }
     }
 
-    void ImportModelFromMetadata(const std::string& filePath, const std::string& name, UID sourceUID)
-    {
-        tinygltf::Model model = LoadModelGLTF(filePath.c_str());
-
-        // find material name that equals to name
-        for (int i = 0; i < model.materials.size(); i++)
-        {
-            if (model.materials[i].name == name)
-            {
-                MaterialImporter::ImportMaterial(model, i, filePath.c_str(), sourceUID);
-                return; // only one material with the same name
-            }
-        }
-    }
-
     void CreateLibraryDirectories()
     {
         if (!FileSystem::IsDirectory(ASSETS_PATH))

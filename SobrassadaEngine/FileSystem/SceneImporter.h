@@ -14,6 +14,5 @@ namespace SceneImporter
     tinygltf::Model LoadModelGLTF(const char* filePath);
     void ImportMeshFromMetadata(const std::string& filePath, const std::string& name, UID sourceUID);
     void ImportMaterialFromMetadata(const std::string& filePath, const std::string& name, UID sourceUID);
-    void ImportModelFromMetadata(const std::string& filePath, const std::string& name, UID sourceUID);
     void CreateLibraryDirectories();
 }; // namespace SceneImporter
