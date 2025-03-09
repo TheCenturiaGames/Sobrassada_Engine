@@ -38,12 +38,13 @@ void main()
     // Indexing with a float is crashing
     if (hasBones) 
     {
-        mat4 skin_t = palette[vertex_joint[0]] * vertex_weights[0] + palette[vertex_joint[1]] * vertex_weights[1] +             
-                      palette[vertex_joint[2]] * vertex_weights[2] + palette[vertex_joint[3]] * vertex_weights[3];
+        mat4 skin    = palette[vertex_joint[0]] * vertex_weights[0] + palette[vertex_joint[1]] * vertex_weights[1] +             
+                       palette[vertex_joint[2]] * vertex_weights[2] + palette[vertex_joint[3]] * vertex_weights[3];
+        pos          = (skin * vec4(vertex_position, 1.0)).xyz;
 
-        pos      = (skin_t*vec4(vertex_position, 1.0)).xyz;
-        normal   = (skin_t*vec4(vertex_normal, 0.0)).xyz;        // 0.0 avoid translation
-        tangent = vec4((skin_t*vec4(tangent.xyz, 0.0)).xyz, tangent.w); // 0.0 avoid translation
+        mat3 skinRot = mat3(skin); // Skin matrix with rotation only
+        normal       = skinRot * vertex_normal;        
+        tangent      = vec4(skinRot * tangent.xyz, tangent.w); 
     } 
     else 
     {
