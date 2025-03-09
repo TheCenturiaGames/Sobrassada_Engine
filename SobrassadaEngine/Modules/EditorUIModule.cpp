@@ -1149,6 +1149,12 @@ void EditorUIModule::OpenGLConfig() const
     {
         openGLModule->SetFrontFaceMode(frontFaceMode);
     }
+
+    ImGui::Separator();
+
+    ImGui::Text("Draw calls:");
+    ImGui::SameLine();
+    ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", App->GetOpenGLModule()->GetDrawCallsCount());
 }
 
 void EditorUIModule::GameTimerConfig() const

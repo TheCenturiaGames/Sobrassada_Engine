@@ -5,11 +5,9 @@
 #include "WindowModule.h"
 
 #include "Windows.h"
-#include "glew.h"
 
 OpenGLModule::OpenGLModule()
 {
-    context = nullptr;
 }
 
 OpenGLModule::~OpenGLModule()
@@ -64,6 +62,8 @@ update_status OpenGLModule::PreUpdate(float deltaTime)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
+    drawCallsCount = 0;
+
     return UPDATE_CONTINUE;
 }
 
@@ -88,42 +88,4 @@ bool OpenGLModule::ShutDown()
     SDL_GL_DeleteContext(App->GetWindowModule()->window);
     delete framebuffer;
     return true;
-}
-
-void OpenGLModule::SetDepthTest(bool enable)
-{
-    if (enable) glEnable(GL_DEPTH_TEST);
-    else glDisable(GL_DEPTH_TEST);
-}
-
-void OpenGLModule::SetFaceCull(bool enable)
-{
-    if (enable) glEnable(GL_CULL_FACE);
-    else glDisable(GL_CULL_FACE);
-}
-
-void OpenGLModule::SetDepthFunc(bool enable)
-{
-    if (enable) glDepthFunc(GL_LESS);
-    else glDepthFunc(GL_ALWAYS);
-}
-
-void OpenGLModule::SetFrontFaceMode(int mode)
-{
-    glFrontFace(mode);
-}
-
-void OpenGLModule::SetClearRed(float newValue)
-{
-    clearColorRed = newValue;
-}
-
-void OpenGLModule::SetClearGreen(float newValue)
-{
-    clearColorGreen = newValue;
-}
-
-void OpenGLModule::SetClearBlue(float newValue)
-{
-    clearColorBlue = newValue;
 }

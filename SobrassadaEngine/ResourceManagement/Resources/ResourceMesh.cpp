@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "CameraModule.h"
+#include "OpenGLModule.h"
 #include "ResourceMaterial.h"
 
 #include <Math/float2.h>
@@ -63,7 +64,7 @@ void ResourceMesh::LoadData(
     glBindVertexArray(0);
 
     this->vertices = vertices;
-    this->indices = indices;
+    this->indices  = indices;
 }
 
 void ResourceMesh::Render(int program, float4x4& modelMatrix, unsigned int cameraUBO, ResourceMaterial* material)
@@ -96,13 +97,13 @@ void ResourceMesh::Render(int program, float4x4& modelMatrix, unsigned int camer
     {
         glBindVertexArray(vao);
 
-        glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+        App->GetOpenGLModule()->DrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
     }
     else if (vao)
     {
         glBindVertexArray(vao);
 
-        glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+        App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, vertexCount);
     }
 
     glBindVertexArray(0);
