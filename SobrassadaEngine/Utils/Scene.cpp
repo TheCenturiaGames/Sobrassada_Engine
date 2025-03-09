@@ -12,11 +12,11 @@
 #include "OpenGLModule.h"
 #include "SceneModule.h"
 
+#include "SDL_mouse.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 // guizmo after imgui include
 #include "./Libs/ImGuizmo/ImGuizmo.h"
-#include "SDL_mouse.h"
 
 Scene::Scene(UID sceneUID, const char* sceneName, UID rootGameObject)
     : sceneUID(sceneUID), sceneName(std::string(sceneName)), gameObjectRootUUID(rootGameObject)
@@ -94,7 +94,6 @@ update_status Scene::Render(float deltaTime)
             gameObject->Render();
         }
     }
-
 
     return UPDATE_CONTINUE;
 }

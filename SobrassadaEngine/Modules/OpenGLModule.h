@@ -30,12 +30,17 @@ class OpenGLModule : public Module
         drawCallsCount++;
     }
 
+    void AddTrianglesPerSecond(float meshTrianglesPerSecond) { trianglesPerSecond += meshTrianglesPerSecond; }
+    void AddVerticesCount(int meshVertices) { verticesCount += meshVertices; }
+
     void* GetContext() const { return context; }
     float GetClearRed() const { return clearColorRed; }
     float GetClearGreen() const { return clearColorGreen; }
     float GetClearBlue() const { return clearColorBlue; }
     Framebuffer* GetFramebuffer() const { return framebuffer; }
     int GetDrawCallsCount() const { return drawCallsCount; }
+    float GetTrianglesPerSecond() const { return trianglesPerSecond; }
+    int GetVerticesCount() const { return verticesCount; }
 
     void SetDepthTest(bool enable)
     {
@@ -67,4 +72,6 @@ class OpenGLModule : public Module
     float clearColorGreen    = DEFAULT_GL_CLEAR_COLOR_GREEN;
     float clearColorBlue     = DEFAULT_GL_CLEAR_COLOR_BLUE;
     int drawCallsCount       = 0;
+    float trianglesPerSecond = 0;
+    int verticesCount        = 0;
 };

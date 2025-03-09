@@ -63,6 +63,8 @@ update_status OpenGLModule::PreUpdate(float deltaTime)
     }
 
     drawCallsCount = 0;
+    verticesCount  = 0;
+    trianglesPerSecond = 0;
 
     return UPDATE_CONTINUE;
 }

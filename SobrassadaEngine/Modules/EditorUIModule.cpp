@@ -47,11 +47,11 @@ bool EditorUIModule::Init()
     ImGui_ImplSDL2_InitForOpenGL(App->GetWindowModule()->window, App->GetOpenGLModule()->GetContext());
     ImGui_ImplOpenGL3_Init("#version 460");
 
-    width          = App->GetWindowModule()->GetWidth();
-    height         = App->GetWindowModule()->GetHeight();
+    width      = App->GetWindowModule()->GetWidth();
+    height     = App->GetWindowModule()->GetHeight();
 
-    startPath      = std::filesystem::current_path().string();
-    scenesPath     = startPath + DELIMITER + SCENES_PATH;
+    startPath  = std::filesystem::current_path().string();
+    scenesPath = startPath + DELIMITER + SCENES_PATH;
 
     App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_G, [&] { mCurrentGizmoOperation = ImGuizmo::TRANSLATE; });
     App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_H, [&] { mCurrentGizmoOperation = ImGuizmo::ROTATE; });
@@ -1150,11 +1150,30 @@ void EditorUIModule::OpenGLConfig() const
         openGLModule->SetFrontFaceMode(frontFaceMode);
     }
 
-    ImGui::Separator();
+    ImGui::SeparatorText("Render Information");
 
     ImGui::Text("Draw calls:");
     ImGui::SameLine();
     ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", App->GetOpenGLModule()->GetDrawCallsCount());
+
+    float currentTime     = App->GetEngineTimer()->GetTime() / 1000.f;
+    static float lastTime = 0.f;
+
+    static std::string tpsStr;
+    if (currentTime - lastTime > 1.f)
+    {
+        unsigned int tps = static_cast<unsigned int>(App->GetOpenGLModule()->GetTrianglesPerSecond());
+        lastTime         = currentTime;
+        tpsStr           = FormatWithCommas(tps);
+    }
+
+    ImGui::Text("Triangles per second:");
+    ImGui::SameLine();
+    ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s", tpsStr.c_str());
+
+    ImGui::Text("Vertices:");
+    ImGui::SameLine();
+    ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", App->GetOpenGLModule()->GetVerticesCount());
 }
 
 void EditorUIModule::GameTimerConfig() const
@@ -1291,4 +1310,12 @@ void EditorUIModule::ShowCaps() const
             cont++;
         }
     }
+}
+
+std::string EditorUIModule::FormatWithCommas(unsigned int number) const
+{
+    std::stringstream ss;
+    ss.imbue(std::locale("en_US.UTF-8")); // use commas
+    ss << number;
+    return ss.str();
 }
