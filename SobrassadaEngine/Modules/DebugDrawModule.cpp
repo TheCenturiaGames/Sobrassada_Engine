@@ -4,9 +4,9 @@
 #include "CameraModule.h"
 #include "Globals.h"
 #include "MathGeoLib.h"
-#include "OpenGLModule.h"
-#include "QuadtreeViewer.h"
 #include "WindowModule.h"
+#include "OpenGLModule.h"
+#include "Framebuffer.h"
 
 #include "SDL_video.h"
 #define DEBUG_DRAW_IMPLEMENTATION
@@ -634,7 +634,12 @@ void DebugDrawModule::Draw()
         dd::frustum(inverseClipMatrix, float3(1.f, 1.f, 1.f));
     }
 
-    SDL_GetWindowSize(App->GetWindowModule()->window, &width, &height);
+    //SDL_GetWindowSize(App->GetWindowModule()->window, &width, &height);
+
+    auto framebuffer = App->GetOpenGLModule()->GetFramebuffer();
+    width                     = framebuffer->GetTextureWidth();
+    height                     = framebuffer->GetTextureHeight();
+
     implementation->width     = width;
     implementation->height    = height;
     implementation->mvpMatrix = projection * view;

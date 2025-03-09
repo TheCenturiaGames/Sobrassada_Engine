@@ -9,6 +9,7 @@
 #include <vector>
 
 class RootComponent;
+class MeshComponent;
 
 class GameObject : public AABBUpdatable
 {
@@ -33,6 +34,8 @@ class GameObject : public AABBUpdatable
 
     void OnEditor();
 
+    void Render();
+    void RenderEditor();
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
 
     void SaveToLibrary();
@@ -44,24 +47,19 @@ class GameObject : public AABBUpdatable
     bool UpdateGameObjectHierarchy(UID sourceUID, UID targetUID);
     void RenameGameObjectHierarchy();
 
-    inline std::string GetName() const { return name; }
-    void SetName(std::string newName) { name = newName; }
+    void AddChildren(UID childUUID) { children.push_back(childUUID); }
 
-    inline std::vector<UID> GetChildren() { return children; }
-    inline void AddChildren(UID childUUID) { children.push_back(childUUID); }
-
-    inline UID GetParent() const { return parentUUID; }
-    void SetParent(UID newParentUUID) { parentUUID = newParentUUID; }
-
-    inline UID GetUID() const { return uuid; }
-    void SetUUID(UID newUUID) { uuid = newUUID; }
-
+    UID GetUID() const { return uuid; }
+    UID GetParent() const { return parentUUID; }
+    std::string GetName() const { return name; }
+    std::vector<UID> GetChildren() { return children; }
     RootComponent* GetRootComponent() const { return rootComponent; }
+    const AABB& GetAABB() const { return globalAABB; };
+    const MeshComponent* GetMeshComponent() const;
 
-    inline const AABB& GetAABB() const { return globalAABB; };
-
-    void Render();
-    void RenderEditor();
+    void SetName(std::string newName) { name = newName; }
+    void SetParent(UID newParentUUID) { parentUUID = newParentUUID; }
+    void SetUUID(UID newUUID) { uuid = newUUID; }
 
     void DrawGizmos();
 

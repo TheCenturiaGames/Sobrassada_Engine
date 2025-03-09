@@ -4,6 +4,7 @@
 #include "DebugDrawModule.h"
 #include "EditorUIModule.h"
 #include "Root/RootComponent.h"
+#include "Standalone/MeshComponent.h"
 #include "SceneModule.h"
 
 #include "imgui.h"
@@ -261,6 +262,26 @@ void GameObject::RenameGameObjectHierarchy()
         isRenaming         = false;
         currentRenamingUID = INVALID_UUID;
     }
+}
+
+const MeshComponent* GameObject::GetMeshComponent() const
+{
+    if (rootComponent == nullptr) return nullptr;
+
+    Component* currentComponent      = nullptr;
+    const std::vector<UID>& childComponents = rootComponent->GetChildren();
+
+    for (UID componentUID : childComponents)
+    {
+        currentComponent = App->GetSceneModule()->GetComponentByUID(componentUID);
+        if (currentComponent != nullptr && currentComponent->GetType() == ComponentType::COMPONENT_MESH)
+        {
+            MeshComponent* meshComponent = static_cast<MeshComponent*>(currentComponent);
+            return meshComponent;
+        }
+    }
+
+    return nullptr;
 }
 
 bool GameObject::UpdateGameObjectHierarchy(UID sourceUID, UID targetUID)
