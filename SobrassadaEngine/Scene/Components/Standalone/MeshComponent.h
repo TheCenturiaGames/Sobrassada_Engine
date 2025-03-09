@@ -11,11 +11,13 @@
 class MeshComponent : public Component
 {
   public:
-    MeshComponent(UID uid, UID uidParent, UID uidRoot, const float4x4& parentGlobalTransform);
+    MeshComponent(UID uid, UID uidParent);
 
     MeshComponent(const rapidjson::Value& initialState);
 
-    virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
+    ~MeshComponent() override;
+
+    void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
 
     void RenderEditorInspector() override;
     void Update() override;
@@ -24,7 +26,7 @@ class MeshComponent : public Component
     const ResourceMesh* GetResourceMesh() const { return currentMesh; }
 
   private:
-    void AddMesh(UID resource, bool reloadAABB = true);
+    void AddMesh(UID resource, bool updateParent = true);
     void AddMaterial(UID resource);
 
   private:

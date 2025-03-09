@@ -1,0 +1,287 @@
+{
+    "Scene": {
+        "UID": 16609617066274989591,
+        "Name": "Hello",
+        "RootGameObject": 13256564810306010616,
+        "GameObjects": [
+            {
+                "UID": 13256564810306010616,
+                "ParentUID": 0,
+                "Name": "SceneModule GameObject",
+                "Children": [
+                    18125215174732479782
+                ],
+                "RootComponentUID": 3892949140
+            },
+            {
+                "UID": 13089765273445170749,
+                "ParentUID": 18125215174732479782,
+                "Name": "new Game Object",
+                "Children": [],
+                "RootComponentUID": 3062806230
+            },
+            {
+                "UID": 18125215174732479782,
+                "ParentUID": 13256564810306010616,
+                "Name": "new Game Object",
+                "Children": [
+                    13089765273445170749
+                ],
+                "RootComponentUID": 4244403244
+            }
+        ],
+        "Components": [
+            {
+                "UID": 52871818,
+                "ParentUID": 3062806230,
+                "RootUID": 3062806230,
+                "Type": 2,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [
+                    3968369964
+                ],
+                "Enabled": true,
+                "Name": "Mesh component",
+                "Mesh": 0,
+                "Material": 0
+            },
+            {
+                "UID": 199069430,
+                "ParentUID": 4244403244,
+                "RootUID": 4244403244,
+                "Type": 5,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Spot Light",
+                "Intensity": 1.0,
+                "ColorRed": 1.0,
+                "ColorGreen": 1.0,
+                "ColorBlue": 1.0,
+                "DrawGizmos": true,
+                "Range": 3.0,
+                "InnerAngle": 10.0,
+                "OuterAngle": 20.0
+            },
+            {
+                "UID": 331973172,
+                "ParentUID": 4244403244,
+                "RootUID": 4244403244,
+                "Type": 2,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [
+                    2253533599
+                ],
+                "Enabled": true,
+                "Name": "Mesh 1",
+                "Mesh": 0,
+                "Material": 0
+            },
+            {
+                "UID": 589908403,
+                "ParentUID": 3062806230,
+                "RootUID": 3062806230,
+                "Type": 5,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Spot Light",
+                "Intensity": 1.0,
+                "ColorRed": 1.0,
+                "ColorGreen": 1.0,
+                "ColorBlue": 1.0,
+                "DrawGizmos": true,
+                "Range": 3.0,
+                "InnerAngle": 10.0,
+                "OuterAngle": 20.0
+            },
+            {
+                "UID": 871747979,
+                "ParentUID": 3062806230,
+                "RootUID": 3062806230,
+                "Type": 4,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Point Light",
+                "Intensity": 1.0,
+                "ColorRed": 1.0,
+                "ColorGreen": 1.0,
+                "ColorBlue": 1.0,
+                "DrawGizmos": true,
+                "Range": 1.0,
+                "GizmosMode": 0
+            },
+            {
+                "UID": 2253533599,
+                "ParentUID": 331973172,
+                "RootUID": 4244403244,
+                "Type": 2,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Mesh 1.1",
+                "Mesh": 0,
+                "Material": 0
+            },
+            {
+                "UID": 3062806230,
+                "ParentUID": 13089765273445170749,
+                "RootUID": 3062806230,
+                "Type": 1,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [
+                    52871818,
+                    871747979,
+                    589908403
+                ],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3892949140,
+                "ParentUID": 13256564810306010616,
+                "RootUID": 3892949140,
+                "Type": 1,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            },
+            {
+                "UID": 3968369964,
+                "ParentUID": 52871818,
+                "RootUID": 3062806230,
+                "Type": 6,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [],
+                "Enabled": true,
+                "Name": "Directional Light",
+                "Intensity": 1.0,
+                "ColorRed": 1.0,
+                "ColorGreen": 1.0,
+                "ColorBlue": 1.0,
+                "DrawGizmos": true
+            },
+            {
+                "UID": 4244403244,
+                "ParentUID": 18125215174732479782,
+                "RootUID": 4244403244,
+                "Type": 1,
+                "LocalTransform": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    -0.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Children": [
+                    331973172,
+                    199069430
+                ],
+                "Enabled": true,
+                "Name": "Root component",
+                "Type": 1,
+                "Mobility": 1
+            }
+        ]
+    }
+}
