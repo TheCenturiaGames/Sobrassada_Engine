@@ -279,9 +279,6 @@
     <ClCompile Include="FileSystem\AnimationImporter.cpp">
       <Filter>FileSystem</Filter>
     </ClCompile>
-    <ClCompile Include="Utils\Transform.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
     <ClCompile Include="Modules\DebugDrawModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
@@ -292,6 +289,9 @@
       <Filter>Modules</Filter>
     </ClCompile>
     <ClCompile Include="AnimController.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\AnimationComponent.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -423,9 +423,6 @@
     <ClInclude Include="Scene\Components\Component.h">
       <Filter>Scene\Components</Filter>
     </ClInclude>
-    <ClInclude Include="Utils\Transform.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Scene\GameObjects\GameObject.h">
       <Filter>Scene\GameObjects</Filter>
     </ClInclude>
@@ -520,6 +517,9 @@
       <Filter>FileSystem</Filter>
     </ClInclude>
     <ClInclude Include="AnimController.h" />
+    <ClInclude Include="Scene\Components\Standalone\AnimationComponent.h">
+      <Filter>Scene\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl">
