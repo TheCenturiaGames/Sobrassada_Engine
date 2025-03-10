@@ -365,9 +365,9 @@ void Scene::RemoveGameObjectHierarchy(UID gameObjectUUID)
     delete gameObject;
 }
 
-const std::unordered_map<uint64_t, Component*> Scene::GetAllComponents() const
+const std::unordered_map<UID, Component*> Scene::GetAllComponents() const
 {
-    std::unordered_map<uint64_t, Component*> collectedComponents;
+    std::unordered_map<UID, Component*> collectedComponents;
     for (auto& pair : gameObjectsContainer)
     {
         if (pair.second != nullptr)
