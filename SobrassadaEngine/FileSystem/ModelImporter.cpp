@@ -24,14 +24,6 @@ namespace ModelImporter
         FillNodes(nodes, 0, -1, meshesUIDs, orderedNodes); // -1 parentId for root
         GLOG("Nodes filled");
 
-        // for (int i = 0; i < orderedNodes.size(); ++i)
-        //{
-        //     GLOG(
-        //         "Node %d. Name: %s. Parent id: %d. Meshes count: %d", i, orderedNodes[i].name.c_str(),
-        //         orderedNodes[i].parentId, orderedNodes[i].meshes.size()
-        //     )
-        // }
-
         newModel.SetNodes(orderedNodes);
 
         // Save in JSON format, way easier for this data

@@ -14,7 +14,6 @@
 #include "ResourceManagement/Resources/ResourceModel.h"
 #include "ResourcesModule.h"
 #include "Scene/Components/ComponentUtils.h"
-#include "Scene/Components/Root/RootComponent.h"
 #include "Scene/Components/Standalone/MeshComponent.h"
 #include "SceneModule.h"
 
@@ -449,10 +448,10 @@ void Scene::LoadModel(const UID modelUID)
         const std::vector<NodeData>& nodes = model.GetNodes();
 
         GameObject* object                 = new GameObject(GetGameObjectRootUID(), nodes[0].name);
-        object->GetRootComponent()->SetLocalTransform(nodes[0].transform);
+        object->SetLocalTransform(nodes[0].transform);
 
-        // Add the gameObject to
-        GetGameObjectByUUID(GetGameObjectRootUID())->AddGameObject(object->GetUID());
+        // Add the gameObject to the rootObject
+        GetGameObjectByUID(GetGameObjectRootUID())->AddGameObject(object->GetUID());
         AddGameObject(object->GetUID(), object);
 
         std::vector<GameObject*> gameObjectsArray;
@@ -460,33 +459,38 @@ void Scene::LoadModel(const UID modelUID)
 
         for (int i = 1; i < nodes.size(); ++i)
         {
-            GameObject* gameObject = new GameObject(gameObjectsArray[nodes[i].parentIndex]->GetUID(), nodes[i].name);
-
-            if (nodes[i].meshes.size() > 0)
+            if (nodes[i].meshes.size() > 0)  // If has meshes, create one gameObject per mesh
             {
                 GLOG("Node %s has %d meshes", nodes[i].name.c_str(), nodes[i].meshes.size());
 
                 for (const auto& mesh : nodes[i].meshes)
                 {
-                    MeshComponent* meshComponent =
-                        reinterpret_cast<MeshComponent*>(ComponentUtils::CreateEmptyComponent(
-                            COMPONENT_MESH, GenerateUID(), gameObject->GetRootComponent()->GetUID(),
-                            gameObject->GetRootComponent()->GetUID(),
-                            gameObject->GetRootComponent()->GetGlobalTransform()
-                        ));
-                    AddComponent(meshComponent->GetUID(), meshComponent);
-                    gameObject->GetRootComponent()->AddChildComponent(meshComponent->GetUID());
+                    GameObject* gameObject =
+                        new GameObject(gameObjectsArray[nodes[i].parentIndex]->GetUID(), nodes[i].name);
 
-                    meshComponent->AddMesh(mesh.first, true);
-                    meshComponent->AddMaterial(mesh.second);
+                    gameObject->CreateComponent(COMPONENT_MESH);
+                    gameObject->AddModel(mesh.first, mesh.second);
+
+                    gameObject->SetLocalTransform(nodes[i].transform);
+
+                    gameObjectsArray.emplace_back(gameObject);
+                    GetGameObjectByUID(gameObjectsArray[nodes[i].parentIndex]->GetUID())
+                        ->AddGameObject(gameObject->GetUID());
+                    AddGameObject(gameObject->GetUID(), gameObject);
                 }
             }
-            gameObjectsArray.emplace_back(gameObject);
-            GetGameObjectByUUID(gameObjectsArray[nodes[i].parentIndex]->GetUID())->AddGameObject(gameObject->GetUID());
-            AddGameObject(gameObject->GetUID(), gameObject);
+            else
+            {
+                GameObject* gameObject =
+                    new GameObject(gameObjectsArray[nodes[i].parentIndex]->GetUID(), nodes[i].name);
 
-            gameObject->GetRootComponent()->SetLocalTransform(nodes[i].transform);
-            gameObject->PassAABBUpdateToParent();
+                gameObject->SetLocalTransform(nodes[i].transform);
+
+                gameObjectsArray.emplace_back(gameObject);
+                GetGameObjectByUID(gameObjectsArray[nodes[i].parentIndex]->GetUID())
+                    ->AddGameObject(gameObject->GetUID());
+                AddGameObject(gameObject->GetUID(), gameObject);
+            }
         }
     }
 }

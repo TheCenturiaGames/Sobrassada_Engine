@@ -1,8 +1,8 @@
 #include "GameObject.h"
 
 #include "Application.h"
-#include "DebugDrawModule.h"
 #include "Component.h"
+#include "DebugDrawModule.h"
 #include "EditorUIModule.h"
 #include "SceneModule.h"
 
@@ -303,6 +303,16 @@ const MeshComponent* GameObject::GetMeshComponent() const
     return nullptr;
 }
 
+void GameObject::AddModel(UID meshUid, UID materialUid) const
+{
+    if (components.find(COMPONENT_MESH) != components.end())
+    {
+        MeshComponent* mesh = static_cast<MeshComponent*>(components.at(COMPONENT_MESH));
+        mesh->AddMesh(meshUid);
+        mesh->AddMaterial(materialUid);
+    }
+}
+
 void GameObject::OnTransformUpdated()
 {
     globalTransform = GetParentGlobalTransform() * localTransform;
@@ -517,7 +527,7 @@ void GameObject::RenderEditor()
     }
 }
 
-void GameObject::DrawGizmos()
+void GameObject::DrawGizmos() const
 {
     if (drawNodes) DrawNodes();
 }
@@ -532,7 +542,7 @@ const float4x4& GameObject::GetParentGlobalTransform() const
     return float4x4::identity;
 }
 
-void GameObject::DrawNodes()
+void GameObject::DrawNodes() const
 {
     DebugDrawModule* debug = App->GetDebugDrawModule();
 
