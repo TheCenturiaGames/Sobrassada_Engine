@@ -177,6 +177,9 @@ void GameObject::RenderEditorInspector()
 
     if (uid != App->GetSceneModule()->GetGameObjectRootUID())
     {
+        ImGui::SameLine();
+        if (ImGui::Checkbox("Draw nodes", &drawNodes)) OnDrawConnectionsToggle();
+
         if (ImGui::Button("Add Component"))
         {
             ImGui::OpenPopup("ComponentSelection");
@@ -440,8 +443,6 @@ void GameObject::RenderContextMenu()
             App->GetSceneModule()->RemoveGameObjectHierarchy(uid);
             App->GetSceneModule()->RegenerateTree();
         }
-
-        if (ImGui::Checkbox("Draw nodes", &drawNodes)) OnDrawConnectionsToggle();
 
         ImGui::EndPopup();
     }

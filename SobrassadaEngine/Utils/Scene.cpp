@@ -459,24 +459,31 @@ void Scene::LoadModel(const UID modelUID)
 
         for (int i = 1; i < nodes.size(); ++i)
         {
-            if (nodes[i].meshes.size() > 0)  // If has meshes, create one gameObject per mesh
+            if (nodes[i].meshes.size() >
+                0) // If has meshes, create a container object and one gameObject per mesh as children
             {
                 GLOG("Node %s has %d meshes", nodes[i].name.c_str(), nodes[i].meshes.size());
+                GameObject* gameObject = new GameObject(gameObjectsArray[nodes[i].parentIndex]->GetUID(), nodes[i].name);
+                //gameObject->SetLocalTransform(nodes[0].transform);
 
+                gameObjectsArray.emplace_back(gameObject);
+                GetGameObjectByUID(gameObjectsArray[nodes[i].parentIndex]->GetUID())
+                    ->AddGameObject(gameObject->GetUID());
+                AddGameObject(gameObject->GetUID(), gameObject);
+
+                unsigned meshNum = 1;
                 for (const auto& mesh : nodes[i].meshes)
                 {
-                    GameObject* gameObject =
-                        new GameObject(gameObjectsArray[nodes[i].parentIndex]->GetUID(), nodes[i].name);
+                    GameObject* meshObject = new GameObject(gameObject->GetUID(), "Mesh " + std::to_string(meshNum));
+                    ++meshNum;
 
-                    gameObject->CreateComponent(COMPONENT_MESH);
-                    gameObject->AddModel(mesh.first, mesh.second);
+                    meshObject->CreateComponent(COMPONENT_MESH);
+                    meshObject->AddModel(mesh.first, mesh.second);
 
-                    gameObject->SetLocalTransform(nodes[i].transform);
+                    meshObject->SetLocalTransform(nodes[i].transform);
 
-                    gameObjectsArray.emplace_back(gameObject);
-                    GetGameObjectByUID(gameObjectsArray[nodes[i].parentIndex]->GetUID())
-                        ->AddGameObject(gameObject->GetUID());
-                    AddGameObject(gameObject->GetUID(), gameObject);
+                    gameObject->AddGameObject(meshObject->GetUID());
+                    AddGameObject(meshObject->GetUID(), meshObject);
                 }
             }
             else
@@ -492,5 +499,6 @@ void Scene::LoadModel(const UID modelUID)
                 AddGameObject(gameObject->GetUID(), gameObject);
             }
         }
+        object->UpdateTransformForGOBranch();
     }
 }
