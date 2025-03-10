@@ -5,6 +5,7 @@
 #include "ComponentUtils.h"
 #include "FileSystem.h"
 #include "GameObject.h"
+#include "ProjectModule.h"
 #include "Root/RootComponent.h"
 #include "SceneImporter.h"
 #include "SceneModule.h"
@@ -261,21 +262,21 @@ bool LibraryModule::LoadLibraryMaps()
             case 11:
                 AddMesh(assetUID, assetName);
                 AddName(assetName, assetUID);
-                libraryPath = MESHES_PATH + std::to_string(assetUID) + MESH_EXTENSION;
+                libraryPath = App->GetProjectModule()->GetLoadedProjectPath() + MESHES_PATH + std::to_string(assetUID) + MESH_EXTENSION;
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 else SceneImporter::ImportMeshFromMetadata(assetPath, assetName, assetUID);
                 break;
             case 12: 
                 AddTexture(assetUID, assetName);
                 AddName(assetName, assetUID);
-                libraryPath = TEXTURES_PATH + std::to_string(assetUID) + TEXTURE_EXTENSION;
+                libraryPath = App->GetProjectModule()->GetLoadedProjectPath() + TEXTURES_PATH + std::to_string(assetUID) + TEXTURE_EXTENSION;
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 else TextureImporter::Import(assetPath.c_str(), assetUID);
                 break;
             case 13:
                 AddMaterial(assetUID, assetName);
                 AddName(assetName, assetUID);
-                libraryPath = MATERIALS_PATH + std::to_string(assetUID) + MATERIAL_EXTENSION;
+                libraryPath = App->GetProjectModule()->GetLoadedProjectPath() + MATERIALS_PATH + std::to_string(assetUID) + MATERIAL_EXTENSION;
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 else SceneImporter::ImportMaterialFromMetadata(assetPath, assetName, assetUID);
                 break;

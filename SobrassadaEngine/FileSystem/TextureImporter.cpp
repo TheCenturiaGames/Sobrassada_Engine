@@ -4,6 +4,7 @@
 #include "FileSystem.h"
 #include "LibraryModule.h"
 #include "MetaTexture.h"
+#include "ProjectModule.h"
 #include "glew.h"
 #include <string>
 
@@ -62,7 +63,7 @@ namespace TextureImporter
         }
         else finalTextureUID = sourceUID;
 
-        std::string saveFilePath = TEXTURES_PATH + std::to_string(finalTextureUID) + TEXTURE_EXTENSION;
+        std::string saveFilePath = App->GetProjectModule()->GetLoadedProjectPath() + TEXTURES_PATH + std::to_string(finalTextureUID) + TEXTURE_EXTENSION;
         unsigned int bytesWritten =
             FileSystem::Save(saveFilePath.c_str(), blob.GetBufferPointer(), (unsigned int)blob.GetBufferSize());
 

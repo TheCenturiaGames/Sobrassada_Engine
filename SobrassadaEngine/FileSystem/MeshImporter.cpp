@@ -4,6 +4,7 @@
 #include "FileSystem.h"
 #include "LibraryModule.h"
 #include "MetaMesh.h"
+#include "ProjectModule.h"
 
 namespace MeshImporter
 {
@@ -226,13 +227,13 @@ namespace MeshImporter
             UID meshUID           = GenerateUID();
             finalMeshUID          = App->GetLibraryModule()->AssignFiletypeUID(meshUID, FileType::Mesh);
 
-            std::string assetPath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
+            std::string assetPath = App->GetProjectModule()->GetLoadedProjectPath() + ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
             MetaMesh meta(finalMeshUID, assetPath, generateTangents);
             meta.Save(name, assetPath);
         }
         else finalMeshUID = sourceUID;
 
-        std::string saveFilePath  = MESHES_PATH + std::to_string(finalMeshUID) + MESH_EXTENSION;
+        std::string saveFilePath  = App->GetProjectModule()->GetLoadedProjectPath() + MESHES_PATH + std::to_string(finalMeshUID) + MESH_EXTENSION;
         unsigned int bytesWritten = (unsigned int)FileSystem::Save(saveFilePath.c_str(), fileBuffer, size, true);
 
         delete[] fileBuffer;
