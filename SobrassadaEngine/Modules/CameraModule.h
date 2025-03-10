@@ -8,6 +8,8 @@
 #include "Math/Quat.h"
 #include "Math/float4x4.h"
 
+// REMOVE
+#include "Geometry/LineSegment.h"
 constexpr float cameraRotationAngle  = 135.f / RAD_DEGREE_CONV;
 constexpr float maximumPositivePitch = 89.f / RAD_DEGREE_CONV;
 constexpr float maximumNegativePitch = -89.f / RAD_DEGREE_CONV;
@@ -28,9 +30,10 @@ class CameraModule : public Module
     update_status Update(float deltaTime) override;
     bool ShutDown() override;
 
-    void UpdateUBO();
-
     bool IsCameraDetached() const { return isCameraDetached; }
+    void UpdateUBO();
+    const LineSegment& CastCameraRay();
+
     const float4x4& GetProjectionMatrix() { return isCameraDetached ? detachedProjectionMatrix : projectionMatrix; }
     const float4x4& GetViewMatrix() { return isCameraDetached ? detachedViewMatrix : viewMatrix; }
     const float4x4& GetFrustumViewMatrix() { return viewMatrix; }
@@ -44,6 +47,7 @@ class CameraModule : public Module
     }
 
     unsigned int GetUbo() const { return ubo; }
+    const LineSegment& GetLastCastedRay() const { return lastCastedRay; }
 
     void SetAspectRatio(float newAspectRatio);
 
@@ -77,4 +81,6 @@ class CameraModule : public Module
     CameraMatrices matrices;
 
     unsigned int ubo;
+
+    LineSegment lastCastedRay;
 };

@@ -33,7 +33,6 @@ void ResourceMesh::LoadData(
 )
 {
     this->mode              = mode;
-    this->material          = material;
     this->vertexCount       = static_cast<unsigned int>(vertices.size());
     this->indexCount        = static_cast<unsigned int>(indices.size());
     unsigned int bufferSize = sizeof(Vertex);
@@ -79,6 +78,9 @@ void ResourceMesh::LoadData(
 
     // Unbind VAO
     glBindVertexArray(0);
+
+    this->vertices = vertices;
+    this->indices = indices;
 }
 
 void ResourceMesh::Render(
@@ -94,7 +96,7 @@ void ResourceMesh::Render(
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, cameraUBO);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-    glUniformMatrix4fv(3, 1, GL_TRUE, &modelMatrix[0][0]);
+    glUniformMatrix4fv(3, 1, GL_TRUE, modelMatrix.ptr());
 
     float3 cameraPos = App->GetCameraModule()->GetCameraPosition();
     glUniform3fv(glGetUniformLocation(program, "cameraPos"), 1, &cameraPos[0]);

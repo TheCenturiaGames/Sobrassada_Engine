@@ -70,6 +70,12 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+        <OutDir>$(ShortProjectName)\$(Platform)\$(Configuration)\</OutDir>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+        <OutDir>$(ShortProjectName)\$(Platform)\$(Configuration)\</OutDir>
+    </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -139,6 +145,10 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="FileSystem\ModelImporter.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceModel.cpp" />
+    <ClCompile Include="FileSystem\MetaFile.cpp" />
+    <ClCompile Include="FileSystem\MetaMaterial.cpp" />
+    <ClCompile Include="FileSystem\MetaMesh.cpp" />
+    <ClCompile Include="FileSystem\MetaTexture.cpp" />
     <ClCompile Include="Modules\CameraModule.cpp" />
     <ClCompile Include="Modules\EditorUIModule.cpp" />
     <ClCompile Include="Utils\EngineTimer.cpp" />
@@ -327,91 +337,7 @@
     <ClCompile Include="FileSystem\TextureImporter.cpp" />
     <ClCompile Include="Utils\FrustumPlanes.cpp" />
     <ClCompile Include="Utils\Octree.cpp" />
-    <ClCompile Include="Tests\MockGameObject.cpp" />
     <ClCompile Include="Utils\Quadtree.cpp" />
-    <ClCompile Include="UI\QuadtreeViewer.cpp" />
-    <ClCompile Include="Scene\Components\Root\RootComponent.cpp">
-      <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <Optimization>Disabled</Optimization>
-      <SupportJustMyCode>true</SupportJustMyCode>
-      <AssemblerOutput>NoListing</AssemblerOutput>
-      <AssemblerListingLocation>SobrassadaEngine\x64\Debug\</AssemblerListingLocation>
-      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
-      <BrowseInformation>false</BrowseInformation>
-      <BrowseInformationFile>SobrassadaEngine\x64\Debug\</BrowseInformationFile>
-      <CompileAs>Default</CompileAs>
-      <ConformanceMode>true</ConformanceMode>
-      <DiagnosticsFormat>Column</DiagnosticsFormat>
-      <DisableLanguageExtensions>false</DisableLanguageExtensions>
-      <ErrorReporting>Prompt</ErrorReporting>
-      <ExpandAttributedSource>false</ExpandAttributedSource>
-      <ExceptionHandling>Sync</ExceptionHandling>
-      <EnableASAN>false</EnableASAN>
-      <EnableFuzzer>false</EnableFuzzer>
-      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Precise</FloatingPointModel>
-      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
-      <GenerateModuleDependencies>false</GenerateModuleDependencies>
-      <GenerateSourceDependencies>false</GenerateSourceDependencies>
-      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
-      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
-      <IntrinsicFunctions>false</IntrinsicFunctions>
-      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <LanguageStandard_C>Default</LanguageStandard_C>
-      <MinimalRebuild>false</MinimalRebuild>
-      <ModuleDependenciesFile>SobrassadaEngine\x64\Debug\</ModuleDependenciesFile>
-      <ModuleOutputFile>SobrassadaEngine\x64\Debug\</ModuleOutputFile>
-      <OmitDefaultLibName>false</OmitDefaultLibName>
-      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
-      <WholeProgramOptimization>false</WholeProgramOptimization>
-      <ObjectFileName>SobrassadaEngine\x64\Debug\</ObjectFileName>
-      <CallingConvention>Cdecl</CallingConvention>
-      <ProgramDataBaseFileName>SobrassadaEngine\x64\Debug\vc143.pdb</ProgramDataBaseFileName>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>SobrassadaEngine\x64\Debug\SobrassadaEngine.pch</PrecompiledHeaderOutputFile>
-      <PreprocessToFile>false</PreprocessToFile>
-      <PreprocessKeepComments>false</PreprocessKeepComments>
-      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
-      <RemoveUnreferencedCodeData>true</RemoveUnreferencedCodeData>
-      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
-      <ShowIncludes>false</ShowIncludes>
-      <SourceDependenciesFile>SobrassadaEngine\x64\Debug\</SourceDependenciesFile>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
-      <SmallerTypeCheck>false</SmallerTypeCheck>
-      <SpectreMitigation>false</SpectreMitigation>
-      <StructMemberAlignment>Default</StructMemberAlignment>
-      <TrackerLogDirectory>SobrassadaEngine\x64\Debug\SobrassadaEngine.tlog\</TrackerLogDirectory>
-      <TranslateIncludes>false</TranslateIncludes>
-      <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
-      <TreatWarningAsError>false</TreatWarningAsError>
-      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
-      <UseFullPaths>true</UseFullPaths>
-      <WarningLevel>Level3</WarningLevel>
-      <XMLDocumentationFileName>SobrassadaEngine\x64\Debug\</XMLDocumentationFileName>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <IntelJCCErratum>false</IntelJCCErratum>
-      <BuildStlModules>false</BuildStlModules>
-      <TreatAngleIncludeAsExternal>false</TreatAngleIncludeAsExternal>
-      <ExternalWarningLevel>InheritWarningLevel</ExternalWarningLevel>
-      <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
-      <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_MBCS;</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\Tests;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\DirectXTex;.\Libs\Tinygltf;.\;.\Modules;.\UI;.\Utils;.\DebugDraw;</AdditionalIncludeDirectories>
-      <LinkCompiled>true</LinkCompiled>
-      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Default</BasicRuntimeChecks>
-      <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MultiThreadedDLL</RuntimeLibrary>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_NDEBUG;_CONSOLE;_MBCS;</PreprocessorDefinitions>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MinSpace</Optimization>
-      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</IntrinsicFunctions>
-      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</WholeProgramOptimization>
-      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ProgramDatabase</DebugInformationFormat>
-    </ClCompile>
     <ClCompile Include="Scene\Components\Standalone\MeshComponent.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -553,17 +479,21 @@
     <ClInclude Include="FileSystem\Importer.h" />
     <ClInclude Include="FileSystem\Model.h" />
     <ClInclude Include="Libs\ImGuizmo\ImGuizmo.h" />
+    <ClInclude Include="FileSystem\MetaFile.h" />
+    <ClInclude Include="FileSystem\MetaMaterial.h" />
+    <ClInclude Include="FileSystem\MetaMesh.h" />
+    <ClInclude Include="FileSystem\MetaTexture.h" />
     <ClInclude Include="Modules\CameraModule.h" />
     <ClInclude Include="Modules\EditorUIModule.h" />
     <ClInclude Include="Modules\ResourcesModule.h" />
     <ClInclude Include="Modules\SceneModule.h" />
     <ClInclude Include="FileSystem\ModelImporter.h" />
+    <ClInclude Include="RaycastController.h" />
     <ClInclude Include="ResourceManagement\Resources\Resource.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceMaterial.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceMesh.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceModel.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceTexture.h" />
-    <ClInclude Include="Scene\AABBUpdatable.h" />
     <ClInclude Include="FileSystem\FileSystem.h" />
     <ClInclude Include="Modules\LibraryModule.h" />
     <ClInclude Include="FileSystem\Material.h" />
@@ -580,10 +510,7 @@
     <ClInclude Include="FileSystem\TextureImporter.h" />
     <ClInclude Include="Utils\FrustumPlanes.h" />
     <ClInclude Include="Utils\Octree.h" />
-    <ClInclude Include="Tests\MockGameObject.h" />
     <ClInclude Include="Utils\Quadtree.h" />
-    <ClInclude Include="UI\QuadtreeViewer.h" />
-    <ClInclude Include="Scene\Components\Root\RootComponent.h" />
     <ClInclude Include="Scene\Components\Standalone\MeshComponent.h" />
     <ClInclude Include="Scene\Components\ComponentUtils.h" />
     <ClInclude Include="Scene\GameObjects\GameObject.h" />
@@ -615,7 +542,6 @@
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Scene\Components\Dependent\" />
     <Folder Include="Scene\GameObjects\" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -1,6 +1,8 @@
 #pragma once
+
 #define NOMINMAX
 #include "Algorithm/Random/LCG.h"
+#include <Geometry/AABB.h>
 #include <stdio.h>
 #include <vector>
 #include <windows.h>
@@ -50,6 +52,9 @@ enum update_status
 #define DELIMITER '/'
 #endif
 
+#define FILENAME_SEPARATOR "_"
+#define DEFAULT_SCENE_NAME "New Scene"
+
 #define DEFAULT_GL_CLEAR_COLOR_RED   0.5f
 #define DEFAULT_GL_CLEAR_COLOR_GREEN 0.5f
 #define DEFAULT_GL_CLEAR_COLOR_BLUE  0.5f
@@ -60,6 +65,8 @@ enum update_status
 #define DEFAULT_CAMERA_ZOOM_SENSITIVITY      5.f;
 
 #define ASSETS_PATH     "Assets/"
+#define SCENES_PATH     "Assets/Scenes/"
+#define METADATA_PATH   "Assets/Metadata/"
 #define LIBRARY_PATH    "Library/"
 #define ANIMATIONS_PATH "Library/Animations/"
 #define AUDIO_PATH      "Library/Audio/"
@@ -67,7 +74,6 @@ enum update_status
 #define MESHES_PATH     "Library/Meshes/"
 #define TEXTURES_PATH   "Library/Textures/"
 #define MATERIALS_PATH  "Library/Materials/"
-#define SCENES_PATH     "Library/Scenes/"
 
 #define ASSET_EXTENSION    ".gltf"
 #define MESH_EXTENSION     ".sobrassada"
@@ -75,11 +81,13 @@ enum update_status
 #define MATERIAL_EXTENSION ".mat"
 #define SCENE_EXTENSION    ".scene"
 #define MODEL_EXTENSION    ".model"
+#define META_EXTENSION     ".meta"
 
 #define MAX_COMPONENT_NAME_LENGTH 64;
 
 #define UID uint64_t
 
+constexpr UID UID_PREFIX_DIVISOR                        = 100000000000000;
 constexpr UID INVALID_UUID                              = 0;
 constexpr UID CONSTANT_EMPTY_UID                        = 0;
 
@@ -93,11 +101,13 @@ constexpr uint32_t CONSTANT_NO_TEXTURE_UUID             = 0;
 constexpr float PI                                      = 3.14159265359f;
 constexpr float RAD_DEGREE_CONV                         = 180.f / PI;
 
+constexpr float MINIMUM_TREE_LEAF_SIZE = 1.f;
+
 inline UID GenerateUID()
 {
     LCG rng;
-
     UID uid = static_cast<UID>(rng.IntFast()) << 32 | rng.IntFast(); // Combine two 32-bit values
-
     return uid;
 }
+
+static AABB DEFAULT_GAME_OBJECT_AABB = AABB(float3(-1, -1, -1), float3(1, 1, 1));

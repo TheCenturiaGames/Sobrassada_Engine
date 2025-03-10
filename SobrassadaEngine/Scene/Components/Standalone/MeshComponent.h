@@ -12,17 +12,21 @@
 class MeshComponent : public Component
 {
   public:
-    MeshComponent(UID uid, UID uidParent, UID uidRoot, const float4x4& parentGlobalTransform);
+    MeshComponent(UID uid, UID uidParent);
 
     MeshComponent(const rapidjson::Value& initialState);
 
-    virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
+    ~MeshComponent() override;
+
+    void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
 
     void RenderEditorInspector() override;
     void Update() override;
     void Render() override;
 
-    void AddMesh(UID resource, bool reloadAABB = true);
+    const ResourceMesh* GetResourceMesh() const { return currentMesh; }
+
+    void AddMesh(UID resource, bool updateParent = true);
     void AddMaterial(UID resource);
 
     void SetBones(const std::vector<GameObject*>& bones) { this->bones = bones; }
@@ -32,7 +36,7 @@ class MeshComponent : public Component
     std::string currentMeshName       = "Not selected";
     ResourceMesh* currentMesh         = nullptr;
 
-    std::string currentTextureName    = "Not selected";
+    std::string currentMaterialName   = "Not selected";
     ResourceMaterial* currentMaterial = nullptr;
 
     std::vector<GameObject*> bones;

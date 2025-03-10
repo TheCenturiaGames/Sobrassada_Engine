@@ -1,24 +1,23 @@
 #pragma once
 
-#include "imgui_internal.h"
-#include "./Libs/ImGuizmo/ImGuizmo.h"
 #include "Module.h"
 #include "ResourceManagement/Resources/Resource.h"
 
 #include "SDL.h"
+#include "imgui_internal.h"
+#include <Math/float4x4.h>
 #include <deque>
 #include <string>
 #include <unordered_map>
-#include <Math/float4x4.h>
+
+// imguizmo after imgui
+#include "./Libs/ImGuizmo/ImGuizmo.h"
 
 struct CPUFeature
 {
     SDL_bool (*check)();
     const char* name;
 };
-
-class EditorViewport;
-class QuadtreeViewer;
 
 class EditorUIModule : public Module
 {
@@ -36,7 +35,10 @@ class EditorUIModule : public Module
     bool RenderTransformWidget(float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform);
     bool RenderImGuizmo(float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform) const;
 
-    UID RenderResourceSelectDialog(const char* id, const std::unordered_map<std::string, UID>& availableResources);
+    template <typename T>
+    T RenderResourceSelectDialog(
+        const char* id, const std::unordered_map<std::string, T>& availableResources, const T& defaultResource
+    );
 
   private:
     void RenderBasicTransformModifiers(
@@ -60,7 +62,6 @@ class EditorUIModule : public Module
     void ShowCaps() const;
 
     void ImportDialog(bool& import);
-    void GetFilesSorted(const std::string& currentPath, std::vector<std::string>& files);
     void LoadDialog(bool& load);
     void SaveDialog(bool& save);
     void Console(bool& consoleMenu) const;
@@ -89,12 +90,10 @@ class EditorUIModule : public Module
     std::deque<float> framerate;
     std::deque<float> frametime;
 
-    ImGuizmo::MODE transformType   = ImGuizmo::LOCAL;
-
-    QuadtreeViewer* quadtreeViewer = nullptr;
+    ImGuizmo::MODE transformType = ImGuizmo::LOCAL;
 
     std::string startPath;
-    std::string libraryPath;
+    std::string scenesPath;
 
     ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
     ;
