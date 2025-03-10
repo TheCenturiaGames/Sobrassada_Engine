@@ -157,9 +157,14 @@ void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGa
 
 update_status Scene::Update(float deltaTime)
 {
-    for (auto& gameObject : gameComponents)
+
+    for (auto& gameObject : gameObjectsContainer)
     {
-        gameObject.second->Update();
+        std::unordered_map<ComponentType, Component*> componentList = gameObject.second->GetComponents();
+        for (auto& component : componentList)
+        {
+            component.second->Update();
+        }
     }
     return UPDATE_CONTINUE;
 }

@@ -24,7 +24,7 @@ Component* ComponentUtils::CreateEmptyComponent(ComponentType type, UID uid, UID
     case COMPONENT_DIRECTIONAL_LIGHT:
         return new DirectionalLightComponent(uid, uidParent);
     case COMPONENT_CAMERA:
-        return new CameraComponent(uid, uidParent, uidRoot, parentGlobalTransform);
+        return new CameraComponent(uid, uidParent);
     }
     return nullptr;
 }

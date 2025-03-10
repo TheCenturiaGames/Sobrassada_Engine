@@ -9,7 +9,7 @@
 class CameraComponent : public Component
 {
   public:
-    CameraComponent(UID uid, UID uidParent, UID uidRoot, const float4x4& parentGlobalTransform);
+    CameraComponent(UID uid, UID uidParent);
     CameraComponent(const rapidjson::Value& initialState);
     ~CameraComponent();
 

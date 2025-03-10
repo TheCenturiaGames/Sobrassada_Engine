@@ -6,6 +6,7 @@
 #include "FileSystem/MeshImporter.h"
 #include "LibraryModule.h"
 #include "ResourcesModule.h"
+#include "SceneModule.h"
 // #include "Scene/GameObjects/GameObject.h"
 
 #include "imgui.h"

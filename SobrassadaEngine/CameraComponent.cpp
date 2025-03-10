@@ -10,10 +10,10 @@
 #include "ImGui.h"
 #include <vector>
 
-CameraComponent::CameraComponent(UID uid, UID uidParent, UID uidRoot, const float4x4& parentGlobalTransform)
-    : Component(uid, uidParent, uidRoot, "Camera", COMPONENT_CAMERA, parentGlobalTransform)
+CameraComponent::CameraComponent(UID uid, UID uidParent)
+    : Component(uid, uidParent, "Camera", COMPONENT_CAMERA)
 {
-
+    float4x4 globalTransform  = GetGlobalTransform();
     camera.type               = FrustumType::PerspectiveFrustum;
     camera.pos                = float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
     camera.front              = -float3(globalTransform[0][2], globalTransform[1][2], globalTransform[2][2]);
@@ -44,7 +44,6 @@ CameraComponent::CameraComponent(UID uid, UID uidParent, UID uidRoot, const floa
     orthographicHeight  = orthographicWidth / ((float)height / (float)width);
 
     localComponentAABB  = AABB({0.0f, 0.0f, 0.0f}, {0.01f, 0.01f, 0.01f});
-    globalComponentAABB = AABB({0.0f, 0.0f, 0.0f}, {0.01f, 0.01f, 0.01f});
 
     if (App->GetSceneModule()->GetMainCamera() == nullptr)
     {
@@ -262,19 +261,10 @@ void CameraComponent::RenderEditorInspector()
 
 void CameraComponent::Update()
 {
-    if (firstTime)
-    {
-        AABBUpdatable* parent = GetParent();
-        if (parent != nullptr)
-        {
-            parent->PassAABBUpdateToParent();
-        }
-        firstTime = false;
-    }
-
+    float4x4 globalTransform  = GetGlobalTransform();
     camera.pos         = float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
-    camera.front       = -float3(localTransform[0][2], localTransform[1][2], localTransform[2][2]).Normalized();
-    camera.up          = float3(localTransform[0][1], localTransform[1][1], localTransform[2][1]).Normalized();
+    camera.front = -float3(globalTransform[0][2], globalTransform[1][2], globalTransform[2][2]).Normalized();
+    camera.up    = float3(globalTransform[0][1], globalTransform[1][1], globalTransform[2][1]).Normalized();
 
     matrices.projectionMatrix = camera.ProjectionMatrix();
     matrices.viewMatrix       = camera.ViewMatrix();
