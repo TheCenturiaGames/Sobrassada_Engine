@@ -11,6 +11,7 @@
 #include "Octree.h"
 #include "OpenGLModule.h"
 #include "SceneModule.h"
+#include "DebugUtils.h"
 
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -95,7 +96,6 @@ update_status Scene::Render(float deltaTime)
         }
     }
 
-
     return UPDATE_CONTINUE;
 }
 
@@ -149,11 +149,32 @@ void Scene::RenderScene()
         if (ImGui::SliderFloat("Time scale", &timeScale, 0, 4)) gameTimer->SetTimeScale(timeScale);
 
         ImGui::SameLine();
-        if (ImGui::BeginMenu("Render options"))
+        
+        // RENDER OPTIONS
+        if (ImGui::Button("Render options"))
         {
-            if (ImGui::MenuItem("Lit", "", litActivated)) litActivated = !litActivated;
+            ImGui::OpenPopup("RenderOptions");
+        }
 
-            ImGui::EndMenu();
+        if (ImGui::BeginPopup("RenderOptions"))
+        {
+            if (ImGui::BeginListBox("##RenderOptionsList", ImVec2(ImGui::CalcItemWidth(), ImGui::GetTextLineHeight() * 7.5f)))
+            {
+                ImGui::Checkbox("Render Lights", &renderLights);
+
+                ImGui::Separator();
+
+                for (auto& debugOption : debugRenderOptions)
+                {
+                    if (ImGui::Checkbox(debugOption.first.c_str(), &debugOption.second))
+                    {
+                    }
+                }
+
+                ImGui::EndListBox();
+            }
+
+            ImGui::EndPopup();
         }
 
         if (App->GetSceneModule()->IsInPlayMode())

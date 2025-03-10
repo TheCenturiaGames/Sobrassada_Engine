@@ -1,5 +1,6 @@
 #include "Application.h"
 #include "Globals.h"
+#include "DebugUtils.h"
 
 #include "SDL.h"
 #pragma comment(lib, "Libs/SDL/lib/SDL2.lib")
@@ -22,6 +23,13 @@ enum MainState
 
 Application* App         = NULL;
 std::vector<char*>* Logs = NULL;
+
+std::map<std::string, bool> debugRenderOptions = {
+    {"Bounding Boxes", false},
+    {"Octree",         false}
+};
+bool renderLights = true;
+
 
 int main(int argc, char** argv)
 {
