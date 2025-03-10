@@ -255,6 +255,12 @@
     <ClCompile Include="Utils\EngineTimer.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
+    <ClCompile Include="ResourceManagement\Resources\ResourceModel.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\ModelImporter.cpp">
+      <Filter>FileSystem</Filter>
+    </ClCompile>
     <ClCompile Include="Modules\DebugDrawModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
@@ -478,6 +484,15 @@
     </ClInclude>
     <ClInclude Include="Utils\EngineTimer.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManagement\Resources\ResourceModel.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\ModelImporter.h">
+      <Filter>FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\Model.h">
+      <Filter>FileSystem</Filter>
     </ClInclude>
     <ClInclude Include="Scene\AABBUpdatable.h">
       <Filter>Utils</Filter>
