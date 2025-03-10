@@ -2,13 +2,14 @@
 
 #include "Application.h"
 #include "DebugDrawModule.h"
+#include "GameObject.h"
 #include "SceneModule.h"
 
 #include "ImGui.h"
 #include <vector>
 
-PointLightComponent::PointLightComponent(UID uid, UID uidParent, UID uidRoot, const float4x4& parentGlobalTransform)
-    : LightComponent(uid, uidParent, uidRoot, "Point Light", COMPONENT_POINT_LIGHT, parentGlobalTransform)
+PointLightComponent::PointLightComponent(UID uid, UID uidParent)
+    : LightComponent(uid, uidParent, "Point Light", COMPONENT_POINT_LIGHT)
 {
     range                      = 1;
     gizmosMode                 = 0;
@@ -107,11 +108,11 @@ void PointLightComponent::Render()
     {
         for (int i = 0; i < directions.size(); ++i)
         {
-            debug->DrawLine(globalTransform.TranslatePart(), directions[i], range, float3(1, 1, 1));
+            debug->DrawLine(GetParent()->GetGlobalTransform().TranslatePart(), directions[i], range, float3(1, 1, 1));
         }
     }
     else
     {
-        debug->DrawSphere(globalTransform.TranslatePart(), float3(1, 1, 1), range);
+        debug->DrawSphere(GetParent()->GetGlobalTransform().TranslatePart(), float3(1, 1, 1), range);
     }
 }
