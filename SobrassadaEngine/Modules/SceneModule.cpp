@@ -21,7 +21,7 @@ SceneModule::SceneModule() : sceneLibraryPath(std::filesystem::current_path().st
 
 SceneModule::~SceneModule()
 {
-    CloseScene();
+    
 }
 
 bool SceneModule::Init()
@@ -82,7 +82,8 @@ update_status SceneModule::PostUpdate(float deltaTime)
 
 bool SceneModule::ShutDown()
 {
-    GLOG("Destroying octree")
+    CloseScene();
+    GLOG("Destroying scene")
     return true;
 }
 
