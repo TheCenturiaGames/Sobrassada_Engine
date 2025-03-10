@@ -49,8 +49,8 @@ bool EditorUIModule::Init()
     ImGui_ImplSDL2_InitForOpenGL(App->GetWindowModule()->window, App->GetOpenGLModule()->GetContext());
     ImGui_ImplOpenGL3_Init("#version 460");
 
-    width          = App->GetWindowModule()->GetWidth();
-    height         = App->GetWindowModule()->GetHeight();
+    width      = App->GetWindowModule()->GetWidth();
+    height     = App->GetWindowModule()->GetHeight();
 
     scenesPath     = App->GetProjectModule()->GetLoadedProjectPath() + DELIMITER + SCENES_PATH;
 
@@ -669,6 +669,14 @@ bool EditorUIModule::RenderImGuizmo(
     return true;
 }
 
+template UID EditorUIModule::RenderResourceSelectDialog<UID>(
+    const char* id, const std::unordered_map<std::string, UID>& availableResources, const UID& defaultResource
+);
+template ComponentType EditorUIModule::RenderResourceSelectDialog<ComponentType>(
+    const char* id, const std::unordered_map<std::string, ComponentType>& availableResources,
+    const ComponentType& defaultResource
+);
+
 void EditorUIModule::RenderBasicTransformModifiers(
     float3& outputPosition, float3& outputRotation, float3& outputScale, bool& lockScaleAxis,
     bool& positionValueChanged, bool& rotationValueChanged, bool& scaleValueChanged
@@ -694,11 +702,12 @@ void EditorUIModule::RenderBasicTransformModifiers(
     ImGui::Checkbox("Lock axis", &lockScaleAxis);
 }
 
-UID EditorUIModule::RenderResourceSelectDialog(
-    const char* id, const std::unordered_map<std::string, UID>& availableResources
+template <typename T>
+T EditorUIModule::RenderResourceSelectDialog(
+    const char* id, const std::unordered_map<std::string, T>& availableResources, const T& defaultResource
 )
 {
-    UID result = CONSTANT_EMPTY_UID;
+    T result = defaultResource;
     if (ImGui::BeginPopup(id))
     {
         static char searchText[255] = "";

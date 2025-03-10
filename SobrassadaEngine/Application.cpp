@@ -11,7 +11,6 @@
 #include "OpenGLModule.h"
 #include "ProjectModule.h"
 #include "ResourcesModule.h"
-#include "Root/RootComponent.h"
 #include "SceneModule.h"
 #include "ShaderModule.h"
 #include "WindowModule.h"
