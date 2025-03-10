@@ -237,7 +237,7 @@ void Scene::RenderScene()
         ImGui::SameLine();
         if (ImGui::SliderFloat("Time scale", &timeScale, 0, 4)) gameTimer->SetTimeScale(timeScale);
 
-        if (App->GetSceneModule()->IsInPlayMode())
+        if (App->GetSceneModule()->GetInPlayMode())
         {
             ImGui::SeparatorText("Playing");
             ImGui::Text("Frame count: %d", gameTimer->GetFrameCount());
@@ -421,7 +421,8 @@ void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects)
 {
     std::vector<GameObject*> queriedObjects;
     FrustumPlanes frustumPlanes = App->GetCameraModule()->GetFrustrumPlanes();
-    if(App->GetSceneModule()->IsInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr) frustumPlanes = App->GetSceneModule()->GetMainCamera()->GetFrustrumPlanes();
+    if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr)
+        frustumPlanes = App->GetSceneModule()->GetMainCamera()->GetFrustrumPlanes();
 
     sceneOctree->QueryElements<FrustumPlanes>(frustumPlanes, queriedObjects);
 

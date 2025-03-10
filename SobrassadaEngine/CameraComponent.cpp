@@ -41,9 +41,7 @@ CameraComponent::CameraComponent(UID uid, UID uidParent)
     verticalFov         = camera.verticalFov;
 
     orthographicWidth   = 10.0f;
-    orthographicHeight  = orthographicWidth / ((float)height / (float)width);
-
-    localComponentAABB  = AABB({0.0f, 0.0f, 0.0f}, {0.01f, 0.01f, 0.01f});
+    orthographicHeight  = orthographicWidth / ((float)width / (float)height);
 
     if (App->GetSceneModule()->GetMainCamera() == nullptr)
     {
@@ -134,6 +132,10 @@ CameraComponent::CameraComponent(const rapidjson::Value& initialState) : Compone
 
 CameraComponent::~CameraComponent()
 {
+    if (App->GetSceneModule()->GetMainCamera() == this)
+    {
+        App->GetSceneModule()->SetMainCamera(nullptr);
+    }
     glDeleteBuffers(1, &ubo);
 }
 
@@ -195,13 +197,13 @@ void CameraComponent::RenderEditorInspector()
         if (ImGui::DragFloat("Near Plane", &camera.nearPlaneDistance, 0.01f, 0.01f, camera.farPlaneDistance, "%.2f"))
         {
             float cameraNear         = std::max(0.01f, camera.nearPlaneDistance);
-            cameraNear               = std::min(cameraNear, camera.farPlaneDistance);
+            cameraNear               = std::min(cameraNear, camera.farPlaneDistance - 0.1f);
             camera.nearPlaneDistance = cameraNear;
         }
         if (ImGui::DragFloat("Far Plane", &camera.farPlaneDistance, 0.1f, camera.nearPlaneDistance, 1000.f, "%.2f"))
         {
             float cameraFar         = std::min(1000.0f, camera.farPlaneDistance);
-            cameraFar               = std::max(cameraFar, camera.nearPlaneDistance);
+            cameraFar               = std::max(cameraFar, camera.nearPlaneDistance + 0.1f);
             camera.farPlaneDistance = cameraFar;
         }
 
@@ -220,7 +222,7 @@ void CameraComponent::RenderEditorInspector()
                 camera.type               = OrthographicFrustum;
                 camera.orthographicWidth  = orthographicWidth;
                 camera.orthographicHeight = orthographicHeight;
-                camera.nearPlaneDistance  = 50.0f;
+                camera.nearPlaneDistance  = 25.10f;
             }
             else
             {
@@ -253,7 +255,7 @@ void CameraComponent::RenderEditorInspector()
             {
                 int width                 = App->GetWindowModule()->GetWidth();
                 int height                = App->GetWindowModule()->GetHeight();
-                camera.orthographicHeight = camera.orthographicWidth / ((float)height / (float)width);
+                camera.orthographicHeight = camera.orthographicWidth / ((float)width / (float)height);
             }
         }
     }

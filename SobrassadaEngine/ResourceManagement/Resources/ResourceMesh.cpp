@@ -83,7 +83,7 @@ void ResourceMesh::Render(int program, const float4x4& modelMatrix, unsigned int
     float3 lightColor       = float3(1.0f, 1.0f, 1.0f);
     float3 ambientIntensity = float3(1.0f, 1.0f, 1.0f);
     float3 cameraPos;
-    if (App->GetSceneModule()->GetMainCamera() != nullptr && App->GetSceneModule()->IsInPlayMode())
+    if (App->GetSceneModule()->GetMainCamera() != nullptr && App->GetSceneModule()->GetInPlayMode())
         cameraPos = App->GetSceneModule()->GetMainCamera()->GetCameraPosition();
     else cameraPos = App->GetCameraModule()->GetCameraPosition();
 

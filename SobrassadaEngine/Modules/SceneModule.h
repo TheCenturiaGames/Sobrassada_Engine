@@ -37,7 +37,6 @@ class SceneModule : public Module
     void LoadComponents(const std::map<UID, Component*>& loadedGameComponents);
     void CloseScene();
     void SwitchPlayModeStateTo(bool wantedStatePlayMode);
-    bool IsInPlayMode() const { return bInPlayMode; }
 
     void AddGameObject(UID uid, GameObject* newGameObject) const
     {
