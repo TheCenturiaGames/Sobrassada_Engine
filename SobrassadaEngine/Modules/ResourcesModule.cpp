@@ -27,8 +27,8 @@ ResourcesModule::~ResourcesModule()
 
 bool ResourcesModule::Init()
 {
-    program = App->GetShaderModule()->GetProgram("./Test/VertexShader.glsl", "./Test/BRDFPhongFragmentShader.glsl");
-    programUnlit = App->GetShaderModule()->GetProgram("./Test/VertexShader.glsl", "./Test/BRDFPhongFragmentShaderUnlit.glsl");
+    program = App->GetShaderModule()->GetProgram(LIGHTS_VERTEX_SHADER_PATH, LIGHTS_FRAGMENT_SHADER_PATH);
+    programUnlit = App->GetShaderModule()->GetProgram(UNLIT_VERTEX_SHADER_PATH, UNLIT_FRAGMENT_SHADER_PATH);
 
     return true;
 }

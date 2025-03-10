@@ -506,8 +506,8 @@
     <ClInclude Include="Utils\RaycastController.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="DebugDraw\DebugUtils.h">
-      <Filter>External\Debug</Filter>
+    <ClInclude Include="Utils\DebugUtils.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
