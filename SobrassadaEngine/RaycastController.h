@@ -1,11 +1,7 @@
 #pragma once
 
-#include "Application.h"
-#include "ComponentUtils.h"
 #include "GameObject.h"
 #include "Geometry/LineSegment.h"
-#include "Root/RootComponent.h"
-#include "SceneModule.h"
 #include "Standalone/MeshComponent.h"
 
 #include "Geometry/Triangle.h"
@@ -39,8 +35,7 @@ inline GameObject* RaycastController::GetRayIntersection(const LineSegment& ray,
     float farDistance   = 0;
     for (const auto& gameObject : queriedGameObjects)
     {
-        const MeshComponent* meshComponent = gameObject->GetMeshComponent();
-        if (ray.Intersects(meshComponent->GetGlobalAABB(), closeDistance, farDistance))
+        if (ray.Intersects(gameObject->GetGlobalAABB(), closeDistance, farDistance))
         {
             sortedGameObjects.insert({closeDistance, gameObject});
         }
@@ -54,11 +49,13 @@ inline GameObject* RaycastController::GetRayIntersection(const LineSegment& ray,
         LineSegment localRay(ray.a, ray.b);
 
         const MeshComponent* meshComponent = pair.second->GetMeshComponent();
+        if (meshComponent == nullptr) continue; // TODO Happens occasionally, figure out why
+        
         const ResourceMesh* resourceMesh = meshComponent->GetResourceMesh();
 
         if (resourceMesh == nullptr) continue;
 
-        float4x4 globalTransform = meshComponent->GetGlobalTransform();
+        float4x4 globalTransform = pair.second->GetGlobalTransform();
         globalTransform.Inverse();
         localRay.Transform(globalTransform);
 
