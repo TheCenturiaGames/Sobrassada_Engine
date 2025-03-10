@@ -25,7 +25,6 @@ class MeshComponent : public Component
 
     const ResourceMesh* GetResourceMesh() const { return currentMesh; }
 
-  private:
     void AddMesh(UID resource, bool updateParent = true);
     void AddMaterial(UID resource);
 

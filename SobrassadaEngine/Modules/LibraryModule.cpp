@@ -150,12 +150,21 @@ bool LibraryModule::LoadLibraryMaps()
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 else SceneImporter::ImportMaterialFromMetadata(assetPath, assetName, assetUID);
                 break;
+            //case 14:
+            //    AddMaterial(assetUID, assetName);
+            //    AddName(assetName, assetUID);
+            //    libraryPath = MODELS_PATH + std::to_string(assetUID) + MODEL_EXTENSION;
+            //    if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
+            //    else SceneImporter::ImportMaterialFromMetadata(assetPath, assetName, assetUID);
+            //    break;
             default:
                 GLOG("Unknown UID prefix (%s) for: %s", std::to_string(prefix).c_str(), assetName.c_str());
                 continue;
             }
         }
     }
+
+    GLOG("MODELS MAP SIZE: %d", modelMap.size());
 
     return true;
 }
@@ -173,6 +182,9 @@ UID LibraryModule::AssignFiletypeUID(UID originalUID, FileType fileType)
         break;
     case FileType::Material:
         prefix = 13;
+        break;
+    case FileType::Model:
+        prefix = 14;
         break;
     default:
         GLOG("Category: Unknown File Type (10)");
@@ -205,6 +217,11 @@ void LibraryModule::AddName(const std::string& resourceName, UID resourceUID)
     namesMap[resourceUID] = resourceName;
 }
 
+void LibraryModule::AddModel(UID modelUID, const std::string& modelPath)
+{
+    modelMap[modelPath] = modelUID;
+}
+
 UID LibraryModule::GetTextureUID(const std::string& texturePath) const
 {
     auto it = textureMap.find(texturePath);
@@ -230,6 +247,17 @@ UID LibraryModule::GetMeshUID(const std::string& meshPath) const
 UID LibraryModule::GetMaterialUID(const std::string& materialPath) const
 {
     auto it = materialMap.find(materialPath);
+    if (it != materialMap.end())
+    {
+        return it->second;
+    }
+
+    return INVALID_UUID;
+}
+
+UID LibraryModule::GetModelUID(const std::string& modelPath) const
+{
+    auto it = materialMap.find(modelPath);
     if (it != materialMap.end())
     {
         return it->second;

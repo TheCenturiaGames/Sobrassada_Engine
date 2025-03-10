@@ -9,9 +9,10 @@
 enum class ResourceType
 {
     Unknown = 10,
-    Mesh,    // 11
-    Texture, // 12
-    Material // 13
+    Mesh,      // 11
+    Texture,   // 12
+    Material,  // 13
+    Model      // 14
 };
 
 class Resource

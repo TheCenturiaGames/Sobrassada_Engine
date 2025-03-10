@@ -67,6 +67,8 @@ class EditorUIModule : public Module
     void Console(bool& consoleMenu) const;
     void About(bool& aboutMenu) const;
 
+    void LoadModelDialog(bool& loadModel);
+
   public:
     bool hierarchyMenu = true;
     bool inspectorMenu = true;
@@ -76,6 +78,7 @@ class EditorUIModule : public Module
     bool consoleMenu            = true;
     bool import                 = false;
     bool load                   = false;
+    bool loadModel              = false;
     bool save                   = false;
     bool aboutMenu              = false;
     bool editorSettingsMenu     = false;

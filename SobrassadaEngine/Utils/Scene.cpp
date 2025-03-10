@@ -10,6 +10,11 @@
 #include "LibraryModule.h"
 #include "Octree.h"
 #include "OpenGLModule.h"
+#include "ResourceManagement/Resources/Resource.h"
+#include "ResourceManagement/Resources/ResourceModel.h"
+#include "ResourcesModule.h"
+#include "Scene/Components/ComponentUtils.h"
+#include "Scene/Components/Standalone/MeshComponent.h"
 #include "SceneModule.h"
 
 #include "imgui.h"
@@ -169,6 +174,11 @@ update_status Scene::Render(float deltaTime) const
         {
             gameObject->Render();
         }
+    }
+
+    for (const auto& gameObject : gameObjectsContainer)
+    {
+        gameObject.second->DrawGizmos();
     }
 
     return UPDATE_CONTINUE;
@@ -425,4 +435,70 @@ GameObject* Scene::GetGameObjectByUID(UID gameObjectUUID)
         return gameObjectsContainer[gameObjectUUID];
     }
     return nullptr;
+}
+
+void Scene::LoadModel(const UID modelUID)
+{
+    if (modelUID != CONSTANT_EMPTY_UID)
+    {
+        GLOG("Load model %d", modelUID);
+
+        ResourceModel* newModel            = (ResourceModel*)App->GetResourcesModule()->RequestResource(modelUID);
+        const Model& model                 = newModel->GetModelData();
+        const std::vector<NodeData>& nodes = model.GetNodes();
+
+        GameObject* object                 = new GameObject(GetGameObjectRootUID(), nodes[0].name);
+        object->SetLocalTransform(nodes[0].transform);
+
+        // Add the gameObject to the rootObject
+        GetGameObjectByUID(GetGameObjectRootUID())->AddGameObject(object->GetUID());
+        AddGameObject(object->GetUID(), object);
+
+        std::vector<GameObject*> gameObjectsArray;
+        gameObjectsArray.push_back(object);
+
+        for (int i = 1; i < nodes.size(); ++i)
+        {
+            if (nodes[i].meshes.size() >
+                0) // If has meshes, create a container object and one gameObject per mesh as children
+            {
+                GLOG("Node %s has %d meshes", nodes[i].name.c_str(), nodes[i].meshes.size());
+                GameObject* gameObject = new GameObject(gameObjectsArray[nodes[i].parentIndex]->GetUID(), nodes[i].name);
+                //gameObject->SetLocalTransform(nodes[0].transform);
+
+                gameObjectsArray.emplace_back(gameObject);
+                GetGameObjectByUID(gameObjectsArray[nodes[i].parentIndex]->GetUID())
+                    ->AddGameObject(gameObject->GetUID());
+                AddGameObject(gameObject->GetUID(), gameObject);
+
+                unsigned meshNum = 1;
+                for (const auto& mesh : nodes[i].meshes)
+                {
+                    GameObject* meshObject = new GameObject(gameObject->GetUID(), "Mesh " + std::to_string(meshNum));
+                    ++meshNum;
+
+                    meshObject->CreateComponent(COMPONENT_MESH);
+                    meshObject->AddModel(mesh.first, mesh.second);
+
+                    meshObject->SetLocalTransform(nodes[i].transform);
+
+                    gameObject->AddGameObject(meshObject->GetUID());
+                    AddGameObject(meshObject->GetUID(), meshObject);
+                }
+            }
+            else
+            {
+                GameObject* gameObject =
+                    new GameObject(gameObjectsArray[nodes[i].parentIndex]->GetUID(), nodes[i].name);
+
+                gameObject->SetLocalTransform(nodes[i].transform);
+
+                gameObjectsArray.emplace_back(gameObject);
+                GetGameObjectByUID(gameObjectsArray[nodes[i].parentIndex]->GetUID())
+                    ->AddGameObject(gameObject->GetUID());
+                AddGameObject(gameObject->GetUID(), gameObject);
+            }
+        }
+        object->UpdateTransformForGOBranch();
+    }
 }

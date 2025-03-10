@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "Component.h"
+#include "DebugDrawModule.h"
 #include "EditorUIModule.h"
 #include "SceneModule.h"
 
@@ -176,6 +177,9 @@ void GameObject::RenderEditorInspector()
 
     if (uid != App->GetSceneModule()->GetGameObjectRootUID())
     {
+        ImGui::SameLine();
+        if (ImGui::Checkbox("Draw nodes", &drawNodes)) OnDrawConnectionsToggle();
+
         if (ImGui::Button("Add Component"))
         {
             ImGui::OpenPopup("ComponentSelection");
@@ -300,6 +304,16 @@ const MeshComponent* GameObject::GetMeshComponent() const
         return dynamic_cast<const MeshComponent*>(components.at(COMPONENT_MESH));
     }
     return nullptr;
+}
+
+void GameObject::AddModel(UID meshUid, UID materialUid) const
+{
+    if (components.find(COMPONENT_MESH) != components.end())
+    {
+        MeshComponent* mesh = static_cast<MeshComponent*>(components.at(COMPONENT_MESH));
+        mesh->AddMesh(meshUid);
+        mesh->AddMaterial(materialUid);
+    }
 }
 
 void GameObject::OnTransformUpdated()
@@ -514,6 +528,11 @@ void GameObject::RenderEditor()
     }
 }
 
+void GameObject::DrawGizmos() const
+{
+    if (drawNodes) DrawNodes();
+}
+
 const float4x4& GameObject::GetParentGlobalTransform() const
 {
     GameObject* parent = App->GetSceneModule()->GetGameObjectByUUID(parentUID);
@@ -522,6 +541,30 @@ const float4x4& GameObject::GetParentGlobalTransform() const
         return parent->GetGlobalTransform();
     }
     return float4x4::identity;
+}
+
+void GameObject::DrawNodes() const
+{
+    DebugDrawModule* debug = App->GetDebugDrawModule();
+
+    debug->DrawLine(
+        GetGlobalTransform().TranslatePart(),
+        GetParentGlobalTransform().TranslatePart() - GetGlobalTransform().TranslatePart(),
+        GetGlobalTransform().TranslatePart().Distance(GetParentGlobalTransform().TranslatePart()), float3(1, 1, 1),
+        false
+    );
+
+    debug->DrawAxisTriad(GetGlobalTransform(), false);
+}
+
+void GameObject::OnDrawConnectionsToggle()
+{
+    for (const UID childUID : children)
+    {
+        GameObject* childObject = App->GetSceneModule()->GetGameObjectByUUID(childUID);
+        childObject->drawNodes  = drawNodes;
+        childObject->OnDrawConnectionsToggle();
+    }
 }
 
 bool GameObject::CreateComponent(const ComponentType componentType)

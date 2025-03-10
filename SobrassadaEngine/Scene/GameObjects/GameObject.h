@@ -77,14 +77,20 @@ class GameObject
     const std::unordered_map<ComponentType, Component*>& GetComponents() const { return components; }
 
     const MeshComponent* GetMeshComponent() const;
+    void AddModel(UID meshUid, UID materialUid) const;
+
+    void SetLocalTransform(const float4x4& newTransform) { localTransform = newTransform; }
+    void DrawGizmos() const;
 
   private:
     void OnTransformUpdated();
     void UpdateLocalTransform(const float4x4& parentGlobalTransform);
+    void DrawNodes() const;
+    void OnDrawConnectionsToggle();
 
   public:
-    inline static UID currentRenamingUID = INVALID_UUID;
-
+    inline static UID currentRenamingUID = INVALID_UUID;    
+    
   private:
     UID parentUID;
     UID uid;
@@ -100,6 +106,8 @@ class GameObject
 
     bool isRenaming = false;
     char renameBuffer[128];
+
+    bool drawNodes = false;
 
     float4x4 localTransform              = float4x4::identity;
     float4x4 globalTransform             = float4x4::identity;

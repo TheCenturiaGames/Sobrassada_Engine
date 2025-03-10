@@ -56,6 +56,7 @@ class Scene
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
 
     bool GetDoInputs() const { return doInputs; }
+    void LoadModel(const UID modelUID);
 
     const std::unordered_map<UID, Component*> GetAllComponents() const;
 

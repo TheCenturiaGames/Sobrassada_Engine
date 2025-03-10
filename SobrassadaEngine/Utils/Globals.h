@@ -70,7 +70,7 @@ enum update_status
 #define LIBRARY_PATH    "Library/"
 #define ANIMATIONS_PATH "Library/Animations/"
 #define AUDIO_PATH      "Library/Audio/"
-#define BONES_PATH      "Library/Bones/"
+#define MODELS_PATH     "Library/Models/"
 #define MESHES_PATH     "Library/Meshes/"
 #define TEXTURES_PATH   "Library/Textures/"
 #define MATERIALS_PATH  "Library/Materials/"
@@ -80,6 +80,7 @@ enum update_status
 #define TEXTURE_EXTENSION  ".dds"
 #define MATERIAL_EXTENSION ".mat"
 #define SCENE_EXTENSION    ".scene"
+#define MODEL_EXTENSION    ".model"
 #define META_EXTENSION     ".meta"
 
 #define MAX_COMPONENT_NAME_LENGTH 64;
@@ -92,6 +93,7 @@ constexpr UID CONSTANT_EMPTY_UID                        = 0;
 
 constexpr const char* CONSTANT_MESH_SELECT_DIALOG_ID    = "mesh-select";
 constexpr const char* CONSTANT_TEXTURE_SELECT_DIALOG_ID = "texture-select";
+constexpr const char* CONSTANT_MODEL_SELECT_DIALOG_ID   = "model-select";
 
 constexpr uint32_t CONSTANT_NO_MESH_UUID                = 0;
 constexpr uint32_t CONSTANT_NO_TEXTURE_UUID             = 0;

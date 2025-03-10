@@ -34,6 +34,10 @@ class SceneModule : public Module
     void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
     void LoadComponents(const std::map<UID, Component*>& loadedGameComponents);
     void CloseScene();
+
+    void LoadModel(const UID modelUID) { loadedScene != nullptr ? loadedScene->LoadModel(modelUID) : void(); }
+
+    //void CheckObjectsToRender();
     void SwitchPlayModeStateTo(bool wantedStatePlayMode);
     bool IsInPlayMode() const { return bInPlayMode; }
 
