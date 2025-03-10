@@ -104,8 +104,8 @@ void ResourceMesh::Render(
     // CPU Skinning
     if (bones.size() > 0 && bindMatrices.size() > 0)
     {
-        //glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        //
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        
         //Vertex* vertices = reinterpret_cast<Vertex*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
         //for (unsigned int i = 0; i < vertexCount; ++i)
         //{
@@ -126,13 +126,13 @@ void ResourceMesh::Render(
         //glUnmapBuffer(GL_ARRAY_BUFFER);
         //glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        //float4x4 palette[64];
-        //for (size_t i = 0; i < bones.size(); ++i)
-        //{
-        //    palette[i] = bones[i]->GetGlobalTransform() * bindMatrices[i];
-        //}
-        //glUniformMatrix4fv(glGetUniformLocation(program, "palette"), bones.size(), GL_TRUE, palette[0].ptr());
-        //glUniform1i(4, 1); // Tell the shader the mesh has bones
+        float4x4 palette[64];
+        for (size_t i = 0; i < bones.size(); ++i)
+        {
+            palette[i] = bones[i]->GetGlobalTransform() * bindMatrices[i];
+        }
+        glUniformMatrix4fv(glGetUniformLocation(program, "palette"), bones.size(), GL_TRUE, palette[0].ptr());
+        glUniform1i(4, 1); // Tell the shader the mesh has bones
     }
     else
     {
