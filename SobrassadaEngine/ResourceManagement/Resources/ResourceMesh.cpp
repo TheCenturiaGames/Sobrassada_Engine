@@ -84,7 +84,7 @@ void ResourceMesh::LoadData(
 }
 
 void ResourceMesh::Render(
-    int program, float4x4& modelMatrix, unsigned int cameraUBO, ResourceMaterial* material,
+    int program, const float4x4& modelMatrix, unsigned int cameraUBO, const ResourceMaterial* material,
     const std::vector<GameObject*>& bones, const std::vector<float4x4>& bindMatrices
 )
 {
@@ -126,13 +126,13 @@ void ResourceMesh::Render(
         //glUnmapBuffer(GL_ARRAY_BUFFER);
         //glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        float4x4 palette[64];
-        for (size_t i = 0; i < bones.size(); ++i)
-        {
-            palette[i] = bones[i]->GetGlobalTransform() * bindMatrices[i];
-        }
-        glUniformMatrix4fv(glGetUniformLocation(program, "palette"), bones.size(), GL_TRUE, palette[0].ptr());
-        glUniform1i(4, 1); // Tell the shader the mesh has bones
+        //float4x4 palette[64];
+        //for (size_t i = 0; i < bones.size(); ++i)
+        //{
+        //    palette[i] = bones[i]->GetGlobalTransform() * bindMatrices[i];
+        //}
+        //glUniformMatrix4fv(glGetUniformLocation(program, "palette"), bones.size(), GL_TRUE, palette[0].ptr());
+        //glUniform1i(4, 1); // Tell the shader the mesh has bones
     }
     else
     {

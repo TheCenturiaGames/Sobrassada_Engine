@@ -94,8 +94,8 @@ void MeshComponent::Render()
     {
         unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
         currentMesh->Render(
-            App->GetResourcesModule()->GetProgram(), globalTransform, cameraUBO, currentMaterial, bones, bindTransforms
-            //App->GetResourcesModule()->GetProgram(), GetParent()->GetGlobalTransform(), cameraUBO, currentMaterial
+            App->GetResourcesModule()->GetProgram(), GetParent()->GetGlobalTransform(), cameraUBO, currentMaterial,
+            bones, bindTransforms
         );
     }
 }

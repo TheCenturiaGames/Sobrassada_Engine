@@ -78,6 +78,7 @@ class GameObject
 
     const MeshComponent* GetMeshComponent() const;
     void AddModel(UID meshUid, UID materialUid) const;
+    void AddSkin(const std::vector<GameObject*>& bones, const std::vector<float4x4>& bindMatrices) const;
 
     void SetLocalTransform(const float4x4& newTransform) { localTransform = newTransform; }
     void DrawGizmos() const;
@@ -89,8 +90,8 @@ class GameObject
     void OnDrawConnectionsToggle();
 
   public:
-    inline static UID currentRenamingUID = INVALID_UUID;    
-    
+    inline static UID currentRenamingUID = INVALID_UUID;
+
   private:
     UID parentUID;
     UID uid;
@@ -107,7 +108,7 @@ class GameObject
     bool isRenaming = false;
     char renameBuffer[128];
 
-    bool drawNodes = false;
+    bool drawNodes                       = false;
 
     float4x4 localTransform              = float4x4::identity;
     float4x4 globalTransform             = float4x4::identity;
