@@ -85,11 +85,19 @@ enum update_status
 
 #define MAX_COMPONENT_NAME_LENGTH 64;
 
-constexpr const char* LIGHTS_VERTEX_SHADER_PATH = "./Test/VertexShader.glsl";
-constexpr const char* LIGHTS_FRAGMENT_SHADER_PATH =  "./Test/BRDFPhongFragmentShader.glsl";
+// SHADER PATHS
+constexpr const char* LIGHTS_VERTEX_SHADER_PATH   = "./Test/VertexShader.glsl";
+constexpr const char* LIGHTS_FRAGMENT_SHADER_PATH = "./Test/BRDFPhongFragmentShader.glsl";
 
-constexpr const char* UNLIT_VERTEX_SHADER_PATH = "./Test/VertexShader.glsl";
-constexpr const char* UNLIT_FRAGMENT_SHADER_PATH = "./Test/BRDFPhongFragmentShaderUnlit.glsl";
+constexpr const char* UNLIT_VERTEX_SHADER_PATH    = "./Test/VertexShader.glsl";
+constexpr const char* UNLIT_FRAGMENT_SHADER_PATH  = "./Test/BRDFPhongFragmentShaderUnlit.glsl";
+
+// DEBUG RENDER OPTIONS
+constexpr const char* RENDER_LIGTHS               = "Render Lights";
+constexpr const char* RENDER_WIREFRAME            = "Render Wireframe";
+constexpr const char* RENDER_AABB                 = "AABB";
+constexpr const char* RENDER_OBB                  = "OBB";
+constexpr const char* RENDER_OCTREE               = "Octree";
 
 #define UID uint64_t
 
@@ -107,7 +115,7 @@ constexpr uint32_t CONSTANT_NO_TEXTURE_UUID             = 0;
 constexpr float PI                                      = 3.14159265359f;
 constexpr float RAD_DEGREE_CONV                         = 180.f / PI;
 
-constexpr float MINIMUM_TREE_LEAF_SIZE = 1.f;
+constexpr float MINIMUM_TREE_LEAF_SIZE                  = 1.f;
 
 inline UID GenerateUID()
 {

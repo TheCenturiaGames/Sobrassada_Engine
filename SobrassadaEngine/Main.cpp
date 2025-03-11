@@ -1,6 +1,6 @@
 #include "Application.h"
-#include "Globals.h"
 #include "DebugUtils.h"
+#include "Globals.h"
 
 #include "SDL.h"
 #pragma comment(lib, "Libs/SDL/lib/SDL2.lib")
@@ -21,18 +21,20 @@ enum MainState
     MAIN_EXIT
 };
 
-Application* App         = NULL;
-std::vector<char*>* Logs = NULL;
+Application* App                               = NULL;
+std::vector<char*>* Logs                       = NULL;
 
 // DebugUtils for rendering
 std::map<std::string, bool> debugRenderOptions = {
-    {"AABB", false},
-    {"OBB", false},
-    {"Octree", false}
+    {RENDER_AABB, false},
+    {RENDER_OBB,  false},
+    {RENDER_OCTREE, false}
 };
-bool renderLights = true;
-bool renderWireframe = false;
 
+std::map<std::string, bool> debugShaderOptions = {
+    {RENDER_LIGTHS,    true },
+    {RENDER_WIREFRAME, false},
+};
 
 int main(int argc, char** argv)
 {
@@ -109,6 +111,9 @@ int main(int argc, char** argv)
     }
     Logs->clear();
     delete Logs;
+
+    debugRenderOptions.clear();
+    debugShaderOptions.clear();
 
     return mainReturn;
 }

@@ -18,7 +18,7 @@ class ResourcesModule : public Module
     Resource* RequestResource(UID uid);
     void ReleaseResource(const Resource* resource);
 
-    int GetProgram() const { return renderLights ? program : programUnlit; }
+    int GetProgram() const { return debugShaderOptions[RENDER_LIGTHS] ? program : programUnlit; }
 
   private:
     Resource* CreateNewResource(UID uid);

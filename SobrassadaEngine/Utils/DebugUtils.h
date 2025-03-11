@@ -4,9 +4,7 @@
 #include <string>
 
 extern std::map<std::string, bool> debugRenderOptions;
-
-extern bool renderLights;
-extern bool renderWireframe;
+extern std::map<std::string, bool> debugShaderOptions;
 
 class DebugUtils
 {

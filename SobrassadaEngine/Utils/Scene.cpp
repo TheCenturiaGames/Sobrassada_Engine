@@ -163,7 +163,7 @@ void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGa
 
 update_status Scene::Render(float deltaTime) const
 {
-    if (!renderWireframe) lightsConfig->RenderSkybox();
+    if (!debugShaderOptions[RENDER_WIREFRAME]) lightsConfig->RenderSkybox();
     lightsConfig->RenderLights();
 
     std::vector<GameObject*> objectsToRender;
@@ -246,10 +246,10 @@ void Scene::RenderScene()
         {
             if (ImGui::BeginListBox("##RenderOptionsList", ImVec2(ImGui::CalcItemWidth(), ImGui::GetTextLineHeight() * 7.5f)))
             {
-                ImGui::Checkbox("Render Lights", &renderLights);
-                if (ImGui::Checkbox("Render Wireframe", &renderWireframe))
+                ImGui::Checkbox(RENDER_LIGTHS, &debugShaderOptions[RENDER_LIGTHS]);
+                if (ImGui::Checkbox("Render Wireframe", &debugShaderOptions[RENDER_WIREFRAME]))
                 {
-                    App->GetOpenGLModule()->SetRenderWireframe(renderWireframe);
+                    App->GetOpenGLModule()->SetRenderWireframe(debugShaderOptions[RENDER_WIREFRAME]);
                 }
 
                 ImGui::Separator();

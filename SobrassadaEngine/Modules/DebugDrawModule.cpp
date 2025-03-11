@@ -646,7 +646,7 @@ void DebugDrawModule::Draw()
 
     const auto& gameObjects = sceneModule->GetAllGameObjects(); 
 
-    if (debugRenderOptions["AABB"])
+    if (debugRenderOptions[RENDER_AABB])
     {
         for ( const auto& gameObject : *gameObjects )
         {
@@ -655,7 +655,7 @@ void DebugDrawModule::Draw()
         }
     }
 
-    if (debugRenderOptions["OBB"])
+    if (debugRenderOptions[RENDER_OBB])
     {
         for (const auto& gameObject : *gameObjects)
         {
@@ -664,7 +664,7 @@ void DebugDrawModule::Draw()
         }
     }
 
-    if (debugRenderOptions["Octree"])
+    if (debugRenderOptions[RENDER_OCTREE])
     {
         Octree* octree = sceneModule->GetSceneOctree();
         if (octree != nullptr) RenderLines(octree->GetDrawLines(), float3(1.f, 0.f, 0.f));
