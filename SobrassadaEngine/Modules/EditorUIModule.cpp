@@ -719,6 +719,8 @@ bool EditorUIModule::RenderImGuizmo(
 
     ImGuizmo::Enable(true);
     float positionSnap[3] = {1.0f, 1.0f, 1.0f};
+    if (mCurrentGizmoOperation == ImGuizmo::SCALE) positionSnap[0] = positionSnap[1] = positionSnap[2] = 0.1f;
+
     ImGuizmo::Manipulate(
         view.ptr(), proj.ptr(), mCurrentGizmoOperation, transformType, transform.ptr(), nullptr, positionSnap, nullptr,
         nullptr
