@@ -25,14 +25,11 @@ bool Quadtree::InsertElement(GameObject* gameObject)
 {
     if (gameObject == nullptr) return false;
 
-    const MeshComponent* meshComponent = gameObject->GetMeshComponent();
-    if (meshComponent == nullptr) return false;
-
     bool inserted = false;
     std::stack<QuadtreeNode*> nodesToVisit;
     nodesToVisit.push(rootNode);
 
-    const AABB elementBoundingBox   = meshComponent->GetGlobalAABB();
+    const AABB elementBoundingBox   = gameObject->GetGlobalAABB();
     QuadtreeElement quadtreeElement = QuadtreeElement(elementBoundingBox, gameObject, totalElements);
 
     while (!nodesToVisit.empty())

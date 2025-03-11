@@ -10,6 +10,11 @@
 #include "LibraryModule.h"
 #include "Octree.h"
 #include "OpenGLModule.h"
+#include "ResourceManagement/Resources/Resource.h"
+#include "ResourceManagement/Resources/ResourceModel.h"
+#include "ResourcesModule.h"
+#include "Scene/Components/ComponentUtils.h"
+#include "Scene/Components/Standalone/MeshComponent.h"
 #include "SceneModule.h"
 #include "DebugUtils.h"
 
@@ -17,14 +22,49 @@
 #include "imgui_internal.h"
 // guizmo after imgui include
 #include "./Libs/ImGuizmo/ImGuizmo.h"
+#include "Importer.h"
 #include "SDL_mouse.h"
 
-Scene::Scene(UID sceneUID, const char* sceneName, UID rootGameObject)
-    : sceneUID(sceneUID), sceneName(std::string(sceneName)), gameObjectRootUUID(rootGameObject)
+Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 {
-    selectedGameObjectUUID = gameObjectRootUUID;
+    memcpy(this->sceneName, sceneName, strlen(sceneName));
 
-    lightsConfig           = new LightsConfig();
+    GameObject* sceneGameObject = new GameObject("SceneModule GameObject");
+    selectedGameObjectUID = gameObjectRootUID = sceneGameObject->GetUID();
+
+    gameObjectsContainer.insert({sceneGameObject->GetUID(), sceneGameObject});
+
+    lightsConfig = new LightsConfig();
+}
+
+Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUID(loadedSceneUID)
+{
+    const char* initName = initialState["Name"].GetString();
+    memcpy(sceneName, initName, strlen(initName));
+    gameObjectRootUID     = initialState["RootGameObject"].GetUint64();
+    selectedGameObjectUID = gameObjectRootUID;
+
+    // Deserialize GameObjects
+    if (initialState.HasMember("GameObjects") && initialState["GameObjects"].IsArray())
+    {
+        const rapidjson::Value& gameObjects = initialState["GameObjects"];
+        for (rapidjson::SizeType i = 0; i < gameObjects.Size(); i++)
+        {
+            const rapidjson::Value& gameObject = gameObjects[i];
+
+            GameObject* newGameObject          = new GameObject(gameObject);
+            gameObjectsContainer.insert({newGameObject->GetUID(), newGameObject});
+        }
+    }
+
+    // Deserialize Lights Config
+    if (initialState.HasMember("Lights Config") && initialState["Lights Config"].IsObject())
+    {
+        lightsConfig = new LightsConfig();
+        lightsConfig->LoadData(initialState["Lights Config"]);
+    }
+
+    GLOG("%s scene loaded", sceneName);
 }
 
 Scene::~Scene()
@@ -35,52 +75,93 @@ Scene::~Scene()
     }
     gameObjectsContainer.clear();
 
-    for (auto it = gameComponents.begin(); it != gameComponents.end(); ++it)
-    {
-        delete it->second;
-    }
-    gameComponents.clear();
-
     delete lightsConfig;
     delete sceneOctree;
     lightsConfig = nullptr;
+    sceneOctree  = nullptr;
 
-    GLOG("%s scene closed", sceneName.c_str());
+    GLOG("%s scene closed", sceneName);
 }
 
-void Scene::Save() const
+void Scene::Init()
 {
-    if (!App->GetLibraryModule()->SaveScene(SCENES_PATH, SaveMode::Save))
+    GameObject* root = GetGameObjectByUID(gameObjectRootUID);
+    if (root != nullptr)
     {
-        GLOG("%s scene saving failed", sceneName.c_str());
+        root->UpdateTransformForGOBranch();
     }
+
+    lightsConfig->InitSkybox();
+    lightsConfig->InitLightBuffers();
+
+    UpdateSpatialDataStruct();
 }
 
-void Scene::LoadComponents(const std::map<UID, Component*>& loadedGameComponents)
+void Scene::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
 {
-    gameComponents.clear();
-    gameComponents.insert(loadedGameComponents.begin(), loadedGameComponents.end());
+    // Create structure
+    targetState.AddMember("UID", sceneUID, allocator);
+    targetState.AddMember("Name", rapidjson::Value(sceneName, allocator), allocator);
+    targetState.AddMember("RootGameObject", gameObjectRootUID, allocator);
 
+    // Serialize GameObjects
+    rapidjson::Value gameObjectsJSON(rapidjson::kArrayType);
+
+    for (auto it = gameObjectsContainer.begin(); it != gameObjectsContainer.end(); ++it)
+    {
+        if (it->second != nullptr)
+        {
+            rapidjson::Value goJSON(rapidjson::kObjectType);
+
+            it->second->Save(goJSON, allocator);
+
+            gameObjectsJSON.PushBack(goJSON, allocator);
+        }
+    }
+
+    // Add gameObjects to scene
+    targetState.AddMember("GameObjects", gameObjectsJSON, allocator);
+
+    // Serialize Lights Config
+    LightsConfig* lightConfig = App->GetSceneModule()->GetLightsConfig();
+
+    if (lightConfig != nullptr)
+    {
+        rapidjson::Value lights(rapidjson::kObjectType);
+
+        lightConfig->SaveData(lights, allocator);
+
+        targetState.AddMember("Lights Config", lights, allocator);
+    }
+    else GLOG("Light Config not found");
+}
+
+void Scene::LoadComponents() const
+{
     lightsConfig->InitSkybox();
     lightsConfig->InitLightBuffers();
 }
 
 void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects)
 {
+    for (auto it = gameObjectsContainer.begin(); it != gameObjectsContainer.end(); ++it)
+    {
+        delete it->second;
+    }
     gameObjectsContainer.clear();
     gameObjectsContainer.insert(loadedGameObjects.begin(), loadedGameObjects.end());
 
-    GameObject* root = GetGameObjectByUUID(gameObjectRootUUID);
+    GameObject* root = GetGameObjectByUID(gameObjectRootUID);
     if (root != nullptr)
     {
         GLOG("Init transform and AABB calculation");
-        root->ComponentGlobalTransformUpdated();
+        root->UpdateTransformForGOBranch();
     }
 
     UpdateSpatialDataStruct();
 }
 
-update_status Scene::Render(float deltaTime)
+update_status Scene::Render(float deltaTime) const
 {
     if (!renderWireframe) lightsConfig->RenderSkybox();
     lightsConfig->RenderLights();
@@ -94,6 +175,11 @@ update_status Scene::Render(float deltaTime)
         {
             gameObject->Render();
         }
+    }
+
+    for (const auto& gameObject : gameObjectsContainer)
+    {
+        gameObject.second->DrawGizmos();
     }
 
     return UPDATE_CONTINUE;
@@ -112,7 +198,7 @@ update_status Scene::RenderEditor(float deltaTime)
 
 void Scene::RenderScene()
 {
-    if (!ImGui::Begin(sceneName.c_str()))
+    if (!ImGui::Begin(sceneName))
     {
         ImGui::End();
         return;
@@ -263,34 +349,33 @@ void Scene::RenderHierarchyUI(bool& hierarchyMenu)
 
     if (ImGui::Button("Add GameObject"))
     {
-        GameObject* newGameObject = new GameObject(selectedGameObjectUUID, "new Game Object");
-        UID newUUID               = newGameObject->GetUID();
+        GameObject* parent = GetGameObjectByUID(selectedGameObjectUID);
+        if (parent != nullptr)
+        {
+            GameObject* newGameObject = new GameObject(selectedGameObjectUID, "new Game Object");
 
-        GetGameObjectByUUID(selectedGameObjectUUID)->AddGameObject(newUUID);
+            gameObjectsContainer.insert({newGameObject->GetUID(), newGameObject});
+            parent->AddGameObject(newGameObject->GetUID());
 
-        // TODO: change when filesystem defined
-        gameObjectsContainer.insert({newUUID, newGameObject});
-
-        GetGameObjectByUUID(newGameObject->GetParent())->ComponentGlobalTransformUpdated();
+            newGameObject->UpdateTransformForGOBranch();
+        }
     }
 
-    if (selectedGameObjectUUID != gameObjectRootUUID)
+    if (selectedGameObjectUID != gameObjectRootUID)
     {
         ImGui::SameLine();
 
         if (ImGui::Button("Delete GameObject"))
         {
-            UID parentUID                = GetGameObjectByUUID(selectedGameObjectUUID)->GetParent();
-            GameObject* parentGameObject = GetGameObjectByUUID(parentUID);
-            RemoveGameObjectHierarchy(selectedGameObjectUUID);
-            // parentGameObject->PassAABBUpdateToParent(); // TODO: check if it works
+            RemoveGameObjectHierarchy(selectedGameObjectUID);
+            App->GetSceneModule()->RegenerateTree();
         }
     }
 
-    GameObject* rootGameObject = GetGameObjectByUUID(gameObjectRootUUID);
+    GameObject* rootGameObject = GetGameObjectByUID(gameObjectRootUID);
     if (rootGameObject)
     {
-        rootGameObject->RenderHierarchyNode(selectedGameObjectUUID);
+        rootGameObject->RenderHierarchyNode(selectedGameObjectUID);
     }
 
     ImGui::End();
@@ -299,9 +384,9 @@ void Scene::RenderHierarchyUI(bool& hierarchyMenu)
 void Scene::RemoveGameObjectHierarchy(UID gameObjectUUID)
 {
     // TODO: Change when filesystem defined
-    if (!gameObjectsContainer.count(gameObjectUUID) || gameObjectUUID == gameObjectRootUUID) return;
+    if (!gameObjectsContainer.count(gameObjectUUID) || gameObjectUUID == gameObjectRootUID) return;
 
-    GameObject* gameObject = GetGameObjectByUUID(gameObjectUUID);
+    GameObject* gameObject = GetGameObjectByUID(gameObjectUUID);
 
     for (UID childUUID : gameObject->GetChildren())
     {
@@ -313,9 +398,9 @@ void Scene::RemoveGameObjectHierarchy(UID gameObjectUUID)
     // TODO: change when filesystem defined
     if (gameObjectsContainer.count(parentUUID))
     {
-        GameObject* parentGameObject = GetGameObjectByUUID(parentUUID);
+        GameObject* parentGameObject = GetGameObjectByUID(parentUUID);
         parentGameObject->RemoveGameObject(gameObjectUUID);
-        selectedGameObjectUUID = parentUUID;
+        selectedGameObjectUID = parentUUID;
     }
 
     // TODO: change when filesystem defined
@@ -324,24 +409,17 @@ void Scene::RemoveGameObjectHierarchy(UID gameObjectUUID)
     delete gameObject;
 }
 
-void Scene::RemoveComponent(uint64_t componentUID)
+const std::unordered_map<UID, Component*> Scene::GetAllComponents() const
 {
-    gameComponents.erase(componentUID);
-}
-
-AABBUpdatable* Scene::GetTargetForAABBUpdate(UID uuid)
-{
-    if (gameObjectsContainer.count(uuid))
+    std::unordered_map<UID, Component*> collectedComponents;
+    for (auto& pair : gameObjectsContainer)
     {
-        return gameObjectsContainer[uuid];
+        if (pair.second != nullptr)
+        {
+            collectedComponents.insert(pair.second->GetComponents().begin(), pair.second->GetComponents().end());
+        }
     }
-
-    if (gameComponents.count(uuid))
-    {
-        return gameComponents[uuid];
-    }
-
-    return nullptr;
+    return collectedComponents;
 }
 
 void Scene::CreateSpatialDataStruct()
@@ -354,8 +432,7 @@ void Scene::CreateSpatialDataStruct()
 
     for (const auto& objectIterator : gameObjectsContainer)
     {
-        if (objectIterator.second->GetUID() == gameObjectRootUUID) continue;
-        AABB objectBB = objectIterator.second->GetAABB();
+        AABB objectBB = objectIterator.second->GetGlobalAABB();
 
         if (objectBB.Size().x == 0 && objectBB.Size().y == 0 && objectBB.Size().z == 0) continue;
 
@@ -379,13 +456,13 @@ void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects)
 
     for (auto gameObject : queriedObjects)
     {
-        AABB objectOBB = gameObject->GetAABB();
+        AABB objectOBB = gameObject->GetGlobalAABB();
 
         if (frustumPlanes.Intersects(objectOBB)) outRenderGameObjects.push_back(gameObject);
     }
 }
 
-GameObject* Scene::GetGameObjectByUUID(UID gameObjectUUID)
+GameObject* Scene::GetGameObjectByUID(UID gameObjectUUID)
 {
     if (gameObjectsContainer.count(gameObjectUUID))
     {
@@ -394,11 +471,68 @@ GameObject* Scene::GetGameObjectByUUID(UID gameObjectUUID)
     return nullptr;
 }
 
-Component* Scene::GetComponentByUID(uint64_t componentUID)
+void Scene::LoadModel(const UID modelUID)
 {
-    if (gameComponents.count(componentUID))
+    if (modelUID != CONSTANT_EMPTY_UID)
     {
-        return gameComponents[componentUID];
+        GLOG("Load model %d", modelUID);
+
+        ResourceModel* newModel            = (ResourceModel*)App->GetResourcesModule()->RequestResource(modelUID);
+        const Model& model                 = newModel->GetModelData();
+        const std::vector<NodeData>& nodes = model.GetNodes();
+
+        GameObject* object                 = new GameObject(GetGameObjectRootUID(), nodes[0].name);
+        object->SetLocalTransform(nodes[0].transform);
+
+        // Add the gameObject to the rootObject
+        GetGameObjectByUID(GetGameObjectRootUID())->AddGameObject(object->GetUID());
+        AddGameObject(object->GetUID(), object);
+
+        std::vector<GameObject*> gameObjectsArray;
+        gameObjectsArray.push_back(object);
+
+        for (int i = 1; i < nodes.size(); ++i)
+        {
+            if (nodes[i].meshes.size() >
+                0) // If has meshes, create a container object and one gameObject per mesh as children
+            {
+                GLOG("Node %s has %d meshes", nodes[i].name.c_str(), nodes[i].meshes.size());
+                GameObject* gameObject = new GameObject(gameObjectsArray[nodes[i].parentIndex]->GetUID(), nodes[i].name);
+                //gameObject->SetLocalTransform(nodes[0].transform);
+
+                gameObjectsArray.emplace_back(gameObject);
+                GetGameObjectByUID(gameObjectsArray[nodes[i].parentIndex]->GetUID())
+                    ->AddGameObject(gameObject->GetUID());
+                AddGameObject(gameObject->GetUID(), gameObject);
+
+                unsigned meshNum = 1;
+                for (const auto& mesh : nodes[i].meshes)
+                {
+                    GameObject* meshObject = new GameObject(gameObject->GetUID(), "Mesh " + std::to_string(meshNum));
+                    ++meshNum;
+
+                    meshObject->CreateComponent(COMPONENT_MESH);
+                    meshObject->AddModel(mesh.first, mesh.second);
+
+                    meshObject->SetLocalTransform(nodes[i].transform);
+
+                    gameObject->AddGameObject(meshObject->GetUID());
+                    AddGameObject(meshObject->GetUID(), meshObject);
+                }
+            }
+            else
+            {
+                GameObject* gameObject =
+                    new GameObject(gameObjectsArray[nodes[i].parentIndex]->GetUID(), nodes[i].name);
+
+                gameObject->SetLocalTransform(nodes[i].transform);
+
+                gameObjectsArray.emplace_back(gameObject);
+                GetGameObjectByUID(gameObjectsArray[nodes[i].parentIndex]->GetUID())
+                    ->AddGameObject(gameObject->GetUID());
+                AddGameObject(gameObject->GetUID(), gameObject);
+            }
+        }
+        object->UpdateTransformForGOBranch();
     }
-    return nullptr;
 }
