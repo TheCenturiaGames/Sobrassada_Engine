@@ -8,10 +8,7 @@
 class LightComponent : public Component
 {
   public:
-    LightComponent(
-        UID uid, UID uidParent, UID uidRoot, const char* uiName, const ComponentType lightType,
-        const Transform& parentGlobalTransform
-    );
+    LightComponent(UID uid, UID uidParent, const char* uiName, ComponentType lightType);
     LightComponent(const rapidjson::Value& initialState);
 
     void Update() override;
