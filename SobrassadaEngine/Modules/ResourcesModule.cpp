@@ -70,15 +70,6 @@ void ResourcesModule::ReleaseResource(const Resource* resource)
     }
 }
 
-void ResourcesModule::UnloadAllResources()
-{
-    for (auto resource : resources)
-    {
-        delete resource.second;
-    }
-    resources.clear();
-}
-
 Resource* ResourcesModule::CreateNewResource(UID uid)
 {
     Resource* loadedResource = Importer::Load(uid);

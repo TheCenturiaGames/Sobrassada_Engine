@@ -193,7 +193,6 @@ void CameraModule::Controls(float deltaTime)
             float mouseX             = mouseMotion.x;
             float mouseY             = mouseMotion.y;
             float deltaRotationAngle = cameraRotationAngle * finalRotateSensitivity;
-            GLOG("DeltaTime: %f", deltaTime);
             RotateCamera(-mouseX * deltaRotationAngle, -mouseY * deltaRotationAngle);
         }
     }

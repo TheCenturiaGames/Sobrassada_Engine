@@ -17,8 +17,6 @@ class ResourcesModule : public Module
     Resource* RequestResource(UID uid);
     void ReleaseResource(const Resource* resource);
 
-    void UnloadAllResources();
-
   private:
     Resource* CreateNewResource(UID uid);
 
