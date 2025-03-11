@@ -18,6 +18,7 @@
 class GameObject;
 class Component;
 class RootComponent;
+class Octree;
 
 class SceneModule : public Module
 {
@@ -107,6 +108,8 @@ class SceneModule : public Module
     const std::tuple<float, float>& GetMousePosition() const { return loadedScene->GetMousePosition(); };
 
     bool GetDoInputs() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() : false; }
+    
+    Octree* GetSceneOctree() const { return loadedScene != nullptr ? loadedScene->GetOctree() : nullptr; }
 
   private:
     Scene* loadedScene = nullptr;

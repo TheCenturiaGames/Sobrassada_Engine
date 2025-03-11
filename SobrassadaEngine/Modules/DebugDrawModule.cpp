@@ -6,7 +6,10 @@
 #include "MathGeoLib.h"
 #include "WindowModule.h"
 #include "OpenGLModule.h"
+#include "SceneModule.h"
 #include "Framebuffer.h"
+#include "DebugUtils.h"
+#include "Octree.h"
 
 #include "SDL_video.h"
 #define DEBUG_DRAW_IMPLEMENTATION
@@ -612,7 +615,7 @@ update_status DebugDrawModule::Render(float deltaTime)
     dd::xzSquareGrid(-10, 10, 0.0f, 1.0f, dd::colors::Blue);
 
     // Probably should go somewhere else, but must go after skybox and meshes
-    App->GetDebugDrawModule()->Draw();
+    Draw();
 
     return UPDATE_CONTINUE;
 }
@@ -634,7 +637,21 @@ void DebugDrawModule::Draw()
         dd::frustum(inverseClipMatrix, float3(1.f, 1.f, 1.f));
     }
 
-    //SDL_GetWindowSize(App->GetWindowModule()->window, &width, &height);
+    if (debugRenderOptions["AABB"])
+    {
+
+    }
+
+    if (debugRenderOptions["OBB"])
+    {
+
+    }
+
+    if (debugRenderOptions["Octree"])
+    {
+        Octree* octree = App->GetSceneModule()->GetSceneOctree();
+        if (octree != nullptr) RenderLines(octree->GetDrawLines(), float3(1.f, 0.f, 0.f));
+    }
 
     auto framebuffer = App->GetOpenGLModule()->GetFramebuffer();
     width                     = framebuffer->GetTextureWidth();

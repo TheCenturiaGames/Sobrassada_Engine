@@ -53,7 +53,7 @@ class Scene
     const std::tuple<float, float>& GetWindowPosition() const { return sceneWindowPosition; };
     const std::tuple<float, float>& GetWindowSize() const { return sceneWindowSize; };
     const std::tuple<float, float>& GetMousePosition() const { return mousePosition; };
-    const Octree* GetOctree() const { return sceneOctree; }
+    Octree* GetOctree() const { return sceneOctree; }
 
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUUID = newSelectedGameObject; };
     

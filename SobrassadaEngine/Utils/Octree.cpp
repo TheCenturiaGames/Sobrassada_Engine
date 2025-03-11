@@ -137,17 +137,17 @@ bool Octree::InsertElement(GameObject* gameObject)
     return false;
 }
 
-void Octree::GetDrawLines(std::vector<LineSegment>& drawLines, std::vector<LineSegment>& elementLines) const
+const std::vector<LineSegment>& Octree::GetDrawLines()
 {
-    std::set<OctreeElement> includedElement;
-    drawLines    = std::vector<LineSegment>(totalLeaf * 12, LineSegment());
-    elementLines = std::vector<LineSegment>(totalElements * 12, LineSegment());
+    int totalLines = totalLeaf * 12;
+    if (drawLines.size() == totalLines) return drawLines;
+
+    drawLines = std::vector<LineSegment>(totalLines, LineSegment());
 
     std::stack<const OctreeNode*> nodesToVisit;
     nodesToVisit.push(rootNode);
 
-    int currentDrawLine    = 0;
-    int currentElementLine = 0;
+    int currentDrawLine = 0;
 
     while (!nodesToVisit.empty())
     {
@@ -159,19 +159,6 @@ void Octree::GetDrawLines(std::vector<LineSegment>& drawLines, std::vector<LineS
             for (int i = 0; i < 12; ++i)
             {
                 drawLines[currentDrawLine++] = currentNode->currentArea.Edge(i);
-            }
-
-            for (const auto& element : currentNode->elements)
-            {
-                if (includedElement.find(element) == includedElement.end())
-                {
-                    includedElement.insert(element);
-
-                    for (int i = 0; i < 12; ++i)
-                    {
-                        elementLines[currentElementLine++] = element.boundingBox.Edge(i);
-                    }
-                }
             }
         }
         else
@@ -186,4 +173,6 @@ void Octree::GetDrawLines(std::vector<LineSegment>& drawLines, std::vector<LineS
             nodesToVisit.push(currentNode->bottomRightBack);
         }
     }
+
+    return drawLines;
 }
