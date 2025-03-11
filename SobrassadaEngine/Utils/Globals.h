@@ -34,10 +34,10 @@ enum update_status
 #define SCREEN_WIDTH  1280
 #define SCREEN_HEIGHT 720
 
-#define BORDERLESS   false
-#define FULL_DESKTOP false
-#define RESIZABLE    true
 #define FULLSCREEN   false
+#define FULL_DESKTOP false
+#define BORDERLESS   false
+#define RESIZABLE    true
 #define VSYNC        true
 
 #define TITLE             "Sobrassada Engine"
@@ -61,8 +61,8 @@ enum update_status
 
 #define DEFAULT_CAMERA_MOVEMENT_SCALE_FACTOR 1.f;
 #define DEFAULT_CAMERA_MOVEMENT_SPEED        7.5f;
-#define DEFAULT_CAMERA_MOUSE_SENSITIVITY     0.5f;
-#define DEFAULT_CAMERA_ZOOM_SENSITIVITY      5.f;
+#define DEFAULT_CAMERA_MOUSE_SENSITIVITY     0.1f;
+#define DEFAULT_CAMERA_ZOOM_SENSITIVITY      2.0f;
 
 #define ASSETS_PATH   "Assets/"
 #define SCENES_PATH   "Assets/Scenes/"

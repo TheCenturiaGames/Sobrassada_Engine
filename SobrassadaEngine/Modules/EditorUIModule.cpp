@@ -25,10 +25,7 @@
 #define TINYGLTF_IMPLEMENTATION /* Only in one of the includes */
 #include <tiny_gltf.h>          // TODO Remove
 
-EditorUIModule::EditorUIModule()
-    : width(0), height(0), closeApplication(false), consoleMenu(false), importMenu(false), loadMenu(false),
-      saveMenu(false), editorSettingsMenu(false), loadModel(false), aboutMenu(false), maxFPS(60), maximumPlotData(50),
-      closeScene(false)
+EditorUIModule::EditorUIModule() : width(0), height(0)
 {
 }
 
@@ -76,7 +73,6 @@ update_status EditorUIModule::PreUpdate(float deltaTime)
 update_status EditorUIModule::Update(float deltaTime)
 {
     UpdateGizmoTransformMode();
-    LimitFPS(deltaTime);
     AddFramePlotData(deltaTime);
     return UPDATE_CONTINUE;
 }
@@ -128,18 +124,6 @@ void EditorUIModule::UpdateGizmoTransformMode()
 
         if (keyboard[SDL_SCANCODE_R]) transformType = ImGuizmo::LOCAL;
         else if (keyboard[SDL_SCANCODE_T]) transformType = ImGuizmo::WORLD;
-    }
-}
-
-void EditorUIModule::LimitFPS(float deltaTime) const
-{
-    if (deltaTime == 0) return;
-
-    float targetFrameTime = 1000.f / maxFPS;
-
-    if (maxFPS != 0)
-    {
-        if (deltaTime < targetFrameTime) SDL_Delay(static_cast<Uint32>(targetFrameTime - deltaTime));
     }
 }
 
@@ -1111,32 +1095,9 @@ void EditorUIModule::FramePlots(bool& vsync)
 {
     static int refreshRate = App->GetWindowModule()->GetDesktopDisplayMode().refresh_rate;
 
-    static int sliderFPS   = 0;
-    ImGui::SliderInt("Max FPS", &sliderFPS, 0, refreshRate);
-
     static float maxYAxis;
-    if (sliderFPS == 0)
-    {
-        if (vsync)
-        {
-            maxFPS   = refreshRate;
-            maxYAxis = maxFPS * 1.66f;
-        }
-        else
-        {
-            maxFPS   = 0;
-            maxYAxis = 1000.f * 1.66f;
-        }
-    }
-    else
-    {
-        maxFPS   = sliderFPS;
-        maxYAxis = maxFPS * 1.66f;
-    }
-
-    ImGui::Text("Limit Framerate: ");
-    ImGui::SameLine();
-    ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", maxFPS);
+    if (vsync) maxYAxis = refreshRate * 1.66f;
+    else maxYAxis = 1000.f * 1.66f;
 
     char title[25];
     std::vector<float> frametimeVector(frametime.begin(), frametime.end());
@@ -1154,12 +1115,11 @@ void EditorUIModule::FramePlots(bool& vsync)
 
 void EditorUIModule::WindowConfig(bool& vsync) const
 {
-    static bool borderless   = BORDERLESS;
-    static bool full_desktop = FULL_DESKTOP;
-    static bool resizable    = RESIZABLE;
     static bool fullscreen   = FULLSCREEN;
+    static bool full_desktop = FULL_DESKTOP;
+    static bool borderless   = BORDERLESS;
+    static bool resizable    = RESIZABLE;
 
-    // Brightness Slider
     float brightness         = App->GetWindowModule()->GetBrightness();
     if (ImGui::SliderFloat("Brightness", &brightness, 0, 1)) App->GetWindowModule()->SetBrightness(brightness);
 
@@ -1167,28 +1127,25 @@ void EditorUIModule::WindowConfig(bool& vsync) const
     int maxWidth                 = displayMode.w;
     int maxHeight                = displayMode.h;
 
-    // Width Slider
     int width                    = App->GetWindowModule()->GetWidth();
     if (ImGui::SliderInt("Width", &width, 0, maxWidth)) App->GetWindowModule()->SetWidth(width);
 
-    // Height Slider
     int height = App->GetWindowModule()->GetHeight();
     if (ImGui::SliderInt("Height", &height, 0, maxHeight)) App->GetWindowModule()->SetHeight(height);
 
-    // Set Fullscreen
     if (ImGui::Checkbox("Fullscreen", &fullscreen)) App->GetWindowModule()->SetFullscreen(fullscreen);
+
+    ImGui::SameLine();
+
+    if (ImGui::Checkbox("Full Desktop", &full_desktop)) App->GetWindowModule()->SetFullDesktop(full_desktop);
+
+    if (ImGui::Checkbox("Borderless", &borderless)) App->GetWindowModule()->SetBorderless(borderless);
+
     ImGui::SameLine();
 
     // Set Resizable
     if (ImGui::Checkbox("Resizable", &resizable)) App->GetWindowModule()->SetResizable(resizable);
     if (ImGui::IsItemHovered()) ImGui::SetTooltip("Restart to apply");
-
-    // Set Borderless
-    if (ImGui::Checkbox("Borderless", &borderless)) App->GetWindowModule()->SetBorderless(borderless);
-    ImGui::SameLine();
-
-    // Set Full Desktop
-    if (ImGui::Checkbox("Full Desktop", &full_desktop)) App->GetWindowModule()->SetFullDesktop(full_desktop);
 
     // Set Vsync
     if (ImGui::Checkbox("Vsync", &vsync)) App->GetWindowModule()->SetVsync(vsync);

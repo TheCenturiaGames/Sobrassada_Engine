@@ -86,7 +86,6 @@ class EditorUIModule : public Module
     bool closeScene             = false;
     bool closeApplication       = false;
 
-    int maxFPS                  = 60;
     int maximumPlotData         = 50;
     std::deque<float> framerate;
     std::deque<float> frametime;
