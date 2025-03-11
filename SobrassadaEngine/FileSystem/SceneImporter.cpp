@@ -26,14 +26,13 @@ namespace SceneImporter
         std::vector<int> matIndices;
         for (const auto& srcMesh : model.meshes)
         {
-            std::string name = srcMesh.name;
             int n            = 0;
             int matIndex     = -1;
             std::vector<std::pair<UID, UID>> primitives;
 
             for (const auto& primitive : srcMesh.primitives)
             {
-                name += std::to_string(n);
+                std::string name = srcMesh.name + std::to_string(n);
                 UID meshUID = MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath);
                 n++;
 
