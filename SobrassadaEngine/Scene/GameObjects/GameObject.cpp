@@ -322,9 +322,8 @@ void GameObject::AddSkin(const std::vector<GameObject*>& bones, const std::vecto
     {
         MeshComponent* mesh = static_cast<MeshComponent*>(components.at(COMPONENT_MESH));
         mesh->SetBones(bones);
-        mesh->SetBindTransforms(bindMatrices);
+        mesh->SetBindMatrices(bindMatrices);
     }
-   
 }
 
 void GameObject::OnTransformUpdated()

@@ -13,8 +13,9 @@ namespace ModelImporter
 {
     UID ImportModel(
         const tinygltf::Model& model, const std::vector<std::vector<std::pair<UID, UID>>>& meshesUIDs,
-        const char* filePath
+        const char* filePath, const UID sourceUID = INVALID_UUID
     );
+    void CopyModel(const std::string& filePath);
     ResourceModel* LoadModel(UID modelUID);
     void FillNodes(
         const std::vector<tinygltf::Node>& nodesList, int nodeId, int parentId,

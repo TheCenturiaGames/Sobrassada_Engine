@@ -30,7 +30,7 @@ class MeshComponent : public Component
     void AddMaterial(UID resource);
 
     void SetBones(const std::vector<GameObject*>& bones) { this->bones = bones; }
-    void SetBindTransforms(const std::vector<float4x4>& bindTransforms) { this->bindTransforms = bindTransforms; }
+    void SetBindMatrices(const std::vector<float4x4>& bindTransforms) { this->bindMatrices = bindTransforms; }
 
   private:
     std::string currentMeshName       = "Not selected";
@@ -40,5 +40,5 @@ class MeshComponent : public Component
     ResourceMaterial* currentMaterial = nullptr;
 
     std::vector<GameObject*> bones;
-    std::vector<float4x4> bindTransforms;
+    std::vector<float4x4> bindMatrices;
 };

@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "LibraryModule.h"
+#include "MetaModel.h"
 #include "ResourceManagement/Resources/ResourceModel.h"
 
 #include "Math/Quat.h"
@@ -13,7 +14,7 @@ namespace ModelImporter
 {
     UID ImportModel(
         const tinygltf::Model& model, const std::vector<std::vector<std::pair<UID, UID>>>& meshesUIDs,
-        const char* filePath
+        const char* filePath, const UID sourceUID
     )
     {
         // Get Nodes data
@@ -67,11 +68,24 @@ namespace ModelImporter
 
         rapidjson::Value modelJSON(rapidjson::kObjectType);
 
-        UID modelUID         = GenerateUID();
-        std::string savePath = MODELS_PATH + std::string("Model") + MODEL_EXTENSION;
-        UID finalModelUID    = App->GetLibraryModule()->AssignFiletypeUID(modelUID, FileType::Model);
-        savePath             = MODELS_PATH + std::to_string(finalModelUID) + MODEL_EXTENSION;
-        std::string name     = FileSystem::GetFileNameWithoutExtension(filePath);
+        const std::string modelName = model.meshes[0].name;
+        std::string assetPath       = "";
+        UID finalModelUID;
+        if (sourceUID == INVALID_UUID)
+        {
+            UID modelUID              = GenerateUID();
+            finalModelUID             = App->GetLibraryModule()->AssignFiletypeUID(modelUID, FileType::Model);
+
+            // replace "" with shader used (example)
+            UID tmpName               = GenerateUID();
+            std::string tmpNameString = std::to_string(tmpName);
+
+            assetPath = ASSETS_PATH + std::string("Models/") + std::to_string(finalModelUID) + MODEL_EXTENSION;
+            MetaModel meta(finalModelUID, assetPath);
+            meta.Save(modelName, assetPath);
+        }
+        else finalModelUID = sourceUID;
+
         newModel.SetUID(finalModelUID);
 
         // Create structure
@@ -156,20 +170,44 @@ namespace ModelImporter
         rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
         doc.Accept(writer);
 
-        unsigned int bytesWritten =
-            (unsigned int)FileSystem::Save(savePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
+        std::string saveFilePath  = MODELS_PATH + std::to_string(finalModelUID) + MODEL_EXTENSION;
+        unsigned int bytesWritten = (unsigned int
+        )FileSystem::Save(saveFilePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
         if (bytesWritten == 0)
         {
-            GLOG("Failed to save model file: %s", savePath);
+            GLOG("Failed to save model file: %s", saveFilePath);
             return 0;
         }
 
-        App->GetLibraryModule()->AddModel(finalModelUID, name);
-        App->GetLibraryModule()->AddResource(savePath, finalModelUID);
+        if (sourceUID == INVALID_UUID)
+        {
+            unsigned int bytesWritten = (unsigned int
+            )FileSystem::Save(assetPath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
+            if (bytesWritten == 0)
+            {
+                GLOG("Failed to save model file: %s", assetPath);
+                return 0;
+            }
+        }
 
-        GLOG("%s saved as model", name.c_str());
+        App->GetLibraryModule()->AddModel(finalModelUID, modelName);
+        App->GetLibraryModule()->AddResource(saveFilePath, finalModelUID);
+
+        GLOG("%s saved as model", modelName.c_str());
 
         return finalModelUID;
+    }
+
+    void CopyModel(const std::string& filePath)
+    {
+        rapidjson::StringBuffer buffer;
+
+        unsigned int bytesWritten =
+            (unsigned int)FileSystem::Save(filePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
+        if (bytesWritten == 0)
+        {
+            GLOG("Failed to save model file: %s", filePath);
+        }
     }
 
     ResourceModel* LoadModel(UID modelUID)

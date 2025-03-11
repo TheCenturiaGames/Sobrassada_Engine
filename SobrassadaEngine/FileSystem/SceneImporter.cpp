@@ -139,6 +139,11 @@ namespace SceneImporter
         }
     }
 
+    void ImportModelFromMetadata(const std::string& filePath, const std::string& name, UID sourceUID)
+    {
+        ModelImporter::CopyModel(filePath);
+    }
+
     void CreateLibraryDirectories()
     {
         if (!FileSystem::IsDirectory(ASSETS_PATH))
