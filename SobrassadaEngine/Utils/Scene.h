@@ -60,8 +60,6 @@ class Scene
 
     const std::unordered_map<UID, Component*> GetAllComponents() const;
 
-    const std::unordered_map<UID, Component*> GetAllComponents() const;
-
   private:
     void CreateSpatialDataStruct();
     void CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects) const;

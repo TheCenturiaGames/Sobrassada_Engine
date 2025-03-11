@@ -309,8 +309,8 @@ void GameObject::AddModel(UID meshUid, UID materialUid) const
     if (components.find(COMPONENT_MESH) != components.end())
     {
         MeshComponent* mesh = static_cast<MeshComponent*>(components.at(COMPONENT_MESH));
-        mesh->AddMesh(meshUid);
         mesh->AddMaterial(materialUid);
+        mesh->AddMesh(meshUid);
     }
 }
 

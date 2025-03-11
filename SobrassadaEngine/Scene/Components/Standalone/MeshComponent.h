@@ -24,10 +24,11 @@ class MeshComponent : public Component
     void Render() override;
 
     const ResourceMesh* GetResourceMesh() const { return currentMesh; }
-
-  private:
+    
     void AddMesh(UID resource, bool updateParent = true);
     void AddMaterial(UID resource);
+
+  private:
 
   private:
     std::string currentMeshName       = "Not selected";
