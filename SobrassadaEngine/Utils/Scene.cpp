@@ -268,7 +268,9 @@ void Scene::RenderScene()
     }
 
     // right click focus window
-    if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) ImGui::SetWindowFocus();
+    if (ImGui::IsWindowHovered() &&
+        (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseClicked(ImGuiMouseButton_Middle)))
+        ImGui::SetWindowFocus();
 
     // do inputs only if window is focused
     if (ImGui::IsWindowFocused(ImGuiFocusedFlags_DockHierarchy) &&

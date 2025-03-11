@@ -131,7 +131,11 @@ void CameraModule::Controls(float deltaTime)
     float scaleFactor            = movementScaleFactor;
     if (keyboard[SDL_SCANCODE_LSHIFT]) scaleFactor *= 2;
 
-    float finalCameraSpeed = cameraMoveSpeed * scaleFactor * deltaTime;
+    float finalCameraSpeed       = cameraMoveSpeed * scaleFactor * deltaTime;
+    float finalRotateSensitivity = rotateSensitivity * scaleFactor;
+    float finalDragSensitivity   = dragSensitivity * scaleFactor;
+    float finalWheelSensitivity  = wheelSensitivity * scaleFactor;
+    float finalZoomSensitivity   = zoomSensitivity * scaleFactor;
 
     if (mouseButtons[SDL_BUTTON_RIGHT - 1])
     {
@@ -179,8 +183,8 @@ void CameraModule::Controls(float deltaTime)
 
             if (mouseY != 0)
             {
-                if (isCameraDetached) detachedCamera.pos += detachedCamera.front * mouseY * finalCameraSpeed;
-                else camera.pos += camera.front * mouseY * finalCameraSpeed;
+                if (isCameraDetached) detachedCamera.pos += detachedCamera.front * mouseY * finalZoomSensitivity;
+                else camera.pos += camera.front * mouseY * finalZoomSensitivity;
             }
         }
         else
@@ -188,7 +192,7 @@ void CameraModule::Controls(float deltaTime)
             // ROTATION WITH MOUSE
             float mouseX             = mouseMotion.x;
             float mouseY             = mouseMotion.y;
-            float deltaRotationAngle = cameraRotationAngle * deltaTime;
+            float deltaRotationAngle = cameraRotationAngle * finalRotateSensitivity;
             GLOG("DeltaTime: %f", deltaTime);
             RotateCamera(-mouseX * deltaRotationAngle, -mouseY * deltaRotationAngle);
         }
@@ -205,13 +209,13 @@ void CameraModule::Controls(float deltaTime)
     {
         if (isCameraDetached)
         {
-            detachedCamera.pos -= detachedCamera.WorldRight() * mouseMotion.x * finalCameraSpeed;
-            detachedCamera.pos += detachedCamera.up * mouseMotion.y * finalCameraSpeed;
+            detachedCamera.pos -= detachedCamera.WorldRight() * mouseMotion.x * finalDragSensitivity;
+            detachedCamera.pos += detachedCamera.up * mouseMotion.y * finalDragSensitivity;
         }
         else
         {
-            camera.pos -= camera.WorldRight() * mouseMotion.x * finalCameraSpeed;
-            camera.pos += camera.up * mouseMotion.y * finalCameraSpeed;
+            camera.pos -= camera.WorldRight() * mouseMotion.x * finalDragSensitivity;
+            camera.pos += camera.up * mouseMotion.y * finalDragSensitivity;
         }
     }
 
@@ -219,16 +223,16 @@ void CameraModule::Controls(float deltaTime)
     if (mouseWheel != 0)
     {
         if (isCameraDetached)
-            detachedCamera.pos += detachedCamera.front * static_cast<float>(mouseWheel) * zoomSensitivity;
-        else camera.pos += camera.front * static_cast<float>(mouseWheel) * zoomSensitivity;
+            detachedCamera.pos += detachedCamera.front * static_cast<float>(mouseWheel) * finalWheelSensitivity;
+        else camera.pos += camera.front * static_cast<float>(mouseWheel) * finalWheelSensitivity;
     }
 
     // ORBIT
     if (mouseButtons[SDL_BUTTON_LEFT - 1] && keyboard[SDL_SCANCODE_LALT])
     {
-        float mouseX             = inputModule->GetMouseMotion().x;
-        float mouseY             = inputModule->GetMouseMotion().y;
-        float deltaRotationAngle = cameraRotationAngle * deltaTime;
+        float mouseX             = mouseMotion.x;
+        float mouseY             = mouseMotion.y;
+        float deltaRotationAngle = cameraRotationAngle * finalRotateSensitivity;
 
         RotateCamera(-mouseX * deltaRotationAngle, -mouseY * deltaRotationAngle);
 
