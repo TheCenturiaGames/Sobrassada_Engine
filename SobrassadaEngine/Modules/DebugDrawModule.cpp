@@ -10,12 +10,16 @@
 #include "Framebuffer.h"
 #include "DebugUtils.h"
 #include "Octree.h"
+#include "GameObject.h"
 
 #include "SDL_video.h"
 #define DEBUG_DRAW_IMPLEMENTATION
 #include "DebugDraw.h" // Debug Draw API. Notice that we need the DEBUG_DRAW_IMPLEMENTATION macro here!
 #include "glew.h"
 #include "imgui.h"
+#include "Geometry/AABB.h"
+#include "Geometry/OBB.h"
+#include <unordered_map>
 
 class DDRenderInterfaceCoreGL final : public dd::RenderInterface
 {
@@ -622,34 +626,47 @@ update_status DebugDrawModule::Render(float deltaTime)
 
 void DebugDrawModule::Draw()
 {
-    const float4x4& projection = App->GetCameraModule()->GetProjectionMatrix();
-    const float4x4& view       = App->GetCameraModule()->GetViewMatrix();
+    CameraModule* cameraModule = App->GetCameraModule();
+    SceneModule* sceneModule = App->GetSceneModule();
+
+    const float4x4& projection = cameraModule->GetProjectionMatrix();
+    const float4x4& view       = cameraModule->GetViewMatrix();
     int width                  = 0;
     int height                 = 0;
 
-    if (App->GetCameraModule()->IsCameraDetached())
+    if (cameraModule->IsCameraDetached())
     {
-        float4x4 frustumProj       = App->GetCameraModule()->GetFrustumProjectionMatrix();
-        float4x4 frustumView       = App->GetCameraModule()->GetFrustumViewMatrix();
+        float4x4 frustumProj       = cameraModule->GetFrustumProjectionMatrix();
+        float4x4 frustumView       = cameraModule->GetFrustumViewMatrix();
         float4x4 inverseClipMatrix = frustumProj * frustumView;
         inverseClipMatrix.Inverse();
 
         dd::frustum(inverseClipMatrix, float3(1.f, 1.f, 1.f));
     }
 
+    const auto& gameObjects = sceneModule->GetAllGameObjects(); 
+
     if (debugRenderOptions["AABB"])
     {
-
+        for ( const auto& gameObject : *gameObjects )
+        {
+            for (int i = 0; i < 12; ++i)
+                DrawLineSegment(gameObject.second->GetGlobalAABB().Edge(i), float3(0.f, 1.f, 0.f));
+        }
     }
 
     if (debugRenderOptions["OBB"])
     {
-
+        for (const auto& gameObject : *gameObjects)
+        {
+            for (int i = 0; i < 12; ++i)
+                DrawLineSegment(gameObject.second->GetGlobalOBB().Edge(i), float3(0.f, 1.f, 0.f));
+        }
     }
 
     if (debugRenderOptions["Octree"])
     {
-        Octree* octree = App->GetSceneModule()->GetSceneOctree();
+        Octree* octree = sceneModule->GetSceneOctree();
         if (octree != nullptr) RenderLines(octree->GetDrawLines(), float3(1.f, 0.f, 0.f));
     }
 
@@ -678,6 +695,11 @@ void DebugDrawModule::RenderLines(const std::vector<LineSegment>& lines, const f
     {
         dd::line(line.a, line.b, color);
     }
+}
+
+void DebugDrawModule::DrawLineSegment(const LineSegment& line, const float3& color)
+{
+    dd::line(line.a, line.b, color);
 }
 
 void DebugDrawModule::DrawLine(

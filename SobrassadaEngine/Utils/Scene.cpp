@@ -456,7 +456,7 @@ void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects)
 
     for (auto gameObject : queriedObjects)
     {
-        AABB objectOBB = gameObject->GetGlobalAABB();
+        OBB objectOBB = gameObject->GetGlobalOBB();
 
         if (frustumPlanes.Intersects(objectOBB)) outRenderGameObjects.push_back(gameObject);
     }
