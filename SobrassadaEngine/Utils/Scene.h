@@ -25,6 +25,7 @@ class Scene
 
     void LoadComponents() const;
     void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
+    void LoadModel(const UID modelUID);
 
     update_status Render(float deltaTime) const;
     update_status RenderEditor(float deltaTime);
@@ -45,25 +46,25 @@ class Scene
     GameObject* GetSelectedGameObject() { return GetGameObjectByUID(selectedGameObjectUID); }
 
     const std::unordered_map<UID, GameObject*>& GetAllGameObjects() const { return gameObjectsContainer; }
+    const std::unordered_map<UID, Component*> GetAllComponents() const;
 
     GameObject* GetGameObjectByUID(UID gameObjectUID); // TODO: Change when filesystem defined
 
     LightsConfig* GetLightsConfig() { return lightsConfig; }
+    const Octree* GetOctree() const { return sceneOctree; }
+
+    bool GetDoInputs() const { return doInputs; }
+    bool GetStopPlaying() const { return stopPlaying; }
 
     const std::tuple<float, float>& GetWindowPosition() const { return sceneWindowPosition; };
     const std::tuple<float, float>& GetWindowSize() const { return sceneWindowSize; };
     const std::tuple<float, float>& GetMousePosition() const { return mousePosition; };
-    const Octree* GetOctree() const { return sceneOctree; }
 
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
 
-    bool GetDoInputs() const { return doInputs; }
-    bool GetStopPlaying() const { return stopPlaying; }
-    void LoadModel(const UID modelUID);
-
-    const std::unordered_map<UID, Component*> GetAllComponents() const;
-
     void SetStopPlaying(bool stop) { stopPlaying = stop; }
+
+    void SetSceneName(const char* newName) { memcpy(sceneName, newName, strlen(newName)); }
 
   private:
     void CreateSpatialDataStruct();
@@ -75,6 +76,7 @@ class Scene
     UID gameObjectRootUID;
     UID selectedGameObjectUID;
     bool stopPlaying = false;
+    bool doInputs    = false;
 
     std::unordered_map<UID, GameObject*> gameObjectsContainer;
 
@@ -85,5 +87,4 @@ class Scene
     std::tuple<float, float> sceneWindowPosition = std::make_tuple(0.f, 0.f);
     std::tuple<float, float> sceneWindowSize     = std::make_tuple(0.f, 0.f);
     std::tuple<float, float> mousePosition       = std::make_tuple(0.f, 0.f);
-    bool doInputs                                = false;
 };

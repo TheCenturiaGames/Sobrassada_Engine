@@ -2,6 +2,7 @@
 
 #include "ComponentUtils.h"
 #include "EditorUIModule.h"
+#include "FileSystem.h"
 #include "LibraryModule.h"
 #include "Octree.h"
 
@@ -21,7 +22,6 @@ SceneModule::SceneModule() : sceneLibraryPath(std::filesystem::current_path().st
 
 SceneModule::~SceneModule()
 {
-    
 }
 
 bool SceneModule::Init()
@@ -117,27 +117,24 @@ void SceneModule::CloseScene()
     // TODO Warning dialog before closing scene without saving
     delete loadedScene;
     loadedScene = nullptr;
-    if (App->GetResourcesModule() != nullptr) App->GetResourcesModule()->UnloadAllResources();
 }
 
 void SceneModule::SwitchPlayMode(bool play)
 {
-    if (play == isPlayMode || loadedScene == nullptr) return;
+    if (play == inPlayMode || loadedScene == nullptr) return;
 
-    if (bInPlayMode)
+    if (inPlayMode)
     {
-        if (loadedScene != nullptr)
+        std::string tmpScene = std::to_string(loadedScene->GetSceneUID()) + SCENE_EXTENSION;
+        if (App->GetLibraryModule()->LoadScene(tmpScene.c_str(), true))
         {
-            bInPlayMode = !App->GetLibraryModule()->LoadScene(
-                std::string(SCENES_PATH + std::string(loadedScene->GetSceneName()) + SCENE_EXTENSION).c_str(), true
-            );
+            FileSystem::Delete((sceneLibraryPath + tmpScene).c_str());
+            inPlayMode = false;
+            loadedScene->SetStopPlaying(false);
         }
     }
     else
     {
-        if (loadedScene != nullptr)
-        {
-            bInPlayMode = App->GetLibraryModule()->SaveScene(sceneLibraryPath.c_str(), SaveMode::Save);
-        }
+        if (App->GetLibraryModule()->SaveScene("", SaveMode::SavePlayMode)) inPlayMode = true;
     }
 }

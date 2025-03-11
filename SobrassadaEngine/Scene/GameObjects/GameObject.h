@@ -30,6 +30,8 @@ class GameObject
 
     const float4x4& GetParentGlobalTransform() const;
 
+    bool AddGameObject(UID gameObjectUID);
+    bool RemoveGameObject(UID gameObjectUID);
 
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
 
@@ -87,8 +89,8 @@ class GameObject
     void OnDrawConnectionsToggle();
 
   public:
-    inline static UID currentRenamingUID = INVALID_UID;    
-    
+    inline static UID currentRenamingUID = INVALID_UID;
+
   private:
     UID parentUID;
     UID uid;
@@ -105,7 +107,7 @@ class GameObject
     bool isRenaming = false;
     char renameBuffer[128];
 
-    bool drawNodes = false;
+    bool drawNodes                       = false;
 
     float4x4 localTransform              = float4x4::identity;
     float4x4 globalTransform             = float4x4::identity;

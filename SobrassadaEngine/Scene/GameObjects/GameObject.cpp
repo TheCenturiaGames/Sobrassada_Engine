@@ -90,19 +90,19 @@ GameObject::~GameObject()
     components.clear();
 }
 
-bool GameObject::AddGameObject(UID gameObjectUUID)
+bool GameObject::AddGameObject(UID gameObjectUID)
 {
-    if (std::find(children.begin(), children.end(), gameObjectUUID) == children.end())
+    if (std::find(children.begin(), children.end(), gameObjectUID) == children.end())
     {
-        children.push_back(gameObjectUUID);
+        children.push_back(gameObjectUID);
         return true;
     }
     return false;
 }
 
-bool GameObject::RemoveGameObject(UID gameObjectUUID)
+bool GameObject::RemoveGameObject(UID gameObjectUID)
 {
-    if (const auto it = std::find(children.begin(), children.end(), gameObjectUUID); it != children.end())
+    if (const auto it = std::find(children.begin(), children.end(), gameObjectUID); it != children.end())
     {
         children.erase(it);
         return true;
@@ -284,7 +284,7 @@ void GameObject::UpdateTransformForGOBranch() const
 
     while (!childrenBuffer.empty())
     {
-        GameObject* gameObject = App->GetSceneModule()->GetGameObjectByUUID(childrenBuffer.top());
+        GameObject* gameObject = App->GetSceneModule()->GetGameObjectByUID(childrenBuffer.top());
         childrenBuffer.pop();
         if (gameObject != nullptr)
         {
@@ -561,7 +561,7 @@ void GameObject::OnDrawConnectionsToggle()
 {
     for (const UID childUID : children)
     {
-        GameObject* childObject = App->GetSceneModule()->GetGameObjectByUUID(childUID);
+        GameObject* childObject = App->GetSceneModule()->GetGameObjectByUID(childUID);
         childObject->drawNodes  = drawNodes;
         childObject->OnDrawConnectionsToggle();
     }

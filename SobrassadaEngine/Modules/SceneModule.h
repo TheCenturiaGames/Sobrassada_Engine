@@ -37,9 +37,7 @@ class SceneModule : public Module
 
     void LoadModel(const UID modelUID) { loadedScene != nullptr ? loadedScene->LoadModel(modelUID) : void(); }
 
-    //void CheckObjectsToRender();
-    void SwitchPlayModeStateTo(bool wantedStatePlayMode);
-    bool IsInPlayMode() const { return bInPlayMode; }
+    void SwitchPlayMode(bool play);
 
     void AddGameObject(UID uid, GameObject* newGameObject) const
     {
@@ -60,7 +58,7 @@ class SceneModule : public Module
 
     GameObject* GetGameObjectByUID(UID gameObjectUID) const
     {
-        return loadedScene != nullptr ? loadedScene->GetGameObjectByUID(gameObjectUUID) : nullptr;
+        return loadedScene != nullptr ? loadedScene->GetGameObjectByUID(gameObjectUID) : nullptr;
     }
 
     GameObject* GetSelectedGameObject() const
@@ -75,25 +73,27 @@ class SceneModule : public Module
 
     UID GetGameObjectRootUID() const
     {
-        return loadedScene != nullptr ? loadedScene->GetGameObjectRootUID() : CONSTANT_EMPTY_UID;
+        return loadedScene != nullptr ? loadedScene->GetGameObjectRootUID() : INVALID_UID;
     }
 
-    UID GetSceneUID() const { return loadedScene != nullptr ? loadedScene->GetSceneUID() : CONSTANT_EMPTY_UID; }
+    bool IsSceneLoaded() const { return loadedScene != nullptr; }
+    
+
+    Scene* GetScene() const { return loadedScene; }
+    UID GetSceneUID() const { return loadedScene != nullptr ? loadedScene->GetSceneUID() : INVALID_UID; }
     const char* GetSceneName() const { return loadedScene != nullptr ? loadedScene->GetSceneName() : "Not loaded"; }
     LightsConfig* GetLightsConfig() { return loadedScene != nullptr ? loadedScene->GetLightsConfig() : nullptr; }
     const std::tuple<float, float>& GetWindowPosition() const { return loadedScene->GetWindowPosition(); };
     const std::tuple<float, float>& GetWindowSize() const { return loadedScene->GetWindowSize(); };
     const std::tuple<float, float>& GetMousePosition() const { return loadedScene->GetMousePosition(); };
 
-    Scene* GetScene() const { return loadedScene; }
-
+    bool GetInPlayMode() const { return inPlayMode; }
     bool GetDoInputs() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() : false; }
-    bool GetDoInputsScene() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() && !isPlayMode : false; }
-    bool GetDoInputsGame() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() && isPlayMode : false; }
+    bool GetDoInputsScene() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() && !inPlayMode : false; }
+    bool GetDoInputsGame() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() && inPlayMode : false; }
 
   private:
     Scene* loadedScene = nullptr;
-    bool bInPlayMode   = false;
     const std::string sceneLibraryPath;
-    bool isPlayMode    = false;
+    bool inPlayMode = false;
 };

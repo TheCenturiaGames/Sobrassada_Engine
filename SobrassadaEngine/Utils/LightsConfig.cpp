@@ -147,7 +147,7 @@ void LightsConfig::EditorParams()
     if (ImGui::IsPopupOpen(CONSTANT_TEXTURE_SELECT_DIALOG_ID))
     {
         const UID uid = LoadSkyboxTexture(App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
-            CONSTANT_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetTextureMap(), INVALID_UUID
+            CONSTANT_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetTextureMap(), INVALID_UID
         ));
         if (uid != INVALID_UID) skyboxTexture = static_cast<unsigned int>(uid);
     }

@@ -18,16 +18,16 @@
 #include "Scene/Components/Standalone/MeshComponent.h"
 #include "SceneModule.h"
 
+#include "Importer.h"
+#include "SDL_mouse.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 // guizmo after imgui include
 #include "./Libs/ImGuizmo/ImGuizmo.h"
-#include "Importer.h"
-#include "SDL_mouse.h"
 
 Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 {
-    memcpy(this->sceneName, sceneName, strlen(sceneName));
+    SetSceneName(sceneName);
 
     GameObject* sceneGameObject = new GameObject("SceneModule GameObject");
     selectedGameObjectUID = gameObjectRootUID = sceneGameObject->GetUID();
@@ -40,7 +40,7 @@ Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUID(loadedSceneUID)
 {
     const char* initName = initialState["Name"].GetString();
-    memcpy(sceneName, initName, strlen(initName));
+    SetSceneName(initName);
     gameObjectRootUID     = initialState["RootGameObject"].GetUint64();
     selectedGameObjectUID = gameObjectRootUID;
 
@@ -234,7 +234,7 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
     ImGui::SetNextItemWidth(100.0f);
     if (ImGui::SliderFloat("Time scale", &timeScale, 0, 4)) gameTimer->SetTimeScale(timeScale);
 
-    if (App->GetSceneModule()->IsInPlayMode())
+    if (App->GetSceneModule()->GetInPlayMode())
     {
         ImGui::SeparatorText("Playing");
         ImGui::Text("Frame count: %d", gameTimer->GetFrameCount());
@@ -443,7 +443,7 @@ GameObject* Scene::GetGameObjectByUID(UID gameObjectUUID)
 
 void Scene::LoadModel(const UID modelUID)
 {
-    if (modelUID != CONSTANT_EMPTY_UID)
+    if (modelUID != INVALID_UID)
     {
         GLOG("Load model %d", modelUID);
 
@@ -467,8 +467,9 @@ void Scene::LoadModel(const UID modelUID)
                 0) // If has meshes, create a container object and one gameObject per mesh as children
             {
                 GLOG("Node %s has %d meshes", nodes[i].name.c_str(), nodes[i].meshes.size());
-                GameObject* gameObject = new GameObject(gameObjectsArray[nodes[i].parentIndex]->GetUID(), nodes[i].name);
-                //gameObject->SetLocalTransform(nodes[0].transform);
+                GameObject* gameObject =
+                    new GameObject(gameObjectsArray[nodes[i].parentIndex]->GetUID(), nodes[i].name);
+                // gameObject->SetLocalTransform(nodes[0].transform);
 
                 gameObjectsArray.emplace_back(gameObject);
                 GetGameObjectByUID(gameObjectsArray[nodes[i].parentIndex]->GetUID())

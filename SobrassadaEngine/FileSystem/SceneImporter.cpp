@@ -37,7 +37,7 @@ namespace SceneImporter
                 UID meshUID = MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath);
                 n++;
 
-                UID matUID = INVALID_UUID;
+                UID matUID = INVALID_UID;
                 matIndex = primitive.material;
                 if (matIndex == -1) GLOG("Material index invalid for mesh: %s", name.c_str())
                 else if (std::find(matIndices.begin(), matIndices.end(), matIndex) == matIndices.end())
