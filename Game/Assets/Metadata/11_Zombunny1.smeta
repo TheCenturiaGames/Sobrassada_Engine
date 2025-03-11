@@ -1,0 +1,9 @@
+{
+    "UID": 1127594203768946,
+    "name": "Zombunny1",
+    "assetPath": "Assets/Zombunny.gltf",
+    "lastModifiedDate": 1740067178,
+    "importOptions": {
+        "generateTangents": true
+    }
+}

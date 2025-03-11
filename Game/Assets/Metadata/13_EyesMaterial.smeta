@@ -1,0 +1,10 @@
+{
+    "UID": 1310145430962238,
+    "name": "EyesMaterial",
+    "assetPath": "Assets/Zombunny.gltf",
+    "lastModifiedDate": 1740067178,
+    "importOptions": {
+        "shader": "6576667084609336694",
+        "useOcclusion": false
+    }
+}

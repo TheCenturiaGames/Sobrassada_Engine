@@ -140,7 +140,7 @@ namespace SceneImporter
 
     void ImportModelFromMetadata(const std::string& filePath, const std::string& name, UID sourceUID)
     {
-        ModelImporter::CopyModel(filePath);
+        ModelImporter::CopyModel(filePath, name, sourceUID);
     }
 
     void CreateLibraryDirectories()

@@ -76,11 +76,7 @@ namespace ModelImporter
             UID modelUID              = GenerateUID();
             finalModelUID             = App->GetLibraryModule()->AssignFiletypeUID(modelUID, FileType::Model);
 
-            // replace "" with shader used (example)
-            UID tmpName               = GenerateUID();
-            std::string tmpNameString = std::to_string(tmpName);
-
-            assetPath = ASSETS_PATH + std::string("Models/") + std::to_string(finalModelUID) + MODEL_EXTENSION;
+            assetPath = ASSETS_PATH + std::string("Models/") + modelName + MODEL_EXTENSION;
             MetaModel meta(finalModelUID, assetPath);
             meta.Save(modelName, assetPath);
         }
@@ -191,6 +187,7 @@ namespace ModelImporter
         }
 
         App->GetLibraryModule()->AddModel(finalModelUID, modelName);
+        App->GetLibraryModule()->AddName(modelName, finalModelUID);
         App->GetLibraryModule()->AddResource(saveFilePath, finalModelUID);
 
         GLOG("%s saved as model", modelName.c_str());
@@ -198,16 +195,14 @@ namespace ModelImporter
         return finalModelUID;
     }
 
-    void CopyModel(const std::string& filePath)
+    void CopyModel(const std::string& filePath, const std::string& name, const UID sourceUID)
     {
-        rapidjson::StringBuffer buffer;
+        std::string destination = MODELS_PATH + std::to_string(sourceUID) + MODEL_EXTENSION;
+        FileSystem::Copy(filePath.c_str(), destination.c_str());
 
-        unsigned int bytesWritten =
-            (unsigned int)FileSystem::Save(filePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
-        if (bytesWritten == 0)
-        {
-            GLOG("Failed to save model file: %s", filePath);
-        }
+        App->GetLibraryModule()->AddModel(sourceUID, name);
+        App->GetLibraryModule()->AddName(name, sourceUID);
+        App->GetLibraryModule()->AddResource(destination, sourceUID);
     }
 
     ResourceModel* LoadModel(UID modelUID)
