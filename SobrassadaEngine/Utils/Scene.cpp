@@ -215,6 +215,52 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
         return;
     }
 
+    GizmoOperation& currentGizmoOperation = App->GetEditorUIModule()->GetCurrentGizmoOperation();
+    int selectedOp                        = static_cast<int>(currentGizmoOperation);
+    ImGui::PushItemWidth(150);
+    ImGui::RadioButton("T", &selectedOp, 0);
+    ImGui::SameLine();
+    ImGui::RadioButton("R", &selectedOp, 1);
+    ImGui::SameLine();
+    ImGui::RadioButton("S", &selectedOp, 2);
+    ImGui::PopItemWidth();
+
+    if (selectedOp == 0) currentGizmoOperation = GizmoOperation::TRANSLATE;
+    else if (selectedOp == 1) currentGizmoOperation = GizmoOperation::ROTATE;
+    else if (selectedOp == 2) currentGizmoOperation = GizmoOperation::SCALE;
+
+    ImGui::SameLine();
+    ImGui::Text("|");
+    ImGui::SameLine();
+
+    GizmoTransform& transformType = App->GetEditorUIModule()->GetTransformType();
+    int selectedMode              = static_cast<int>(transformType);
+    ImGui::PushItemWidth(150);
+    ImGui::RadioButton("L", &selectedMode, 0);
+    ImGui::SameLine();
+    ImGui::RadioButton("W", &selectedMode, 1);
+    ImGui::PopItemWidth();
+
+    if (selectedMode == 0) transformType = GizmoTransform::LOCAL;
+    else if (selectedMode == 1) transformType = GizmoTransform::WORLD;
+
+    ImGui::SameLine();
+    ImGui::Text("|");
+    ImGui::SameLine();
+
+    float3& snapValues = App->GetEditorUIModule()->GetSnapValues();
+    ImGui::PushItemWidth(150);
+    ImGui::Text("Snap");
+    ImGui::SameLine();
+    ImGui::Checkbox("##snapEnabled", &App->GetEditorUIModule()->snapEnabled);
+    ImGui::SameLine();
+    ImGui::InputFloat3("##snap", &snapValues.x);
+    ImGui::PopItemWidth();
+
+    ImGui::SameLine();
+    ImGui::Text("|");
+    ImGui::SameLine();
+
     GameTimer* gameTimer = App->GetGameTimer();
 
     float timeScale      = gameTimer->GetTimeScale();

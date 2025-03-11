@@ -118,13 +118,33 @@ void EditorUIModule::UpdateGizmoTransformMode()
     {
         const KeyState* keyboard = App->GetInputModule()->GetKeyboard();
 
-        if (keyboard[SDL_SCANCODE_G]) mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
-        else if (keyboard[SDL_SCANCODE_H]) mCurrentGizmoOperation = ImGuizmo::ROTATE;
-        else if (keyboard[SDL_SCANCODE_J]) mCurrentGizmoOperation = ImGuizmo::SCALE;
+        if (keyboard[SDL_SCANCODE_G]) currentGizmoOperation = GizmoOperation::TRANSLATE;
+        else if (keyboard[SDL_SCANCODE_H]) currentGizmoOperation = GizmoOperation::ROTATE;
+        else if (keyboard[SDL_SCANCODE_J]) currentGizmoOperation = GizmoOperation::SCALE;
 
-        if (keyboard[SDL_SCANCODE_R]) transformType = ImGuizmo::LOCAL;
-        else if (keyboard[SDL_SCANCODE_T]) transformType = ImGuizmo::WORLD;
+        if (keyboard[SDL_SCANCODE_R]) transformType = GizmoTransform::LOCAL;
+        else if (keyboard[SDL_SCANCODE_T]) transformType = GizmoTransform::WORLD;
     }
+}
+
+ImGuizmo::OPERATION EditorUIModule::GetImGuizmoOperation() const
+{
+    switch (currentGizmoOperation)
+    {
+    case GizmoOperation::TRANSLATE:
+        return ImGuizmo::TRANSLATE;
+    case GizmoOperation::ROTATE:
+        return ImGuizmo::ROTATE;
+    case GizmoOperation::SCALE:
+        return ImGuizmo::SCALE;
+    }
+    return ImGuizmo::TRANSLATE;
+}
+
+ImGuizmo::MODE EditorUIModule::GetImGuizmoTransformMode() const
+{
+    if (transformType == GizmoTransform::LOCAL) return ImGuizmo::LOCAL;
+    else ImGuizmo::WORLD;
 }
 
 void EditorUIModule::AddFramePlotData(float deltaTime)
@@ -640,7 +660,7 @@ bool EditorUIModule::RenderTransformWidget(
     float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform
 )
 {
-    float4x4 outputTransform = float4x4(transformType == ImGuizmo::LOCAL ? localTransform : globalTransform);
+    float4x4 outputTransform = float4x4(transformType == GizmoTransform::LOCAL ? localTransform : globalTransform);
 
     float3 outputScale       = outputTransform.GetScale();
     outputTransform.ScaleCol3(0, outputScale.x != 0 ? 1 / outputScale.x : 1);
@@ -653,7 +673,7 @@ bool EditorUIModule::RenderTransformWidget(
     static bool lockScaleAxis = false;
     float3 originalScale      = float3(outputScale);
 
-    std::string transformName = std::string(transformType == ImGuizmo::LOCAL ? "Local " : "World ") + "Transform";
+    std::string transformName = std::string(transformType == GizmoTransform::LOCAL ? "Local " : "World ") + "Transform";
     ImGui::SeparatorText(transformName.c_str());
 
     RenderBasicTransformModifiers(
@@ -689,7 +709,7 @@ bool EditorUIModule::RenderTransformWidget(
         outputTransform.ScaleCol3(1, outputScale.y);
         outputTransform.ScaleCol3(2, outputScale.z);
 
-        if (transformType == ImGuizmo::WORLD)
+        if (transformType == GizmoTransform::WORLD)
         {
             localTransform = parentTransform.Inverted() * outputTransform;
         }
@@ -717,15 +737,14 @@ bool EditorUIModule::RenderImGuizmo(
     float4x4 transform = float4x4(globalTransform);
     transform.Transpose();
 
-    ImGuizmo::Enable(true);
-    float positionSnap[3] = {1.0f, 1.0f, 1.0f};
-    if (mCurrentGizmoOperation == ImGuizmo::SCALE) positionSnap[0] = positionSnap[1] = positionSnap[2] = 0.1f;
+    ImGuizmo::OPERATION operation = GetImGuizmoOperation();
+    ImGuizmo::MODE mode           = GetImGuizmoTransformMode();
 
+    ImGuizmo::Enable(true);
     ImGuizmo::Manipulate(
-        view.ptr(), proj.ptr(), mCurrentGizmoOperation, transformType, transform.ptr(), nullptr, positionSnap, nullptr,
-        nullptr
+        view.ptr(), proj.ptr(), operation, mode, transform.ptr(), nullptr, snapEnabled ? snapValues.ptr() : nullptr,
+        nullptr, nullptr
     );
-    // Manipulate(view.ptr(), proj.ptr(), mCurrentGizmoOperation, transformType, transform.ptr());
 
     if (!ImGuizmo::IsUsing()) return false;
 
