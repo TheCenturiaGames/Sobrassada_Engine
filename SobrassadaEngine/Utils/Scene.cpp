@@ -235,7 +235,7 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
 
     GizmoTransform& transformType = App->GetEditorUIModule()->GetTransformType();
     int selectedMode              = static_cast<int>(transformType);
-    ImGui::PushItemWidth(150);
+    ImGui::PushItemWidth(100);
     ImGui::RadioButton("L", &selectedMode, 0);
     ImGui::SameLine();
     ImGui::RadioButton("W", &selectedMode, 1);
