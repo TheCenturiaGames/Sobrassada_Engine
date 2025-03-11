@@ -78,6 +78,7 @@ Resource* ResourcesModule::CreateNewResource(UID uid)
     if (loadedResource != nullptr)
     {
         resources.insert(std::pair(uid, loadedResource));
+        loadedResource->AddReference();
         return loadedResource;
     }
     return nullptr;
