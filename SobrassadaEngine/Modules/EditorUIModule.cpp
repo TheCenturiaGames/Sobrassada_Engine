@@ -231,16 +231,10 @@ void EditorUIModule::MainMenu()
         if (ImGui::BeginMenu("Engine Editor Window"))
         {
 
-            if (ImGui::MenuItem("Mockup Base Engine Editor", ""))
-            {
-                
-                OpenEditor(CreateEditor(EditorType::BASE));
-            }
-            if (ImGui::MenuItem("Nodes Engine Editor", ""))
-            {
-
-                OpenEditor(CreateEditor(EditorType::NODES));
-            }
+            if (ImGui::MenuItem("Mockup Base Engine Editor", "")) OpenEditor(CreateEditor(EditorType::BASE));
+            
+            if (ImGui::MenuItem("Nodes Engine Editor", "")) OpenEditor(CreateEditor(EditorType::NODES));
+            
             ImGui::EndMenu();
         }
 
