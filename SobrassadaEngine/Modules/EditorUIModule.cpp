@@ -269,7 +269,7 @@ void EditorUIModule::LoadDialog(bool& load)
     {
         if (!inputFile.empty())
         {
-            std::string loadPath = App->GetProjectModule()->GetLoadedProjectPath() + DELIMITER + SCENES_PATH + inputFile;
+            std::string loadPath = App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PATH + inputFile;
             App->GetLibraryModule()->LoadScene(loadPath.c_str());
         }
         inputFile = "";

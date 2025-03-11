@@ -88,5 +88,4 @@ class SceneModule : public Module
   private:
     Scene* loadedScene = nullptr;
     bool bInPlayMode   = false;
-    const std::string sceneLibraryPath;
 };

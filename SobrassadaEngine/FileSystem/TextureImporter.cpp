@@ -13,7 +13,7 @@ namespace TextureImporter
     UID Import(const char* sourceFilePath, UID sourceUID)
     {
         // Copy image to Assets folder
-        std::string copyPath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
+        std::string copyPath = App->GetProjectModule()->GetLoadedProjectPath() + ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
         if (!FileSystem::Exists(copyPath.c_str()))
         {
             FileSystem::Copy(sourceFilePath, copyPath.c_str());
