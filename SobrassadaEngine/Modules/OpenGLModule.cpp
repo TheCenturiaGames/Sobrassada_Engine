@@ -127,3 +127,9 @@ void OpenGLModule::SetClearBlue(float newValue)
 {
     clearColorBlue = newValue;
 }
+
+void OpenGLModule::SetRenderWireframe(bool renderWireframe)
+{
+    if (renderWireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}

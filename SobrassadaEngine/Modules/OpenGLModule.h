@@ -29,6 +29,7 @@ class OpenGLModule : public Module
     void SetClearRed(float newValue);
     void SetClearGreen(float newValue);
     void SetClearBlue(float newValue);
+    void SetRenderWireframe(bool renderWireframe);
 
   private:
     void* context;

@@ -24,11 +24,13 @@ enum MainState
 Application* App         = NULL;
 std::vector<char*>* Logs = NULL;
 
+// DebugUtils for rendering
 std::map<std::string, bool> debugRenderOptions = {
     {"Bounding Boxes", false},
     {"Octree",         false}
 };
 bool renderLights = true;
+bool renderWireframe = false;
 
 
 int main(int argc, char** argv)
