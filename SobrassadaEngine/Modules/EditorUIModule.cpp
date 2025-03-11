@@ -144,7 +144,7 @@ ImGuizmo::OPERATION EditorUIModule::GetImGuizmoOperation() const
 ImGuizmo::MODE EditorUIModule::GetImGuizmoTransformMode() const
 {
     if (transformType == GizmoTransform::LOCAL) return ImGuizmo::LOCAL;
-    else ImGuizmo::WORLD;
+    else return ImGuizmo::WORLD;
 }
 
 void EditorUIModule::AddFramePlotData(float deltaTime)

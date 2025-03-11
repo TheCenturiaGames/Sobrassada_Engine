@@ -10,7 +10,6 @@
 // #include "Scene/GameObjects/GameObject.h"
 
 #include "imgui.h"
-
 #include <Math/Quat.h>
 
 MeshComponent::MeshComponent(const UID uid, const UID uidParent) : Component(uid, uidParent, "Mesh", COMPONENT_MESH)
