@@ -47,11 +47,11 @@ bool EditorUIModule::Init()
 	ImGui_ImplSDL2_InitForOpenGL(App->GetWindowModule()->window, App->GetOpenGLModule()->GetContext());
 	ImGui_ImplOpenGL3_Init("#version 460");
 
-	width = App->GetWindowModule()->GetWidth();
-	height = App->GetWindowModule()->GetHeight();
+    width      = App->GetWindowModule()->GetWidth();
+    height     = App->GetWindowModule()->GetHeight();
 
-	startPath = std::filesystem::current_path().string();
-	scenesPath = startPath + DELIMITER + SCENES_PATH;
+    startPath  = std::filesystem::current_path().string();
+    scenesPath = startPath + DELIMITER + SCENES_PATH;
 
 	return true;
 }
@@ -172,6 +172,8 @@ void EditorUIModule::Draw()
 
 	if (loadMenu) LoadDialog(loadMenu);
 
+    if (loadModel) LoadModelDialog(loadModel);
+
 	if (saveMenu) SaveDialog(saveMenu);
 
 	if (editorSettingsMenu) EditorSettings(editorSettingsMenu);
@@ -225,8 +227,24 @@ void EditorUIModule::MainMenu()
 
 		if (ImGui::MenuItem("About", "", aboutMenu)) aboutMenu = !aboutMenu;
 
-		ImGui::EndMenu();
-	}
+        ImGui::EndMenu();
+    }
+
+    // Menu window to load files into scene (useful while a window with the
+    // resources to drag and drop does not exist)
+    if (App->GetSceneModule()->GetSceneUID() != INVALID_UUID)
+    {
+        if (ImGui::BeginMenu("Resource Loader"))
+        {
+            if (ImGui::MenuItem("Load Model"))
+            {
+                loadModel = !loadModel;
+                ImGui::OpenPopup(CONSTANT_MODEL_SELECT_DIALOG_ID);
+            }
+
+            ImGui::EndMenu();
+        }
+    }
 
 	ImGui::EndMainMenuBar();
 }
@@ -294,6 +312,48 @@ void EditorUIModule::LoadDialog(bool& loadMenu)
 	}
 
 	ImGui::End();
+}
+
+void EditorUIModule::LoadModelDialog(bool& loadModel)
+{
+    ImGui::SetNextWindowSize(ImVec2(width * 0.25f, height * 0.4f), ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin("Load Model", &loadModel, ImGuiWindowFlags_NoCollapse))
+    {
+        ImGui::End();
+        return;
+    }
+
+    static UID modelUid         = INVALID_UUID;
+    static char searchText[255] = "";
+    ImGui::InputText("Search", searchText, 255);
+
+    ImGui::Separator();
+    if (ImGui::BeginListBox("##ModelsList", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
+    {
+        static int selected = -1;
+        int i               = 0;
+        for (const auto& valuePair : App->GetLibraryModule()->GetModelMap())
+        {
+            ++i;
+            if (valuePair.first.find(searchText) != std::string::npos)
+            {
+                if (ImGui::Selectable(valuePair.first.c_str(), selected == i))
+                {
+                    selected = i;
+                    modelUid = valuePair.second;
+                }
+            }
+        }
+        ImGui::EndListBox();
+    }
+
+    if (ImGui::Button("Ok"))
+    {
+        App->GetSceneModule()->LoadModel(modelUid);
+    }
+
+    ImGui::End();
 }
 
 void EditorUIModule::SaveDialog(bool& saveMenu)
@@ -680,6 +740,14 @@ bool EditorUIModule::RenderImGuizmo(
 	return true;
 }
 
+template UID EditorUIModule::RenderResourceSelectDialog<UID>(
+    const char* id, const std::unordered_map<std::string, UID>& availableResources, const UID& defaultResource
+);
+template ComponentType EditorUIModule::RenderResourceSelectDialog<ComponentType>(
+    const char* id, const std::unordered_map<std::string, ComponentType>& availableResources,
+    const ComponentType& defaultResource
+);
+
 void EditorUIModule::RenderBasicTransformModifiers(
 	float3& outputPosition, float3& outputRotation, float3& outputScale, bool& lockScaleAxis,
 	bool& positionValueChanged, bool& rotationValueChanged, bool& scaleValueChanged
@@ -705,15 +773,16 @@ void EditorUIModule::RenderBasicTransformModifiers(
 	ImGui::Checkbox("Lock axis", &lockScaleAxis);
 }
 
-UID EditorUIModule::RenderResourceSelectDialog(
-	const char* id, const std::unordered_map<std::string, UID>& availableResources
+template <typename T>
+T EditorUIModule::RenderResourceSelectDialog(
+    const char* id, const std::unordered_map<std::string, T>& availableResources, const T& defaultResource
 )
 {
-	UID result = CONSTANT_EMPTY_UID;
-	if (ImGui::BeginPopup(id))
-	{
-		static char searchText[255] = "";
-		ImGui::InputText("Search", searchText, 255);
+    T result = defaultResource;
+    if (ImGui::BeginPopup(id))
+    {
+        static char searchText[255] = "";
+        ImGui::InputText("Search", searchText, 255);
 
 		ImGui::Separator();
 		if (ImGui::BeginListBox("##ComponentList", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))

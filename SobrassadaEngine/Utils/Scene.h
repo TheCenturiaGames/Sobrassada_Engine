@@ -10,19 +10,23 @@
 class GameObject;
 class Component;
 class RootComponent;
-class AABBUpdatable;
 class Octree;
 
 class Scene
 {
   public:
-    Scene(UID sceneUID, const char* sceneName, UID rootGameObject);
+    Scene(const char* sceneName);
+    Scene(const rapidjson::Value& initialState, UID loadedSceneUID);
+
     ~Scene();
 
-    void LoadComponents(const std::map<UID, Component*>& loadedGameComponents);
+    void Init();
+    void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
+
+    void LoadComponents() const;
     void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
 
-    update_status Render(float deltaTime);
+    update_status Render(float deltaTime) const;
     update_status RenderEditor(float deltaTime);
 
     void RenderEditorControl(bool& editorControlMenu);
@@ -33,32 +37,32 @@ class Scene
     void UpdateSpatialDataStruct();
 
     void AddGameObject(UID uid, GameObject* newGameObject) { gameObjectsContainer.insert({uid, newGameObject}); }
-    void AddComponent(UID uid, Component* newComponent) { gameComponents.insert({uid, newComponent}); }
     void RemoveGameObjectHierarchy(UID gameObjectUUID);
-    void RemoveComponent(UID componentUID);
 
-    const char* GetSceneName() const { return sceneName.c_str(); }
+    const char* GetSceneName() const { return sceneName; }
     UID GetSceneUID() const { return sceneUID; }
     UID GetGameObjectRootUID() const { return gameObjectRootUID; }
     GameObject* GetSelectedGameObject() { return GetGameObjectByUID(selectedGameObjectUID); }
 
     const std::unordered_map<UID, GameObject*>& GetAllGameObjects() const { return gameObjectsContainer; }
-    const std::map<UID, Component*>& GetAllComponents() const { return gameComponents; }
 
     GameObject* GetGameObjectByUID(UID gameObjectUID); // TODO: Change when filesystem defined
-    Component* GetComponentByUID(UID componentUID);
 
-    AABBUpdatable* GetTargetForAABBUpdate(UID uid);
     LightsConfig* GetLightsConfig() { return lightsConfig; }
 
     const std::tuple<float, float>& GetWindowPosition() const { return sceneWindowPosition; };
     const std::tuple<float, float>& GetWindowSize() const { return sceneWindowSize; };
     const std::tuple<float, float>& GetMousePosition() const { return mousePosition; };
     const Octree* GetOctree() const { return sceneOctree; }
-    bool GetStopPlaying() const { return stopPlaying; }
-    bool GetDoInputs() const { return doInputs; }
 
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
+
+    bool GetDoInputs() const { return doInputs; }
+    bool GetStopPlaying() const { return stopPlaying; }
+    void LoadModel(const UID modelUID);
+
+    const std::unordered_map<UID, Component*> GetAllComponents() const;
+
     void SetStopPlaying(bool stop) { stopPlaying = stop; }
 
   private:
@@ -66,13 +70,12 @@ class Scene
     void CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects) const;
 
   private:
-    std::string sceneName;
-    UID sceneUID;
+    char sceneName[64];
+    const UID sceneUID;
     UID gameObjectRootUID;
     UID selectedGameObjectUID;
     bool stopPlaying = false;
 
-    std::map<UID, Component*> gameComponents; // TODO Move components to individual gameObjects
     std::unordered_map<UID, GameObject*> gameObjectsContainer;
 
     LightsConfig* lightsConfig                   = nullptr;
@@ -82,5 +85,5 @@ class Scene
     std::tuple<float, float> sceneWindowPosition = std::make_tuple(0.f, 0.f);
     std::tuple<float, float> sceneWindowSize     = std::make_tuple(0.f, 0.f);
     std::tuple<float, float> mousePosition       = std::make_tuple(0.f, 0.f);
-    bool doInputs = false;
+    bool doInputs                                = false;
 };

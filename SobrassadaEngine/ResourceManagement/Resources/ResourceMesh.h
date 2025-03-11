@@ -20,7 +20,7 @@ class ResourceMesh : public Resource
     ResourceMesh(UID uid, const std::string& name, const float3& maxPos, const float3& minPos);
     ~ResourceMesh() override;
 
-    void Render(int program, const float4x4& modelMatrix, unsigned int cameraUBO, ResourceMaterial* material);
+    void Render(int program, const float4x4& modelMatrix, unsigned int cameraUBO, const ResourceMaterial* material) const;
     void LoadData(unsigned int mode, const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices);
 
     const AABB& GetAABB() const { return aabb; }

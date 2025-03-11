@@ -283,8 +283,8 @@ void CameraModule::RotateCamera(float yaw, float pitch)
 
 void CameraModule::FocusCamera()
 {
-	AABB focusedObjectAABB = App->GetSceneModule()->GetSelectedGameObject()->GetAABB();
-	float3 center = focusedObjectAABB.CenterPoint();
+    AABB focusedObjectAABB = App->GetSceneModule()->GetSelectedGameObject()->GetGlobalAABB();
+    float3 center          = focusedObjectAABB.CenterPoint();
 
 	if (IsNan(center.x))
 	{

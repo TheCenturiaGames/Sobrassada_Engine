@@ -66,7 +66,7 @@ void ResourceMesh::LoadData(
     this->indices = indices;
 }
 
-void ResourceMesh::Render(int program, const float4x4& modelMatrix, unsigned int cameraUBO, ResourceMaterial* material)
+void ResourceMesh::Render(int program, const float4x4& modelMatrix, unsigned int cameraUBO, const ResourceMaterial* material) const
 {
     glUseProgram(program);
 
