@@ -151,6 +151,7 @@
     <ClCompile Include="FileSystem\MetaTexture.cpp" />
     <ClCompile Include="Modules\CameraModule.cpp" />
     <ClCompile Include="Modules\EditorUIModule.cpp" />
+    <ClCompile Include="Modules\ProjectModule.cpp" />
     <ClCompile Include="Utils\EngineTimer.cpp" />
     <ClCompile Include="FileSystem\Importer.cpp" />
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp" />
@@ -485,6 +486,7 @@
     <ClInclude Include="FileSystem\MetaTexture.h" />
     <ClInclude Include="Modules\CameraModule.h" />
     <ClInclude Include="Modules\EditorUIModule.h" />
+    <ClInclude Include="Modules\ProjectModule.h" />
     <ClInclude Include="Modules\ResourcesModule.h" />
     <ClInclude Include="Modules\SceneModule.h" />
     <ClInclude Include="FileSystem\ModelImporter.h" />

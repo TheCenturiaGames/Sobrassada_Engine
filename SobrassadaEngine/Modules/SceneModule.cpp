@@ -3,6 +3,7 @@
 #include "ComponentUtils.h"
 #include "EditorUIModule.h"
 #include "LibraryModule.h"
+#include "ProjectModule.h"
 #include "Octree.h"
 
 #define TINYGLTF_NO_STB_IMAGE_WRITE
@@ -126,7 +127,7 @@ void SceneModule::SwitchPlayModeStateTo(bool wantedStatePlayMode)
         if (loadedScene != nullptr)
         {
             bInPlayMode = !App->GetLibraryModule()->LoadScene(
-                std::string(SCENES_PATH + std::string(loadedScene->GetSceneName()) + SCENE_EXTENSION).c_str(), true
+                std::string(App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PATH + std::string(loadedScene->GetSceneName()) + SCENE_EXTENSION).c_str(), true
             );
         }
     }
@@ -134,7 +135,7 @@ void SceneModule::SwitchPlayModeStateTo(bool wantedStatePlayMode)
     {
         if (loadedScene != nullptr)
         {
-            bInPlayMode = App->GetLibraryModule()->SaveScene(sceneLibraryPath.c_str(), SaveMode::Save);
+            bInPlayMode = App->GetLibraryModule()->SaveScene((App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PATH).c_str(), SaveMode::Save);
         }
     }
 }

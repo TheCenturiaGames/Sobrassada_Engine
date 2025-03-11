@@ -5,6 +5,7 @@
 #include "LibraryModule.h"
 #include "Material.h"
 #include "MetaMaterial.h"
+#include "ProjectModule.h"
 #include "TextureImporter.h"
 
 #include <FileSystem>
@@ -160,7 +161,7 @@ UID MaterialImporter::ImportMaterial(
         UID tmpName               = GenerateUID();
         std::string tmpNameString = std::to_string(tmpName);
 
-        std::string assetPath     = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
+        std::string assetPath     = App->GetProjectModule()->GetLoadedProjectPath() + ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
         MetaMaterial meta(finalMaterialUID, assetPath, tmpNameString, useOcclusion);
         meta.Save(materialName, assetPath);
     }
@@ -168,7 +169,7 @@ UID MaterialImporter::ImportMaterial(
 
     material.SetMaterialUID(finalMaterialUID);
 
-    std::string saveFilePath  = MATERIALS_PATH + std::to_string(finalMaterialUID) + MATERIAL_EXTENSION;
+    std::string saveFilePath  = App->GetProjectModule()->GetLoadedProjectPath() + MATERIALS_PATH + std::to_string(finalMaterialUID) + MATERIAL_EXTENSION;
     unsigned int bytesWritten = (unsigned int)FileSystem::Save(saveFilePath.c_str(), fileBuffer, size, true);
 
     delete[] fileBuffer;

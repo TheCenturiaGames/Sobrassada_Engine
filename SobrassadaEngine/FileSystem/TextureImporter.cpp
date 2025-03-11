@@ -4,6 +4,7 @@
 #include "FileSystem.h"
 #include "LibraryModule.h"
 #include "MetaTexture.h"
+#include "ProjectModule.h"
 #include "glew.h"
 #include <string>
 
@@ -12,7 +13,7 @@ namespace TextureImporter
     UID Import(const char* sourceFilePath, UID sourceUID)
     {
         // Copy image to Assets folder
-        std::string copyPath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
+        std::string copyPath = App->GetProjectModule()->GetLoadedProjectPath() + ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
         if (!FileSystem::Exists(copyPath.c_str()))
         {
             FileSystem::Copy(sourceFilePath, copyPath.c_str());
@@ -62,7 +63,7 @@ namespace TextureImporter
         }
         else finalTextureUID = sourceUID;
 
-        std::string saveFilePath = TEXTURES_PATH + std::to_string(finalTextureUID) + TEXTURE_EXTENSION;
+        std::string saveFilePath = App->GetProjectModule()->GetLoadedProjectPath() + TEXTURES_PATH + std::to_string(finalTextureUID) + TEXTURE_EXTENSION;
         unsigned int bytesWritten =
             FileSystem::Save(saveFilePath.c_str(), blob.GetBufferPointer(), (unsigned int)blob.GetBufferSize());
 

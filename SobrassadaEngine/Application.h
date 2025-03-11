@@ -12,6 +12,7 @@ class InputModule;
 class ShaderModule;
 class LibraryModule;
 class EditorUIModule;
+class ProjectModule;
 class SceneModule;
 class CameraModule;
 class DebugDrawModule;
@@ -36,6 +37,7 @@ class Application
     ShaderModule* GetShaderModule() { return shaderModule; }
     LibraryModule* GetLibraryModule() { return libraryModule; }
     EditorUIModule* GetEditorUIModule() { return editorUIModule; };
+    ProjectModule* GetProjectModule() { return projectModule; };
     SceneModule* GetSceneModule() { return sceneModule; }
     CameraModule* GetCameraModule() { return cameraModule; }
     DebugDrawModule* GetDebugDrawModule() { return debugDraw; }
@@ -53,6 +55,7 @@ class Application
     ShaderModule* shaderModule       = nullptr;
     LibraryModule* libraryModule     = nullptr;
     EditorUIModule* editorUIModule   = nullptr;
+    ProjectModule* projectModule     = nullptr;
     SceneModule* sceneModule         = nullptr;
     CameraModule* cameraModule       = nullptr;
     DebugDrawModule* debugDraw       = nullptr;

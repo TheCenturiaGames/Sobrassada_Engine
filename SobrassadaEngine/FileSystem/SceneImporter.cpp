@@ -1,8 +1,10 @@
 #include "SceneImporter.h"
 
+#include "Application.h"
 #include "FileSystem.h"
 #include "MaterialImporter.h"
 #include "MeshImporter.h"
+#include "ProjectModule.h"
 #include "TextureImporter.h"
 #include "ModelImporter.h"
 
@@ -84,7 +86,7 @@ namespace SceneImporter
 
         {
             // Copy gltf to Assets folder
-            std::string copyPath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(filePath);
+            std::string copyPath = App->GetProjectModule()->GetLoadedProjectPath() + ASSETS_PATH + FileSystem::GetFileNameWithExtension(filePath);
             if (!FileSystem::Exists(copyPath.c_str())) FileSystem::Copy(filePath, copyPath.c_str());
         }
         {
@@ -94,7 +96,7 @@ namespace SceneImporter
             for (const auto& srcBuffers : model.buffers)
             {
                 std::string binPath     = path + srcBuffers.uri;
-                std::string copyBinPath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(binPath);
+                std::string copyBinPath = App->GetProjectModule()->GetLoadedProjectPath() + ASSETS_PATH + FileSystem::GetFileNameWithExtension(binPath);
                 if (!FileSystem::Exists(copyBinPath.c_str())) FileSystem::Copy(binPath.c_str(), copyBinPath.c_str());
             }
         }
@@ -140,67 +142,76 @@ namespace SceneImporter
 
     void CreateLibraryDirectories()
     {
-        if (!FileSystem::IsDirectory(ASSETS_PATH))
+        const std::string convertedAssetPath = App->GetProjectModule()->GetLoadedProjectPath() + ASSETS_PATH;
+        if (!FileSystem::IsDirectory(convertedAssetPath.c_str()))
         {
-            if (!FileSystem::CreateDirectories(ASSETS_PATH))
+            if (!FileSystem::CreateDirectories(convertedAssetPath.c_str()))
             {
-                GLOG("Failed to create directory: %s", ASSETS_PATH);
+                GLOG("Failed to create directory: %s", convertedAssetPath.c_str());
             }
         }
-        if (!FileSystem::IsDirectory(METADATA_PATH))
+        const std::string convertedMetadataPath = App->GetProjectModule()->GetLoadedProjectPath() + METADATA_PATH;
+        if (!FileSystem::IsDirectory(convertedMetadataPath.c_str()))
         {
-            if (!FileSystem::CreateDirectories(METADATA_PATH))
+            if (!FileSystem::CreateDirectories(convertedMetadataPath.c_str()))
             {
-                GLOG("Failed to create directory: %s", METADATA_PATH);
+                GLOG("Failed to create directory: %s", convertedMetadataPath.c_str());
             }
         }
-        if (!FileSystem::IsDirectory(ANIMATIONS_PATH))
+        const std::string convertedAnimationsPath = App->GetProjectModule()->GetLoadedProjectPath() + ANIMATIONS_PATH;
+        if (!FileSystem::IsDirectory(convertedAnimationsPath.c_str()))
         {
-            if (!FileSystem::CreateDirectories(ANIMATIONS_PATH))
+            if (!FileSystem::CreateDirectories(convertedAnimationsPath.c_str()))
             {
-                GLOG("Failed to create directory: %s", ANIMATIONS_PATH);
+                GLOG("Failed to create directory: %s", convertedAnimationsPath.c_str());
             }
         }
-        if (!FileSystem::IsDirectory(AUDIO_PATH))
+        const std::string convertedAudioPath = App->GetProjectModule()->GetLoadedProjectPath() + AUDIO_PATH;
+        if (!FileSystem::IsDirectory(convertedAudioPath.c_str()))
         {
-            if (!FileSystem::CreateDirectories(AUDIO_PATH))
+            if (!FileSystem::CreateDirectories(convertedAudioPath.c_str()))
             {
-                GLOG("Failed to create directory: %s", AUDIO_PATH);
+                GLOG("Failed to create directory: %s", convertedAudioPath.c_str());
             }
         }
-        if (!FileSystem::IsDirectory(MODELS_PATH))
+        const std::string convertedBonesPath = App->GetProjectModule()->GetLoadedProjectPath() + MODELS_PATH;
+        if (!FileSystem::IsDirectory(convertedBonesPath.c_str()))
         {
-            if (!FileSystem::CreateDirectories(MODELS_PATH))
+            if (!FileSystem::CreateDirectories(convertedBonesPath.c_str()))
             {
-                GLOG("Failed to create directory: %s", MODELS_PATH);
+                GLOG("Failed to create directory: %s", convertedBonesPath.c_str());
             }
         }
-        if (!FileSystem::IsDirectory(MESHES_PATH))
+        const std::string convertedMeshesPath = App->GetProjectModule()->GetLoadedProjectPath() + MESHES_PATH;
+        if (!FileSystem::IsDirectory(convertedMeshesPath.c_str()))
         {
-            if (!FileSystem::CreateDirectories(MESHES_PATH))
+            if (!FileSystem::CreateDirectories(convertedMeshesPath.c_str()))
             {
-                GLOG("Failed to create directory: %s", MESHES_PATH);
+                GLOG("Failed to create directory: %s", convertedMeshesPath.c_str());
             }
         }
-        if (!FileSystem::IsDirectory(TEXTURES_PATH))
+        const std::string convertedTexturesPath = App->GetProjectModule()->GetLoadedProjectPath() + TEXTURES_PATH;
+        if (!FileSystem::IsDirectory(convertedTexturesPath.c_str()))
         {
-            if (!FileSystem::CreateDirectories(TEXTURES_PATH))
+            if (!FileSystem::CreateDirectories(convertedTexturesPath.c_str()))
             {
-                GLOG("Failed to create directory: %s", TEXTURES_PATH);
+                GLOG("Failed to create directory: %s", convertedTexturesPath.c_str());
             }
         }
-        if (!FileSystem::IsDirectory(MATERIALS_PATH))
+        const std::string convertedMaterialsPath = App->GetProjectModule()->GetLoadedProjectPath() + MATERIALS_PATH;
+        if (!FileSystem::IsDirectory(convertedMaterialsPath.c_str()))
         {
-            if (!FileSystem::CreateDirectories(MATERIALS_PATH))
+            if (!FileSystem::CreateDirectories(convertedMaterialsPath.c_str()))
             {
-                GLOG("Failed to create directory: %s", MATERIALS_PATH);
+                GLOG("Failed to create directory: %s", convertedMaterialsPath.c_str());
             }
         }
-        if (!FileSystem::IsDirectory(SCENES_PATH))
+        const std::string convertedScenesPath = App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PATH;
+        if (!FileSystem::IsDirectory(convertedScenesPath.c_str()))
         {
-            if (!FileSystem::CreateDirectories(SCENES_PATH))
+            if (!FileSystem::CreateDirectories(convertedScenesPath.c_str()))
             {
-                GLOG("Failed to create directory: %s", SCENES_PATH);
+                GLOG("Failed to create directory: %s", convertedScenesPath.c_str());
             }
         }
     }
