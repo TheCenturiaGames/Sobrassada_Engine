@@ -2,11 +2,11 @@
 
 #include "document.h"
 #include "istreamwrapper.h"
-#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <sys/stat.h>
 #if defined(_WIN32) || defined(_WIN64)
 #include <Windows.h>
 #elif defined(__linux__) || defined(__APPLE__)
@@ -100,7 +100,7 @@ namespace FileSystem
 
         std::error_code errorCode;
         std::filesystem::copy(
-            sourceFilePath, destinationFilePath, std::filesystem::copy_options::overwrite_existing, errorCode
+            sourceFilePath, destinationFilePath, std::filesystem::copy_options::update_existing, errorCode
         );
 
         if (errorCode)
@@ -160,6 +160,24 @@ namespace FileSystem
         }
     }
 
+    void GetFilesSorted(const std::string& currentPath, std::vector<std::string>& files)
+    {
+        // files & dir in the current directory
+        GetAllInDirectory(currentPath, files);
+
+        std::sort(
+            files.begin(), files.end(),
+            [&](const std::string& a, const std::string& b)
+            {
+                bool isDirA = FileSystem::IsDirectory((currentPath + DELIMITER + a).c_str());
+                bool isDirB = FileSystem::IsDirectory((currentPath + DELIMITER + b).c_str());
+
+                if (isDirA != isDirB) return isDirA > isDirB;
+                return a < b;
+            }
+        );
+    }
+
     void SplitAccumulatedPath(const std::string& path, std::vector<std::string>& accPaths)
     {
         accPaths.clear();
@@ -179,5 +197,18 @@ namespace FileSystem
                 accPaths.push_back(accumulatedPath);
             }
         }
+    }
+
+    time_t GetLastModifiedTime(const std::string& path)
+    {
+        struct stat fileInfo;
+
+        if (stat(path.c_str(), &fileInfo) != 0)
+        {
+            return 0;
+        }
+
+        return fileInfo.st_mtime; 
+
     }
 } // namespace FileSystem

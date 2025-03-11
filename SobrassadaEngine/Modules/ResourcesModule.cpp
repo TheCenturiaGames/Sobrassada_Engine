@@ -18,11 +18,7 @@ ResourcesModule::ResourcesModule()
 
 ResourcesModule::~ResourcesModule()
 {
-    for (auto resource : resources)
-    {
-        delete resource.second;
-    }
-    resources.clear();
+    
 }
 
 bool ResourcesModule::Init()
@@ -35,6 +31,11 @@ bool ResourcesModule::Init()
 
 bool ResourcesModule::ShutDown()
 {
+    for (auto resource : resources)
+    {
+        delete resource.second;
+    }
+    resources.clear();
     return true;
 }
 

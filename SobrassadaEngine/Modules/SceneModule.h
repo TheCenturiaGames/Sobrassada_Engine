@@ -3,15 +3,12 @@
 #include "Globals.h"
 #include "LightsConfig.h"
 #include "Module.h"
-#include "Scene/AABBUpdatable.h"
 // TMP
-#include "Application.h"
 #include "CameraModule.h"
-#include "DebugDrawModule.h"
 #include "Scene.h"
 
 #include <map>
-#include <string>
+#include <tuple>
 #include <unordered_map>
 
 class GameObject;
@@ -33,28 +30,23 @@ class SceneModule : public Module
     bool ShutDown() override;
 
     void CreateScene();
-    void LoadScene(
-        UID sceneUID, const char* sceneName, UID rootGameObject, const std::map<UID, Component*>& loadedGameComponents
-    );
+    void LoadScene(const rapidjson::Value& initialState, bool forceReload = false);
     void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
+    void LoadComponents(const std::map<UID, Component*>& loadedGameComponents);
     void CloseScene();
-    void CheckObjectsToRender();
+
+    void LoadModel(const UID modelUID) { loadedScene != nullptr ? loadedScene->LoadModel(modelUID) : void(); }
+
+    //void CheckObjectsToRender();
     void SwitchPlayModeStateTo(bool wantedStatePlayMode);
+    bool IsInPlayMode() const { return bInPlayMode; }
 
     void AddGameObject(UID uid, GameObject* newGameObject) const
     {
         loadedScene != nullptr ? loadedScene->AddGameObject(uid, newGameObject) : void();
     }
-    void AddComponent(UID uid, Component* newComponent) const
-    {
-        loadedScene != nullptr ? loadedScene->AddComponent(uid, newComponent) : void();
-    }
-    void RegenerateTree() { loadedScene->UpdateSpatialDataStruct(); };
 
-    void RemoveComponent(UID componentUID) const
-    {
-        loadedScene != nullptr ? loadedScene->RemoveComponent(componentUID) : void();
-    }
+    void RegenerateTree() const { loadedScene->UpdateSpatialDataStruct(); }
 
     void RenderHierarchyUI(bool& hierarchyMenu) const
     {
@@ -68,11 +60,7 @@ class SceneModule : public Module
 
     GameObject* GetGameObjectByUUID(UID gameObjectUUID) const
     {
-        return loadedScene != nullptr ? loadedScene->GetGameObjectByUUID(gameObjectUUID) : nullptr;
-    }
-    Component* GetComponentByUID(UID componentUID) const
-    {
-        return loadedScene != nullptr ? loadedScene->GetComponentByUID(componentUID) : nullptr;
+        return loadedScene != nullptr ? loadedScene->GetGameObjectByUID(gameObjectUUID) : nullptr;
     }
 
     GameObject* GetSeletedGameObject() const
@@ -84,28 +72,25 @@ class SceneModule : public Module
     {
         return loadedScene != nullptr ? &loadedScene->GetAllGameObjects() : nullptr;
     }
-    const std::map<UID, Component*>* GetAllComponents() const
-    {
-        return loadedScene != nullptr ? &loadedScene->GetAllComponents() : nullptr;
-    }
+
     UID GetGameObjectRootUID() const
     {
         return loadedScene != nullptr ? loadedScene->GetGameObjectRootUID() : CONSTANT_EMPTY_UID;
     }
 
-    AABBUpdatable* GetTargetForAABBUpdate(UID uuid) const
-    {
-        return loadedScene != nullptr ? loadedScene->GetTargetForAABBUpdate(uuid) : nullptr;
-    }
-
     UID GetSceneUID() const { return loadedScene != nullptr ? loadedScene->GetSceneUID() : CONSTANT_EMPTY_UID; }
     const char* GetSceneName() const { return loadedScene != nullptr ? loadedScene->GetSceneName() : "Not loaded"; }
-    bool IsInPlayMode() const { return bInPlayMode; }
     LightsConfig* GetLightsConfig() { return loadedScene != nullptr ? loadedScene->GetLightsConfig() : nullptr; }
+    const std::tuple<float, float>& GetWindowPosition() const { return loadedScene->GetWindowPosition(); };
+    const std::tuple<float, float>& GetWindowSize() const { return loadedScene->GetWindowSize(); };
+    const std::tuple<float, float>& GetMousePosition() const { return loadedScene->GetMousePosition(); };
+
+    Scene* GetScene() const { return loadedScene; }
 
     bool GetDoInputs() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() : false; }
 
   private:
     Scene* loadedScene = nullptr;
     bool bInPlayMode   = false;
+    const std::string sceneLibraryPath;
 };

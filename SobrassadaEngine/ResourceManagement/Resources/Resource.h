@@ -5,12 +5,14 @@
 #include <cstdint>
 #include <string>
 
+// order matters
 enum class ResourceType
 {
     Unknown = 10,
-    Texture,
-    Material,
-    Mesh,
+    Mesh,      // 11
+    Texture,   // 12
+    Material,  // 13
+    Model      // 14
 };
 
 class Resource
@@ -26,7 +28,7 @@ class Resource
     const std::string& GetName() const { return name; }
     ResourceType GetType() const { return type; }
     unsigned int GetReferenceCount() const { return referenceCount; }
-    static ResourceType GetResourceTypeForUID(UID uid) { return static_cast<ResourceType>(uid / 100000000000000); }
+    static ResourceType GetResourceTypeForUID(UID uid) { return static_cast<ResourceType>(uid / UID_PREFIX_DIVISOR); }
 
   protected:
     UID uid = CONSTANT_EMPTY_UID;
