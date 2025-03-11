@@ -66,6 +66,7 @@ class EditorUIModule : public Module
     void SaveDialog(bool& save);
     void Console(bool& consoleMenu) const;
     void About(bool& aboutMenu) const;
+    std::string FormatWithCommas(unsigned int number) const;
 
     void LoadModelDialog(bool& loadModel);
 

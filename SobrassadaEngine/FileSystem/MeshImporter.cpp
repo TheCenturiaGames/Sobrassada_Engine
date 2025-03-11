@@ -331,6 +331,7 @@ namespace MeshImporter
 
         // added mesh to meshes map
         App->GetLibraryModule()->AddMesh(finalMeshUID, name);
+        App->GetLibraryModule()->AddName(name, finalMeshUID);
         App->GetLibraryModule()->AddResource(saveFilePath, finalMeshUID);
 
         GLOG("%s saved as binary", name.c_str());

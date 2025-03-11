@@ -13,6 +13,18 @@ struct Vertex
     float4 weights;
     float3 normal;
     float2 texCoord;
+
+    Vertex& operator=(const Vertex& other)
+    {
+        if (this != &other)
+        {
+            position = other.position;
+            tangent  = other.tangent;
+            normal   = other.normal;
+            texCoord = other.texCoord;
+        }
+        return *this;
+    }
 };
 
 class Mesh

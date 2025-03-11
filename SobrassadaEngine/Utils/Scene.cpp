@@ -6,6 +6,7 @@
 #include "Framebuffer.h"
 #include "GameObject.h"
 #include "GameTimer.h"
+#include "Importer.h"
 #include "InputModule.h"
 #include "LibraryModule.h"
 #include "Octree.h"
@@ -17,12 +18,11 @@
 #include "Scene/Components/Standalone/MeshComponent.h"
 #include "SceneModule.h"
 
+#include "SDL_mouse.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 // guizmo after imgui include
 #include "./Libs/ImGuizmo/ImGuizmo.h"
-#include "Importer.h"
-#include "SDL_mouse.h"
 
 Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 {
@@ -460,7 +460,6 @@ void Scene::LoadModel(const UID modelUID)
         for (int i = 1; i < nodes.size(); ++i)
         {
             GameObject* gameObject = new GameObject(gameObjectsArray[nodes[i].parentIndex]->GetUID(), nodes[i].name);
-
             gameObject->SetLocalTransform(nodes[i].transform);
 
             gameObjectsArray.emplace_back(gameObject);
