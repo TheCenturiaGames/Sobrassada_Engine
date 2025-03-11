@@ -148,6 +148,13 @@ namespace SceneImporter
                 GLOG("Failed to create directory: %s", ASSETS_PATH);
             }
         }
+        if (!FileSystem::IsDirectory(SCENES_PATH))
+        {
+            if (!FileSystem::CreateDirectories(SCENES_PATH))
+            {
+                GLOG("Failed to create directory: %s", SCENES_PATH);
+            }
+        }
         if (!FileSystem::IsDirectory(METADATA_PATH))
         {
             if (!FileSystem::CreateDirectories(METADATA_PATH))
@@ -183,6 +190,13 @@ namespace SceneImporter
                 GLOG("Failed to create directory: %s", MESHES_PATH);
             }
         }
+        if (!FileSystem::IsDirectory(SCENES_PLAY_PATH))
+        {
+            if (!FileSystem::CreateDirectories(SCENES_PLAY_PATH))
+            {
+                GLOG("Failed to create directory: %s", SCENES_PLAY_PATH);
+            }
+        }
         if (!FileSystem::IsDirectory(TEXTURES_PATH))
         {
             if (!FileSystem::CreateDirectories(TEXTURES_PATH))
@@ -197,12 +211,6 @@ namespace SceneImporter
                 GLOG("Failed to create directory: %s", MATERIALS_PATH);
             }
         }
-        if (!FileSystem::IsDirectory(SCENES_PATH))
-        {
-            if (!FileSystem::CreateDirectories(SCENES_PATH))
-            {
-                GLOG("Failed to create directory: %s", SCENES_PATH);
-            }
-        }
+
     }
 }; // namespace SceneImporter

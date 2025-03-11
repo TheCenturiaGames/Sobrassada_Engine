@@ -21,7 +21,10 @@ class Scene
     ~Scene();
 
     void Init();
-    void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
+    void Save(
+        rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator, UID saveUID = INVALID_UID,
+        const std::string& newName = ""
+    ) const;
 
     void LoadComponents() const;
     void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
@@ -63,8 +66,6 @@ class Scene
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
 
     void SetStopPlaying(bool stop) { stopPlaying = stop; }
-
-    void SetSceneName(const char* newName) { memcpy(sceneName, newName, strlen(newName)); }
 
   private:
     void CreateSpatialDataStruct();

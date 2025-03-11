@@ -83,7 +83,6 @@ class EditorUIModule : public Module
     bool loadModel              = false;
     bool aboutMenu              = false;
     bool editorSettingsMenu     = false;
-    bool quadtreeViewerViewport = false;
     bool closeScene             = false;
     bool closeApplication       = false;
 

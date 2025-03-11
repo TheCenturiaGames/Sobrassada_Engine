@@ -27,7 +27,7 @@
 
 Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 {
-    SetSceneName(sceneName);
+    memcpy(this->sceneName, sceneName, strlen(sceneName));
 
     GameObject* sceneGameObject = new GameObject("SceneModule GameObject");
     selectedGameObjectUID = gameObjectRootUID = sceneGameObject->GetUID();
@@ -40,7 +40,7 @@ Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUID(loadedSceneUID)
 {
     const char* initName = initialState["Name"].GetString();
-    SetSceneName(initName);
+    memcpy(this->sceneName, initName, strlen(initName));
     gameObjectRootUID     = initialState["RootGameObject"].GetUint64();
     selectedGameObjectUID = gameObjectRootUID;
 
@@ -97,11 +97,21 @@ void Scene::Init()
     UpdateSpatialDataStruct();
 }
 
-void Scene::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
+void Scene::Save(
+    rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator, UID newUID, const std::string& newName
+) const
 {
-    // Create structure
-    targetState.AddMember("UID", sceneUID, allocator);
-    targetState.AddMember("Name", rapidjson::Value(sceneName, allocator), allocator);
+    if (newUID != INVALID_UID)
+    {
+        targetState.AddMember("UID", newUID, allocator);
+        targetState.AddMember("Name", rapidjson::Value(newName.c_str(), allocator), allocator);
+    }
+    else
+    {
+        targetState.AddMember("UID", sceneUID, allocator);
+        targetState.AddMember("Name", rapidjson::Value(sceneName, allocator), allocator);
+    }
+
     targetState.AddMember("RootGameObject", gameObjectRootUID, allocator);
 
     // Serialize GameObjects

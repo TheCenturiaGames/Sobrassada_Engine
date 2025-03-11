@@ -94,6 +94,6 @@ class SceneModule : public Module
 
   private:
     Scene* loadedScene = nullptr;
-    const std::string sceneLibraryPath;
+    const std::string scenePath;
     bool inPlayMode = false;
 };

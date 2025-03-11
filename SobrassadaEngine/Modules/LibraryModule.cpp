@@ -52,7 +52,6 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
         case SaveMode::SaveAs:
             sceneUID  = GenerateUID();
             sceneName = std::string(path);
-            loadedScene->SetSceneName(sceneName.c_str());
             break;
         case SaveMode::SavePlayMode:
             sceneUID  = loadedScene->GetSceneUID();
@@ -69,7 +68,8 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
 
         rapidjson::Value scene(rapidjson::kObjectType);
 
-        loadedScene->Save(scene, allocator);
+        if (saveMode == SaveMode::SaveAs) loadedScene->Save(scene, allocator, sceneUID, sceneName);
+        else loadedScene->Save(scene, allocator);
 
         doc.AddMember("Scene", scene, allocator);
 
@@ -81,7 +81,7 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
         std::string sceneFilePath;
 
         if (saveMode == SaveMode::SavePlayMode)
-            sceneFilePath = SCENES_PATH + std::to_string(sceneUID) + SCENE_EXTENSION;
+            sceneFilePath = SCENES_PLAY_PATH + std::to_string(sceneUID) + SCENE_EXTENSION;
         else sceneFilePath = SCENES_PATH + sceneName + SCENE_EXTENSION;
 
         unsigned int bytesWritten = (unsigned int
@@ -103,7 +103,12 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
 bool LibraryModule::LoadScene(const char* file, bool reload) const
 {
     rapidjson::Document doc;
-    bool loaded = FileSystem::LoadJSON((SCENES_PATH + std::string(file)).c_str(), doc);
+
+    std::string path;
+    if (reload) path = SCENES_PLAY_PATH;
+    else path = SCENES_PATH;
+
+    bool loaded = FileSystem::LoadJSON((path + std::string(file)).c_str(), doc);
 
     if (!loaded)
     {

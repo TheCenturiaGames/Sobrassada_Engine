@@ -196,6 +196,7 @@ void EditorUIModule::MainMenu()
     // File tab menu
     if (ImGui::BeginMenu("File"))
     {
+
         if (ImGui::MenuItem("Create", "")) App->GetSceneModule()->CreateScene();
 
         if (ImGui::MenuItem("Load", "", loadMenu)) loadMenu = !loadMenu;

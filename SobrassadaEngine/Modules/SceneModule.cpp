@@ -16,7 +16,7 @@
 #include <filesystem>
 #include <tiny_gltf.h>
 
-SceneModule::SceneModule() : sceneLibraryPath(std::filesystem::current_path().string() + DELIMITER + SCENES_PATH)
+SceneModule::SceneModule() : scenePath(std::filesystem::current_path().string() + DELIMITER)
 {
 }
 
@@ -114,6 +114,13 @@ void SceneModule::LoadScene(const rapidjson::Value& initialState, const bool for
 
 void SceneModule::CloseScene()
 {
+    if (inPlayMode)
+    {
+        std::string tmpScene = SCENES_PLAY_PATH + std::to_string(loadedScene->GetSceneUID()) + SCENE_EXTENSION;
+        FileSystem::Delete(tmpScene.c_str());
+        inPlayMode = false;
+    }
+
     // TODO Warning dialog before closing scene without saving
     delete loadedScene;
     loadedScene = nullptr;
@@ -128,7 +135,7 @@ void SceneModule::SwitchPlayMode(bool play)
         std::string tmpScene = std::to_string(loadedScene->GetSceneUID()) + SCENE_EXTENSION;
         if (App->GetLibraryModule()->LoadScene(tmpScene.c_str(), true))
         {
-            FileSystem::Delete((sceneLibraryPath + tmpScene).c_str());
+            FileSystem::Delete((scenePath + SCENES_PLAY_PATH + tmpScene).c_str());
             inPlayMode = false;
             loadedScene->SetStopPlaying(false);
         }

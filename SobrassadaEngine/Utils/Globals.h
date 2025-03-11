@@ -64,16 +64,18 @@ enum update_status
 #define DEFAULT_CAMERA_MOUSE_SENSITIVITY     0.5f;
 #define DEFAULT_CAMERA_ZOOM_SENSITIVITY      5.f;
 
-#define ASSETS_PATH     "Assets/"
-#define SCENES_PATH     "Assets/Scenes/"
-#define METADATA_PATH   "Assets/Metadata/"
-#define LIBRARY_PATH    "Library/"
-#define ANIMATIONS_PATH "Library/Animations/"
-#define AUDIO_PATH      "Library/Audio/"
-#define MODELS_PATH     "Library/Models/"
-#define MESHES_PATH     "Library/Meshes/"
-#define TEXTURES_PATH   "Library/Textures/"
-#define MATERIALS_PATH  "Library/Materials/"
+#define ASSETS_PATH   "Assets/"
+#define SCENES_PATH   "Assets/Scenes/"
+#define METADATA_PATH "Assets/Metadata/"
+
+#define LIBRARY_PATH     "Library/"
+#define ANIMATIONS_PATH  "Library/Animations/"
+#define AUDIO_PATH       "Library/Audio/"
+#define MODELS_PATH      "Library/Models/"
+#define MESHES_PATH      "Library/Meshes/"
+#define SCENES_PLAY_PATH "Library/Scenes/"
+#define TEXTURES_PATH    "Library/Textures/"
+#define MATERIALS_PATH   "Library/Materials/"
 
 #define ASSET_EXTENSION    ".gltf"
 #define MESH_EXTENSION     ".sobrassada"
