@@ -266,9 +266,12 @@ void GameObject::RenderEditorInspector()
 
         ImGui::End();
 
-        if (App->GetEditorUIModule()->RenderImGuizmo(localTransform, globalTransform, parentTransform))
+        if (!App->GetSceneModule()->GetInPlayMode())
         {
-            UpdateTransformForGOBranch();
+            if (App->GetEditorUIModule()->RenderImGuizmo(localTransform, globalTransform, parentTransform))
+            {
+                UpdateTransformForGOBranch();
+            }
         }
     }
     else
