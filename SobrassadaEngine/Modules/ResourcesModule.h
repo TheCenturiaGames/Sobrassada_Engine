@@ -17,8 +17,8 @@ class ResourcesModule : public Module
     Resource* RequestResource(UID uid);
     void ReleaseResource(const Resource* resource);
 
-    int GetSpecularProgram() const { return specularGlossinessProgram; }
-    int GetProgram() const { return program; }
+    int GetSpecularGlossinessProgram() const { return specularGlossinessProgram; }
+    int GetMetallicRoughnessProgram() const { return metallicRoughnessProgram; }
 
   private:
     Resource* CreateNewResource(UID uid);
@@ -26,6 +26,6 @@ class ResourcesModule : public Module
   private:
     //We will need to do a resourceProgram
     int specularGlossinessProgram = -1;
-    int program = -1;
+    int metallicRoughnessProgram  = -1;
     std::map<UID, Resource*> resources;
 };

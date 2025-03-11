@@ -24,7 +24,7 @@ ResourcesModule::~ResourcesModule()
 bool ResourcesModule::Init()
 {
     specularGlossinessProgram = App->GetShaderModule()->GetProgram("./Test/VertexShader.glsl", "./Test/BRDFPhongFragmentShader.glsl");
-    program = App->GetShaderModule()->GetProgram("./Test/VertexShader.glsl", "./Test/BRDFCookTorranceShader.glsl");
+    metallicRoughnessProgram = App->GetShaderModule()->GetProgram("./Test/VertexShader.glsl", "./Test/BRDFCookTorranceShader.glsl");
 
     return true;
 }
