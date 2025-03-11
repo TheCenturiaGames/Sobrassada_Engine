@@ -244,7 +244,11 @@ void Scene::RenderScene()
 
         if (ImGui::BeginPopup("RenderOptions"))
         {
-            if (ImGui::BeginListBox("##RenderOptionsList", ImVec2(ImGui::CalcItemWidth(), ImGui::GetTextLineHeight() * 7.5f)))
+            float listBoxSize = debugShaderOptions.size() + debugRenderOptions.size() + 0.5f;
+            if (ImGui::BeginListBox(
+                    "##RenderOptionsList",
+                    ImVec2(ImGui::CalcItemWidth(), ImGui::GetFrameHeightWithSpacing() * listBoxSize)
+                ))
             {
                 ImGui::Checkbox(RENDER_LIGTHS, &debugShaderOptions[RENDER_LIGTHS]);
                 if (ImGui::Checkbox("Render Wireframe", &debugShaderOptions[RENDER_WIREFRAME]))
