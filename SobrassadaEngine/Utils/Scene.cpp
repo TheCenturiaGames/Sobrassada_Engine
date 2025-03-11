@@ -7,6 +7,7 @@
 #include "Framebuffer.h"
 #include "GameObject.h"
 #include "GameTimer.h"
+#include "Importer.h"
 #include "InputModule.h"
 #include "LibraryModule.h"
 #include "Octree.h"
@@ -18,7 +19,6 @@
 #include "Scene/Components/Standalone/MeshComponent.h"
 #include "SceneModule.h"
 
-#include "Importer.h"
 #include "SDL_mouse.h"
 #include "imgui.h"
 #include "imgui_internal.h"

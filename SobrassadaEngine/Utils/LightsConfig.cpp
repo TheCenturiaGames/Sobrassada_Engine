@@ -92,7 +92,7 @@ void LightsConfig::RenderSkybox() const
     glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
 
     glBindVertexArray(skyboxVao);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 36);
 
     glBindVertexArray(0);
 

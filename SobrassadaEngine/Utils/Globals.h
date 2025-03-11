@@ -86,7 +86,7 @@ enum update_status
 #define MATERIAL_EXTENSION ".mat"
 #define SCENE_EXTENSION    ".scene"
 #define MODEL_EXTENSION    ".model"
-#define META_EXTENSION     ".meta"
+#define META_EXTENSION     ".smeta"
 
 #define MAX_COMPONENT_NAME_LENGTH 64;
 

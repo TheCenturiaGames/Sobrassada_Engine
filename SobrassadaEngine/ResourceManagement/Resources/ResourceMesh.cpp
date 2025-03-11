@@ -2,11 +2,13 @@
 
 #include "Application.h"
 #include "CameraModule.h"
+#include "OpenGLModule.h"
 #include "ResourceMaterial.h"
 
 #include <Math/float2.h>
 #include <Math/float4x4.h>
 #include <SDL_assert.h>
+#include <chrono>
 #include <glew.h>
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #define TINYGLTF_NO_STB_IMAGE
@@ -63,11 +65,13 @@ void ResourceMesh::LoadData(
     glBindVertexArray(0);
 
     this->vertices = vertices;
-    this->indices = indices;
+    this->indices  = indices;
 }
 
 void ResourceMesh::Render(int program, const float4x4& modelMatrix, unsigned int cameraUBO, const ResourceMaterial* material) const
 {
+    auto start = std::chrono::high_resolution_clock::now();
+
     glUseProgram(program);
 
     glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
@@ -92,18 +96,26 @@ void ResourceMesh::Render(int program, const float4x4& modelMatrix, unsigned int
         material->RenderMaterial(program);
     }
 
+    unsigned int meshTriangles  = 0;
+
     if (indexCount > 0 && vao)
     {
         glBindVertexArray(vao);
-
-        glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+        meshTriangles   = indexCount / 3;
+        App->GetOpenGLModule()->DrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
     }
     else if (vao)
     {
         glBindVertexArray(vao);
-
-        glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+        meshTriangles   = vertexCount / 3;
+        App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, vertexCount);
     }
 
     glBindVertexArray(0);
+
+    auto end                             = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<float> elapsed = end - start;
+    
+    App->GetOpenGLModule()->AddTrianglesPerSecond(meshTriangles / elapsed.count());
+    App->GetOpenGLModule()->AddVerticesCount(vertexCount);
 }

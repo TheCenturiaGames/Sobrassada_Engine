@@ -64,8 +64,8 @@
                         "Type": 1,
                         "Enabled": true,
                         "Name": "Mesh",
-                        "Mesh": 1114551704884827,
-                        "Material": 1378520981369562
+                        "Mesh": 1199065820978570,
+                        "Material": 1302428436367250
                     }
                 ],
                 "Children": []
@@ -100,8 +100,8 @@
                         "Type": 1,
                         "Enabled": true,
                         "Name": "Mesh",
-                        "Mesh": 1107116317507835,
-                        "Material": 1338670816551630
+                        "Mesh": 1115159156586115,
+                        "Material": 1386357050443265
                     }
                 ],
                 "Children": []
@@ -136,8 +136,8 @@
                         "Type": 1,
                         "Enabled": true,
                         "Name": "Mesh",
-                        "Mesh": 1182280659502797,
-                        "Material": 1394412070044591
+                        "Mesh": 1153313518663731,
+                        "Material": 1327299028901811
                     }
                 ],
                 "Children": []
@@ -150,7 +150,7 @@
                 1.0
             ],
             "Ambient Intensity": 0.20000000298023224,
-            "Skybox UID": 1206779861952962
+            "Skybox UID": 1211595514475110
         }
     }
 }
