@@ -31,6 +31,9 @@ class DebugDrawModule : public Module
     void DrawSphere(const float3 &center, const float3 &color, const float radius);
     void DrawAxisTriad(const float4x4& transform, bool depthEnabled = true);
 
+    private:
+    void HandleDebugRenderOptions();
+
   private:
     static DDRenderInterfaceCoreGL* implementation;
 };

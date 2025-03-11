@@ -627,7 +627,7 @@ update_status DebugDrawModule::Render(float deltaTime)
 void DebugDrawModule::Draw()
 {
     CameraModule* cameraModule = App->GetCameraModule();
-    SceneModule* sceneModule = App->GetSceneModule();
+    
 
     const float4x4& projection = cameraModule->GetProjectionMatrix();
     const float4x4& view       = cameraModule->GetViewMatrix();
@@ -644,31 +644,7 @@ void DebugDrawModule::Draw()
         dd::frustum(inverseClipMatrix, float3(1.f, 1.f, 1.f));
     }
 
-    const auto& gameObjects = sceneModule->GetAllGameObjects(); 
-
-    if (debugRenderOptions[RENDER_AABB])
-    {
-        for ( const auto& gameObject : *gameObjects )
-        {
-            for (int i = 0; i < 12; ++i)
-                DrawLineSegment(gameObject.second->GetGlobalAABB().Edge(i), float3(0.f, 1.f, 0.f));
-        }
-    }
-
-    if (debugRenderOptions[RENDER_OBB])
-    {
-        for (const auto& gameObject : *gameObjects)
-        {
-            for (int i = 0; i < 12; ++i)
-                DrawLineSegment(gameObject.second->GetGlobalOBB().Edge(i), float3(0.f, 1.f, 0.f));
-        }
-    }
-
-    if (debugRenderOptions[RENDER_OCTREE])
-    {
-        Octree* octree = sceneModule->GetSceneOctree();
-        if (octree != nullptr) RenderLines(octree->GetDrawLines(), float3(1.f, 0.f, 0.f));
-    }
+    HandleDebugRenderOptions();
 
     auto framebuffer = App->GetOpenGLModule()->GetFramebuffer();
     width                     = framebuffer->GetTextureWidth();
@@ -732,4 +708,41 @@ void DebugDrawModule::Draw(const float4x4& view, const float4x4& proj, unsigned 
 void DebugDrawModule::DrawAxisTriad(const float4x4& transform, bool depthEnabled)
 {
     dd::axisTriad(transform, 0.005f, 0.05f, 0, depthEnabled);
+}
+
+void DebugDrawModule::HandleDebugRenderOptions()
+{
+    SceneModule* sceneModule = App->GetSceneModule();
+    CameraModule* cameraModule = App->GetCameraModule();
+
+    const auto& gameObjects  = sceneModule->GetAllGameObjects();
+
+    if (debugRenderOptions[RENDER_AABB])
+    {
+        for (const auto& gameObject : *gameObjects)
+        {
+            for (int i = 0; i < 12; ++i)
+                DrawLineSegment(gameObject.second->GetGlobalAABB().Edge(i), float3(0.f, 1.f, 0.f));
+        }
+    }
+
+    if (debugRenderOptions[RENDER_OBB])
+    {
+        for (const auto& gameObject : *gameObjects)
+        {
+            for (int i = 0; i < 12; ++i)
+                DrawLineSegment(gameObject.second->GetGlobalOBB().Edge(i), float3(0.f, 1.f, 0.f));
+        }
+    }
+
+    if (debugRenderOptions[RENDER_OCTREE])
+    {
+        Octree* octree = sceneModule->GetSceneOctree();
+        if (octree != nullptr) RenderLines(octree->GetDrawLines(), float3(1.f, 0.f, 0.f));
+    }
+
+    if (debugRenderOptions[RENDER_CAMERA_RAY])
+    {
+        DrawLineSegment(cameraModule->GetLastCastedRay(), float3(1.f, 1.f, 0.f));
+    }
 }
