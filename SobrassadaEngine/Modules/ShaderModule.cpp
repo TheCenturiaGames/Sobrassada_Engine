@@ -1,4 +1,6 @@
 #include "ShaderModule.h"
+#include "Application.h"
+
 
 #include "glew.h"
 
@@ -10,7 +12,22 @@ ShaderModule::~ShaderModule()
 {
 }
 
-unsigned int ShaderModule::GetProgram(const char* vertexPath, const char* fragmentPath)
+bool ShaderModule::Init()
+{
+    specularGlossinessProgram      = CreateShaderProgram(LIGHTS_VERTEX_SHADER_PATH, SPECULAR_FRAGMENT_SHADER_PATH);
+    specularGlossinessProgramUnlit = CreateShaderProgram(LIGHTS_VERTEX_SHADER_PATH, UNLIT_FRAGMENT_SHADER_PATH);
+
+    metallicRoughnessProgram       = CreateShaderProgram(LIGHTS_VERTEX_SHADER_PATH, METALLIC_FRAGMENT_SHADER_PATH);
+    metallicRoughnessProgramUnlit = CreateShaderProgram(LIGHTS_VERTEX_SHADER_PATH, UNLIT_FRAGMENT_SHADER_PATH);
+    return true;
+}
+
+bool ShaderModule::ShutDown()
+{
+    return true;
+}
+
+unsigned int ShaderModule::CreateShaderProgram(const char* vertexPath, const char* fragmentPath)
 {
     GLOG("Loading shaders")
     unsigned int program    = 0;

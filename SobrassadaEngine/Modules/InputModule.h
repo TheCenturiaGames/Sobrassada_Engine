@@ -28,10 +28,8 @@ class InputModule : public Module
     update_status PreUpdate(float deltaTime) override;
     bool ShutDown() override;
 
-    void SubscribeToEvent(int keyEvent, const std::function<void(void)>& functionCallback);
-
     const KeyState* GetKeyboard() const { return keyboard; }
-    KeyState GetKey(int id) const { return keyboard[id]; }
+    KeyState GetKey(int id) const { return keyboard[id]; } // avoid using this function
 
     const KeyState* GetMouseButtons() const { return mouseButtons; }
     KeyState GetMouseButtonDown(int id) const { return mouseButtons[id - 1]; }
@@ -46,5 +44,4 @@ class InputModule : public Module
     float2 mouseMotion;
     float2 mouse;
     int mouseWheel = 0;
-    std::vector<std::vector<std::function<void(void)>>> subscribedCallbacks;
 };

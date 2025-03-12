@@ -1,21 +1,18 @@
 ﻿#include "MeshComponent.h"
 
-#include "../Root/RootComponent.h"
 #include "Application.h"
 #include "CameraModule.h"
 #include "EditorUIModule.h"
 #include "FileSystem/MeshImporter.h"
 #include "LibraryModule.h"
 #include "ResourcesModule.h"
-#include "SceneModule.h"
+#include "ShaderModule.h"
+// #include "Scene/GameObjects/GameObject.h"
 
 #include "imgui.h"
 #include <Math/Quat.h>
 
-MeshComponent::MeshComponent(
-    const UID uid, const UID uidParent, const UID uidRoot, const float4x4& parentGlobalTransform
-)
-    : Component(uid, uidParent, uidRoot, "Mesh", COMPONENT_MESH, parentGlobalTransform)
+MeshComponent::MeshComponent(const UID uid, const UID uidParent) : Component(uid, uidParent, "Mesh", COMPONENT_MESH)
 {
 }
 
@@ -27,18 +24,22 @@ MeshComponent::MeshComponent(const rapidjson::Value& initialState) : Component(i
     }
     if (initialState.HasMember("Mesh"))
     {
-        AddMesh(initialState["Mesh"].GetUint64(), false); // Do not update aabb, will be done once at the end
+        AddMesh(initialState["Mesh"].GetUint64(), false);
     }
+}
+
+MeshComponent::~MeshComponent()
+{
+    App->GetResourcesModule()->ReleaseResource(currentMaterial);
+    App->GetResourcesModule()->ReleaseResource(currentMesh);
 }
 
 void MeshComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
 {
     Component::Save(targetState, allocator);
 
-    targetState.AddMember("Mesh", currentMesh != nullptr ? currentMesh->GetUID() : CONSTANT_EMPTY_UID, allocator);
-    targetState.AddMember(
-        "Material", currentMaterial != nullptr ? currentMaterial->GetUID() : CONSTANT_EMPTY_UID, allocator
-    );
+    targetState.AddMember("Mesh", currentMesh != nullptr ? currentMesh->GetUID() : INVALID_UID, allocator);
+    targetState.AddMember("Material", currentMaterial != nullptr ? currentMaterial->GetUID() : INVALID_UID, allocator);
 }
 
 void MeshComponent::RenderEditorInspector()
@@ -57,23 +58,23 @@ void MeshComponent::RenderEditorInspector()
 
         if (ImGui::IsPopupOpen(CONSTANT_MESH_SELECT_DIALOG_ID))
         {
-            AddMesh(App->GetEditorUIModule()->RenderResourceSelectDialog(
-                CONSTANT_MESH_SELECT_DIALOG_ID, App->GetLibraryModule()->GetMeshMap()
+            AddMesh(App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
+                CONSTANT_MESH_SELECT_DIALOG_ID, App->GetLibraryModule()->GetMeshMap(), INVALID_UID
             ));
         }
 
         ImGui::SeparatorText("Material");
-        ImGui::Text(currentTextureName.c_str());
+        ImGui::Text(currentMaterialName.c_str());
         ImGui::SameLine();
-        if (ImGui::Button("Select texture"))
+        if (ImGui::Button("Select material"))
         {
             ImGui::OpenPopup(CONSTANT_TEXTURE_SELECT_DIALOG_ID);
         }
 
         if (ImGui::IsPopupOpen(CONSTANT_TEXTURE_SELECT_DIALOG_ID))
         {
-            AddMaterial(App->GetEditorUIModule()->RenderResourceSelectDialog(
-                CONSTANT_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetMaterialMap()
+            AddMaterial(App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
+                CONSTANT_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetMaterialMap(), INVALID_UID
             ));
         }
 
@@ -90,14 +91,18 @@ void MeshComponent::Render()
     if (enabled && currentMesh != nullptr)
     {
         unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
-        currentMesh->Render(App->GetResourcesModule()->GetProgram(), globalTransform, cameraUBO, currentMaterial);
+        int program            = App->GetShaderModule()->GetMetallicRoughnessProgram();
+        if (currentMaterial != nullptr)
+        {
+            if(!currentMaterial->GetIsMetallicRoughness()) program = App->GetShaderModule()->GetSpecularGlossinessProgram();
+        }
+        currentMesh->Render(program, GetParent()->GetGlobalTransform(), cameraUBO, currentMaterial);
     }
-    Component::Render();
 }
 
-void MeshComponent::AddMesh(UID resource, bool reloadAABB)
+void MeshComponent::AddMesh(UID resource, bool updateParent)
 {
-    if (resource == CONSTANT_EMPTY_UID) return;
+    if (resource == INVALID_UID) return;
 
     if (currentMesh != nullptr && currentMesh->GetUID() == resource) return;
 
@@ -105,19 +110,13 @@ void MeshComponent::AddMesh(UID resource, bool reloadAABB)
     if (newMesh != nullptr)
     {
         App->GetResourcesModule()->ReleaseResource(currentMesh);
-        newMesh->SetMaterial(currentMaterial != nullptr ? currentMaterial->GetUID() : CONSTANT_EMPTY_UID);
         currentMeshName    = newMesh->GetName();
         currentMesh        = newMesh;
         localComponentAABB = AABB(currentMesh->GetAABB());
-
-        if (reloadAABB)
+        GameObject* parent = GetParent();
+        if (parent != nullptr)
         {
-            globalComponentAABB   = AABB(currentMesh->GetAABB());
-            AABBUpdatable* parent = GetParent();
-            if (parent != nullptr)
-            {
-                parent->PassAABBUpdateToParent();
-            }
+            parent->OnAABBUpdated();
         }
     }
 }
@@ -131,7 +130,7 @@ void MeshComponent::AddMaterial(UID resource)
     if (newMaterial != nullptr)
     {
         App->GetResourcesModule()->ReleaseResource(currentMaterial);
-        currentMaterial    = newMaterial;
-        currentTextureName = currentMaterial->GetName();
+        currentMaterial     = newMaterial;
+        currentMaterialName = currentMaterial->GetName();
     }
 }
