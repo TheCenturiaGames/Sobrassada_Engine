@@ -135,7 +135,7 @@ void ResourceMesh::Render(
         {
             palette[i] = bones[i]->GetGlobalTransform() * bindMatrices[i];
         }
-        glUniformMatrix4fv(glGetUniformLocation(program, "palette"), bones.size(), GL_TRUE, palette[0].ptr());
+        glUniformMatrix4fv(glGetUniformLocation(program, "palette"), (GLsizei)bones.size(), GL_TRUE, palette[0].ptr());
         glUniform1i(4, 1); // Tell the shader the mesh has bones
     }
     else

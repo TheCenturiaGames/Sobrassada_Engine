@@ -20,6 +20,11 @@ struct Vertex
         {
             position = other.position;
             tangent  = other.tangent;
+            joint[0] = other.joint[0];
+            joint[1] = other.joint[1];
+            joint[2] = other.joint[2];
+            joint[3] = other.joint[3];
+            weights  = other.weights;
             normal   = other.normal;
             texCoord = other.texCoord;
         }

@@ -31,7 +31,7 @@ MeshComponent::MeshComponent(const rapidjson::Value& initialState) : Component(i
     if (initialState.HasMember("Bones"))
     {
         const rapidjson::Value& initBones = initialState["Bones"];
-        for (int i = 0; i < initBones.Size(); ++i)
+        for (unsigned int i = 0; i < initBones.Size(); ++i)
         {
             bonesUIDs.push_back(initBones[i].GetUint64());
         }
