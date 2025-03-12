@@ -12,7 +12,8 @@ ShaderModule::~ShaderModule()
 
 bool ShaderModule::Init()
 {
-    program = CreateShaderProgram("./Test/VertexShader.glsl", "./Test/BRDFPhongFragmentShader.glsl");
+    specularGlossinessProgram = CreateShaderProgram(LIGHTS_VERTEX_SHADER_PATH, LIGHTS_SPECULAR_FRAGMENT_SHADER_PATH);
+    metallicRoughnessProgram = CreateShaderProgram(LIGHTS_VERTEX_SHADER_PATH, LIGHTS_METALLIC_FRAGMENT_SHADER_PATH);
     return true;
 }
 

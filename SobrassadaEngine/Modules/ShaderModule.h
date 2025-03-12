@@ -14,7 +14,8 @@ class ShaderModule : public Module
     unsigned int CreateShaderProgram(const char* vertexPath, const char* fragmentPath);
     void DeleteProgram(unsigned int programID);
 
-    int GetProgramID() const { return program; }
+    int GetSpecularGlossinessProgram() const { return specularGlossinessProgram; }
+    int GetMetallicRoughnessProgram() const { return metallicRoughnessProgram; }
 
   private:
     char* LoadShaderSource(const char* shaderPath);
@@ -22,5 +23,6 @@ class ShaderModule : public Module
     unsigned int CreateProgram(unsigned int vertexShader, unsigned fragmentShader);
 
   private:
-    int program = -1;
+    int specularGlossinessProgram = -1;
+    int metallicRoughnessProgram  = -1;
 };
