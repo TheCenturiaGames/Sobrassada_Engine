@@ -71,7 +71,7 @@ namespace ModelImporter
         const std::string modelName = FileSystem::GetFileNameWithoutExtension(filePath);
         std::string assetPath       = "";
         UID finalModelUID;
-        if (sourceUID == INVALID_UUID)
+        if (sourceUID == INVALID_UID)
         {
             UID modelUID              = GenerateUID();
             finalModelUID             = App->GetLibraryModule()->AssignFiletypeUID(modelUID, FileType::Model);
@@ -175,7 +175,7 @@ namespace ModelImporter
             return 0;
         }
 
-        if (sourceUID == INVALID_UUID)
+        if (sourceUID == INVALID_UID)
         {
             unsigned int bytesWritten = (unsigned int
             )FileSystem::Save(assetPath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);

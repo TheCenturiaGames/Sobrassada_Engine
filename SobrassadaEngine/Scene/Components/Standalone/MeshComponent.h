@@ -51,6 +51,6 @@ class MeshComponent : public Component
     std::vector<GameObject*> bones;
     std::vector<float4x4> bindMatrices;
 
-    UID modelUID  = INVALID_UUID;
+    UID modelUID  = INVALID_UID;
     int skinIndex = -1;
 };

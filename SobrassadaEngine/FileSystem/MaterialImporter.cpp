@@ -14,7 +14,7 @@ UID MaterialImporter::ImportMaterial(
 )
 {
     // If it has no materials exit
-    if (materialIndex == -1) return INVALID_UUID;
+    if (materialIndex == -1) return INVALID_UID;
 
     std::string path                       = FileSystem::GetFilePath(sourceFilePath);
     bool useOcclusion                      = false;
