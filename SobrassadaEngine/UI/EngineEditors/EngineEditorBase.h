@@ -17,4 +17,5 @@ class EngineEditorBase
   protected:
     std::string name = "EngineEditor";
     UID uid;
+    bool firstTime = true;
 };

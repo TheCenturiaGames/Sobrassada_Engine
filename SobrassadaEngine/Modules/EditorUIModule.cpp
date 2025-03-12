@@ -99,6 +99,7 @@ update_status EditorUIModule::RenderEditor(float deltaTime)
     Draw();
     for (auto it = openEditors.cbegin(); it != openEditors.cend();)
     {
+        
         if (!it->second->RenderEditor())
         {
             delete it->second;
@@ -237,7 +238,7 @@ void EditorUIModule::MainMenu()
 
         if (ImGui::BeginMenu("Engine Editor Window"))
         {
-
+              
             if (ImGui::MenuItem("Mockup Base Engine Editor", "")) OpenEditor(CreateEditor(EditorType::BASE));
             ImGui::EndMenu();
         }
@@ -983,6 +984,7 @@ EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
     switch (type)
     {
     case EditorType::BASE:
+
         return new EngineEditorBase("Base Editor " + std::to_string(uid), uid);
 
     default:
