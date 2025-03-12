@@ -26,10 +26,10 @@ struct MaterialGPU
     bool shininessInAlpha = false;
     float metallicFactor  = 1.0f;
     float roughnessFactor = 1.0f;
-    uint64_t diffuseTex = 0;
-    uint64_t specularTex = 0;
-    uint64_t metallicTex = 0;
-    uint64_t normalTex = 0;
+    UID diffuseTex = 0;
+    UID specularTex = 0;
+    UID metallicTex = 0;
+    UID normalTex = 0;
 };
 
 class ResourceMaterial : public Resource

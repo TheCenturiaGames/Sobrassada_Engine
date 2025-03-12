@@ -90,6 +90,10 @@ enum update_status
 
 #define MAX_COMPONENT_NAME_LENGTH 64;
 
+constexpr const char* LIGHTS_VERTEX_SHADER_PATH   = "./Test/VertexShader.glsl";
+constexpr const char* LIGHTS_SPECULAR_FRAGMENT_SHADER_PATH = "./Test/BRDFPhongFragmentShader.glsl";
+constexpr const char* LIGHTS_METALLIC_FRAGMENT_SHADER_PATH = "./Test/BRDFCookTorranceShader.glsl";
+
 #define UID uint64_t
 
 constexpr UID INVALID_UID                               = 0;

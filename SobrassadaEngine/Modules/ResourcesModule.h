@@ -17,9 +17,6 @@ class ResourcesModule : public Module
     Resource* RequestResource(UID uid);
     void ReleaseResource(const Resource* resource);
 
-    int GetSpecularGlossinessProgram() const { return specularGlossinessProgram; }
-    int GetMetallicRoughnessProgram() const { return metallicRoughnessProgram; }
-
   private:
     Resource* CreateNewResource(UID uid);
 
