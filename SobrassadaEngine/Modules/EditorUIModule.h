@@ -1,14 +1,9 @@
 #pragma once
 #include "Module.h"
 #include "ResourceManagement/Resources/Resource.h"
-#include "EngineEditors/EngineEditorBase.h"
-
 
 #include "UI/EngineEditorBase.h"
 #include "UI/NodeEditor.h"
-
-
-
 
 #include "SDL.h"
 #include "imgui_internal.h"
@@ -24,7 +19,7 @@ enum EditorType
 {
     BASE,
     ANIMATION,
-    NODE
+    NODES
 };
 struct CPUFeature
 {
@@ -32,13 +27,7 @@ struct CPUFeature
     const char* name;
 };
 
-class EditorViewport;
-class QuadtreeViewer;
-enum EditorType
-{ BASE,
-  ANIMATION,
-  NODES
-};
+
 enum class GizmoOperation
 {
     TRANSLATE,
@@ -73,8 +62,7 @@ class EditorUIModule : public Module
         const char* id, const std::unordered_map<std::string, T>& availableResources, const T& defaultResource
     );
 
-     void OpenEditor(EngineEditorBase* editorToOpen);
-     EngineEditorBase* CreateEditor(EditorType type);
+    
     GizmoOperation& GetCurrentGizmoOperation() { return currentGizmoOperation; }
     GizmoTransform& GetTransformType() { return transformType; }
     float3& GetSnapValues() { return snapValues; }

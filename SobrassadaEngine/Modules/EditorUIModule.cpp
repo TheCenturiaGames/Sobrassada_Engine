@@ -1074,20 +1074,6 @@ void EditorUIModule::About(bool& aboutMenu) const
     ImGui::End();
 }
 
-EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
-{
-    UID uid = GenerateUID();
-    switch (type)
-    {
-    case EditorType::BASE:
-
-        return new EngineEditorBase("Base Editor " + std::to_string(uid), uid);
-
-    default:
-        return nullptr;
-    }
-}
-
 void EditorUIModule::EditorSettings(bool& editorSettingsMenu)
 {
     if (!ImGui::Begin("Editor settings", &editorSettingsMenu))

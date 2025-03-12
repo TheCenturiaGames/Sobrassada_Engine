@@ -10,15 +10,14 @@ NodeEditor::~NodeEditor()
 
 bool NodeEditor::RenderEditor()
 {
-    if (!EngineEditorBase::RenderEditor()) return false;
-
+   if (!EngineEditorBase::RenderEditor()) return false;
+    
+    
     ImGui::Begin(name.c_str());
-
+    
     myGrid->update();
 
-    
-
-      myGrid->rightClickPopUpContent(
+    myGrid->rightClickPopUpContent(
         [this](ImFlow::BaseNode* node)
         {
             if (node == nullptr)
@@ -57,7 +56,11 @@ bool NodeEditor::RenderEditor()
             }
         }
     );
-
+    ImVec2 currentSize = ImGui::GetWindowSize();
+    if (currentSize.x < 150 || currentSize.y < 150)
+    {
+        ImGui::SetWindowSize(ImVec2(150, 150), ImGuiCond_Always);
+    }
 
     ImGui::End();
     return true;
