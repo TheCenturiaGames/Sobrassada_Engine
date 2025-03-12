@@ -1,7 +1,7 @@
 {
-    "UID": 1180910550090325,
-    "name": "Robot0",
-    "assetPath": "Assets/Robot.gltf",
+    "UID": 1166247728759279,
+    "name": "Base0",
+    "assetPath": "Assets/Floor.gltf",
     "lastModifiedDate": 1739979581,
     "importOptions": {
         "generateTangents": true

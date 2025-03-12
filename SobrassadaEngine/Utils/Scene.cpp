@@ -90,6 +90,16 @@ void Scene::Init()
         root->UpdateTransformForGOBranch();
     }
 
+    // Initialize the skinning for all the gameObjects that need it
+    for (const auto& gameObject : gameObjectsContainer)
+    {
+        MeshComponent* mesh = gameObject.second->GetMeshComponent();
+        if (mesh != nullptr)
+        {
+            mesh->InitSkin();
+        }
+    }
+
     lightsConfig->InitSkybox();
     lightsConfig->InitLightBuffers();
 
@@ -484,25 +494,34 @@ void Scene::LoadModel(const UID modelUID)
                         new GameObject(currentGameObject->GetUID(), "Mesh " + std::to_string(meshNum));
                     ++meshNum;
 
-                    meshObject->CreateComponent(COMPONENT_MESH);
-                    meshObject->AddModel(mesh.first, mesh.second);
-                    // meshObject->SetLocalTransform(nodes[i].transform);
-
-                    currentGameObject->AddGameObject(meshObject->GetUID());
-                    AddGameObject(meshObject->GetUID(), meshObject);
-
-                    // Add skin to meshComponent
-                    if (nodes[i].skinIndex != -1)
+                    if (meshObject->CreateComponent(COMPONENT_MESH))
                     {
-                        GLOG("Node %s has skin index: %d", nodes[i].name.c_str(), nodes[i].skinIndex);
-                        Skin skin = model.GetSkin(nodes[i].skinIndex);
+                        MeshComponent* meshComponent = meshObject->GetMeshComponent();
 
-                        std::vector<GameObject*> bones;
-                        for (int index : skin.bonesIndices)
+                        meshComponent->SetModelUID(modelUID);
+                        meshComponent->AddMesh(mesh.first);
+                        meshComponent->AddMaterial(mesh.second);
+
+                        currentGameObject->AddGameObject(meshObject->GetUID());
+                        AddGameObject(meshObject->GetUID(), meshObject);
+
+                        // Add skin to meshComponent
+                        if (nodes[i].skinIndex != -1)
                         {
-                            bones.push_back(gameObjectsArray[index]);
+                            GLOG("Node %s has skin index: %d", nodes[i].name.c_str(), nodes[i].skinIndex);
+                            Skin skin = model.GetSkin(nodes[i].skinIndex);
+
+                            std::vector<GameObject*> bones;
+                            std::vector<UID> bonesIds;
+                            for (int index : skin.bonesIndices)
+                            {
+                                bonesIds.push_back(gameObjectsArray[index]->GetUID());
+                                bones.push_back(gameObjectsArray[index]);
+                            }
+                            meshComponent->SetBones(bones, bonesIds);
+                            meshComponent->SetBindMatrices(skin.inverseBindMatrices);
+                            meshComponent->SetSkinIndex(nodes[i].skinIndex);
                         }
-                        meshObject->AddSkin(bones, skin.inverseBindMatrices);
                     }
                 }
             }

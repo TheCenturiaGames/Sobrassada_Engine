@@ -297,33 +297,13 @@ void GameObject::UpdateTransformForGOBranch() const
     App->GetSceneModule()->RegenerateTree();
 }
 
-const MeshComponent* GameObject::GetMeshComponent() const
+MeshComponent* GameObject::GetMeshComponent() const
 {
     if (components.find(COMPONENT_MESH) != components.end())
     {
-        return dynamic_cast<const MeshComponent*>(components.at(COMPONENT_MESH));
+        return dynamic_cast<MeshComponent*>(components.at(COMPONENT_MESH));
     }
     return nullptr;
-}
-
-void GameObject::AddModel(UID meshUid, UID materialUid) const
-{
-    if (components.find(COMPONENT_MESH) != components.end())
-    {
-        MeshComponent* mesh = static_cast<MeshComponent*>(components.at(COMPONENT_MESH));
-        mesh->AddMesh(meshUid);
-        mesh->AddMaterial(materialUid);
-    }
-}
-
-void GameObject::AddSkin(const std::vector<GameObject*>& bones, const std::vector<float4x4>& bindMatrices) const
-{
-    if (components.find(COMPONENT_MESH) != components.end())
-    {
-        MeshComponent* mesh = static_cast<MeshComponent*>(components.at(COMPONENT_MESH));
-        mesh->SetBones(bones);
-        mesh->SetBindMatrices(bindMatrices);
-    }
 }
 
 void GameObject::OnTransformUpdated()

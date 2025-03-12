@@ -76,9 +76,7 @@ class GameObject
 
     const std::unordered_map<ComponentType, Component*>& GetComponents() const { return components; }
 
-    const MeshComponent* GetMeshComponent() const;
-    void AddModel(UID meshUid, UID materialUid) const;
-    void AddSkin(const std::vector<GameObject*>& bones, const std::vector<float4x4>& bindMatrices) const;
+    MeshComponent* GetMeshComponent() const;
 
     void SetLocalTransform(const float4x4& newTransform) { localTransform = newTransform; }
     void DrawGizmos() const;
