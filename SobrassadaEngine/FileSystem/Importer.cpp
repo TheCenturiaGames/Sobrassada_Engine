@@ -7,6 +7,7 @@
 #include "TextureImporter.h"
 #include "MaterialImporter.h"
 #include "AnimationImporter.h"
+#include "ModelImporter.h"
 
 Resource* Importer::Load(UID uid)
 {
@@ -23,6 +24,9 @@ Resource* Importer::Load(UID uid)
             return MeshImporter::LoadMesh(uid);
         case ResourceType::Animation:
             return AnimationImporter::LoadAnimation(uid);
+        case ResourceType::Model:
+            return ModelImporter::LoadModel(uid);
+            
         default:
             GLOG("Unknown resource type: %d", type)
             return nullptr;

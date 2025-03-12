@@ -1,0 +1,10 @@
+{
+    "UID": 1327299028901811,
+    "name": "DrawersMaterial",
+    "assetPath": "Assets/Drawers.gltf",
+    "lastModifiedDate": 1741545783,
+    "importOptions": {
+        "shader": "1461230779516301790",
+        "useOcclusion": true
+    }
+}

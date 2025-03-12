@@ -1,82 +1,117 @@
 #pragma once
 
+#include "ComponentUtils.h"
 #include "Globals.h"
-#include "Scene/AABBUpdatable.h"
 
 #include <Geometry/AABB.h>
+#include <Geometry/OBB.h>
 #include <Libs/rapidjson/document.h>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
-class RootComponent;
+class MeshComponent;
 
-class GameObject : public AABBUpdatable
+enum ComponentMobilitySettings
+{
+    STATIC  = 0,
+    DYNAMIC = 1,
+};
+
+class GameObject
 {
   public:
     GameObject(std::string name);
-    GameObject(UID parentUUID, std::string name);
-    GameObject(UID parentUUID, std::string name, UID rootComponent);
+    GameObject(UID parentUID, std::string name);
 
     GameObject(const rapidjson::Value& initialState);
 
-    ~GameObject() override;
+    ~GameObject();
 
-    void PassAABBUpdateToParent() override;
-    void ComponentGlobalTransformUpdated() override;
-    const float4x4& GetGlobalTransform() const override;
-    const float4x4& GetParentGlobalTransform() override;
+    const float4x4& GetParentGlobalTransform() const;
 
-    bool AddGameObject(UID gameObjectUUID);
-    bool RemoveGameObject(UID gameObjectUUID);
-
-    bool CreateRootComponent();
-
-    void OnEditor();
+    bool AddGameObject(UID gameObjectUID);
+    bool RemoveGameObject(UID gameObjectUID);
 
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
 
-    void SaveToLibrary();
-
-    void RenderHierarchyNode(UID& selectedGameObjectUUID);
-    void HandleNodeClick(UID& selectedGameObjectUUID);
+    void RenderHierarchyNode(UID& selectedGameObjectUID);
+    void HandleNodeClick(UID& selectedGameObjectUID);
     void RenderContextMenu();
+    void RenderEditorInspector();
 
-    bool UpdateGameObjectHierarchy(UID sourceUID, UID targetUID);
+    void UpdateGameObjectHierarchy(UID sourceUID);
     void RenameGameObjectHierarchy();
 
-    inline std::string GetName() const { return name; }
-    void SetName(std::string newName) { name = newName; }
+    const std::string& GetName() const { return name; }
+    void SetName(const std::string& newName) { name = newName; }
 
-    inline std::vector<UID> GetChildren() { return children; }
-    inline void AddChildren(UID childUUID) { children.push_back(childUUID); }
+    const std::vector<UID>& GetChildren() { return children; }
+    void AddChildren(UID childUID) { children.push_back(childUID); }
 
-    inline UID GetParent() const { return parentUUID; }
-    void SetParent(UID newParentUUID) { parentUUID = newParentUUID; }
+    UID GetParent() const { return parentUID; }
+    void SetParent(UID newParentUID) { parentUID = newParentUID; }
 
-    inline UID GetUID() const { return uuid; }
-    void SetUUID(UID newUUID) { uuid = newUUID; }
+    UID GetUID() const { return uid; }
+    void SetUID(UID newUID) { uid = newUID; }
 
-    RootComponent* GetRootComponent() const { return rootComponent; }
+    const AABB& GetLocalAABB() const { return localAABB; }
 
-    inline const AABB& GetAABB() const { return globalAABB; };
+    const AABB& GetGlobalAABB() const { return globalAABB; }
+    const OBB& GetGlobalOBB() const { return globalOBB; }
 
-    void Render();
+    void OnAABBUpdated();
+
+    void Render() const;
     void RenderEditor();
 
-  public:
-    inline static UID currentRenamingUID = INVALID_UUID;
+    const float4x4& GetGlobalTransform() const { return globalTransform; }
+    const float4x4& GetLocalTransform() const { return localTransform; }
+
+    bool CreateComponent(ComponentType componentType);
+    bool RemoveComponent(ComponentType componentType);
+
+    // Updates the transform for this game object and all descending children
+    void UpdateTransformForGOBranch() const;
+
+    const std::unordered_map<ComponentType, Component*>& GetComponents() const { return components; }
+
+    const MeshComponent* GetMeshComponent() const;
+    void AddModel(UID meshUid, UID materialUid) const;
+
+    void SetLocalTransform(const float4x4& newTransform) { localTransform = newTransform; }
+    void DrawGizmos() const;
 
   private:
-    UID parentUUID;
-    UID uuid;
+    void OnTransformUpdated();
+    void UpdateLocalTransform(const float4x4& parentGlobalTransform);
+    void DrawNodes() const;
+    void OnDrawConnectionsToggle();
+
+  public:
+    inline static UID currentRenamingUID = INVALID_UID;
+
+  private:
+    UID parentUID;
+    UID uid;
     std::vector<UID> children;
 
     std::string name;
 
-    RootComponent* rootComponent;
+    std::unordered_map<ComponentType, Component*> components;
 
+    AABB localAABB;
     AABB globalAABB;
+    OBB globalOBB;
 
     bool isRenaming = false;
     char renameBuffer[128];
+
+    bool drawNodes                       = false;
+
+    float4x4 localTransform              = float4x4::identity;
+    float4x4 globalTransform             = float4x4::identity;
+
+    ComponentType selectedComponentIndex = COMPONENT_NONE;
+    int mobilitySettings                 = DYNAMIC;
 };

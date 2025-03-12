@@ -10,7 +10,6 @@
 #include "LibraryModule.h"
 #include "OpenGLModule.h"
 #include "ResourcesModule.h"
-#include "Root/RootComponent.h"
 #include "SceneModule.h"
 #include "ShaderModule.h"
 #include "WindowModule.h"

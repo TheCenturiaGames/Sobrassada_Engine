@@ -7,9 +7,9 @@
 class PointLightComponent : public LightComponent
 {
   public:
-    PointLightComponent(UID uid, UID uidParent, UID uidRoot, const float4x4 &parentGlobalTransform);
+    PointLightComponent(UID uid, UID uidParent);
     PointLightComponent(const rapidjson::Value& initialState);
-    ~PointLightComponent();
+    ~PointLightComponent() override;
 
     void Render() override;
     void RenderEditorInspector() override;

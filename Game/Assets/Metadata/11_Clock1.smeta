@@ -1,0 +1,9 @@
+{
+    "UID": 1152980932761771,
+    "name": "Clock1",
+    "assetPath": "Assets/Clock.gltf",
+    "lastModifiedDate": 1739828225,
+    "importOptions": {
+        "generateTangents": false
+    }
+}
