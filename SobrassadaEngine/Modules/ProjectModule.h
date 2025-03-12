@@ -16,15 +16,21 @@ public:
     const std::string& GetLoadedProjectPath() const { return loadedProjectAbsolutePath; }
     const std::string& GetLoadedProjectName() const { return loadedProjectName; }
 
-    void LoadNewProject();
+    void ShowProjectDialog();
 
     bool IsProjectLoaded() const { return projectLoaded; }
+    
+private:
 
+    void CreateNewProject(const std::string& projectPath, const std::string& projectName);
+    void LoadProject(const std::string& projectPath);
+    void CloseProject();
+    
 private:
 
     bool projectLoaded = false;
-    bool projectLoadFileSelectDialogOpen = false;
-    bool projectSelectPathFileSelectDialogOpen = false;
+    bool showCreateProjectFileDialog = false;
+    bool showOpenProjectFileDialog = false;
 
     std::string loadedProjectName = "No project loaded";
     std::string loadedProjectAbsolutePath;

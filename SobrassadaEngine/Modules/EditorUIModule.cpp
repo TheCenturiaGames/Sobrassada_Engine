@@ -537,7 +537,17 @@ std::string EditorUIModule::RenderFileDialog(bool& window, const char* windowTit
 
     if (ImGui::Button("Ok", ImVec2(0, 0)))
     {
-        std::string importPath = inputFile.empty() ? "" : currentPath + DELIMITER + inputFile;
+        std::string importPath = "";
+        if (!inputFile.empty())
+        {
+            if (selectFolder)
+            {
+                importPath = currentPath;
+            } else
+            {
+                importPath = currentPath + DELIMITER + inputFile;
+            }
+        }
         
         inputFile      = "";
         currentPath    = App->GetProjectModule()->GetLoadedProjectPath();

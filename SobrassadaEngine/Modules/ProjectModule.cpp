@@ -33,54 +33,53 @@ update_status ProjectModule::RenderEditor(float deltaTime)
             {
                 if (ImGui::BeginTabItem("Create new project"))
                 {
-                    
                     ImGui::InputText("Path", newProjectPath, 255);
                     ImGui::SameLine();
                     if (ImGui::Button("Select path"))
                     {
-                        projectSelectPathFileSelectDialogOpen = true;
+                        showOpenProjectFileDialog = true;
                     }
                     ImGui::InputText("Name", newProjectName, 255);
                     ImGui::Text("Project path: %s\\%s", newProjectPath, newProjectName);
+
+                    if (ImGui::Button("Create"))
+                    {
+                        CreateNewProject(newProjectPath, newProjectName);
+                    }
                     
                     ImGui::EndTabItem();
                 }
                 if (ImGui::BeginTabItem("Load project"))
                 {
-                    static char selectedProjectPath[255];
-                    ImGui::Text("Project to load");
+                    ImGui::InputText("Path", newProjectPath, 255);
                     ImGui::SameLine();
-                    if (ImGui::Button("Select project"))
+                    if (ImGui::Button("Select path"))
                     {
-                        projectLoadFileSelectDialogOpen = true;
+                        showCreateProjectFileDialog = true;
                     }
-                    ImGui::Text(selectedProjectPath);
+                    if (ImGui::Button("Load"))
+                    {
+                        LoadProject(newProjectPath);
+                    }
                     ImGui::EndTabItem();
                 }
 
                 ImGui::EndTabBar();
             }
-    
-            if (ImGui::Button("Load"))
-            {
-                // TODO Set project path and name
-                projectLoaded = true;
-                App->GetWindowModule()->UpdateProjectNameInWindowTitle(loadedProjectName);
-            }
         
             ImGui::End();
 
-            if (projectLoadFileSelectDialogOpen)
+            if (showCreateProjectFileDialog)
             {
-                const std::string resultingPath = App->GetEditorUIModule()->RenderFileDialog(projectLoadFileSelectDialogOpen, "Select project", true);
+                const std::string resultingPath = App->GetEditorUIModule()->RenderFileDialog(showCreateProjectFileDialog, "Select project", true);
                 if (!resultingPath.empty())
                 {
                     memcpy(newProjectPath, resultingPath.c_str(), 255);
                     memcpy(newProjectName, FileSystem::GetFileNameWithoutExtension(newProjectPath).c_str(), 255);
                 }
-            } else if (projectSelectPathFileSelectDialogOpen)
+            } else if (showOpenProjectFileDialog)
             {
-                const std::string resultingPath = App->GetEditorUIModule()->RenderFileDialog(projectSelectPathFileSelectDialogOpen, "Select save location", true);
+                const std::string resultingPath = App->GetEditorUIModule()->RenderFileDialog(showOpenProjectFileDialog, "Select save location", true);
                 if (!resultingPath.empty())
                 {
                     memcpy(newProjectPath, resultingPath.c_str(), 255);
@@ -93,9 +92,29 @@ update_status ProjectModule::RenderEditor(float deltaTime)
     return UPDATE_CONTINUE;
 }
 
-void ProjectModule::LoadNewProject()
+void ProjectModule::ShowProjectDialog()
 {
-    // TODO Save old project
+    CloseProject();
+}
+
+void ProjectModule::CreateNewProject(const std::string& projectPath, const std::string& projectName)
+{
+    projectLoaded = true;
+    loadedProjectName = std::string(projectName);
+    loadedProjectAbsolutePath = std::string(projectPath + DELIMITER + projectName);
+    App->GetWindowModule()->UpdateProjectNameInWindowTitle(loadedProjectName);
+}
+
+void ProjectModule::LoadProject(const std::string& projectPath)
+{
+    projectLoaded = true;
+    loadedProjectName = FileSystem::GetFileNameWithoutExtension(projectPath);
+    loadedProjectAbsolutePath = std::string(projectPath);
+    App->GetWindowModule()->UpdateProjectNameInWindowTitle(loadedProjectName);
+}
+
+void ProjectModule::CloseProject()
+{
     projectLoaded = false;
     loadedProjectName = "No project loaded";
     loadedProjectAbsolutePath = "";
