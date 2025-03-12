@@ -129,7 +129,6 @@ void MeshComponent::Render()
 {
     if (enabled && currentMesh != nullptr)
     {
-        GLOG("Current mesh: %s", currentMeshName.c_str());
         unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
         currentMesh->Render(
             App->GetResourcesModule()->GetProgram(), GetParent()->GetGlobalTransform(), cameraUBO, currentMaterial,

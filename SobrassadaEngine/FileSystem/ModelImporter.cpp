@@ -68,7 +68,7 @@ namespace ModelImporter
 
         rapidjson::Value modelJSON(rapidjson::kObjectType);
 
-        const std::string modelName = model.meshes[0].name;
+        const std::string modelName = FileSystem::GetFileNameWithoutExtension(filePath);
         std::string assetPath       = "";
         UID finalModelUID;
         if (sourceUID == INVALID_UUID)

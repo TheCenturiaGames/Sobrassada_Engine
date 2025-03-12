@@ -457,7 +457,7 @@ void Scene::LoadModel(const UID modelUID)
         const Model& model                 = newModel->GetModelData();
         const std::vector<NodeData>& nodes = model.GetNodes();
 
-        GameObject* rootObject                 = new GameObject(GetGameObjectRootUID(), nodes[0].name);
+        GameObject* rootObject                 = new GameObject(GetGameObjectRootUID(), App->GetLibraryModule()->GetResourceName(modelUID));
         rootObject->SetLocalTransform(nodes[0].transform);
 
         // Add the gameObject to the rootObject
@@ -490,20 +490,20 @@ void Scene::LoadModel(const UID modelUID)
                 unsigned meshNum = 1;
                 for (const auto& mesh : nodes[i].meshes)
                 {
-                    GameObject* meshObject =
-                        new GameObject(currentGameObject->GetUID(), "Mesh " + std::to_string(meshNum));
+                    GameObject* meshObject = new GameObject(
+                        currentGameObject->GetUID(), currentGameObject->GetName() + " Mesh " + std::to_string(meshNum)
+                    );
                     ++meshNum;
 
                     if (meshObject->CreateComponent(COMPONENT_MESH))
                     {
-                        MeshComponent* meshComponent = meshObject->GetMeshComponent();
+                        currentGameObject->AddGameObject(meshObject->GetUID());
+                        AddGameObject(meshObject->GetUID(), meshObject);
 
+                        MeshComponent* meshComponent = meshObject->GetMeshComponent();
                         meshComponent->SetModelUID(modelUID);
                         meshComponent->AddMesh(mesh.first);
                         meshComponent->AddMaterial(mesh.second);
-
-                        currentGameObject->AddGameObject(meshObject->GetUID());
-                        AddGameObject(meshObject->GetUID(), meshObject);
 
                         // Add skin to meshComponent
                         if (nodes[i].skinIndex != -1)
