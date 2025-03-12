@@ -36,7 +36,7 @@ namespace SceneImporter
                 UID meshUID = MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath);
                 n++;
 
-                UID matUID = INVALID_UUID;
+                UID matUID = INVALID_UID;
                 matIndex = primitive.material;
                 if (matIndex == -1) GLOG("Material index invalid for mesh: %s", name.c_str())
                 else if (std::find(matIndices.begin(), matIndices.end(), matIndex) == matIndices.end())
@@ -152,6 +152,13 @@ namespace SceneImporter
                 GLOG("Failed to create directory: %s", ASSETS_PATH);
             }
         }
+        if (!FileSystem::IsDirectory(SCENES_PATH))
+        {
+            if (!FileSystem::CreateDirectories(SCENES_PATH))
+            {
+                GLOG("Failed to create directory: %s", SCENES_PATH);
+            }
+        }
         if (!FileSystem::IsDirectory(METADATA_PATH))
         {
             if (!FileSystem::CreateDirectories(METADATA_PATH))
@@ -187,6 +194,13 @@ namespace SceneImporter
                 GLOG("Failed to create directory: %s", MESHES_PATH);
             }
         }
+        if (!FileSystem::IsDirectory(SCENES_PLAY_PATH))
+        {
+            if (!FileSystem::CreateDirectories(SCENES_PLAY_PATH))
+            {
+                GLOG("Failed to create directory: %s", SCENES_PLAY_PATH);
+            }
+        }
         if (!FileSystem::IsDirectory(TEXTURES_PATH))
         {
             if (!FileSystem::CreateDirectories(TEXTURES_PATH))
@@ -201,12 +215,6 @@ namespace SceneImporter
                 GLOG("Failed to create directory: %s", MATERIALS_PATH);
             }
         }
-        if (!FileSystem::IsDirectory(SCENES_PATH))
-        {
-            if (!FileSystem::CreateDirectories(SCENES_PATH))
-            {
-                GLOG("Failed to create directory: %s", SCENES_PATH);
-            }
-        }
+
     }
 }; // namespace SceneImporter

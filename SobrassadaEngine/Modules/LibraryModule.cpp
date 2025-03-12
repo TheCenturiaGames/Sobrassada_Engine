@@ -28,20 +28,39 @@ LibraryModule::~LibraryModule()
 bool LibraryModule::Init()
 {
     SceneImporter::CreateLibraryDirectories();
-    LibraryModule::LoadLibraryMaps();
+    LoadLibraryMaps();
 
     return true;
 }
 
-// Save = library/scenes/
-// SaveAs = all path + name.scene
+// Save         = Path: library/scenes/   | UID: sceneUID     | FileName: scene name
+// SaveAs       = Path: fileName          | UID: generate new | FileName: path filename
+// SavePlayMode = Path: sceneUID          | UID: sceneUID     | FileName: sceneUID
 bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
 {
     Scene* loadedScene = App->GetSceneModule()->GetScene();
     if (loadedScene != nullptr)
     {
-        const char* sceneName = loadedScene->GetSceneName();
+        UID sceneUID = INVALID_UID;
+        std::string sceneName;
+        switch (saveMode)
+        {
+        case SaveMode::Save:
+            sceneUID  = loadedScene->GetSceneUID();
+            sceneName = loadedScene->GetSceneName();
+            break;
+        case SaveMode::SaveAs:
+            sceneUID  = GenerateUID();
+            sceneName = std::string(path);
+            break;
+        case SaveMode::SavePlayMode:
+            sceneUID  = loadedScene->GetSceneUID();
+            sceneName = loadedScene->GetSceneName();
+            break;
+        }
+
         if (sceneName == DEFAULT_SCENE_NAME && saveMode == SaveMode::Save) return false;
+
         // Create doc JSON
         rapidjson::Document doc;
         doc.SetObject();
@@ -49,7 +68,8 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
 
         rapidjson::Value scene(rapidjson::kObjectType);
 
-        loadedScene->Save(scene, allocator);
+        if (saveMode == SaveMode::SaveAs) loadedScene->Save(scene, allocator, sceneUID, sceneName);
+        else loadedScene->Save(scene, allocator);
 
         doc.AddMember("Scene", scene, allocator);
 
@@ -59,53 +79,52 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
         doc.Accept(writer);
 
         std::string sceneFilePath;
-        std::string fileName;
 
-        if (saveMode == SaveMode::Save)
-        {
-            sceneFilePath = std::string(path) + sceneName + SCENE_EXTENSION;
-            fileName      = sceneName;
-        }
-        else
-        {
-            fileName      = FileSystem::GetFileNameWithoutExtension(path);
-            sceneFilePath = FileSystem::GetFilePath(path) + fileName + SCENE_EXTENSION;
-        }
+        if (saveMode == SaveMode::SavePlayMode)
+            sceneFilePath = SCENES_PLAY_PATH + std::to_string(sceneUID) + SCENE_EXTENSION;
+        else sceneFilePath = SCENES_PATH + sceneName + SCENE_EXTENSION;
 
         unsigned int bytesWritten = (unsigned int
         )FileSystem::Save(sceneFilePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
         if (bytesWritten == 0)
         {
-            GLOG("Failed to save scene file: %s", path);
+            GLOG("Failed to save scene file: %s", sceneName.c_str());
             return false;
         }
 
-        GLOG("%s saved as scene", fileName.c_str());
+        GLOG("%s saved as scene", sceneName.c_str());
+        return true;
     }
 
+    GLOG("No scene loaded");
     return false;
 }
 
-bool LibraryModule::LoadScene(const char* path, bool reload) const
+bool LibraryModule::LoadScene(const char* file, bool reload) const
 {
     rapidjson::Document doc;
-    bool loaded = FileSystem::LoadJSON(path, doc);
+
+    std::string path;
+    if (reload) path = SCENES_PLAY_PATH;
+    else path = SCENES_PATH;
+
+    bool loaded = FileSystem::LoadJSON((path + std::string(file)).c_str(), doc);
 
     if (!loaded)
     {
-        GLOG("Failed to load scene file: %s", path);
+        GLOG("Failed to load scene file: %s", file);
         return false;
     }
 
     if (!doc.HasMember("Scene") || !doc["Scene"].IsObject())
     {
-        GLOG("Invalid scene format: %s", path);
+        GLOG("Invalid scene format: %s", file);
         return false;
     }
 
     rapidjson::Value& scene = doc["Scene"];
 
-    App->GetSceneModule()->LoadScene(scene);
+    App->GetSceneModule()->LoadScene(scene, reload);
     return true;
 }
 
@@ -136,7 +155,7 @@ bool LibraryModule::LoadLibraryMaps()
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 else SceneImporter::ImportMeshFromMetadata(assetPath, assetName, assetUID);
                 break;
-            case 12: 
+            case 12:
                 AddTexture(assetUID, assetName);
                 AddName(assetName, assetUID);
                 libraryPath = TEXTURES_PATH + std::to_string(assetUID) + TEXTURE_EXTENSION;
@@ -230,7 +249,7 @@ UID LibraryModule::GetTextureUID(const std::string& texturePath) const
         return it->second;
     }
 
-    return INVALID_UUID;
+    return INVALID_UID;
 }
 
 UID LibraryModule::GetMeshUID(const std::string& meshPath) const
@@ -241,7 +260,7 @@ UID LibraryModule::GetMeshUID(const std::string& meshPath) const
         return it->second;
     }
 
-    return INVALID_UUID;
+    return INVALID_UID;
 }
 
 UID LibraryModule::GetMaterialUID(const std::string& materialPath) const
@@ -252,7 +271,7 @@ UID LibraryModule::GetMaterialUID(const std::string& materialPath) const
         return it->second;
     }
 
-    return INVALID_UUID;
+    return INVALID_UID;
 }
 
 UID LibraryModule::GetModelUID(const std::string& modelPath) const
@@ -263,7 +282,7 @@ UID LibraryModule::GetModelUID(const std::string& modelPath) const
         return it->second;
     }
 
-    return INVALID_UUID;
+    return INVALID_UID;
 }
 
 const std::string& LibraryModule::GetResourcePath(UID resourceID) const
