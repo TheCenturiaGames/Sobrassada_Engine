@@ -4,11 +4,8 @@
 
 #include "ImGui.h"
 
-LightComponent::LightComponent(
-    const UID uid, const UID uidParent, const UID uidRoot, const char* uiName, const ComponentType lightType,
-    const Transform& parentGlobalTransform
-)
-    : Component(uid, uidParent, uidRoot, uiName, lightType, parentGlobalTransform)
+LightComponent::LightComponent(const UID uid, const UID uidParent, const char* uiName, const ComponentType lightType)
+    : Component(uid, uidParent, uiName, lightType)
 {
     intensity  = 1;
     color      = float3(1.0f, 1.0f, 1.0f);
@@ -71,4 +68,3 @@ void LightComponent::Update()
 void LightComponent::Render()
 {
 }
-

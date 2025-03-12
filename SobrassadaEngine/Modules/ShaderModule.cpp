@@ -10,7 +10,18 @@ ShaderModule::~ShaderModule()
 {
 }
 
-unsigned int ShaderModule::GetProgram(const char* vertexPath, const char* fragmentPath)
+bool ShaderModule::Init()
+{
+    program = CreateShaderProgram("./Test/VertexShader.glsl", "./Test/BRDFPhongFragmentShader.glsl");
+    return true;
+}
+
+bool ShaderModule::ShutDown()
+{
+    return true;
+}
+
+unsigned int ShaderModule::CreateShaderProgram(const char* vertexPath, const char* fragmentPath)
 {
     GLOG("Loading shaders")
     unsigned int program    = 0;

@@ -2,14 +2,15 @@
 
 #include "Module.h"
 #include "ResourceManagement/Resources/Resource.h"
-#include "Transform.h"
 
 #include "SDL.h"
 #include "imgui_internal.h"
+#include <Math/float3.h>
+#include <Math/float4x4.h>
 #include <deque>
 #include <string>
 #include <unordered_map>
-// guizmo after imgui include
+// imguizmo include after imgui
 #include "./Libs/ImGuizmo/ImGuizmo.h"
 
 struct CPUFeature
@@ -18,8 +19,18 @@ struct CPUFeature
     const char* name;
 };
 
-class EditorViewport;
-class QuadtreeViewer;
+enum class GizmoOperation
+{
+    TRANSLATE,
+    ROTATE,
+    SCALE
+};
+
+enum class GizmoTransform
+{
+    LOCAL,
+    WORLD
+};
 
 class EditorUIModule : public Module
 {
@@ -34,17 +45,27 @@ class EditorUIModule : public Module
     update_status PostUpdate(float deltaTime) override;
     bool ShutDown() override;
 
-    bool RenderTransformWidget(Transform& localTransform, Transform& globalTransform, const Transform& parentTransform);
-    bool RenderImGuizmo(Transform& gameObjectTransform);
-    UID RenderResourceSelectDialog(const char* id, const std::unordered_map<std::string, UID>& availableResources) const;
+    bool RenderTransformWidget(float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform);
+    bool RenderImGuizmo(float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform) const;
+
+    template <typename T>
+    T RenderResourceSelectDialog(
+        const char* id, const std::unordered_map<std::string, T>& availableResources, const T& defaultResource
+    );
+
+    GizmoOperation& GetCurrentGizmoOperation() { return currentGizmoOperation; }
+    GizmoTransform& GetTransformType() { return transformType; }
+    float3& GetSnapValues() { return snapValues; }
 
   private:
     void RenderBasicTransformModifiers(
-        Transform& transform, bool& lockScaleAxis, bool& positionValueChanged, bool& rotationValueChanged,
-        bool& scaleValueChanged
+        float3& outputPosition, float3& outputRotation, float3& outputScale, bool& lockScaleAxis,
+        bool& positionValueChanged, bool& rotationValueChanged, bool& scaleValueChanged
     );
 
-    void LimitFPS(float deltaTime) const;
+    void UpdateGizmoTransformMode();
+    ImGuizmo::OPERATION GetImGuizmoOperation() const;
+    ImGuizmo::MODE GetImGuizmoTransformMode() const;
     void AddFramePlotData(float deltaTime);
 
     void Draw();
@@ -58,42 +79,44 @@ class EditorUIModule : public Module
     void GameTimerConfig() const;
     void HardwareConfig() const;
     void ShowCaps() const;
+
     void ImportDialog(bool& import);
-    void GetFilesSorted(const std::string& currentPath, std::vector<std::string>& files);
     void LoadDialog(bool& load);
     void SaveDialog(bool& save);
     void Console(bool& consoleMenu) const;
     void About(bool& aboutMenu) const;
+    std::string FormatWithCommas(unsigned int number) const;
+
+    void LoadModelDialog(bool& loadModel);
 
     void LoadPrefabDialog(bool& loadPrefab) const;
 
   public:
-    bool hierarchyMenu = true;
-    bool inspectorMenu = true;
+    bool editorControlMenu = true;
+    bool hierarchyMenu     = true;
+    bool inspectorMenu     = true;
+    bool snapEnabled       = false;
 
   private:
     int width, height;
-    bool consoleMenu            = true;
-    bool import                 = false;
-    bool load                   = false;
-    bool save                   = false;
-    bool aboutMenu              = false;
-    bool editorSettingsMenu     = false;
-    bool quadtreeViewerViewport = false;
-    bool closeApplication       = false;
+    bool consoleMenu        = false;
+    bool importMenu         = false;
+    bool loadMenu           = false;
+    bool saveMenu           = false;
+    bool loadModel          = false;
+    bool aboutMenu          = false;
+    bool editorSettingsMenu = false;
+    bool closeScene         = false;
+    bool closeApplication   = false;
 
-    bool loadPrefab             = false;
-
-    int maxFPS                  = 60;
-    int maximumPlotData         = 50;
+    int maximumPlotData     = 50;
     std::deque<float> framerate;
     std::deque<float> frametime;
 
-    QuadtreeViewer* quadtreeViewer = nullptr;
-
     std::string startPath;
-    std::string libraryPath;
+    std::string scenesPath;
 
-    int transformType = LOCAL;
-    ImGuizmo::OPERATION mCurrentGizmoOperation;
+    GizmoOperation currentGizmoOperation = GizmoOperation::TRANSLATE;
+    GizmoTransform transformType         = GizmoTransform::LOCAL;
+    float3 snapValues                    = {1.f, 1.f, 1.f};
 };
