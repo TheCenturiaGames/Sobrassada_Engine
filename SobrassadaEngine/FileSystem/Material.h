@@ -49,15 +49,15 @@ class Material
     float occlusionStrength       = 1.0f;
 
     // pointers to the dds paths
-    UID diffuseTexture            = CONSTANT_EMPTY_UID;
-    UID specularGlossinessTexture = CONSTANT_EMPTY_UID;
-    UID normalTexture             = CONSTANT_EMPTY_UID;
-    UID occlusionTexture          = CONSTANT_EMPTY_UID;
+    UID diffuseTexture            = INVALID_UID;
+    UID specularGlossinessTexture = INVALID_UID;
+    UID normalTexture             = INVALID_UID;
+    UID occlusionTexture          = INVALID_UID;
 
-    UID materialUID               = CONSTANT_EMPTY_UID;
+    UID materialUID               = INVALID_UID;
 
     // need to be here for not breaking the .mat existing (when loading)
     float metallicFactor          = 0.0f;
     float roughnessFactor         = 1.0f;
-    UID metallicRoughnessTexture  = CONSTANT_EMPTY_UID;
+    UID metallicRoughnessTexture  = INVALID_UID;
 };

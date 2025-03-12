@@ -6,10 +6,10 @@
 #include "FileSystem/MeshImporter.h"
 #include "LibraryModule.h"
 #include "ResourcesModule.h"
+#include "ShaderModule.h"
 // #include "Scene/GameObjects/GameObject.h"
 
 #include "imgui.h"
-
 #include <Math/Quat.h>
 
 MeshComponent::MeshComponent(const UID uid, const UID uidParent) : Component(uid, uidParent, "Mesh", COMPONENT_MESH)
@@ -38,10 +38,8 @@ void MeshComponent::Save(rapidjson::Value& targetState, rapidjson::Document::All
 {
     Component::Save(targetState, allocator);
 
-    targetState.AddMember("Mesh", currentMesh != nullptr ? currentMesh->GetUID() : CONSTANT_EMPTY_UID, allocator);
-    targetState.AddMember(
-        "Material", currentMaterial != nullptr ? currentMaterial->GetUID() : CONSTANT_EMPTY_UID, allocator
-    );
+    targetState.AddMember("Mesh", currentMesh != nullptr ? currentMesh->GetUID() : INVALID_UID, allocator);
+    targetState.AddMember("Material", currentMaterial != nullptr ? currentMaterial->GetUID() : INVALID_UID, allocator);
 }
 
 void MeshComponent::RenderEditorInspector()
@@ -61,7 +59,7 @@ void MeshComponent::RenderEditorInspector()
         if (ImGui::IsPopupOpen(CONSTANT_MESH_SELECT_DIALOG_ID))
         {
             AddMesh(App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
-                CONSTANT_MESH_SELECT_DIALOG_ID, App->GetLibraryModule()->GetMeshMap(), INVALID_UUID
+                CONSTANT_MESH_SELECT_DIALOG_ID, App->GetLibraryModule()->GetMeshMap(), INVALID_UID
             ));
         }
 
@@ -76,7 +74,7 @@ void MeshComponent::RenderEditorInspector()
         if (ImGui::IsPopupOpen(CONSTANT_TEXTURE_SELECT_DIALOG_ID))
         {
             AddMaterial(App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
-                CONSTANT_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetMaterialMap(), INVALID_UUID
+                CONSTANT_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetMaterialMap(), INVALID_UID
             ));
         }
 
@@ -104,7 +102,7 @@ void MeshComponent::Render()
 
 void MeshComponent::AddMesh(UID resource, bool updateParent)
 {
-    if (resource == CONSTANT_EMPTY_UID) return;
+    if (resource == INVALID_UID) return;
 
     if (currentMesh != nullptr && currentMesh->GetUID() == resource) return;
 

@@ -133,6 +133,7 @@ void ResourceMaterial::LoadMaterialData(Material mat)
     ResourceTexture* normTexture = TextureImporter::LoadTexture(mat.GetNormalTexture());
     if (normTexture != nullptr)
     {
+        GLOG("%s has normal", normTexture->GetName().c_str());
         normalTexture.textureID = normTexture->GetTextureID();
 
         material.normalTex = glGetTextureHandleARB(normTexture->GetTextureID());

@@ -31,7 +31,7 @@ class Resource
     static ResourceType GetResourceTypeForUID(UID uid) { return static_cast<ResourceType>(uid / UID_PREFIX_DIVISOR); }
 
   protected:
-    UID uid = CONSTANT_EMPTY_UID;
+    UID uid = INVALID_UID;
     std::string name;
     ResourceType type           = ResourceType::Unknown;
     unsigned int referenceCount = 0;
