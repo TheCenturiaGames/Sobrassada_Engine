@@ -119,7 +119,7 @@ UID MaterialImporter::ImportMaterial(
             int texIndex = pbr.metallicRoughnessTexture.index;
             UID metallicRoughnessTextureUID =
                 TextureImporter::Import((path + model.images[model.textures[texIndex].source].uri).c_str());
-            if (metallicRoughnessTextureUID != CONSTANT_EMPTY_UID)
+            if (metallicRoughnessTextureUID != INVALID_UID)
             {
                 material.SetMetallicRoughnessTexture(metallicRoughnessTextureUID);
             }
