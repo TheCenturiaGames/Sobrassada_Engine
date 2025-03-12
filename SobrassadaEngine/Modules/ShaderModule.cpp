@@ -14,8 +14,11 @@ ShaderModule::~ShaderModule()
 
 bool ShaderModule::Init()
 {
-    program      = CreateShaderProgram(LIGHTS_VERTEX_SHADER_PATH, LIGHTS_FRAGMENT_SHADER_PATH);
-    programUnlit = CreateShaderProgram(UNLIT_VERTEX_SHADER_PATH, UNLIT_FRAGMENT_SHADER_PATH);
+    specularGlossinessProgram      = CreateShaderProgram(LIGHTS_VERTEX_SHADER_PATH, SPECULAR_FRAGMENT_SHADER_PATH);
+    specularGlossinessProgramUnlit = CreateShaderProgram(LIGHTS_VERTEX_SHADER_PATH, UNLIT_FRAGMENT_SHADER_PATH);
+
+    metallicRoughnessProgram       = CreateShaderProgram(LIGHTS_VERTEX_SHADER_PATH, METALLIC_FRAGMENT_SHADER_PATH);
+    metallicRoughnessProgramUnlit = CreateShaderProgram(LIGHTS_VERTEX_SHADER_PATH, UNLIT_FRAGMENT_SHADER_PATH);
     return true;
 }
 

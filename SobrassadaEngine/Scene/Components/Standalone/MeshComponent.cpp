@@ -91,9 +91,12 @@ void MeshComponent::Render()
     if (enabled && currentMesh != nullptr)
     {
         unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
-        currentMesh->Render(
-            App->GetShaderModule()->GetProgramID(), GetParent()->GetGlobalTransform(), cameraUBO, currentMaterial
-        );
+        int program            = App->GetShaderModule()->GetMetallicRoughnessProgram();
+        if (currentMaterial != nullptr)
+        {
+            if(!currentMaterial->GetIsMetallicRoughness()) program = App->GetShaderModule()->GetSpecularGlossinessProgram();
+        }
+        currentMesh->Render(program, GetParent()->GetGlobalTransform(), cameraUBO, currentMaterial);
     }
 }
 

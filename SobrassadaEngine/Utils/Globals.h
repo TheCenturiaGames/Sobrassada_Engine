@@ -92,10 +92,10 @@ enum update_status
 
 // SHADER PATHS
 constexpr const char* LIGHTS_VERTEX_SHADER_PATH   = "./Test/VertexShader.glsl";
-constexpr const char* LIGHTS_FRAGMENT_SHADER_PATH = "./Test/BRDFPhongFragmentShader.glsl";
 
-constexpr const char* UNLIT_VERTEX_SHADER_PATH    = "./Test/VertexShader.glsl";
-constexpr const char* UNLIT_FRAGMENT_SHADER_PATH  = "./Test/BRDFPhongFragmentShaderUnlit.glsl";
+constexpr const char* UNLIT_FRAGMENT_SHADER_PATH = "./Test/UnlitFragmentShader.glsl";
+constexpr const char* SPECULAR_FRAGMENT_SHADER_PATH = "./Test/BRDFPhongFragmentShader.glsl";
+constexpr const char* METALLIC_FRAGMENT_SHADER_PATH = "./Test/BRDFCookTorranceShader.glsl";
 
 // DEBUG RENDER OPTIONS
 constexpr const char* RENDER_LIGTHS               = "Render Lights";
