@@ -3,8 +3,8 @@
 #include "Module.h"
 #include "ResourceManagement/Resources/Resource.h"
 
-#include "EngineEditorBase.h"
-#include "NodeEditor.h"
+#include "UI/EngineEditorBase.h"
+#include "UI/NodeEditor.h"
 
 
 

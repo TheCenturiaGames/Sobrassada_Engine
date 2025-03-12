@@ -275,7 +275,7 @@ void EditorUIModule::MainMenu()
             ImGui::EndMenu();
         }
 
-        if (ImGui::MenuItem("Quadtree", "", quadtreeViewerViewport)) quadtreeViewerViewport = !quadtreeViewerViewport;
+       
         if (ImGui::BeginMenu("Engine Editor Window"))
         {
 
