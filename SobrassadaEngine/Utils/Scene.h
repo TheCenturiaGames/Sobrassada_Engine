@@ -21,13 +21,19 @@ class Scene
     ~Scene();
 
     void Init();
-    void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
+    void Save(
+        rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator, UID saveUID = INVALID_UID,
+        const std::string& newName = ""
+    ) const;
 
     void LoadComponents() const;
     void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
+    void LoadModel(const UID modelUID);
 
     update_status Render(float deltaTime) const;
     update_status RenderEditor(float deltaTime);
+
+    void RenderEditorControl(bool& editorControlMenu);
     void RenderScene();
     void RenderSelectedGameObjectUI();
     void RenderHierarchyUI(bool& hierarchyMenu);
@@ -40,25 +46,26 @@ class Scene
     const char* GetSceneName() const { return sceneName; }
     UID GetSceneUID() const { return sceneUID; }
     UID GetGameObjectRootUID() const { return gameObjectRootUID; }
-    GameObject* GetSeletedGameObject() { return GetGameObjectByUID(selectedGameObjectUID); }
+    GameObject* GetSelectedGameObject() { return GetGameObjectByUID(selectedGameObjectUID); }
 
     const std::unordered_map<UID, GameObject*>& GetAllGameObjects() const { return gameObjectsContainer; }
+    const std::unordered_map<UID, Component*> GetAllComponents() const;
 
-    GameObject* GetGameObjectByUID(UID gameObjectUUID); // TODO: Change when filesystem defined
+    GameObject* GetGameObjectByUID(UID gameObjectUID); // TODO: Change when filesystem defined
 
     LightsConfig* GetLightsConfig() { return lightsConfig; }
+    const Octree* GetOctree() const { return sceneOctree; }
+
+    bool GetDoInputs() const { return doInputs; }
+    bool GetStopPlaying() const { return stopPlaying; }
 
     const std::tuple<float, float>& GetWindowPosition() const { return sceneWindowPosition; };
     const std::tuple<float, float>& GetWindowSize() const { return sceneWindowSize; };
     const std::tuple<float, float>& GetMousePosition() const { return mousePosition; };
-    const Octree* GetOctree() const { return sceneOctree; }
 
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
 
-    bool GetDoInputs() const { return doInputs; }
-    void LoadModel(const UID modelUID);
-
-    const std::unordered_map<UID, Component*> GetAllComponents() const;
+    void SetStopPlaying(bool stop) { stopPlaying = stop; }
 
   private:
     void CreateSpatialDataStruct();
@@ -69,6 +76,8 @@ class Scene
     const UID sceneUID;
     UID gameObjectRootUID;
     UID selectedGameObjectUID;
+    bool stopPlaying = false;
+    bool doInputs    = false;
 
     std::unordered_map<UID, GameObject*> gameObjectsContainer;
 
@@ -79,5 +88,4 @@ class Scene
     std::tuple<float, float> sceneWindowPosition = std::make_tuple(0.f, 0.f);
     std::tuple<float, float> sceneWindowSize     = std::make_tuple(0.f, 0.f);
     std::tuple<float, float> mousePosition       = std::make_tuple(0.f, 0.f);
-    bool doInputs                                = false;
 };

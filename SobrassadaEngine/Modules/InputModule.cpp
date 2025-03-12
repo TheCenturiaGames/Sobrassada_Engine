@@ -15,7 +15,6 @@ InputModule::InputModule()
     keyboard = new KeyState[MAX_KEYS];
     memset(keyboard, KEY_IDLE, sizeof(KeyState) * MAX_KEYS);
     memset(mouseButtons, KEY_IDLE, sizeof(KeyState) * NUM_MOUSE_BUTTONS);
-    subscribedCallbacks.assign(MAX_KEYS, std::vector<std::function<void(void)>>());
 }
 
 InputModule::~InputModule()
@@ -106,21 +105,6 @@ update_status InputModule::PreUpdate(float deltaTime)
         }
     }
 
-    if (App->GetSceneModule()->GetDoInputs())
-    {
-        // Dispatch events
-        for (int key = 0; key < MAX_KEYS; ++key)
-        {
-            if (keyboard[key] == KEY_DOWN)
-            {
-                for (const auto& it : subscribedCallbacks[key])
-                {
-                    it();
-                }
-            }
-        }
-    }
-
     return UPDATE_CONTINUE;
 }
 
@@ -129,11 +113,4 @@ bool InputModule::ShutDown()
     GLOG("Quitting SDL input event subsystem");
     SDL_QuitSubSystem(SDL_INIT_EVENTS);
     return true;
-}
-
-void InputModule::SubscribeToEvent(int keyEvent, const std::function<void(void)>& functionCallback)
-{
-    if (keyEvent > MAX_KEYS || keyEvent < 0) return;
-
-    subscribedCallbacks[keyEvent].push_back(functionCallback);
 }

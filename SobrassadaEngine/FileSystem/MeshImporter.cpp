@@ -221,7 +221,7 @@ namespace MeshImporter
         cursor += sizeof(float3);
 
         UID finalMeshUID;
-        if (sourceUID == INVALID_UUID)
+        if (sourceUID == INVALID_UID)
         {
             UID meshUID           = GenerateUID();
             finalMeshUID          = App->GetLibraryModule()->AssignFiletypeUID(meshUID, FileType::Mesh);

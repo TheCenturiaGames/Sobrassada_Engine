@@ -72,8 +72,13 @@ class CameraModule : public Module
 
     float movementScaleFactor = DEFAULT_CAMERA_MOVEMENT_SCALE_FACTOR;
     float cameraMoveSpeed     = DEFAULT_CAMERA_MOVEMENT_SPEED;
+
     float mouseSensitivity    = DEFAULT_CAMERA_MOUSE_SENSITIVITY;
+    float rotateSensitivity   = DEFAULT_CAMERA_ROTATE_SENSITIVITY;
+    float dragSensitivity     = DEFAULT_CAMERA_DRAG_SENSITIVITY;
+    float wheelSensitivity    = DEFAULT_CAMERA_WHEEL_SENSITIVITY;
     float zoomSensitivity     = DEFAULT_CAMERA_ZOOM_SENSITIVITY;
+
     float currentPitchAngle   = 0.f;
 
     bool isCameraDetached     = false;
