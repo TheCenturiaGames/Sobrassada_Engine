@@ -575,6 +575,7 @@ void Scene::LoadPrefab(const UID prefabUid)
 
         ResourcePrefab* prefab = (ResourcePrefab*)App->GetResourcesModule()->RequestResource(prefabUid);
         std::vector<GameObject*> gameObjects = prefab->GetGameObjectsVector();
+        // PROBABLY BREAKS BECAUSE WHEN LOADING A SECOND TIME THE RESOURCE ALREADY EXIST, SO THE GAMEOBJECT POINTERS ARE BROKER FOR DESTROYING THE PREVIOUS ONE
 
         // Right now it is loaded to the root gameObject
         gameObjects[0]->SetParent(GetGameObjectRootUID());
