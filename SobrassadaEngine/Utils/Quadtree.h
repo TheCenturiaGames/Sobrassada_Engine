@@ -56,7 +56,7 @@ class Quadtree
     ~Quadtree();
 
     bool InsertElement(GameObject* newElement);
-    void GetDrawLines(std::vector<LineSegment>& drawLines, std::vector<LineSegment>& elementLines) const;
+    const std::vector<LineSegment>& GetDrawLines();
 
     template <typename AreaType>
     void QueryElements(const AreaType& queryObject, std::vector<GameObject*>& foundElements) const;
@@ -66,6 +66,8 @@ class Quadtree
 
     int totalLeaf     = 0;
     int totalElements = 0;
+
+    std::vector<LineSegment> drawLines;
 };
 
 template <typename AreaType>

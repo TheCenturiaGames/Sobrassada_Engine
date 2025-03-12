@@ -65,6 +65,8 @@ class OpenGLModule : public Module
     void SetClearGreen(float newValue) { clearColorGreen = newValue; }
     void SetClearBlue(float newValue) { clearColorBlue = newValue; }
 
+    void SetRenderWireframe(bool renderWireframe);
+
   private:
     void* context            = nullptr;
     Framebuffer* framebuffer = nullptr;
