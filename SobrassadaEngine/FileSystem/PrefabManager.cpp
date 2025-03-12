@@ -56,7 +56,7 @@ namespace PrefabManager
 
             for (UID child : currentGameObject->GetChildren())
             {
-                queue.push(App->GetSceneModule()->GetGameObjectByUUID(child));
+                queue.push(App->GetSceneModule()->GetGameObjectByUID(child));
             }
 
             queue.pop();
@@ -72,7 +72,19 @@ namespace PrefabManager
         rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
         doc.Accept(writer);
 
-        unsigned int bytesWritten =
+        const std::string assetPath = PREFABS_PATH + name + PREFAB_EXTENSION;
+
+        // Save in assets
+        unsigned int bytesWritten   = (unsigned int
+        )FileSystem::Save(assetPath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
+        if (bytesWritten == 0)
+        {
+            GLOG("Failed to save prefab file: %s", assetPath);
+            return INVALID_UID;
+        }
+
+        // Save in library
+        bytesWritten =
             (unsigned int)FileSystem::Save(savePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
         if (bytesWritten == 0)
         {
@@ -82,9 +94,20 @@ namespace PrefabManager
 
         // Add the prefab to the resources map
         App->GetLibraryModule()->AddPrefab(finalPrefabUID, name);
+        App->GetLibraryModule()->AddName(name, finalPrefabUID);
         App->GetLibraryModule()->AddResource(savePath, finalPrefabUID);
 
         return finalPrefabUID;
+    }
+
+    void CopyPrefab(const std::string& filePath, const std::string& name, const UID sourceUID)
+    {
+        std::string destination = PREFABS_PATH + std::to_string(sourceUID) + PREFAB_EXTENSION;
+        FileSystem::Copy(filePath.c_str(), destination.c_str());
+
+        App->GetLibraryModule()->AddPrefab(sourceUID, name);
+        App->GetLibraryModule()->AddName(name, sourceUID);
+        App->GetLibraryModule()->AddResource(destination, sourceUID);
     }
 
     ResourcePrefab* LoadPrefab(UID prefabUID)
@@ -117,7 +140,6 @@ namespace PrefabManager
             {
                 const rapidjson::Value& gameObject = gameObjects[i];
                 GameObject* newObject              = new GameObject(gameObject);
-                newObject->CreateRootComponent();
 
                 // TODO: Deserialize the rest of components and add them to their corresponding gameObject,
                 // once the serialization is also done

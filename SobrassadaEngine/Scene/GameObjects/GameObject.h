@@ -46,7 +46,7 @@ class GameObject
     const std::string& GetName() const { return name; }
     void SetName(const std::string& newName) { name = newName; }
 
-    const std::vector<UID>& GetChildren() { return children; }
+    const std::vector<UID>& GetChildren() const { return children; }
     void AddChildren(UID childUID) { children.push_back(childUID); }
 
     UID GetParent() const { return parentUID; }

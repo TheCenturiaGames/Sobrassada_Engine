@@ -5,6 +5,7 @@
 #include "MeshImporter.h"
 #include "TextureImporter.h"
 #include "ModelImporter.h"
+#include "PrefabManager.h"
 
 namespace SceneImporter
 {
@@ -136,6 +137,11 @@ namespace SceneImporter
                 return; // only one material with the same name
             }
         }
+    }
+
+    void CopyPrefab(const std::string& filePath, const std::string& name, UID sourceUID)
+    {
+        PrefabManager::CopyPrefab(filePath, name, sourceUID);
     }
 
     void CreateLibraryDirectories()
