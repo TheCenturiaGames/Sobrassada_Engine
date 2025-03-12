@@ -54,7 +54,7 @@ class DDRenderInterfaceCoreGL final : public dd::RenderInterface
         glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(dd::DrawVertex), points);
 
         // Issue the draw call:
-        glDrawArrays(GL_POINTS, 0, count);
+        App->GetOpenGLModule()->DrawArrays(GL_POINTS, 0, count);
 
         glUseProgram(0);
         glBindVertexArray(0);
@@ -97,7 +97,7 @@ class DDRenderInterfaceCoreGL final : public dd::RenderInterface
         glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(dd::DrawVertex), lines);
 
         // Issue the draw call:
-        glDrawArrays(GL_LINES, 0, count);
+        App->GetOpenGLModule()->DrawArrays(GL_LINES, 0, count);
 
         glUseProgram(0);
         glBindVertexArray(0);
@@ -146,7 +146,8 @@ class DDRenderInterfaceCoreGL final : public dd::RenderInterface
         glBindBuffer(GL_ARRAY_BUFFER, textVBO);
         glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(dd::DrawVertex), glyphs);
 
-        glDrawArrays(GL_TRIANGLES, 0, count); // Issue the draw call
+        // Issue the draw call
+        App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, count);
 
         if (!already_blend)
         {

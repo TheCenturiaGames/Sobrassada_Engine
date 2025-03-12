@@ -25,9 +25,7 @@
 #define TINYGLTF_IMPLEMENTATION /* Only in one of the includes */
 #include <tiny_gltf.h>          // TODO Remove
 
-EditorUIModule::EditorUIModule()
-    : width(0), height(0), closeApplication(false), consoleMenu(false), import(false), load(false), save(false),
-      editorSettingsMenu(false)
+EditorUIModule::EditorUIModule() : width(0), height(0)
 {
 }
 
@@ -53,13 +51,6 @@ bool EditorUIModule::Init()
     startPath  = std::filesystem::current_path().string();
     scenesPath = startPath + DELIMITER + SCENES_PATH;
 
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_G, [&] { mCurrentGizmoOperation = ImGuizmo::TRANSLATE; });
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_H, [&] { mCurrentGizmoOperation = ImGuizmo::ROTATE; });
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_J, [&] { mCurrentGizmoOperation = ImGuizmo::SCALE; });
-
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_R, [&] { transformType = ImGuizmo::LOCAL; });
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_T, [&] { transformType = ImGuizmo::WORLD; });
-
     return true;
 }
 
@@ -81,7 +72,7 @@ update_status EditorUIModule::PreUpdate(float deltaTime)
 
 update_status EditorUIModule::Update(float deltaTime)
 {
-    LimitFPS(deltaTime);
+    UpdateGizmoTransformMode();
     AddFramePlotData(deltaTime);
     return UPDATE_CONTINUE;
 }
@@ -98,8 +89,13 @@ update_status EditorUIModule::RenderEditor(float deltaTime)
 
 update_status EditorUIModule::PostUpdate(float deltaTime)
 {
-
     if (closeApplication) return UPDATE_STOP;
+
+    if (closeScene)
+    {
+        App->GetSceneModule()->CloseScene();
+        closeScene = false;
+    }
 
     return UPDATE_CONTINUE;
 }
@@ -116,16 +112,39 @@ bool EditorUIModule::ShutDown()
     return true;
 }
 
-void EditorUIModule::LimitFPS(float deltaTime) const
+void EditorUIModule::UpdateGizmoTransformMode()
 {
-    if (deltaTime == 0) return;
-
-    float targetFrameTime = 1000.f / maxFPS;
-
-    if (maxFPS != 0)
+    if (App->GetSceneModule()->GetDoInputsScene())
     {
-        if (deltaTime < targetFrameTime) SDL_Delay(static_cast<Uint32>(targetFrameTime - deltaTime));
+        const KeyState* keyboard = App->GetInputModule()->GetKeyboard();
+
+        if (keyboard[SDL_SCANCODE_G]) currentGizmoOperation = GizmoOperation::TRANSLATE;
+        else if (keyboard[SDL_SCANCODE_H]) currentGizmoOperation = GizmoOperation::ROTATE;
+        else if (keyboard[SDL_SCANCODE_J]) currentGizmoOperation = GizmoOperation::SCALE;
+
+        if (keyboard[SDL_SCANCODE_R]) transformType = GizmoTransform::LOCAL;
+        else if (keyboard[SDL_SCANCODE_T]) transformType = GizmoTransform::WORLD;
     }
+}
+
+ImGuizmo::OPERATION EditorUIModule::GetImGuizmoOperation() const
+{
+    switch (currentGizmoOperation)
+    {
+    case GizmoOperation::TRANSLATE:
+        return ImGuizmo::TRANSLATE;
+    case GizmoOperation::ROTATE:
+        return ImGuizmo::ROTATE;
+    case GizmoOperation::SCALE:
+        return ImGuizmo::SCALE;
+    }
+    return ImGuizmo::TRANSLATE;
+}
+
+ImGuizmo::MODE EditorUIModule::GetImGuizmoTransformMode() const
+{
+    if (transformType == GizmoTransform::LOCAL) return ImGuizmo::LOCAL;
+    else return ImGuizmo::WORLD;
 }
 
 void EditorUIModule::AddFramePlotData(float deltaTime)
@@ -160,13 +179,13 @@ void EditorUIModule::Draw()
 
     if (aboutMenu) About(aboutMenu);
 
-    if (import) ImportDialog(import);
+    if (importMenu) ImportDialog(importMenu);
 
-    if (load) LoadDialog(load);
+    if (loadMenu) LoadDialog(loadMenu);
 
     if (loadModel) LoadModelDialog(loadModel);
 
-    if (save) SaveDialog(save);
+    if (saveMenu) SaveDialog(saveMenu);
 
     if (editorSettingsMenu) EditorSettings(editorSettingsMenu);
 }
@@ -175,39 +194,68 @@ void EditorUIModule::MainMenu()
 {
     ImGui::BeginMainMenuBar();
 
+    bool sceneLoaded = App->GetSceneModule()->IsSceneLoaded();
+    bool inPlayMode  = App->GetSceneModule()->GetInPlayMode();
+
     // File tab menu
     if (ImGui::BeginMenu("File"))
     {
+
         if (ImGui::MenuItem("Create", "")) App->GetSceneModule()->CreateScene();
 
-        if (ImGui::MenuItem("Import", "", import)) import = !import;
+        if (ImGui::MenuItem("Load", "", loadMenu)) loadMenu = !loadMenu;
 
-        if (ImGui::MenuItem("Load", "", load)) load = !load;
-
+        ImGui::BeginDisabled(inPlayMode || !sceneLoaded);
         if (ImGui::MenuItem("Save"))
         {
-            if (!App->GetLibraryModule()->SaveScene(scenesPath.c_str(), SaveMode::Save))
-            {
-                save = !save;
-            }
+            if (!App->GetLibraryModule()->SaveScene(scenesPath.c_str(), SaveMode::Save)) saveMenu = !saveMenu;
         }
 
-        if (ImGui::MenuItem("Save as")) save = !save;
+        if (ImGui::MenuItem("Save as", "", saveMenu)) saveMenu = !saveMenu;
+        ImGui::EndDisabled();
+
+        ImGui::BeginDisabled(!sceneLoaded);
+        if (ImGui ::MenuItem("Close")) closeScene = true;
+        ImGui::EndDisabled();
 
         if (ImGui::MenuItem("Quit")) closeApplication = true;
 
         ImGui::EndMenu();
     }
 
-    // Windows tab menu
-    if (ImGui::BeginMenu("Window"))
+    // Assets tab menu
+    if (ImGui::BeginMenu("Assets"))
+    {
+        if (ImGui::MenuItem("Import", "", importMenu)) importMenu = !importMenu;
+
+        if (ImGui::BeginMenu("Resource Loader"))
+        {
+            ImGui::BeginDisabled(!sceneLoaded);
+            if (ImGui::MenuItem("Load Model"))
+            {
+                loadModel = !loadModel;
+                ImGui::OpenPopup(CONSTANT_MODEL_SELECT_DIALOG_ID);
+            }
+            ImGui::EndDisabled();
+
+            ImGui::EndMenu();
+        }
+
+        ImGui::EndMenu();
+    }
+
+    // View tab menu
+    if (ImGui::BeginMenu("View"))
     {
         if (ImGui::MenuItem("Console", "", consoleMenu)) consoleMenu = !consoleMenu;
 
         if (ImGui::BeginMenu("Scene"))
         {
+            ImGui::BeginDisabled(!sceneLoaded);
+            if (ImGui::MenuItem("Editor Control", "", editorControlMenu)) editorControlMenu = !editorControlMenu;
             if (ImGui::MenuItem("Hierarchy", "", hierarchyMenu)) hierarchyMenu = !hierarchyMenu;
             if (ImGui::MenuItem("Inspector", "", inspectorMenu)) inspectorMenu = !inspectorMenu;
+            ImGui::EndDisabled();
 
             ImGui::EndMenu();
         }
@@ -219,30 +267,14 @@ void EditorUIModule::MainMenu()
         ImGui::EndMenu();
     }
 
-    // Menu window to load files into scene (useful while a window with the
-    // resources to drag and drop does not exist)
-    if (App->GetSceneModule()->GetSceneUID() != INVALID_UUID)
-    {
-        if (ImGui::BeginMenu("Resource Loader"))
-        {
-            if (ImGui::MenuItem("Load Model"))
-            {
-                loadModel = !loadModel;
-                ImGui::OpenPopup(CONSTANT_MODEL_SELECT_DIALOG_ID);
-            }
-
-            ImGui::EndMenu();
-        }
-    }
-
     ImGui::EndMainMenuBar();
 }
 
-void EditorUIModule::LoadDialog(bool& load)
+void EditorUIModule::LoadDialog(bool& loadMenu)
 {
     ImGui::SetNextWindowSize(ImVec2(width * 0.25f, height * 0.4f), ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin("Load Scene", &load, ImGuiWindowFlags_NoCollapse))
+    if (!ImGui::Begin("Load Scene", &loadMenu, ImGuiWindowFlags_NoCollapse))
     {
         ImGui::End();
         return;
@@ -286,11 +318,10 @@ void EditorUIModule::LoadDialog(bool& load)
     {
         if (!inputFile.empty())
         {
-            std::string loadPath = SCENES_PATH + inputFile;
-            App->GetLibraryModule()->LoadScene(loadPath.c_str());
+            App->GetLibraryModule()->LoadScene(inputFile.c_str());
         }
         inputFile = "";
-        load      = false;
+        loadMenu  = false;
     }
 
     ImGui::SameLine();
@@ -298,7 +329,7 @@ void EditorUIModule::LoadDialog(bool& load)
     if (ImGui::Button("Cancel", ImVec2(0, 0)))
     {
         inputFile = "";
-        load      = false;
+        loadMenu  = false;
     }
 
     ImGui::End();
@@ -314,7 +345,7 @@ void EditorUIModule::LoadModelDialog(bool& loadModel)
         return;
     }
 
-    static UID modelUid         = INVALID_UUID;
+    static UID modelUid         = INVALID_UID;
     static char searchText[255] = "";
     ImGui::InputText("Search", searchText, 255);
 
@@ -346,11 +377,11 @@ void EditorUIModule::LoadModelDialog(bool& loadModel)
     ImGui::End();
 }
 
-void EditorUIModule::SaveDialog(bool& save)
+void EditorUIModule::SaveDialog(bool& saveMenu)
 {
     ImGui::SetNextWindowSize(ImVec2(width * 0.25f, height * 0.4f), ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin("Save Scene", &save, ImGuiWindowFlags_NoCollapse))
+    if (!ImGui::Begin("Save Scene", &saveMenu, ImGuiWindowFlags_NoCollapse))
     {
         ImGui::End();
         return;
@@ -389,11 +420,11 @@ void EditorUIModule::SaveDialog(bool& save)
     {
         if (strlen(inputFile) > 0)
         {
-            std::string savePath = scenesPath + inputFile + SCENE_EXTENSION;
+            std::string savePath = inputFile;
             App->GetLibraryModule()->SaveScene(savePath.c_str(), SaveMode::SaveAs);
         }
         inputFile[0] = '\0';
-        save         = false;
+        saveMenu     = false;
     }
 
     ImGui::SameLine();
@@ -401,17 +432,17 @@ void EditorUIModule::SaveDialog(bool& save)
     if (ImGui::Button("Cancel", ImVec2(0, 0)))
     {
         inputFile[0] = '\0';
-        save         = false;
+        saveMenu     = false;
     }
 
     ImGui::End();
 }
 
-void EditorUIModule::ImportDialog(bool& import)
+void EditorUIModule::ImportDialog(bool& importMenu)
 {
     ImGui::SetNextWindowSize(ImVec2(width * 0.4f, height * 0.4f), ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin("Import Asset", &import, ImGuiWindowFlags_NoCollapse))
+    if (!ImGui::Begin("Import Asset", &importMenu, ImGuiWindowFlags_NoCollapse))
     {
         ImGui::End();
         return;
@@ -577,7 +608,7 @@ void EditorUIModule::ImportDialog(bool& import)
     {
         inputFile      = "";
         currentPath    = startPath;
-        import         = false;
+        importMenu     = false;
         showDrives     = false;
         searchQuery[0] = '\0';
         loadFiles      = true;
@@ -594,7 +625,7 @@ void EditorUIModule::ImportDialog(bool& import)
         }
         inputFile      = "";
         currentPath    = startPath;
-        import         = false;
+        importMenu     = false;
         showDrives     = false;
         searchQuery[0] = '\0';
         loadFiles      = true;
@@ -629,7 +660,7 @@ bool EditorUIModule::RenderTransformWidget(
     float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform
 )
 {
-    float4x4 outputTransform = float4x4(transformType == ImGuizmo::LOCAL ? localTransform : globalTransform);
+    float4x4 outputTransform = float4x4(transformType == GizmoTransform::LOCAL ? localTransform : globalTransform);
 
     float3 outputScale       = outputTransform.GetScale();
     outputTransform.ScaleCol3(0, outputScale.x != 0 ? 1 / outputScale.x : 1);
@@ -642,7 +673,7 @@ bool EditorUIModule::RenderTransformWidget(
     static bool lockScaleAxis = false;
     float3 originalScale      = float3(outputScale);
 
-    std::string transformName = std::string(transformType == ImGuizmo::LOCAL ? "Local " : "World ") + "Transform";
+    std::string transformName = std::string(transformType == GizmoTransform::LOCAL ? "Local " : "World ") + "Transform";
     ImGui::SeparatorText(transformName.c_str());
 
     RenderBasicTransformModifiers(
@@ -678,7 +709,7 @@ bool EditorUIModule::RenderTransformWidget(
         outputTransform.ScaleCol3(1, outputScale.y);
         outputTransform.ScaleCol3(2, outputScale.z);
 
-        if (transformType == ImGuizmo::WORLD)
+        if (transformType == GizmoTransform::WORLD)
         {
             localTransform = parentTransform.Inverted() * outputTransform;
         }
@@ -705,23 +736,26 @@ bool EditorUIModule::RenderImGuizmo(
 
     float4x4 transform = float4x4(globalTransform);
     transform.Transpose();
-    Manipulate(view.ptr(), proj.ptr(), mCurrentGizmoOperation, transformType, transform.ptr());
 
-    if (!ImGuizmo::IsUsing())
+    ImGuizmo::OPERATION operation = GetImGuizmoOperation();
+    ImGuizmo::MODE mode           = GetImGuizmoTransformMode();
+
+    ImGuizmo::Enable(true);
+    ImGuizmo::Manipulate(
+        view.ptr(), proj.ptr(), operation, mode, transform.ptr(), nullptr, snapEnabled ? snapValues.ptr() : nullptr,
+        nullptr, nullptr
+    );
+
+    if (!ImGuizmo::IsUsing()) return false;
+
+    if (App->GetSceneModule()->GetDoInputsScene())
     {
-        return false;
-    }
-
-    if (App->GetSceneModule()->GetDoInputs())
-    {
-
+        transform.Transpose();
         if (transform.TranslatePart().Distance(App->GetCameraModule()->GetCameraPosition()) > maxDistance)
         {
             ImGuizmo::Enable(false);
             return false;
         }
-
-        transform.Transpose();
         localTransform = parentTransform.Inverted() * transform;
     }
 
@@ -1013,12 +1047,6 @@ void EditorUIModule::EditorSettings(bool& editorSettingsMenu)
     }
 
     ImGui::Spacing();
-    if (ImGui::CollapsingHeader("Game timer"))
-    {
-        GameTimerConfig();
-    }
-
-    ImGui::Spacing();
 
     ImGui::SeparatorText("Modules Configuration");
     if (ImGui::CollapsingHeader("Window"))
@@ -1037,6 +1065,13 @@ void EditorUIModule::EditorSettings(bool& editorSettingsMenu)
         ImGui::Text("Key A: %s", (keyboard[SDL_SCANCODE_A] ? "Pressed" : "Not Pressed"));
         ImGui::Text("Key S: %s", (keyboard[SDL_SCANCODE_S] ? "Pressed" : "Not Pressed"));
         ImGui::Text("Key D: %s", (keyboard[SDL_SCANCODE_D] ? "Pressed" : "Not Pressed"));
+        ImGui::Text("Key F: %s", (keyboard[SDL_SCANCODE_F] ? "Pressed" : "Not Pressed"));
+        ImGui::Text("Key G: %s", (keyboard[SDL_SCANCODE_G] ? "Pressed" : "Not Pressed"));
+        ImGui::Text("Key H: %s", (keyboard[SDL_SCANCODE_H] ? "Pressed" : "Not Pressed"));
+        ImGui::Text("Key J: %s", (keyboard[SDL_SCANCODE_J] ? "Pressed" : "Not Pressed"));
+        ImGui::Text("Key R: %s", (keyboard[SDL_SCANCODE_R] ? "Pressed" : "Not Pressed"));
+        ImGui::Text("Key T: %s", (keyboard[SDL_SCANCODE_T] ? "Pressed" : "Not Pressed"));
+        ImGui::Text("Key O: %s", (keyboard[SDL_SCANCODE_O] ? "Pressed" : "Not Pressed"));
         ImGui::Text("Key LSHIFT: %s", (keyboard[SDL_SCANCODE_LSHIFT] ? "Pressed" : "Not Pressed"));
         ImGui::Text("Key LALT: %s", (keyboard[SDL_SCANCODE_LALT] ? "Pressed" : "Not Pressed"));
 
@@ -1081,32 +1116,9 @@ void EditorUIModule::FramePlots(bool& vsync)
 {
     static int refreshRate = App->GetWindowModule()->GetDesktopDisplayMode().refresh_rate;
 
-    static int sliderFPS   = 0;
-    ImGui::SliderInt("Max FPS", &sliderFPS, 0, refreshRate);
-
     static float maxYAxis;
-    if (sliderFPS == 0)
-    {
-        if (vsync)
-        {
-            maxFPS   = refreshRate;
-            maxYAxis = maxFPS * 1.66f;
-        }
-        else
-        {
-            maxFPS   = 0;
-            maxYAxis = 1000.f * 1.66f;
-        }
-    }
-    else
-    {
-        maxFPS   = sliderFPS;
-        maxYAxis = maxFPS * 1.66f;
-    }
-
-    ImGui::Text("Limit Framerate: ");
-    ImGui::SameLine();
-    ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", maxFPS);
+    if (vsync) maxYAxis = refreshRate * 1.66f;
+    else maxYAxis = 1000.f * 1.66f;
 
     char title[25];
     std::vector<float> frametimeVector(frametime.begin(), frametime.end());
@@ -1124,12 +1136,11 @@ void EditorUIModule::FramePlots(bool& vsync)
 
 void EditorUIModule::WindowConfig(bool& vsync) const
 {
-    static bool borderless   = BORDERLESS;
-    static bool full_desktop = FULL_DESKTOP;
-    static bool resizable    = RESIZABLE;
     static bool fullscreen   = FULLSCREEN;
+    static bool full_desktop = FULL_DESKTOP;
+    static bool borderless   = BORDERLESS;
+    static bool resizable    = RESIZABLE;
 
-    // Brightness Slider
     float brightness         = App->GetWindowModule()->GetBrightness();
     if (ImGui::SliderFloat("Brightness", &brightness, 0, 1)) App->GetWindowModule()->SetBrightness(brightness);
 
@@ -1137,28 +1148,25 @@ void EditorUIModule::WindowConfig(bool& vsync) const
     int maxWidth                 = displayMode.w;
     int maxHeight                = displayMode.h;
 
-    // Width Slider
     int width                    = App->GetWindowModule()->GetWidth();
     if (ImGui::SliderInt("Width", &width, 0, maxWidth)) App->GetWindowModule()->SetWidth(width);
 
-    // Height Slider
     int height = App->GetWindowModule()->GetHeight();
     if (ImGui::SliderInt("Height", &height, 0, maxHeight)) App->GetWindowModule()->SetHeight(height);
 
-    // Set Fullscreen
     if (ImGui::Checkbox("Fullscreen", &fullscreen)) App->GetWindowModule()->SetFullscreen(fullscreen);
+
+    ImGui::SameLine();
+
+    if (ImGui::Checkbox("Full Desktop", &full_desktop)) App->GetWindowModule()->SetFullDesktop(full_desktop);
+
+    if (ImGui::Checkbox("Borderless", &borderless)) App->GetWindowModule()->SetBorderless(borderless);
+
     ImGui::SameLine();
 
     // Set Resizable
     if (ImGui::Checkbox("Resizable", &resizable)) App->GetWindowModule()->SetResizable(resizable);
     if (ImGui::IsItemHovered()) ImGui::SetTooltip("Restart to apply");
-
-    // Set Borderless
-    if (ImGui::Checkbox("Borderless", &borderless)) App->GetWindowModule()->SetBorderless(borderless);
-    ImGui::SameLine();
-
-    // Set Full Desktop
-    if (ImGui::Checkbox("Full Desktop", &full_desktop)) App->GetWindowModule()->SetFullDesktop(full_desktop);
 
     // Set Vsync
     if (ImGui::Checkbox("Vsync", &vsync)) App->GetWindowModule()->SetVsync(vsync);
@@ -1218,6 +1226,31 @@ void EditorUIModule::OpenGLConfig() const
     {
         openGLModule->SetFrontFaceMode(frontFaceMode);
     }
+
+    ImGui::SeparatorText("Render Information");
+
+    ImGui::Text("Draw calls:");
+    ImGui::SameLine();
+    ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", App->GetOpenGLModule()->GetDrawCallsCount());
+
+    float currentTime     = App->GetEngineTimer()->GetTime() / 1000.f;
+    static float lastTime = 0.f;
+
+    static std::string tpsStr;
+    if (currentTime - lastTime > 1.f)
+    {
+        unsigned int tps = static_cast<unsigned int>(App->GetOpenGLModule()->GetTrianglesPerSecond());
+        lastTime         = currentTime;
+        tpsStr           = FormatWithCommas(tps);
+    }
+
+    ImGui::Text("Triangles per second:");
+    ImGui::SameLine();
+    ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s", tpsStr.c_str());
+
+    ImGui::Text("Vertices:");
+    ImGui::SameLine();
+    ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", App->GetOpenGLModule()->GetVerticesCount());
 }
 
 void EditorUIModule::GameTimerConfig() const
@@ -1354,4 +1387,12 @@ void EditorUIModule::ShowCaps() const
             cont++;
         }
     }
+}
+
+std::string EditorUIModule::FormatWithCommas(unsigned int number) const
+{
+    std::stringstream ss;
+    ss.imbue(std::locale("en_US.UTF-8")); // use commas
+    ss << number;
+    return ss.str();
 }

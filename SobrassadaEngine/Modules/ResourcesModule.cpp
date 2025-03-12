@@ -1,6 +1,5 @@
 #include "ResourcesModule.h"
 
-#include "Application.h"
 #include "FileSystem/Importer.h"
 #include "FileSystem/MeshImporter.h"
 #include "LibraryModule.h"
@@ -23,9 +22,6 @@ ResourcesModule::~ResourcesModule()
 
 bool ResourcesModule::Init()
 {
-    program = App->GetShaderModule()->GetProgram(LIGHTS_VERTEX_SHADER_PATH, LIGHTS_FRAGMENT_SHADER_PATH);
-    programUnlit = App->GetShaderModule()->GetProgram(UNLIT_VERTEX_SHADER_PATH, UNLIT_FRAGMENT_SHADER_PATH);
-
     return true;
 }
 
