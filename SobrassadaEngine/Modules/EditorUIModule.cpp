@@ -98,7 +98,7 @@ update_status EditorUIModule::RenderEditor(float deltaTime)
             ++it;
         }
     }
-    if (quadtreeViewerViewport) quadtreeViewer->Render(quadtreeViewerViewport);
+ 
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -279,7 +279,7 @@ void EditorUIModule::MainMenu()
             ImGui::EndMenu();
         }
 
-        if (ImGui::MenuItem("Quadtree", "", quadtreeViewerViewport)) quadtreeViewerViewport = !quadtreeViewerViewport;
+       
 
         if (ImGui::BeginMenu("Engine Editor Window"))
         {
