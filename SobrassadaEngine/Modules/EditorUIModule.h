@@ -39,6 +39,8 @@ class EditorUIModule : public Module
     T RenderResourceSelectDialog(
         const char* id, const std::unordered_map<std::string, T>& availableResources, const T& defaultResource
     );
+    
+    std::string RenderFileDialog(bool& window, const char* windowTitle, bool selectFolder = false) const;
 
   private:
     void RenderBasicTransformModifiers(

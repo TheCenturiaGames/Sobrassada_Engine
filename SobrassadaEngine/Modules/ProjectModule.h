@@ -22,7 +22,9 @@ public:
 
 private:
 
-    bool projectLoaded = true;
+    bool projectLoaded = false;
+    bool projectLoadFileSelectDialogOpen = false;
+    bool projectSelectPathFileSelectDialogOpen = false;
 
     std::string loadedProjectName = "No project loaded";
     std::string loadedProjectAbsolutePath;

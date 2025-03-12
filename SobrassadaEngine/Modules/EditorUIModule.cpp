@@ -347,78 +347,18 @@ void EditorUIModule::LoadModelDialog(bool& loadModel)
     ImGui::End();
 }
 
-void EditorUIModule::SaveDialog(bool& save)
-{
-    ImGui::SetNextWindowSize(ImVec2(width * 0.25f, height * 0.4f), ImGuiCond_FirstUseEver);
-
-    if (!ImGui::Begin("Save Scene", &save, ImGuiWindowFlags_NoCollapse))
-    {
-        ImGui::End();
-        return;
-    }
-
-    static std::vector<std::string> files;
-    static char inputFile[32];
-
-    ImGui::BeginChild("scrollFiles", ImVec2(0, -30), ImGuiChildFlags_Borders);
-
-    if (FileSystem::Exists(scenesPath.c_str()))
-    {
-        if (ImGui::TreeNodeEx("Scenes/", ImGuiTreeNodeFlags_DefaultOpen))
-        {
-            FileSystem::GetFilesSorted(scenesPath, files);
-
-            for (int i = 0; i < files.size(); i++)
-            {
-                const std::string& file = files[i];
-                if (ImGui::Selectable(file.c_str()))
-                {
-                }
-            }
-
-            ImGui::TreePop();
-        }
-    }
-
-    ImGui::EndChild();
-
-    ImGui::InputText("##filename", inputFile, IM_ARRAYSIZE(inputFile));
-
-    ImGui::SameLine();
-
-    if (ImGui::Button("Ok", ImVec2(0, 0)))
-    {
-        if (strlen(inputFile) > 0)
-        {
-            std::string savePath = scenesPath + inputFile + SCENE_EXTENSION;
-            App->GetLibraryModule()->SaveScene(savePath.c_str(), SaveMode::SaveAs);
-        }
-        inputFile[0] = '\0';
-        save         = false;
-    }
-
-    ImGui::SameLine();
-
-    if (ImGui::Button("Cancel", ImVec2(0, 0)))
-    {
-        inputFile[0] = '\0';
-        save         = false;
-    }
-
-    ImGui::End();
-}
-
-void EditorUIModule::ImportDialog(bool& import)
+std::string EditorUIModule::RenderFileDialog(bool& window, const char* windowTitle, bool selectFolder) const
 {
     ImGui::SetNextWindowSize(ImVec2(width * 0.4f, height * 0.4f), ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin("Import Asset", &import, ImGuiWindowFlags_NoCollapse))
+    if (!ImGui::Begin(windowTitle, &window, ImGuiWindowFlags_NoCollapse))
     {
         ImGui::End();
-        return;
+        return "";
     }
 
     static std::string currentPath = App->GetProjectModule()->GetLoadedProjectPath();
+    if (currentPath == "")  currentPath = "C:"; 
     static std::vector<std::string> accPaths;
     static bool loadButtons = true;
 
@@ -549,11 +489,20 @@ void EditorUIModule::ImportDialog(bool& import)
                     loadFiles      = true;
                     loadButtons    = true;
                 }
-                else if (isDirectory)
+                else if (isDirectory && !selectFolder)
                 {
                     currentPath = filePath;
                     inputFile   = "";
                     selected    = -1;
+                    FileSystem::GetFilesSorted(currentPath, files);
+                    searchQuery[0] = '\0';
+                    loadFiles      = true;
+                    loadButtons    = true;
+                }
+                else if (isDirectory && selectFolder)
+                {
+                    currentPath = filePath;
+                    inputFile = FileSystem::GetFileNameWithExtension(file);
                     FileSystem::GetFilesSorted(currentPath, files);
                     searchQuery[0] = '\0';
                     loadFiles      = true;
@@ -578,7 +527,7 @@ void EditorUIModule::ImportDialog(bool& import)
     {
         inputFile      = "";
         currentPath    = App->GetProjectModule()->GetLoadedProjectPath();
-        import         = false;
+        window         = false;
         showDrives     = false;
         searchQuery[0] = '\0';
         loadFiles      = true;
@@ -588,20 +537,92 @@ void EditorUIModule::ImportDialog(bool& import)
 
     if (ImGui::Button("Ok", ImVec2(0, 0)))
     {
-        if (!inputFile.empty())
-        {
-            std::string importPath = currentPath + DELIMITER + inputFile;
-            SceneImporter::Import(importPath.c_str());
-        }
+        std::string importPath = inputFile.empty() ? "" : currentPath + DELIMITER + inputFile;
+        
         inputFile      = "";
         currentPath    = App->GetProjectModule()->GetLoadedProjectPath();
-        import         = false;
+        window         = false;
         showDrives     = false;
         searchQuery[0] = '\0';
         loadFiles      = true;
+
+        ImGui::End();
+        return importPath;
     }
 
     ImGui::End();
+
+    return "";
+}
+
+void EditorUIModule::SaveDialog(bool& save)
+{
+    ImGui::SetNextWindowSize(ImVec2(width * 0.25f, height * 0.4f), ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin("Save Scene", &save, ImGuiWindowFlags_NoCollapse))
+    {
+        ImGui::End();
+        return;
+    }
+
+    static std::vector<std::string> files;
+    static char inputFile[32];
+
+    ImGui::BeginChild("scrollFiles", ImVec2(0, -30), ImGuiChildFlags_Borders);
+
+    if (FileSystem::Exists(scenesPath.c_str()))
+    {
+        if (ImGui::TreeNodeEx("Scenes/", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            FileSystem::GetFilesSorted(scenesPath, files);
+
+            for (int i = 0; i < files.size(); i++)
+            {
+                const std::string& file = files[i];
+                if (ImGui::Selectable(file.c_str()))
+                {
+                }
+            }
+
+            ImGui::TreePop();
+        }
+    }
+
+    ImGui::EndChild();
+
+    ImGui::InputText("##filename", inputFile, IM_ARRAYSIZE(inputFile));
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Ok", ImVec2(0, 0)))
+    {
+        if (strlen(inputFile) > 0)
+        {
+            std::string savePath = scenesPath + inputFile + SCENE_EXTENSION;
+            App->GetLibraryModule()->SaveScene(savePath.c_str(), SaveMode::SaveAs);
+        }
+        inputFile[0] = '\0';
+        save         = false;
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Cancel", ImVec2(0, 0)))
+    {
+        inputFile[0] = '\0';
+        save         = false;
+    }
+
+    ImGui::End();
+}
+
+void EditorUIModule::ImportDialog(bool& import)
+{
+    const std::string resultingPath = RenderFileDialog(import, "Import Asset");
+    if (!resultingPath.empty())
+    {
+        SceneImporter::Import(resultingPath.c_str());
+    }
 }
 
 void EditorUIModule::Console(bool& consoleMenu) const

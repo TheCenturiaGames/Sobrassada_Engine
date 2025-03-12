@@ -1,6 +1,8 @@
 ﻿#include "ProjectModule.h"
 
 #include "Application.h"
+#include "EditorUIModule.h"
+#include "FileSystem.h"
 #include "ImGui.h"
 #include "WindowModule.h"
 
@@ -23,23 +25,24 @@ update_status ProjectModule::RenderEditor(float deltaTime)
 {
     if (!projectLoaded)
     {
+        static char newProjectPath[255];
+        static char newProjectName[255];
         if (ImGui::Begin("Project manager"))
         {
             ImGui::BeginTabBar("##ProjectLoaderBar", ImGuiTabBarFlags_None);
             {
                 if (ImGui::BeginTabItem("Create new project"))
                 {
-                    static char newProjectPath[255];
-                    static char newProjectName[255];
+                    
                     ImGui::InputText("Path", newProjectPath, 255);
-                    // TODO  Button for file dialog
                     ImGui::SameLine();
-                    ImGui::InputText("Name", newProjectPath, 255);
-            
-                    if (ImGui::Button("Select project"))
+                    if (ImGui::Button("Select path"))
                     {
-                        //todo add file dialog
+                        projectSelectPathFileSelectDialogOpen = true;
                     }
+                    ImGui::InputText("Name", newProjectName, 255);
+                    ImGui::Text("Project path: %s\\%s", newProjectPath, newProjectName);
+                    
                     ImGui::EndTabItem();
                 }
                 if (ImGui::BeginTabItem("Load project"))
@@ -49,7 +52,7 @@ update_status ProjectModule::RenderEditor(float deltaTime)
                     ImGui::SameLine();
                     if (ImGui::Button("Select project"))
                     {
-                        //todo add file dialog
+                        projectLoadFileSelectDialogOpen = true;
                     }
                     ImGui::Text(selectedProjectPath);
                     ImGui::EndTabItem();
@@ -66,6 +69,23 @@ update_status ProjectModule::RenderEditor(float deltaTime)
             }
         
             ImGui::End();
+
+            if (projectLoadFileSelectDialogOpen)
+            {
+                const std::string resultingPath = App->GetEditorUIModule()->RenderFileDialog(projectLoadFileSelectDialogOpen, "Select project", true);
+                if (!resultingPath.empty())
+                {
+                    memcpy(newProjectPath, resultingPath.c_str(), 255);
+                    memcpy(newProjectName, FileSystem::GetFileNameWithoutExtension(newProjectPath).c_str(), 255);
+                }
+            } else if (projectSelectPathFileSelectDialogOpen)
+            {
+                const std::string resultingPath = App->GetEditorUIModule()->RenderFileDialog(projectSelectPathFileSelectDialogOpen, "Select save location", true);
+                if (!resultingPath.empty())
+                {
+                    memcpy(newProjectPath, resultingPath.c_str(), 255);
+                }
+            }
             return UPDATE_CONTINUE;
         }
     }
