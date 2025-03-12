@@ -55,7 +55,7 @@ GameObject* Component::GetParent()
 {
     if (parent == nullptr)
     {
-        parent = App->GetSceneModule()->GetGameObjectByUUID(parentUID);
+        parent = App->GetSceneModule()->GetGameObjectByUID(parentUID);
         if (parent == nullptr)
         {
             // GLOG("Could not load parent with UID: %s - Object does not exist", uidParent)

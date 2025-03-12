@@ -42,6 +42,7 @@ class Application
     DebugDrawModule* GetDebugDrawModule() { return debugDraw; }
     UserInterfaceModule* GetUserInterfaceModule() { return UIModule; }
 
+    EngineTimer* GetEngineTimer() { return engineTimer; }
     GameTimer* GetGameTimer() { return gameTimer; }
 
   private:

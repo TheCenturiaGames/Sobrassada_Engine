@@ -52,7 +52,7 @@ namespace TextureImporter
         std::string fileName = FileSystem::GetFileNameWithoutExtension(sourceFilePath);
 
         UID finalTextureUID;
-        if (sourceUID == INVALID_UUID)
+        if (sourceUID == INVALID_UID)
         {
             UID textureUID  = GenerateUID();
             finalTextureUID = App->GetLibraryModule()->AssignFiletypeUID(textureUID, FileType::Texture);
@@ -74,6 +74,7 @@ namespace TextureImporter
 
         // added texture to textures map
         App->GetLibraryModule()->AddTexture(finalTextureUID, fileName);
+        App->GetLibraryModule()->AddName(fileName, finalTextureUID);
         App->GetLibraryModule()->AddResource(saveFilePath, finalTextureUID);
 
         GLOG("%s saved as dds", fileName.c_str());
