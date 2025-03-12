@@ -18,22 +18,21 @@ ResourcesModule::ResourcesModule()
 
 ResourcesModule::~ResourcesModule()
 {
-    for (auto resource : resources)
-    {
-        delete resource.second;
-    }
-    resources.clear();
+    
 }
 
 bool ResourcesModule::Init()
 {
-    program = App->GetShaderModule()->GetProgram("./Test/VertexShader.glsl", "./Test/BRDFPhongFragmentShader.glsl");
-
     return true;
 }
 
 bool ResourcesModule::ShutDown()
 {
+    for (auto resource : resources)
+    {
+        delete resource.second;
+    }
+    resources.clear();
     return true;
 }
 

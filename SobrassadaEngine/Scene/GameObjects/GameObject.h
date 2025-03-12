@@ -22,7 +22,7 @@ class GameObject
 {
   public:
     GameObject(std::string name);
-    GameObject(UID parentUUID, std::string name);
+    GameObject(UID parentUID, std::string name);
 
     GameObject(const rapidjson::Value& initialState);
 
@@ -30,13 +30,13 @@ class GameObject
 
     const float4x4& GetParentGlobalTransform() const;
 
-    bool AddGameObject(UID gameObjectUUID);
-    bool RemoveGameObject(UID gameObjectUUID);
+    bool AddGameObject(UID gameObjectUID);
+    bool RemoveGameObject(UID gameObjectUID);
 
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
 
-    void RenderHierarchyNode(UID& selectedGameObjectUUID);
-    void HandleNodeClick(UID& selectedGameObjectUUID);
+    void RenderHierarchyNode(UID& selectedGameObjectUID);
+    void HandleNodeClick(UID& selectedGameObjectUID);
     void RenderContextMenu();
     void RenderEditorInspector();
 
@@ -50,7 +50,7 @@ class GameObject
     void AddChildren(UID childUID) { children.push_back(childUID); }
 
     UID GetParent() const { return parentUID; }
-    void SetParent(UID newParentUUID) { parentUID = newParentUUID; }
+    void SetParent(UID newParentUID) { parentUID = newParentUID; }
 
     UID GetUID() const { return uid; }
     void SetUID(UID newUID) { uid = newUID; }
@@ -77,13 +77,19 @@ class GameObject
     const std::unordered_map<ComponentType, Component*>& GetComponents() const { return components; }
 
     const MeshComponent* GetMeshComponent() const;
+    void AddModel(UID meshUid, UID materialUid) const;
+
+    void SetLocalTransform(const float4x4& newTransform) { localTransform = newTransform; }
+    void DrawGizmos() const;
 
   private:
     void OnTransformUpdated();
     void UpdateLocalTransform(const float4x4& parentGlobalTransform);
+    void DrawNodes() const;
+    void OnDrawConnectionsToggle();
 
   public:
-    inline static UID currentRenamingUID = INVALID_UUID;
+    inline static UID currentRenamingUID = INVALID_UID;
 
   private:
     UID parentUID;
@@ -100,6 +106,8 @@ class GameObject
 
     bool isRenaming = false;
     char renameBuffer[128];
+
+    bool drawNodes                       = false;
 
     float4x4 localTransform              = float4x4::identity;
     float4x4 globalTransform             = float4x4::identity;

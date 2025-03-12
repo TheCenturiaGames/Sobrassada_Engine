@@ -4,6 +4,7 @@
 #include "MaterialImporter.h"
 #include "MeshImporter.h"
 #include "TextureImporter.h"
+#include "ModelImporter.h"
 
 namespace SceneImporter
 {
@@ -21,27 +22,39 @@ namespace SceneImporter
     {
         tinygltf::Model model = LoadModelGLTF(filePath);
 
+        std::vector<std::vector<std::pair<UID, UID>>> gltfMeshes;
         std::vector<int> matIndices;
         for (const auto& srcMesh : model.meshes)
         {
-            std::string name = srcMesh.name;
             int n            = 0;
             int matIndex     = -1;
+            std::vector<std::pair<UID, UID>> primitives;
+
             for (const auto& primitive : srcMesh.primitives)
             {
-                name += std::to_string(n);
-                MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath);
+                std::string name = srcMesh.name + std::to_string(n);
+                UID meshUID = MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath);
                 n++;
 
+                UID matUID = INVALID_UID;
                 matIndex = primitive.material;
                 if (matIndex == -1) GLOG("Material index invalid for mesh: %s", name.c_str())
                 else if (std::find(matIndices.begin(), matIndices.end(), matIndex) == matIndices.end())
                 {
-                    MaterialImporter::ImportMaterial(model, matIndex, filePath);
+                    matUID = MaterialImporter::ImportMaterial(model, matIndex, filePath);
                     matIndices.push_back(matIndex);
                 }
+
+                primitives.emplace_back(meshUID, matUID);
+                GLOG("New primitive with mesh UID: %d and Material UID: %d", meshUID, matUID);
             }
+            gltfMeshes.emplace_back(primitives);
         }
+
+         GLOG("Total .gltf meshes: %d", gltfMeshes.size());
+
+        // Import Model
+        ModelImporter::ImportModel(model.nodes, gltfMeshes, filePath);
     }
 
     tinygltf::Model LoadModelGLTF(const char* filePath)
@@ -134,6 +147,13 @@ namespace SceneImporter
                 GLOG("Failed to create directory: %s", ASSETS_PATH);
             }
         }
+        if (!FileSystem::IsDirectory(SCENES_PATH))
+        {
+            if (!FileSystem::CreateDirectories(SCENES_PATH))
+            {
+                GLOG("Failed to create directory: %s", SCENES_PATH);
+            }
+        }
         if (!FileSystem::IsDirectory(METADATA_PATH))
         {
             if (!FileSystem::CreateDirectories(METADATA_PATH))
@@ -155,11 +175,11 @@ namespace SceneImporter
                 GLOG("Failed to create directory: %s", AUDIO_PATH);
             }
         }
-        if (!FileSystem::IsDirectory(BONES_PATH))
+        if (!FileSystem::IsDirectory(MODELS_PATH))
         {
-            if (!FileSystem::CreateDirectories(BONES_PATH))
+            if (!FileSystem::CreateDirectories(MODELS_PATH))
             {
-                GLOG("Failed to create directory: %s", BONES_PATH);
+                GLOG("Failed to create directory: %s", MODELS_PATH);
             }
         }
         if (!FileSystem::IsDirectory(MESHES_PATH))
@@ -167,6 +187,13 @@ namespace SceneImporter
             if (!FileSystem::CreateDirectories(MESHES_PATH))
             {
                 GLOG("Failed to create directory: %s", MESHES_PATH);
+            }
+        }
+        if (!FileSystem::IsDirectory(SCENES_PLAY_PATH))
+        {
+            if (!FileSystem::CreateDirectories(SCENES_PLAY_PATH))
+            {
+                GLOG("Failed to create directory: %s", SCENES_PLAY_PATH);
             }
         }
         if (!FileSystem::IsDirectory(TEXTURES_PATH))
@@ -183,12 +210,6 @@ namespace SceneImporter
                 GLOG("Failed to create directory: %s", MATERIALS_PATH);
             }
         }
-        if (!FileSystem::IsDirectory(SCENES_PATH))
-        {
-            if (!FileSystem::CreateDirectories(SCENES_PATH))
-            {
-                GLOG("Failed to create directory: %s", SCENES_PATH);
-            }
-        }
+
     }
 }; // namespace SceneImporter

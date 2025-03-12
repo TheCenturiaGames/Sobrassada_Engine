@@ -90,7 +90,7 @@ void ResourceMaterial::LoadMaterialData(Material mat)
     ResourceTexture* normTexture = TextureImporter::LoadTexture(mat.GetNormalTexture());
     if (normTexture != nullptr)
     {
-        GLOG("%s has normal", normTexture->GetName());
+        GLOG("%s has normal", normTexture->GetName().c_str());
         normalTexture.textureID = normTexture->GetTextureID();
         hasNormalTexture        = true;
         material.hasNormal      = 1;

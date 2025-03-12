@@ -7,6 +7,7 @@
 #include "LibraryModule.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
+#include "ShaderModule.h"
 // #include "Scene/GameObjects/GameObject.h"
 
 #include "imgui.h"
@@ -39,10 +40,8 @@ void MeshComponent::Save(rapidjson::Value& targetState, rapidjson::Document::All
 {
     Component::Save(targetState, allocator);
 
-    targetState.AddMember("Mesh", currentMesh != nullptr ? currentMesh->GetUID() : CONSTANT_EMPTY_UID, allocator);
-    targetState.AddMember(
-        "Material", currentMaterial != nullptr ? currentMaterial->GetUID() : CONSTANT_EMPTY_UID, allocator
-    );
+    targetState.AddMember("Mesh", currentMesh != nullptr ? currentMesh->GetUID() : INVALID_UID, allocator);
+    targetState.AddMember("Material", currentMaterial != nullptr ? currentMaterial->GetUID() : INVALID_UID, allocator);
 }
 
 void MeshComponent::RenderEditorInspector()
@@ -62,7 +61,7 @@ void MeshComponent::RenderEditorInspector()
         if (ImGui::IsPopupOpen(CONSTANT_MESH_SELECT_DIALOG_ID))
         {
             AddMesh(App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
-                CONSTANT_MESH_SELECT_DIALOG_ID, App->GetLibraryModule()->GetMeshMap(), INVALID_UUID
+                CONSTANT_MESH_SELECT_DIALOG_ID, App->GetLibraryModule()->GetMeshMap(), INVALID_UID
             ));
         }
 
@@ -77,7 +76,7 @@ void MeshComponent::RenderEditorInspector()
         if (ImGui::IsPopupOpen(CONSTANT_TEXTURE_SELECT_DIALOG_ID))
         {
             AddMaterial(App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
-                CONSTANT_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetMaterialMap(), INVALID_UUID
+                CONSTANT_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetMaterialMap(), INVALID_UID
             ));
         }
 
@@ -97,13 +96,15 @@ void MeshComponent::Render()
         if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr)
             cameraUBO = App->GetSceneModule()->GetMainCamera()->GetUbo();
         
-        currentMesh->Render(App->GetResourcesModule()->GetProgram(), GetParent()->GetGlobalTransform(), cameraUBO, currentMaterial);
+            currentMesh->Render(
+                App->GetShaderModule()->GetProgramID(), GetParent()->GetGlobalTransform(), cameraUBO, currentMaterial
+            );
     }
 }
 
 void MeshComponent::AddMesh(UID resource, bool updateParent)
 {
-    if (resource == CONSTANT_EMPTY_UID) return;
+    if (resource == INVALID_UID) return;
 
     if (currentMesh != nullptr && currentMesh->GetUID() == resource) return;
 
