@@ -386,7 +386,6 @@
     <ClInclude Include="Modules\WindowModule.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Users\kille\Downloads\imgui-node-editor-0.9.3\imgui-node-editor-0.9.3\.gitignore" />
     <None Include=".clang-format" />
     <None Include="Libs\ImNodeFlow-1.2.2\src\imgui_bezier_math.inl" />
     <None Include="Libs\ImNodeFlow-1.2.2\src\imgui_extra_math.inl" />
