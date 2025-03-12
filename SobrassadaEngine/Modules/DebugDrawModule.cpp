@@ -5,9 +5,10 @@
 #include "Framebuffer.h"
 #include "Globals.h"
 #include "MathGeoLib.h"
-#include "QuadtreeViewer.h"
 #include "WindowModule.h"
 #include "OpenGLModule.h"
+#include "Framebuffer.h"
+
 #include "SDL_video.h"
 #define DEBUG_DRAW_IMPLEMENTATION
 #include "DebugDraw.h" // Debug Draw API. Notice that we need the DEBUG_DRAW_IMPLEMENTATION macro here!
@@ -47,7 +48,7 @@ class DDRenderInterfaceCoreGL final : public dd::RenderInterface
         glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(dd::DrawVertex), points);
 
         // Issue the draw call:
-        glDrawArrays(GL_POINTS, 0, count);
+        App->GetOpenGLModule()->DrawArrays(GL_POINTS, 0, count);
 
         glUseProgram(0);
         glBindVertexArray(0);
@@ -90,7 +91,7 @@ class DDRenderInterfaceCoreGL final : public dd::RenderInterface
         glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(dd::DrawVertex), lines);
 
         // Issue the draw call:
-        glDrawArrays(GL_LINES, 0, count);
+        App->GetOpenGLModule()->DrawArrays(GL_LINES, 0, count);
 
         glUseProgram(0);
         glBindVertexArray(0);
@@ -139,7 +140,8 @@ class DDRenderInterfaceCoreGL final : public dd::RenderInterface
         glBindBuffer(GL_ARRAY_BUFFER, textVBO);
         glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(dd::DrawVertex), glyphs);
 
-        glDrawArrays(GL_TRIANGLES, 0, count); // Issue the draw call
+        // Issue the draw call
+        App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, count);
 
         if (!already_blend)
         {
@@ -619,10 +621,10 @@ update_status DebugDrawModule::Render(float deltaTime)
 
 void DebugDrawModule::Draw()
 {
-    auto projection = App->GetCameraModule()->GetProjectionMatrix();
-    auto view       = App->GetCameraModule()->GetViewMatrix();
-    int width       = 0;
-    int height      = 0;
+    const float4x4& projection = App->GetCameraModule()->GetProjectionMatrix();
+    const float4x4& view       = App->GetCameraModule()->GetViewMatrix();
+    int width                  = 0;
+    int height                 = 0;
 
     if (App->GetCameraModule()->IsCameraDetached())
     {
@@ -659,10 +661,12 @@ void DebugDrawModule::RenderLines(const std::vector<LineSegment>& lines, const f
     }
 }
 
-void DebugDrawModule::DrawLine(const float3& origin, const float3& direction, const float distance, const float3& color)
+void DebugDrawModule::DrawLine(
+    const float3& origin, const float3& direction, const float distance, const float3& color, bool enableDepth
+)
 {
-    float3 dir = direction * distance;
-    dd::line(origin, dir + origin, color);
+    float3 dir = direction.Normalized() * distance;
+    dd::line(origin, dir + origin, color, 0, enableDepth);
 }
 
 void DebugDrawModule::DrawCircle(const float3& center, const float3& upVector, const float3& color, const float radius)
@@ -682,4 +686,9 @@ void DebugDrawModule::Draw(const float4x4& view, const float4x4& proj, unsigned 
     implementation->mvpMatrix = proj * view;
 
     dd::flush();
+}
+
+void DebugDrawModule::DrawAxisTriad(const float4x4& transform, bool depthEnabled)
+{
+    dd::axisTriad(transform, 0.005f, 0.05f, 0, depthEnabled);
 }

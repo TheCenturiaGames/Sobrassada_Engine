@@ -9,13 +9,14 @@
 #define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_EXTERNAL_IMAGE
 #include "tiny_gltf.h"
+#include "MetaMesh.h"
 
 namespace MeshImporter
 {
 
     UID ImportMesh(
         const tinygltf::Model& model, const tinygltf::Mesh& mesh, const tinygltf::Primitive& primitive,
-        const std::string& name, const char* filePath, float4x4 transform
+        const std::string& name, const char* sourceFilePath, UID sourceUID, floatx4 transform
     )
     {
         enum DataType dataType = UNSIGNED_CHAR;
@@ -25,10 +26,11 @@ namespace MeshImporter
         std::vector<unsigned short> indexBufferShort;
         std::vector<unsigned int> indexBufferInt;
         size_t posStride = 0, tanStride = 0, texStride = 0, normStride = 0;
-        float3 minPos     = {0.0f, 0.0f, 0.0f};
-        float3 maxPos     = {0.0f, 0.0f, 0.0f};
+        float3 minPos         = {0.0f, 0.0f, 0.0f};
+        float3 maxPos         = {0.0f, 0.0f, 0.0f};
+        bool generateTangents = false;
 
-        const auto& itPos = primitive.attributes.find("POSITION");
+        const auto& itPos     = primitive.attributes.find("POSITION");
         if (itPos != primitive.attributes.end())
         {
             const tinygltf::Accessor& posAcc    = model.accessors[itPos->second];
@@ -81,6 +83,7 @@ namespace MeshImporter
                 const tinygltf::Buffer& tanBuffer   = model.buffers[tanView.buffer];
                 bufferTan                           = &(tanBuffer.data[tanAcc.byteOffset + tanView.byteOffset]);
                 tanStride                           = tanView.byteStride ? tanView.byteStride : sizeof(float4);
+                generateTangents                    = true;
             }
 
             vertexBuffer.reserve(posAcc.count);
@@ -226,31 +229,43 @@ namespace MeshImporter
         cursor                     += sizeof(float4x4);
 
 
-        UID meshUID                = GenerateUID();
+        UID finalMeshUID;
+        if (sourceUID == INVALID_UID)
+        {
+            UID meshUID           = GenerateUID();
+            finalMeshUID          = App->GetLibraryModule()->AssignFiletypeUID(meshUID, FileType::Mesh);
 
-        std::string savePath       = MESHES_PATH + std::string("Mesh") + MESH_EXTENSION;
-        UID finalMeshUID           = App->GetLibraryModule()->AssignFiletypeUID(meshUID, savePath);
-        std::string fileName       = FileSystem::GetFileNameWithoutExtension(filePath);
+            std::string assetPath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
+            MetaMesh meta(finalMeshUID, assetPath, generateTangents);
+            meta.Save(name, assetPath);
+        }
+        else finalMeshUID = sourceUID;
 
-        savePath                   = MESHES_PATH + std::to_string(finalMeshUID) + MESH_EXTENSION;
-
-        unsigned int bytesWritten  = (unsigned int)FileSystem::Save(savePath.c_str(), fileBuffer, size, true);
+        std::string saveFilePath  = MESHES_PATH + std::to_string(finalMeshUID) + MESH_EXTENSION;
+        unsigned int bytesWritten = (unsigned int)FileSystem::Save(saveFilePath.c_str(), fileBuffer, size, true);
 
         delete[] fileBuffer;
 
         if (bytesWritten == 0)
         {
-            GLOG("Failed to save mesh file: %s", savePath.c_str());
+            GLOG("Failed to save mesh file: %s", saveFilePath.c_str());
             return 0;
         }
 
         // added mesh to meshes map
         App->GetLibraryModule()->AddMesh(finalMeshUID, name);
-        App->GetLibraryModule()->AddResource(savePath, finalMeshUID);
+        App->GetLibraryModule()->AddName(name, finalMeshUID);
+        App->GetLibraryModule()->AddResource(saveFilePath, finalMeshUID);
 
-        GLOG("%s saved as binary", fileName.c_str());
+        GLOG("%s saved as binary", name.c_str());
 
         return finalMeshUID;
+    }
+
+    UID ImportMeshFromMetadata(const std::string& filePath, const std::string& name, UID sourceUID)
+    {
+
+        return 0;
     }
 
     ResourceMesh* LoadMesh(UID meshUID)
@@ -258,6 +273,7 @@ namespace MeshImporter
         char* buffer          = nullptr;
 
         std::string path      = App->GetLibraryModule()->GetResourcePath(meshUID);
+        std::string name      = App->GetLibraryModule()->GetResourceName(meshUID);
 
         unsigned int fileSize = FileSystem::Load(path.c_str(), &buffer);
 
@@ -336,7 +352,7 @@ namespace MeshImporter
         cursor             += sizeof(float3);
         float4x4 transform       = *reinterpret_cast<float4x4*>(cursor);
 
-        ResourceMesh* mesh  = new ResourceMesh(meshUID, FileSystem::GetFileNameWithoutExtension(path), maxPos, minPos, transform);
+        ResourceMesh* mesh  = new ResourceMesh(meshUID, name, maxPos, minPos, transform);
 
         mesh->LoadData(mode, tmpVertices, tmpIndices, transform);
 

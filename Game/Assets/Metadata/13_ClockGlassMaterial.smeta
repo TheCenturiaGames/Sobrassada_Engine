@@ -1,0 +1,10 @@
+{
+    "UID": 1346727538371593,
+    "name": "ClockGlassMaterial",
+    "assetPath": "Assets/Clock.gltf",
+    "lastModifiedDate": 1739828225,
+    "importOptions": {
+        "shader": "14286607809738846423",
+        "useOcclusion": false
+    }
+}

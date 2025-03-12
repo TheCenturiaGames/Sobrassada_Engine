@@ -1,13 +1,13 @@
 #include "EditorUIModule.h"
 
 #include "Application.h"
+#include "CameraModule.h"
 #include "Component.h"
 #include "FileSystem.h"
 #include "GameTimer.h"
 #include "InputModule.h"
 #include "LibraryModule.h"
 #include "OpenGLModule.h"
-#include "QuadtreeViewer.h"
 #include "SceneImporter.h"
 #include "SceneModule.h"
 #include "WindowModule.h"
@@ -25,9 +25,7 @@
 #define TINYGLTF_IMPLEMENTATION /* Only in one of the includes */
 #include <tiny_gltf.h>          // TODO Remove
 
-EditorUIModule::EditorUIModule()
-    : width(0), height(0), closeApplication(false), consoleMenu(false), import(false), load(false), save(false),
-      editorSettingsMenu(false)
+EditorUIModule::EditorUIModule() : width(0), height(0)
 {
 }
 
@@ -37,7 +35,8 @@ EditorUIModule::~EditorUIModule()
 
 bool EditorUIModule::Init()
 {
-    ImGui::CreateContext();
+    ImGuiContext* context = ImGui::CreateContext();
+    ImGuizmo::SetImGuiContext(context);
     ImGuiIO& io     = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
@@ -46,17 +45,11 @@ bool EditorUIModule::Init()
     ImGui_ImplSDL2_InitForOpenGL(App->GetWindowModule()->window, App->GetOpenGLModule()->GetContext());
     ImGui_ImplOpenGL3_Init("#version 460");
 
-    quadtreeViewer = new QuadtreeViewer();
+    width      = App->GetWindowModule()->GetWidth();
+    height     = App->GetWindowModule()->GetHeight();
 
-    width          = App->GetWindowModule()->GetWidth();
-    height         = App->GetWindowModule()->GetHeight();
-
-    startPath      = std::filesystem::current_path().string();
-    libraryPath    = startPath + DELIMITER + SCENES_PATH;
-
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_W, [&] { mCurrentGizmoOperation = ImGuizmo::TRANSLATE; });
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_E, [&] { mCurrentGizmoOperation = ImGuizmo::ROTATE; });
-    App->GetInputModule()->SubscribeToEvent(SDL_SCANCODE_R, [&] { mCurrentGizmoOperation = ImGuizmo::SCALE; });
+    startPath  = std::filesystem::current_path().string();
+    scenesPath = startPath + DELIMITER + SCENES_PATH;
 
     return true;
 }
@@ -66,8 +59,12 @@ update_status EditorUIModule::PreUpdate(float deltaTime)
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
-    ImGuizmo::SetOrthographic(false); // TODO Implement orthographic camera
     ImGuizmo::BeginFrame();
+
+    // ImGuizmo::SetOrthographic(false);
+    // ImGuizmo::AllowAxisFlip(false);
+    // ImGuizmo::SetPlaneLimit(0);
+
     ImGui::DockSpaceOverViewport();
 
     return UPDATE_CONTINUE;
@@ -75,7 +72,7 @@ update_status EditorUIModule::PreUpdate(float deltaTime)
 
 update_status EditorUIModule::Update(float deltaTime)
 {
-    LimitFPS(deltaTime);
+    UpdateGizmoTransformMode();
     AddFramePlotData(deltaTime);
     return UPDATE_CONTINUE;
 }
@@ -83,8 +80,6 @@ update_status EditorUIModule::Update(float deltaTime)
 update_status EditorUIModule::RenderEditor(float deltaTime)
 {
     Draw();
-
-    if (quadtreeViewerViewport) quadtreeViewer->Render(quadtreeViewerViewport);
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -94,8 +89,13 @@ update_status EditorUIModule::RenderEditor(float deltaTime)
 
 update_status EditorUIModule::PostUpdate(float deltaTime)
 {
-
     if (closeApplication) return UPDATE_STOP;
+
+    if (closeScene)
+    {
+        App->GetSceneModule()->CloseScene();
+        closeScene = false;
+    }
 
     return UPDATE_CONTINUE;
 }
@@ -109,21 +109,42 @@ bool EditorUIModule::ShutDown()
     framerate.clear();
     frametime.clear();
 
-    delete quadtreeViewer;
-
     return true;
 }
 
-void EditorUIModule::LimitFPS(float deltaTime) const
+void EditorUIModule::UpdateGizmoTransformMode()
 {
-    if (deltaTime == 0) return;
-
-    float targetFrameTime = 1000.f / maxFPS;
-
-    if (maxFPS != 0)
+    if (App->GetSceneModule()->GetDoInputsScene())
     {
-        if (deltaTime < targetFrameTime) SDL_Delay(static_cast<Uint32>(targetFrameTime - deltaTime));
+        const KeyState* keyboard = App->GetInputModule()->GetKeyboard();
+
+        if (keyboard[SDL_SCANCODE_G]) currentGizmoOperation = GizmoOperation::TRANSLATE;
+        else if (keyboard[SDL_SCANCODE_H]) currentGizmoOperation = GizmoOperation::ROTATE;
+        else if (keyboard[SDL_SCANCODE_J]) currentGizmoOperation = GizmoOperation::SCALE;
+
+        if (keyboard[SDL_SCANCODE_R]) transformType = GizmoTransform::LOCAL;
+        else if (keyboard[SDL_SCANCODE_T]) transformType = GizmoTransform::WORLD;
     }
+}
+
+ImGuizmo::OPERATION EditorUIModule::GetImGuizmoOperation() const
+{
+    switch (currentGizmoOperation)
+    {
+    case GizmoOperation::TRANSLATE:
+        return ImGuizmo::TRANSLATE;
+    case GizmoOperation::ROTATE:
+        return ImGuizmo::ROTATE;
+    case GizmoOperation::SCALE:
+        return ImGuizmo::SCALE;
+    }
+    return ImGuizmo::TRANSLATE;
+}
+
+ImGuizmo::MODE EditorUIModule::GetImGuizmoTransformMode() const
+{
+    if (transformType == GizmoTransform::LOCAL) return ImGuizmo::LOCAL;
+    else return ImGuizmo::WORLD;
 }
 
 void EditorUIModule::AddFramePlotData(float deltaTime)
@@ -158,11 +179,13 @@ void EditorUIModule::Draw()
 
     if (aboutMenu) About(aboutMenu);
 
-    if (import) ImportDialog(import);
+    if (importMenu) ImportDialog(importMenu);
 
-    if (load) LoadDialog(load);
+    if (loadMenu) LoadDialog(loadMenu);
 
-    if (save) SaveDialog(save);
+    if (loadModel) LoadModelDialog(loadModel);
+
+    if (saveMenu) SaveDialog(saveMenu);
 
     if (editorSettingsMenu) EditorSettings(editorSettingsMenu);
 }
@@ -171,44 +194,71 @@ void EditorUIModule::MainMenu()
 {
     ImGui::BeginMainMenuBar();
 
+    bool sceneLoaded = App->GetSceneModule()->IsSceneLoaded();
+    bool inPlayMode  = App->GetSceneModule()->GetInPlayMode();
+
     // File tab menu
     if (ImGui::BeginMenu("File"))
     {
+
         if (ImGui::MenuItem("Create", "")) App->GetSceneModule()->CreateScene();
 
-        if (ImGui::MenuItem("Import", "", import)) import = !import;
+        if (ImGui::MenuItem("Load", "", loadMenu)) loadMenu = !loadMenu;
 
-        if (ImGui::MenuItem("Load", "", load)) load = !load;
-
+        ImGui::BeginDisabled(inPlayMode || !sceneLoaded);
         if (ImGui::MenuItem("Save"))
         {
-            if (!App->GetLibraryModule()->SaveScene(libraryPath.c_str(), SaveMode::Save))
-            {
-                save = !save;
-            }
+            if (!App->GetLibraryModule()->SaveScene(scenesPath.c_str(), SaveMode::Save)) saveMenu = !saveMenu;
         }
 
-        if (ImGui::MenuItem("Save as")) save = !save;
+        if (ImGui::MenuItem("Save as", "", saveMenu)) saveMenu = !saveMenu;
+        ImGui::EndDisabled();
+
+        ImGui::BeginDisabled(!sceneLoaded);
+        if (ImGui ::MenuItem("Close")) closeScene = true;
+        ImGui::EndDisabled();
 
         if (ImGui::MenuItem("Quit")) closeApplication = true;
 
         ImGui::EndMenu();
     }
 
-    // Windows tab menu
-    if (ImGui::BeginMenu("Window"))
+    // Assets tab menu
+    if (ImGui::BeginMenu("Assets"))
+    {
+        if (ImGui::MenuItem("Import", "", importMenu)) importMenu = !importMenu;
+
+        if (ImGui::BeginMenu("Resource Loader"))
+        {
+            ImGui::BeginDisabled(!sceneLoaded);
+            if (ImGui::MenuItem("Load Model"))
+            {
+                loadModel = !loadModel;
+                ImGui::OpenPopup(CONSTANT_MODEL_SELECT_DIALOG_ID);
+            }
+            ImGui::EndDisabled();
+
+            ImGui::EndMenu();
+        }
+
+        ImGui::EndMenu();
+    }
+
+    // View tab menu
+    if (ImGui::BeginMenu("View"))
     {
         if (ImGui::MenuItem("Console", "", consoleMenu)) consoleMenu = !consoleMenu;
 
         if (ImGui::BeginMenu("Scene"))
         {
+            ImGui::BeginDisabled(!sceneLoaded);
+            if (ImGui::MenuItem("Editor Control", "", editorControlMenu)) editorControlMenu = !editorControlMenu;
             if (ImGui::MenuItem("Hierarchy", "", hierarchyMenu)) hierarchyMenu = !hierarchyMenu;
             if (ImGui::MenuItem("Inspector", "", inspectorMenu)) inspectorMenu = !inspectorMenu;
+            ImGui::EndDisabled();
 
             ImGui::EndMenu();
         }
-
-        if (ImGui::MenuItem("Quadtree", "", quadtreeViewerViewport)) quadtreeViewerViewport = !quadtreeViewerViewport;
 
         if (ImGui::MenuItem("Editor settings", "", editorSettingsMenu)) editorSettingsMenu = !editorSettingsMenu;
 
@@ -220,11 +270,11 @@ void EditorUIModule::MainMenu()
     ImGui::EndMainMenuBar();
 }
 
-void EditorUIModule::LoadDialog(bool& load)
+void EditorUIModule::LoadDialog(bool& loadMenu)
 {
     ImGui::SetNextWindowSize(ImVec2(width * 0.25f, height * 0.4f), ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin("Load Scene", &load, ImGuiWindowFlags_NoCollapse))
+    if (!ImGui::Begin("Load Scene", &loadMenu, ImGuiWindowFlags_NoCollapse))
     {
         ImGui::End();
         return;
@@ -235,12 +285,12 @@ void EditorUIModule::LoadDialog(bool& load)
 
     ImGui::BeginChild("scrollFiles", ImVec2(0, -30), ImGuiChildFlags_Borders);
 
-    if (FileSystem::Exists(libraryPath.c_str()))
+    if (FileSystem::Exists(scenesPath.c_str()))
     {
         // Only scenes library folder for now
-        if (ImGui::TreeNode("Scenes/"))
+        if (ImGui::TreeNodeEx("Scenes/", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            GetFilesSorted(libraryPath, files);
+            FileSystem::GetFilesSorted(scenesPath, files);
 
             static int selected = -1;
 
@@ -268,11 +318,10 @@ void EditorUIModule::LoadDialog(bool& load)
     {
         if (!inputFile.empty())
         {
-            std::string loadPath = SCENES_PATH + inputFile;
-            App->GetLibraryModule()->LoadScene(loadPath.c_str());
+            App->GetLibraryModule()->LoadScene(inputFile.c_str());
         }
         inputFile = "";
-        load      = false;
+        loadMenu  = false;
     }
 
     ImGui::SameLine();
@@ -280,17 +329,59 @@ void EditorUIModule::LoadDialog(bool& load)
     if (ImGui::Button("Cancel", ImVec2(0, 0)))
     {
         inputFile = "";
-        load      = false;
+        loadMenu  = false;
     }
 
     ImGui::End();
 }
 
-void EditorUIModule::SaveDialog(bool& save)
+void EditorUIModule::LoadModelDialog(bool& loadModel)
 {
     ImGui::SetNextWindowSize(ImVec2(width * 0.25f, height * 0.4f), ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin("Save Scene", &save, ImGuiWindowFlags_NoCollapse))
+    if (!ImGui::Begin("Load Model", &loadModel, ImGuiWindowFlags_NoCollapse))
+    {
+        ImGui::End();
+        return;
+    }
+
+    static UID modelUid         = INVALID_UID;
+    static char searchText[255] = "";
+    ImGui::InputText("Search", searchText, 255);
+
+    ImGui::Separator();
+    if (ImGui::BeginListBox("##ModelsList", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
+    {
+        static int selected = -1;
+        int i               = 0;
+        for (const auto& valuePair : App->GetLibraryModule()->GetModelMap())
+        {
+            ++i;
+            if (valuePair.first.find(searchText) != std::string::npos)
+            {
+                if (ImGui::Selectable(valuePair.first.c_str(), selected == i))
+                {
+                    selected = i;
+                    modelUid = valuePair.second;
+                }
+            }
+        }
+        ImGui::EndListBox();
+    }
+
+    if (ImGui::Button("Ok"))
+    {
+        App->GetSceneModule()->LoadModel(modelUid);
+    }
+
+    ImGui::End();
+}
+
+void EditorUIModule::SaveDialog(bool& saveMenu)
+{
+    ImGui::SetNextWindowSize(ImVec2(width * 0.25f, height * 0.4f), ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin("Save Scene", &saveMenu, ImGuiWindowFlags_NoCollapse))
     {
         ImGui::End();
         return;
@@ -301,11 +392,11 @@ void EditorUIModule::SaveDialog(bool& save)
 
     ImGui::BeginChild("scrollFiles", ImVec2(0, -30), ImGuiChildFlags_Borders);
 
-    if (FileSystem::Exists(libraryPath.c_str()))
+    if (FileSystem::Exists(scenesPath.c_str()))
     {
-        if (ImGui::TreeNode("Scenes/"))
+        if (ImGui::TreeNodeEx("Scenes/", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            GetFilesSorted(libraryPath, files);
+            FileSystem::GetFilesSorted(scenesPath, files);
 
             for (int i = 0; i < files.size(); i++)
             {
@@ -329,11 +420,11 @@ void EditorUIModule::SaveDialog(bool& save)
     {
         if (strlen(inputFile) > 0)
         {
-            std::string savePath = libraryPath + inputFile + SCENE_EXTENSION;
+            std::string savePath = inputFile;
             App->GetLibraryModule()->SaveScene(savePath.c_str(), SaveMode::SaveAs);
         }
         inputFile[0] = '\0';
-        save         = false;
+        saveMenu     = false;
     }
 
     ImGui::SameLine();
@@ -341,17 +432,17 @@ void EditorUIModule::SaveDialog(bool& save)
     if (ImGui::Button("Cancel", ImVec2(0, 0)))
     {
         inputFile[0] = '\0';
-        save         = false;
+        saveMenu     = false;
     }
 
     ImGui::End();
 }
 
-void EditorUIModule::ImportDialog(bool& import)
+void EditorUIModule::ImportDialog(bool& importMenu)
 {
     ImGui::SetNextWindowSize(ImVec2(width * 0.4f, height * 0.4f), ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin("Import Asset", &import, ImGuiWindowFlags_NoCollapse))
+    if (!ImGui::Begin("Import Asset", &importMenu, ImGuiWindowFlags_NoCollapse))
     {
         ImGui::End();
         return;
@@ -438,7 +529,7 @@ void EditorUIModule::ImportDialog(bool& import)
 
         if (files.empty() || loadFiles)
         {
-            GetFilesSorted(currentPath, files);
+            FileSystem::GetFilesSorted(currentPath, files);
 
             files.insert(files.begin(), "..");
 
@@ -483,7 +574,7 @@ void EditorUIModule::ImportDialog(bool& import)
                     currentPath = FileSystem::GetParentPath(currentPath);
                     inputFile   = "";
                     selected    = -1;
-                    GetFilesSorted(currentPath, files);
+                    FileSystem::GetFilesSorted(currentPath, files);
                     searchQuery[0] = '\0';
                     loadFiles      = true;
                     loadButtons    = true;
@@ -493,7 +584,7 @@ void EditorUIModule::ImportDialog(bool& import)
                     currentPath = filePath;
                     inputFile   = "";
                     selected    = -1;
-                    GetFilesSorted(currentPath, files);
+                    FileSystem::GetFilesSorted(currentPath, files);
                     searchQuery[0] = '\0';
                     loadFiles      = true;
                     loadButtons    = true;
@@ -517,7 +608,7 @@ void EditorUIModule::ImportDialog(bool& import)
     {
         inputFile      = "";
         currentPath    = startPath;
-        import         = false;
+        importMenu     = false;
         showDrives     = false;
         searchQuery[0] = '\0';
         loadFiles      = true;
@@ -534,31 +625,13 @@ void EditorUIModule::ImportDialog(bool& import)
         }
         inputFile      = "";
         currentPath    = startPath;
-        import         = false;
+        importMenu     = false;
         showDrives     = false;
         searchQuery[0] = '\0';
         loadFiles      = true;
     }
 
     ImGui::End();
-}
-
-void EditorUIModule::GetFilesSorted(const std::string& currentPath, std::vector<std::string>& files)
-{
-    // files & dir in the current directory
-    FileSystem::GetAllInDirectory(currentPath, files);
-
-    std::sort(
-        files.begin(), files.end(),
-        [&](const std::string& a, const std::string& b)
-        {
-            bool isDirA = FileSystem::IsDirectory((currentPath + DELIMITER + a).c_str());
-            bool isDirB = FileSystem::IsDirectory((currentPath + DELIMITER + b).c_str());
-
-            if (isDirA != isDirB) return isDirA > isDirB;
-            return a < b;
-        }
-    );
 }
 
 void EditorUIModule::Console(bool& consoleMenu) const
@@ -584,80 +657,74 @@ void EditorUIModule::Console(bool& consoleMenu) const
 }
 
 bool EditorUIModule::RenderTransformWidget(
-    Transform& localTransform, Transform& globalTransform, const Transform& parentTransform
+    float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform
 )
 {
-    bool positionValueChanged = false;
-    bool rotationValueChanged = false;
-    bool scaleValueChanged    = false;
+    float4x4 outputTransform = float4x4(transformType == GizmoTransform::LOCAL ? localTransform : globalTransform);
+
+    float3 outputScale       = outputTransform.GetScale();
+    outputTransform.ScaleCol3(0, outputScale.x != 0 ? 1 / outputScale.x : 1);
+    outputTransform.ScaleCol3(1, outputScale.y != 0 ? 1 / outputScale.y : 1);
+    outputTransform.ScaleCol3(2, outputScale.z != 0 ? 1 / outputScale.z : 1);
+    float3 outputPosition     = outputTransform.TranslatePart();
+    float3 outputRotation     = Quat(outputTransform.RotatePart()).ToEulerXYZ();
+
+    bool positionValueChanged = false, rotationValueChanged = false, scaleValueChanged = false;
     static bool lockScaleAxis = false;
-    static int transformType  = LOCAL;
-    static int pivotType      = OBJECT;
-    float3 originalScale;
+    float3 originalScale      = float3(outputScale);
 
-    ImGui::SeparatorText("Transform");
-    ImGui::RadioButton("Use object pivot", &pivotType, OBJECT);
-    // TODO Add later if necessary
-    // ImGui::SameLine();
-    // ImGui::RadioButton("Use root pivot", &pivotType, ROOT);
+    std::string transformName = std::string(transformType == GizmoTransform::LOCAL ? "Local " : "World ") + "Transform";
+    ImGui::SeparatorText(transformName.c_str());
 
-    ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
-    if (ImGui::BeginTabBar("TransformType##", tab_bar_flags))
-    {
-        if (ImGui::BeginTabItem("Local transform"))
-        {
-            transformType = LOCAL;
-            originalScale = float3(localTransform.scale);
-            RenderBasicTransformModifiers(
-                localTransform, lockScaleAxis, positionValueChanged, rotationValueChanged, scaleValueChanged
-            );
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Global transform"))
-        {
-            transformType = GLOBAL;
-            originalScale = float3(globalTransform.scale);
-            RenderBasicTransformModifiers(
-                globalTransform, lockScaleAxis, positionValueChanged, rotationValueChanged, scaleValueChanged
-            );
-            ImGui::EndTabItem();
-        }
-        ImGui::EndTabBar();
-    }
-
-    Transform& outputTransform = transformType == LOCAL ? localTransform : globalTransform;
+    RenderBasicTransformModifiers(
+        outputPosition, outputRotation, outputScale, lockScaleAxis, positionValueChanged, rotationValueChanged,
+        scaleValueChanged
+    );
 
     if (positionValueChanged || rotationValueChanged || scaleValueChanged)
     {
         if (scaleValueChanged && lockScaleAxis)
         {
             float scaleFactor = 1;
-            if (outputTransform.scale.x != originalScale.x)
+            if (outputScale.x != originalScale.x)
             {
-                scaleFactor = originalScale.x == 0 ? 1 : outputTransform.scale.x / originalScale.x;
+                scaleFactor = originalScale.x == 0 ? 1 : outputScale.x / originalScale.x;
             }
-            else if (outputTransform.scale.y != originalScale.y)
+            else if (outputScale.y != originalScale.y)
             {
-                scaleFactor = originalScale.y == 0 ? 1 : outputTransform.scale.y / originalScale.y;
+                scaleFactor = originalScale.y == 0 ? 1 : outputScale.y / originalScale.y;
             }
-            else if (outputTransform.scale.z != originalScale.z)
+            else if (outputScale.z != originalScale.z)
             {
-                scaleFactor = originalScale.z == 0 ? 1 : outputTransform.scale.z / originalScale.z;
+                scaleFactor = originalScale.z == 0 ? 1 : outputScale.z / originalScale.z;
             }
-            originalScale         *= scaleFactor;
-            outputTransform.scale  = originalScale;
+            originalScale *= scaleFactor;
+            outputScale    = originalScale;
         }
 
-        if (transformType == GLOBAL)
+        outputTransform = float4x4::identity;
+        outputTransform.SetTranslatePart(outputPosition);
+        outputTransform.SetRotatePart(Quat::FromEulerXYZ(outputRotation.x, outputRotation.y, outputRotation.z));
+        outputTransform.ScaleCol3(0, outputScale.x);
+        outputTransform.ScaleCol3(1, outputScale.y);
+        outputTransform.ScaleCol3(2, outputScale.z);
+
+        if (transformType == GizmoTransform::WORLD)
         {
-            localTransform.Set(globalTransform - parentTransform);
+            localTransform = parentTransform.Inverted() * outputTransform;
+        }
+        else
+        {
+            localTransform = outputTransform;
         }
     }
 
     return positionValueChanged || rotationValueChanged || scaleValueChanged;
 }
 
-bool EditorUIModule::RenderImGuizmo(Transform& gameObjectTransform)
+bool EditorUIModule::RenderImGuizmo(
+    float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform
+) const
 {
     float4x4 view = float4x4(App->GetCameraModule()->GetViewMatrix());
     view.Transpose();
@@ -665,54 +732,75 @@ bool EditorUIModule::RenderImGuizmo(Transform& gameObjectTransform)
     float4x4 proj = float4x4(App->GetCameraModule()->GetProjectionMatrix());
     proj.Transpose();
 
-    float4x4 gizmoMatrix          = float4x4::identity;
-    gameObjectTransform.rotation *= RAD_DEGREE_CONV;
-    ImGuizmo::RecomposeMatrixFromComponents(
-        gameObjectTransform.position.ptr(), gameObjectTransform.rotation.ptr(), gameObjectTransform.scale.ptr(),
-        gizmoMatrix.ptr()
+    float maxDistance  = App->GetCameraModule()->GetFarPlaneDistance() * 0.9f;
+
+    float4x4 transform = float4x4(globalTransform);
+    transform.Transpose();
+
+    ImGuizmo::OPERATION operation = GetImGuizmoOperation();
+    ImGuizmo::MODE mode           = GetImGuizmoTransformMode();
+
+    ImGuizmo::Enable(true);
+    ImGuizmo::Manipulate(
+        view.ptr(), proj.ptr(), operation, mode, transform.ptr(), nullptr, snapEnabled ? snapValues.ptr() : nullptr,
+        nullptr, nullptr
     );
 
-    Manipulate(view.ptr(), proj.ptr(), mCurrentGizmoOperation, ImGuizmo::MODE::LOCAL, gizmoMatrix.ptr());
+    if (!ImGuizmo::IsUsing()) return false;
 
-    ImGuizmo::DecomposeMatrixToComponents(
-        gizmoMatrix.ptr(), gameObjectTransform.position.ptr(), gameObjectTransform.rotation.ptr(),
-        gameObjectTransform.scale.ptr()
-    );
-    gameObjectTransform.rotation /= RAD_DEGREE_CONV;
+    if (App->GetSceneModule()->GetDoInputsScene())
+    {
+        transform.Transpose();
+        if (transform.TranslatePart().Distance(App->GetCameraModule()->GetCameraPosition()) > maxDistance)
+        {
+            ImGuizmo::Enable(false);
+            return false;
+        }
+        localTransform = parentTransform.Inverted() * transform;
+    }
 
-    return ImGuizmo::IsUsing();
+    return true;
 }
 
+template UID EditorUIModule::RenderResourceSelectDialog<UID>(
+    const char* id, const std::unordered_map<std::string, UID>& availableResources, const UID& defaultResource
+);
+template ComponentType EditorUIModule::RenderResourceSelectDialog<ComponentType>(
+    const char* id, const std::unordered_map<std::string, ComponentType>& availableResources,
+    const ComponentType& defaultResource
+);
+
 void EditorUIModule::RenderBasicTransformModifiers(
-    Transform& outputTransform, bool& lockScaleAxis, bool& positionValueChanged, bool& rotationValueChanged,
-    bool& scaleValueChanged
+    float3& outputPosition, float3& outputRotation, float3& outputScale, bool& lockScaleAxis,
+    bool& positionValueChanged, bool& rotationValueChanged, bool& scaleValueChanged
 )
 {
     static bool bUseRad   = true;
 
-    positionValueChanged |= ImGui::InputFloat3("Position", &outputTransform.position[0]);
+    positionValueChanged |= ImGui::InputFloat3("Position", &outputPosition[0]);
 
     if (!bUseRad)
     {
-        outputTransform.rotation *= RAD_DEGREE_CONV;
+        outputRotation *= RAD_DEGREE_CONV;
     }
-    rotationValueChanged |= ImGui::InputFloat3("Rotation", &outputTransform.rotation[0]);
+    rotationValueChanged |= ImGui::InputFloat3("Rotation", &outputRotation[0]);
     if (!bUseRad)
     {
-        outputTransform.rotation /= RAD_DEGREE_CONV;
+        outputRotation /= RAD_DEGREE_CONV;
     }
     ImGui::SameLine();
     ImGui::Checkbox("Radians", &bUseRad);
-    scaleValueChanged |= ImGui::InputFloat3("Scale", &outputTransform.scale[0]);
+    scaleValueChanged |= ImGui::InputFloat3("Scale", &outputScale[0]);
     ImGui::SameLine();
     ImGui::Checkbox("Lock axis", &lockScaleAxis);
 }
 
-UID EditorUIModule::RenderResourceSelectDialog(
-    const char* id, const std::unordered_map<std::string, UID>& availableResources
+template <typename T>
+T EditorUIModule::RenderResourceSelectDialog(
+    const char* id, const std::unordered_map<std::string, T>& availableResources, const T& defaultResource
 )
 {
-    UID result = CONSTANT_EMPTY_UID;
+    T result = defaultResource;
     if (ImGui::BeginPopup(id))
     {
         static char searchText[255] = "";
@@ -959,12 +1047,6 @@ void EditorUIModule::EditorSettings(bool& editorSettingsMenu)
     }
 
     ImGui::Spacing();
-    if (ImGui::CollapsingHeader("Game timer"))
-    {
-        GameTimerConfig();
-    }
-
-    ImGui::Spacing();
 
     ImGui::SeparatorText("Modules Configuration");
     if (ImGui::CollapsingHeader("Window"))
@@ -983,6 +1065,13 @@ void EditorUIModule::EditorSettings(bool& editorSettingsMenu)
         ImGui::Text("Key A: %s", (keyboard[SDL_SCANCODE_A] ? "Pressed" : "Not Pressed"));
         ImGui::Text("Key S: %s", (keyboard[SDL_SCANCODE_S] ? "Pressed" : "Not Pressed"));
         ImGui::Text("Key D: %s", (keyboard[SDL_SCANCODE_D] ? "Pressed" : "Not Pressed"));
+        ImGui::Text("Key F: %s", (keyboard[SDL_SCANCODE_F] ? "Pressed" : "Not Pressed"));
+        ImGui::Text("Key G: %s", (keyboard[SDL_SCANCODE_G] ? "Pressed" : "Not Pressed"));
+        ImGui::Text("Key H: %s", (keyboard[SDL_SCANCODE_H] ? "Pressed" : "Not Pressed"));
+        ImGui::Text("Key J: %s", (keyboard[SDL_SCANCODE_J] ? "Pressed" : "Not Pressed"));
+        ImGui::Text("Key R: %s", (keyboard[SDL_SCANCODE_R] ? "Pressed" : "Not Pressed"));
+        ImGui::Text("Key T: %s", (keyboard[SDL_SCANCODE_T] ? "Pressed" : "Not Pressed"));
+        ImGui::Text("Key O: %s", (keyboard[SDL_SCANCODE_O] ? "Pressed" : "Not Pressed"));
         ImGui::Text("Key LSHIFT: %s", (keyboard[SDL_SCANCODE_LSHIFT] ? "Pressed" : "Not Pressed"));
         ImGui::Text("Key LALT: %s", (keyboard[SDL_SCANCODE_LALT] ? "Pressed" : "Not Pressed"));
 
@@ -1027,32 +1116,9 @@ void EditorUIModule::FramePlots(bool& vsync)
 {
     static int refreshRate = App->GetWindowModule()->GetDesktopDisplayMode().refresh_rate;
 
-    static int sliderFPS   = 0;
-    ImGui::SliderInt("Max FPS", &sliderFPS, 0, refreshRate);
-
     static float maxYAxis;
-    if (sliderFPS == 0)
-    {
-        if (vsync)
-        {
-            maxFPS   = refreshRate;
-            maxYAxis = maxFPS * 1.66f;
-        }
-        else
-        {
-            maxFPS   = 0;
-            maxYAxis = 1000.f * 1.66f;
-        }
-    }
-    else
-    {
-        maxFPS   = sliderFPS;
-        maxYAxis = maxFPS * 1.66f;
-    }
-
-    ImGui::Text("Limit Framerate: ");
-    ImGui::SameLine();
-    ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", maxFPS);
+    if (vsync) maxYAxis = refreshRate * 1.66f;
+    else maxYAxis = 1000.f * 1.66f;
 
     char title[25];
     std::vector<float> frametimeVector(frametime.begin(), frametime.end());
@@ -1070,12 +1136,11 @@ void EditorUIModule::FramePlots(bool& vsync)
 
 void EditorUIModule::WindowConfig(bool& vsync) const
 {
-    static bool borderless   = BORDERLESS;
-    static bool full_desktop = FULL_DESKTOP;
-    static bool resizable    = RESIZABLE;
     static bool fullscreen   = FULLSCREEN;
+    static bool full_desktop = FULL_DESKTOP;
+    static bool borderless   = BORDERLESS;
+    static bool resizable    = RESIZABLE;
 
-    // Brightness Slider
     float brightness         = App->GetWindowModule()->GetBrightness();
     if (ImGui::SliderFloat("Brightness", &brightness, 0, 1)) App->GetWindowModule()->SetBrightness(brightness);
 
@@ -1083,28 +1148,25 @@ void EditorUIModule::WindowConfig(bool& vsync) const
     int maxWidth                 = displayMode.w;
     int maxHeight                = displayMode.h;
 
-    // Width Slider
     int width                    = App->GetWindowModule()->GetWidth();
     if (ImGui::SliderInt("Width", &width, 0, maxWidth)) App->GetWindowModule()->SetWidth(width);
 
-    // Height Slider
     int height = App->GetWindowModule()->GetHeight();
     if (ImGui::SliderInt("Height", &height, 0, maxHeight)) App->GetWindowModule()->SetHeight(height);
 
-    // Set Fullscreen
     if (ImGui::Checkbox("Fullscreen", &fullscreen)) App->GetWindowModule()->SetFullscreen(fullscreen);
+
+    ImGui::SameLine();
+
+    if (ImGui::Checkbox("Full Desktop", &full_desktop)) App->GetWindowModule()->SetFullDesktop(full_desktop);
+
+    if (ImGui::Checkbox("Borderless", &borderless)) App->GetWindowModule()->SetBorderless(borderless);
+
     ImGui::SameLine();
 
     // Set Resizable
     if (ImGui::Checkbox("Resizable", &resizable)) App->GetWindowModule()->SetResizable(resizable);
     if (ImGui::IsItemHovered()) ImGui::SetTooltip("Restart to apply");
-
-    // Set Borderless
-    if (ImGui::Checkbox("Borderless", &borderless)) App->GetWindowModule()->SetBorderless(borderless);
-    ImGui::SameLine();
-
-    // Set Full Desktop
-    if (ImGui::Checkbox("Full Desktop", &full_desktop)) App->GetWindowModule()->SetFullDesktop(full_desktop);
 
     // Set Vsync
     if (ImGui::Checkbox("Vsync", &vsync)) App->GetWindowModule()->SetVsync(vsync);
@@ -1164,6 +1226,31 @@ void EditorUIModule::OpenGLConfig() const
     {
         openGLModule->SetFrontFaceMode(frontFaceMode);
     }
+
+    ImGui::SeparatorText("Render Information");
+
+    ImGui::Text("Draw calls:");
+    ImGui::SameLine();
+    ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", App->GetOpenGLModule()->GetDrawCallsCount());
+
+    float currentTime     = App->GetEngineTimer()->GetTime() / 1000.f;
+    static float lastTime = 0.f;
+
+    static std::string tpsStr;
+    if (currentTime - lastTime > 1.f)
+    {
+        unsigned int tps = static_cast<unsigned int>(App->GetOpenGLModule()->GetTrianglesPerSecond());
+        lastTime         = currentTime;
+        tpsStr           = FormatWithCommas(tps);
+    }
+
+    ImGui::Text("Triangles per second:");
+    ImGui::SameLine();
+    ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s", tpsStr.c_str());
+
+    ImGui::Text("Vertices:");
+    ImGui::SameLine();
+    ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", App->GetOpenGLModule()->GetVerticesCount());
 }
 
 void EditorUIModule::GameTimerConfig() const
@@ -1300,4 +1387,12 @@ void EditorUIModule::ShowCaps() const
             cont++;
         }
     }
+}
+
+std::string EditorUIModule::FormatWithCommas(unsigned int number) const
+{
+    std::stringstream ss;
+    ss.imbue(std::locale("en_US.UTF-8")); // use commas
+    ss << number;
+    return ss.str();
 }

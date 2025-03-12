@@ -2,10 +2,12 @@
 
 #include "Application.h"
 #include "CameraModule.h"
+#include "OpenGLModule.h"
 #include "ResourceMaterial.h"
 #include <Math/float2.h>
 #include <Math/float4x4.h>
 #include <SDL_assert.h>
+#include <chrono>
 #include <glew.h>
 
 #include "Application.h"
@@ -33,13 +35,11 @@ void ResourceMesh::LoadData(
     float4x4& transform
 )
 {
-
-    this->mode                 = mode;
-    this->material             = material;
-    this->vertexCount          = vertices.size();
-    this->indexCount           = indices.size();
+    this->mode              = mode;
+    this->vertexCount       = static_cast<unsigned int>(vertices.size());
+    this->indexCount        = static_cast<unsigned int>(indices.size());
     this->currentMeshTransform = transform;
-    unsigned int bufferSize    = sizeof(Vertex);
+    unsigned int bufferSize = sizeof(Vertex);
 
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
@@ -66,10 +66,15 @@ void ResourceMesh::LoadData(
 
     // Unbind VAO
     glBindVertexArray(0);
+
+    this->vertices = vertices;
+    this->indices  = indices;
 }
 
-void ResourceMesh::Render(int program, float4x4& modelMatrix, unsigned int cameraUBO, ResourceMaterial* material)
+void ResourceMesh::Render(int program, const float4x4& modelMatrix, unsigned int cameraUBO, const ResourceMaterial* material) const
 {
+    auto start = std::chrono::high_resolution_clock::now();
+
     glUseProgram(program);
 
     glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
@@ -78,7 +83,7 @@ void ResourceMesh::Render(int program, float4x4& modelMatrix, unsigned int camer
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, cameraUBO);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-    glUniformMatrix4fv(2, 1, GL_TRUE, &modelMatrix[0][0]);
+    glUniformMatrix4fv(2, 1, GL_TRUE, modelMatrix.ptr());
 
     float3 lightDir         = float3(-1.0f, -0.3f, 2.0f);
     float3 lightColor       = float3(1.0f, 1.0f, 1.0f);
@@ -94,18 +99,26 @@ void ResourceMesh::Render(int program, float4x4& modelMatrix, unsigned int camer
         material->RenderMaterial(program);
     }
 
+    unsigned int meshTriangles  = 0;
+
     if (indexCount > 0 && vao)
     {
         glBindVertexArray(vao);
-
-        glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+        meshTriangles   = indexCount / 3;
+        App->GetOpenGLModule()->DrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
     }
     else if (vao)
     {
         glBindVertexArray(vao);
-
-        glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+        meshTriangles   = vertexCount / 3;
+        App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, vertexCount);
     }
 
     glBindVertexArray(0);
+
+    auto end                             = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<float> elapsed = end - start;
+    
+    App->GetOpenGLModule()->AddTrianglesPerSecond(meshTriangles / elapsed.count());
+    App->GetOpenGLModule()->AddVerticesCount(vertexCount);
 }

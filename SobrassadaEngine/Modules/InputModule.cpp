@@ -1,12 +1,12 @@
 #include "InputModule.h"
+
 #include "Application.h"
 #include "FileSystem.h"
 #include "SceneImporter.h"
+#include "SceneModule.h"
 
 #include "SDL.h"
 #include "imgui_impl_sdl2.h"
-#include "FileSystem.h"
-#include "SceneImporter.h"
 
 #define MAX_KEYS 300
 
@@ -15,10 +15,12 @@ InputModule::InputModule()
     keyboard = new KeyState[MAX_KEYS];
     memset(keyboard, KEY_IDLE, sizeof(KeyState) * MAX_KEYS);
     memset(mouseButtons, KEY_IDLE, sizeof(KeyState) * NUM_MOUSE_BUTTONS);
-    subscribedCallbacks.assign(MAX_KEYS, std::vector<std::function<void(void)>>());
 }
 
-InputModule::~InputModule() { RELEASE_ARRAY(keyboard); }
+InputModule::~InputModule()
+{
+    RELEASE_ARRAY(keyboard);
+}
 
 bool InputModule::Init()
 {
@@ -35,58 +37,10 @@ bool InputModule::Init()
     return returnStatus;
 }
 
-void SaveHardcodedNumber() {
-    int hardcoded_number = 45;
-
-    // Step 2: Create a buffer to store the number
-    char* buffer = new char[sizeof(int)];
-    memcpy(buffer, &hardcoded_number, sizeof(int));
-
-    // Step 3: Save the buffer to a file
-    const char* file_path = "hardcoded_number.sobrassada";
-    FileSystem::Save(file_path, buffer, sizeof(int));
-
-    delete[] buffer;
-}
-
-void LoadHardcodedNumber() {
-    const char* file_path = "hardcoded_number.sobrassada";
-
-    FILE* file = nullptr;
-
-    errno_t err = fopen_s(&file, file_path, "rb");
-
-    if (err != 0 || file == nullptr) {
-        GLOG("Failed to open file for reading!");
-        return;
-    }
-
-    fseek(file, 0, SEEK_END);
-    long fileSize = ftell(file);
-    fseek(file, 0, SEEK_SET);
-
-    char* buffer = new char[fileSize];
-
-    size_t bytesRead = fread(buffer, 1, fileSize, file);
-    if (bytesRead != fileSize) {
-        GLOG("Failed to read the entire file!");
-        delete[] buffer;
-        fclose(file);
-        return;
-    }
-
-    int loadedNumber = 0;
-    memcpy(&loadedNumber, buffer, sizeof(int));
-
-    GLOG("Loaded number: %d", loadedNumber);
-
-    delete[] buffer;
-    fclose(file);
-}
 update_status InputModule::PreUpdate(float deltaTime)
 {
     // Checking and updating keyboard key states
-    const Uint8 *keys = SDL_GetKeyboardState(NULL);
+    const Uint8* keys = SDL_GetKeyboardState(NULL);
     mouseMotion.x     = 0;
     mouseMotion.y     = 0;
     mouseWheel        = 0;
@@ -146,20 +100,8 @@ update_status InputModule::PreUpdate(float deltaTime)
         case SDL_MOUSEWHEEL:
             mouseWheel = sdlEvent.wheel.y;
             break;
-            case SDL_DROPFILE:
-                SceneImporter::Import(sdlEvent.drop.file);
-        }
-    }
-
-    // Dispatch events
-    for (int key = 0; key < MAX_KEYS; ++key)
-    {
-        if (keyboard[key] == KEY_DOWN)
-        {
-            for (const auto& it : subscribedCallbacks[key])
-            {
-                it();
-            }
+        case SDL_DROPFILE:
+            SceneImporter::Import(sdlEvent.drop.file);
         }
     }
 
@@ -171,11 +113,4 @@ bool InputModule::ShutDown()
     GLOG("Quitting SDL input event subsystem");
     SDL_QuitSubSystem(SDL_INIT_EVENTS);
     return true;
-}
-
-void InputModule::SubscribeToEvent(int keyEvent, const std::function<void(void)> &functionCallback)
-{
-    if (keyEvent > MAX_KEYS || keyEvent < 0) return;
-    
-    subscribedCallbacks[keyEvent].push_back(functionCallback);
 }

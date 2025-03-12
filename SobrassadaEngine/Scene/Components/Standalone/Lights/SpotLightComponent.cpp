@@ -2,13 +2,14 @@
 
 #include "Application.h"
 #include "DebugDrawModule.h"
+#include "GameObject.h"
 #include "SceneModule.h"
 
 #include "ImGui.h"
 #include "Math/Quat.h"
 
-SpotLightComponent::SpotLightComponent(UID uid, UID uidParent, UID uidRoot, const Transform& parentGlobalTransform)
-    : LightComponent(uid, uidParent, uidRoot, "Spot Light", COMPONENT_SPOT_LIGHT, parentGlobalTransform)
+SpotLightComponent::SpotLightComponent(UID uid, UID uidParent)
+    : LightComponent(uid, uidParent, "Spot Light", COMPONENT_SPOT_LIGHT)
 {
     range                      = 3;
     innerAngle                 = 10;
@@ -86,42 +87,35 @@ void SpotLightComponent::Render()
     outerDirections.emplace_back(Quat::RotateZ(outerRads).Transform(-float3::unitY));
     outerDirections.emplace_back(Quat::RotateZ(-outerRads).Transform(-float3::unitY));
 
-    const float4x4& rot = float4x4::FromQuat(
-        Quat::FromEulerXYZ(globalTransform.rotation.x, globalTransform.rotation.y, globalTransform.rotation.z)
-    );
+    const float4x4& globalTransform = GetParent()->GetGlobalTransform();
 
-    const float3 direction = (rot.RotatePart() * -float3::unitY).Normalized();
-    innerDirections[0]     = (rot.RotatePart() * innerDirections[0]);
-    innerDirections[1]     = (rot.RotatePart() * innerDirections[1]);
-    outerDirections[0]     = (rot.RotatePart() * outerDirections[0]);
-    outerDirections[1]     = (rot.RotatePart() * outerDirections[1]);
+    const float3 direction          = (globalTransform.RotatePart() * -float3::unitY).Normalized();
+    innerDirections[0]              = (globalTransform.RotatePart() * innerDirections[0]);
+    innerDirections[1]              = (globalTransform.RotatePart() * innerDirections[1]);
+    outerDirections[0]              = (globalTransform.RotatePart() * outerDirections[0]);
+    outerDirections[1]              = (globalTransform.RotatePart() * outerDirections[1]);
 
-    DebugDrawModule* debug = App->GetDebugDrawModule();
-    debug->DrawLine(globalTransform.position, direction, range, float3(1, 1, 1));
+    DebugDrawModule* debug          = App->GetDebugDrawModule();
+    debug->DrawLine(globalTransform.TranslatePart(), direction, range, float3(1, 1, 1));
 
     for (const float3& dir : innerDirections)
     {
-        debug->DrawLine(globalTransform.position, dir, range / cos(innerRads), float3(1, 1, 1));
+        debug->DrawLine(globalTransform.TranslatePart(), dir, range / cos(innerRads), float3(1, 1, 1));
     }
 
     for (const float3& dir : outerDirections)
     {
-        debug->DrawLine(globalTransform.position, dir, range / cos(outerRads), float3(1, 1, 1));
+        debug->DrawLine(globalTransform.TranslatePart(), dir, range / cos(outerRads), float3(1, 1, 1));
     }
 
-    float3 center       = globalTransform.position + (direction * range);
+    float3 center       = globalTransform.TranslatePart() + (direction * range);
     float innerCathetus = range * tan(innerRads);
     float outerCathetus = range * tan(outerRads);
     debug->DrawCircle(center, -direction, float3(1, 1, 1), innerCathetus);
     debug->DrawCircle(center, -direction, float3(1, 1, 1), outerCathetus);
 }
 
-float3 SpotLightComponent::GetDirection() const
+const float3 SpotLightComponent::GetDirection()
 {
-    return (float4x4::FromQuat(
-                Quat::FromEulerXYZ(globalTransform.rotation.x, globalTransform.rotation.y, globalTransform.rotation.z)
-            )
-                .RotatePart() *
-            -float3::unitY)
-        .Normalized();
+    return (GetParent()->GetGlobalTransform().RotatePart() * -float3::unitY).Normalized();
 }
