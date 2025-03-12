@@ -486,6 +486,7 @@
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_extra_math.h" />
     <ClInclude Include="UI\CustomNode.h" />
     <ClInclude Include="UI\EngineEditorBase.h" />
+    <ClInclude Include="Utils\DebugUtils.h" />
     <ClInclude Include="FileSystem\Importer.h" />
     <ClInclude Include="FileSystem\Model.h" />
     <ClInclude Include="Libs\ImGuizmo\ImGuizmo.h" />
@@ -499,7 +500,7 @@
     <ClInclude Include="Modules\SceneModule.h" />
     <ClInclude Include="Modules\NodeEditor.h" />
     <ClInclude Include="FileSystem\ModelImporter.h" />
-    <ClInclude Include="RaycastController.h" />
+    <ClInclude Include="Utils\RaycastController.h" />
     <ClInclude Include="ResourceManagement\Resources\Resource.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceMaterial.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceMesh.h" />
