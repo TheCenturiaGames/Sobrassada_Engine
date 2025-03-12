@@ -1,5 +1,8 @@
 #include "WindowModule.h"
 
+#include "Application.h"
+#include "ProjectModule.h"
+
 WindowModule::WindowModule()
 {
 }
@@ -82,4 +85,9 @@ void WindowModule::SetHeight(const unsigned int height)
 {
     windowHeight = height;
     SDL_SetWindowSize(window, windowWidth, windowHeight);
+}
+
+void WindowModule::UpdateProjectNameInWindowTitle(const std::string& newProjectName) const
+{
+    SDL_SetWindowTitle(window, (newProjectName + " - " + TITLE).c_str());
 }

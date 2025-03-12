@@ -31,6 +31,7 @@ class WindowModule : public Module
         return SDL_SetWindowFullscreen(window, fullDesktop ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
     }
     void SetVsync(bool vsync) const { SDL_GL_SetSwapInterval(vsync ? 1 : 0); }
+    void UpdateProjectNameInWindowTitle(const std::string& newProjectName) const;
 
   public:
     SDL_Window* window         = nullptr;

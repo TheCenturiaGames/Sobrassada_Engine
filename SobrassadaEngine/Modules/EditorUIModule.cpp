@@ -88,7 +88,8 @@ update_status EditorUIModule::Update(float deltaTime)
 
 update_status EditorUIModule::RenderEditor(float deltaTime)
 {
-    Draw();
+    if (App->GetProjectModule()->IsProjectLoaded())
+        Draw();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

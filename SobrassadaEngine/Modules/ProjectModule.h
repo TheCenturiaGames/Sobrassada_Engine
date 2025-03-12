@@ -16,9 +16,15 @@ public:
     const std::string& GetLoadedProjectPath() const { return loadedProjectAbsolutePath; }
     const std::string& GetLoadedProjectName() const { return loadedProjectName; }
 
+    void LoadNewProject();
+
+    bool IsProjectLoaded() const { return projectLoaded; }
+
 private:
 
-    std::string loadedProjectName;
+    bool projectLoaded = true;
+
+    std::string loadedProjectName = "No project loaded";
     std::string loadedProjectAbsolutePath;
     std::vector<char*> previouslyLoadedProjects;
 };
