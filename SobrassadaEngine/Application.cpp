@@ -87,17 +87,21 @@ update_status Application::Update()
 #endif
     // Unbinding frame buffer so ui gets rendered
     App->GetOpenGLModule()->GetFramebuffer()->Unbind();
+    int i = 0;
 
     for (std::list<Module*>::iterator it = modules.begin(); it != modules.end() && returnStatus == UPDATE_CONTINUE;
-         ++it)
+        ++it)
         returnStatus = (*it)->RenderEditor(deltaTime);
+
 
 #ifdef _DEBUG
     OPTICK_CATEGORY("Application::PostUpdate", Optick::Category::GameLogic)
 #endif
     for (std::list<Module*>::iterator it = modules.begin(); it != modules.end() && returnStatus == UPDATE_CONTINUE;
          ++it)
+    {
         returnStatus = (*it)->PostUpdate(deltaTime);
+    }
 
     return returnStatus;
 }

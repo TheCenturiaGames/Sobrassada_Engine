@@ -236,7 +236,10 @@ void EditorUIModule::MainMenu()
             if (ImGui::MenuItem("Load Model"))
             {
                 loadModel = !loadModel;
-                ImGui::OpenPopup(CONSTANT_MODEL_SELECT_DIALOG_ID);
+            }
+            if (ImGui::MenuItem("Load Prefab"))
+            {
+                loadPrefab = !loadPrefab;
             }
             ImGui::EndDisabled();
 
@@ -268,23 +271,6 @@ void EditorUIModule::MainMenu()
 
         ImGui::EndMenu();
     }
-
-    // Menu window to load file into scene (useful while a window with the the resources to drag and drop does not
-    // exist)
-    if (App->GetSceneModule()->GetSceneUID() != INVALID_UID)
-    {
-        if (ImGui::BeginMenu("Scene"))
-        {
-            if (ImGui::MenuItem("Load Prefab"))
-            {
-                loadPrefab = !loadPrefab;
-                ImGui::OpenPopup(CONSTANT_PREFAB_SELECT_DIALOG_ID);
-            }
-
-            ImGui::EndMenu();
-        }
-    }
-
     ImGui::EndMainMenuBar();
 }
 
@@ -389,13 +375,13 @@ void EditorUIModule::LoadPrefabDialog(bool& loadPrefab) const
 
     if (ImGui::Button("Ok"))
     {
-        App->GetSceneModule()->LoadModel(prefabUid);
+        App->GetSceneModule()->LoadPrefab(prefabUid);
     }
 
     ImGui::End();
 }
 
-void EditorUIModule::LoadModelDialog(bool& loadModel)
+void EditorUIModule::LoadModelDialog(bool& loadModel) const
 {
     ImGui::SetNextWindowSize(ImVec2(width * 0.25f, height * 0.4f), ImGuiCond_FirstUseEver);
 

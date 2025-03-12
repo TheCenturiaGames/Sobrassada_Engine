@@ -12,7 +12,7 @@ class ResourcePrefab : public Resource
 
     void LoadData(const std::vector<GameObject*> &objects) { gameObjects = objects; }
     GameObject* GetRootObject() const { return gameObjects[0]; }
-    const std::vector<GameObject*> GetGameObjectsVector() const { return gameObjects; }
+    std::vector<GameObject*> GetGameObjectsVector() const { return gameObjects; }
 
   private:
     std::vector<GameObject*> gameObjects;

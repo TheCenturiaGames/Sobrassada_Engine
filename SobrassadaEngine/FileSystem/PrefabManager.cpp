@@ -6,6 +6,7 @@
 #include "ResourceManagement/Resources/ResourcePrefab.h"
 #include "Scene/GameObjects/GameObject.h"
 #include "SceneModule.h"
+#include "MetaPrefab.h"
 
 #include "prettywriter.h"
 #include "stringbuffer.h"
@@ -25,10 +26,10 @@ namespace PrefabManager
 
         // Scene values
         UID uid              = GenerateUID();
-        std::string savePath = PREFABS_PATH + std::string("Prefab") + PREFAB_EXTENSION;
+        std::string savePath = PREFABS_LIB_PATH + std::string("Prefab") + PREFAB_EXTENSION;
         UID finalPrefabUID =
             override ? gameObject->GetPrefabUID() : App->GetLibraryModule()->AssignFiletypeUID(uid, FileType::Prefab);
-        savePath                = PREFABS_PATH + std::to_string(finalPrefabUID) + PREFAB_EXTENSION;
+        savePath                = PREFABS_LIB_PATH + std::to_string(finalPrefabUID) + PREFAB_EXTENSION;
         const std::string& name = gameObject->GetName();
 
         // Create structure
@@ -72,7 +73,10 @@ namespace PrefabManager
         rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
         doc.Accept(writer);
 
-        const std::string assetPath = PREFABS_PATH + name + PREFAB_EXTENSION;
+        // Create meta file
+        std::string assetPath = PREFABS_ASSETS_PATH + name + PREFAB_EXTENSION;
+        MetaPrefab meta(finalPrefabUID, assetPath);
+        meta.Save(name, assetPath);
 
         // Save in assets
         unsigned int bytesWritten   = (unsigned int
@@ -102,7 +106,7 @@ namespace PrefabManager
 
     void CopyPrefab(const std::string& filePath, const std::string& name, const UID sourceUID)
     {
-        std::string destination = PREFABS_PATH + std::to_string(sourceUID) + PREFAB_EXTENSION;
+        std::string destination = PREFABS_LIB_PATH + std::to_string(sourceUID) + PREFAB_EXTENSION;
         FileSystem::Copy(filePath.c_str(), destination.c_str());
 
         App->GetLibraryModule()->AddPrefab(sourceUID, name);
@@ -145,16 +149,6 @@ namespace PrefabManager
                 // once the serialization is also done
 
                 loadedGameObjects.push_back(newObject);
-            }
-        }
-
-        std::vector<Component*> loadedComponents;
-        if (prefab.HasMember("Components") && prefab["Components"].IsArray())
-        {
-            const rapidjson::Value& components = prefab["Components"];
-            for (rapidjson::SizeType i = 0; i < components.Size(); i++)
-            {
-                const rapidjson::Value& component = components[i];
             }
         }
 

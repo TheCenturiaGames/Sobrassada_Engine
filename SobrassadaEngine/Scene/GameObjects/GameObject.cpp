@@ -338,6 +338,11 @@ void GameObject::RenderHierarchyNode(UID& selectedGameObjectUUID)
 
     bool hasChildren         = !children.empty();
 
+    if (prefabUid != INVALID_UID)
+    {
+        GLOG("HELLO");
+    }
+
     if (!hasChildren) flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
     if (selectedGameObjectUUID == uid) flags |= ImGuiTreeNodeFlags_Selected;
 
@@ -353,10 +358,10 @@ void GameObject::RenderHierarchyNode(UID& selectedGameObjectUUID)
     else
     {
         std::string objectName = name;
-        if (prefabUid != INVALID_UID)
-        {
-            objectName += "(prefab " + std::to_string(prefabUid) + ')';
-        }
+        //if (prefabUid != INVALID_UID)
+        //{
+        //    objectName += "(prefab " + std::to_string(prefabUid) + ')';
+        //}
         nodeOpen = ImGui::TreeNodeEx(objectName.c_str(), flags);
     }
 

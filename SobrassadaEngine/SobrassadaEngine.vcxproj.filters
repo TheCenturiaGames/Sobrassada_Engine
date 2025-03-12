@@ -177,9 +177,6 @@
     <ClCompile Include="Scene\Components\ComponentUtils.cpp">
       <Filter>Scene\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Components\Root\RootComponent.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\Components\Standalone\MeshComponent.cpp">
       <Filter>Scene\Components</Filter>
     </ClCompile>
@@ -273,12 +270,7 @@
     <ClCompile Include="ResourceManagement\Resources\ResourcePrefab.cpp">
       <Filter>Resources</Filter>
     </ClCompile>
-    <ClCompile Include="FileSystem\PrefabManager.cpp">
-      <Filter>FileSystem</Filter>
-    </ClCompile>
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp" />
-    <ClCompile Include="Tests\MockGameObject.cpp" />
-    <ClCompile Include="UI\QuadtreeViewer.cpp" />
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp">
       <Filter>External\ImGuizmo</Filter>
     </ClCompile>
@@ -292,6 +284,12 @@
       <Filter>FileSystem\Meta</Filter>
     </ClCompile>
     <ClCompile Include="FileSystem\MetaTexture.cpp">
+      <Filter>FileSystem\Meta</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\MetaPrefab.cpp">
+      <Filter>FileSystem\Meta</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\PrefabManager.cpp">
       <Filter>FileSystem\Meta</Filter>
     </ClCompile>
   </ItemGroup>
@@ -428,9 +426,6 @@
     <ClInclude Include="Modules\SceneModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Components\Root\RootComponent.h">
-      <Filter>Scene\Components</Filter>
-    </ClInclude>
     <ClInclude Include="Scene\Components\Standalone\MeshComponent.h">
       <Filter>Scene\Components</Filter>
     </ClInclude>
@@ -532,6 +527,9 @@
     </ClInclude>
     <ClInclude Include="RaycastController.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\MetaPrefab.h">
+      <Filter>FileSystem\Meta</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

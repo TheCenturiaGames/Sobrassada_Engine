@@ -67,9 +67,10 @@ enum update_status
 #define DEFAULT_CAMERA_WHEEL_SENSITIVITY     2.f;
 #define DEFAULT_CAMERA_ZOOM_SENSITIVITY      0.5f;
 
-#define ASSETS_PATH   "Assets/"
-#define SCENES_PATH   "Assets/Scenes/"
-#define METADATA_PATH "Assets/Metadata/"
+#define ASSETS_PATH         "Assets/"
+#define SCENES_PATH         "Assets/Scenes/"
+#define METADATA_PATH       "Assets/Metadata/"
+#define PREFABS_ASSETS_PATH "Assets/Prefabs/"
 
 #define LIBRARY_PATH     "Library/"
 #define ANIMATIONS_PATH  "Library/Animations/"
@@ -79,7 +80,7 @@ enum update_status
 #define SCENES_PLAY_PATH "Library/Scenes/"
 #define TEXTURES_PATH    "Library/Textures/"
 #define MATERIALS_PATH   "Library/Materials/"
-#define PREFABS_PATH     "Library/Prefabs/"
+#define PREFABS_LIB_PATH "Library/Prefabs/"
 
 #define ASSET_EXTENSION    ".gltf"
 #define MESH_EXTENSION     ".sobrassada"

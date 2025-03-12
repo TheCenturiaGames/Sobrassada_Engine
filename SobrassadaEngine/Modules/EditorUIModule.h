@@ -87,8 +87,7 @@ class EditorUIModule : public Module
     void About(bool& aboutMenu) const;
     std::string FormatWithCommas(unsigned int number) const;
 
-    void LoadModelDialog(bool& loadModel);
-
+    void LoadModelDialog(bool& loadModel) const;
     void LoadPrefabDialog(bool& loadPrefab) const;
 
   public:

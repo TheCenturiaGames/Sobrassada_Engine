@@ -167,6 +167,13 @@ namespace SceneImporter
                 GLOG("Failed to create directory: %s", METADATA_PATH);
             }
         }
+        if (!FileSystem::IsDirectory(PREFABS_ASSETS_PATH))
+        {
+            if (!FileSystem::CreateDirectories(PREFABS_LIB_PATH))
+            {
+                GLOG("Failed to create directory: %s", PREFABS_LIB_PATH);
+            }
+        }
         if (!FileSystem::IsDirectory(ANIMATIONS_PATH))
         {
             if (!FileSystem::CreateDirectories(ANIMATIONS_PATH))
@@ -216,11 +223,11 @@ namespace SceneImporter
                 GLOG("Failed to create directory: %s", MATERIALS_PATH);
             }
         }
-        if (!FileSystem::IsDirectory(PREFABS_PATH))
+        if (!FileSystem::IsDirectory(PREFABS_LIB_PATH))
         {
-            if (!FileSystem::CreateDirectories(PREFABS_PATH))
+            if (!FileSystem::CreateDirectories(PREFABS_LIB_PATH))
             {
-                GLOG("Failed to create directory: %s", PREFABS_PATH);
+                GLOG("Failed to create directory: %s", PREFABS_LIB_PATH);
             }
         }
     }

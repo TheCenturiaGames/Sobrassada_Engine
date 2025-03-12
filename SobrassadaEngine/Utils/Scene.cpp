@@ -574,7 +574,7 @@ void Scene::LoadPrefab(const UID prefabUid)
         GLOG("Load prefab %d", prefabUid);
 
         ResourcePrefab* prefab = (ResourcePrefab*)App->GetResourcesModule()->RequestResource(prefabUid);
-        const std::vector<GameObject*>& gameObjects = prefab->GetGameObjectsVector();
+        std::vector<GameObject*> gameObjects = prefab->GetGameObjectsVector();
 
         // Right now it is loaded to the root gameObject
         gameObjects[0]->SetParent(GetGameObjectRootUID());

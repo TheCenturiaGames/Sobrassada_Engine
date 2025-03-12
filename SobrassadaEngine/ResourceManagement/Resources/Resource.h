@@ -13,6 +13,7 @@ enum class ResourceType
     Texture,   // 12
     Material,  // 13
     Model,     // 14
+    Animation, // 15
     Prefab,    // 16
 };
 

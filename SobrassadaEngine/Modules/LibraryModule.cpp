@@ -179,7 +179,7 @@ bool LibraryModule::LoadLibraryMaps()
             case 16:
                 AddPrefab(assetUID, assetName);
                 AddName(assetName, assetUID);
-                libraryPath = PREFABS_PATH + std::to_string(assetUID) + PREFAB_EXTENSION;
+                libraryPath = PREFABS_LIB_PATH + std::to_string(assetUID) + PREFAB_EXTENSION;
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 else SceneImporter::CopyPrefab(assetPath, assetName, assetUID);
                 break;

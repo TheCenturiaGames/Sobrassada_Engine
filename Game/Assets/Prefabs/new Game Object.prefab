@@ -1,0 +1,34 @@
+{
+    "Prefab": {
+        "UID": 1699958424588279,
+        "Name": "new Game Object",
+        "GameObjects": [
+            {
+                "UID": 10218210300176690836,
+                "ParentUID": 13088172952933329028,
+                "Name": "new Game Object",
+                "Mobility": 1,
+                "LocalTransform": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "Components": [],
+                "Children": []
+            }
+        ]
+    }
+}
