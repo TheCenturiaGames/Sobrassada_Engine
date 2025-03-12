@@ -111,7 +111,7 @@ class GameObject
     bool isRenaming = false;
     char renameBuffer[128];
 
-    UID prefabUid = CONSTANT_EMPTY_UID;
+    UID prefabUid = INVALID_UID;
     bool drawNodes                       = false;
 
     float4x4 localTransform              = float4x4::identity;

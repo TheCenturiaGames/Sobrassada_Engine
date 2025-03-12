@@ -569,7 +569,7 @@ void Scene::LoadModel(const UID modelUID)
 
 void Scene::LoadPrefab(const UID prefabUid)
 {
-    if (prefabUid != CONSTANT_EMPTY_UID)
+    if (prefabUid != INVALID_UID)
     {
         GLOG("Load prefab %d", prefabUid);
 
@@ -579,19 +579,19 @@ void Scene::LoadPrefab(const UID prefabUid)
         // Right now it is loaded to the root gameObject
         gameObjects[0]->SetParent(GetGameObjectRootUID());
         gameObjects[0]->SetPrefabUID(prefabUid);
-        GetGameObjectByUUID(GetGameObjectRootUID())->AddGameObject(gameObjects[0]->GetUID());
+        GetGameObjectByUID(GetGameObjectRootUID())->AddGameObject(gameObjects[0]->GetUID());
         AddGameObject(gameObjects[0]->GetUID(), gameObjects[0]);
 
         // Add the gameObject to the scene. The parents will always be added before the children
         for (int i = 1; i < gameObjects.size(); ++i)
         {
-            GetGameObjectByUUID(gameObjects[i]->GetParent())->AddGameObject(gameObjects[i]->GetUID());
+            GetGameObjectByUID(gameObjects[i]->GetParent())->AddGameObject(gameObjects[i]->GetUID());
             AddGameObject(gameObjects[i]->GetUID(), gameObjects[i]);
 
             // TODO: Add components
-
-            gameObjects[i]->PassAABBUpdateToParent();
         }
+
+        gameObjects[0]->UpdateTransformForGOBranch();
     }
 
     // ONLY ONE INSTANCE OF PREFAB CAN BE LOADED BECAUSE THE OBJECTS UID ARE REPEATED,

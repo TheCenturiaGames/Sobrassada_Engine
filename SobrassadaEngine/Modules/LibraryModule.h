@@ -19,7 +19,8 @@ enum class FileType
     Texture,
     Material,
     Scene,
-    Model
+    Model,
+    Prefab
 };
 
 class LibraryModule : public Module
@@ -57,6 +58,7 @@ class LibraryModule : public Module
     const std::unordered_map<std::string, UID>& GetTextureMap() const { return textureMap; }
     const std::unordered_map<std::string, UID>& GetMaterialMap() const { return materialMap; }
     const std::unordered_map<std::string, UID>& GetMeshMap() const { return meshMap; }
+    const std::unordered_map<std::string, UID>& GetModelMap() const { return modelMap; }
     const std::unordered_map<std::string, UID>& GetPrefabMap() const { return prefabMap; }
 
   private:

@@ -271,7 +271,7 @@ void EditorUIModule::MainMenu()
 
     // Menu window to load file into scene (useful while a window with the the resources to drag and drop does not
     // exist)
-    if (App->GetSceneModule()->GetSceneUID() != CONSTANT_EMPTY_UID)
+    if (App->GetSceneModule()->GetSceneUID() != INVALID_UID)
     {
         if (ImGui::BeginMenu("Scene"))
         {
@@ -363,12 +363,12 @@ void EditorUIModule::LoadPrefabDialog(bool& loadPrefab) const
         return;
     }
 
-    static UID prefabUid               = CONSTANT_EMPTY_UID;
+    static UID prefabUid         = INVALID_UID;
     static char searchText[255] = "";
     ImGui::InputText("Search", searchText, 255);
 
     ImGui::Separator();
-    if (ImGui::BeginListBox("##ComponentList", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
+    if (ImGui::BeginListBox("##PrefabsList", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
     {
         static int selected = -1;
         int i               = 0;
@@ -379,7 +379,7 @@ void EditorUIModule::LoadPrefabDialog(bool& loadPrefab) const
             {
                 if (ImGui::Selectable(valuePair.first.c_str(), selected == i))
                 {
-                    selected  = i;
+                    selected = i;
                     prefabUid = valuePair.second;
                 }
             }
@@ -389,7 +389,7 @@ void EditorUIModule::LoadPrefabDialog(bool& loadPrefab) const
 
     if (ImGui::Button("Ok"))
     {
-        App->GetSceneModule()->LoadPrefab(prefabUid);
+        App->GetSceneModule()->LoadModel(prefabUid);
     }
 
     ImGui::End();

@@ -4,7 +4,6 @@
 #include "FileSystem.h"
 #include "LibraryModule.h"
 #include "ResourceManagement/Resources/ResourcePrefab.h"
-#include "Scene/Components/Root/RootComponent.h"
 #include "Scene/GameObjects/GameObject.h"
 #include "SceneModule.h"
 
@@ -28,7 +27,7 @@ namespace PrefabManager
         UID uid              = GenerateUID();
         std::string savePath = PREFABS_PATH + std::string("Prefab") + PREFAB_EXTENSION;
         UID finalPrefabUID =
-            override ? gameObject->GetPrefabUID() : App->GetLibraryModule()->AssignFiletypeUID(uid, savePath);
+            override ? gameObject->GetPrefabUID() : App->GetLibraryModule()->AssignFiletypeUID(uid, FileType::Prefab);
         savePath                = PREFABS_PATH + std::to_string(finalPrefabUID) + PREFAB_EXTENSION;
         const std::string& name = gameObject->GetName();
 
@@ -78,7 +77,7 @@ namespace PrefabManager
         if (bytesWritten == 0)
         {
             GLOG("Failed to save prefab file: %s", savePath);
-            return CONSTANT_EMPTY_UID;
+            return INVALID_UID;
         }
 
         // Add the prefab to the resources map

@@ -353,7 +353,7 @@ void GameObject::RenderHierarchyNode(UID& selectedGameObjectUUID)
     else
     {
         std::string objectName = name;
-        if (prefabUid != CONSTANT_EMPTY_UID)
+        if (prefabUid != INVALID_UID)
         {
             objectName += "(prefab " + std::to_string(prefabUid) + ')';
         }
@@ -447,7 +447,7 @@ void GameObject::RenderContextMenu()
             currentRenamingUID = uid;
         }
 
-        const char* label = prefabUid == CONSTANT_EMPTY_UID ? "Create Prefab" : "Update Prefab";
+        const char* label = prefabUid == INVALID_UID ? "Create Prefab" : "Update Prefab";
         if (ImGui::MenuItem(label))
         {
             CreatePrefab();
@@ -612,7 +612,6 @@ bool GameObject::RemoveComponent(ComponentType componentType)
 
 void GameObject::CreatePrefab()
 {
-    bool override = this->prefabUid == CONSTANT_EMPTY_UID ? false : true;
+    bool override = this->prefabUid == INVALID_UID ? false : true;
     prefabUid     = PrefabManager::SavePrefab(this, override);
-    return float4x4::identity;
 }

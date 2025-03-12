@@ -205,6 +205,9 @@ UID LibraryModule::AssignFiletypeUID(UID originalUID, FileType fileType)
     case FileType::Model:
         prefix = 14;
         break;
+    case FileType::Prefab:
+        prefix = 16;
+        break;
     default:
         GLOG("Category: Unknown File Type (10)");
         break;

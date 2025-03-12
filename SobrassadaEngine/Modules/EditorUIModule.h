@@ -104,6 +104,7 @@ class EditorUIModule : public Module
     bool loadMenu           = false;
     bool saveMenu           = false;
     bool loadModel          = false;
+    bool loadPrefab         = false;
     bool aboutMenu          = false;
     bool editorSettingsMenu = false;
     bool closeScene         = false;
