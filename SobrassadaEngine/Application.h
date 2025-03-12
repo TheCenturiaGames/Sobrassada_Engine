@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include "Globals.h"
 #include "Module.h"
 
@@ -33,6 +34,7 @@ class Application
     WindowModule* GetWindowModule() { return windowModule; }
     OpenGLModule* GetOpenGLModule() { return openGLModule; }
     ResourcesModule* GetResourcesModule() { return resourcesModule; }
+    
     InputModule* GetInputModule() { return inputModule; }
     ShaderModule* GetShaderModule() { return shaderModule; }
     LibraryModule* GetLibraryModule() { return libraryModule; }
@@ -44,8 +46,10 @@ class Application
     EngineTimer* GetEngineTimer() { return engineTimer; }
     GameTimer* GetGameTimer() { return gameTimer; }
 
+
   private:
     std::list<Module*> modules;
+
 
     WindowModule* windowModule       = nullptr;
     OpenGLModule* openGLModule       = nullptr;
@@ -60,6 +64,7 @@ class Application
 
     EngineTimer* engineTimer         = nullptr;
     GameTimer* gameTimer             = nullptr;
+
 };
 
 extern Application* App;

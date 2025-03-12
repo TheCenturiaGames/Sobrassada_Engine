@@ -1,7 +1,8 @@
 #pragma once
-
 #include "Module.h"
 #include "ResourceManagement/Resources/Resource.h"
+#include "EngineEditors/EngineEditorBase.h"
+
 
 #include "UI/EngineEditorBase.h"
 #include "UI/NodeEditor.h"
@@ -19,6 +20,12 @@
 // imguizmo include after imgui
 #include "./Libs/ImGuizmo/ImGuizmo.h"
 
+enum EditorType
+{
+    BASE,
+    ANIMATION,
+    NODE
+};
 struct CPUFeature
 {
     SDL_bool (*check)();
@@ -103,6 +110,9 @@ class EditorUIModule : public Module
     std::string FormatWithCommas(unsigned int number) const;
 
     void LoadModelDialog(bool& loadModel);
+
+    void OpenEditor(EngineEditorBase* editorToOpen);
+    EngineEditorBase* CreateEditor(EditorType type);
 
   public:
     bool editorControlMenu = true;

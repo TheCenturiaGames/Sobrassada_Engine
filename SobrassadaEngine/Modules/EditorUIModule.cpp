@@ -31,6 +31,11 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
 
 EditorUIModule::~EditorUIModule()
 {
+    for (auto values : openEditors)
+    {
+        delete values.second;
+    }
+    openEditors.clear();
 }
 
 bool EditorUIModule::Init()
@@ -82,19 +87,18 @@ update_status EditorUIModule::RenderEditor(float deltaTime)
     Draw();
     for (auto it = openEditors.cbegin(); it != openEditors.cend();)
     {
-       
+        
         if (!it->second->RenderEditor())
         {
-          
             delete it->second;
             it = openEditors.erase(it);
         }
         else
         {
-            
             ++it;
         }
     }
+ 
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -1068,6 +1072,20 @@ void EditorUIModule::About(bool& aboutMenu) const
         ImGui::EndChild();
     }
     ImGui::End();
+}
+
+EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
+{
+    UID uid = GenerateUID();
+    switch (type)
+    {
+    case EditorType::BASE:
+
+        return new EngineEditorBase("Base Editor " + std::to_string(uid), uid);
+
+    default:
+        return nullptr;
+    }
 }
 
 void EditorUIModule::EditorSettings(bool& editorSettingsMenu)
