@@ -20,6 +20,9 @@ namespace FileSystem
     void GetFilesSorted(const std::string& currentPath, std::vector<std::string>& files);
     time_t GetLastModifiedTime(const std::string& path);
 
+    void AddDelimiterIfNotPresent(std::string& path);
+    void RemoveDelimiterIfPresent(std::string& path);
+
     inline size_t GetFileSize(const char* filePath)
     {
         return std::filesystem::file_size(filePath);

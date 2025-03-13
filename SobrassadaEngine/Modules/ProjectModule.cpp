@@ -70,10 +70,10 @@ update_status ProjectModule::RenderEditor(float deltaTime)
 
                     if (ImGui::BeginListBox("Previous projects"))
                     {
-                        for (int n = 0; n < App->GetEngineConfig()->GetProjectPaths().size(); n++)
+                        for (const auto& path: App->GetEngineConfig()->GetProjectPaths())
                         {
-                            if (ImGui::Selectable(App->GetEngineConfig()->GetProjectPaths()[n].c_str(), false))
-                                memcpy(newProjectPath, App->GetEngineConfig()->GetProjectPaths()[n].c_str(), 255);
+                            if (ImGui::Selectable(path.c_str(), false))
+                                memcpy(newProjectPath, path.c_str(), 255);
                         }
                         ImGui::EndListBox();
                     }
@@ -128,7 +128,10 @@ void ProjectModule::CreateNewProject(const std::string& projectPath, const std::
 {
     projectLoaded = true;
     loadedProjectName = std::string(projectName);
-    loadedProjectAbsolutePath = std::string(projectPath + DELIMITER + projectName + DELIMITER);
+
+    std::string path = projectPath;
+    FileSystem::AddDelimiterIfNotPresent(path);
+    loadedProjectAbsolutePath = path + projectName + DELIMITER;
     FileSystem::CreateDirectories(loadedProjectAbsolutePath.c_str());
     App->GetWindowModule()->UpdateProjectNameInWindowTitle(loadedProjectName);
     App->GetEngineConfig()->SetStartupProjectPath(loadedProjectAbsolutePath);
@@ -139,7 +142,10 @@ void ProjectModule::LoadProject(const std::string& projectPath)
 {
     projectLoaded = true;
     loadedProjectName = FileSystem::GetFileNameWithoutExtension(projectPath);
-    loadedProjectAbsolutePath = std::string(projectPath + DELIMITER);
+    
+    std::string path = projectPath;
+    FileSystem::AddDelimiterIfNotPresent(path);
+    loadedProjectAbsolutePath = std::string(path);
     App->GetWindowModule()->UpdateProjectNameInWindowTitle(loadedProjectName);
     App->GetEngineConfig()->SetStartupProjectPath(loadedProjectAbsolutePath);
     projectReloadRequested = true;

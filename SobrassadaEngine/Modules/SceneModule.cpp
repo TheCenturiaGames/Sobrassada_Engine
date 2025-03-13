@@ -17,7 +17,7 @@
 #include <filesystem>
 #include <tiny_gltf.h>
 
-SceneModule::SceneModule() : scenePath(std::filesystem::current_path().string() + DELIMITER)
+SceneModule::SceneModule()
 {
 }
 
@@ -117,7 +117,7 @@ void SceneModule::CloseScene()
 {
     if (inPlayMode)
     {
-        std::string tmpScene = SCENES_PLAY_PATH + std::to_string(loadedScene->GetSceneUID()) + SCENE_EXTENSION;
+        std::string tmpScene = App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PLAY_PATH + std::to_string(loadedScene->GetSceneUID()) + SCENE_EXTENSION;
         FileSystem::Delete(tmpScene.c_str());
         inPlayMode = false;
     }
@@ -136,7 +136,7 @@ void SceneModule::SwitchPlayMode(bool play)
         std::string tmpScene = std::to_string(loadedScene->GetSceneUID()) + SCENE_EXTENSION;
         if (App->GetLibraryModule()->LoadScene(tmpScene.c_str(), true))
         {
-            FileSystem::Delete((sceePath + SCENES_PLAY_PATH + tmpScene).c_str());
+            FileSystem::Delete((App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PLAY_PATH + tmpScene).c_str());
             inPlayMode = false;
             loadedScene->SetStopPlaying(false);
         }

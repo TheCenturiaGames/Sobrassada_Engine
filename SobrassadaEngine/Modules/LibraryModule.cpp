@@ -82,8 +82,8 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
         std::string sceneFilePath;
 
         if (saveMode == SaveMode::SavePlayMode)
-            sceneFilePath = SCENES_PLAY_PATH + std::to_string(sceneUID) + SCENE_EXTENSION;
-        else sceneFilePath = SCENES_PATH + sceneName + SCENE_EXTENSION;
+            sceneFilePath = App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PLAY_PATH + std::to_string(sceneUID) + SCENE_EXTENSION;
+        else sceneFilePath = App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PATH + sceneName + SCENE_EXTENSION;
 
         unsigned int bytesWritten = (unsigned int
         )FileSystem::Save(sceneFilePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
@@ -106,8 +106,8 @@ bool LibraryModule::LoadScene(const char* file, bool reload) const
     rapidjson::Document doc;
 
     std::string path;
-    if (reload) path = SCENES_PLAY_PATH;
-    else path = SCENES_PATH;
+    if (reload) path = App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PLAY_PATH;
+    else path = App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PATH;
 
     bool loaded = FileSystem::LoadJSON((path + std::string(file)).c_str(), doc);
 

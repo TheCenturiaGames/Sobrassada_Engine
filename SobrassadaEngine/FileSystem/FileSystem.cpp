@@ -211,4 +211,18 @@ namespace FileSystem
         return fileInfo.st_mtime; 
 
     }
+
+    void AddDelimiterIfNotPresent(std::string& path)
+    {
+        RemoveDelimiterIfPresent(path);
+        path += DELIMITER;
+    }
+
+    void RemoveDelimiterIfPresent(std::string& path)
+    {
+        while (!path.empty() && path.back() == '\\' || path.back() == '/')
+        {
+            path.pop_back();
+        }
+    }
 } // namespace FileSystem

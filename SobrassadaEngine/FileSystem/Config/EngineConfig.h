@@ -2,7 +2,7 @@
 #include "ConfigFile.h"
 
 #include <string>
-#include <vector>
+#include <unordered_set>
 
 class EngineConfig : public ConfigFile
 {
@@ -16,12 +16,12 @@ public:
     void Save() const override;
 
     const std::string& GetStartupProjectPath() const { return startupProjectPath; }
-    const std::vector<std::string>& GetProjectPaths() const { return previouslyLoadedProjectPaths; }
+    const std::unordered_set<std::string>& GetProjectPaths() const { return previouslyLoadedProjectPaths; }
 
     void ClearPreviouslyLoadedProjectPaths();
 
 private:
 
     std::string startupProjectPath;
-    std::vector<std::string> previouslyLoadedProjectPaths;
+    std::unordered_set<std::string> previouslyLoadedProjectPaths;
 };

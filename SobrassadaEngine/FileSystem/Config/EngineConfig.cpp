@@ -19,7 +19,7 @@ void EngineConfig::SetStartupProjectPath(const std::string& newStartupProjectPat
     startupProjectPath = newStartupProjectPath;
     if (!newStartupProjectPath.empty())
     {
-        previouslyLoadedProjectPaths.push_back(startupProjectPath);   
+        previouslyLoadedProjectPaths.insert(startupProjectPath);   
     }
     Save();
 }
@@ -45,7 +45,7 @@ void EngineConfig::Load()
 
         for (rapidjson::SizeType i = 0; i < previouslyLoaded.Size(); i++)
         {
-            previouslyLoadedProjectPaths.push_back(previouslyLoaded[i].GetString());
+            previouslyLoadedProjectPaths.insert(previouslyLoaded[i].GetString());
         }
     }
 }
