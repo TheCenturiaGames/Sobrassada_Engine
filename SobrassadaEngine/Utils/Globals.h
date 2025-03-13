@@ -93,6 +93,21 @@ enum update_status
 
 #define MAX_COMPONENT_NAME_LENGTH 64;
 
+// SHADER PATHS
+constexpr const char* LIGHTS_VERTEX_SHADER_PATH   = "./Test/VertexShader.glsl";
+
+constexpr const char* UNLIT_FRAGMENT_SHADER_PATH = "./Test/UnlitFragmentShader.glsl";
+constexpr const char* SPECULAR_FRAGMENT_SHADER_PATH = "./Test/BRDFPhongFragmentShader.glsl";
+constexpr const char* METALLIC_FRAGMENT_SHADER_PATH = "./Test/BRDFCookTorranceShader.glsl";
+
+// DEBUG RENDER OPTIONS
+constexpr const char* RENDER_LIGTHS               = "Render Lights";
+constexpr const char* RENDER_WIREFRAME            = "Render Wireframe";
+constexpr const char* RENDER_AABB                 = "AABB";
+constexpr const char* RENDER_OBB                  = "OBB";
+constexpr const char* RENDER_OCTREE               = "Octree";
+constexpr const char* RENDER_CAMERA_RAY           = "Camera Ray";
+
 #define UID uint64_t
 
 constexpr UID INVALID_UID                               = 0;

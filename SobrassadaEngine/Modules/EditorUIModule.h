@@ -1,7 +1,8 @@
 #pragma once
-
 #include "Module.h"
 #include "ResourceManagement/Resources/Resource.h"
+#include "EngineEditors/EngineEditorBase.h"
+
 
 #include "SDL.h"
 #include "imgui_internal.h"
@@ -13,6 +14,12 @@
 // imguizmo include after imgui
 #include "./Libs/ImGuizmo/ImGuizmo.h"
 
+enum EditorType
+{
+    BASE,
+    ANIMATION,
+    NODE
+};
 struct CPUFeature
 {
     SDL_bool (*check)();
@@ -90,6 +97,9 @@ class EditorUIModule : public Module
     void LoadModelDialog(bool& loadModel) const;
     void LoadPrefabDialog(bool& loadPrefab) const;
 
+    void OpenEditor(EngineEditorBase* editorToOpen);
+    EngineEditorBase* CreateEditor(EditorType type);
+
   public:
     bool editorControlMenu = true;
     bool hierarchyMenu     = true;
@@ -119,4 +129,5 @@ class EditorUIModule : public Module
     GizmoOperation currentGizmoOperation = GizmoOperation::TRANSLATE;
     GizmoTransform transformType         = GizmoTransform::LOCAL;
     float3 snapValues                    = {1.f, 1.f, 1.f};
+    std::unordered_map<UID, EngineEditorBase*> openEditors;
 };

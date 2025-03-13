@@ -55,7 +55,6 @@ class Scene
     GameObject* GetGameObjectByUID(UID gameObjectUID); // TODO: Change when filesystem defined
 
     LightsConfig* GetLightsConfig() { return lightsConfig; }
-    const Octree* GetOctree() const { return sceneOctree; }
 
     bool GetDoInputs() const { return doInputs; }
     bool GetStopPlaying() const { return stopPlaying; }
@@ -63,6 +62,7 @@ class Scene
     const std::tuple<float, float>& GetWindowPosition() const { return sceneWindowPosition; };
     const std::tuple<float, float>& GetWindowSize() const { return sceneWindowSize; };
     const std::tuple<float, float>& GetMousePosition() const { return mousePosition; };
+    Octree* GetOctree() const { return sceneOctree; }
 
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
 
