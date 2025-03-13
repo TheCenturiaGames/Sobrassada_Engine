@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "DebugUtils.h"
 #include "Globals.h"
 
 #include "SDL.h"
@@ -20,8 +21,21 @@ enum MainState
     MAIN_EXIT
 };
 
-Application* App         = NULL;
-std::vector<char*>* Logs = NULL;
+Application* App                               = NULL;
+std::vector<char*>* Logs                       = NULL;
+
+// DebugUtils for rendering
+std::map<std::string, bool> debugRenderOptions = {
+    {RENDER_AABB, false},
+    {RENDER_OBB,  false},
+    {RENDER_OCTREE, false},
+    {RENDER_CAMERA_RAY, false}
+};
+
+std::map<std::string, bool> debugShaderOptions = {
+    {RENDER_LIGTHS,    true },
+    {RENDER_WIREFRAME, false},
+};
 
 int main(int argc, char** argv)
 {
@@ -98,6 +112,9 @@ int main(int argc, char** argv)
     }
     Logs->clear();
     delete Logs;
+
+    debugRenderOptions.clear();
+    debugShaderOptions.clear();
 
     return mainReturn;
 }

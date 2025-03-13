@@ -25,7 +25,6 @@ UID MaterialImporter::ImportMaterial(
     // KHR_materials_pbrSpecularGlossiness extension
     if (it != gltfMaterial.extensions.end())
     {
-
         const tinygltf::Value& specGloss    = it->second;
 
         // Diffuse Factor
@@ -115,7 +114,17 @@ UID MaterialImporter::ImportMaterial(
             }
         }
 
-        // Metallic i Roughness Factors
+        if (pbr.metallicRoughnessTexture.index >= 0)
+        {
+            int texIndex = pbr.metallicRoughnessTexture.index;
+            UID metallicRoughnessTextureUID = HandleTextureImport(path + model.images[model.textures[texIndex].source].uri);
+            if (metallicRoughnessTextureUID != INVALID_UID)
+            {
+                material.SetMetallicRoughnessTexture(metallicRoughnessTextureUID);
+            }
+        }
+
+        // Metallic and Roughness Factors
         material.SetMetallicFactor(static_cast<float>(pbr.metallicFactor));
         material.SetRoughnessFactor(static_cast<float>(pbr.roughnessFactor));
     }

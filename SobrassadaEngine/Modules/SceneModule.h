@@ -16,6 +16,7 @@
 class GameObject;
 class Component;
 class RootComponent;
+class Octree;
 
 class SceneModule : public Module
 {
@@ -95,6 +96,9 @@ class SceneModule : public Module
     bool GetDoInputs() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() : false; }
     bool GetDoInputsScene() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() && !inPlayMode : false; }
     bool GetDoInputsGame() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() && inPlayMode : false; }
+
+    
+    Octree* GetSceneOctree() const { return loadedScene != nullptr ? loadedScene->GetOctree() : nullptr; }
 
   private:
     Scene* loadedScene = nullptr;

@@ -93,12 +93,18 @@ void MeshComponent::Render()
     if (enabled && currentMesh != nullptr)
     {
         unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
+        int program            = App->GetShaderModule()->GetMetallicRoughnessProgram();
+
+        if (currentMaterial != nullptr)
+        {
+            if(!currentMaterial->GetIsMetallicRoughness()) program = App->GetShaderModule()->GetSpecularGlossinessProgram();
+        }
         if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr)
             cameraUBO = App->GetSceneModule()->GetMainCamera()->GetUbo();
         
-            currentMesh->Render(
-                App->GetShaderModule()->GetProgramID(), GetParent()->GetGlobalTransform(), cameraUBO, currentMaterial
-            );
+        currentMesh->Render(
+            App->GetShaderModule()->GetProgramID(), GetParent()->GetGlobalTransform(), cameraUBO, currentMaterial
+        );
     }
 }
 
