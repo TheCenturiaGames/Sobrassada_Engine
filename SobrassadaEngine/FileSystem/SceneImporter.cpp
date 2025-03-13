@@ -1,4 +1,4 @@
-#include "SceneImporter.h"
+ #include "SceneImporter.h"
 
 #include "FileSystem.h"
 #include "MaterialImporter.h"
@@ -58,9 +58,9 @@ namespace SceneImporter
         }
 
          GLOG("Total .gltf meshes: %d", gltfMeshes.size());
-
+        
         // Import Model
-        ModelImporter::ImportModel(model.nodes, gltfMeshes, filePath);
+        ModelImporter::ImportModel(model, gltfMeshes, filePath);
     }
 
     tinygltf::Model LoadModelGLTF(const char* filePath)
@@ -149,6 +149,11 @@ namespace SceneImporter
             animationName = srcAnim.name;
             AnimationImporter::ImportAnimation(model, srcAnim, animationName, filePath);
         }
+    }
+
+    void ImportModelFromMetadata(const std::string& filePath, const std::string& name, UID sourceUID)
+    {
+        ModelImporter::CopyModel(filePath, name, sourceUID);
     }
 
     void CreateLibraryDirectories()

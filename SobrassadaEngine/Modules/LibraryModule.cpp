@@ -155,6 +155,7 @@ bool LibraryModule::LoadLibraryMaps()
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 else SceneImporter::ImportMeshFromMetadata(assetPath, assetName, assetUID);
                 break;
+                
             case 12:
                 AddTexture(assetUID, assetName);
                 AddName(assetName, assetUID);
@@ -162,6 +163,7 @@ bool LibraryModule::LoadLibraryMaps()
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 else TextureImporter::Import(assetPath.c_str(), assetUID);
                 break;
+                
             case 13:
                 AddMaterial(assetUID, assetName);
                 AddName(assetName, assetUID);
@@ -169,7 +171,15 @@ bool LibraryModule::LoadLibraryMaps()
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 else SceneImporter::ImportMaterialFromMetadata(assetPath, assetName, assetUID);
                 break;
-               
+
+                case 14:
+                AddModel(assetUID, assetName);
+                AddName(assetName, assetUID);
+                libraryPath = MODELS_PATH + std::to_string(assetUID) + MODEL_EXTENSION;
+                if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
+                else SceneImporter::ImportModelFromMetadata(assetPath, assetName, assetUID);
+                break;
+
                 case 15:
                 AddAnimation(assetUID, assetName);
                 AddName(assetName, assetUID);
@@ -184,6 +194,7 @@ bool LibraryModule::LoadLibraryMaps()
             //     if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
             //     else SceneImporter::ImportMaterialFromMetadata(assetPath, assetName, assetUID);
             //     break;
+           
             default:
                 GLOG("Unknown UID prefix (%s) for: %s", std::to_string(prefix).c_str(), assetName.c_str());
                 continue;
@@ -246,14 +257,14 @@ void LibraryModule::AddMaterial(UID materialUID, const std::string& matName)
     materialMap[matName] = materialUID;
 }
 
+void LibraryModule::AddModel(UID modelUID, const std::string& modelName)
+{
+    modelMap[modelName] = modelUID;
+}
+
 void LibraryModule::AddName(const std::string& resourceName, UID resourceUID)
 {
     namesMap[resourceUID] = resourceName;
-}
-
-void LibraryModule::AddModel(UID modelUID, const std::string& modelPath)
-{
-    modelMap[modelPath] = modelUID;
 }
 
 UID LibraryModule::GetTextureUID(const std::string& texturePath) const

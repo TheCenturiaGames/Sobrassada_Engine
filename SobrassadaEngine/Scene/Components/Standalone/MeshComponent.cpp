@@ -5,7 +5,9 @@
 #include "EditorUIModule.h"
 #include "FileSystem/MeshImporter.h"
 #include "LibraryModule.h"
+#include "ResourceManagement/Resources/ResourceModel.h"
 #include "ResourcesModule.h"
+#include "SceneModule.h"
 #include "ShaderModule.h"
 // #include "Scene/GameObjects/GameObject.h"
 
@@ -26,6 +28,26 @@ MeshComponent::MeshComponent(const rapidjson::Value& initialState) : Component(i
     {
         AddMesh(initialState["Mesh"].GetUint64(), false);
     }
+    if (initialState.HasMember("Bones"))
+    {
+        const rapidjson::Value& initBones = initialState["Bones"];
+        for (unsigned int i = 0; i < initBones.Size(); ++i)
+        {
+            bonesUIDs.push_back(initBones[i].GetUint64());
+        }
+    }
+    if (initialState.HasMember("ModelUID"))
+    {
+        modelUID = initialState["ModelUID"].GetUint64();
+
+        // Get the skin index and the bind matrices
+        if (initialState.HasMember("SkinIndex"))
+        {
+            ResourceModel* model = static_cast<ResourceModel*>(App->GetResourcesModule()->RequestResource(modelUID));
+            skinIndex            = initialState["SkinIndex"].GetInt();
+            bindMatrices         = model->GetModelData().GetSkin(skinIndex).inverseBindMatrices;
+        }
+    }
 }
 
 MeshComponent::~MeshComponent()
@@ -40,6 +62,21 @@ void MeshComponent::Save(rapidjson::Value& targetState, rapidjson::Document::All
 
     targetState.AddMember("Mesh", currentMesh != nullptr ? currentMesh->GetUID() : INVALID_UID, allocator);
     targetState.AddMember("Material", currentMaterial != nullptr ? currentMaterial->GetUID() : INVALID_UID, allocator);
+
+    if (bones.size() > 0) // Store the skin of the mesh as the UID of each bone
+    {
+        rapidjson::Value valBones(rapidjson::kArrayType);
+        for (const UID boneUID : bonesUIDs)
+        {
+            valBones.PushBack(boneUID, allocator);
+        }
+
+        targetState.AddMember("Bones", valBones, allocator);
+
+        // Save the resource model UID used to load this mesh, so it can get the bind matrices when loading
+        if (modelUID != INVALID_UID) targetState.AddMember("ModelUID", modelUID, allocator);
+        if (skinIndex != -1) targetState.AddMember("SkinIndex", skinIndex, allocator);
+    }
 }
 
 void MeshComponent::RenderEditorInspector()
@@ -92,8 +129,17 @@ void MeshComponent::Render()
     {
         unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
         currentMesh->Render(
-            App->GetShaderModule()->GetProgramID(), GetParent()->GetGlobalTransform(), cameraUBO, currentMaterial
+            App->GetShaderModule()->GetProgramID(), GetParent()->GetGlobalTransform(), cameraUBO, currentMaterial,
+            bones, bindMatrices
         );
+    }
+}
+
+void MeshComponent::InitSkin()
+{
+    for (UID uid : bonesUIDs)
+    {
+        bones.emplace_back(App->GetSceneModule()->GetGameObjectByUID(uid));
     }
 }
 

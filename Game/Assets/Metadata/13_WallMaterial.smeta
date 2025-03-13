@@ -1,0 +1,10 @@
+{
+    "UID": 1361203432179654,
+    "name": "WallMaterial",
+    "assetPath": "Assets/Wall.gltf",
+    "lastModifiedDate": 1739979581,
+    "importOptions": {
+        "shader": "1513069581568423828",
+        "useOcclusion": true
+    }
+}
