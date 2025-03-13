@@ -259,6 +259,8 @@
       <Filter>Resources</Filter>
     </ClCompile>
     <ClCompile Include="FileSystem\AnimationImporter.cpp">
+      <Filter>FileSystem</Filter>
+    </ClCompile>
     <ClCompile Include="ResourceManagement\Resources\ResourceModel.cpp">
       <Filter>Resources</Filter>
     </ClCompile>
@@ -276,7 +278,8 @@
     </ClCompile>
     <ClCompile Include="AnimController.cpp" />
     <ClCompile Include="Scene\Components\Standalone\AnimationComponent.cpp">
-      <Filter>Scene\Components</Filter>
+    <Filter>Scene\Components</Filter>
+    </ClCompile>
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp" />
     <ClCompile Include="Tests\MockGameObject.cpp" />
     <ClCompile Include="UI\QuadtreeViewer.cpp" />
@@ -520,7 +523,7 @@
       <Filter>FileSystem</Filter>
     </ClInclude>
     <ClInclude Include="AnimController.h" />
-    <ClInclude Include="Scene\Components\Standalone\AnimationComponent.h">
+    <ClInclude Include="Scene\Components\Standalone\AnimationComponent.h"></ClInclude>
       <Filter>Scene\Components</Filter>
     <ClInclude Include="FileSystem\MetaFile.h">
       <Filter>FileSystem\Meta</Filter>

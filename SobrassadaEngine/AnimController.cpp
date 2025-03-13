@@ -3,7 +3,7 @@
 #include "Application.h"
 #include <chrono>
 
-AnimController::AnimController() : resource(0), currentTime(0), loop(false)
+AnimController::AnimController() : resource(0), currentTime(0), loop(false), playAnimation(false), startTime(0)
 {
 }
 
@@ -13,25 +13,32 @@ void AnimController::Play(UID newResource, bool shouldLoop)
     currentTime = 0;
     loop        = shouldLoop;
     playAnimation = true;
-    startTime     = clock();
+    startTime     = 0;
 }
 
 void AnimController::Stop()
 {
-    resource    = 0;
-    currentTime = 0;
-    loop        = false;
     playAnimation = false;
+    currentTime   = 0.0f;
 }
 
-update_status AnimController::Update(float deltaTime)
+update_status AnimController::Update()
 {
+    if (!playAnimation || resource == 0)
+    {
+        return UPDATE_CONTINUE;
+    }
+    if (startTime == 0)
+    {
+        startTime = clock();
+        return UPDATE_CONTINUE;
+    }
+    clock_t currentClock  = clock();
+    float deltaTime       = (float)(currentClock - startTime) / CLOCKS_PER_SEC;
+    startTime             = currentClock;
 
-    if (resource == 0) return UPDATE_CONTINUE;
-    
-
-    if (playAnimation == false) return UPDATE_CONTINUE;
-
+   
+    currentTime          += deltaTime;
     ResourceAnimation* animation =
         static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
     if (!animation) return UPDATE_CONTINUE;
@@ -39,20 +46,21 @@ update_status AnimController::Update(float deltaTime)
     float duration = animation->GetDuration();
     if (duration <= 0.0f) return UPDATE_CONTINUE;
 
-    float delta_time = (clock() - startTime) * 1000.0f / CLOCKS_PER_SEC;
-    currentTime      = delta_time / 1000.0f;
+    
 
 
-    if (currentTime > duration)
+   if (currentTime > duration)
     {
         if (loop)
         {
-            startTime   = clock();
-            currentTime = 0; 
+            
+            currentTime = fmod(currentTime, duration);
         }
         else
         {
-            currentTime = duration; 
+          
+            playAnimation = false;
+            currentTime   = duration;
         }
     }
     
@@ -61,11 +69,22 @@ update_status AnimController::Update(float deltaTime)
 
 void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat& rot)
 {
+    if (!playAnimation || resource == 0)
+    {
+        return;
+    }
 
     ResourceAnimation* animation =
         static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
-
+    if (animation == nullptr)
+    {
+        return;
+    }
     Channel* animChannel = animation->GetChannel(nodeName);
+    if (animChannel == nullptr)
+    {
+        return;
+    }
 
     GLOG("POSITIONS of channel %s: %d", nodeName.c_str(), animChannel->numPositions);
 

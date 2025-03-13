@@ -11,7 +11,7 @@ class AnimController
                                     
     void GetTransform(const std::string& nodeName, float3& pos, Quat& rot); 
 
-    update_status Update(float deltaTime);  
+    update_status Update();  
     void Play(UID resource, bool loop);
     void Stop();
    
