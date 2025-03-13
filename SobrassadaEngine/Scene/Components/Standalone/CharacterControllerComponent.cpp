@@ -65,20 +65,19 @@ CharacterControllerComponent::~CharacterControllerComponent()
 
 void CharacterControllerComponent::Update()
 {
+}
+
+void CharacterControllerComponent::Render()
+{
     if (!enabled) return;
 
-    if (!App->GetSceneModule()->IsInPlayMode()) return;
+    if (!App->GetSceneModule()->GetInPlayMode()) return;
 
     float deltaTime = App->GetSceneModule()->GetCurrentDeltaTime();
 
     if (deltaTime <= 0.0f) return;
 
     HandleInput(deltaTime);
-
-}
-
-void CharacterControllerComponent::Render()
-{
 }
 
 void CharacterControllerComponent::RenderEditorInspector()
