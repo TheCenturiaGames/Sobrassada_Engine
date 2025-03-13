@@ -276,8 +276,8 @@ UID LibraryModule::GetMaterialUID(const std::string& materialPath) const
 
 UID LibraryModule::GetModelUID(const std::string& modelPath) const
 {
-    auto it = materialMap.find(modelPath);
-    if (it != materialMap.end())
+    auto it = modelMap.find(modelPath);
+    if (it != modelMap.end())
     {
         return it->second;
     }
