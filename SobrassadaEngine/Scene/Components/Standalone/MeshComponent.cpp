@@ -103,7 +103,7 @@ void MeshComponent::Render()
             cameraUBO = App->GetSceneModule()->GetMainCamera()->GetUbo();
         
         currentMesh->Render(
-            App->GetShaderModule()->GetProgramID(), GetParent()->GetGlobalTransform(), cameraUBO, currentMaterial
+            program, GetParent()->GetGlobalTransform(), cameraUBO, currentMaterial
         );
     }
 }

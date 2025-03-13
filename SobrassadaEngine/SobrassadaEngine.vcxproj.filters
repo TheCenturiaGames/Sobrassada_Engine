@@ -177,9 +177,6 @@
     <ClCompile Include="Scene\Components\ComponentUtils.cpp">
       <Filter>Scene\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Components\Root\RootComponent.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\Components\Standalone\MeshComponent.cpp">
       <Filter>Scene\Components</Filter>
     </ClCompile>
@@ -213,36 +210,6 @@
     <ClCompile Include="Utils\LightsConfig.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Utils\Quadtree.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="Utils\Octree.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Components\Component.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\GameObjects\GameObject.cpp">
-      <Filter>Scene\GameObjects</Filter>
-    </ClCompile>
-    <ClCompile Include="Modules\SceneModule.cpp">
-      <Filter>Modules</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Components\Standalone\MeshComponent.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Components\Root\RootComponent.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Components\Component.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Components\ComponentUtils.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Utils\Scene.cpp">
-      <Filter>Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Utils\FrustumPlanes.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
@@ -270,8 +237,6 @@
     <ClCompile Include="Modules\EditorUIModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
-    <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
-      <Filter>UI\EngineEditors</Filter>
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp">
       <Filter>External\ImGuizmo</Filter>
     </ClCompile>
@@ -289,6 +254,9 @@
     </ClCompile>
     <ClCompile Include="CameraComponent.cpp">
       <Filter>Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
+      <Filter>UI\EngineEditors</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -328,10 +296,14 @@
     <Filter Include="External\MathGeoLib">
       <UniqueIdentifier>{77ec05ef-e581-4de2-bda3-50c6c7bcc0d2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="UI\EngineEditors">
-      <UniqueIdentifier>{86a4c6bd-9fcf-4173-8393-657c59aa19cf}</UniqueIdentifier>
     <Filter Include="FileSystem\Meta">
       <UniqueIdentifier>{0325771a-d106-4c90-8e61-78de9e68b286}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{9096db94-8011-467c-8549-ccc0382ca11f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\EngineEditors">
+      <UniqueIdentifier>{db4cb5a0-8fe4-429c-9895-ea191f1f3f3e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -426,9 +398,6 @@
     <ClInclude Include="Modules\SceneModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Components\Root\RootComponent.h">
-      <Filter>Scene\Components</Filter>
-    </ClInclude>
     <ClInclude Include="Scene\Components\Standalone\MeshComponent.h">
       <Filter>Scene\Components</Filter>
     </ClInclude>
@@ -498,9 +467,6 @@
     <ClInclude Include="FileSystem\Model.h">
       <Filter>FileSystem</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\AABBUpdatable.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Modules\DebugDrawModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
@@ -510,8 +476,6 @@
     <ClInclude Include="Modules\EditorUIModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
-    <ClInclude Include="UI\EngineEditors\EngineEditorBase.h">
-      <Filter>UI\EngineEditors</Filter>
     <ClInclude Include="FileSystem\MetaFile.h">
       <Filter>FileSystem\Meta</Filter>
     </ClInclude>
@@ -532,6 +496,9 @@
     </ClInclude>
     <ClInclude Include="CameraComponent.h">
       <Filter>Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\EngineEditors\EngineEditorBase.h">
+      <Filter>UI\EngineEditors</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
