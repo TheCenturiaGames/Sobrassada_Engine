@@ -126,7 +126,7 @@ void ProjectModule::LoadProject(const std::string& projectPath)
 {
     projectLoaded = true;
     loadedProjectName = FileSystem::GetFileNameWithoutExtension(projectPath);
-    loadedProjectAbsolutePath = std::string(projectPath);
+    loadedProjectAbsolutePath = std::string(projectPath + DELIMITER);
     App->GetWindowModule()->UpdateProjectNameInWindowTitle(loadedProjectName);
     App->GetEngineConfig()->SetStartupProjectPath(loadedProjectAbsolutePath);
     projectReloadRequested = true;
