@@ -89,8 +89,11 @@ class SceneModule : public Module
 
     bool GetDoInputs() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() : false; }
 
-  private:
+    float GetCurrentDeltaTime() const { return currentDeltaTime; } 
+
+private:
     Scene* loadedScene = nullptr;
     bool bInPlayMode   = false;
     const std::string sceneLibraryPath;
+    float currentDeltaTime;
 };

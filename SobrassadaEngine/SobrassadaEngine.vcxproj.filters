@@ -177,9 +177,6 @@
     <ClCompile Include="Scene\Components\ComponentUtils.cpp">
       <Filter>Scene\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Components\Root\RootComponent.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\Components\Standalone\MeshComponent.cpp">
       <Filter>Scene\Components</Filter>
     </ClCompile>
@@ -231,9 +228,6 @@
     <ClCompile Include="Scene\Components\Standalone\MeshComponent.cpp">
       <Filter>Scene\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Components\Root\RootComponent.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\Components\Component.cpp">
       <Filter>Scene\Components</Filter>
     </ClCompile>
@@ -271,8 +265,6 @@
       <Filter>Modules</Filter>
     </ClCompile>
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp" />
-    <ClCompile Include="Tests\MockGameObject.cpp" />
-    <ClCompile Include="UI\QuadtreeViewer.cpp" />
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp">
       <Filter>External\ImGuizmo</Filter>
     </ClCompile>
@@ -287,6 +279,9 @@
     </ClCompile>
     <ClCompile Include="FileSystem\MetaTexture.cpp">
       <Filter>FileSystem\Meta</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\CharacterControllerComponent.cpp">
+      <Filter>Scene\Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -422,9 +417,6 @@
     <ClInclude Include="Modules\SceneModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Components\Root\RootComponent.h">
-      <Filter>Scene\Components</Filter>
-    </ClInclude>
     <ClInclude Include="Scene\Components\Standalone\MeshComponent.h">
       <Filter>Scene\Components</Filter>
     </ClInclude>
@@ -494,9 +486,6 @@
     <ClInclude Include="FileSystem\Model.h">
       <Filter>FileSystem</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\AABBUpdatable.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Modules\DebugDrawModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
@@ -520,6 +509,9 @@
     </ClInclude>
     <ClInclude Include="RaycastController.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\CharacterControllerComponent.h">
+      <Filter>Scene\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

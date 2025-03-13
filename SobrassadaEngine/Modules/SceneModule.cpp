@@ -36,6 +36,7 @@ update_status SceneModule::PreUpdate(float deltaTime)
 
 update_status SceneModule::Update(float deltaTime)
 {
+    currentDeltaTime = deltaTime;
     return UPDATE_CONTINUE;
 }
 

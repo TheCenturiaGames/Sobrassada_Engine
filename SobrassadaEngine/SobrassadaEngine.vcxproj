@@ -70,12 +70,12 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-        <OutDir>$(ShortProjectName)\$(Platform)\$(Configuration)\</OutDir>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-        <OutDir>$(ShortProjectName)\$(Platform)\$(Configuration)\</OutDir>
-    </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(ShortProjectName)\$(Platform)\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(ShortProjectName)\$(Platform)\$(Configuration)\</OutDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -151,6 +151,7 @@
     <ClCompile Include="FileSystem\MetaTexture.cpp" />
     <ClCompile Include="Modules\CameraModule.cpp" />
     <ClCompile Include="Modules\EditorUIModule.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\CharacterControllerComponent.cpp" />
     <ClCompile Include="Utils\EngineTimer.cpp" />
     <ClCompile Include="FileSystem\Importer.cpp" />
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp" />
@@ -501,6 +502,7 @@
     <ClInclude Include="FileSystem\Mesh.h" />
     <ClInclude Include="FileSystem\MeshImporter.h" />
     <ClInclude Include="FileSystem\SceneImporter.h" />
+    <ClInclude Include="Scene\Components\Standalone\CharacterControllerComponent.h" />
     <ClInclude Include="Utils\EngineTimer.h" />
     <ClInclude Include="Scene\Components\Component.h" />
     <ClInclude Include="Scene\Components\Standalone\LightComponent.h" />
