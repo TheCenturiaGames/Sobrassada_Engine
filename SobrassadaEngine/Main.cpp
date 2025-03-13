@@ -70,6 +70,19 @@ int main(int argc, char** argv)
                 mainState = MAIN_EXIT;
             }
 
+            if (update_return == UPDATE_RESTART)
+            {
+                mainState = MAIN_CREATION;
+                App->ShutDown();
+                delete App;
+                // Free memory from log*
+                for (auto log : *Logs)
+                {
+                    free(log);
+                }
+                Logs->clear();
+            }
+
             if (update_return == UPDATE_STOP) mainState = MAIN_FINISH;
         }
         break;

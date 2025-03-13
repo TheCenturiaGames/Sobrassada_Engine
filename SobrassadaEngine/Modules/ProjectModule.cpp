@@ -5,18 +5,26 @@
 #include "FileSystem.h"
 #include "ImGui.h"
 #include "WindowModule.h"
+#include "Config/EngineConfig.h"
 
 #include <filesystem>
 
 bool ProjectModule::Init()
 {
-    //loadedProjectName = "TemplateProject";
-    //loadedProjectAbsolutePath = std::filesystem::current_path().string() + DELIMITER + DEFAULT_PROJECTS_PATH + DELIMITER + loadedProjectName;
-    //loadedProjectName = "TemplateProject";
-    //loadedProjectAbsolutePath = std::filesystem::current_path().string() + DELIMITER;
-    
-    //loadedProjectAbsolutePath = "C:\\Users\\lukas\\Documents\\Unreal Projects\\" + loadedProjectName + DELIMITER;
-    // TODO Load config file with startup project and list of previously selected projects
+    if (!App->GetEngineConfig()->GetStartupProjectPath().empty())
+    {
+        loadedProjectAbsolutePath = App->GetEngineConfig()->GetStartupProjectPath();
+        if (FileSystem::Exists(loadedProjectAbsolutePath.c_str()))
+        {
+            loadedProjectName = FileSystem::GetFileNameWithoutExtension(loadedProjectAbsolutePath);
+            projectLoaded = true;
+        } else
+        {
+            loadedProjectAbsolutePath = "";
+            App->GetEngineConfig()->SetStartupProjectPath("");
+        }
+        
+    }
     App->GetWindowModule()->UpdateProjectNameInWindowTitle(loadedProjectName);
     return Module::Init();
 }
@@ -46,17 +54,23 @@ update_status ProjectModule::RenderEditor(float deltaTime)
                     {
                         CreateNewProject(newProjectPath, newProjectName);
                     }
-                    
+                    ImGui::SameLine();
                     ImGui::EndTabItem();
                 }
                 if (ImGui::BeginTabItem("Load project"))
                 {
+                    
                     ImGui::InputText("Path", newProjectPath, 255);
                     ImGui::SameLine();
                     if (ImGui::Button("Select path"))
                     {
                         showCreateProjectFileDialog = true;
                     }
+                    if (ImGui::Button("Clear previous projects"))
+                    {
+                        App->GetEngineConfig()->ClearPreviouslyLoadedProjectPaths();
+                    }
+                    // TODO Add list view for displaying previously loaded projects
                     if (ImGui::Button("Load"))
                     {
                         LoadProject(newProjectPath);
@@ -89,10 +103,10 @@ update_status ProjectModule::RenderEditor(float deltaTime)
         }
     }
     
-    return UPDATE_CONTINUE;
+    return projectReloadRequested ? UPDATE_RESTART : UPDATE_CONTINUE;
 }
 
-void ProjectModule::ShowProjectDialog()
+void ProjectModule::CloseCurrentProject()
 {
     CloseProject();
 }
@@ -101,8 +115,11 @@ void ProjectModule::CreateNewProject(const std::string& projectPath, const std::
 {
     projectLoaded = true;
     loadedProjectName = std::string(projectName);
-    loadedProjectAbsolutePath = std::string(projectPath + DELIMITER + projectName);
+    loadedProjectAbsolutePath = std::string(projectPath + DELIMITER + projectName + DELIMITER);
+    FileSystem::CreateDirectories(loadedProjectAbsolutePath.c_str());
     App->GetWindowModule()->UpdateProjectNameInWindowTitle(loadedProjectName);
+    App->GetEngineConfig()->SetStartupProjectPath(loadedProjectAbsolutePath);
+    projectReloadRequested = true;
 }
 
 void ProjectModule::LoadProject(const std::string& projectPath)
@@ -111,12 +128,13 @@ void ProjectModule::LoadProject(const std::string& projectPath)
     loadedProjectName = FileSystem::GetFileNameWithoutExtension(projectPath);
     loadedProjectAbsolutePath = std::string(projectPath);
     App->GetWindowModule()->UpdateProjectNameInWindowTitle(loadedProjectName);
+    App->GetEngineConfig()->SetStartupProjectPath(loadedProjectAbsolutePath);
+    projectReloadRequested = true;
 }
 
 void ProjectModule::CloseProject()
 {
-    projectLoaded = false;
-    loadedProjectName = "No project loaded";
-    loadedProjectAbsolutePath = "";
-    App->GetWindowModule()->UpdateProjectNameInWindowTitle(loadedProjectName);
+    // TODO Save all assets
+    App->GetEngineConfig()->SetStartupProjectPath("");
+    projectReloadRequested = true;
 }

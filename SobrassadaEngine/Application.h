@@ -5,6 +5,7 @@
 
 #include <list>
 
+class EngineConfig;
 class WindowModule;
 class OpenGLModule;
 class ResourcesModule;
@@ -45,6 +46,8 @@ class Application
     EngineTimer* GetEngineTimer() { return engineTimer; }
     GameTimer* GetGameTimer() { return gameTimer; }
 
+    EngineConfig* GetEngineConfig() const { return engineConfig; }
+
   private:
     std::list<Module*> modules;
 
@@ -62,6 +65,8 @@ class Application
 
     EngineTimer* engineTimer         = nullptr;
     GameTimer* gameTimer             = nullptr;
+
+    EngineConfig* engineConfig       = nullptr;
 };
 
 extern Application* App;

@@ -14,6 +14,7 @@
 #include "SceneModule.h"
 #include "ShaderModule.h"
 #include "WindowModule.h"
+#include "Config/EngineConfig.h"
 
 #ifdef _DEBUG
 #include "optick.h"
@@ -21,9 +22,11 @@
 
 Application::Application()
 {
+    engineConfig = new EngineConfig();
+    
+    modules.push_back(projectModule = new ProjectModule());
     modules.push_back(windowModule = new WindowModule());
     modules.push_back(openGLModule = new OpenGLModule());
-    modules.push_back(projectModule = new ProjectModule());
     modules.push_back(libraryModule = new LibraryModule());
     modules.push_back(resourcesModule = new ResourcesModule());
     modules.push_back(inputModule = new InputModule());

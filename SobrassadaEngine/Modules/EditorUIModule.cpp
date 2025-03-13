@@ -179,6 +179,8 @@ void EditorUIModule::MainMenu()
     // File tab menu
     if (ImGui::BeginMenu("File"))
     {
+        if (ImGui::MenuItem("Change Project", "")) App->GetProjectModule()->CloseCurrentProject();
+        
         if (ImGui::MenuItem("Create", "")) App->GetSceneModule()->CreateScene();
 
         if (ImGui::MenuItem("Import", "", import)) import = !import;

@@ -143,6 +143,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="FileSystem\Config\EngineConfig.cpp" />
     <ClCompile Include="FileSystem\ModelImporter.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceModel.cpp" />
     <ClCompile Include="FileSystem\MetaFile.cpp" />
@@ -477,6 +478,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="FileSystem\Config\ConfigFile.h" />
+    <ClInclude Include="FileSystem\Config\EngineConfig.h" />
     <ClInclude Include="FileSystem\Importer.h" />
     <ClInclude Include="FileSystem\Model.h" />
     <ClInclude Include="Libs\ImGuizmo\ImGuizmo.h" />
