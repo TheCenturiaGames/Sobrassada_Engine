@@ -76,6 +76,7 @@ class GameObject
     void UpdateTransformForGOBranch() const;
 
     const std::unordered_map<ComponentType, Component*>& GetComponents() const { return components; }
+    Component* GetComponentByType(ComponentType type) const;
 
     const MeshComponent* GetMeshComponent() const;
     void AddModel(UID meshUid, UID materialUid) const;

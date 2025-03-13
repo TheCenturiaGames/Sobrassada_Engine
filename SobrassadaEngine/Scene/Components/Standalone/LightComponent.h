@@ -15,6 +15,7 @@ class LightComponent : public Component
     virtual void Render() override;
     virtual void RenderEditorInspector() override;
     virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
+    virtual void Clone(const Component* other) = 0;
 
     float GetIntensity() const { return intensity; }
     float3 GetColor() const { return color; }

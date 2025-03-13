@@ -52,6 +52,27 @@ void SpotLightComponent::Save(rapidjson::Value& targetState, rapidjson::Document
     targetState.AddMember("OuterAngle", outerAngle, allocator);
 }
 
+void SpotLightComponent::Clone(const Component* other)
+{
+    if (other->GetType() == ComponentType::COMPONENT_SPOT_LIGHT)
+    {
+        const SpotLightComponent* otherLight = static_cast<const SpotLightComponent*>(other);
+        enabled                              = otherLight->enabled;
+
+        intensity                            = otherLight->intensity;
+        color                                = otherLight->color;
+        drawGizmos                           = otherLight->drawGizmos;
+
+        range                                = otherLight->range;
+        innerAngle                           = otherLight->innerAngle;
+        outerAngle                           = otherLight->outerAngle;
+    }
+    else
+    {
+        GLOG("It is not possible to clone a component of a different type!");
+    }
+}
+
 void SpotLightComponent::RenderEditorInspector()
 {
     LightComponent::RenderEditorInspector();

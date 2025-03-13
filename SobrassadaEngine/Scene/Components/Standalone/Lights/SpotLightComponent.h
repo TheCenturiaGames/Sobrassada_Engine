@@ -14,6 +14,7 @@ class SpotLightComponent : public LightComponent
     void Render() override;
     void RenderEditorInspector() override;
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
+    void Clone(const Component* other) override;
 
     const float3 GetDirection();
     float GetRange() const { return range; }

@@ -41,6 +41,8 @@ GameObject::GameObject(UID parentUID, GameObject* refObject)
     for (const auto& component : refObject->components)
     {
         CreateComponent(component.first);
+        Component* newComponent = GetComponentByType(component.first);
+        newComponent->Clone(component.second);
     }
 
     OnAABBUpdated();
@@ -316,6 +318,15 @@ void GameObject::UpdateTransformForGOBranch() const
     }
 
     App->GetSceneModule()->RegenerateTree();
+}
+
+Component* GameObject::GetComponentByType(ComponentType type) const
+{
+    if (components.find(type) != components.end())
+    {
+        return components.at(type);
+    }
+    return nullptr;
 }
 
 const MeshComponent* GameObject::GetMeshComponent() const

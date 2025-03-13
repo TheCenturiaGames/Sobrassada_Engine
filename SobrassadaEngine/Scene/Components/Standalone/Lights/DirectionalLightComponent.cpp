@@ -28,6 +28,23 @@ void DirectionalLightComponent::Save(rapidjson::Value& targetState, rapidjson::D
     LightComponent::Save(targetState, allocator);
 }
 
+void DirectionalLightComponent::Clone(const Component* other)
+{
+    if (other->GetType() == ComponentType::COMPONENT_DIRECTIONAL_LIGHT)
+    {
+        const DirectionalLightComponent* otherLight = static_cast<const DirectionalLightComponent*>(other);
+        enabled                                     = otherLight->enabled;
+
+        intensity                                   = otherLight->intensity;
+        color                                       = otherLight->color;
+        drawGizmos                                  = otherLight->drawGizmos;
+    }
+    else
+    {
+        GLOG("It is not possible to clone a component of a different type!");
+    }
+}
+
 void DirectionalLightComponent::Render()
 {
     if (!enabled || !drawGizmos) return;

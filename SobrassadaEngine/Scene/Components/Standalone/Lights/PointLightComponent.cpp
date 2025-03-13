@@ -46,6 +46,26 @@ void PointLightComponent::Save(rapidjson::Value& targetState, rapidjson::Documen
     targetState.AddMember("GizmosMode", gizmosMode, allocator);
 }
 
+void PointLightComponent::Clone(const Component* other)
+{
+    if (other->GetType() == ComponentType::COMPONENT_POINT_LIGHT)
+    {
+        const PointLightComponent* otherLight = static_cast<const PointLightComponent*>(other);
+        enabled                              = otherLight->enabled;
+
+        intensity                             = otherLight->intensity;
+        color                                 = otherLight->color;
+        drawGizmos                            = otherLight->drawGizmos;
+
+        range                                = otherLight->range;
+        gizmosMode                            = otherLight->gizmosMode;
+    }
+    else
+    {
+        GLOG("It is not possible to clone a component of a different type!");
+    }
+}
+
 void PointLightComponent::RenderEditorInspector()
 {
     LightComponent::RenderEditorInspector();

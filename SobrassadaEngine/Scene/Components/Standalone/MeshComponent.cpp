@@ -42,6 +42,27 @@ void MeshComponent::Save(rapidjson::Value& targetState, rapidjson::Document::All
     targetState.AddMember("Material", currentMaterial != nullptr ? currentMaterial->GetUID() : INVALID_UID, allocator);
 }
 
+void MeshComponent::Clone(const Component* other)
+{
+    if (other->GetType() == ComponentType::COMPONENT_MESH)
+    {
+        const MeshComponent* otherMesh = static_cast<const MeshComponent*>(other);
+        enabled                        = otherMesh->enabled;
+
+        currentMeshName                = otherMesh->currentMeshName;
+        currentMesh                    = otherMesh->currentMesh;
+        currentMesh->AddReference();
+
+        currentMaterialName = otherMesh->currentMaterialName;
+        currentMaterial     = otherMesh->currentMaterial;
+        currentMaterial->AddReference();
+    }
+    else
+    {
+        GLOG("It is not possible to clone a component of a different type!");
+    }
+}
+
 void MeshComponent::RenderEditorInspector()
 {
     Component::RenderEditorInspector();
@@ -94,7 +115,8 @@ void MeshComponent::Render()
         int program            = App->GetShaderModule()->GetMetallicRoughnessProgram();
         if (currentMaterial != nullptr)
         {
-            if(!currentMaterial->GetIsMetallicRoughness()) program = App->GetShaderModule()->GetSpecularGlossinessProgram();
+            if (!currentMaterial->GetIsMetallicRoughness())
+                program = App->GetShaderModule()->GetSpecularGlossinessProgram();
         }
         currentMesh->Render(program, GetParent()->GetGlobalTransform(), cameraUBO, currentMaterial);
     }
