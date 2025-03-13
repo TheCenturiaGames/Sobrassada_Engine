@@ -28,8 +28,11 @@ LibraryModule::~LibraryModule()
 
 bool LibraryModule::Init()
 {
-    SceneImporter::CreateLibraryDirectories();
-    LoadLibraryMaps();
+    const std::string engineDefaultPath = ENGINE_DEFAULT_ASSETS;
+    SceneImporter::CreateLibraryDirectories(App->GetProjectModule()->GetLoadedProjectPath());
+    SceneImporter::CreateLibraryDirectories(engineDefaultPath);
+    LoadLibraryMaps(App->GetProjectModule()->GetLoadedProjectPath());
+    LoadLibraryMaps(engineDefaultPath);
 
     return true;
 }
@@ -129,9 +132,9 @@ bool LibraryModule::LoadScene(const char* file, bool reload) const
     return true;
 }
 
-bool LibraryModule::LoadLibraryMaps()
+bool LibraryModule::LoadLibraryMaps(const std::string& projectPath)
 {
-    for (const auto& entry : std::filesystem::recursive_directory_iterator(App->GetProjectModule()->GetLoadedProjectPath() + METADATA_PATH))
+    for (const auto& entry : std::filesystem::recursive_directory_iterator(projectPath + METADATA_PATH))
     {
         if (entry.is_regular_file() && (FileSystem::GetFileExtension(entry.path().string()) == META_EXTENSION))
         {
@@ -152,21 +155,21 @@ bool LibraryModule::LoadLibraryMaps()
             case 11:
                 AddMesh(assetUID, assetName);
                 AddName(assetName, assetUID);
-                libraryPath = App->GetProjectModule()->GetLoadedProjectPath() + MESHES_PATH + std::to_string(assetUID) + MESH_EXTENSION;
+                libraryPath = projectPath + MESHES_PATH + std::to_string(assetUID) + MESH_EXTENSION;
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 else SceneImporter::ImportMeshFromMetadata(assetPath, assetName, assetUID);
                 break;
             case 12:
                 AddTexture(assetUID, assetName);
                 AddName(assetName, assetUID);
-                libraryPath = App->GetProjectModule()->GetLoadedProjectPath() + TEXTURES_PATH + std::to_string(assetUID) + TEXTURE_EXTENSION;
+                libraryPath = projectPath + TEXTURES_PATH + std::to_string(assetUID) + TEXTURE_EXTENSION;
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 else TextureImporter::Import(assetPath.c_str(), assetUID);
                 break;
             case 13:
                 AddMaterial(assetUID, assetName);
                 AddName(assetName, assetUID);
-                libraryPath = App->GetProjectModule()->GetLoadedProjectPath() + MATERIALS_PATH + std::to_string(assetUID) + MATERIAL_EXTENSION;
+                libraryPath = projectPath + MATERIALS_PATH + std::to_string(assetUID) + MATERIAL_EXTENSION;
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 else SceneImporter::ImportMaterialFromMetadata(assetPath, assetName, assetUID);
                 break;
