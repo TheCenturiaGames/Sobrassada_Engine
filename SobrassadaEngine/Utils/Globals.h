@@ -94,11 +94,11 @@ enum update_status
 #define MAX_COMPONENT_NAME_LENGTH 64;
 
 // SHADER PATHS
-constexpr const char* LIGHTS_VERTEX_SHADER_PATH   = "./Test/VertexShader.glsl";
+constexpr const char* LIGHTS_VERTEX_SHADER_PATH   = "./EngineDefaults/Shader/Vertex/VertexShader.glsl";
 
-constexpr const char* UNLIT_FRAGMENT_SHADER_PATH = "./Test/UnlitFragmentShader.glsl";
-constexpr const char* SPECULAR_FRAGMENT_SHADER_PATH = "./Test/BRDFPhongFragmentShader.glsl";
-constexpr const char* METALLIC_FRAGMENT_SHADER_PATH = "./Test/BRDFCookTorranceShader.glsl";
+constexpr const char* UNLIT_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader/Fragment/UnlitFragmentShader.glsl";
+constexpr const char* SPECULAR_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader/Fragment/BRDFPhongFragmentShader.glsl";
+constexpr const char* METALLIC_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader/Fragment/BRDFCookTorranceShader.glsl";
 
 // DEBUG RENDER OPTIONS
 constexpr const char* RENDER_LIGTHS               = "Render Lights";
