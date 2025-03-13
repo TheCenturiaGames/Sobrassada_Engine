@@ -346,7 +346,7 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
 
 void Scene::RenderScene()
 {
-    if (!ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar))
+    if (!ImGui::Begin(sceneName.c_str(), nullptr, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar))
     {
         ImGui::End();
         return;

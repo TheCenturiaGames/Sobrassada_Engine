@@ -16,7 +16,9 @@ bool ProjectModule::Init()
         loadedProjectAbsolutePath = App->GetEngineConfig()->GetStartupProjectPath();
         if (FileSystem::Exists(loadedProjectAbsolutePath.c_str()))
         {
-            loadedProjectName = FileSystem::GetFileNameWithoutExtension(loadedProjectAbsolutePath);
+            loadedProjectName = loadedProjectAbsolutePath;
+            FileSystem::RemoveDelimiterIfPresent(loadedProjectName);
+            loadedProjectName = FileSystem::GetFileNameWithoutExtension(loadedProjectName);
             projectLoaded = true;
         } else
         {
