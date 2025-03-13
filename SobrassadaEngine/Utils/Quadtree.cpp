@@ -25,14 +25,11 @@ bool Quadtree::InsertElement(GameObject* gameObject)
 {
     if (gameObject == nullptr) return false;
 
-    const MeshComponent* meshComponent = gameObject->GetMeshComponent();
-    if (meshComponent == nullptr) return false;
-
     bool inserted = false;
     std::stack<QuadtreeNode*> nodesToVisit;
     nodesToVisit.push(rootNode);
 
-    const AABB elementBoundingBox   = meshComponent->GetGlobalAABB();
+    const AABB elementBoundingBox   = gameObject->GetGlobalAABB();
     QuadtreeElement quadtreeElement = QuadtreeElement(elementBoundingBox, gameObject, totalElements);
 
     while (!nodesToVisit.empty())
@@ -73,11 +70,12 @@ bool Quadtree::InsertElement(GameObject* gameObject)
     return inserted;
 }
 
-void Quadtree::GetDrawLines(std::vector<LineSegment>& drawLines, std::vector<LineSegment>& elementLines) const
+const std::vector<LineSegment>& Quadtree::GetDrawLines()
 {
-    std::set<QuadtreeElement> includedElement;
-    drawLines    = std::vector<LineSegment>(totalLeaf * 12, LineSegment());
-    elementLines = std::vector<LineSegment>(totalElements * 12, LineSegment());
+    int totalLines = totalLeaf * 12;
+    if (drawLines.size() == totalLines) return drawLines;
+
+    drawLines = std::vector<LineSegment>(totalLines, LineSegment());
 
     std::stack<const QuadtreeNode*> nodesToVisit;
     nodesToVisit.push(rootNode);
@@ -96,19 +94,6 @@ void Quadtree::GetDrawLines(std::vector<LineSegment>& drawLines, std::vector<Lin
             {
                 drawLines[currentDrawLine++] = currentNode->currentArea.Edge(i);
             }
-
-            for (const auto& element : currentNode->elements)
-            {
-                if (includedElement.find(element) == includedElement.end())
-                {
-                    includedElement.insert(element);
-
-                    for (int i = 0; i < 12; ++i)
-                    {
-                        elementLines[currentElementLine++] = element.boundingBox.Edge(i);
-                    }
-                }
-            }
         }
         else
         {
@@ -118,6 +103,8 @@ void Quadtree::GetDrawLines(std::vector<LineSegment>& drawLines, std::vector<Lin
             nodesToVisit.push(currentNode->bottomRight);
         }
     }
+
+    return drawLines;
 }
 
 Quadtree::QuadtreeNode::~QuadtreeNode()

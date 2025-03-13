@@ -6,13 +6,20 @@
 #include "MathGeoLib.h"
 #include "WindowModule.h"
 #include "OpenGLModule.h"
+#include "SceneModule.h"
 #include "Framebuffer.h"
+#include "DebugUtils.h"
+#include "Octree.h"
+#include "GameObject.h"
 
 #include "SDL_video.h"
 #define DEBUG_DRAW_IMPLEMENTATION
 #include "DebugDraw.h" // Debug Draw API. Notice that we need the DEBUG_DRAW_IMPLEMENTATION macro here!
 #include "glew.h"
 #include "imgui.h"
+#include "Geometry/AABB.h"
+#include "Geometry/OBB.h"
+#include <unordered_map>
 
 class DDRenderInterfaceCoreGL final : public dd::RenderInterface
 {
@@ -47,7 +54,7 @@ class DDRenderInterfaceCoreGL final : public dd::RenderInterface
         glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(dd::DrawVertex), points);
 
         // Issue the draw call:
-        glDrawArrays(GL_POINTS, 0, count);
+        App->GetOpenGLModule()->DrawArrays(GL_POINTS, 0, count);
 
         glUseProgram(0);
         glBindVertexArray(0);
@@ -90,7 +97,7 @@ class DDRenderInterfaceCoreGL final : public dd::RenderInterface
         glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(dd::DrawVertex), lines);
 
         // Issue the draw call:
-        glDrawArrays(GL_LINES, 0, count);
+        App->GetOpenGLModule()->DrawArrays(GL_LINES, 0, count);
 
         glUseProgram(0);
         glBindVertexArray(0);
@@ -139,7 +146,8 @@ class DDRenderInterfaceCoreGL final : public dd::RenderInterface
         glBindBuffer(GL_ARRAY_BUFFER, textVBO);
         glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(dd::DrawVertex), glyphs);
 
-        glDrawArrays(GL_TRIANGLES, 0, count); // Issue the draw call
+        // Issue the draw call
+        App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, count);
 
         if (!already_blend)
         {
@@ -612,29 +620,32 @@ update_status DebugDrawModule::Render(float deltaTime)
     dd::xzSquareGrid(-10, 10, 0.0f, 1.0f, dd::colors::Blue);
 
     // Probably should go somewhere else, but must go after skybox and meshes
-    App->GetDebugDrawModule()->Draw();
+    Draw();
 
     return UPDATE_CONTINUE;
 }
 
 void DebugDrawModule::Draw()
 {
-    auto projection = App->GetCameraModule()->GetProjectionMatrix();
-    auto view       = App->GetCameraModule()->GetViewMatrix();
-    int width       = 0;
-    int height      = 0;
+    CameraModule* cameraModule = App->GetCameraModule();
+    
 
-    if (App->GetCameraModule()->IsCameraDetached())
+    const float4x4& projection = cameraModule->GetProjectionMatrix();
+    const float4x4& view       = cameraModule->GetViewMatrix();
+    int width                  = 0;
+    int height                 = 0;
+
+    if (cameraModule->IsCameraDetached())
     {
-        float4x4 frustumProj       = App->GetCameraModule()->GetFrustumProjectionMatrix();
-        float4x4 frustumView       = App->GetCameraModule()->GetFrustumViewMatrix();
+        float4x4 frustumProj       = cameraModule->GetFrustumProjectionMatrix();
+        float4x4 frustumView       = cameraModule->GetFrustumViewMatrix();
         float4x4 inverseClipMatrix = frustumProj * frustumView;
         inverseClipMatrix.Inverse();
 
         dd::frustum(inverseClipMatrix, float3(1.f, 1.f, 1.f));
     }
 
-    //SDL_GetWindowSize(App->GetWindowModule()->window, &width, &height);
+    HandleDebugRenderOptions();
 
     auto framebuffer = App->GetOpenGLModule()->GetFramebuffer();
     width                     = framebuffer->GetTextureWidth();
@@ -663,10 +674,17 @@ void DebugDrawModule::RenderLines(const std::vector<LineSegment>& lines, const f
     }
 }
 
-void DebugDrawModule::DrawLine(const float3& origin, const float3& direction, const float distance, const float3& color)
+void DebugDrawModule::DrawLineSegment(const LineSegment& line, const float3& color)
 {
-    float3 dir = direction * distance;
-    dd::line(origin, dir + origin, color);
+    dd::line(line.a, line.b, color);
+}
+
+void DebugDrawModule::DrawLine(
+    const float3& origin, const float3& direction, const float distance, const float3& color, bool enableDepth
+)
+{
+    float3 dir = direction.Normalized() * distance;
+    dd::line(origin, dir + origin, color, 0, enableDepth);
 }
 
 void DebugDrawModule::DrawCircle(const float3& center, const float3& upVector, const float3& color, const float radius)
@@ -686,4 +704,46 @@ void DebugDrawModule::Draw(const float4x4& view, const float4x4& proj, unsigned 
     implementation->mvpMatrix = proj * view;
 
     dd::flush();
+}
+
+void DebugDrawModule::DrawAxisTriad(const float4x4& transform, bool depthEnabled)
+{
+    dd::axisTriad(transform, 0.005f, 0.05f, 0, depthEnabled);
+}
+
+void DebugDrawModule::HandleDebugRenderOptions()
+{
+    SceneModule* sceneModule = App->GetSceneModule();
+    CameraModule* cameraModule = App->GetCameraModule();
+
+    const auto& gameObjects  = sceneModule->GetAllGameObjects();
+
+    if (debugRenderOptions[RENDER_AABB])
+    {
+        for (const auto& gameObject : *gameObjects)
+        {
+            for (int i = 0; i < 12; ++i)
+                DrawLineSegment(gameObject.second->GetGlobalAABB().Edge(i), float3(0.f, 1.f, 0.f));
+        }
+    }
+
+    if (debugRenderOptions[RENDER_OBB])
+    {
+        for (const auto& gameObject : *gameObjects)
+        {
+            for (int i = 0; i < 12; ++i)
+                DrawLineSegment(gameObject.second->GetGlobalOBB().Edge(i), float3(0.f, 1.f, 0.f));
+        }
+    }
+
+    if (debugRenderOptions[RENDER_OCTREE])
+    {
+        Octree* octree = sceneModule->GetSceneOctree();
+        if (octree != nullptr) RenderLines(octree->GetDrawLines(), float3(1.f, 0.f, 0.f));
+    }
+
+    if (debugRenderOptions[RENDER_CAMERA_RAY])
+    {
+        DrawLineSegment(cameraModule->GetLastCastedRay(), float3(1.f, 1.f, 0.f));
+    }
 }

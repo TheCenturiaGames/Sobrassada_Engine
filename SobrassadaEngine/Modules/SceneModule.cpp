@@ -1,37 +1,27 @@
 #include "SceneModule.h"
 
-#include "CameraModule.h"
 #include "ComponentUtils.h"
 #include "EditorUIModule.h"
-#include "FrustumPlanes.h"
-#include "GameObject.h"
-#include "InputModule.h"
+#include "FileSystem.h"
 #include "LibraryModule.h"
 #include "Octree.h"
-#include "RaycastController.h"
-#include "Root/RootComponent.h"
-#include "Scene/Components/Standalone/MeshComponent.h"
 
-#include "glew.h"
-#include "imgui.h"
-#include "imgui_impl_opengl3.h"
-#include "imgui_impl_sdl2.h"
-#include "imgui_internal.h"
-// guizmo after imgui include
-#include "./Libs/ImGuizmo/ImGuizmo.h"
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_EXTERNAL_IMAGE
-#include <Algorithm/Random/LCG.h>
+#include "Application.h"
+#include "InputModule.h"
+#include "RaycastController.h"
+
+#include <filesystem>
 #include <tiny_gltf.h>
 
-SceneModule::SceneModule()
+SceneModule::SceneModule() : scenePath(std::filesystem::current_path().string() + DELIMITER)
 {
 }
 
 SceneModule::~SceneModule()
 {
-    CloseScene();
 }
 
 bool SceneModule::Init()
@@ -71,10 +61,10 @@ update_status SceneModule::RenderEditor(float deltaTime)
 update_status SceneModule::PostUpdate(float deltaTime)
 {
     // CAST RAY WHEN LEFT CLICK IS RELEASED
-    if (loadedScene != nullptr && loadedScene->GetDoInputs() && !ImGuizmo::IsUsingAny())
+    if (loadedScene != nullptr && GetDoInputsScene() && !ImGuizmo::IsUsingAny())
     {
         const KeyState* mouseButtons = App->GetInputModule()->GetMouseButtons();
-        const KeyState* keyboard = App->GetInputModule()->GetKeyboard();
+        const KeyState* keyboard     = App->GetInputModule()->GetKeyboard();
         if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_DOWN && !keyboard[SDL_SCANCODE_LALT])
         {
             GameObject* selectedObject = RaycastController::GetRayIntersection<Octree>(
@@ -84,16 +74,18 @@ update_status SceneModule::PostUpdate(float deltaTime)
             if (selectedObject != nullptr)
             {
                 loadedScene->SetSelectedGameObject(selectedObject->GetUID());
-                selectedObject->GetRootComponent()->SetSelectedComponent(selectedObject->GetRootComponent()->GetUID());
             }
         }
     }
+    if (loadedScene != nullptr && loadedScene->GetStopPlaying()) SwitchPlayMode(false);
+
     return UPDATE_CONTINUE;
 }
 
 bool SceneModule::ShutDown()
 {
-    GLOG("Destroying octree")
+    CloseScene();
+    GLOG("Destroying scene")
     return true;
 }
 
@@ -101,61 +93,55 @@ void SceneModule::CreateScene()
 {
     CloseScene();
 
-    GameObject* sceneGameObject = new GameObject("SceneModule GameObject");
-
-    loadedScene                 = new Scene(GenerateUID(), DEFAULT_SCENE_NAME, sceneGameObject->GetUID());
-
-    std::unordered_map<UID, GameObject*> loadedGameObjects;
-    loadedGameObjects.insert({sceneGameObject->GetUID(), sceneGameObject});
-
-    loadedScene->LoadComponents(std::map<UID, Component*>());
-    loadedScene->LoadGameObjects(loadedGameObjects);
-
-    sceneGameObject->CreateRootComponent();
-
-    // TODO Filesystem: Save this new created level immediatelly
+    loadedScene = new Scene(DEFAULT_SCENE_NAME);
+    loadedScene->Init();
 }
 
-void SceneModule::LoadScene(
-    UID sceneUID, const char* sceneName, UID rootGameObject, const std::map<UID, Component*>& loadedGameComponents
-)
+void SceneModule::LoadScene(const rapidjson::Value& initialState, const bool forceReload)
 {
+    const UID extractedSceneUID = initialState["UID"].GetUint64();
+    if (!forceReload && loadedScene != nullptr && loadedScene->GetSceneUID() == extractedSceneUID)
+    {
+        GLOG("Scene already loaded: %s", loadedScene->GetSceneName());
+        return;
+    }
+
     CloseScene();
-    loadedScene = new Scene(sceneUID, sceneName, rootGameObject);
-    loadedScene->LoadComponents(loadedGameComponents);
-}
 
-void SceneModule::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects)
-{
-    loadedScene->LoadGameObjects(loadedGameObjects);
+    loadedScene = new Scene(initialState, extractedSceneUID);
+    loadedScene->Init();
 }
 
 void SceneModule::CloseScene()
 {
+    if (inPlayMode)
+    {
+        std::string tmpScene = SCENES_PLAY_PATH + std::to_string(loadedScene->GetSceneUID()) + SCENE_EXTENSION;
+        FileSystem::Delete(tmpScene.c_str());
+        inPlayMode = false;
+    }
+
+    // TODO Warning dialog before closing scene without saving
     delete loadedScene;
     loadedScene = nullptr;
 }
 
-void SceneModule::SwitchPlayModeStateTo(bool wantedStatePlayMode)
+void SceneModule::SwitchPlayMode(bool play)
 {
-    if (wantedStatePlayMode == bInPlayMode) return;
+    if (play == inPlayMode || loadedScene == nullptr) return;
 
-    if (bInPlayMode)
+    if (inPlayMode)
     {
-        if (loadedScene != nullptr)
+        std::string tmpScene = std::to_string(loadedScene->GetSceneUID()) + SCENE_EXTENSION;
+        if (App->GetLibraryModule()->LoadScene(tmpScene.c_str(), true))
         {
-            App->GetLibraryModule()->LoadScene(
-                std::string(SCENES_PATH + std::string(loadedScene->GetSceneName()) + SCENE_EXTENSION).c_str(), true
-            );
-            bInPlayMode = false;
+            FileSystem::Delete((scenePath + SCENES_PLAY_PATH + tmpScene).c_str());
+            inPlayMode = false;
+            loadedScene->SetStopPlaying(false);
         }
     }
     else
     {
-        if (loadedScene != nullptr)
-        {
-            loadedScene->Save();
-            bInPlayMode = true;
-        }
+        if (App->GetLibraryModule()->SaveScene("", SaveMode::SavePlayMode)) inPlayMode = true;
     }
 }

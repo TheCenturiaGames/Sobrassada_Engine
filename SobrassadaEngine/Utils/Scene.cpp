@@ -3,27 +3,69 @@
 #include "Application.h"
 #include "CameraModule.h"
 #include "Component.h"
+#include "EditorUIModule.h"
 #include "Framebuffer.h"
 #include "GameObject.h"
 #include "GameTimer.h"
+#include "Importer.h"
 #include "InputModule.h"
 #include "LibraryModule.h"
 #include "Octree.h"
 #include "OpenGLModule.h"
+#include "ResourceManagement/Resources/Resource.h"
+#include "ResourceManagement/Resources/ResourceModel.h"
+#include "ResourcesModule.h"
+#include "Scene/Components/ComponentUtils.h"
+#include "Scene/Components/Standalone/MeshComponent.h"
 #include "SceneModule.h"
+#include "DebugUtils.h"
 
+#include "SDL_mouse.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 // guizmo after imgui include
 #include "./Libs/ImGuizmo/ImGuizmo.h"
-#include "SDL_mouse.h"
 
-Scene::Scene(UID sceneUID, const char* sceneName, UID rootGameObject)
-    : sceneUID(sceneUID), sceneName(std::string(sceneName)), gameObjectRootUUID(rootGameObject)
+Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 {
-    selectedGameObjectUUID = gameObjectRootUUID;
+    memcpy(this->sceneName, sceneName, strlen(sceneName));
 
-    lightsConfig           = new LightsConfig();
+    GameObject* sceneGameObject = new GameObject("SceneModule GameObject");
+    selectedGameObjectUID = gameObjectRootUID = sceneGameObject->GetUID();
+
+    gameObjectsContainer.insert({sceneGameObject->GetUID(), sceneGameObject});
+
+    lightsConfig = new LightsConfig();
+}
+
+Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUID(loadedSceneUID)
+{
+    const char* initName = initialState["Name"].GetString();
+    memcpy(this->sceneName, initName, strlen(initName));
+    gameObjectRootUID     = initialState["RootGameObject"].GetUint64();
+    selectedGameObjectUID = gameObjectRootUID;
+
+    // Deserialize GameObjects
+    if (initialState.HasMember("GameObjects") && initialState["GameObjects"].IsArray())
+    {
+        const rapidjson::Value& gameObjects = initialState["GameObjects"];
+        for (rapidjson::SizeType i = 0; i < gameObjects.Size(); i++)
+        {
+            const rapidjson::Value& gameObject = gameObjects[i];
+
+            GameObject* newGameObject          = new GameObject(gameObject);
+            gameObjectsContainer.insert({newGameObject->GetUID(), newGameObject});
+        }
+    }
+
+    // Deserialize Lights Config
+    if (initialState.HasMember("Lights Config") && initialState["Lights Config"].IsObject())
+    {
+        lightsConfig = new LightsConfig();
+        lightsConfig->LoadData(initialState["Lights Config"]);
+    }
+
+    GLOG("%s scene loaded", sceneName);
 }
 
 Scene::~Scene()
@@ -34,54 +76,105 @@ Scene::~Scene()
     }
     gameObjectsContainer.clear();
 
-    for (auto it = gameComponents.begin(); it != gameComponents.end(); ++it)
-    {
-        delete it->second;
-    }
-    gameComponents.clear();
-
     delete lightsConfig;
     delete sceneOctree;
     lightsConfig = nullptr;
+    sceneOctree  = nullptr;
 
-    GLOG("%s scene closed", sceneName.c_str());
+    GLOG("%s scene closed", sceneName);
 }
 
-void Scene::Save() const
+void Scene::Init()
 {
-    if (!App->GetLibraryModule()->SaveScene(SCENES_PATH, SaveMode::Save))
+    GameObject* root = GetGameObjectByUID(gameObjectRootUID);
+    if (root != nullptr)
     {
-        GLOG("%s scene saving failed", sceneName.c_str());
+        root->UpdateTransformForGOBranch();
     }
+
+    lightsConfig->InitSkybox();
+    lightsConfig->InitLightBuffers();
+
+    UpdateSpatialDataStruct();
 }
 
-void Scene::LoadComponents(const std::map<UID, Component*>& loadedGameComponents)
+void Scene::Save(
+    rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator, UID newUID, const std::string& newName
+) const
 {
-    gameComponents.clear();
-    gameComponents.insert(loadedGameComponents.begin(), loadedGameComponents.end());
+    if (newUID != INVALID_UID)
+    {
+        targetState.AddMember("UID", newUID, allocator);
+        targetState.AddMember("Name", rapidjson::Value(newName.c_str(), allocator), allocator);
+    }
+    else
+    {
+        targetState.AddMember("UID", sceneUID, allocator);
+        targetState.AddMember("Name", rapidjson::Value(sceneName, allocator), allocator);
+    }
 
+    targetState.AddMember("RootGameObject", gameObjectRootUID, allocator);
+
+    // Serialize GameObjects
+    rapidjson::Value gameObjectsJSON(rapidjson::kArrayType);
+
+    for (auto it = gameObjectsContainer.begin(); it != gameObjectsContainer.end(); ++it)
+    {
+        if (it->second != nullptr)
+        {
+            rapidjson::Value goJSON(rapidjson::kObjectType);
+
+            it->second->Save(goJSON, allocator);
+
+            gameObjectsJSON.PushBack(goJSON, allocator);
+        }
+    }
+
+    // Add gameObjects to scene
+    targetState.AddMember("GameObjects", gameObjectsJSON, allocator);
+
+    // Serialize Lights Config
+    LightsConfig* lightConfig = App->GetSceneModule()->GetLightsConfig();
+
+    if (lightConfig != nullptr)
+    {
+        rapidjson::Value lights(rapidjson::kObjectType);
+
+        lightConfig->SaveData(lights, allocator);
+
+        targetState.AddMember("Lights Config", lights, allocator);
+    }
+    else GLOG("Light Config not found");
+}
+
+void Scene::LoadComponents() const
+{
     lightsConfig->InitSkybox();
     lightsConfig->InitLightBuffers();
 }
 
 void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects)
 {
+    for (auto it = gameObjectsContainer.begin(); it != gameObjectsContainer.end(); ++it)
+    {
+        delete it->second;
+    }
     gameObjectsContainer.clear();
     gameObjectsContainer.insert(loadedGameObjects.begin(), loadedGameObjects.end());
 
-    GameObject* root = GetGameObjectByUUID(gameObjectRootUUID);
+    GameObject* root = GetGameObjectByUID(gameObjectRootUID);
     if (root != nullptr)
     {
         GLOG("Init transform and AABB calculation");
-        root->ComponentGlobalTransformUpdated();
+        root->UpdateTransformForGOBranch();
     }
 
     UpdateSpatialDataStruct();
 }
 
-update_status Scene::Render(float deltaTime)
+update_status Scene::Render(float deltaTime) const
 {
-    lightsConfig->RenderSkybox();
+    if (!debugShaderOptions[RENDER_WIREFRAME]) lightsConfig->RenderSkybox();
     lightsConfig->RenderLights();
 
     std::vector<GameObject*> objectsToRender;
@@ -95,125 +188,216 @@ update_status Scene::Render(float deltaTime)
         }
     }
 
+    for (const auto& gameObject : gameObjectsContainer)
+    {
+        gameObject.second->DrawGizmos();
+    }
 
     return UPDATE_CONTINUE;
 }
 
 update_status Scene::RenderEditor(float deltaTime)
 {
+    if (App->GetEditorUIModule()->editorControlMenu) RenderEditorControl(App->GetEditorUIModule()->editorControlMenu);
+
     RenderScene();
 
     RenderSelectedGameObjectUI();
-
     lightsConfig->EditorParams();
 
     return UPDATE_CONTINUE;
 }
 
-void Scene::RenderScene()
+void Scene::RenderEditorControl(bool& editorControlMenu)
 {
-    if (!ImGui::Begin(sceneName.c_str()))
+    if (!ImGui::Begin("Editor Control", &editorControlMenu))
     {
         ImGui::End();
         return;
     }
 
-    if (ImGui::BeginChild("##SceneChildToolBar", ImVec2(0, 70)))
+    GizmoOperation& currentGizmoOperation = App->GetEditorUIModule()->GetCurrentGizmoOperation();
+    int selectedOp                        = static_cast<int>(currentGizmoOperation);
+    ImGui::PushItemWidth(150);
+    ImGui::RadioButton("T", &selectedOp, 0);
+    ImGui::SameLine();
+    ImGui::RadioButton("R", &selectedOp, 1);
+    ImGui::SameLine();
+    ImGui::RadioButton("S", &selectedOp, 2);
+    ImGui::PopItemWidth();
+
+    if (selectedOp == 0) currentGizmoOperation = GizmoOperation::TRANSLATE;
+    else if (selectedOp == 1) currentGizmoOperation = GizmoOperation::ROTATE;
+    else if (selectedOp == 2) currentGizmoOperation = GizmoOperation::SCALE;
+
+    ImGui::SameLine();
+    ImGui::Text("|");
+    ImGui::SameLine();
+
+    GizmoTransform& transformType = App->GetEditorUIModule()->GetTransformType();
+    int selectedMode              = static_cast<int>(transformType);
+    ImGui::PushItemWidth(100);
+    ImGui::RadioButton("L", &selectedMode, 0);
+    ImGui::SameLine();
+    ImGui::RadioButton("W", &selectedMode, 1);
+    ImGui::PopItemWidth();
+
+    if (selectedMode == 0) transformType = GizmoTransform::LOCAL;
+    else if (selectedMode == 1) transformType = GizmoTransform::WORLD;
+
+    ImGui::SameLine();
+    ImGui::Text("|");
+    ImGui::SameLine();
+
+    float3& snapValues = App->GetEditorUIModule()->GetSnapValues();
+    ImGui::PushItemWidth(150);
+    ImGui::Text("Snap");
+    ImGui::SameLine();
+    ImGui::Checkbox("##snapEnabled", &App->GetEditorUIModule()->snapEnabled);
+    ImGui::SameLine();
+    ImGui::InputFloat3("##snap", &snapValues.x);
+    ImGui::PopItemWidth();
+
+    ImGui::SameLine();
+    ImGui::Text("|");
+    ImGui::SameLine();
+
+    GameTimer* gameTimer = App->GetGameTimer();
+
+    float timeScale      = gameTimer->GetTimeScale();
+
+    if (ImGui::Button("Play"))
     {
-        GameTimer* gameTimer = App->GetGameTimer();
+        App->GetSceneModule()->SwitchPlayMode(true);
+        gameTimer->Start();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Pause"))
+    {
+        gameTimer->TogglePause();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Step"))
+    {
+        gameTimer->Step();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Stop"))
+    {
+        stopPlaying = true;
+        gameTimer->Reset();
+    }
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(100.0f);
+    if (ImGui::SliderFloat("Time scale", &timeScale, 0, 4)) gameTimer->SetTimeScale(timeScale);
 
-        float timeScale      = gameTimer->GetTimeScale();
+    ImGui::SameLine();
 
-        if (ImGui::Button("Play"))
-        {
-            App->GetSceneModule()->SwitchPlayModeStateTo(true);
-            gameTimer->Start();
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Pause"))
-        {
-            gameTimer->TogglePause();
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Step"))
-        {
-            gameTimer->Step();
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Stop"))
-        {
-            App->GetSceneModule()->SwitchPlayModeStateTo(false);
-            gameTimer->Reset();
-        }
-        ImGui::SameLine();
-        if (ImGui::SliderFloat("Time scale", &timeScale, 0, 4)) gameTimer->SetTimeScale(timeScale);
-
-        if (App->GetSceneModule()->IsInPlayMode())
-        {
-            ImGui::SeparatorText("Playing");
-            ImGui::Text("Frame count: %d", gameTimer->GetFrameCount());
-            ImGui::SameLine();
-            ImGui::Text("Game time: %.3f", gameTimer->GetTime() / 1000.0f);
-            ImGui::SameLine();
-            ImGui::Text("Delta time: %.3f", gameTimer->GetDeltaTime() / 1000.0f);
-        }
-
-        ImGui::EndChild();
+    // RENDER OPTIONS
+    if (ImGui::Button("Render options"))
+    {
+        ImGui::OpenPopup("RenderOptions");
     }
 
-    if (ImGui::BeginChild(
-            "##SceneChild", ImVec2(0.f, 0.f), NULL, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar
+    if (ImGui::BeginPopup("RenderOptions"))
+    {
+        float listBoxSize = debugShaderOptions.size() + debugRenderOptions.size() + 0.5f;
+        if (ImGui::BeginListBox(
+            "##RenderOptionsList",
+            ImVec2(ImGui::CalcItemWidth(), ImGui::GetFrameHeightWithSpacing() * listBoxSize)
         ))
-    {
-        // right click focus window
-        if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) ImGui::SetWindowFocus();
-
-        // do inputs only if window is focused
-
-        if (ImGui::IsWindowFocused(ImGuiFocusedFlags_DockHierarchy) &&
-            ImGui::IsWindowHovered(ImGuiFocusedFlags_DockHierarchy))
-            doInputs = true;
-        else doInputs = false;
-
-        const auto& framebuffer = App->GetOpenGLModule()->GetFramebuffer();
-
-        ImGui::SetCursorPos(ImVec2(0.f, 0.f));
-
-        ImGui::Image(
-            (ImTextureID)framebuffer->GetTextureID(),
-            ImVec2((float)framebuffer->GetTextureWidth(), (float)framebuffer->GetTextureHeight()), ImVec2(0.f, 1.f),
-            ImVec2(1.f, 0.f)
-        );
-
-        ImGuizmo::SetOrthographic(false);
-        ImGuizmo::SetDrawlist(); // ImGui::GetWindowDrawList()
-
-        ImGuizmo::SetRect(
-            ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight()
-        );
-
-        ImVec2 windowSize = ImGui::GetWindowSize();
-        if (framebuffer->GetTextureWidth() != windowSize.x || framebuffer->GetTextureHeight() != windowSize.y)
         {
-            float aspectRatio = windowSize.y / windowSize.x;
-            App->GetCameraModule()->SetAspectRatio(aspectRatio);
-            framebuffer->Resize((int)windowSize.x, (int)windowSize.y);
+            ImGui::Checkbox(RENDER_LIGTHS, &debugShaderOptions[RENDER_LIGTHS]);
+            if (ImGui::Checkbox("Render Wireframe", &debugShaderOptions[RENDER_WIREFRAME]))
+            {
+                App->GetOpenGLModule()->SetRenderWireframe(debugShaderOptions[RENDER_WIREFRAME]);
+            }
+
+            ImGui::Separator();
+
+            for (auto& debugOption : debugRenderOptions)
+            {
+                if (ImGui::Checkbox(debugOption.first.c_str(), &debugOption.second))
+                {
+                }
+            }
+
+            ImGui::EndListBox();
         }
 
-        ImVec2 windowPosition     = ImGui::GetWindowPos();
-        ImVec2 imGuimousePosition = ImGui::GetMousePos();
-        sceneWindowPosition       = std::make_tuple(windowPosition.x, windowPosition.y);
-        sceneWindowSize           = std::make_tuple(windowSize.x, windowSize.y);
-        mousePosition             = std::make_tuple(imGuimousePosition.x, imGuimousePosition.y);
-
-        ImGui::EndChild();
+        ImGui::EndPopup();
     }
+    if (App->GetSceneModule()->GetInPlayMode())
+    {
+        ImGui::SeparatorText("Playing");
+        ImGui::Text("Frame count: %d", gameTimer->GetFrameCount());
+        ImGui::SameLine();
+        ImGui::Text("Game time: %.3f", gameTimer->GetTime() / 1000.0f);
+        ImGui::SameLine();
+        ImGui::Text("Delta time: %.3f", gameTimer->GetDeltaTime() / 1000.0f);
+        // ImGui::Text("Unscaled game time: %.3f", gameTimer->GetUnscaledTime() / 1000.0f);
+        // ImGui::Text("Unscaled delta time: %.3f", gameTimer->GetUnscaledDeltaTime() / 1000.0f);
+        // ImGui::Text("Reference time: %.3f", gameTimer->GetReferenceTime() / 1000.0f);
+    }
+    ImGui::End();
+}
+
+void Scene::RenderScene()
+{
+    if (!ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar))
+    {
+        ImGui::End();
+        return;
+    }
+
+    // right click focus window
+    if (ImGui::IsWindowHovered() &&
+        (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseClicked(ImGuiMouseButton_Middle)))
+        ImGui::SetWindowFocus();
+
+    // do inputs only if window is focused
+    if (ImGui::IsWindowFocused(ImGuiFocusedFlags_DockHierarchy) &&
+        ImGui::IsWindowHovered(ImGuiFocusedFlags_DockHierarchy))
+        doInputs = true;
+    else doInputs = false;
+
+    const auto& framebuffer = App->GetOpenGLModule()->GetFramebuffer();
+
+    ImGui::SetCursorPos(ImVec2(0.f, 0.f));
+
+    ImGui::Image(
+        (ImTextureID)framebuffer->GetTextureID(),
+        ImVec2((float)framebuffer->GetTextureWidth(), (float)framebuffer->GetTextureHeight()), ImVec2(0.f, 1.f),
+        ImVec2(1.f, 0.f)
+    );
+
+    ImGuizmo::SetOrthographic(false);
+    ImGuizmo::SetDrawlist(); // ImGui::GetWindowDrawList()
+
+    float width  = ImGui::GetWindowWidth();
+    float height = ImGui::GetWindowHeight();
+    ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, width, height);
+
+    ImVec2 windowSize = ImGui::GetWindowSize();
+    if (framebuffer->GetTextureWidth() != windowSize.x || framebuffer->GetTextureHeight() != windowSize.y)
+    {
+        float aspectRatio = windowSize.y / windowSize.x;
+        App->GetCameraModule()->SetAspectRatio(aspectRatio);
+        framebuffer->Resize((int)windowSize.x, (int)windowSize.y);
+    }
+
+    ImVec2 windowPosition     = ImGui::GetWindowPos();
+    ImVec2 imGuimousePosition = ImGui::GetMousePos();
+    sceneWindowPosition       = std::make_tuple(windowPosition.x, windowPosition.y);
+    sceneWindowSize           = std::make_tuple(windowSize.x, windowSize.y);
+    mousePosition             = std::make_tuple(imGuimousePosition.x, imGuimousePosition.y);
+
     ImGui::End();
 }
 
 void Scene::RenderSelectedGameObjectUI()
 {
-    GameObject* selectedGameObject = GetSeletedGameObject();
+    GameObject* selectedGameObject = GetSelectedGameObject();
     if (selectedGameObject != nullptr)
     {
         selectedGameObject->RenderEditor();
@@ -230,85 +414,77 @@ void Scene::RenderHierarchyUI(bool& hierarchyMenu)
 
     if (ImGui::Button("Add GameObject"))
     {
-        GameObject* newGameObject = new GameObject(selectedGameObjectUUID, "new Game Object");
-        UID newUUID               = newGameObject->GetUID();
+        GameObject* parent = GetGameObjectByUID(selectedGameObjectUID);
+        if (parent != nullptr)
+        {
+            GameObject* newGameObject = new GameObject(selectedGameObjectUID, "new Game Object");
 
-        GetGameObjectByUUID(selectedGameObjectUUID)->AddGameObject(newUUID);
+            gameObjectsContainer.insert({newGameObject->GetUID(), newGameObject});
+            parent->AddGameObject(newGameObject->GetUID());
 
-        // TODO: change when filesystem defined
-        gameObjectsContainer.insert({newUUID, newGameObject});
-
-        GetGameObjectByUUID(newGameObject->GetParent())->ComponentGlobalTransformUpdated();
+            newGameObject->UpdateTransformForGOBranch();
+        }
     }
 
-    if (selectedGameObjectUUID != gameObjectRootUUID)
+    if (selectedGameObjectUID != gameObjectRootUID)
     {
         ImGui::SameLine();
 
         if (ImGui::Button("Delete GameObject"))
         {
-            UID parentUID                = GetGameObjectByUUID(selectedGameObjectUUID)->GetParent();
-            GameObject* parentGameObject = GetGameObjectByUUID(parentUID);
-            RemoveGameObjectHierarchy(selectedGameObjectUUID);
-            // parentGameObject->PassAABBUpdateToParent(); // TODO: check if it works
+            RemoveGameObjectHierarchy(selectedGameObjectUID);
+            App->GetSceneModule()->RegenerateTree();
         }
     }
 
-    GameObject* rootGameObject = GetGameObjectByUUID(gameObjectRootUUID);
+    GameObject* rootGameObject = GetGameObjectByUID(gameObjectRootUID);
     if (rootGameObject)
     {
-        rootGameObject->RenderHierarchyNode(selectedGameObjectUUID);
+        rootGameObject->RenderHierarchyNode(selectedGameObjectUID);
     }
 
     ImGui::End();
 }
 
-void Scene::RemoveGameObjectHierarchy(UID gameObjectUUID)
+void Scene::RemoveGameObjectHierarchy(UID gameObjectUID)
 {
     // TODO: Change when filesystem defined
-    if (!gameObjectsContainer.count(gameObjectUUID) || gameObjectUUID == gameObjectRootUUID) return;
+    if (!gameObjectsContainer.count(gameObjectUID) || gameObjectUID == gameObjectRootUID) return;
 
-    GameObject* gameObject = GetGameObjectByUUID(gameObjectUUID);
+    GameObject* gameObject = GetGameObjectByUID(gameObjectUID);
 
-    for (UID childUUID : gameObject->GetChildren())
+    for (UID childUID : gameObject->GetChildren())
     {
-        RemoveGameObjectHierarchy(childUUID);
+        RemoveGameObjectHierarchy(childUID);
     }
 
-    UID parentUUID = gameObject->GetParent();
+    UID parentUID = gameObject->GetParent();
 
     // TODO: change when filesystem defined
-    if (gameObjectsContainer.count(parentUUID))
+    if (gameObjectsContainer.count(parentUID))
     {
-        GameObject* parentGameObject = GetGameObjectByUUID(parentUUID);
-        parentGameObject->RemoveGameObject(gameObjectUUID);
-        selectedGameObjectUUID = parentUUID;
+        GameObject* parentGameObject = GetGameObjectByUID(parentUID);
+        parentGameObject->RemoveGameObject(gameObjectUID);
+        selectedGameObjectUID = parentUID;
     }
 
     // TODO: change when filesystem defined
-    gameObjectsContainer.erase(gameObjectUUID);
+    gameObjectsContainer.erase(gameObjectUID);
 
     delete gameObject;
 }
 
-void Scene::RemoveComponent(uint64_t componentUID)
+const std::unordered_map<UID, Component*> Scene::GetAllComponents() const
 {
-    gameComponents.erase(componentUID);
-}
-
-AABBUpdatable* Scene::GetTargetForAABBUpdate(UID uuid)
-{
-    if (gameObjectsContainer.count(uuid))
+    std::unordered_map<UID, Component*> collectedComponents;
+    for (auto& pair : gameObjectsContainer)
     {
-        return gameObjectsContainer[uuid];
+        if (pair.second != nullptr)
+        {
+            collectedComponents.insert(pair.second->GetComponents().begin(), pair.second->GetComponents().end());
+        }
     }
-
-    if (gameComponents.count(uuid))
-    {
-        return gameComponents[uuid];
-    }
-
-    return nullptr;
+    return collectedComponents;
 }
 
 void Scene::CreateSpatialDataStruct()
@@ -321,9 +497,9 @@ void Scene::CreateSpatialDataStruct()
 
     for (const auto& objectIterator : gameObjectsContainer)
     {
-        if (objectIterator.second->GetUID() == gameObjectRootUUID) continue;
-        AABB objectBB = objectIterator.second->GetAABB();
+        AABB objectBB = objectIterator.second->GetGlobalAABB();
 
+        if (objectIterator.second->GetUID() == gameObjectRootUID) continue;
         if (objectBB.Size().x == 0 && objectBB.Size().y == 0 && objectBB.Size().z == 0) continue;
 
         sceneOctree->InsertElement(objectIterator.second);
@@ -346,13 +522,13 @@ void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects)
 
     for (auto gameObject : queriedObjects)
     {
-        AABB objectOBB = gameObject->GetAABB();
+        OBB objectOBB = gameObject->GetGlobalOBB();
 
         if (frustumPlanes.Intersects(objectOBB)) outRenderGameObjects.push_back(gameObject);
     }
 }
 
-GameObject* Scene::GetGameObjectByUUID(UID gameObjectUUID)
+GameObject* Scene::GetGameObjectByUID(UID gameObjectUUID)
 {
     if (gameObjectsContainer.count(gameObjectUUID))
     {
@@ -361,11 +537,69 @@ GameObject* Scene::GetGameObjectByUUID(UID gameObjectUUID)
     return nullptr;
 }
 
-Component* Scene::GetComponentByUID(uint64_t componentUID)
+void Scene::LoadModel(const UID modelUID)
 {
-    if (gameComponents.count(componentUID))
+    if (modelUID != INVALID_UID)
     {
-        return gameComponents[componentUID];
+        GLOG("Load model %d", modelUID);
+
+        ResourceModel* newModel            = (ResourceModel*)App->GetResourcesModule()->RequestResource(modelUID);
+        const Model& model                 = newModel->GetModelData();
+        const std::vector<NodeData>& nodes = model.GetNodes();
+
+        GameObject* object                 = new GameObject(GetGameObjectRootUID(), nodes[0].name);
+        object->SetLocalTransform(nodes[0].transform);
+
+        // Add the gameObject to the rootObject
+        GetGameObjectByUID(GetGameObjectRootUID())->AddGameObject(object->GetUID());
+        AddGameObject(object->GetUID(), object);
+
+        std::vector<GameObject*> gameObjectsArray;
+        gameObjectsArray.push_back(object);
+
+        for (int i = 1; i < nodes.size(); ++i)
+        {
+            if (nodes[i].meshes.size() >
+                0) // If has meshes, create a container object and one gameObject per mesh as children
+            {
+                GLOG("Node %s has %d meshes", nodes[i].name.c_str(), nodes[i].meshes.size());
+                GameObject* gameObject =
+                    new GameObject(gameObjectsArray[nodes[i].parentIndex]->GetUID(), nodes[i].name);
+                // gameObject->SetLocalTransform(nodes[0].transform);
+
+                gameObjectsArray.emplace_back(gameObject);
+                GetGameObjectByUID(gameObjectsArray[nodes[i].parentIndex]->GetUID())
+                    ->AddGameObject(gameObject->GetUID());
+                AddGameObject(gameObject->GetUID(), gameObject);
+
+                unsigned meshNum = 1;
+                for (const auto& mesh : nodes[i].meshes)
+                {
+                    GameObject* meshObject = new GameObject(gameObject->GetUID(), "Mesh " + std::to_string(meshNum));
+                    ++meshNum;
+
+                    meshObject->CreateComponent(COMPONENT_MESH);
+                    meshObject->AddModel(mesh.first, mesh.second);
+
+                    meshObject->SetLocalTransform(nodes[i].transform);
+
+                    gameObject->AddGameObject(meshObject->GetUID());
+                    AddGameObject(meshObject->GetUID(), meshObject);
+                }
+            }
+            else
+            {
+                GameObject* gameObject =
+                    new GameObject(gameObjectsArray[nodes[i].parentIndex]->GetUID(), nodes[i].name);
+
+                gameObject->SetLocalTransform(nodes[i].transform);
+
+                gameObjectsArray.emplace_back(gameObject);
+                GetGameObjectByUID(gameObjectsArray[nodes[i].parentIndex]->GetUID())
+                    ->AddGameObject(gameObject->GetUID());
+                AddGameObject(gameObject->GetUID(), gameObject);
+            }
+        }
+        object->UpdateTransformForGOBranch();
     }
-    return nullptr;
 }

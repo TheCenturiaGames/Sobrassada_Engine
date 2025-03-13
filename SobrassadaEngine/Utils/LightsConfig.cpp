@@ -74,7 +74,7 @@ void LightsConfig::InitSkybox()
     skyboxTexture = LoadSkyboxTexture(App->GetLibraryModule()->GetTextureUID("cubemap"));
 
     // Load the skybox shaders
-    skyboxProgram = App->GetShaderModule()->GetProgram("Test/skyboxVertex.glsl", "Test/skyboxFragment.glsl");
+    skyboxProgram = App->GetShaderModule()->CreateShaderProgram("Test/skyboxVertex.glsl", "Test/skyboxFragment.glsl");
 }
 
 void LightsConfig::RenderSkybox() const
@@ -92,7 +92,7 @@ void LightsConfig::RenderSkybox() const
     glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
 
     glBindVertexArray(skyboxVao);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 36);
 
     glBindVertexArray(0);
 
@@ -120,9 +120,9 @@ void LightsConfig::SaveData(rapidjson::Value& targetState, rapidjson::Document::
     targetState.AddMember("Skybox UID", skyboxUID, allocator);
 }
 
-void LightsConfig::LoadData(rapidjson::Value& lights)
+void LightsConfig::LoadData(const rapidjson::Value& lights)
 {
-    rapidjson::Value& ambientColorArray = lights["Ambient Color"];
+    const rapidjson::Value& ambientColorArray = lights["Ambient Color"];
     ambientColor = {ambientColorArray[0].GetFloat(), ambientColorArray[1].GetFloat(), ambientColorArray[2].GetFloat()};
     ambientIntensity = lights["Ambient Intensity"].GetFloat();
     skyboxTexture    = LoadSkyboxTexture(lights["Skybox UID"].GetUint64());
@@ -146,10 +146,10 @@ void LightsConfig::EditorParams()
 
     if (ImGui::IsPopupOpen(CONSTANT_TEXTURE_SELECT_DIALOG_ID))
     {
-        const UID uid = LoadSkyboxTexture(App->GetEditorUIModule()->RenderResourceSelectDialog(
-            CONSTANT_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetTextureMap()
+        const UID uid = LoadSkyboxTexture(App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
+            CONSTANT_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetTextureMap(), INVALID_UID
         ));
-        if (uid != INVALID_UUID) skyboxTexture = static_cast<unsigned int>(uid);
+        if (uid != INVALID_UID) skyboxTexture = static_cast<unsigned int>(uid);
     }
 
     ImGui::SeparatorText("Ambient light");
@@ -364,67 +364,55 @@ void LightsConfig::RemoveSpotLight(UID spotUid)
 
 void LightsConfig::GetAllSceneLights()
 {
-    GetDirectionalLight();
-    GetAllPointLights();
-    GetAllSpotLights();
+    if (App->GetSceneModule()->GetScene() != nullptr)
+    {
+        const std::unordered_map<UID, Component*>& components = App->GetSceneModule()->GetScene()->GetAllComponents();
+        GetDirectionalLight(components);
+        GetAllPointLights(components);
+        GetAllSpotLights(components);
+    }
 }
 
-void LightsConfig::GetAllPointLights()
+void LightsConfig::GetAllPointLights(const std::unordered_map<UID, Component*>& components)
 {
-    const std::map<UID, Component*>* components = App->GetSceneModule()->GetAllComponents();
-
-    if (components != nullptr)
+    // Iterate through all the components and get the point lights
+    for (auto& component : components)
     {
-        // Iterate through all the components and get the point lights
-        for (auto& component : *components)
+        if (component.second->GetType() == COMPONENT_POINT_LIGHT)
         {
-            if (component.second->GetType() == COMPONENT_POINT_LIGHT)
-            {
-                GLOG("Add point light");
-                pointLights.push_back(static_cast<PointLightComponent*>(component.second));
-            }
+            GLOG("Add point light");
+            pointLights.push_back(static_cast<PointLightComponent*>(component.second));
         }
     }
 
     GLOG("Point lights count: %d", pointLights.size());
 }
 
-void LightsConfig::GetAllSpotLights()
+void LightsConfig::GetAllSpotLights(const std::unordered_map<UID, Component*>& components)
 {
-    const std::map<UID, Component*>* components = App->GetSceneModule()->GetAllComponents();
-
-    if (components != nullptr)
+    // Iterate through all the components and get the spot lights
+    for (auto& component : components)
     {
-
-        // Iterate through all the components and get the spot lights
-        for (auto& component : *components)
+        if (component.second->GetType() == COMPONENT_SPOT_LIGHT)
         {
-            if (component.second->GetType() == COMPONENT_SPOT_LIGHT)
-            {
-                GLOG("Add spotlight")
-                spotLights.push_back(static_cast<SpotLightComponent*>(component.second));
-            }
+            GLOG("Add spotlight")
+            spotLights.push_back(static_cast<SpotLightComponent*>(component.second));
         }
     }
 
     GLOG("Spot lights count: %d", spotLights.size());
 }
 
-void LightsConfig::GetDirectionalLight()
+void LightsConfig::GetDirectionalLight(const std::unordered_map<UID, Component*>& components)
 {
-    const std::map<UID, Component*>* components = App->GetSceneModule()->GetAllComponents();
-
-    if (components != nullptr)
+    // Iterate through all the components and get the spot lights
+    for (const auto& component : components)
     {
-        // Iterate through all the components and get the spot lights
-        for (const auto& component : (*components))
+        if (component.second->GetType() == COMPONENT_DIRECTIONAL_LIGHT)
         {
-            if (component.second->GetType() == COMPONENT_DIRECTIONAL_LIGHT)
-            {
-                GLOG("Add directional light");
-                directionalLight = static_cast<DirectionalLightComponent*>(component.second);
-                break;
-            }
+            GLOG("Add directional light");
+            directionalLight = static_cast<DirectionalLightComponent*>(component.second);
+            break;
         }
     }
 }
