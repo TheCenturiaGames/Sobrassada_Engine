@@ -625,8 +625,8 @@ void Scene::LoadPrefab(const UID prefabUID)
         // Add the gameObject to the scene. The parents will always be added before the children
         for (int i = 1; i < referenceObjects.size(); ++i)
         {
-            UID uid = referenceObjects[parentIndices[i]]->GetUID();
-            newObjects.push_back(new GameObject(uid, referenceObjects[i]));
+            UID parentUID = newObjects[parentIndices[i]]->GetUID();
+            newObjects.push_back(new GameObject(parentUID, referenceObjects[i]));
             newObjects[parentIndices[i]]->AddGameObject(newObjects[i]->GetUID());
             AddGameObject(newObjects[i]->GetUID(), newObjects[i]);
         }
