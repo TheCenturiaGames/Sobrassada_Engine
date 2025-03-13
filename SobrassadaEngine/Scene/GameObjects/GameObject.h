@@ -23,6 +23,7 @@ class GameObject
   public:
     GameObject(std::string name);
     GameObject(UID parentUID, std::string name);
+    GameObject(UID parentUID, GameObject* refObject);
 
     GameObject(const rapidjson::Value& initialState);
 

@@ -14,11 +14,11 @@
 #include "OpenGLModule.h"
 #include "ResourceManagement/Resources/Resource.h"
 #include "ResourceManagement/Resources/ResourceModel.h"
+#include "ResourceManagement/Resources/ResourcePrefab.h"
 #include "ResourcesModule.h"
 #include "Scene/Components/ComponentUtils.h"
 #include "Scene/Components/Standalone/MeshComponent.h"
 #include "SceneModule.h"
-#include "ResourceManagement/Resources/ResourcePrefab.h"
 
 #include "SDL_mouse.h"
 #include "imgui.h"
@@ -567,32 +567,32 @@ void Scene::LoadModel(const UID modelUID)
     }
 }
 
-void Scene::LoadPrefab(const UID prefabUid)
+void Scene::LoadPrefab(const UID prefabUID)
 {
-    if (prefabUid != INVALID_UID)
+    if (prefabUID != INVALID_UID)
     {
-        GLOG("Load prefab %d", prefabUid);
+        GLOG("Load prefab %d", prefabUID);
 
-        ResourcePrefab* prefab = (ResourcePrefab*)App->GetResourcesModule()->RequestResource(prefabUid);
-        std::vector<GameObject*> gameObjects = prefab->GetGameObjectsVector();
-        // PROBABLY BREAKS BECAUSE WHEN LOADING A SECOND TIME THE RESOURCE ALREADY EXIST, SO THE GAMEOBJECT POINTERS ARE BROKER FOR DESTROYING THE PREVIOUS ONE
+        ResourcePrefab* prefab = (ResourcePrefab*)App->GetResourcesModule()->RequestResource(prefabUID);
+        const std::vector<GameObject*>& referenceObjects = prefab->GetGameObjectsVector();
+        const std::vector<int>& parentIndices            = prefab->GetParentIndices();
 
+        std::vector<GameObject*> newObjects;
+        newObjects.push_back(new GameObject(GetGameObjectRootUID(), referenceObjects[0]));
+        newObjects[0]->SetPrefabUID(prefabUID);
+        GetGameObjectByUID(GetGameObjectRootUID())->AddGameObject(newObjects[0]->GetUID());
+        AddGameObject(newObjects[0]->GetUID(), newObjects[0]);
         // Right now it is loaded to the root gameObject
-        gameObjects[0]->SetParent(GetGameObjectRootUID());
-        gameObjects[0]->SetPrefabUID(prefabUid);
-        GetGameObjectByUID(GetGameObjectRootUID())->AddGameObject(gameObjects[0]->GetUID());
-        AddGameObject(gameObjects[0]->GetUID(), gameObjects[0]);
 
         // Add the gameObject to the scene. The parents will always be added before the children
-        for (int i = 1; i < gameObjects.size(); ++i)
+        for (int i = 1; i < referenceObjects.size(); ++i)
         {
-            GetGameObjectByUID(gameObjects[i]->GetParent())->AddGameObject(gameObjects[i]->GetUID());
-            AddGameObject(gameObjects[i]->GetUID(), gameObjects[i]);
-
-            // TODO: Add components
+            UID uid = referenceObjects[parentIndices[i]]->GetUID();
+            newObjects.push_back(new GameObject(uid, referenceObjects[i]));
+            newObjects[parentIndices[i]]->AddGameObject(newObjects[i]->GetUID());
+            AddGameObject(newObjects[i]->GetUID(), newObjects[i]);
         }
-
-        gameObjects[0]->UpdateTransformForGOBranch();
+        newObjects[0]->UpdateTransformForGOBranch();
     }
 
     // ONLY ONE INSTANCE OF PREFAB CAN BE LOADED BECAUSE THE OBJECTS UID ARE REPEATED,

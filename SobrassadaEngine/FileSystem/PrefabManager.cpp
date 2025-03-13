@@ -49,12 +49,6 @@ namespace PrefabManager
             currentGameObject->Save(goJSON, allocator);
             gameObjectsJSON.PushBack(goJSON, allocator);
 
-            // TODO: Serialize the rest of components after merged with the branch where the gameObjects have an array
-            // of their components, because right now is quite more complicated to get them
-            // rapidjson::Value componentJSON(rapidjson::kObjectType);
-            // currentGameObject->GetRootComponent()->Save(componentJSON, allocator);
-            // goJSON.AddMember("RootComponent", componentJSON, allocator);
-
             for (UID child : currentGameObject->GetChildren())
             {
                 queue.push(App->GetSceneModule()->GetGameObjectByUID(child));
@@ -137,6 +131,7 @@ namespace PrefabManager
         std::string name         = prefab["Name"].GetString();
 
         std::vector<GameObject*> loadedGameObjects;
+        std::vector<int> parentIndices;
         if (prefab.HasMember("GameObjects") && prefab["GameObjects"].IsArray())
         {
             const rapidjson::Value& gameObjects = prefab["GameObjects"];
@@ -145,15 +140,18 @@ namespace PrefabManager
                 const rapidjson::Value& gameObject = gameObjects[i];
                 GameObject* newObject              = new GameObject(gameObject);
 
-                // TODO: Deserialize the rest of components and add them to their corresponding gameObject,
-                // once the serialization is also done
-
+                int index                          = 0;
+                for (const GameObject* obj : loadedGameObjects)
+                {
+                    if (obj->GetUID() == newObject->GetParent()) break;
+                    ++index;
+                }
+                parentIndices.push_back(index); // We will ignoe the parent index of the root object, so it's fine this is also 0 for it
                 loadedGameObjects.push_back(newObject);
             }
         }
-
         ResourcePrefab* resourcePrefab = new ResourcePrefab(uid, name);
-        resourcePrefab->LoadData(loadedGameObjects);
+        resourcePrefab->LoadData(loadedGameObjects, parentIndices);
         return resourcePrefab;
     }
 } // namespace PrefabManager

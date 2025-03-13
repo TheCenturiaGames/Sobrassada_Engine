@@ -169,9 +169,9 @@ namespace SceneImporter
         }
         if (!FileSystem::IsDirectory(PREFABS_ASSETS_PATH))
         {
-            if (!FileSystem::CreateDirectories(PREFABS_LIB_PATH))
+            if (!FileSystem::CreateDirectories(PREFABS_ASSETS_PATH))
             {
-                GLOG("Failed to create directory: %s", PREFABS_LIB_PATH);
+                GLOG("Failed to create directory: %s", PREFABS_ASSETS_PATH);
             }
         }
         if (!FileSystem::IsDirectory(ANIMATIONS_PATH))

@@ -29,6 +29,23 @@ GameObject::GameObject(UID parentUID, std::string name) : parentUID(parentUID), 
     globalAABB = AABB(globalOBB);
 }
 
+GameObject::GameObject(UID parentUID, GameObject* refObject)
+    : parentUID(parentUID), name(refObject->name), localTransform(refObject->localTransform)
+{
+    uid        = GenerateUID();
+    localAABB  = AABB(DEFAULT_GAME_OBJECT_AABB);
+    globalOBB  = OBB(localAABB);
+    globalAABB = AABB(globalOBB);
+
+    // Must make a copy of each manually
+    for (const auto& component : refObject->components)
+    {
+        CreateComponent(component.first);
+    }
+
+    OnAABBUpdated();
+}
+
 GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState["UID"].GetUint64())
 {
     parentUID              = initialState["ParentUID"].GetUint64();
@@ -338,11 +355,6 @@ void GameObject::RenderHierarchyNode(UID& selectedGameObjectUUID)
 
     bool hasChildren         = !children.empty();
 
-    if (prefabUid != INVALID_UID)
-    {
-        GLOG("HELLO");
-    }
-
     if (!hasChildren) flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
     if (selectedGameObjectUUID == uid) flags |= ImGuiTreeNodeFlags_Selected;
 
@@ -358,10 +370,10 @@ void GameObject::RenderHierarchyNode(UID& selectedGameObjectUUID)
     else
     {
         std::string objectName = name;
-        //if (prefabUid != INVALID_UID)
-        //{
-        //    objectName += "(prefab " + std::to_string(prefabUid) + ')';
-        //}
+        if (prefabUid != INVALID_UID)
+        {
+            objectName += "(prefab " + std::to_string(prefabUid) + ')';
+        }
         nodeOpen = ImGui::TreeNodeEx(objectName.c_str(), flags);
     }
 
