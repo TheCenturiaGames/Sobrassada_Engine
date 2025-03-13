@@ -19,7 +19,7 @@ void EngineConfig::SetStartupProjectPath(const std::string& newStartupProjectPat
     startupProjectPath = newStartupProjectPath;
     if (!newStartupProjectPath.empty())
     {
-        previouslyLoadedProjectPaths.insert(startupProjectPath);   
+        previouslyLoadedProjectPaths.insert(startupProjectPath);
     }
     Save();
 }
@@ -71,7 +71,8 @@ void EngineConfig::Save() const
     doc.Accept(writer);
 
     std::string savePath = "Config.json";
-    unsigned int bytesWritten = FileSystem::Save(savePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
+    unsigned int bytesWritten =
+        FileSystem::Save(savePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
 
     if (bytesWritten == 0) GLOG("Failed to save engine config file: %s", savePath.c_str());
 }

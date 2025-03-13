@@ -2,10 +2,10 @@
 
 class ConfigFile
 {
-public:
-    ConfigFile() = default;
-    virtual ~ConfigFile() = default;
+  public:
+    ConfigFile()              = default;
+    virtual ~ConfigFile()     = default;
 
-    virtual void Load() = 0;
+    virtual void Load()       = 0;
     virtual void Save() const = 0;
 };

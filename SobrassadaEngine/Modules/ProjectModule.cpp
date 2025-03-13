@@ -1,11 +1,11 @@
 ﻿#include "ProjectModule.h"
 
 #include "Application.h"
+#include "Config/EngineConfig.h"
 #include "EditorUIModule.h"
 #include "FileSystem.h"
 #include "ImGui.h"
 #include "WindowModule.h"
-#include "Config/EngineConfig.h"
 
 #include <filesystem>
 
@@ -19,13 +19,13 @@ bool ProjectModule::Init()
             loadedProjectName = loadedProjectAbsolutePath;
             FileSystem::RemoveDelimiterIfPresent(loadedProjectName);
             loadedProjectName = FileSystem::GetFileNameWithoutExtension(loadedProjectName);
-            projectLoaded = true;
-        } else
+            projectLoaded     = true;
+        }
+        else
         {
             loadedProjectAbsolutePath = "";
             App->GetEngineConfig()->SetStartupProjectPath("");
         }
-        
     }
     App->GetWindowModule()->UpdateProjectNameInWindowTitle(loadedProjectName);
     return Module::Init();
@@ -37,7 +37,6 @@ update_status ProjectModule::RenderEditor(float deltaTime)
     {
         static char newProjectPath[255];
         static char newProjectName[255];
-        static int selectedPathIndex = -1;
         if (ImGui::Begin("Project manager"))
         {
             ImGui::BeginTabBar("##ProjectLoaderBar", ImGuiTabBarFlags_None);
@@ -62,7 +61,7 @@ update_status ProjectModule::RenderEditor(float deltaTime)
                 }
                 if (ImGui::BeginTabItem("Load project"))
                 {
-                    
+
                     ImGui::InputText("Path", newProjectPath, 255);
                     ImGui::SameLine();
                     if (ImGui::Button("Select path"))
@@ -72,20 +71,19 @@ update_status ProjectModule::RenderEditor(float deltaTime)
 
                     if (ImGui::BeginListBox("Previous projects"))
                     {
-                        for (const auto& path: App->GetEngineConfig()->GetProjectPaths())
+                        for (const auto& path : App->GetEngineConfig()->GetProjectPaths())
                         {
-                            if (ImGui::Selectable(path.c_str(), false))
-                                memcpy(newProjectPath, path.c_str(), 255);
+                            if (ImGui::Selectable(path.c_str(), false)) memcpy(newProjectPath, path.c_str(), 255);
                         }
                         ImGui::EndListBox();
                     }
-                    
+
                     if (ImGui::Button("Clear previous projects"))
                     {
                         App->GetEngineConfig()->ClearPreviouslyLoadedProjectPaths();
                     }
                     // TODO Add list view for displaying previously loaded projects
-                    
+
                     if (ImGui::Button("Load"))
                     {
                         LoadProject(newProjectPath);
@@ -95,20 +93,23 @@ update_status ProjectModule::RenderEditor(float deltaTime)
 
                 ImGui::EndTabBar();
             }
-        
+
             ImGui::End();
 
             if (showCreateProjectFileDialog)
             {
-                const std::string resultingPath = App->GetEditorUIModule()->RenderFileDialog(showCreateProjectFileDialog, "Select project", true);
+                const std::string resultingPath =
+                    App->GetEditorUIModule()->RenderFileDialog(showCreateProjectFileDialog, "Select project", true);
                 if (!resultingPath.empty())
                 {
                     memcpy(newProjectPath, resultingPath.c_str(), 255);
                     memcpy(newProjectName, FileSystem::GetFileNameWithoutExtension(newProjectPath).c_str(), 255);
                 }
-            } else if (showOpenProjectFileDialog)
+            }
+            else if (showOpenProjectFileDialog)
             {
-                const std::string resultingPath = App->GetEditorUIModule()->RenderFileDialog(showOpenProjectFileDialog, "Select save location", true);
+                const std::string resultingPath =
+                    App->GetEditorUIModule()->RenderFileDialog(showOpenProjectFileDialog, "Select save location", true);
                 if (!resultingPath.empty())
                 {
                     memcpy(newProjectPath, resultingPath.c_str(), 255);
@@ -117,7 +118,7 @@ update_status ProjectModule::RenderEditor(float deltaTime)
             return UPDATE_CONTINUE;
         }
     }
-    
+
     return projectReloadRequested ? UPDATE_RESTART : UPDATE_CONTINUE;
 }
 
@@ -128,10 +129,10 @@ void ProjectModule::CloseCurrentProject()
 
 void ProjectModule::CreateNewProject(const std::string& projectPath, const std::string& projectName)
 {
-    projectLoaded = true;
+    projectLoaded     = true;
     loadedProjectName = std::string(projectName);
 
-    std::string path = projectPath;
+    std::string path  = projectPath;
     FileSystem::AddDelimiterIfNotPresent(path);
     loadedProjectAbsolutePath = path + projectName + DELIMITER;
     FileSystem::CreateDirectories(loadedProjectAbsolutePath.c_str());
@@ -142,10 +143,10 @@ void ProjectModule::CreateNewProject(const std::string& projectPath, const std::
 
 void ProjectModule::LoadProject(const std::string& projectPath)
 {
-    projectLoaded = true;
+    projectLoaded     = true;
     loadedProjectName = FileSystem::GetFileNameWithoutExtension(projectPath);
-    
-    std::string path = projectPath;
+
+    std::string path  = projectPath;
     FileSystem::AddDelimiterIfNotPresent(path);
     loadedProjectAbsolutePath = std::string(path);
     App->GetWindowModule()->UpdateProjectNameInWindowTitle(loadedProjectName);

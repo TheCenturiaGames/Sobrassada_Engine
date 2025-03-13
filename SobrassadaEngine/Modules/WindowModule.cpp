@@ -37,8 +37,10 @@ bool WindowModule::Init()
 
         if (RESIZABLE == true) flags |= SDL_WINDOW_RESIZABLE;
 
-        window =
-            SDL_CreateWindow((App->GetProjectModule()->GetLoadedProjectName() + " - " + TITLE).c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight, flags);
+        window = SDL_CreateWindow(
+            (App->GetProjectModule()->GetLoadedProjectName() + " - " + TITLE).c_str(), SDL_WINDOWPOS_UNDEFINED,
+            SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight, flags
+        );
 
         if (window == NULL)
         {

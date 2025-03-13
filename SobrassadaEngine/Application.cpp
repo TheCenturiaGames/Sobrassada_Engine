@@ -1,6 +1,7 @@
 #include "Application.h"
 
 #include "CameraModule.h"
+#include "Config/EngineConfig.h"
 #include "DebugDrawModule.h"
 #include "EditorUIModule.h"
 #include "EngineTimer.h"
@@ -14,7 +15,6 @@
 #include "SceneModule.h"
 #include "ShaderModule.h"
 #include "WindowModule.h"
-#include "Config/EngineConfig.h"
 
 #ifdef _DEBUG
 #include "optick.h"
@@ -23,7 +23,7 @@
 Application::Application()
 {
     engineConfig = new EngineConfig();
-    
+
     modules.push_back(projectModule = new ProjectModule());
     modules.push_back(windowModule = new WindowModule());
     modules.push_back(openGLModule = new OpenGLModule());

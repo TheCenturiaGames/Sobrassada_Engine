@@ -21,7 +21,10 @@ class Scene
     ~Scene();
 
     void Init();
-    void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator, UID newUID = INVALID_UID, const char* newName = nullptr);
+    void Save(
+        rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator, UID newUID = INVALID_UID,
+        const char* newName = nullptr
+    );
 
     void LoadComponents() const;
     void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
@@ -47,7 +50,7 @@ class Scene
 
     const std::unordered_map<UID, GameObject*>& GetAllGameObjects() const { return gameObjectsContainer; }
     const std::unordered_map<UID, Component*> GetAllComponents() const;
-
+    
     GameObject* GetGameObjectByUID(UID gameObjectUID); // TODO: Change when filesystem defined
 
     LightsConfig* GetLightsConfig() { return lightsConfig; }
@@ -69,7 +72,7 @@ class Scene
     void CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects) const;
 
   private:
-    std::string sceneName; 
+    std::string sceneName;
     UID sceneUID;
     UID gameObjectRootUID;
     UID selectedGameObjectUID;

@@ -4,8 +4,8 @@
 #include "EditorUIModule.h"
 #include "FileSystem.h"
 #include "LibraryModule.h"
-#include "ProjectModule.h"
 #include "Octree.h"
+#include "ProjectModule.h"
 
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #define TINYGLTF_NO_STB_IMAGE
@@ -117,7 +117,8 @@ void SceneModule::CloseScene()
 {
     if (inPlayMode)
     {
-        std::string tmpScene = App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PLAY_PATH + std::to_string(loadedScene->GetSceneUID()) + SCENE_EXTENSION;
+        std::string tmpScene = App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PLAY_PATH +
+                               std::to_string(loadedScene->GetSceneUID()) + SCENE_EXTENSION;
         FileSystem::Delete(tmpScene.c_str());
         inPlayMode = false;
     }

@@ -5,9 +5,8 @@
 
 class ProjectModule : public Module
 {
-public:
-
-    ProjectModule() = default;
+  public:
+    ProjectModule()           = default;
     ~ProjectModule() override = default;
 
     bool Init() override;
@@ -19,22 +18,20 @@ public:
     void CloseCurrentProject();
 
     bool IsProjectLoaded() const { return projectLoaded; }
-    
-private:
 
+  private:
     void CreateNewProject(const std::string& projectPath, const std::string& projectName);
     void LoadProject(const std::string& projectPath);
     void CloseProject();
-    
-private:
 
-    bool projectReloadRequested = false;
-    bool projectLoaded = false;
+  private:
+    bool projectReloadRequested      = false;
+    bool projectLoaded               = false;
     bool showCreateProjectFileDialog = false;
-    bool showOpenProjectFileDialog = false;
-    bool setAsStartupProject = false;
+    bool showOpenProjectFileDialog   = false;
+    bool setAsStartupProject         = false;
 
-    std::string loadedProjectName = "No project loaded";
+    std::string loadedProjectName    = "No project loaded";
     std::string loadedProjectAbsolutePath;
     std::vector<char*> previouslyLoadedProjects;
 };

@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "CameraModule.h"
 #include "Component.h"
+#include "DebugUtils.h"
 #include "EditorUIModule.h"
 #include "Framebuffer.h"
 #include "GameObject.h"
@@ -18,7 +19,6 @@
 #include "Scene/Components/ComponentUtils.h"
 #include "Scene/Components/Standalone/MeshComponent.h"
 #include "SceneModule.h"
-#include "DebugUtils.h"
 
 #include "SDL_mouse.h"
 #include "imgui.h"
@@ -30,7 +30,7 @@
 
 Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 {
-    this->sceneName = sceneName;
+    this->sceneName             = sceneName;
 
     GameObject* sceneGameObject = new GameObject("SceneModule GameObject");
     selectedGameObjectUID = gameObjectRootUID = sceneGameObject->GetUID();
@@ -42,7 +42,7 @@ Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 
 Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUID(loadedSceneUID)
 {
-    this->sceneName = initialState["Name"].GetString();
+    this->sceneName       = initialState["Name"].GetString();
     gameObjectRootUID     = initialState["RootGameObject"].GetUint64();
     selectedGameObjectUID = gameObjectRootUID;
 
@@ -305,9 +305,8 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
     {
         float listBoxSize = debugShaderOptions.size() + debugRenderOptions.size() + 0.5f;
         if (ImGui::BeginListBox(
-            "##RenderOptionsList",
-            ImVec2(ImGui::CalcItemWidth(), ImGui::GetFrameHeightWithSpacing() * listBoxSize)
-        ))
+                "##RenderOptionsList", ImVec2(ImGui::CalcItemWidth(), ImGui::GetFrameHeightWithSpacing() * listBoxSize)
+            ))
         {
             ImGui::Checkbox(RENDER_LIGTHS, &debugShaderOptions[RENDER_LIGTHS]);
             if (ImGui::Checkbox("Render Wireframe", &debugShaderOptions[RENDER_WIREFRAME]))

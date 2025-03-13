@@ -6,12 +6,12 @@
 
 class EngineConfig : public ConfigFile
 {
-public:
+  public:
     EngineConfig();
     ~EngineConfig() override;
 
     void SetStartupProjectPath(const std::string& newStartupProjectPath);
-    
+
     void Load() override;
     void Save() const override;
 
@@ -20,8 +20,7 @@ public:
 
     void ClearPreviouslyLoadedProjectPaths();
 
-private:
-
+  private:
     std::string startupProjectPath;
     std::unordered_set<std::string> previouslyLoadedProjectPaths;
 };

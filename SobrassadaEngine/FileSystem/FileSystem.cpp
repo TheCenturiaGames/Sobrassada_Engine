@@ -208,8 +208,7 @@ namespace FileSystem
             return 0;
         }
 
-        return fileInfo.st_mtime; 
-
+        return fileInfo.st_mtime;
     }
 
     void AddDelimiterIfNotPresent(std::string& path)

@@ -1,8 +1,7 @@
 #pragma once
+#include "EngineEditors/EngineEditorBase.h"
 #include "Module.h"
 #include "ResourceManagement/Resources/Resource.h"
-#include "EngineEditors/EngineEditorBase.h"
-
 
 #include "SDL.h"
 #include "imgui_internal.h"
@@ -59,7 +58,7 @@ class EditorUIModule : public Module
     T RenderResourceSelectDialog(
         const char* id, const std::unordered_map<std::string, T>& availableResources, const T& defaultResource
     );
-    
+
     std::string RenderFileDialog(bool& window, const char* windowTitle, bool selectFolder = false) const;
 
     GizmoOperation& GetCurrentGizmoOperation() { return currentGizmoOperation; }

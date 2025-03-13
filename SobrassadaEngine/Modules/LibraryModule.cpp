@@ -46,7 +46,8 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
     if (loadedScene != nullptr)
     {
         UID sceneUID = loadedScene->GetSceneUID();
-        const std::string& sceneName = saveMode == SaveMode::SaveAs ? FileSystem::GetFileNameWithoutExtension(path) : loadedScene->GetSceneName();
+        const std::string& sceneName =
+            saveMode == SaveMode::SaveAs ? FileSystem::GetFileNameWithoutExtension(path) : loadedScene->GetSceneName();
 
         if (sceneName == DEFAULT_SCENE_NAME && saveMode == SaveMode::Save) return false;
 
@@ -70,8 +71,10 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
         std::string sceneFilePath;
 
         if (saveMode == SaveMode::SavePlayMode)
-            sceneFilePath = App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PLAY_PATH + std::to_string(sceneUID) + SCENE_EXTENSION;
-        else sceneFilePath = App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PATH + sceneName + SCENE_EXTENSION;
+            sceneFilePath = App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PLAY_PATH +
+                            std::to_string(sceneUID) + SCENE_EXTENSION;
+        else
+            sceneFilePath = App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PATH + sceneName + SCENE_EXTENSION;
 
         unsigned int bytesWritten = (unsigned int
         )FileSystem::Save(sceneFilePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
