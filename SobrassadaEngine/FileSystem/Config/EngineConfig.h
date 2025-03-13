@@ -16,7 +16,7 @@ public:
     void Save() const override;
 
     const std::string& GetStartupProjectPath() const { return startupProjectPath; }
-    const std::vector<std::string>& GetProjectPath() const { return previouslyLoadedProjectPaths; }
+    const std::vector<std::string>& GetProjectPaths() const { return previouslyLoadedProjectPaths; }
 
     void ClearPreviouslyLoadedProjectPaths();
 

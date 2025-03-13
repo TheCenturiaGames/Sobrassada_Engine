@@ -35,6 +35,7 @@ update_status ProjectModule::RenderEditor(float deltaTime)
     {
         static char newProjectPath[255];
         static char newProjectName[255];
+        static int selectedPathIndex = -1;
         if (ImGui::Begin("Project manager"))
         {
             ImGui::BeginTabBar("##ProjectLoaderBar", ImGuiTabBarFlags_None);
@@ -66,11 +67,23 @@ update_status ProjectModule::RenderEditor(float deltaTime)
                     {
                         showCreateProjectFileDialog = true;
                     }
+
+                    if (ImGui::BeginListBox("Previous projects"))
+                    {
+                        for (int n = 0; n < App->GetEngineConfig()->GetProjectPaths().size(); n++)
+                        {
+                            if (ImGui::Selectable(App->GetEngineConfig()->GetProjectPaths()[n].c_str(), false))
+                                memcpy(newProjectPath, App->GetEngineConfig()->GetProjectPaths()[n].c_str(), 255);
+                        }
+                        ImGui::EndListBox();
+                    }
+                    
                     if (ImGui::Button("Clear previous projects"))
                     {
                         App->GetEngineConfig()->ClearPreviouslyLoadedProjectPaths();
                     }
                     // TODO Add list view for displaying previously loaded projects
+                    
                     if (ImGui::Button("Load"))
                     {
                         LoadProject(newProjectPath);
