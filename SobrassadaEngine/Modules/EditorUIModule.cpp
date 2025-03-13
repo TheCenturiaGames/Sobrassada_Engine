@@ -350,8 +350,7 @@ void EditorUIModule::LoadDialog(bool& loadMenu)
     {
         if (!inputFile.empty())
         {
-            std::string loadPath = App->GetProjectModule()->GetLoadedProjectPath() + inputFile;
-            App->GetLibraryModule()->LoadScene(loadPath.c_str());
+            App->GetLibraryModule()->LoadScene(inputFile.c_str());
         }
         inputFile = "";
         loadMenu  = false;
