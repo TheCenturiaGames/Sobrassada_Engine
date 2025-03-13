@@ -45,23 +45,8 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
     Scene* loadedScene = App->GetSceneModule()->GetScene();
     if (loadedScene != nullptr)
     {
-        UID sceneUID = INVALID_UID;
-        std::string sceneName;
-        switch (saveMode)
-        {
-        case SaveMode::Save:
-            sceneUID  = loadedScene->GetSceneUID();
-            sceneName = loadedScene->GetSceneName();
-            break;
-        case SaveMode::SaveAs:
-            sceneUID  = GenerateUID();
-            sceneName = std::string(path);
-            break;
-        case SaveMode::SavePlayMode:
-            sceneUID  = loadedScene->GetSceneUID();
-            sceneName = loadedScene->GetSceneName();
-            break;
-        }
+        UID sceneUID = loadedScene->GetSceneUID();
+        const std::string& sceneName = saveMode == SaveMode::SaveAs ? FileSystem::GetFileNameWithoutExtension(path) : loadedScene->GetSceneName();
 
         if (sceneName == DEFAULT_SCENE_NAME && saveMode == SaveMode::Save) return false;
 
@@ -72,7 +57,7 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
 
         rapidjson::Value scene(rapidjson::kObjectType);
 
-        if (saveMode == SaveMode::SaveAs) loadedScene->Save(scene, allocator, sceneUID, sceneName);
+        if (saveMode == SaveMode::SaveAs) loadedScene->Save(scene, allocator, GenerateUID(), sceneName.c_str());
         else loadedScene->Save(scene, allocator);
 
         doc.AddMember("Scene", scene, allocator);

@@ -54,7 +54,7 @@ bool EditorUIModule::Init()
     width      = App->GetWindowModule()->GetWidth();
     height     = App->GetWindowModule()->GetHeight();
 
-    scenesPath     = App->GetProjectModule()->GetLoadedProjectPath() + DELIMITER + SCENES_PATH;
+    scenesPath     = App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PATH;
 
     return true;
 }

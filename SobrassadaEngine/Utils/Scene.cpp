@@ -30,7 +30,7 @@
 
 Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 {
-    memcpy(this->sceneName, sceneName, strlen(sceneName));
+    this->sceneName = sceneName;
 
     GameObject* sceneGameObject = new GameObject("SceneModule GameObject");
     selectedGameObjectUID = gameObjectRootUID = sceneGameObject->GetUID();
@@ -42,8 +42,7 @@ Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 
 Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUID(loadedSceneUID)
 {
-    const char* initName = initialState["Name"].GetString();
-    memcpy(this->sceneName, initName, strlen(initName));
+    this->sceneName = initialState["Name"].GetString();
     gameObjectRootUID     = initialState["RootGameObject"].GetUint64();
     selectedGameObjectUID = gameObjectRootUID;
 
@@ -101,19 +100,20 @@ void Scene::Init()
 }
 
 void Scene::Save(
-    rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator, UID newUID, const std::string& newName
-) const
+    rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator, UID newUID, const char* newName
+)
 {
     if (newUID != INVALID_UID)
     {
-        targetState.AddMember("UID", newUID, allocator);
-        targetState.AddMember("Name", rapidjson::Value(newName.c_str(), allocator), allocator);
+        sceneUID = newUID;
     }
-    else
+    if (newName != nullptr)
     {
-        targetState.AddMember("UID", sceneUID, allocator);
-        targetState.AddMember("Name", rapidjson::Value(sceneName, allocator), allocator);
+        sceneName = newName;
     }
+
+    targetState.AddMember("UID", sceneUID, allocator);
+    targetState.AddMember("Name", rapidjson::Value(sceneName.c_str(), allocator), allocator);
 
     targetState.AddMember("RootGameObject", gameObjectRootUID, allocator);
 

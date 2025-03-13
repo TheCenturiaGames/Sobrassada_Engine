@@ -82,7 +82,7 @@ class SceneModule : public Module
 
     Scene* GetScene() const { return loadedScene; }
     UID GetSceneUID() const { return loadedScene != nullptr ? loadedScene->GetSceneUID() : INVALID_UID; }
-    const char* GetSceneName() const { return loadedScene != nullptr ? loadedScene->GetSceneName() : "Not loaded"; }
+    const std::string& GetSceneName() const { return loadedScene != nullptr ? loadedScene->GetSceneName() : "Not loaded"; }
     LightsConfig* GetLightsConfig() { return loadedScene != nullptr ? loadedScene->GetLightsConfig() : nullptr; }
     const std::tuple<float, float>& GetWindowPosition() const { return loadedScene->GetWindowPosition(); };
     const std::tuple<float, float>& GetWindowSize() const { return loadedScene->GetWindowSize(); };
