@@ -17,6 +17,7 @@ class CameraComponent : public Component
     void Render() override;
     void RenderEditorInspector() override;
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
+    void SetAspectRatio(float newAspectRatio);
 
     const FrustumPlanes& GetFrustrumPlanes() const { return frustumPlanes; }
     const float3& GetCameraPosition() const { return camera.pos; }

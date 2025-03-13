@@ -10,8 +10,7 @@
 #include "ImGui.h"
 #include <vector>
 
-CameraComponent::CameraComponent(UID uid, UID uidParent)
-    : Component(uid, uidParent, "Camera", COMPONENT_CAMERA)
+CameraComponent::CameraComponent(UID uid, UID uidParent) : Component(uid, uidParent, "Camera", COMPONENT_CAMERA)
 {
     float4x4 globalTransform  = GetGlobalTransform();
     camera.type               = FrustumType::PerspectiveFrustum;
@@ -37,11 +36,11 @@ CameraComponent::CameraComponent(UID uid, UID uidParent)
     glBufferData(GL_UNIFORM_BUFFER, sizeof(CameraMatrices), nullptr, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-    horizontalFov       = camera.horizontalFov;
-    verticalFov         = camera.verticalFov;
+    horizontalFov      = camera.horizontalFov;
+    verticalFov        = camera.verticalFov;
 
-    orthographicWidth   = 10.0f;
-    orthographicHeight  = orthographicWidth / ((float)width / (float)height);
+    orthographicWidth  = 10.0f;
+    orthographicHeight = orthographicWidth / ((float)width / (float)height);
 
     if (App->GetSceneModule()->GetMainCamera() == nullptr)
     {
@@ -263,8 +262,8 @@ void CameraComponent::RenderEditorInspector()
 
 void CameraComponent::Update()
 {
-    float4x4 globalTransform  = GetGlobalTransform();
-    camera.pos         = float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
+    float4x4 globalTransform = GetGlobalTransform();
+    camera.pos               = float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
     camera.front = -float3(globalTransform[0][2], globalTransform[1][2], globalTransform[2][2]).Normalized();
     camera.up    = float3(globalTransform[0][1], globalTransform[1][1], globalTransform[2][1]).Normalized();
 
@@ -283,4 +282,16 @@ void CameraComponent::Render()
     if (!enabled || !drawGizmos || App->GetSceneModule()->GetInPlayMode()) return;
     DebugDrawModule* debug = App->GetDebugDrawModule();
     debug->DrawFrustrum(camera.ProjectionMatrix(), camera.ViewMatrix());
+}
+
+void CameraComponent::SetAspectRatio(float newAspectRatio)
+{
+    if (camera.type == PerspectiveFrustum)
+    {
+        camera.verticalFov = 2.0f * atanf(tanf(camera.horizontalFov * 0.5f) * newAspectRatio);
+    }
+    if (camera.type == OrthographicFrustum)
+    {
+        camera.orthographicHeight = camera.orthographicWidth / newAspectRatio;
+    }
 }

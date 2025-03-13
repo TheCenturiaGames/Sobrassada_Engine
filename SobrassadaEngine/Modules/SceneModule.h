@@ -85,7 +85,7 @@ class SceneModule : public Module
     UID GetSceneUID() const { return loadedScene != nullptr ? loadedScene->GetSceneUID() : INVALID_UID; }
     const char* GetSceneName() const { return loadedScene != nullptr ? loadedScene->GetSceneName() : "Not loaded"; }
     LightsConfig* GetLightsConfig() { return loadedScene != nullptr ? loadedScene->GetLightsConfig() : nullptr; }
-    bool GetInPlayMode() { return bInPlayMode; }
+    bool GetInPlayMode() { return inPlayMode; }
     void SetMainCamera(CameraComponent* camera) { loadedScene->SetMainCamera(camera); }
     CameraComponent* GetMainCamera() { return loadedScene->GetMainCamera(); }
     const std::tuple<float, float>& GetWindowPosition() const { return loadedScene->GetWindowPosition(); };

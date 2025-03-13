@@ -359,7 +359,10 @@ void Scene::RenderScene()
     if (framebuffer->GetTextureWidth() != windowSize.x || framebuffer->GetTextureHeight() != windowSize.y)
     {
         float aspectRatio = windowSize.y / windowSize.x;
-        App->GetCameraModule()->SetAspectRatio(aspectRatio);
+        if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr)
+        {
+            App->GetSceneModule()->GetMainCamera()->SetAspectRatio(aspectRatio);
+        } else App->GetCameraModule()->SetAspectRatio(aspectRatio);
         framebuffer->Resize((int)windowSize.x, (int)windowSize.y);
     }
 

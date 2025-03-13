@@ -26,6 +26,7 @@ class DebugDrawModule : public Module
         const float3& origin, const float3& direction, const float distance, const float3& color,
         bool enableDepth = true
     );
+    void DrawFrustrum(float4x4 frustumProj, float4x4 frustumView);
     void DrawCircle(const float3 &center, const float3 &upVector, const float3 &color, const float radius);
     void DrawSphere(const float3 &center, const float3 &color, const float radius);
     void DrawAxisTriad(const float4x4& transform, bool depthEnabled = true);

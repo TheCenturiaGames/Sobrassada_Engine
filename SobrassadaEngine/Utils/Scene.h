@@ -31,6 +31,7 @@ class Scene
     void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
     void LoadModel(const UID modelUID);
 
+    update_status Update(float deltaTime);
     update_status Render(float deltaTime) const;
     update_status RenderEditor(float deltaTime);
 
@@ -70,8 +71,6 @@ class Scene
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
 
     void SetStopPlaying(bool stop) { stopPlaying = stop; }
-
-    const std::unordered_map<UID, Component*> GetAllComponents() const;
 
   private:
     void CreateSpatialDataStruct();
