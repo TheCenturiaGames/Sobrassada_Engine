@@ -1,0 +1,10 @@
+{
+    "UID": 1328865709108987,
+    "name": "RobotMaterial",
+    "assetPath": "C:\\\\Users\\lukas\\Documents\\Projekte\\UPC\\Sobrassada_Engine\\Game\\EngineDefaults\\Assets/Robot.gltf",
+    "lastModifiedDate": 1739822817,
+    "importOptions": {
+        "shader": "4221282866298176926",
+        "useOcclusion": true
+    }
+}
