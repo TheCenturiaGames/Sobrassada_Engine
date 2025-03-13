@@ -14,13 +14,13 @@
 GameObject::GameObject(std::string name) : name(name)
 {
     uid        = GenerateUID();
-    parentUID  = INVALID_UUID;
+    parentUID  = INVALID_UID;
     localAABB  = AABB(DEFAULT_GAME_OBJECT_AABB);
     globalOBB  = OBB(localAABB);
     globalAABB = AABB(globalOBB);
 }
 
-GameObject::GameObject(UID parentUUID, std::string name) : parentUID(parentUUID), name(name)
+GameObject::GameObject(UID parentUID, std::string name) : parentUID(parentUID), name(name)
 {
     uid        = GenerateUID();
     localAABB  = AABB(DEFAULT_GAME_OBJECT_AABB);
@@ -90,19 +90,19 @@ GameObject::~GameObject()
     components.clear();
 }
 
-bool GameObject::AddGameObject(UID gameObjectUUID)
+bool GameObject::AddGameObject(UID gameObjectUID)
 {
-    if (std::find(children.begin(), children.end(), gameObjectUUID) == children.end())
+    if (std::find(children.begin(), children.end(), gameObjectUID) == children.end())
     {
-        children.push_back(gameObjectUUID);
+        children.push_back(gameObjectUID);
         return true;
     }
     return false;
 }
 
-bool GameObject::RemoveGameObject(UID gameObjectUUID)
+bool GameObject::RemoveGameObject(UID gameObjectUID)
 {
-    if (const auto it = std::find(children.begin(), children.end(), gameObjectUUID); it != children.end())
+    if (const auto it = std::find(children.begin(), children.end(), gameObjectUID); it != children.end())
     {
         children.erase(it);
         return true;
@@ -266,9 +266,12 @@ void GameObject::RenderEditorInspector()
 
         ImGui::End();
 
-        if (App->GetEditorUIModule()->RenderImGuizmo(localTransform, globalTransform, parentTransform))
+        if (!App->GetSceneModule()->GetInPlayMode())
         {
-            UpdateTransformForGOBranch();
+            if (App->GetEditorUIModule()->RenderImGuizmo(localTransform, globalTransform, parentTransform))
+            {
+                UpdateTransformForGOBranch();
+            }
         }
     }
     else
@@ -284,7 +287,7 @@ void GameObject::UpdateTransformForGOBranch() const
 
     while (!childrenBuffer.empty())
     {
-        GameObject* gameObject = App->GetSceneModule()->GetGameObjectByUUID(childrenBuffer.top());
+        GameObject* gameObject = App->GetSceneModule()->GetGameObjectByUID(childrenBuffer.top());
         childrenBuffer.pop();
         if (gameObject != nullptr)
         {
@@ -356,10 +359,10 @@ void GameObject::RenderHierarchyNode(UID& selectedGameObjectUUID)
 
     if (nodeOpen && hasChildren)
     {
-        for (UID childUUID : children)
+        for (UID childUID : children)
         {
-            GameObject* childGameObject = App->GetSceneModule()->GetGameObjectByUUID(childUUID);
-            if (childGameObject && childUUID != uid)
+            GameObject* childGameObject = App->GetSceneModule()->GetGameObjectByUID(childUID);
+            if (childGameObject && childUID != uid)
             {
                 childGameObject->RenderHierarchyNode(selectedGameObjectUUID);
             }
@@ -397,10 +400,10 @@ void GameObject::HandleNodeClick(UID& selectedGameObjectUUID)
     {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DRAG_DROP_GAMEOBJECT"))
         {
-            UID draggedUUID = *static_cast<const UID*>(payload->Data);
-            if (draggedUUID != uid)
+            UID draggedUID = *static_cast<const UID*>(payload->Data);
+            if (draggedUID != uid)
             {
-                UpdateGameObjectHierarchy(draggedUUID);
+                UpdateGameObjectHierarchy(draggedUID);
             }
         }
 
@@ -421,9 +424,9 @@ void GameObject::RenderContextMenu()
 
         if (ImGui::MenuItem("Rename"))
         {
-            if (currentRenamingUID != INVALID_UUID && currentRenamingUID != uid)
+            if (currentRenamingUID != INVALID_UID && currentRenamingUID != uid)
             {
-                GameObject* oldGameObject = App->GetSceneModule()->GetGameObjectByUUID(currentRenamingUID);
+                GameObject* oldGameObject = App->GetSceneModule()->GetGameObjectByUID(currentRenamingUID);
 
                 if (oldGameObject)
                 {
@@ -458,7 +461,7 @@ void GameObject::RenameGameObjectHierarchy()
     {
         name               = renameBuffer;
         isRenaming         = false;
-        currentRenamingUID = INVALID_UUID;
+        currentRenamingUID = INVALID_UID;
     }
 
     bool isClickedOutside =
@@ -470,20 +473,20 @@ void GameObject::RenameGameObjectHierarchy()
     {
         name               = renameBuffer;
         isRenaming         = false;
-        currentRenamingUID = INVALID_UUID;
+        currentRenamingUID = INVALID_UID;
     }
 }
 
 void GameObject::UpdateGameObjectHierarchy(UID sourceUID)
 {
-    GameObject* sourceGameObject = App->GetSceneModule()->GetGameObjectByUUID(sourceUID);
+    GameObject* sourceGameObject = App->GetSceneModule()->GetGameObjectByUID(sourceUID);
 
     if (sourceGameObject != nullptr)
     {
-        UID oldParentUUID = sourceGameObject->GetParent();
+        UID oldParentUID = sourceGameObject->GetParent();
         sourceGameObject->SetParent(uid);
 
-        GameObject* oldParentGameObject = App->GetSceneModule()->GetGameObjectByUUID(oldParentUUID);
+        GameObject* oldParentGameObject = App->GetSceneModule()->GetGameObjectByUID(oldParentUID);
 
         if (oldParentGameObject)
         {
@@ -535,7 +538,7 @@ void GameObject::DrawGizmos() const
 
 const float4x4& GameObject::GetParentGlobalTransform() const
 {
-    GameObject* parent = App->GetSceneModule()->GetGameObjectByUUID(parentUID);
+    GameObject* parent = App->GetSceneModule()->GetGameObjectByUID(parentUID);
     if (parent != nullptr)
     {
         return parent->GetGlobalTransform();
@@ -561,7 +564,7 @@ void GameObject::OnDrawConnectionsToggle()
 {
     for (const UID childUID : children)
     {
-        GameObject* childObject = App->GetSceneModule()->GetGameObjectByUUID(childUID);
+        GameObject* childObject = App->GetSceneModule()->GetGameObjectByUID(childUID);
         childObject->drawNodes  = drawNodes;
         childObject->OnDrawConnectionsToggle();
     }
@@ -572,7 +575,7 @@ bool GameObject::CreateComponent(const ComponentType componentType)
     if (components.find(componentType) == components.end())
     // TODO Allow override of components after displaying an info box
     {
-        Component* createdComponent = ComponentUtils::CreateEmptyComponent(componentType, LCG().IntFast(), uid);
+        Component* createdComponent = ComponentUtils::CreateEmptyComponent(componentType, LCG().IntFast(), uid); // TODO: CHANGE LCG for UID
         if (createdComponent != nullptr)
         {
             components.insert({componentType, createdComponent});

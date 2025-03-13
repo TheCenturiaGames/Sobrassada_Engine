@@ -74,7 +74,7 @@ void LightsConfig::InitSkybox()
     skyboxTexture = LoadSkyboxTexture(App->GetLibraryModule()->GetTextureUID("cubemap"));
 
     // Load the skybox shaders
-    skyboxProgram = App->GetShaderModule()->GetProgram("Test/skyboxVertex.glsl", "Test/skyboxFragment.glsl");
+    skyboxProgram = App->GetShaderModule()->CreateShaderProgram("Test/skyboxVertex.glsl", "Test/skyboxFragment.glsl");
 }
 
 void LightsConfig::RenderSkybox() const
@@ -147,9 +147,9 @@ void LightsConfig::EditorParams()
     if (ImGui::IsPopupOpen(CONSTANT_TEXTURE_SELECT_DIALOG_ID))
     {
         const UID uid = LoadSkyboxTexture(App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
-            CONSTANT_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetTextureMap(), INVALID_UUID
+            CONSTANT_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetTextureMap(), INVALID_UID
         ));
-        if (uid != INVALID_UUID) skyboxTexture = static_cast<unsigned int>(uid);
+        if (uid != INVALID_UID) skyboxTexture = static_cast<unsigned int>(uid);
     }
 
     ImGui::SeparatorText("Ambient light");

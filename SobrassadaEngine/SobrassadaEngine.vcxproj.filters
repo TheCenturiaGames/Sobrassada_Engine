@@ -264,7 +264,8 @@
     <ClCompile Include="Modules\EditorUIModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
-    <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp" />
+    <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
+      <Filter>UI\EngineEditors</Filter>
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp">
       <Filter>External\ImGuizmo</Filter>
     </ClCompile>
@@ -282,6 +283,8 @@
     </ClCompile>
     <ClCompile Include="Scene\Components\Standalone\CharacterControllerComponent.cpp">
       <Filter>Scene\Components</Filter>
+    <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp">
+      <Filter>External\ImGuizmo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -321,6 +324,8 @@
     <Filter Include="External\MathGeoLib">
       <UniqueIdentifier>{77ec05ef-e581-4de2-bda3-50c6c7bcc0d2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UI\EngineEditors">
+      <UniqueIdentifier>{86a4c6bd-9fcf-4173-8393-657c59aa19cf}</UniqueIdentifier>
     <Filter Include="FileSystem\Meta">
       <UniqueIdentifier>{0325771a-d106-4c90-8e61-78de9e68b286}</UniqueIdentifier>
     </Filter>
@@ -495,6 +500,8 @@
     <ClInclude Include="Modules\EditorUIModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
+    <ClInclude Include="UI\EngineEditors\EngineEditorBase.h">
+      <Filter>UI\EngineEditors</Filter>
     <ClInclude Include="FileSystem\MetaFile.h">
       <Filter>FileSystem\Meta</Filter>
     </ClInclude>
@@ -507,7 +514,10 @@
     <ClInclude Include="FileSystem\MetaTexture.h">
       <Filter>FileSystem\Meta</Filter>
     </ClInclude>
-    <ClInclude Include="RaycastController.h">
+    <ClInclude Include="Utils\RaycastController.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\DebugUtils.h">
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="Scene\Components\Standalone\CharacterControllerComponent.h">
