@@ -2,6 +2,7 @@
 
 #include "ComponentUtils.h"
 #include "EditorUIModule.h"
+#include "FileSystem.h"
 #include "LibraryModule.h"
 #include "ProjectModule.h"
 #include "Octree.h"
@@ -16,13 +17,12 @@
 #include <filesystem>
 #include <tiny_gltf.h>
 
-SceneModule::SceneModule() : sceneLibraryPath(std::filesystem::current_path().string() + DELIMITER + SCENES_PATH)
+SceneModule::SceneModule() : scenePath(std::filesystem::current_path().string() + DELIMITER)
 {
 }
 
 SceneModule::~SceneModule()
 {
-    
 }
 
 bool SceneModule::Init()
@@ -62,7 +62,7 @@ update_status SceneModule::RenderEditor(float deltaTime)
 update_status SceneModule::PostUpdate(float deltaTime)
 {
     // CAST RAY WHEN LEFT CLICK IS RELEASED
-    if (loadedScene != nullptr && loadedScene->GetDoInputs() && !ImGuizmo::IsUsingAny())
+    if (loadedScene != nullptr && GetDoInputsScene() && !ImGuizmo::IsUsingAny())
     {
         const KeyState* mouseButtons = App->GetInputModule()->GetMouseButtons();
         const KeyState* keyboard     = App->GetInputModule()->GetKeyboard();
@@ -78,6 +78,8 @@ update_status SceneModule::PostUpdate(float deltaTime)
             }
         }
     }
+    if (loadedScene != nullptr && loadedScene->GetStopPlaying()) SwitchPlayMode(false);
+
     return UPDATE_CONTINUE;
 }
 
@@ -113,29 +115,34 @@ void SceneModule::LoadScene(const rapidjson::Value& initialState, const bool for
 
 void SceneModule::CloseScene()
 {
+    if (inPlayMode)
+    {
+        std::string tmpScene = SCENES_PLAY_PATH + std::to_string(loadedScene->GetSceneUID()) + SCENE_EXTENSION;
+        FileSystem::Delete(tmpScene.c_str());
+        inPlayMode = false;
+    }
+
     // TODO Warning dialog before closing scene without saving
     delete loadedScene;
     loadedScene = nullptr;
 }
 
-void SceneModule::SwitchPlayModeStateTo(bool wantedStatePlayMode)
+void SceneModule::SwitchPlayMode(bool play)
 {
-    if (wantedStatePlayMode == bInPlayMode) return;
+    if (play == inPlayMode || loadedScene == nullptr) return;
 
-    if (bInPlayMode)
+    if (inPlayMode)
     {
-        if (loadedScene != nullptr)
+        std::string tmpScene = std::to_string(loadedScene->GetSceneUID()) + SCENE_EXTENSION;
+        if (App->GetLibraryModule()->LoadScene(tmpScene.c_str(), true))
         {
-            bInPlayMode = !App->GetLibraryModule()->LoadScene(
-                std::string(App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PATH + std::string(loadedScene->GetSceneName()) + SCENE_EXTENSION).c_str(), true
-            );
+            FileSystem::Delete((sceePath + SCENES_PLAY_PATH + tmpScene).c_str());
+            inPlayMode = false;
+            loadedScene->SetStopPlaying(false);
         }
     }
     else
     {
-        if (loadedScene != nullptr)
-        {
-            bInPlayMode = App->GetLibraryModule()->SaveScene((App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PATH).c_str(), SaveMode::Save);
-        }
+        if (App->GetLibraryModule()->SaveScene("", SaveMode::SavePlayMode)) inPlayMode = true;
     }
 }

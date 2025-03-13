@@ -29,9 +29,13 @@ bool WindowModule::Init()
         windowWidth  = displayMode.w / 2;
         windowHeight = displayMode.h / 2;
 
-        Uint32 flags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+        Uint32 flags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 
         if (FULLSCREEN == true) flags |= SDL_WINDOW_FULLSCREEN;
+        else if (FULL_DESKTOP == true) flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+        else if (BORDERLESS == true) flags |= SDL_WINDOW_BORDERLESS;
+
+        if (RESIZABLE == true) flags |= SDL_WINDOW_RESIZABLE;
 
         window =
             SDL_CreateWindow(TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight, flags);
@@ -44,6 +48,7 @@ bool WindowModule::Init()
         else
         {
             screenSurface = SDL_GetWindowSurface(window);
+            SetVsync(VSYNC);
         }
     }
 

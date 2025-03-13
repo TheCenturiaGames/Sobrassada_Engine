@@ -38,7 +38,7 @@ namespace SceneImporter
                 UID meshUID = MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath);
                 n++;
 
-                UID matUID = INVALID_UUID;
+                UID matUID = INVALID_UID;
                 matIndex = primitive.material;
                 if (matIndex == -1) GLOG("Material index invalid for mesh: %s", name.c_str())
                 else if (std::find(matIndices.begin(), matIndices.end(), matIndex) == matIndices.end())
@@ -150,6 +150,14 @@ namespace SceneImporter
                 GLOG("Failed to create directory: %s", convertedAssetPath.c_str());
             }
         }
+        const std::string convertedScenePath = App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PATH;
+        if (!FileSystem::IsDirectory(convertedScenePath.c_str()))
+        {
+            if (!FileSystem::CreateDirectories(convertedScenePath.c_str()))
+            {
+                GLOG("Failed to create directory: %s", convertedScenePath.c_str());
+            }
+        }
         const std::string convertedMetadataPath = App->GetProjectModule()->GetLoadedProjectPath() + METADATA_PATH;
         if (!FileSystem::IsDirectory(convertedMetadataPath.c_str()))
         {
@@ -190,6 +198,14 @@ namespace SceneImporter
                 GLOG("Failed to create directory: %s", convertedMeshesPath.c_str());
             }
         }
+        const std::string convertedPlayScenePath = App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PLAY_PATH;
+        if (!FileSystem::IsDirectory(convertedPlayScenePath.c_str()))
+        {
+            if (!FileSystem::CreateDirectories(convertedPlayScenePath.c_str()))
+            {
+                GLOG("Failed to create directory: %s", convertedPlayScenePath.c_str());
+            }
+        }
         const std::string convertedTexturesPath = App->GetProjectModule()->GetLoadedProjectPath() + TEXTURES_PATH;
         if (!FileSystem::IsDirectory(convertedTexturesPath.c_str()))
         {
@@ -206,13 +222,6 @@ namespace SceneImporter
                 GLOG("Failed to create directory: %s", convertedMaterialsPath.c_str());
             }
         }
-        const std::string convertedScenesPath = App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PATH;
-        if (!FileSystem::IsDirectory(convertedScenesPath.c_str()))
-        {
-            if (!FileSystem::CreateDirectories(convertedScenesPath.c_str()))
-            {
-                GLOG("Failed to create directory: %s", convertedScenesPath.c_str());
-            }
-        }
+
     }
 }; // namespace SceneImporter
