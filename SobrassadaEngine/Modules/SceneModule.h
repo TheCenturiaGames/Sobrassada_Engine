@@ -4,12 +4,12 @@
 #include "LightsConfig.h"
 #include "Module.h"
 // TMP
+#include "Scene/Components/CameraComponent.h"
 #include "CameraModule.h"
 #include "Scene.h"
 
 #include <map>
 #include <string>
-#include <CameraComponent.h>
 #include <tuple>
 #include <unordered_map>
 

@@ -252,11 +252,11 @@
     <ClCompile Include="FileSystem\MetaTexture.cpp">
       <Filter>FileSystem\Meta</Filter>
     </ClCompile>
-    <ClCompile Include="CameraComponent.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
     <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
       <Filter>UI\EngineEditors</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\CameraComponent.cpp">
+      <Filter>Scene\Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -494,11 +494,11 @@
     <ClInclude Include="Utils\DebugUtils.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="CameraComponent.h">
-      <Filter>Scene\Components</Filter>
-    </ClInclude>
     <ClInclude Include="UI\EngineEditors\EngineEditorBase.h">
       <Filter>UI\EngineEditors</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\CameraComponent.h">
+      <Filter>Scene\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
