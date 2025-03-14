@@ -111,7 +111,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>.\Tests;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\DirectXTex;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\;.\Modules;.\UI;.\Utils;.\FileSystem;.\DebugDraw;.\Scene\GameObjects;.\Scene\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Tests;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\DirectXTex;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\;.\Modules;.\UI;.\Utils;.\FileSystem;.\DebugDraw;.\Scene\GameObjects;.\Scene\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -129,7 +129,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>.\Tests;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\DirectXTex;.\Libs\Tinygltf;.\Libs\freetype\include;.\;.\Modules;.\UI;.\Utils;.\FileSystem;.\DebugDraw;.\Scene\GameObjects;.\Scene\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Tests;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\DirectXTex;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\RecastDetour\Detour\Include;.\;.\Modules;.\UI;.\Utils;.\FileSystem;.\DebugDraw;.\Scene\GameObjects;.\Scene\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -150,6 +150,46 @@
     <ClCompile Include="FileSystem\MetaMaterial.cpp" />
     <ClCompile Include="FileSystem\MetaMesh.cpp" />
     <ClCompile Include="FileSystem\MetaTexture.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourAlloc.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourAssert.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourCommon.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourNavMesh.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourNavMeshBuilder.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourNavMeshQuery.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourNode.cpp" />
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\Recast.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastAlloc.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastArea.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastAssert.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastContour.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastFilter.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastLayers.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastMesh.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastMeshDetail.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastRasterization.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastRegion.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Modules\CameraModule.cpp" />
     <ClCompile Include="Modules\EditorUIModule.cpp" />
     <ClCompile Include="UserInterfaceModule.cpp" />
