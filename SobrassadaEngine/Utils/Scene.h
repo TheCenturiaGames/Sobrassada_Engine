@@ -50,7 +50,7 @@ class Scene
     GameObject* GetSelectedGameObject() { return GetGameObjectByUID(selectedGameObjectUID); }
 
     const std::unordered_map<UID, GameObject*>& GetAllGameObjects() const { return gameObjectsContainer; }
-    const std::unordered_map<UID, Component*> GetAllComponents() const;
+    const std::vector<Component*> GetAllComponents() const;
 
     GameObject* GetGameObjectByUID(UID gameObjectUID); // TODO: Change when filesystem defined
 

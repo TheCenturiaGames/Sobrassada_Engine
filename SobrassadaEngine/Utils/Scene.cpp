@@ -477,14 +477,17 @@ void Scene::RemoveGameObjectHierarchy(UID gameObjectUID)
     gameObjectsContainer.erase(gameObjectUID);    
 }
 
-const std::unordered_map<UID, Component*> Scene::GetAllComponents() const
+const std::vector<Component*> Scene::GetAllComponents() const
 {
-    std::unordered_map<UID, Component*> collectedComponents;
-    for (auto& pair : gameObjectsContainer)
+    std::vector<Component*> collectedComponents;
+    for (const auto& pair : gameObjectsContainer)
     {
         if (pair.second != nullptr)
         {
-            collectedComponents.insert(pair.second->GetComponents().begin(), pair.second->GetComponents().end());
+            for (const auto& component : pair.second->GetComponents())
+            {
+                collectedComponents.push_back(component.second);
+            }
         }
     }
     return collectedComponents;

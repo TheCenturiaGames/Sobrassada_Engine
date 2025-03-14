@@ -387,24 +387,24 @@ void LightsConfig::GetAllSceneLights()
 {
     if (App->GetSceneModule()->GetScene() != nullptr)
     {
-        const std::unordered_map<UID, Component*>& components = App->GetSceneModule()->GetScene()->GetAllComponents();
+        const std::vector<Component*>& components = App->GetSceneModule()->GetScene()->GetAllComponents();
         GetDirectionalLight(components);
         GetAllPointLights(components);
         GetAllSpotLights(components);
     }
 }
 
-void LightsConfig::GetAllPointLights(const std::unordered_map<UID, Component*>& components)
+void LightsConfig::GetAllPointLights(const std::vector<Component*>& components)
 {
     pointLights.clear();
 
     // Iterate through all the components and get the point lights
     for (auto& component : components)
     {
-        if (component.second->GetType() == COMPONENT_POINT_LIGHT)
+        if (component->GetType() == COMPONENT_POINT_LIGHT)
         {
             GLOG("Add point light");
-            pointLights.push_back(static_cast<PointLightComponent*>(component.second));
+            pointLights.push_back(static_cast<PointLightComponent*>(component));
         }
     }
     GLOG("Point lights count: %d", pointLights.size());
@@ -413,17 +413,17 @@ void LightsConfig::GetAllPointLights(const std::unordered_map<UID, Component*>& 
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize, nullptr, GL_STATIC_DRAW);
 }
 
-void LightsConfig::GetAllSpotLights(const std::unordered_map<UID, Component*>& components)
+void LightsConfig::GetAllSpotLights(const std::vector<Component*>& components)
 {
     spotLights.clear();
 
     // Iterate through all the components and get the spot lights
     for (auto& component : components)
     {
-        if (component.second->GetType() == COMPONENT_SPOT_LIGHT)
+        if (component->GetType() == COMPONENT_SPOT_LIGHT)
         {
-            GLOG("Add spotlight with UID: %d", component.first);
-            spotLights.push_back(static_cast<SpotLightComponent*>(component.second));
+            GLOG("Add spotlight");
+            spotLights.push_back(static_cast<SpotLightComponent*>(component));
         }
     }
     GLOG("Spot lights count: %d", spotLights.size());
@@ -435,15 +435,15 @@ void LightsConfig::GetAllSpotLights(const std::unordered_map<UID, Component*>& c
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize, nullptr, GL_STATIC_DRAW);
 }
 
-void LightsConfig::GetDirectionalLight(const std::unordered_map<UID, Component*>& components)
+void LightsConfig::GetDirectionalLight(const std::vector<Component*>& components)
 {
     // Iterate through all the components and get the spot lights
     for (const auto& component : components)
     {
-        if (component.second->GetType() == COMPONENT_DIRECTIONAL_LIGHT)
+        if (component->GetType() == COMPONENT_DIRECTIONAL_LIGHT)
         {
             GLOG("Add directional light");
-            directionalLight = static_cast<DirectionalLightComponent*>(component.second);
+            directionalLight = static_cast<DirectionalLightComponent*>(component);
             break;
         }
     }

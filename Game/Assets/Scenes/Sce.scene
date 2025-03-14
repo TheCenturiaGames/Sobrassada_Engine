@@ -1,0 +1,119 @@
+{
+    "Scene": {
+        "UID": 13173267422670650832,
+        "Name": "Sce",
+        "RootGameObject": 17225029549862894528,
+        "GameObjects": [
+            {
+                "UID": 17225029549862894528,
+                "ParentUID": 0,
+                "Name": "SceneModule GameObject",
+                "Mobility": 1,
+                "LocalTransform": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "Components": [],
+                "Children": [
+                    12813924133888750295,
+                    3634038609231220876
+                ]
+            },
+            {
+                "UID": 12813924133888750295,
+                "ParentUID": 17225029549862894528,
+                "Name": "new Game Object",
+                "Mobility": 1,
+                "LocalTransform": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "Components": [
+                    {
+                        "UID": 130617915,
+                        "ParentUID": 12813924133888750295,
+                        "Type": 1,
+                        "Enabled": true,
+                        "Name": "Mesh",
+                        "Mesh": 1199065820978570,
+                        "Material": 0
+                    }
+                ],
+                "Children": []
+            },
+            {
+                "UID": 3634038609231220876,
+                "ParentUID": 17225029549862894528,
+                "Name": "new Game Object",
+                "Mobility": 1,
+                "LocalTransform": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    4.910923480987549,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "Components": [
+                    {
+                        "UID": 3228998306,
+                        "ParentUID": 3634038609231220876,
+                        "Type": 1,
+                        "Enabled": true,
+                        "Name": "Mesh",
+                        "Mesh": 1199065820978570,
+                        "Material": 0
+                    }
+                ],
+                "Children": []
+            }
+        ],
+        "Lights Config": {
+            "Ambient Color": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Ambient Intensity": 0.20000000298023224,
+            "Skybox UID": 1211595514475110
+        }
+    }
+}

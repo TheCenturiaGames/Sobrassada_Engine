@@ -90,9 +90,9 @@ class LightsConfig
   private:
     unsigned int LoadSkyboxTexture(UID cubemapUID);
 
-    void GetAllPointLights(const std::unordered_map<UID, Component*>& components);
-    void GetAllSpotLights(const std::unordered_map<UID, Component*>& components);
-    void GetDirectionalLight(const std::unordered_map<UID, Component*>& components);
+    void GetAllPointLights(const std::vector<Component*>& components);
+    void GetAllSpotLights(const std::vector<Component*>& components);
+    void GetDirectionalLight(const std::vector<Component*>& components);
 
     void SetDirectionalLightShaderData() const;
     void SetPointLightsShaderData() const;
