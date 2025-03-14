@@ -897,6 +897,7 @@ void EditorUIModule::About(bool& aboutMenu) const
     ImGui::Text(" - Geometry loader: TinyGLTF v2.9.3");
     ImGui::Text(" - Math: MathGeoLib v1.5");
     ImGui::Text(" - JSON: rapidjson v1.1");
+    ImGui::Text(" - UI: FreeType: v2.13.3");
     ImGui::Text(" - RecastNavigation: v1.6.0");
     ImGui::Text("%s is licensed under the MIT License, see LICENSE for more information.", ENGINE_NAME);
 
