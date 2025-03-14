@@ -79,7 +79,6 @@ class SceneModule : public Module
     }
 
     bool IsSceneLoaded() const { return loadedScene != nullptr; }
-    
 
     Scene* GetScene() const { return loadedScene; }
     UID GetSceneUID() const { return loadedScene != nullptr ? loadedScene->GetSceneUID() : INVALID_UID; }
@@ -93,9 +92,12 @@ class SceneModule : public Module
     bool GetDoInputs() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() : false; }
     bool GetDoInputsScene() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() && !inPlayMode : false; }
     bool GetDoInputsGame() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() && inPlayMode : false; }
+    void OverridePrefabs(UID prefabUID) const { loadedScene != nullptr ? loadedScene->OverridePrefabs(prefabUID) : void(); }
 
-    
-    Octree* GetSceneOctree() const { return loadedScene != nullptr ? loadedScene->GetOctree() : nullptr; }
+    Octree* GetSceneOctree() const
+    {
+        return loadedScene != nullptr ? loadedScene->GetOctree() : nullptr;
+    }
 
   private:
     Scene* loadedScene = nullptr;

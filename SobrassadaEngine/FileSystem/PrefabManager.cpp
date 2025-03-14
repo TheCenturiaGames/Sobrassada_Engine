@@ -146,7 +146,7 @@ namespace PrefabManager
                     if (obj->GetUID() == newObject->GetParent()) break;
                     ++index;
                 }
-                parentIndices.push_back(index); // We will ignoe the parent index of the root object, so it's fine this is also 0 for it
+                parentIndices.push_back(index); // We will ignore the parent index of the root object, so it's fine this is also 0 for it
                 loadedGameObjects.push_back(newObject);
             }
         }

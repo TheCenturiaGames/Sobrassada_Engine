@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "CameraModule.h"
 #include "Component.h"
+#include "DebugUtils.h"
 #include "EditorUIModule.h"
 #include "Framebuffer.h"
 #include "GameObject.h"
@@ -19,7 +20,6 @@
 #include "Scene/Components/ComponentUtils.h"
 #include "Scene/Components/Standalone/MeshComponent.h"
 #include "SceneModule.h"
-#include "DebugUtils.h"
 
 #include "SDL_mouse.h"
 #include "imgui.h"
@@ -304,9 +304,8 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
     {
         float listBoxSize = debugShaderOptions.size() + debugRenderOptions.size() + 0.5f;
         if (ImGui::BeginListBox(
-            "##RenderOptionsList",
-            ImVec2(ImGui::CalcItemWidth(), ImGui::GetFrameHeightWithSpacing() * listBoxSize)
-        ))
+                "##RenderOptionsList", ImVec2(ImGui::CalcItemWidth(), ImGui::GetFrameHeightWithSpacing() * listBoxSize)
+            ))
         {
             ImGui::Checkbox(RENDER_LIGTHS, &debugShaderOptions[RENDER_LIGTHS]);
             if (ImGui::Checkbox("Render Wireframe", &debugShaderOptions[RENDER_WIREFRAME]))
@@ -469,12 +468,13 @@ void Scene::RemoveGameObjectHierarchy(UID gameObjectUID)
         selectedGameObjectUID = parentUID;
     }
 
-    // First delete the gameObject, then remove it from the map. This is because when removing a light, it checks if its parent
-    // gameObject is in the scene, so it has to be removed after deleting the pointer. I think this change doesn't affect anything else
+    // First delete the gameObject, then remove it from the map. This is because when removing a light, it checks if its
+    // parent gameObject is in the scene, so it has to be removed after deleting the pointer. I think this change
+    // doesn't affect anything else
     delete gameObject;
 
     // TODO: change when filesystem defined
-    gameObjectsContainer.erase(gameObjectUID);    
+    gameObjectsContainer.erase(gameObjectUID);
 }
 
 const std::vector<Component*> Scene::GetAllComponents() const
@@ -610,18 +610,25 @@ void Scene::LoadModel(const UID modelUID)
     }
 }
 
-void Scene::LoadPrefab(const UID prefabUID)
+void Scene::LoadPrefab(const UID prefabUID, const ResourcePrefab* prefab, const float4x4& transform)
 {
     if (prefabUID != INVALID_UID)
     {
         GLOG("Load prefab %d", prefabUID);
 
-        ResourcePrefab* prefab = (ResourcePrefab*)App->GetResourcesModule()->RequestResource(prefabUID);
-        const std::vector<GameObject*>& referenceObjects = prefab->GetGameObjectsVector();
-        const std::vector<int>& parentIndices            = prefab->GetParentIndices();
+        const ResourcePrefab* resourcePrefab =
+            prefab == nullptr ? (const ResourcePrefab*)App->GetResourcesModule()->RequestResource(prefabUID) : prefab;
+        const std::vector<GameObject*>& referenceObjects = resourcePrefab->GetGameObjectsVector();
+        const std::vector<int>& parentIndices            = resourcePrefab->GetParentIndices();
 
         std::vector<GameObject*> newObjects;
         newObjects.push_back(new GameObject(GetGameObjectRootUID(), referenceObjects[0]));
+        if (prefab != nullptr)
+        {
+            // Set the root prefab the transform it had before
+            newObjects[0]->SetLocalTransform(transform);
+        }
+
         newObjects[0]->SetPrefabUID(prefabUID);
         GetGameObjectByUID(GetGameObjectRootUID())->AddGameObject(newObjects[0]->GetUID());
         AddGameObject(newObjects[0]->GetUID(), newObjects[0]);
@@ -635,10 +642,45 @@ void Scene::LoadPrefab(const UID prefabUID)
             newObjects[parentIndices[i]]->AddGameObject(newObjects[i]->GetUID());
             AddGameObject(newObjects[i]->GetUID(), newObjects[i]);
         }
+
+        if (prefab == nullptr) App->GetResourcesModule()->ReleaseResource(resourcePrefab);
         newObjects[0]->UpdateTransformForGOBranch();
 
         // Get all scene lights, because if the prefab has lights when creating them they won't be added to the scene,
         // as the gameObject is still not part of the scene
         lightsConfig->GetAllSceneLights();
     }
+}
+
+void Scene::OverridePrefabs(const UID prefabUID)
+{
+    const ResourcePrefab* prefab = (const ResourcePrefab*)App->GetResourcesModule()->RequestResource(prefabUID);
+    std::vector<UID> updatedObjects;
+    std::vector<float4x4> transforms;
+
+    for (const auto& gameObject : gameObjectsContainer)
+    {
+        if (gameObject.second != nullptr)
+        {
+            if (gameObject.second->GetPrefabUID() == prefabUID)
+            {
+                updatedObjects.push_back(gameObject.first);
+                transforms.emplace_back(gameObject.second->GetGlobalTransform());
+            }
+        } 
+    }
+
+    for (const UID object : updatedObjects)
+    {
+        RemoveGameObjectHierarchy(object);
+    }
+
+    for (const float4x4& transform : transforms)
+    {
+        LoadPrefab(prefabUID, prefab, transform);
+    }
+
+    App->GetResourcesModule()->ReleaseResource(prefab);
+
+    
 }

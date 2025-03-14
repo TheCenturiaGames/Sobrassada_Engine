@@ -4,9 +4,9 @@
 #include "Component.h"
 #include "DebugDrawModule.h"
 #include "EditorUIModule.h"
+#include "PrefabManager.h"
 #include "SceneModule.h"
 #include "Standalone/MeshComponent.h"
-#include "PrefabManager.h"
 
 #include "imgui.h"
 
@@ -381,9 +381,9 @@ void GameObject::RenderHierarchyNode(UID& selectedGameObjectUUID)
     else
     {
         std::string objectName = name;
-        if (prefabUid != INVALID_UID)
+        if (prefabUID != INVALID_UID)
         {
-            objectName += "(prefab " + std::to_string(prefabUid) + ')';
+            objectName += "(prefab " + std::to_string(prefabUID) + ')';
         }
         nodeOpen = ImGui::TreeNodeEx(objectName.c_str(), flags);
     }
@@ -475,11 +475,8 @@ void GameObject::RenderContextMenu()
             currentRenamingUID = uid;
         }
 
-        const char* label = prefabUid == INVALID_UID ? "Create Prefab" : "Update Prefab";
-        if (ImGui::MenuItem(label))
-        {
-            CreatePrefab();
-        }
+        const char* label = prefabUID == INVALID_UID ? "Create Prefab" : "Update Prefab";
+        if (ImGui::MenuItem(label)) CreatePrefab();
 
         if (uid != App->GetSceneModule()->GetGameObjectRootUID() && ImGui::MenuItem("Delete"))
         {
@@ -615,7 +612,8 @@ bool GameObject::CreateComponent(const ComponentType componentType)
     if (components.find(componentType) == components.end())
     // TODO Allow override of components after displaying an info box
     {
-        Component* createdComponent = ComponentUtils::CreateEmptyComponent(componentType, LCG().IntFast(), uid); // TODO: CHANGE LCG for UID
+        Component* createdComponent =
+            ComponentUtils::CreateEmptyComponent(componentType, LCG().IntFast(), uid); // TODO: CHANGE LCG for UID
         if (createdComponent != nullptr)
         {
             components.insert({componentType, createdComponent});
@@ -640,6 +638,12 @@ bool GameObject::RemoveComponent(ComponentType componentType)
 
 void GameObject::CreatePrefab()
 {
-    bool override = this->prefabUid == INVALID_UID ? false : true;
-    prefabUid     = PrefabManager::SavePrefab(this, override);
+    bool override = this->prefabUID == INVALID_UID ? false : true;
+    prefabUID     = PrefabManager::SavePrefab(this, override);
+
+    if (override)
+    {
+        // Update all prefabs
+        App->GetSceneModule()->OverridePrefabs(prefabUID);
+    }
 }

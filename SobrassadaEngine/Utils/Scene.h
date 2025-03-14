@@ -2,6 +2,7 @@
 
 #include "Globals.h"
 #include "LightsConfig.h"
+#include "Math/float4x4.h"
 
 #include <map>
 #include <tuple>
@@ -11,6 +12,7 @@ class GameObject;
 class Component;
 class RootComponent;
 class Octree;
+class ResourcePrefab;
 
 class Scene
 {
@@ -29,7 +31,8 @@ class Scene
     void LoadComponents() const;
     void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
     void LoadModel(const UID modelUID);
-    void LoadPrefab(const UID prefabUid);
+    void LoadPrefab(const UID prefabUid, const ResourcePrefab* prefab = nullptr, const float4x4& transform = float4x4::identity);
+    void OverridePrefabs(UID prefabUID);
 
     update_status Render(float deltaTime) const;
     update_status RenderEditor(float deltaTime);

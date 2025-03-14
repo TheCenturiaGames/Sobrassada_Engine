@@ -85,8 +85,9 @@ class GameObject
     void DrawGizmos() const;
 
     void CreatePrefab();
-    UID GetPrefabUID() const { return prefabUid; }
-    void SetPrefabUID(const UID uid) { prefabUid = uid; }
+    void UpdatePrefab() const;
+    UID GetPrefabUID() const { return prefabUID; }
+    void SetPrefabUID(const UID uid) { prefabUID = uid; }
 
   private:
     void OnTransformUpdated();
@@ -113,7 +114,7 @@ class GameObject
     bool isRenaming = false;
     char renameBuffer[128];
 
-    UID prefabUid = INVALID_UID;
+    UID prefabUID = INVALID_UID;
     bool drawNodes                       = false;
 
     float4x4 localTransform              = float4x4::identity;

@@ -11,6 +11,7 @@ class ResourcePrefab : public Resource
     ~ResourcePrefab() override;
 
     void LoadData(const std::vector<GameObject*>& objects, const std::vector<int>& indices);
+
     GameObject* GetRootObject() const { return gameObjects[0]; }
     const std::vector<GameObject*>& GetGameObjectsVector() const { return gameObjects; }
     const std::vector<int>& GetParentIndices() const { return parentIndices; }
