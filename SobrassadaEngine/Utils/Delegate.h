@@ -13,7 +13,7 @@ template <typename ReturnValue, typename... Arguments> class Delegate
 
     ~Delegate() = default;
 
-    ReturnValue Call(Arguments... args) { callback(args...); }
+    ReturnValue Call(Arguments... args) { return callback(args...); }
 
   private:
     std::function<ReturnValue(Arguments...)> callback;
