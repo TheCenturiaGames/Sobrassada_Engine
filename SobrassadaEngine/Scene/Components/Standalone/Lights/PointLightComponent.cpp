@@ -88,7 +88,7 @@ void PointLightComponent::RenderEditorInspector()
 
 void PointLightComponent::Render()
 {
-    if (!enabled || !drawGizmos) return;
+    if (!enabled || !drawGizmos || App->GetSceneModule()->GetInPlayMode()) return;
 
     GLOG("%d", parentUID);
 

@@ -13,6 +13,7 @@ class Component;
 class RootComponent;
 class Octree;
 class ResourcePrefab;
+class CameraComponent;
 
 class Scene
 {
@@ -34,6 +35,7 @@ class Scene
     void LoadPrefab(const UID prefabUid, const ResourcePrefab* prefab = nullptr, const float4x4& transform = float4x4::identity);
     void OverridePrefabs(UID prefabUID);
 
+    update_status Update(float deltaTime);
     update_status Render(float deltaTime) const;
     update_status RenderEditor(float deltaTime);
 
@@ -59,6 +61,9 @@ class Scene
 
     LightsConfig* GetLightsConfig() { return lightsConfig; }
 
+    void SetMainCamera(CameraComponent* camera) { mainCamera = camera; }
+    CameraComponent* GetMainCamera() { return mainCamera; }
+
     bool GetDoInputs() const { return doInputs; }
     bool GetStopPlaying() const { return stopPlaying; }
 
@@ -80,6 +85,7 @@ class Scene
     const UID sceneUID;
     UID gameObjectRootUID;
     UID selectedGameObjectUID;
+    CameraComponent* mainCamera;
     bool stopPlaying = false;
     bool doInputs    = false;
 

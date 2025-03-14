@@ -4,10 +4,12 @@
 #include "LightsConfig.h"
 #include "Module.h"
 // TMP
+#include "Scene/Components/CameraComponent.h"
 #include "CameraModule.h"
 #include "Scene.h"
 
 #include <map>
+#include <string>
 #include <tuple>
 #include <unordered_map>
 
@@ -84,20 +86,20 @@ class SceneModule : public Module
     UID GetSceneUID() const { return loadedScene != nullptr ? loadedScene->GetSceneUID() : INVALID_UID; }
     const char* GetSceneName() const { return loadedScene != nullptr ? loadedScene->GetSceneName() : "Not loaded"; }
     LightsConfig* GetLightsConfig() { return loadedScene != nullptr ? loadedScene->GetLightsConfig() : nullptr; }
+    bool GetInPlayMode() const { return inPlayMode; }
+    CameraComponent* GetMainCamera() { return loadedScene->GetMainCamera(); }
     const std::tuple<float, float>& GetWindowPosition() const { return loadedScene->GetWindowPosition(); };
     const std::tuple<float, float>& GetWindowSize() const { return loadedScene->GetWindowSize(); };
     const std::tuple<float, float>& GetMousePosition() const { return loadedScene->GetMousePosition(); };
 
-    bool GetInPlayMode() const { return inPlayMode; }
     bool GetDoInputs() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() : false; }
     bool GetDoInputsScene() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() && !inPlayMode : false; }
     bool GetDoInputsGame() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() && inPlayMode : false; }
     void OverridePrefabs(UID prefabUID) const { loadedScene != nullptr ? loadedScene->OverridePrefabs(prefabUID) : void(); }
+    
+    Octree* GetSceneOctree() const { return loadedScene != nullptr ? loadedScene->GetOctree() : nullptr; }
 
-    Octree* GetSceneOctree() const
-    {
-        return loadedScene != nullptr ? loadedScene->GetOctree() : nullptr;
-    }
+    void SetMainCamera(CameraComponent* camera) { loadedScene->SetMainCamera(camera); }
 
   private:
     Scene* loadedScene = nullptr;

@@ -189,6 +189,20 @@ void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGa
     UpdateSpatialDataStruct();
 }
 
+update_status Scene::Update(float deltaTime)
+{
+
+    for (auto& gameObject : gameObjectsContainer)
+    {
+        std::unordered_map<ComponentType, Component*> componentList = gameObject.second->GetComponents();
+        for (auto& component : componentList)
+        {
+            component.second->Update();
+        }
+    }
+    return UPDATE_CONTINUE;
+}
+
 update_status Scene::Render(float deltaTime) const
 {
     if (!debugShaderOptions[RENDER_WIREFRAME]) lightsConfig->RenderSkybox();
@@ -398,7 +412,10 @@ void Scene::RenderScene()
     if (framebuffer->GetTextureWidth() != windowSize.x || framebuffer->GetTextureHeight() != windowSize.y)
     {
         float aspectRatio = windowSize.y / windowSize.x;
-        App->GetCameraModule()->SetAspectRatio(aspectRatio);
+        if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr)
+        {
+            App->GetSceneModule()->GetMainCamera()->SetAspectRatio(aspectRatio);
+        } else App->GetCameraModule()->SetAspectRatio(aspectRatio);
         framebuffer->Resize((int)windowSize.x, (int)windowSize.y);
     }
 
@@ -538,7 +555,9 @@ void Scene::UpdateSpatialDataStruct()
 void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects) const
 {
     std::vector<GameObject*> queriedObjects;
-    const FrustumPlanes& frustumPlanes = App->GetCameraModule()->GetFrustrumPlanes();
+    FrustumPlanes frustumPlanes = App->GetCameraModule()->GetFrustrumPlanes();
+    if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr)
+        frustumPlanes = App->GetSceneModule()->GetMainCamera()->GetFrustrumPlanes();
 
     sceneOctree->QueryElements<FrustumPlanes>(frustumPlanes, queriedObjects);
 

@@ -20,6 +20,7 @@ enum ComponentType
     COMPONENT_POINT_LIGHT,
     COMPONENT_SPOT_LIGHT,
     COMPONENT_DIRECTIONAL_LIGHT,
+    COMPONENT_CAMERA,
     FIRST = COMPONENT_NONE,
     LAST  = COMPONENT_DIRECTIONAL_LIGHT
 };
@@ -28,7 +29,8 @@ static const std::unordered_map<std::string, ComponentType> standaloneComponents
     {"Mesh",              COMPONENT_MESH             },
     {"Point Light",       COMPONENT_POINT_LIGHT      },
     {"Spot Light",        COMPONENT_SPOT_LIGHT       },
-    {"Directional Light", COMPONENT_DIRECTIONAL_LIGHT}
+    {"Directional Light", COMPONENT_DIRECTIONAL_LIGHT},
+    {"Camera",            COMPONENT_CAMERA           }
 };
 
 class ComponentUtils

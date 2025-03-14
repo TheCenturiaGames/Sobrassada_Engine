@@ -47,7 +47,7 @@ void DirectionalLightComponent::Clone(const Component* other)
 
 void DirectionalLightComponent::Render()
 {
-    if (!enabled || !drawGizmos) return;
+    if (!enabled || !drawGizmos || App->GetSceneModule()->GetInPlayMode()) return;
 
     DebugDrawModule* debug = App->GetDebugDrawModule();
     debug->DrawLine(
