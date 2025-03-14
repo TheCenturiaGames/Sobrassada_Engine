@@ -191,7 +191,6 @@ void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGa
 
 update_status Scene::Update(float deltaTime)
 {
-
     for (auto& gameObject : gameObjectsContainer)
     {
         std::unordered_map<ComponentType, Component*> componentList = gameObject.second->GetComponents();
@@ -484,16 +483,30 @@ void Scene::RemoveGameObjectHierarchy(UID gameObjectUID)
     // TODO: Change when filesystem defined
     if (!gameObjectsContainer.count(gameObjectUID) || gameObjectUID == gameObjectRootUID) return;
 
-    GameObject* gameObject = GetGameObjectByUID(gameObjectUID);
+    std::stack<UID> toDelete;
+    toDelete.push(gameObjectUID);
 
-    for (UID childUID : gameObject->GetChildren())
+    std::vector<UID> collectedUIDs;
+
+    // Collect all UIDs to delete
+    while (!toDelete.empty())
     {
-        RemoveGameObjectHierarchy(childUID);
+        UID currentUID = toDelete.top();
+        toDelete.pop();
+
+        GameObject* gameObject = GetGameObjectByUID(currentUID);
+        if (gameObject == nullptr) continue;
+
+        collectedUIDs.push_back(currentUID);
+
+        for (UID childUID : gameObject->GetChildren())
+        {
+            toDelete.push(childUID);
+        }
     }
 
-    UID parentUID = gameObject->GetParent();
-
-    // TODO: change when filesystem defined
+    // Remove from parent
+    UID parentUID = GetGameObjectByUID(gameObjectUID)->GetParent();
     if (gameObjectsContainer.count(parentUID))
     {
         GameObject* parentGameObject = GetGameObjectByUID(parentUID);
@@ -501,13 +514,12 @@ void Scene::RemoveGameObjectHierarchy(UID gameObjectUID)
         selectedGameObjectUID = parentUID;
     }
 
-    // First delete the gameObject, then remove it from the map. This is because when removing a light, it checks if its
-    // parent gameObject is in the scene, so it has to be removed after deleting the pointer. I think this change
-    // doesn't affect anything else
-    delete gameObject;
-
-    // TODO: change when filesystem defined
-    gameObjectsContainer.erase(gameObjectUID);
+    // Delete collected game objects
+    for (UID uid : collectedUIDs)
+    {
+        delete gameObjectsContainer[uid];
+        gameObjectsContainer.erase(uid);
+    }
 }
 
 const std::vector<Component*> Scene::GetAllComponents() const
