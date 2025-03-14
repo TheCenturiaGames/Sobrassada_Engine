@@ -210,33 +210,6 @@
     <ClCompile Include="Utils\LightsConfig.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Utils\Quadtree.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="Utils\Octree.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Components\Component.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\GameObjects\GameObject.cpp">
-      <Filter>Scene\GameObjects</Filter>
-    </ClCompile>
-    <ClCompile Include="Modules\SceneModule.cpp">
-      <Filter>Modules</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Components\Standalone\MeshComponent.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Components\Component.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Components\ComponentUtils.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Utils\Scene.cpp">
-      <Filter>Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Utils\FrustumPlanes.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
@@ -339,8 +312,14 @@
     <ClCompile Include="FileSystem\MetaTexture.cpp">
       <Filter>FileSystem\Meta</Filter>
     </ClCompile>
-    <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp">
-      <Filter>External\ImGuizmo</Filter>
+    <ClCompile Include="Scene\Components\CameraComponent.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="UserInterfaceModule.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
+      <Filter>UI\EngineEditors</Filter>
     </ClCompile>
     <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
       <Filter>UI\EngineEditors</Filter>
@@ -387,10 +366,10 @@
       <UniqueIdentifier>{0325771a-d106-4c90-8e61-78de9e68b286}</UniqueIdentifier>
     </Filter>
     <Filter Include="UI">
-      <UniqueIdentifier>{87e018d4-80c9-4b66-86ac-b43d623a5c64}</UniqueIdentifier>
+      <UniqueIdentifier>{9096db94-8011-467c-8549-ccc0382ca11f}</UniqueIdentifier>
     </Filter>
     <Filter Include="UI\EngineEditors">
-      <UniqueIdentifier>{eb0746d8-2adb-43eb-9887-db5a8b20b45a}</UniqueIdentifier>
+      <UniqueIdentifier>{db4cb5a0-8fe4-429c-9895-ea191f1f3f3e}</UniqueIdentifier>
     </Filter>
     <Filter Include="External\Detour">
       <UniqueIdentifier>{2caa9ea7-72e8-450d-adad-4b1805c68bb0}</UniqueIdentifier>
@@ -592,6 +571,12 @@
     </ClInclude>
     <ClInclude Include="Utils\Interpolation.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\CameraComponent.h">
+      <Filter>Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="UserInterfaceModule.h">
+      <Filter>Modules</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

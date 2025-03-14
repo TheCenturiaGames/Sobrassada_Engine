@@ -5,6 +5,7 @@
 #include "Globals.h"
 #include "MathGeoLib.h"
 #include "WindowModule.h"
+#include "SceneModule.h"
 #include "OpenGLModule.h"
 #include "SceneModule.h"
 #include "Framebuffer.h"
@@ -617,7 +618,7 @@ bool DebugDrawModule::ShutDown()
 update_status DebugDrawModule::Render(float deltaTime)
 {
     // dd::axisTriad(float4x4::identity, 0.1f, 1.0f);
-    dd::xzSquareGrid(-10, 10, 0.0f, 1.0f, dd::colors::Blue);
+    if(!App->GetSceneModule()->GetInPlayMode()) dd::xzSquareGrid(-10, 10, 0.0f, 1.0f, dd::colors::Blue);
 
     // Probably should go somewhere else, but must go after skybox and meshes
     Draw();
@@ -695,6 +696,13 @@ void DebugDrawModule::DrawCircle(const float3& center, const float3& upVector, c
 void DebugDrawModule::DrawSphere(const float3& center, const float3& color, const float radius)
 {
     dd::sphere(center, color, radius);
+}
+
+void DebugDrawModule::DrawFrustrum(float4x4 frustumProj, float4x4 frustumView)
+{
+    float4x4 inverseClipMatrix = frustumProj * frustumView;
+    inverseClipMatrix.Inverse();
+    dd::frustum(inverseClipMatrix, float3(1.f, 1.f, 1.f));
 }
 
 void DebugDrawModule::Draw(const float4x4& view, const float4x4& proj, unsigned width, unsigned height)

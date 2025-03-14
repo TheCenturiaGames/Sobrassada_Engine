@@ -1,0 +1,310 @@
+#include "CameraComponent.h"
+
+#include "Application.h"
+#include "DebugDrawModule.h"
+#include "Framebuffer.h"
+#include "InputModule.h"
+#include "OpenGLModule.h"
+#include "SceneModule.h"
+#include "glew.h"
+
+#include "ImGui.h"
+#include <vector>
+
+CameraComponent::CameraComponent(UID uid, UID uidParent) : Component(uid, uidParent, "Camera", COMPONENT_CAMERA)
+{
+    float4x4 globalTransform  = GetGlobalTransform();
+    camera.type               = FrustumType::PerspectiveFrustum;
+    camera.pos                = float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
+    camera.front              = -float3(globalTransform[0][2], globalTransform[1][2], globalTransform[2][2]);
+    camera.up                 = float3(globalTransform[0][1], globalTransform[1][1], globalTransform[2][1]);
+
+    camera.nearPlaneDistance  = perspectiveNearPlane;
+    camera.farPlaneDistance   = perspectiveFarPlane;
+
+    camera.horizontalFov      = (float)HFOV * DEGREE_RAD_CONV;
+
+    auto framebuffer          = App->GetOpenGLModule()->GetFramebuffer();
+    int width                 = framebuffer->GetTextureWidth();
+    int height                = framebuffer->GetTextureHeight();
+
+    camera.verticalFov        = 2.0f * atanf(tanf(camera.horizontalFov * 0.5f) * ((float)height / (float)width));
+
+    matrices.viewMatrix       = camera.ViewMatrix();
+    matrices.projectionMatrix = camera.ProjectionMatrix();
+
+    glGenBuffers(1, &ubo);
+    glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(CameraMatrices), nullptr, GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    horizontalFov      = camera.horizontalFov;
+    verticalFov        = camera.verticalFov;
+
+    orthographicWidth  = 10.0f;
+    orthographicHeight = orthographicWidth * ((float)height / (float)width);
+
+    if (App->GetSceneModule()->GetMainCamera() == nullptr)
+    {
+        isMainCamera = true;
+        App->GetSceneModule()->SetMainCamera(this);
+    }
+}
+
+CameraComponent::CameraComponent(const rapidjson::Value& initialState) : Component(initialState)
+{
+    if (initialState.HasMember("MainCamera"))
+    {
+        isMainCamera = initialState["MainCamera"].GetBool();
+    }
+    if (initialState.HasMember("DrawGizmos"))
+    {
+        drawGizmos = initialState["DrawGizmos"].GetBool();
+    }
+
+    if (initialState.HasMember("CameraType"))
+    {
+        camera.type = (initialState["CameraType"].GetInt() == 1) ? OrthographicFrustum : PerspectiveFrustum;
+    }
+    if (initialState.HasMember("CameraPosition"))
+    {
+        const rapidjson::Value& cameraPosArray = initialState["CameraPosition"];
+        camera.pos = {cameraPosArray[0].GetFloat(), cameraPosArray[1].GetFloat(), cameraPosArray[2].GetFloat()};
+    }
+    if (initialState.HasMember("CameraFront"))
+    {
+        const rapidjson::Value& cameraFrontArray = initialState["CameraFront"];
+        camera.front = {cameraFrontArray[0].GetFloat(), cameraFrontArray[1].GetFloat(), cameraFrontArray[2].GetFloat()};
+    }
+    if (initialState.HasMember("CameraUp"))
+    {
+        const rapidjson::Value& cameraUpArray = initialState["CameraUp"];
+        camera.up = {cameraUpArray[0].GetFloat(), cameraUpArray[1].GetFloat(), cameraUpArray[2].GetFloat()};
+    }
+
+    if (initialState.HasMember("CameraNearPlane"))
+    {
+        camera.nearPlaneDistance = initialState["CameraNearPlane"].GetFloat();
+    }
+    if (initialState.HasMember("CameraFarPlane"))
+    {
+        camera.farPlaneDistance = initialState["CameraFarPlane"].GetFloat();
+    }
+
+    auto framebuffer = App->GetOpenGLModule()->GetFramebuffer();
+    int width        = framebuffer->GetTextureWidth();
+    int height       = framebuffer->GetTextureHeight();
+
+    if (camera.type == OrthographicFrustum)
+    {
+        if (initialState.HasMember("CameraOrtographicWidth"))
+        {
+            camera.orthographicWidth = initialState["CameraOrtographicWidth"].GetFloat();
+        }
+        if (initialState.HasMember("CameraOrtographicHeight"))
+        {
+            camera.orthographicHeight = initialState["CameraOrtographicHeight"].GetFloat();
+        }
+        horizontalFov = (float)HFOV * DEGREE_RAD_CONV;
+        verticalFov   = 2.0f * atanf(tanf(camera.horizontalFov * 0.5f) * ((float)height / (float)width));
+    }
+    else
+    {
+        if (initialState.HasMember("CameraHFOV"))
+        {
+            camera.horizontalFov = initialState["CameraHFOV"].GetFloat();
+        }
+        if (initialState.HasMember("CameraVFOV"))
+        {
+            camera.verticalFov = initialState["CameraVFOV"].GetFloat();
+        }
+
+        orthographicWidth  = 10.0f;
+        orthographicHeight = orthographicWidth * ((float)height / (float)width);
+    }
+
+    matrices.viewMatrix       = camera.ViewMatrix();
+    matrices.projectionMatrix = camera.ProjectionMatrix();
+
+    glGenBuffers(1, &ubo);
+    glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(CameraMatrices), nullptr, GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
+CameraComponent::~CameraComponent()
+{
+    if (App->GetSceneModule()->GetMainCamera() == this)
+    {
+        App->GetSceneModule()->SetMainCamera(nullptr);
+    }
+    glDeleteBuffers(1, &ubo);
+}
+
+void CameraComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
+{
+    Component::Save(targetState, allocator);
+
+    targetState.AddMember("MainCamera", isMainCamera, allocator);
+    targetState.AddMember("DrawGizmos", drawGizmos, allocator);
+    targetState.AddMember("CameraType", (camera.type == OrthographicFrustum) ? 1 : 0, allocator);
+
+    rapidjson::Value cameraPos(rapidjson::kArrayType);
+    cameraPos.PushBack(camera.pos.x, allocator).PushBack(camera.pos.y, allocator).PushBack(camera.pos.z, allocator);
+    targetState.AddMember("CameraPosition", cameraPos, allocator);
+
+    rapidjson::Value cameraFront(rapidjson::kArrayType);
+    cameraFront.PushBack(camera.front.x, allocator)
+        .PushBack(camera.front.y, allocator)
+        .PushBack(camera.front.z, allocator);
+    targetState.AddMember("CameraFront", cameraFront, allocator);
+
+    rapidjson::Value cameraUp(rapidjson::kArrayType);
+    cameraUp.PushBack(camera.up.x, allocator).PushBack(camera.up.y, allocator).PushBack(camera.up.z, allocator);
+    targetState.AddMember("CameraUp", cameraUp, allocator);
+
+    targetState.AddMember("CameraNearPlane", camera.nearPlaneDistance, allocator);
+    targetState.AddMember("CameraFarPlane", camera.farPlaneDistance, allocator);
+
+    if (camera.type == OrthographicFrustum)
+    {
+        targetState.AddMember("CameraOrtographicWidth", camera.orthographicWidth, allocator);
+        targetState.AddMember("CameraOrtographicHeight", camera.orthographicHeight, allocator);
+    }
+    else
+    {
+        targetState.AddMember("CameraHFOV", camera.horizontalFov, allocator);
+        targetState.AddMember("CameraVFOV", camera.verticalFov, allocator);
+    }
+}
+
+void CameraComponent::RenderEditorInspector()
+{
+    Component::RenderEditorInspector();
+
+    if (enabled)
+    {
+        ImGui::SeparatorText("Camera");
+        if (App->GetSceneModule()->GetMainCamera() != nullptr)
+            isMainCamera = (App->GetSceneModule()->GetMainCamera()->GetUbo() == ubo);
+        if (ImGui::Checkbox("Main Camera", &isMainCamera))
+        {
+            if (isMainCamera)
+            {
+                App->GetSceneModule()->SetMainCamera(this);
+            }
+        }
+        ImGui::Checkbox("Draw gizmos", &drawGizmos);
+
+        if (ImGui::DragFloat("Near Plane", &camera.nearPlaneDistance, 0.01f, 0.01f, camera.farPlaneDistance, "%.2f"))
+        {
+            float cameraNear         = std::max(0.01f, camera.nearPlaneDistance);
+            cameraNear               = std::min(cameraNear, camera.farPlaneDistance - 0.1f);
+            camera.nearPlaneDistance = cameraNear;
+        }
+        if (ImGui::DragFloat("Far Plane", &camera.farPlaneDistance, 0.1f, camera.nearPlaneDistance, 1000.f, "%.2f"))
+        {
+            float cameraFar         = std::min(1000.0f, camera.farPlaneDistance);
+            cameraFar               = std::max(cameraFar, camera.nearPlaneDistance + 0.1f);
+            camera.farPlaneDistance = cameraFar;
+        }
+
+        static const char* projectionTypes[] = {"Perspective", "Orthographic"};
+        int currentProjection                = (camera.type == OrthographicFrustum) ? 1 : 0;
+
+        if (ImGui::Combo("Projection Type", &currentProjection, projectionTypes, IM_ARRAYSIZE(projectionTypes)))
+        {
+            if (currentProjection == 1) ChangeToOrtographic();
+            else ChangeToPerspective();
+        }
+
+        if (camera.type == PerspectiveFrustum)
+        {
+            float hfov = camera.horizontalFov * RAD_DEGREE_CONV;
+            if (ImGui::DragFloat("FoV", &hfov, 0.1f, 1.0f, 179.0f, "%.2f"))
+            {
+                camera.horizontalFov = hfov * DEGREE_RAD_CONV;
+                auto framebuffer     = App->GetOpenGLModule()->GetFramebuffer();
+                int width            = framebuffer->GetTextureWidth();
+                int height           = framebuffer->GetTextureHeight();
+                camera.verticalFov   = 2.0f * atanf(tanf(camera.horizontalFov * 0.5f) * ((float)height / (float)width));
+            }
+        }
+        else if (camera.type == OrthographicFrustum)
+        {
+            if (ImGui::DragFloat("Width", &camera.orthographicWidth, 0.1f, 0.1f, 200.f, "%.2f"))
+            {
+                auto framebuffer          = App->GetOpenGLModule()->GetFramebuffer();
+                int width                 = framebuffer->GetTextureWidth();
+                int height                = framebuffer->GetTextureHeight();
+                camera.orthographicHeight = camera.orthographicWidth * ((float)height / (float)width);
+            }
+        }
+    }
+}
+
+void CameraComponent::Update()
+{
+    if (isMainCamera && App->GetSceneModule()->GetMainCamera() == nullptr) App->GetSceneModule()->SetMainCamera(this);
+    float4x4 globalTransform = GetGlobalTransform();
+    camera.pos               = float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
+    camera.front     = -float3(globalTransform[0][2], globalTransform[1][2], globalTransform[2][2]).Normalized();
+    camera.up        = float3(globalTransform[0][1], globalTransform[1][1], globalTransform[2][1]).Normalized();
+
+    auto framebuffer = App->GetOpenGLModule()->GetFramebuffer();
+    int width        = framebuffer->GetTextureWidth();
+    int height       = framebuffer->GetTextureHeight();
+    SetAspectRatio((float)height / (float)width);
+
+    matrices.projectionMatrix = camera.ProjectionMatrix();
+    matrices.viewMatrix       = camera.ViewMatrix();
+
+    glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(CameraMatrices), &matrices);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    frustumPlanes.UpdateFrustumPlanes(camera.ViewMatrix(), camera.ProjectionMatrix());
+}
+
+void CameraComponent::Render()
+{
+    if (!enabled || !drawGizmos || App->GetSceneModule()->GetInPlayMode()) return;
+    DebugDrawModule* debug = App->GetDebugDrawModule();
+    debug->DrawFrustrum(camera.ProjectionMatrix(), camera.ViewMatrix());
+}
+
+void CameraComponent::SetAspectRatio(float newAspectRatio)
+{
+    if (camera.type == PerspectiveFrustum)
+    {
+        camera.verticalFov = 2.0f * atanf(tanf(camera.horizontalFov * 0.5f) * newAspectRatio);
+    }
+    if (camera.type == OrthographicFrustum)
+    {
+        camera.orthographicHeight = camera.orthographicWidth * newAspectRatio;
+    }
+}
+
+void CameraComponent::ChangeToPerspective()
+{
+    orthographicWidth        = camera.orthographicWidth;
+    orthographicHeight       = camera.orthographicHeight;
+
+    camera.type              = PerspectiveFrustum;
+    camera.horizontalFov     = horizontalFov;
+    camera.verticalFov       = verticalFov;
+    camera.nearPlaneDistance = perspectiveNearPlane;
+    camera.farPlaneDistance  = perspectiveFarPlane;
+}
+
+void CameraComponent::ChangeToOrtographic()
+{
+    horizontalFov             = camera.horizontalFov;
+    verticalFov               = camera.verticalFov;
+
+    camera.type               = OrthographicFrustum;
+    camera.orthographicWidth  = orthographicWidth;
+    camera.orthographicHeight = orthographicHeight;
+    camera.nearPlaneDistance  = ortographicNearPlane;
+    camera.farPlaneDistance   = ortographicFarPlane;
+}
