@@ -10,7 +10,7 @@ public:
     }
 
     //Quat are spherical, so we use a spherical linear interpolation instead of linear one
-    static Quat Lerp(const Quat& a, const Quat& b, float t) {
+    static Quat Lerp(const Quat& a, const Quat& b, const float t) {
         return a.Slerp(b, t);
     }
 };
