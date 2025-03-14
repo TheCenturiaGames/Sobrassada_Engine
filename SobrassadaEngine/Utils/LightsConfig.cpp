@@ -80,9 +80,25 @@ void LightsConfig::InitSkybox()
 void LightsConfig::RenderSkybox() const
 {
     App->GetOpenGLModule()->SetDepthFunc(false);
-
-    const float4x4& projection = App->GetCameraModule()->GetProjectionMatrix();
-    const float4x4& view       = App->GetCameraModule()->GetViewMatrix();
+    float4x4 projection;
+    float4x4 view;
+    bool change = false;
+    if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr)
+    {
+        if (App->GetSceneModule()->GetMainCamera()->GetType() == 1)
+        {
+            //We need to change to perspective as ortographic doesnt support cubemap
+            change = true;
+            App->GetSceneModule()->GetMainCamera()->ChangeToPerspective();
+        }
+        projection = App->GetSceneModule()->GetMainCamera()->GetProjectionMatrix();
+        view       = App->GetSceneModule()->GetMainCamera()->GetViewMatrix();
+    }
+    else
+    {
+        projection = App->GetCameraModule()->GetProjectionMatrix();
+        view       = App->GetCameraModule()->GetViewMatrix();
+    }
 
     glUseProgram(skyboxProgram);
     glUniformMatrix4fv(0, 1, GL_TRUE, projection.ptr());
@@ -95,6 +111,8 @@ void LightsConfig::RenderSkybox() const
     App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 36);
 
     glBindVertexArray(0);
+
+    if(change == true) App->GetSceneModule()->GetMainCamera()->ChangeToOrtographic();
 
     App->GetOpenGLModule()->SetDepthFunc(true);
 }

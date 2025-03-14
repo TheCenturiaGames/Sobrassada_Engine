@@ -5,6 +5,7 @@
 #include "Standalone/Lights/PointLightComponent.h"
 #include "Standalone/Lights/SpotLightComponent.h"
 #include "Standalone/MeshComponent.h"
+#include "CameraComponent.h"
 
 #include <cstdint>
 
@@ -22,6 +23,8 @@ Component* ComponentUtils::CreateEmptyComponent(ComponentType type, UID uid, UID
         return new SpotLightComponent(uid, uidParent);
     case COMPONENT_DIRECTIONAL_LIGHT:
         return new DirectionalLightComponent(uid, uidParent);
+    case COMPONENT_CAMERA:
+        return new CameraComponent(uid, uidParent);
     }
     return nullptr;
 }
@@ -42,6 +45,8 @@ Component* ComponentUtils::CreateExistingComponent(const rapidjson::Value& initi
             return new SpotLightComponent(initialState);
         case COMPONENT_DIRECTIONAL_LIGHT:
             return new DirectionalLightComponent(initialState);
+        case COMPONENT_CAMERA:
+            return new CameraComponent(initialState);
         default:
             return nullptr;
         }
