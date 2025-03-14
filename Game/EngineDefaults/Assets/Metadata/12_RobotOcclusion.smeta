@@ -1,8 +1,8 @@
 {
-    "UID": 1236496679747109,
+    "UID": 1279770370646087,
     "name": "RobotOcclusion",
-    "assetPath": "C:\\\\Users\\lukas\\Documents\\Projekte\\UPC\\Sobrassada_Engine\\Game\\EngineDefaults\\Assets/RobotOcclusion.png",
-    "lastModifiedDate": 1739822817,
+    "assetPath": "Assets/RobotOcclusion.png",
+    "lastModifiedDate": 0,
     "importOptions": {
         "mipmaps": 1
     }

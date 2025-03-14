@@ -227,7 +227,7 @@ namespace MeshImporter
             UID meshUID           = GenerateUID();
             finalMeshUID          = App->GetLibraryModule()->AssignFiletypeUID(meshUID, FileType::Mesh);
 
-            std::string assetPath = App->GetProjectModule()->GetLoadedProjectPath() + ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
+            std::string assetPath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
             MetaMesh meta(finalMeshUID, assetPath, generateTangents);
             meta.Save(name, assetPath);
         }

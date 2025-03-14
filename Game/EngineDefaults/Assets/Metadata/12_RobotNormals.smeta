@@ -1,8 +1,8 @@
 {
-    "UID": 1252064786132463,
+    "UID": 1288062862379827,
     "name": "RobotNormals",
-    "assetPath": "C:\\\\Users\\lukas\\Documents\\Projekte\\UPC\\Sobrassada_Engine\\Game\\EngineDefaults\\Assets/RobotNormals.png",
-    "lastModifiedDate": 1739822817,
+    "assetPath": "Assets/RobotNormals.png",
+    "lastModifiedDate": 0,
     "importOptions": {
         "mipmaps": 1
     }

@@ -133,7 +133,7 @@ bool LibraryModule::LoadLibraryMaps(const std::string& projectPath)
 
             UID assetUID          = doc["UID"].GetUint64();
             std::string assetName = doc["name"].GetString();
-            std::string assetPath = doc["assetPath"].GetString();
+            std::string assetPath = projectPath + doc["assetPath"].GetString();
 
             UID prefix            = assetUID / UID_PREFIX_DIVISOR;
             std::string libraryPath;

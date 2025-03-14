@@ -1,8 +1,8 @@
 {
-    "UID": 1242985824964500,
+    "UID": 1206397014828245,
     "name": "RobotDiffuse",
-    "assetPath": "C:\\\\Users\\lukas\\Documents\\Projekte\\UPC\\Sobrassada_Engine\\Game\\EngineDefaults\\Assets/RobotDiffuse.png",
-    "lastModifiedDate": 1739822817,
+    "assetPath": "Assets/RobotDiffuse.png",
+    "lastModifiedDate": 0,
     "importOptions": {
         "mipmaps": 1
     }

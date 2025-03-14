@@ -170,7 +170,7 @@ UID MaterialImporter::ImportMaterial(
         UID tmpName               = GenerateUID();
         std::string tmpNameString = std::to_string(tmpName);
 
-        std::string assetPath     = App->GetProjectModule()->GetLoadedProjectPath() + ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
+        std::string assetPath     = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
         MetaMaterial meta(finalMaterialUID, assetPath, tmpNameString, useOcclusion);
         meta.Save(materialName, assetPath);
     }

@@ -13,7 +13,8 @@ namespace TextureImporter
     UID Import(const char* sourceFilePath, UID sourceUID)
     {
         // Copy image to Assets folder
-        std::string copyPath = App->GetProjectModule()->GetLoadedProjectPath() + ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
+        const std::string relativePath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
+        std::string copyPath = App->GetProjectModule()->GetLoadedProjectPath() + relativePath;
         if (!FileSystem::Exists(copyPath.c_str()))
         {
             FileSystem::Copy(sourceFilePath, copyPath.c_str());
@@ -58,8 +59,8 @@ namespace TextureImporter
             UID textureUID  = GenerateUID();
             finalTextureUID = App->GetLibraryModule()->AssignFiletypeUID(textureUID, FileType::Texture);
 
-            MetaTexture meta(finalTextureUID, copyPath, (int)image.GetMetadata().mipLevels);
-            meta.Save(fileName, copyPath);
+            MetaTexture meta(finalTextureUID, relativePath, (int)image.GetMetadata().mipLevels);
+            meta.Save(fileName, relativePath);
         }
         else finalTextureUID = sourceUID;
 
