@@ -93,6 +93,22 @@ void Scene::Init()
         root->UpdateTransformForGOBranch();
     }
 
+    // When loading a scene, overrides all gameObjects that have a prefabUID. That is because if the prefab has been
+    // modified, the scene file may have not, so the prefabs need to be updated when loading the scene again
+    std::vector<UID> prefabs;
+    for (const auto& gameObject : gameObjectsContainer)
+    {
+        if (gameObject.second->GetPrefabUID() == INVALID_UID) continue;
+
+        // Add to prefabs UIDs if not existing, only once each
+        std::vector<UID>::iterator it = std::find(prefabs.begin(), prefabs.end(), gameObject.second->GetPrefabUID());
+        if (it == prefabs.end()) prefabs.emplace_back(gameObject.second->GetPrefabUID());
+    }
+    for (const UID prefab : prefabs)
+    {
+        OverridePrefabs(prefab);
+    }
+
     lightsConfig->InitSkybox();
     lightsConfig->InitLightBuffers();
 
@@ -648,13 +664,24 @@ void Scene::LoadPrefab(const UID prefabUID, const ResourcePrefab* prefab, const 
 
         // Get all scene lights, because if the prefab has lights when creating them they won't be added to the scene,
         // as the gameObject is still not part of the scene
-        lightsConfig->GetAllSceneLights();
+        if (lightsConfig != nullptr) lightsConfig->GetAllSceneLights();
     }
 }
 
 void Scene::OverridePrefabs(const UID prefabUID)
 {
     const ResourcePrefab* prefab = (const ResourcePrefab*)App->GetResourcesModule()->RequestResource(prefabUID);
+
+    // If prefab is null, it no longer exists, then remove the prefab UID from all objects that may have it
+    if (prefab == nullptr)
+    {
+        for (const auto& gameObject : gameObjectsContainer)
+        {
+            if (gameObject.second != nullptr) gameObject.second->SetPrefabUID(INVALID_UID);
+        }
+        return;
+    }
+
     std::vector<UID> updatedObjects;
     std::vector<float4x4> transforms;
 
@@ -667,7 +694,7 @@ void Scene::OverridePrefabs(const UID prefabUID)
                 updatedObjects.push_back(gameObject.first);
                 transforms.emplace_back(gameObject.second->GetGlobalTransform());
             }
-        } 
+        }
     }
 
     for (const UID object : updatedObjects)
@@ -681,6 +708,4 @@ void Scene::OverridePrefabs(const UID prefabUID)
     }
 
     App->GetResourcesModule()->ReleaseResource(prefab);
-
-    
 }
