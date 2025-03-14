@@ -30,7 +30,7 @@ public:
 
 private:
     void Move(const float3& direction, float deltaTime);
-	void Rotate(float deltaTime);
+    void Rotate(float rotationDir, float deltaTime);
     void HandleInput(float deltaTime);
 
 private:
@@ -39,6 +39,8 @@ private:
 	float3 targetDirection;
 
 	float speed;
+
+	bool useRad;
 
 	//MovementType currentMovement;
 

@@ -12,23 +12,13 @@
 #include <algorithm>
 
 
-
-//CharacterControllerComponent::CharacterControllerComponent(
-//    UID uid, UID uidParent, UID uidRoot, const char* initName, const ComponentType characterControllertype,
-//    const float4x4& parentGlobalTransform
-//)
-//    : Component(uid, uidParent, uidRoot, initName, type, parentGlobalTransform)
-//{
-//}
-
-
-
 CharacterControllerComponent::CharacterControllerComponent(UID uid, UID uidParent)
     : Component(uid, uidParent, "Character Controller", COMPONENT_CHARACTER_CONTROLLER)
 {
-    speed = 0;
+    speed = 1;
     maxLinearSpeed = 10;
-    maxAngularSpeed = 120;
+    maxAngularSpeed = 90/RAD_DEGREE_CONV;
+    useRad          = true;
 }
 
 CharacterControllerComponent::CharacterControllerComponent(const rapidjson::Value& initialState) : Component(initialState)
@@ -84,16 +74,48 @@ void CharacterControllerComponent::RenderEditorInspector()
 {
     Component::RenderEditorInspector();
 
+
+    
     if (enabled)
     {
+        float availableWidth = ImGui::GetContentRegionAvail().x;
+
         ImGui::Separator();
         ImGui::Text("Character Controller");
 
-        ImGui::DragFloat("Speed", &speed, 0.1f, 0.0f, 100.0f);
-        ImGui::DragFloat("Max Linear Speed", &maxLinearSpeed, 0.1f, 0.0f, 100.0f);
-        ImGui::DragFloat("Max Angular Speed", &maxAngularSpeed, 1.0f, 0.0f, 360.0f);
-    }
+        ImGui::DragFloat("Speed", &speed, 0.1f, 0.0f, maxLinearSpeed, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+        ImGui::DragFloat("Max Linear Speed", &maxLinearSpeed, 0.1f, 0.0f, 100.0f,"%.3f",ImGuiSliderFlags_AlwaysClamp);
 
+        if (speed > maxLinearSpeed) speed = maxLinearSpeed;
+        
+        float dragStep = useRad ? 1.0 / RAD_DEGREE_CONV : 1.0f;
+        float minVal   = 0.0f;
+        float maxVal   = useRad ? 360.0f / RAD_DEGREE_CONV : 360.0f; 
+        
+        ImGui::DragFloat(
+            "Max Angular Speed##maxAngSpeed", &maxAngularSpeed, dragStep, minVal, maxVal, "%.3f",
+            ImGuiSliderFlags_AlwaysClamp
+        );
+
+        if (maxAngularSpeed > maxVal) maxAngularSpeed = maxVal;
+
+        bool prevUseRad = useRad;
+
+        ImGui::SameLine();
+        ImGui::Checkbox("Radians##maxAngCheck", &useRad);
+
+        if (useRad != prevUseRad)
+        {
+            if (useRad)
+            {
+                maxAngularSpeed /= RAD_DEGREE_CONV;
+            }
+            else
+            {
+                maxAngularSpeed *= RAD_DEGREE_CONV;
+            }
+        }
+    }
 }
 
 void CharacterControllerComponent::Move(const float3& direction, float deltaTime)
@@ -114,6 +136,31 @@ void CharacterControllerComponent::Move(const float3& direction, float deltaTime
     parentGO->UpdateTransformForGOBranch();
 }
 
+void CharacterControllerComponent::Rotate(float rotationDir, float deltaTime)
+{
+    float angleDeg = 0.0f;
+    
+    if (useRad)
+    {
+        angleDeg = maxAngularSpeed * rotationDir * deltaTime;
+    }
+    else
+    {
+        angleDeg = (maxAngularSpeed * rotationDir * deltaTime) / RAD_DEGREE_CONV; 
+    }
+
+    float4x4 rotationMatrix = float4x4::FromEulerXYZ(0.0f, angleDeg, 0.0f);
+
+    GameObject* parentGO    = GetParent();
+    if (!parentGO) return;
+
+    float4x4 localTr = parentGO->GetLocalTransform();
+    localTr          = localTr * rotationMatrix;
+    parentGO->SetLocalTransform(localTr);
+    parentGO->UpdateTransformForGOBranch();
+
+}
+
 void CharacterControllerComponent::HandleInput(float deltaTime)
 {
     const KeyState* keyboard = App->GetInputModule()->GetKeyboard();
@@ -123,10 +170,20 @@ void CharacterControllerComponent::HandleInput(float deltaTime)
     if (keyboard[SDL_SCANCODE_W] == KEY_REPEAT) direction.z += 1.0f;
     if (keyboard[SDL_SCANCODE_S] == KEY_REPEAT) direction.z -= 1.0f;
 
+    float rotationDir = 0.0f;
+
+    if (keyboard[SDL_SCANCODE_A] == KEY_REPEAT) rotationDir += 1.0f;
+    if (keyboard[SDL_SCANCODE_D] == KEY_REPEAT) rotationDir -= 1.0f;
+
     if (direction.LengthSq() > 0.0001f)
     {
         direction.Normalize();
         Move(direction, deltaTime);
+    }
+
+    if (fabs(rotationDir) > 0.0001f)
+    {
+        Rotate(rotationDir, deltaTime);
     }
     //else
     //{
