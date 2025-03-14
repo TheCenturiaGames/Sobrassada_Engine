@@ -19,6 +19,7 @@ CharacterControllerComponent::CharacterControllerComponent(UID uid, UID uidParen
     maxLinearSpeed = 10;
     maxAngularSpeed = 90/RAD_DEGREE_CONV;
     useRad          = true;
+    targetDirection.Set(0.0f, 0.0f, 1.0f);
 }
 
 CharacterControllerComponent::CharacterControllerComponent(const rapidjson::Value& initialState) : Component(initialState)
@@ -186,8 +187,8 @@ void CharacterControllerComponent::HandleInput(float deltaTime)
 
     float3 direction(0.0f, 0.0f, 0.0f);
 
-    if (keyboard[SDL_SCANCODE_W] == KEY_REPEAT) direction.z += 1.0f;
-    if (keyboard[SDL_SCANCODE_S] == KEY_REPEAT) direction.z -= 1.0f;
+    if (keyboard[SDL_SCANCODE_W] == KEY_REPEAT) direction += targetDirection;
+    if (keyboard[SDL_SCANCODE_S] == KEY_REPEAT) direction -= targetDirection;
 
     float rotationDir = 0.0f;
 

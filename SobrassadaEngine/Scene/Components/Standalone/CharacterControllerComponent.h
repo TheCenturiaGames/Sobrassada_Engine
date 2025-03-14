@@ -1,12 +1,6 @@
 #pragma once
 #include "Component.h"
 
-//enum class MovementType
-//{
-//	FORWARD = 0,
-//	BACKWARD
-//};
-
 class CharacterControllerComponent : public Component
 {
 
@@ -26,7 +20,6 @@ public:
 	float3 GetTargetDirection() { return targetDirection; }
 	float  GetSpeed() { return speed; }
 
-	//void SetMovementType(MovementType newMovement) { currentMovement = newMovement; }
     void SetTargetDirection(float3 newTargetDir) { targetDirection = newTargetDir; }
     void SetSpeed(float newSpeed) { speed = newSpeed; }
 
@@ -37,18 +30,12 @@ private:
 
 private:
 
-	bool isPlayerInput = false;
 	float3 targetDirection;
 
 	float speed;
-
-	bool useRad;
-
-	//MovementType currentMovement;
-
-	float maxLinearSpeed;
+    float maxLinearSpeed;
     float maxAngularSpeed;
 
-
+	bool useRad;
 
 };
