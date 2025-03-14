@@ -15,4 +15,4 @@ void ResourcePrefab::LoadData(const std::vector<GameObject*>& objects, const std
         gameObjects.emplace_back(objects[i]);
         parentIndices.push_back(indices[i]);
     }
-}
+} 

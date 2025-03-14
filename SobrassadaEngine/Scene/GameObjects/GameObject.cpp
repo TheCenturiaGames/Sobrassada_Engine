@@ -55,6 +55,8 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
     selectedComponentIndex = COMPONENT_NONE;
     mobilitySettings       = initialState["Mobility"].GetInt();
 
+    if (initialState.HasMember("PrefabUID"))prefabUID = initialState["PrefabUID"].GetUint64();
+    
     if (initialState.HasMember("LocalTransform") && initialState["LocalTransform"].IsArray() &&
         initialState["LocalTransform"].Size() == 16)
     {
@@ -135,8 +137,10 @@ void GameObject::Save(rapidjson::Value& targetState, rapidjson::Document::Alloca
     targetState.AddMember("UID", uid, allocator);
     targetState.AddMember("ParentUID", parentUID, allocator);
     targetState.AddMember("Name", rapidjson::Value(name.c_str(), allocator), allocator);
-
     targetState.AddMember("Mobility", mobilitySettings, allocator);
+
+    if (prefabUID != INVALID_UID) targetState.AddMember("PrefabUID", prefabUID, allocator);
+
     rapidjson::Value valLocalTransform(rapidjson::kArrayType);
     valLocalTransform.PushBack(localTransform.ptr()[0], allocator)
         .PushBack(localTransform.ptr()[1], allocator)
