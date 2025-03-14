@@ -85,7 +85,6 @@ class GameObject
     void DrawGizmos() const;
 
     void CreatePrefab();
-    void UpdatePrefab() const;
     UID GetPrefabUID() const { return prefabUID; }
     void SetPrefabUID(const UID uid) { prefabUID = uid; }
 
