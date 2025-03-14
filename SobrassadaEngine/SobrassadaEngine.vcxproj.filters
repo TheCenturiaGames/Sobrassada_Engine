@@ -141,12 +141,6 @@
     <ClCompile Include="Utils\Framebuffer.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Utils\Quadtree.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="Utils\Octree.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\Components\Component.cpp">
       <Filter>Scene\Components</Filter>
     </ClCompile>
@@ -175,9 +169,6 @@
       <Filter>FileSystem</Filter>
     </ClCompile>
     <ClCompile Include="Scene\Components\ComponentUtils.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Components\Root\RootComponent.cpp">
       <Filter>Scene\Components</Filter>
     </ClCompile>
     <ClCompile Include="Scene\Components\Standalone\MeshComponent.cpp">
@@ -213,12 +204,6 @@
     <ClCompile Include="Utils\LightsConfig.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Utils\Quadtree.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="Utils\Octree.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\Components\Component.cpp">
       <Filter>Scene\Components</Filter>
     </ClCompile>
@@ -229,9 +214,6 @@
       <Filter>Modules</Filter>
     </ClCompile>
     <ClCompile Include="Scene\Components\Standalone\MeshComponent.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Components\Root\RootComponent.cpp">
       <Filter>Scene\Components</Filter>
     </ClCompile>
     <ClCompile Include="Scene\Components\Component.cpp">
@@ -270,8 +252,6 @@
     <ClCompile Include="Modules\EditorUIModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
-    <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
-      <Filter>UI\EngineEditors</Filter>
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp">
       <Filter>External\ImGuizmo</Filter>
     </ClCompile>
@@ -289,6 +269,15 @@
     </ClCompile>
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp">
       <Filter>External\ImGuizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
+      <Filter>UI\EngineEditors</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\Trees\Quadtree.cpp">
+      <Filter>Utils\Trees</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\Trees\Octree.cpp">
+      <Filter>Utils\Trees</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -328,10 +317,17 @@
     <Filter Include="External\MathGeoLib">
       <UniqueIdentifier>{77ec05ef-e581-4de2-bda3-50c6c7bcc0d2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="UI\EngineEditors">
-      <UniqueIdentifier>{86a4c6bd-9fcf-4173-8393-657c59aa19cf}</UniqueIdentifier>
     <Filter Include="FileSystem\Meta">
       <UniqueIdentifier>{0325771a-d106-4c90-8e61-78de9e68b286}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{bc623787-76e4-4f29-927e-59cd35a8a7a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\EngineEditors">
+      <UniqueIdentifier>{4d922e19-f4c0-435d-b4c4-895dc0ec3ab1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils\Trees">
+      <UniqueIdentifier>{da62eae3-ffa4-4a74-a4ca-ce764b881e18}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -426,9 +422,6 @@
     <ClInclude Include="Modules\SceneModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Components\Root\RootComponent.h">
-      <Filter>Scene\Components</Filter>
-    </ClInclude>
     <ClInclude Include="Scene\Components\Standalone\MeshComponent.h">
       <Filter>Scene\Components</Filter>
     </ClInclude>
@@ -471,12 +464,6 @@
     <ClInclude Include="Utils\LightsConfig.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="Utils\Quadtree.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils\Octree.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Utils\FrustumPlanes.h">
       <Filter>Utils</Filter>
     </ClInclude>
@@ -498,9 +485,6 @@
     <ClInclude Include="FileSystem\Model.h">
       <Filter>FileSystem</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\AABBUpdatable.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Modules\DebugDrawModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
@@ -510,8 +494,6 @@
     <ClInclude Include="Modules\EditorUIModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
-    <ClInclude Include="UI\EngineEditors\EngineEditorBase.h">
-      <Filter>UI\EngineEditors</Filter>
     <ClInclude Include="FileSystem\MetaFile.h">
       <Filter>FileSystem\Meta</Filter>
     </ClInclude>
@@ -528,6 +510,21 @@
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="Utils\DebugUtils.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\EngineEditors\EngineEditorBase.h">
+      <Filter>UI\EngineEditors</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Trees\Quadtree.h">
+      <Filter>Utils\Trees</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Trees\Octree.h">
+      <Filter>Utils\Trees</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Delegate.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\EventDispatcher.h">
       <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>

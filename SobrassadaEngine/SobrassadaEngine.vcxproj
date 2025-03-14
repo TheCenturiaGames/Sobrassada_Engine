@@ -70,12 +70,12 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-        <OutDir>$(ShortProjectName)\$(Platform)\$(Configuration)\</OutDir>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-        <OutDir>$(ShortProjectName)\$(Platform)\$(Configuration)\</OutDir>
-    </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(ShortProjectName)\$(Platform)\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(ShortProjectName)\$(Platform)\$(Configuration)\</OutDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -111,7 +111,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>.\Tests;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\DirectXTex;.\Libs\Tinygltf;.\Libs\Optick_1.4.0\include;.\;.\Modules;.\UI;.\Utils;.\FileSystem;.\DebugDraw;.\Scene\GameObjects;.\Scene\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Tests;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\DirectXTex;.\Libs\Tinygltf;.\Libs\Optick_1.4.0\include;.\;.\Modules;.\UI;.\Utils;.\FileSystem;.\DebugDraw;.\Scene\GameObjects;.\Scene\Components;%(AdditionalIncludeDirectories);.\Utils\Trees</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -129,7 +129,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>.\Tests;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\DirectXTex;.\Libs\Tinygltf;.\;.\Modules;.\UI;.\Utils;.\FileSystem;.\DebugDraw;.\Scene\GameObjects;.\Scene\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Tests;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\DirectXTex;.\Libs\Tinygltf;.\;.\Modules;.\UI;.\Utils;.\FileSystem;.\DebugDraw;.\Scene\GameObjects;.\Scene\Components;%(AdditionalIncludeDirectories);.\Utils\Trees</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -173,8 +173,8 @@
     <ClCompile Include="Scene\Components\Standalone\Lights\DirectionalLightComponent.cpp" />
     <ClCompile Include="FileSystem\TextureImporter.cpp" />
     <ClCompile Include="Utils\FrustumPlanes.cpp" />
-    <ClCompile Include="Utils\Octree.cpp" />
-    <ClCompile Include="Utils\Quadtree.cpp" />
+    <ClCompile Include="Utils\Trees\Octree.cpp" />
+    <ClCompile Include="Utils\Trees\Quadtree.cpp" />
     <ClCompile Include="Scene\Components\Standalone\MeshComponent.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -313,6 +313,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="Utils\Delegate.h" />
+    <ClInclude Include="Utils\EventDispatcher.h" />
     <ClInclude Include="Utils\DebugUtils.h" />
     <ClInclude Include="FileSystem\Importer.h" />
     <ClInclude Include="FileSystem\Model.h" />
@@ -348,8 +350,8 @@
     <ClInclude Include="Scene\Components\Standalone\Lights\DirectionalLightComponent.h" />
     <ClInclude Include="FileSystem\TextureImporter.h" />
     <ClInclude Include="Utils\FrustumPlanes.h" />
-    <ClInclude Include="Utils\Octree.h" />
-    <ClInclude Include="Utils\Quadtree.h" />
+    <ClInclude Include="Utils\Trees\Octree.h" />
+    <ClInclude Include="Utils\Trees\Quadtree.h" />
     <ClInclude Include="Scene\Components\Standalone\MeshComponent.h" />
     <ClInclude Include="Scene\Components\ComponentUtils.h" />
     <ClInclude Include="Scene\GameObjects\GameObject.h" />
