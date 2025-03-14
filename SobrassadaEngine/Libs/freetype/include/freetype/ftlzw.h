@@ -15,8 +15,6 @@
  *
  */
 
-#pragma warning(disable : 4099)
-
 #ifndef FTLZW_H_
 #define FTLZW_H_
 

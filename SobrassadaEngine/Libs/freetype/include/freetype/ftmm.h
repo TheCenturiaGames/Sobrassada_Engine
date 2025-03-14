@@ -15,8 +15,6 @@
  *
  */
 
-#pragma warning(disable : 4099)
-
 #ifndef FTMM_H_
 #define FTMM_H_
 

@@ -30,8 +30,6 @@
    *
    */
 
-#pragma warning(disable : 4099)
-
 #ifndef FT2BUILD_H_
 #define FT2BUILD_H_
 
