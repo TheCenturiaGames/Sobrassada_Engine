@@ -25,6 +25,8 @@ class ProjectModule : public Module
     void CloseProject();
 
   private:
+    char engineWorkingDirectory[255];
+    
     bool projectReloadRequested      = false;
     bool projectLoaded               = false;
     bool showCreateProjectFileDialog = false;

@@ -7,10 +7,12 @@
 #include "ImGui.h"
 #include "WindowModule.h"
 
+#include <direct.h>
 #include <filesystem>
 
 bool ProjectModule::Init()
 {
+    _getcwd(engineWorkingDirectory, 255);
     if (!App->GetEngineConfig()->GetStartupProjectPath().empty())
     {
         loadedProjectAbsolutePath = App->GetEngineConfig()->GetStartupProjectPath();
@@ -37,6 +39,7 @@ update_status ProjectModule::RenderEditor(float deltaTime)
     {
         static char newProjectPath[255];
         static char newProjectName[255];
+        
         if (ImGui::Begin("Project manager"))
         {
             ImGui::BeginTabBar("##ProjectLoaderBar", ImGuiTabBarFlags_None);
@@ -50,13 +53,32 @@ update_status ProjectModule::RenderEditor(float deltaTime)
                         showOpenProjectFileDialog = true;
                     }
                     ImGui::InputText("Name", newProjectName, 255);
-                    ImGui::Text("Project path: %s\\%s", newProjectPath, newProjectName);
-
-                    if (ImGui::Button("Create"))
+                    if (strlen(newProjectName) == 0)
                     {
-                        CreateNewProject(newProjectPath, newProjectName);
+                        ImGui::SameLine();
+                        
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 0, 0, 1));
+                        ImGui::Text("Name for the project folder is required!");
+                        ImGui::PopStyleColor();
+                        
                     }
-                    ImGui::SameLine();
+                    if (FileSystem::IsAbsolute(newProjectPath))
+                        ImGui::Text("Absolute project path: %s\\%s", newProjectPath, newProjectName);
+                    else
+                    {
+                        if (strlen(newProjectPath) == 0)
+                            ImGui::Text("Absolute project path: %s\\%s", engineWorkingDirectory, newProjectName);
+                        else
+                            ImGui::Text("Absolute project path: %s\\%s\\%s", engineWorkingDirectory, newProjectPath, newProjectName);
+                        
+                    }
+
+                    if (strlen(newProjectName) != 0 && ImGui::Button("Create"))
+                    {
+                        if (FileSystem::IsAbsolute(newProjectPath))
+                            CreateNewProject(newProjectPath, newProjectName);
+                        else CreateNewProject(std::string(engineWorkingDirectory) + DELIMITER + newProjectPath, newProjectName);
+                    }
                     ImGui::EndTabItem();
                 }
                 if (ImGui::BeginTabItem("Load project"))
@@ -82,11 +104,22 @@ update_status ProjectModule::RenderEditor(float deltaTime)
                     {
                         App->GetEngineConfig()->ClearPreviouslyLoadedProjectPaths();
                     }
-                    // TODO Add list view for displaying previously loaded projects
+                    if (FileSystem::IsAbsolute(newProjectPath))
+                        ImGui::Text("Absolute project path: %s", newProjectPath);
+                    else
+                    {
+                        if (strlen(newProjectPath) == 0)
+                            ImGui::Text("Absolute project path: %s", engineWorkingDirectory);
+                        else ImGui::Text("Absolute project path: %s\\%s", engineWorkingDirectory, newProjectPath);
+                        
+                    }
 
                     if (ImGui::Button("Load"))
                     {
-                        LoadProject(newProjectPath);
+                        if (FileSystem::IsAbsolute(newProjectPath))
+                            LoadProject(newProjectPath);
+                        else
+                            LoadProject(std::string(engineWorkingDirectory) + DELIMITER + newProjectPath);
                     }
                     ImGui::EndTabItem();
                 }
@@ -132,7 +165,7 @@ void ProjectModule::CreateNewProject(const std::string& projectPath, const std::
     projectLoaded     = true;
     loadedProjectName = std::string(projectName);
 
-    std::string path  = projectPath;
+    std::string path = projectPath;
     FileSystem::AddDelimiterIfNotPresent(path);
     loadedProjectAbsolutePath = path + projectName + DELIMITER;
     FileSystem::CreateDirectories(loadedProjectAbsolutePath.c_str());

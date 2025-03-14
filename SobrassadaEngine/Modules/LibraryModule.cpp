@@ -28,11 +28,14 @@ LibraryModule::~LibraryModule()
 
 bool LibraryModule::Init()
 {
-    const std::string engineDefaultPath = ENGINE_DEFAULT_ASSETS;
-    SceneImporter::CreateLibraryDirectories(App->GetProjectModule()->GetLoadedProjectPath());
-    SceneImporter::CreateLibraryDirectories(engineDefaultPath);
-    LoadLibraryMaps(App->GetProjectModule()->GetLoadedProjectPath());
-    LoadLibraryMaps(engineDefaultPath);
+    if (App->GetProjectModule()->IsProjectLoaded())
+    {
+        const std::string engineDefaultPath = ENGINE_DEFAULT_ASSETS;
+        SceneImporter::CreateLibraryDirectories(App->GetProjectModule()->GetLoadedProjectPath());
+        SceneImporter::CreateLibraryDirectories(engineDefaultPath);
+        LoadLibraryMaps(App->GetProjectModule()->GetLoadedProjectPath());
+        LoadLibraryMaps(engineDefaultPath);
+    }
 
     return true;
 }

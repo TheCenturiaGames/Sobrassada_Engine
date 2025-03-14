@@ -72,4 +72,9 @@ namespace FileSystem
     {
         return std::filesystem::path(filePath).extension().string();
     }
+
+    inline bool IsAbsolute(const char* filePath)
+    {
+        return std::filesystem::path(filePath).is_absolute();
+    }
 } // namespace FileSystem
