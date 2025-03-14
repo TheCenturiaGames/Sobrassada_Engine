@@ -1,27 +1,27 @@
 {
     "Prefab": {
-        "UID": 1604389684759464,
+        "UID": 1601489720821474,
         "Name": "new Game Object",
         "GameObjects": [
             {
-                "UID": 1673381679916240521,
-                "ParentUID": 3894567190543037837,
+                "UID": 10014691328747805763,
+                "ParentUID": 3141121424670663110,
                 "Name": "new Game Object",
                 "Mobility": 1,
-                "PrefabUID": 1604389684759464,
+                "PrefabUID": 1601489720821474,
                 "LocalTransform": [
                     1.0,
                     0.0,
                     0.0,
-                    11.016460418701172,
+                    8.23490047454834,
                     0.0,
                     1.0,
                     0.0,
-                    0.0,
+                    0.0000040026729948294815,
                     0.0,
                     0.0,
                     1.0,
-                    2.916531562805176,
+                    3.336137056350708,
                     0.0,
                     0.0,
                     0.0,
@@ -29,18 +29,18 @@
                 ],
                 "Components": [
                     {
-                        "UID": 390380364,
-                        "ParentUID": 1673381679916240521,
+                        "UID": 2332562480,
+                        "ParentUID": 10014691328747805763,
                         "Type": 5,
                         "Enabled": true,
                         "Name": "Camera",
                         "MainCamera": false,
-                        "DrawGizmos": true,
+                        "DrawGizmos": false,
                         "CameraType": 0,
                         "CameraPosition": [
-                            11.016460418701172,
-                            0.0,
-                            2.916531562805176
+                            8.23490047454834,
+                            0.0000040026729948294815,
+                            3.336137056350708
                         ],
                         "CameraFront": [
                             -0.0,
@@ -53,9 +53,9 @@
                             0.0
                         ],
                         "CameraNearPlane": 0.10000000149011612,
-                        "CameraFarPlane": 50.0,
-                        "CameraHFOV": 1.3823007345199585,
-                        "CameraVFOV": 1.0602123737335205
+                        "CameraFarPlane": 17.700000762939453,
+                        "CameraHFOV": 1.1344640254974365,
+                        "CameraVFOV": 0.8478959202766418
                     }
                 ],
                 "Children": []

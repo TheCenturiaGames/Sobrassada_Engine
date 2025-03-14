@@ -180,7 +180,7 @@ void CameraComponent::Save(rapidjson::Value& targetState, rapidjson::Document::A
 
 void CameraComponent::Clone(const Component* other)
 {
-    if (other->GetType() == ComponentType::COMPONENT_MESH)
+    if (other->GetType() == ComponentType::COMPONENT_CAMERA)
     {
         const CameraComponent* otherCamera = static_cast<const CameraComponent*>(other);
         enabled                            = otherCamera->enabled;
