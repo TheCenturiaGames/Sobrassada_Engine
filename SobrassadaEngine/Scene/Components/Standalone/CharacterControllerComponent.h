@@ -17,6 +17,8 @@ public:
 
 	~CharacterControllerComponent();
 
+	void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
+
 	void Update() override;
     void Render() override;
 	void RenderEditorInspector() override;

@@ -47,10 +47,29 @@ CharacterControllerComponent::CharacterControllerComponent(const rapidjson::Valu
     {
         maxAngularSpeed = initialState["MaxAngularSpeed"].GetFloat();
     }
+    if (initialState.HasMember("isRadians"))
+    {
+        useRad = initialState["isRadians"].GetBool();
+    }
+
 }
 
 CharacterControllerComponent::~CharacterControllerComponent()
 {
+}
+
+void CharacterControllerComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator)
+    const
+{
+    Component::Save(targetState, allocator);
+    
+    targetState.AddMember("TargetDirectionX", targetDirection.x, allocator);
+    targetState.AddMember("TargetDirectionY", targetDirection.y, allocator);
+    targetState.AddMember("TargetDirectionZ", targetDirection.z, allocator);
+    targetState.AddMember("Speed", speed, allocator);
+    targetState.AddMember("MaxLinearSpeed", maxLinearSpeed, allocator);
+    targetState.AddMember("MaxAngularSpeed", maxAngularSpeed, allocator);
+    targetState.AddMember("isRadians", useRad, allocator);
 }
 
 void CharacterControllerComponent::Update()
