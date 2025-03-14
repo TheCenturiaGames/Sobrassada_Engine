@@ -17,8 +17,8 @@ public:
     void Render() override;
 	void RenderEditorInspector() override;
 
-	float3 GetTargetDirection() { return targetDirection; }
-	float  GetSpeed() { return speed; }
+	float3 GetTargetDirection() const { return targetDirection; }
+	float  GetSpeed() const{ return speed; }
 
     void SetTargetDirection(float3 newTargetDir) { targetDirection = newTargetDir; }
     void SetSpeed(float newSpeed) { speed = newSpeed; }
