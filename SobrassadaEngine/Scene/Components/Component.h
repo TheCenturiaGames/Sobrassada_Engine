@@ -22,6 +22,7 @@ class Component
     virtual void RenderEditorInspector();
 
     UID GetUID() const { return uid; }
+    UID GetParentUID() const { return parentUID; }
 
     const AABB& GetLocalAABB() const { return localComponentAABB; }
 
@@ -29,6 +30,7 @@ class Component
     const char* GetName() const { return name; }
 
     const float4x4& GetGlobalTransform();
+
 
   protected:
     GameObject* GetParent();

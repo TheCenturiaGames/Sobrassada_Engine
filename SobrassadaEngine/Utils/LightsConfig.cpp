@@ -161,30 +161,17 @@ void LightsConfig::EditorParams()
 
 void LightsConfig::InitLightBuffers()
 {
-    GetAllSceneLights();
-
+    // First generate all buffers
     glGenBuffers(1, &ambientBufferId);
-
-    // Buffer for the Directional Light
     glGenBuffers(1, &directionalBufferId);
-    glBindBuffer(GL_UNIFORM_BUFFER, directionalBufferId);
-    glBufferData(GL_UNIFORM_BUFFER, sizeof(Lights::DirectionalLightShaderData), nullptr, GL_STATIC_DRAW);
-
-    // Point lights buffer
     glGenBuffers(1, &pointBufferId);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, pointBufferId);
-    size_t bufferSize = sizeof(Lights::PointLightShaderData) * pointLights.size() + 16;
-    glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize, nullptr, GL_STATIC_DRAW);
-
-    // Spot lights buffer
     glGenBuffers(1, &spotBufferId);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, spotBufferId);
-    bufferSize =
-        (sizeof(Lights::SpotLightShaderData) + 12) * spotLights.size() + 16; // 12 bytes offset between spotlights
-    glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize, nullptr, GL_STATIC_DRAW);
+
+    // Then get all lights an resize each buffer accordingly
+    GetAllSceneLights();
 }
 
-void LightsConfig::RenderLights() const
+void LightsConfig::SetLightsShaderData() const
 {
     // Ambient light
     Lights::AmbientLightShaderData ambient = Lights::AmbientLightShaderData(float4(ambientColor, ambientIntensity));
@@ -196,13 +183,6 @@ void LightsConfig::RenderLights() const
     SetDirectionalLightShaderData();
     SetPointLightsShaderData();
     SetSpotLightsShaderData();
-
-    // Draw lights gizmos
-    if (directionalLight != nullptr) directionalLight->Render();
-    for (auto& light : pointLights)
-        light->Render();
-    for (auto& light : spotLights)
-        light->Render();
 }
 
 void LightsConfig::SetDirectionalLightShaderData() const
@@ -277,10 +257,24 @@ void LightsConfig::SetSpotLightsShaderData() const
 
 void LightsConfig::AddDirectionalLight(DirectionalLightComponent* newDirectional)
 {
+    // Check that the gameObject is in the current scene (to avoid including prefab lights)
+    if (App->GetSceneModule()->GetGameObjectByUID(newDirectional->GetParentUID()) == nullptr)
+    {
+        GLOG("The gameObject is not in the current scene, probably a prefab");
+        return;
+    }
+
     if (directionalLight == nullptr) directionalLight = newDirectional;
 }
 void LightsConfig::AddPointLight(PointLightComponent* newPoint)
 {
+    // Check that the gameObject is in the current scene (to avoid including prefab lights)
+    if (App->GetSceneModule()->GetGameObjectByUID(newPoint->GetParentUID()) == nullptr)
+    {
+        GLOG("The gameObject is not in the current scene, probably a prefab");
+        return;
+    }
+
     // Add point light to vector and resize buffer
     pointLights.push_back(newPoint);
 
@@ -295,6 +289,13 @@ void LightsConfig::AddPointLight(PointLightComponent* newPoint)
 }
 void LightsConfig::AddSpotLight(SpotLightComponent* newSpot)
 {
+    // Check that the gameObject is in the current scene (to avoid including prefab lights)
+    if (App->GetSceneModule()->GetGameObjectByUID(newSpot->GetParentUID()) == nullptr)
+    {
+        GLOG("The gameObject is not in the current scene, probably a prefab");
+        return;
+    }
+
     spotLights.push_back(newSpot);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, spotBufferId);
@@ -309,18 +310,31 @@ void LightsConfig::AddSpotLight(SpotLightComponent* newSpot)
     );
 }
 
-void LightsConfig::RemoveDirectionalLight()
+void LightsConfig::RemoveDirectionalLight(DirectionalLightComponent* directional)
 {
+    // Check that the gameObject is in the current scene (to avoid including prefab lights)
+    if (App->GetSceneModule()->GetGameObjectByUID(directional->GetParentUID()) == nullptr)
+    {
+        GLOG("The gameObject is not in the current scene, probably a prefab");
+        return;
+    }
+
     if (directionalLight != nullptr) directionalLight = nullptr;
 }
 
-void LightsConfig::RemovePointLight(UID pointUid)
+void LightsConfig::RemovePointLight(PointLightComponent* point)
 {
-    GLOG("Remove point light with UID: %d", pointUid);
+    // Check that the gameObject is in the current scene (to avoid including prefab lights)
+    if (App->GetSceneModule()->GetGameObjectByUID(point->GetParentUID()) == nullptr)
+    {
+        GLOG("The gameObject is not in the current scene, probably a prefab");
+        return;
+    }
+
+    GLOG("Remove point light with UID: %d", point->GetUID());
     for (int i = 0; i < pointLights.size(); ++i)
     {
-        // NO HO TROBA MAI PERQUE ES NULLPTR
-        if (pointLights[i]->GetUID() == pointUid)
+        if (pointLights[i] == point)
         {
             // Not optimal to remove an element which is not last from a vector, but this will not happen often
             GLOG("Remove point light in index: %d", i);
@@ -337,12 +351,19 @@ void LightsConfig::RemovePointLight(UID pointUid)
     GLOG("Point lights size: %d. Buffer size: %d", pointLights.size(), bufferSize);
 }
 
-void LightsConfig::RemoveSpotLight(UID spotUid)
+void LightsConfig::RemoveSpotLight(SpotLightComponent* spot)
 {
-    GLOG("Remove spot light with UID: %d", spotUid);
+    // Check that the gameObject is in the current scene (to avoid including prefab lights)
+    if (App->GetSceneModule()->GetGameObjectByUID(spot->GetParentUID()) == nullptr)
+    {
+        GLOG("The gameObject is not in the current scene, probably a prefab");
+        return;
+    }
+
+    GLOG("Remove spot light with UID: %d", spot->GetUID());
     for (int i = 0; i < spotLights.size(); ++i)
     {
-        if (spotLights[i]->GetUID() == spotUid)
+        if (spotLights[i] == spot)
         {
             // Not optimal to remove an element which is not last from a vector, but this will not happen often
             GLOG("Remove spot light in index: %d", i);
@@ -375,6 +396,8 @@ void LightsConfig::GetAllSceneLights()
 
 void LightsConfig::GetAllPointLights(const std::unordered_map<UID, Component*>& components)
 {
+    pointLights.clear();
+
     // Iterate through all the components and get the point lights
     for (auto& component : components)
     {
@@ -384,23 +407,32 @@ void LightsConfig::GetAllPointLights(const std::unordered_map<UID, Component*>& 
             pointLights.push_back(static_cast<PointLightComponent*>(component.second));
         }
     }
-
     GLOG("Point lights count: %d", pointLights.size());
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, pointBufferId);
+    size_t bufferSize = sizeof(Lights::PointLightShaderData) * pointLights.size() + 16;
+    glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize, nullptr, GL_STATIC_DRAW);
 }
 
 void LightsConfig::GetAllSpotLights(const std::unordered_map<UID, Component*>& components)
 {
+    spotLights.clear();
+
     // Iterate through all the components and get the spot lights
     for (auto& component : components)
     {
         if (component.second->GetType() == COMPONENT_SPOT_LIGHT)
         {
-            GLOG("Add spotlight")
+            GLOG("Add spotlight with UID: %d", component.first);
             spotLights.push_back(static_cast<SpotLightComponent*>(component.second));
         }
     }
-
     GLOG("Spot lights count: %d", spotLights.size());
+
+    // Maybe make function to do this because it's called like 3 times
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, spotBufferId);
+    size_t bufferSize =
+        (sizeof(Lights::SpotLightShaderData) + 12) * spotLights.size() + 16; // 12 bytes offset between spotlights
+    glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize, nullptr, GL_STATIC_DRAW);
 }
 
 void LightsConfig::GetDirectionalLight(const std::unordered_map<UID, Component*>& components)
@@ -415,4 +447,7 @@ void LightsConfig::GetDirectionalLight(const std::unordered_map<UID, Component*>
             break;
         }
     }
+
+    glBindBuffer(GL_UNIFORM_BUFFER, directionalBufferId);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(Lights::DirectionalLightShaderData), nullptr, GL_STATIC_DRAW);
 }

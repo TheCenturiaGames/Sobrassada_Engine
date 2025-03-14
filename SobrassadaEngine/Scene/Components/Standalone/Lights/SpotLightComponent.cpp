@@ -40,7 +40,7 @@ SpotLightComponent::SpotLightComponent(const rapidjson::Value& initialState) : L
 
 SpotLightComponent::~SpotLightComponent()
 {
-    App->GetSceneModule()->GetLightsConfig()->RemoveSpotLight(uid);
+    App->GetSceneModule()->GetLightsConfig()->RemoveSpotLight(this);
 }
 
 void SpotLightComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const

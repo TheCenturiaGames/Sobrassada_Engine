@@ -20,7 +20,7 @@ DirectionalLightComponent::DirectionalLightComponent(const rapidjson::Value& ini
 
 DirectionalLightComponent::~DirectionalLightComponent()
 {
-    App->GetSceneModule()->GetLightsConfig()->RemoveDirectionalLight();
+    App->GetSceneModule()->GetLightsConfig()->RemoveDirectionalLight(this);
 }
 
 void DirectionalLightComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const

@@ -78,6 +78,7 @@ update_status Application::Update()
 #ifdef _DEBUG
     OPTICK_CATEGORY("Application::Render", Optick::Category::Rendering)
 #endif
+    int ixx = 0;
     for (std::list<Module*>::iterator it = modules.begin(); it != modules.end() && returnStatus == UPDATE_CONTINUE;
          ++it)
         returnStatus = (*it)->Render(deltaTime);
@@ -90,9 +91,8 @@ update_status Application::Update()
     int i = 0;
 
     for (std::list<Module*>::iterator it = modules.begin(); it != modules.end() && returnStatus == UPDATE_CONTINUE;
-        ++it)
+         ++it)
         returnStatus = (*it)->RenderEditor(deltaTime);
-
 
 #ifdef _DEBUG
     OPTICK_CATEGORY("Application::PostUpdate", Optick::Category::GameLogic)

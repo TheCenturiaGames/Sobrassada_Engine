@@ -176,7 +176,7 @@ void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGa
 update_status Scene::Render(float deltaTime) const
 {
     if (!debugShaderOptions[RENDER_WIREFRAME]) lightsConfig->RenderSkybox();
-    lightsConfig->RenderLights();
+    lightsConfig->SetLightsShaderData();
 
     std::vector<GameObject*> objectsToRender;
     CheckObjectsToRender(objectsToRender);
@@ -469,10 +469,12 @@ void Scene::RemoveGameObjectHierarchy(UID gameObjectUID)
         selectedGameObjectUID = parentUID;
     }
 
-    // TODO: change when filesystem defined
-    gameObjectsContainer.erase(gameObjectUID);
-
+    // First delete the gameObject, then remove it from the map. This is because when removing a light, it checks if its parent
+    // gameObject is in the scene, so it has to be removed after deleting the pointer. I think this change doesn't affect anything else
     delete gameObject;
+
+    // TODO: change when filesystem defined
+    gameObjectsContainer.erase(gameObjectUID);    
 }
 
 const std::unordered_map<UID, Component*> Scene::GetAllComponents() const
@@ -631,8 +633,9 @@ void Scene::LoadPrefab(const UID prefabUID)
             AddGameObject(newObjects[i]->GetUID(), newObjects[i]);
         }
         newObjects[0]->UpdateTransformForGOBranch();
-    }
 
-    // ONLY ONE INSTANCE OF PREFAB CAN BE LOADED BECAUSE THE OBJECTS UID ARE REPEATED,
-    // THEY SHOULD BE GENERATED AS NEW WHEN LOADING THE PREFAB
+        // Get all scene lights, because if the prefab has lights when creating them they won't be added to the scene,
+        // as the gameObject is still not part of the scene
+        lightsConfig->GetAllSceneLights();
+    }
 }

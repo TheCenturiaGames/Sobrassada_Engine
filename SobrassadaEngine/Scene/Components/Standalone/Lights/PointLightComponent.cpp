@@ -35,7 +35,7 @@ PointLightComponent::PointLightComponent(const rapidjson::Value& initialState) :
 
 PointLightComponent::~PointLightComponent()
 {
-    App->GetSceneModule()->GetLightsConfig()->RemovePointLight(uid);
+    App->GetSceneModule()->GetLightsConfig()->RemovePointLight(this);
 }
 
 void PointLightComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
@@ -89,6 +89,8 @@ void PointLightComponent::RenderEditorInspector()
 void PointLightComponent::Render()
 {
     if (!enabled || !drawGizmos) return;
+
+    GLOG("%d", parentUID);
 
     std::vector<float3> directions;
     directions.push_back(float3::unitX);

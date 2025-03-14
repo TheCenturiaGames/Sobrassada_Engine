@@ -73,15 +73,16 @@ class LightsConfig
     void RenderSkybox() const;
 
     void InitLightBuffers();
-    void RenderLights() const;
+    void SetLightsShaderData() const;
+    void GetAllSceneLights();
 
     void AddDirectionalLight(DirectionalLightComponent* newDirectional);
     void AddPointLight(PointLightComponent* newPoint);
     void AddSpotLight(SpotLightComponent* newSpot);
 
-    void RemoveDirectionalLight();
-    void RemovePointLight(UID pointUid);
-    void RemoveSpotLight(UID spotUid);
+    void RemoveDirectionalLight(DirectionalLightComponent* directional);
+    void RemovePointLight(PointLightComponent* point);
+    void RemoveSpotLight(SpotLightComponent* spot);
 
     void SaveData(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
     void LoadData(const rapidjson::Value& lights);
@@ -89,7 +90,6 @@ class LightsConfig
   private:
     unsigned int LoadSkyboxTexture(UID cubemapUID);
 
-    void GetAllSceneLights();
     void GetAllPointLights(const std::unordered_map<UID, Component*>& components);
     void GetAllSpotLights(const std::unordered_map<UID, Component*>& components);
     void GetDirectionalLight(const std::unordered_map<UID, Component*>& components);
