@@ -108,10 +108,7 @@ const LineSegment& CameraModule::CastCameraRay()
 
 update_status CameraModule::Update(float deltaTime)
 {
-    if (!App->GetSceneModule()->GetInPlayMode())
-    {
-        if (App->GetSceneModule()->GetDoInputsScene()) Controls(deltaTime);
-    }
+    if (App->GetSceneModule()->GetDoInputsScene()) Controls(deltaTime);
 
     return UPDATE_CONTINUE;
 }

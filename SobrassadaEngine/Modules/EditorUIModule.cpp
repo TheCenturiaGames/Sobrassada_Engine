@@ -754,8 +754,6 @@ bool EditorUIModule::RenderImGuizmo(
     float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform
 ) const
 {
-    if (App->GetSceneModule()->GetInPlayMode()) return false;
-
     float4x4 view = float4x4(App->GetCameraModule()->GetViewMatrix());
     view.Transpose();
 

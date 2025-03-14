@@ -11,12 +11,14 @@ class CameraComponent : public Component
   public:
     CameraComponent(UID uid, UID uidParent);
     CameraComponent(const rapidjson::Value& initialState);
-    ~CameraComponent();
+    ~CameraComponent() override;
+
+    void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
 
     void Update() override;
     void Render() override;
     void RenderEditorInspector() override;
-    void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
+
     void SetAspectRatio(float newAspectRatio);
     void ChangeToPerspective();
     void ChangeToOrtographic();

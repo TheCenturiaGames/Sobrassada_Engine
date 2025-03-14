@@ -86,8 +86,7 @@ class SceneModule : public Module
     UID GetSceneUID() const { return loadedScene != nullptr ? loadedScene->GetSceneUID() : INVALID_UID; }
     const char* GetSceneName() const { return loadedScene != nullptr ? loadedScene->GetSceneName() : "Not loaded"; }
     LightsConfig* GetLightsConfig() { return loadedScene != nullptr ? loadedScene->GetLightsConfig() : nullptr; }
-    bool GetInPlayMode() { return inPlayMode; }
-    void SetMainCamera(CameraComponent* camera) { loadedScene->SetMainCamera(camera); }
+    bool GetInPlayMode() const { return inPlayMode; }
     CameraComponent* GetMainCamera() { return loadedScene->GetMainCamera(); }
     const std::tuple<float, float>& GetWindowPosition() const { return loadedScene->GetWindowPosition(); };
     const std::tuple<float, float>& GetWindowSize() const { return loadedScene->GetWindowSize(); };
@@ -96,9 +95,10 @@ class SceneModule : public Module
     bool GetDoInputs() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() : false; }
     bool GetDoInputsScene() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() && !inPlayMode : false; }
     bool GetDoInputsGame() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() && inPlayMode : false; }
-
     
     Octree* GetSceneOctree() const { return loadedScene != nullptr ? loadedScene->GetOctree() : nullptr; }
+
+    void SetMainCamera(CameraComponent* camera) { loadedScene->SetMainCamera(camera); }
 
   private:
     Scene* loadedScene = nullptr;
