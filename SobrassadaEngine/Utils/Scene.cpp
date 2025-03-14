@@ -630,8 +630,6 @@ void Scene::LoadPrefab(const UID prefabUID, const ResourcePrefab* prefab, const 
 {
     if (prefabUID != INVALID_UID)
     {
-        GLOG("Load prefab %d", prefabUID);
-
         const ResourcePrefab* resourcePrefab =
             prefab == nullptr ? (const ResourcePrefab*)App->GetResourcesModule()->RequestResource(prefabUID) : prefab;
         const std::vector<GameObject*>& referenceObjects = resourcePrefab->GetGameObjectsVector();
@@ -639,16 +637,14 @@ void Scene::LoadPrefab(const UID prefabUID, const ResourcePrefab* prefab, const 
 
         std::vector<GameObject*> newObjects;
         newObjects.push_back(new GameObject(GetGameObjectRootUID(), referenceObjects[0]));
-        if (prefab != nullptr)
-        {
-            // Set the root prefab the transform it had before
-            newObjects[0]->SetLocalTransform(transform);
-        }
 
+        // If new, always appear at origin. If overriden, stay in place
+        newObjects[0]->SetLocalTransform(transform);
+
+        // Right now it is loaded to the root gameObject
         newObjects[0]->SetPrefabUID(prefabUID);
         GetGameObjectByUID(GetGameObjectRootUID())->AddGameObject(newObjects[0]->GetUID());
         AddGameObject(newObjects[0]->GetUID(), newObjects[0]);
-        // Right now it is loaded to the root gameObject
 
         // Add the gameObject to the scene. The parents will always be added before the children
         for (int i = 1; i < referenceObjects.size(); ++i)
@@ -682,9 +678,10 @@ void Scene::OverridePrefabs(const UID prefabUID)
         return;
     }
 
+    // Store uids and transforms. We need transforms so when we override the prefab, the objects
+    // stay in place. UIDs to delete the duplicates
     std::vector<UID> updatedObjects;
     std::vector<float4x4> transforms;
-
     for (const auto& gameObject : gameObjectsContainer)
     {
         if (gameObject.second != nullptr)
