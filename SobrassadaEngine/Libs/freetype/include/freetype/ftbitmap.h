@@ -15,6 +15,7 @@
  *
  */
 
+#pragma warning(disable : 4099)
 
 #ifndef FTBITMAP_H_
 #define FTBITMAP_H_

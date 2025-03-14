@@ -15,6 +15,7 @@
  *
  */
 
+#pragma warning(disable : 4099)
 
 #ifndef FTGZIP_H_
 #define FTGZIP_H_

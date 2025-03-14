@@ -20,7 +20,7 @@
 #define FTSYSTEM_H_
 
 
-
+#pragma warning(disable : 4099)
 
 FT_BEGIN_HEADER
 
