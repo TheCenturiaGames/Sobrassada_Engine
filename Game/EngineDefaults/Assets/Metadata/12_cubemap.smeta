@@ -1,8 +1,8 @@
 {
-    "UID": 1262070597614682,
+    "UID": 1281272330578818,
     "name": "cubemap",
-    "assetPath": "C:\\\\Users\\lukas\\Documents\\Projekte\\UPC\\Sobrassada_Engine\\Game\\EngineDefaults\\Assets/cubemap.dds",
-    "lastModifiedDate": 1739822819,
+    "assetPath": "Assets/cubemap.dds",
+    "lastModifiedDate": 0,
     "importOptions": {
         "mipmaps": 1
     }
