@@ -19,7 +19,6 @@ class CameraComponent : public Component
     void Render() override;
     void RenderEditorInspector() override;
 
-    void SetAspectRatio(float newAspectRatio);
     void ChangeToPerspective();
     void ChangeToOrtographic();
 
@@ -29,6 +28,8 @@ class CameraComponent : public Component
     const float4x4 GetProjectionMatrix() { return camera.ProjectionMatrix(); }
     const float4x4 GetViewMatrix() { return camera.ViewMatrix(); }
     const int GetType() { return (camera.type == OrthographicFrustum) ? 1 : 0; }
+
+    void SetAspectRatio(float newAspectRatio);
 
   private:
     Frustum camera;
