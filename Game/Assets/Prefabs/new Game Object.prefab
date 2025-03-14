@@ -1,26 +1,27 @@
 {
     "Prefab": {
-        "UID": 1661812613098907,
+        "UID": 1604389684759464,
         "Name": "new Game Object",
         "GameObjects": [
             {
-                "UID": 14014611290874021410,
-                "ParentUID": 11085164253732401223,
+                "UID": 1673381679916240521,
+                "ParentUID": 3894567190543037837,
                 "Name": "new Game Object",
                 "Mobility": 1,
+                "PrefabUID": 1604389684759464,
                 "LocalTransform": [
                     1.0,
                     0.0,
                     0.0,
-                    0.0,
-                    0.0,
-                    1.0,
-                    0.0,
-                    2.466311454772949,
-                    0.0,
+                    11.016460418701172,
                     0.0,
                     1.0,
                     0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    2.916531562805176,
                     0.0,
                     0.0,
                     0.0,
@@ -28,19 +29,33 @@
                 ],
                 "Components": [
                     {
-                        "UID": 1950733770,
-                        "ParentUID": 14014611290874021410,
-                        "Type": 3,
+                        "UID": 390380364,
+                        "ParentUID": 1673381679916240521,
+                        "Type": 5,
                         "Enabled": true,
-                        "Name": "Spot Light",
-                        "Intensity": 40.16400146484375,
-                        "ColorRed": 1.0,
-                        "ColorGreen": 1.0,
-                        "ColorBlue": 1.0,
+                        "Name": "Camera",
+                        "MainCamera": false,
                         "DrawGizmos": true,
-                        "Range": 3.0,
-                        "InnerAngle": 18.44300079345703,
-                        "OuterAngle": 42.7869987487793
+                        "CameraType": 0,
+                        "CameraPosition": [
+                            11.016460418701172,
+                            0.0,
+                            2.916531562805176
+                        ],
+                        "CameraFront": [
+                            -0.0,
+                            -0.0,
+                            -1.0
+                        ],
+                        "CameraUp": [
+                            0.0,
+                            1.0,
+                            0.0
+                        ],
+                        "CameraNearPlane": 0.10000000149011612,
+                        "CameraFarPlane": 50.0,
+                        "CameraHFOV": 1.3823007345199585,
+                        "CameraVFOV": 1.0602123737335205
                     }
                 ],
                 "Children": []

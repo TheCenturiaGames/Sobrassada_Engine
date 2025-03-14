@@ -178,6 +178,38 @@ void CameraComponent::Save(rapidjson::Value& targetState, rapidjson::Document::A
     }
 }
 
+void CameraComponent::Clone(const Component* other)
+{
+    if (other->GetType() == ComponentType::COMPONENT_MESH)
+    {
+        const CameraComponent* otherCamera = static_cast<const CameraComponent*>(other);
+        enabled                            = otherCamera->enabled;
+
+        camera                             = otherCamera->camera;
+        matrices                           = otherCamera->matrices;
+        ubo                                = otherCamera->ubo;
+
+        drawGizmos                         = otherCamera->drawGizmos;
+        isMainCamera                       = otherCamera->isMainCamera;
+
+        horizontalFov                      = otherCamera->horizontalFov;
+        verticalFov                        = otherCamera->verticalFov;
+        perspectiveNearPlane               = otherCamera->perspectiveNearPlane;
+        perspectiveFarPlane                = otherCamera->perspectiveFarPlane;
+
+        orthographicWidth                  = otherCamera->orthographicWidth;
+        orthographicHeight                 = otherCamera->orthographicHeight;
+        ortographicNearPlane               = otherCamera->ortographicNearPlane;
+        ortographicFarPlane                = otherCamera->ortographicFarPlane;
+
+        firstTime                          = otherCamera->firstTime;
+    }
+    else
+    {
+        GLOG("It is not possible to clone a component of a different type!");
+    }
+}
+
 void CameraComponent::RenderEditorInspector()
 {
     Component::RenderEditorInspector();
