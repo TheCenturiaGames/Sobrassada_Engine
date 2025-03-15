@@ -10,11 +10,11 @@
 
 namespace TextureImporter
 {
-    UID Import(const char* sourceFilePath, UID sourceUID)
+    UID Import(const char* sourceFilePath, const std::string& targetFilePath, UID sourceUID)
     {
         // Copy image to Assets folder
         const std::string relativePath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
-        std::string copyPath = App->GetProjectModule()->GetLoadedProjectPath() + relativePath;
+        std::string copyPath = targetFilePath + relativePath;
         if (!FileSystem::Exists(copyPath.c_str()))
         {
             FileSystem::Copy(sourceFilePath, copyPath.c_str());
@@ -64,7 +64,7 @@ namespace TextureImporter
         }
         else finalTextureUID = sourceUID;
 
-        std::string saveFilePath = App->GetProjectModule()->GetLoadedProjectPath() + TEXTURES_PATH + std::to_string(finalTextureUID) + TEXTURE_EXTENSION;
+        std::string saveFilePath = targetFilePath + TEXTURES_PATH + std::to_string(finalTextureUID) + TEXTURE_EXTENSION;
         unsigned int bytesWritten =
             FileSystem::Save(saveFilePath.c_str(), blob.GetBufferPointer(), (unsigned int)blob.GetBufferSize());
 

@@ -12,17 +12,18 @@ namespace SceneImporter
 {
     void Import(const char* filePath)
     {
+        // TODO Is it necessary to create directories here? They should be already created
         const std::string engineDefaultPath = ENGINE_DEFAULT_ASSETS;
         CreateLibraryDirectories(App->GetProjectModule()->GetLoadedProjectPath());
         CreateLibraryDirectories(engineDefaultPath);
 
         std::string extension = FileSystem::GetFileExtension(filePath);
 
-        if (extension == ASSET_EXTENSION) ImportGLTF(filePath);
-        else TextureImporter::Import(filePath);
+        if (extension == ASSET_EXTENSION) ImportGLTF(filePath, App->GetProjectModule()->GetLoadedProjectPath());
+        else TextureImporter::Import(filePath, App->GetProjectModule()->GetLoadedProjectPath());
     }
 
-    void ImportGLTF(const char* filePath)
+    void ImportGLTF(const char* filePath, const std::string& targetFilePath)
     {
         tinygltf::Model model = LoadModelGLTF(filePath);
 
@@ -37,7 +38,7 @@ namespace SceneImporter
             for (const auto& primitive : srcMesh.primitives)
             {
                 std::string name = srcMesh.name + std::to_string(n);
-                UID meshUID = MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath);
+                UID meshUID = MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath, targetFilePath);
                 n++;
 
                 UID matUID = INVALID_UID;
@@ -45,7 +46,7 @@ namespace SceneImporter
                 if (matIndex == -1) GLOG("Material index invalid for mesh: %s", name.c_str())
                 else if (std::find(matIndices.begin(), matIndices.end(), matIndex) == matIndices.end())
                 {
-                    matUID = MaterialImporter::ImportMaterial(model, matIndex, filePath);
+                    matUID = MaterialImporter::ImportMaterial(model, matIndex, filePath, targetFilePath);
                     matIndices.push_back(matIndex);
                 }
 
@@ -58,7 +59,7 @@ namespace SceneImporter
          GLOG("Total .gltf meshes: %d", gltfMeshes.size());
         
         // Import Model
-        ModelImporter::ImportModel(model, gltfMeshes, filePath);
+        ModelImporter::ImportModel(model, gltfMeshes, filePath, targetFilePath);
     }
 
     tinygltf::Model LoadModelGLTF(const char* filePath)
@@ -106,7 +107,7 @@ namespace SceneImporter
         return model;
     }
 
-    void ImportMeshFromMetadata(const std::string& filePath, const std::string& name, UID sourceUID)
+    void ImportMeshFromMetadata(const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID)
     {
         tinygltf::Model model = LoadModelGLTF(filePath.c_str());
 
@@ -120,14 +121,14 @@ namespace SceneImporter
             {
                 for (const auto& primitive : srcMesh.primitives)
                 {
-                    MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath.c_str(), sourceUID);
+                    MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath.c_str(), targetFilePath, sourceUID);
                     return; // only one mesh with the same name
                 }
             }
         }
     }
 
-    void ImportMaterialFromMetadata(const std::string& filePath, const std::string& name, UID sourceUID)
+    void ImportMaterialFromMetadata(const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID)
     {
         tinygltf::Model model = LoadModelGLTF(filePath.c_str());
 
@@ -136,15 +137,15 @@ namespace SceneImporter
         {
             if (model.materials[i].name == name)
             {
-                MaterialImporter::ImportMaterial(model, i, filePath.c_str(), sourceUID);
+                MaterialImporter::ImportMaterial(model, i, filePath.c_str(), targetFilePath, sourceUID);
                 return; // only one material with the same name
             }
         }
     }
 
-    void ImportModelFromMetadata(const std::string& filePath, const std::string& name, UID sourceUID)
+    void ImportModelFromMetadata(const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID)
     {
-        ModelImporter::CopyModel(filePath, name, sourceUID);
+        ModelImporter::CopyModel(filePath, targetFilePath, name, sourceUID);
     }
 
     void CreateLibraryDirectories(const std::string& projectFilePath)

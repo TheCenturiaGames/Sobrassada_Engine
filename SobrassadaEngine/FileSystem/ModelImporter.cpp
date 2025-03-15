@@ -15,7 +15,7 @@ namespace ModelImporter
 {
     UID ImportModel(
         const tinygltf::Model& model, const std::vector<std::vector<std::pair<UID, UID>>>& meshesUIDs,
-        const char* filePath, const UID sourceUID
+        const char* filePath, const std::string& targetFilePath, const UID sourceUID
     )
     {
         // Get Nodes data
@@ -82,7 +82,7 @@ namespace ModelImporter
         }
         else finalModelUID = sourceUID;
 
-        assetPath = App->GetProjectModule()->GetLoadedProjectPath() + assetPath;
+        assetPath = targetFilePath + assetPath;
 
         newModel.SetUID(finalModelUID);
 
@@ -197,9 +197,9 @@ namespace ModelImporter
         return finalModelUID;
     }
 
-    void CopyModel(const std::string& filePath, const std::string& name, const UID sourceUID)
+    void CopyModel(const std::string& filePath, const std::string& targetFilePath, const std::string& name, const UID sourceUID)
     {
-        std::string destination = App->GetProjectModule()->GetLoadedProjectPath() + MODELS_LIB_PATH + std::to_string(sourceUID) + MODEL_EXTENSION;
+        std::string destination = targetFilePath + MODELS_LIB_PATH + std::to_string(sourceUID) + MODEL_EXTENSION;
         FileSystem::Copy(filePath.c_str(), destination.c_str());
 
         App->GetLibraryModule()->AddModel(sourceUID, name);

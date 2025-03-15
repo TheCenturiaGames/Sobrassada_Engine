@@ -148,28 +148,28 @@ bool LibraryModule::LoadLibraryMaps(const std::string& projectPath)
                 AddName(assetName, assetUID);
                 libraryPath = projectPath + MESHES_PATH + std::to_string(assetUID) + MESH_EXTENSION;
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
-                else SceneImporter::ImportMeshFromMetadata(assetPath, assetName, assetUID);
+                else SceneImporter::ImportMeshFromMetadata(assetPath, projectPath, assetName, assetUID);
                 break;
             case 12:
                 AddTexture(assetUID, assetName);
                 AddName(assetName, assetUID);
                 libraryPath = projectPath + TEXTURES_PATH + std::to_string(assetUID) + TEXTURE_EXTENSION;
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
-                else TextureImporter::Import(assetPath.c_str(), assetUID);
+                else TextureImporter::Import(assetPath.c_str(), projectPath, assetUID);
                 break;
             case 13:
                 AddMaterial(assetUID, assetName);
                 AddName(assetName, assetUID);
                 libraryPath = projectPath + MATERIALS_PATH + std::to_string(assetUID) + MATERIAL_EXTENSION;
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
-                else SceneImporter::ImportMaterialFromMetadata(assetPath, assetName, assetUID);
+                else SceneImporter::ImportMaterialFromMetadata(assetPath, projectPath, assetName, assetUID);
                 break;
             case 14:
                 AddModel(assetUID, assetName);
                 AddName(assetName, assetUID);
                 libraryPath = projectPath + MODELS_LIB_PATH + std::to_string(assetUID) + MODEL_EXTENSION;
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
-                else SceneImporter::ImportModelFromMetadata(assetPath, assetName, assetUID);
+                else SceneImporter::ImportModelFromMetadata(assetPath, projectPath, assetName, assetUID);
                 break;
             default:
                 GLOG("Unknown UID prefix (%s) for: %s", std::to_string(prefix).c_str(), assetName.c_str());
