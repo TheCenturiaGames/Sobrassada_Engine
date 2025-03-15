@@ -1,32 +1,30 @@
 ﻿#include "ComponentUtils.h"
 
 #include "Component.h"
-#include "Root/RootComponent.h"
 #include "Standalone/Lights/DirectionalLightComponent.h"
 #include "Standalone/Lights/PointLightComponent.h"
 #include "Standalone/Lights/SpotLightComponent.h"
 #include "Standalone/MeshComponent.h"
+#include "CameraComponent.h"
 
 #include <cstdint>
 
-Component* ComponentUtils::CreateEmptyComponent(
-    ComponentType type, UID uid, UID uidParent, UID uidRoot, const float4x4& parentGlobalTransform
-)
+Component* ComponentUtils::CreateEmptyComponent(ComponentType type, UID uid, UID uidParent)
 {
     switch (type)
     {
     case COMPONENT_NONE:
         return nullptr;
-    case COMPONENT_ROOT:
-        return new RootComponent(uid, uidParent, parentGlobalTransform);
     case COMPONENT_MESH:
-        return new MeshComponent(uid, uidParent, uidRoot, parentGlobalTransform);
+        return new MeshComponent(uid, uidParent);
     case COMPONENT_POINT_LIGHT:
-        return new PointLightComponent(uid, uidParent, uidRoot, parentGlobalTransform);
+        return new PointLightComponent(uid, uidParent);
     case COMPONENT_SPOT_LIGHT:
-        return new SpotLightComponent(uid, uidParent, uidRoot, parentGlobalTransform);
+        return new SpotLightComponent(uid, uidParent);
     case COMPONENT_DIRECTIONAL_LIGHT:
-        return new DirectionalLightComponent(uid, uidParent, uidRoot, parentGlobalTransform);
+        return new DirectionalLightComponent(uid, uidParent);
+    case COMPONENT_CAMERA:
+        return new CameraComponent(uid, uidParent);
     }
     return nullptr;
 }
@@ -39,8 +37,6 @@ Component* ComponentUtils::CreateExistingComponent(const rapidjson::Value& initi
         {
         case COMPONENT_NONE:
             return nullptr;
-        case COMPONENT_ROOT:
-            return new RootComponent(initialState);
         case COMPONENT_MESH:
             return new MeshComponent(initialState);
         case COMPONENT_POINT_LIGHT:
@@ -49,6 +45,8 @@ Component* ComponentUtils::CreateExistingComponent(const rapidjson::Value& initi
             return new SpotLightComponent(initialState);
         case COMPONENT_DIRECTIONAL_LIGHT:
             return new DirectionalLightComponent(initialState);
+        case COMPONENT_CAMERA:
+            return new CameraComponent(initialState);
         default:
             return nullptr;
         }

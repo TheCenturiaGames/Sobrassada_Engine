@@ -1,15 +1,11 @@
 #include "DirectionalLightComponent.h"
 #include "Application.h"
 #include "DebugDrawModule.h"
+#include "GameObject.h"
 #include "SceneModule.h"
 
-#include "Math/Quat.h"
-#include "imgui.h"
-
-DirectionalLightComponent::DirectionalLightComponent(
-    UID uid, UID uidParent, UID uidRoot, const float4x4& parentGlobalTransform
-)
-    : LightComponent(uid, uidParent, uidRoot, "Directional Light", COMPONENT_DIRECTIONAL_LIGHT, parentGlobalTransform)
+DirectionalLightComponent::DirectionalLightComponent(UID uid, UID uidParent)
+    : LightComponent(uid, uidParent, "Directional Light", COMPONENT_DIRECTIONAL_LIGHT)
 {
     LightsConfig* lightsConfig = App->GetSceneModule()->GetLightsConfig();
     if (lightsConfig != nullptr) lightsConfig->AddDirectionalLight(this);
@@ -34,16 +30,16 @@ void DirectionalLightComponent::Save(rapidjson::Value& targetState, rapidjson::D
 
 void DirectionalLightComponent::Render()
 {
-    if (!enabled || !drawGizmos) return;
+    if (!enabled || !drawGizmos || App->GetSceneModule()->GetInPlayMode()) return;
 
     DebugDrawModule* debug = App->GetDebugDrawModule();
     debug->DrawLine(
-        globalTransform.TranslatePart(), (globalTransform.RotatePart() * -float3::unitY).Normalized(), 2,
-        float3(1, 1, 1)
+        GetParent()->GetGlobalTransform().TranslatePart(),
+        (GetParent()->GetGlobalTransform().RotatePart() * -float3::unitY).Normalized(), 2, float3(1, 1, 1)
     );
 }
 
-float3 DirectionalLightComponent::GetDirection() const
+const float3 DirectionalLightComponent::GetDirection()
 {
-    return (globalTransform.RotatePart() * -float3::unitY).Normalized();
+    return (GetParent()->GetGlobalTransform().RotatePart() * -float3::unitY).Normalized();
 }

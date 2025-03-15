@@ -3,41 +3,40 @@
 #include "Globals.h"
 
 #include <Libs/rapidjson/document.h>
+#include <Math/float4x4.h>
 #include <cstdint>
 #include <map>
 #include <string>
-#include <Math/float4x4.h>
+#include <unordered_map>
 
 class Component;
-class RootComponent;
-class MeshComponent;
 
 enum ComponentType
 {
     // Empty type
-    COMPONENT_NONE              = 0,
-    // Root types
-    COMPONENT_ROOT              = 1,
+    COMPONENT_NONE = 0,
     // Standalone types
-    COMPONENT_MESH              = 2,
-    COMPONENT_POINT_LIGHT       = 4,
-    COMPONENT_SPOT_LIGHT        = 5,
-    COMPONENT_DIRECTIONAL_LIGHT = 6
+    COMPONENT_MESH,
+    COMPONENT_POINT_LIGHT,
+    COMPONENT_SPOT_LIGHT,
+    COMPONENT_DIRECTIONAL_LIGHT,
+    COMPONENT_CAMERA,
+    FIRST = COMPONENT_NONE,
+    LAST  = COMPONENT_DIRECTIONAL_LIGHT
 };
 
-static const std::map<std::string, ComponentType> standaloneComponents = {
+static const std::unordered_map<std::string, ComponentType> standaloneComponents = {
     {"Mesh",              COMPONENT_MESH             },
     {"Point Light",       COMPONENT_POINT_LIGHT      },
     {"Spot Light",        COMPONENT_SPOT_LIGHT       },
-    {"Directional Light", COMPONENT_DIRECTIONAL_LIGHT}
+    {"Directional Light", COMPONENT_DIRECTIONAL_LIGHT},
+    {"Camera",            COMPONENT_CAMERA           }
 };
 
 class ComponentUtils
 {
   public:
-    static Component* CreateEmptyComponent(
-        ComponentType type, UID uid, UID uidParent, UID uidRoot, const float4x4& parentGlobalTransform
-    );
+    static Component* CreateEmptyComponent(ComponentType type, UID uid, UID uidParent);
 
     static Component* CreateExistingComponent(const rapidjson::Value& initialState);
 };

@@ -2,6 +2,7 @@
 
 #define NOMINMAX
 #include "Algorithm/Random/LCG.h"
+#include <Geometry/AABB.h>
 #include <stdio.h>
 #include <vector>
 #include <windows.h>
@@ -33,10 +34,10 @@ enum update_status
 #define SCREEN_WIDTH  1280
 #define SCREEN_HEIGHT 720
 
-#define BORDERLESS   false
-#define FULL_DESKTOP false
-#define RESIZABLE    true
 #define FULLSCREEN   false
+#define FULL_DESKTOP false
+#define BORDERLESS   false
+#define RESIZABLE    true
 #define VSYNC        true
 
 #define TITLE             "Sobrassada Engine"
@@ -60,45 +61,67 @@ enum update_status
 
 #define DEFAULT_CAMERA_MOVEMENT_SCALE_FACTOR 1.f;
 #define DEFAULT_CAMERA_MOVEMENT_SPEED        7.5f;
-#define DEFAULT_CAMERA_MOUSE_SENSITIVITY     0.5f;
-#define DEFAULT_CAMERA_ZOOM_SENSITIVITY      5.f;
+#define DEFAULT_CAMERA_MOUSE_SENSITIVITY     0.1f;
+#define DEFAULT_CAMERA_ROTATE_SENSITIVITY    0.006f;
+#define DEFAULT_CAMERA_DRAG_SENSITIVITY      0.05f;
+#define DEFAULT_CAMERA_WHEEL_SENSITIVITY     2.f;
+#define DEFAULT_CAMERA_ZOOM_SENSITIVITY      0.5f;
 
-#define ASSETS_PATH     "Assets/"
-#define SCENES_PATH     "Assets/Scenes/"
-#define METADATA_PATH   "Assets/Metadata/"
-#define LIBRARY_PATH    "Library/"
-#define ANIMATIONS_PATH "Library/Animations/"
-#define AUDIO_PATH      "Library/Audio/"
-#define BONES_PATH      "Library/Bones/"
-#define MESHES_PATH     "Library/Meshes/"
-#define TEXTURES_PATH   "Library/Textures/"
-#define MATERIALS_PATH  "Library/Materials/"
+#define ASSETS_PATH   "Assets/"
+#define SCENES_PATH   "Assets/Scenes/"
+#define METADATA_PATH "Assets/Metadata/"
+
+#define LIBRARY_PATH     "Library/"
+#define ANIMATIONS_PATH  "Library/Animations/"
+#define AUDIO_PATH       "Library/Audio/"
+#define MODELS_PATH      "Library/Models/"
+#define MESHES_PATH      "Library/Meshes/"
+#define SCENES_PLAY_PATH "Library/Scenes/"
+#define TEXTURES_PATH    "Library/Textures/"
+#define MATERIALS_PATH   "Library/Materials/"
 
 #define ASSET_EXTENSION    ".gltf"
 #define MESH_EXTENSION     ".sobrassada"
 #define TEXTURE_EXTENSION  ".dds"
 #define MATERIAL_EXTENSION ".mat"
 #define SCENE_EXTENSION    ".scene"
-#define META_EXTENSION     ".meta"
+#define MODEL_EXTENSION    ".model"
+#define META_EXTENSION     ".smeta"
 
 #define MAX_COMPONENT_NAME_LENGTH 64;
 
+// SHADER PATHS
+constexpr const char* LIGHTS_VERTEX_SHADER_PATH   = "./Test/VertexShader.glsl";
+
+constexpr const char* UNLIT_FRAGMENT_SHADER_PATH = "./Test/UnlitFragmentShader.glsl";
+constexpr const char* SPECULAR_FRAGMENT_SHADER_PATH = "./Test/BRDFPhongFragmentShader.glsl";
+constexpr const char* METALLIC_FRAGMENT_SHADER_PATH = "./Test/BRDFCookTorranceShader.glsl";
+
+// DEBUG RENDER OPTIONS
+constexpr const char* RENDER_LIGTHS               = "Render Lights";
+constexpr const char* RENDER_WIREFRAME            = "Render Wireframe";
+constexpr const char* RENDER_AABB                 = "AABB";
+constexpr const char* RENDER_OBB                  = "OBB";
+constexpr const char* RENDER_OCTREE               = "Octree";
+constexpr const char* RENDER_CAMERA_RAY           = "Camera Ray";
+
 #define UID uint64_t
 
+constexpr UID INVALID_UID                               = 0;
 constexpr UID UID_PREFIX_DIVISOR                        = 100000000000000;
-constexpr UID INVALID_UUID                              = 0;
-constexpr UID CONSTANT_EMPTY_UID                        = 0;
 
 constexpr const char* CONSTANT_MESH_SELECT_DIALOG_ID    = "mesh-select";
 constexpr const char* CONSTANT_TEXTURE_SELECT_DIALOG_ID = "texture-select";
+constexpr const char* CONSTANT_MODEL_SELECT_DIALOG_ID   = "model-select";
 
 constexpr uint32_t CONSTANT_NO_MESH_UUID                = 0;
 constexpr uint32_t CONSTANT_NO_TEXTURE_UUID             = 0;
 
 constexpr float PI                                      = 3.14159265359f;
 constexpr float RAD_DEGREE_CONV                         = 180.f / PI;
+constexpr float DEGREE_RAD_CONV                         = PI / 180.f;
 
-constexpr float MINIMUM_TREE_LEAF_SIZE = 1.f;
+constexpr float MINIMUM_TREE_LEAF_SIZE                  = 1.f;
 
 inline UID GenerateUID()
 {
@@ -106,3 +129,5 @@ inline UID GenerateUID()
     UID uid = static_cast<UID>(rng.IntFast()) << 32 | rng.IntFast(); // Combine two 32-bit values
     return uid;
 }
+
+static AABB DEFAULT_GAME_OBJECT_AABB = AABB(float3(-1, -1, -1), float3(1, 1, 1));

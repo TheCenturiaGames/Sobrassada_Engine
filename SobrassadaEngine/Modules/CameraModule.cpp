@@ -71,7 +71,6 @@ bool CameraModule::Init()
 
 void CameraModule::UpdateUBO()
 {
-
     matrices.projectionMatrix = GetProjectionMatrix();
     matrices.viewMatrix       = GetViewMatrix();
 
@@ -109,7 +108,7 @@ const LineSegment& CameraModule::CastCameraRay()
 
 update_status CameraModule::Update(float deltaTime)
 {
-    if (App->GetSceneModule()->GetDoInputs()) Controls(deltaTime);
+    if (App->GetSceneModule()->GetDoInputsScene()) Controls(deltaTime);
 
     return UPDATE_CONTINUE;
 }
@@ -126,17 +125,16 @@ void CameraModule::Controls(float deltaTime)
     const KeyState* keyboard     = inputModule->GetKeyboard();
     const KeyState* mouseButtons = inputModule->GetMouseButtons();
     const float2& mouseMotion    = inputModule->GetMouseMotion();
+    int mouseWheel               = inputModule->GetMouseWheel();
 
-    float finalCameraSpeed       = cameraMoveSpeed * deltaTime;
+    float scaleFactor            = movementScaleFactor;
+    if (keyboard[SDL_SCANCODE_LSHIFT]) scaleFactor *= 2;
 
-    // FOCUS & DETACH
-    if (keyboard[SDL_SCANCODE_F] == KeyState::KEY_DOWN) TriggerFocusCamera();
-    if (keyboard[SDL_SCANCODE_O] == KeyState::KEY_DOWN) ToggleDetachedCamera();
-
-    if (keyboard[SDL_SCANCODE_LSHIFT])
-    {
-        finalCameraSpeed *= 2;
-    }
+    float finalCameraSpeed       = cameraMoveSpeed * scaleFactor * deltaTime;
+    float finalRotateSensitivity = rotateSensitivity * scaleFactor;
+    float finalDragSensitivity   = dragSensitivity * scaleFactor;
+    float finalWheelSensitivity  = wheelSensitivity * scaleFactor;
+    float finalZoomSensitivity   = zoomSensitivity * scaleFactor;
 
     if (mouseButtons[SDL_BUTTON_RIGHT - 1])
     {
@@ -184,8 +182,8 @@ void CameraModule::Controls(float deltaTime)
 
             if (mouseY != 0)
             {
-                if (isCameraDetached) detachedCamera.pos += detachedCamera.front * mouseY * finalCameraSpeed;
-                else camera.pos += camera.front * mouseY * finalCameraSpeed;
+                if (isCameraDetached) detachedCamera.pos += detachedCamera.front * mouseY * finalZoomSensitivity;
+                else camera.pos += camera.front * mouseY * finalZoomSensitivity;
             }
         }
         else
@@ -193,10 +191,38 @@ void CameraModule::Controls(float deltaTime)
             // ROTATION WITH MOUSE
             float mouseX             = mouseMotion.x;
             float mouseY             = mouseMotion.y;
-            float deltaRotationAngle = cameraRotationAngle * deltaTime;
-
+            float deltaRotationAngle = cameraRotationAngle * finalRotateSensitivity;
             RotateCamera(-mouseX * deltaRotationAngle, -mouseY * deltaRotationAngle);
         }
+    }
+
+    // FOCUS
+    if (keyboard[SDL_SCANCODE_F] == KeyState::KEY_DOWN) TriggerFocusCamera();
+
+    // DETACH
+    if (keyboard[SDL_SCANCODE_O] == KeyState::KEY_DOWN) ToggleDetachedCamera();
+
+    // DRAG
+    if (mouseButtons[SDL_BUTTON_MIDDLE - 1])
+    {
+        if (isCameraDetached)
+        {
+            detachedCamera.pos -= detachedCamera.WorldRight() * mouseMotion.x * finalDragSensitivity;
+            detachedCamera.pos += detachedCamera.up * mouseMotion.y * finalDragSensitivity;
+        }
+        else
+        {
+            camera.pos -= camera.WorldRight() * mouseMotion.x * finalDragSensitivity;
+            camera.pos += camera.up * mouseMotion.y * finalDragSensitivity;
+        }
+    }
+
+    // ZOOM WHEEL
+    if (mouseWheel != 0)
+    {
+        if (isCameraDetached)
+            detachedCamera.pos += detachedCamera.front * static_cast<float>(mouseWheel) * finalWheelSensitivity;
+        else camera.pos += camera.front * static_cast<float>(mouseWheel) * finalWheelSensitivity;
     }
 
     // ORBIT
@@ -204,11 +230,11 @@ void CameraModule::Controls(float deltaTime)
     {
         float mouseX             = mouseMotion.x;
         float mouseY             = mouseMotion.y;
-        float deltaRotationAngle = cameraRotationAngle * deltaTime;
+        float deltaRotationAngle = cameraRotationAngle * finalRotateSensitivity;
 
         RotateCamera(-mouseX * deltaRotationAngle, -mouseY * deltaRotationAngle);
 
-        FocusCamera();
+        TriggerFocusCamera();
     }
 
     viewMatrix         = camera.ViewMatrix();
@@ -277,16 +303,16 @@ void CameraModule::RotateCamera(float yaw, float pitch)
         if ((currentPitchAngle + pitch) > maximumNegativePitch && (currentPitchAngle + pitch) < maximumPositivePitch)
         {
             currentPitchAngle  += pitch;
-            Quat pitchRotation  = Quat::RotateAxisAngle(camera.WorldRight(), pitch);
-            camera.front        = pitchRotation.Mul(camera.front).Normalized();
-            camera.up           = pitchRotation.Mul(camera.up).Normalized();
+            Quat pitchRotation = Quat::RotateAxisAngle(camera.WorldRight(), pitch);
+            camera.front       = pitchRotation.Mul(camera.front).Normalized();
+            camera.up          = pitchRotation.Mul(camera.up).Normalized();
         }
     }
 }
 
 void CameraModule::FocusCamera()
 {
-    AABB focusedObjectAABB = App->GetSceneModule()->GetSeletedGameObject()->GetAABB();
+    AABB focusedObjectAABB = App->GetSceneModule()->GetSelectedGameObject()->GetGlobalAABB();
     float3 center          = focusedObjectAABB.CenterPoint();
 
     if (IsNan(center.x))

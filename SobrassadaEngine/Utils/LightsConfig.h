@@ -5,8 +5,10 @@
 
 #include "Math/float3.h"
 #include "Math/float4.h"
-#include <memory>
 #include <Libs/rapidjson/document.h>
+#include <memory>
+
+class Component;
 
 namespace Math
 {
@@ -82,15 +84,15 @@ class LightsConfig
     void RemoveSpotLight(UID spotUid);
 
     void SaveData(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
-    void LoadData(rapidjson::Value& lights);
+    void LoadData(const rapidjson::Value& lights);
 
   private:
     unsigned int LoadSkyboxTexture(UID cubemapUID);
 
     void GetAllSceneLights();
-    void GetAllPointLights();
-    void GetAllSpotLights();
-    void GetDirectionalLight();
+    void GetAllPointLights(const std::unordered_map<UID, Component*>& components);
+    void GetAllSpotLights(const std::unordered_map<UID, Component*>& components);
+    void GetDirectionalLight(const std::unordered_map<UID, Component*>& components);
 
     void SetDirectionalLightShaderData() const;
     void SetPointLightsShaderData() const;
@@ -108,10 +110,10 @@ class LightsConfig
     unsigned int pointBufferId;
     unsigned int spotBufferId;
 
-    DirectionalLightComponent *directionalLight = nullptr;
+    DirectionalLightComponent* directionalLight = nullptr;
     std::vector<PointLightComponent*> pointLights;
     std::vector<SpotLightComponent*> spotLights;
 
     ResourceTexture* currentTexture = nullptr;
-    std::string currentTextureName = "Not selected";
+    std::string currentTextureName  = "Not selected";
 };
