@@ -196,8 +196,7 @@
     <ClCompile Include="Modules\CameraModule.cpp" />
     <ClCompile Include="Modules\EditorUIModule.cpp" />
     <ClCompile Include="Modules\ProjectModule.cpp" />
-    <ClCompile Include="UserInterfaceModule.cpp" />
-    <ClCompile Include="Modules\UserInterfaceModule.cpp" />
+    <ClCompile Include="Modules\UserInterfaceModule.cpp"/>
     <ClCompile Include="Utils\EngineTimer.cpp" />
     <ClCompile Include="FileSystem\Importer.cpp" />
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp" />
