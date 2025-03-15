@@ -3,6 +3,11 @@
 #include "Delegate.h"
 #include <map>
 
+/*
+    For testing and checking how to use event dispatchers please have a look at this repo with sample code:
+    https://github.com/IDarkgenesis/DelegateTesting
+*/
+
 template <typename ReturnValue, typename... Arguments> class EventDispatcher
 {
   public:
