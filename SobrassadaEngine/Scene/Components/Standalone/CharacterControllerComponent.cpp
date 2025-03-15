@@ -1,28 +1,28 @@
 #include "CharacterControllerComponent.h"
 
 #include "Application.h"
-#include "SceneModule.h"
-#include "GameObject.h"
 #include "EditorUIModule.h"
+#include "GameObject.h"
 #include "InputModule.h"
+#include "SceneModule.h"
 
-#include <Math/float4x4.h>
 #include <Math/float3.h>
-#include <cmath>
+#include <Math/float4x4.h>
 #include <algorithm>
-
+#include <cmath>
 
 CharacterControllerComponent::CharacterControllerComponent(UID uid, UID uidParent)
     : Component(uid, uidParent, "Character Controller", COMPONENT_CHARACTER_CONTROLLER)
 {
-    speed = 1;
-    maxLinearSpeed = 10;
-    maxAngularSpeed = 90/RAD_DEGREE_CONV;
+    speed           = 1;
+    maxLinearSpeed  = 10;
+    maxAngularSpeed = 90 / RAD_DEGREE_CONV;
     isRadians       = true;
     targetDirection.Set(0.0f, 0.0f, 1.0f);
 }
 
-CharacterControllerComponent::CharacterControllerComponent(const rapidjson::Value& initialState) : Component(initialState)
+CharacterControllerComponent::CharacterControllerComponent(const rapidjson::Value& initialState)
+    : Component(initialState)
 {
     if (initialState.HasMember("TargetDirectionX"))
     {
@@ -62,7 +62,7 @@ void CharacterControllerComponent::Save(rapidjson::Value& targetState, rapidjson
     const
 {
     Component::Save(targetState, allocator);
-    
+
     targetState.AddMember("TargetDirectionX", targetDirection.x, allocator);
     targetState.AddMember("TargetDirectionY", targetDirection.y, allocator);
     targetState.AddMember("TargetDirectionZ", targetDirection.z, allocator);
@@ -99,15 +99,18 @@ void CharacterControllerComponent::RenderEditorInspector()
         ImGui::Text("Character Controller");
 
         ImGui::DragFloat("Speed", &speed, 0.1f, 0.0f, maxLinearSpeed, "%.3f", ImGuiSliderFlags_AlwaysClamp);
-        ImGui::DragFloat("Max Linear Speed", &maxLinearSpeed, 0.1f, 0.0f, 100.0f,"%.3f",ImGuiSliderFlags_AlwaysClamp);
+        ImGui::DragFloat("Max Linear Speed", &maxLinearSpeed, 0.1f, 0.0f, 100.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
 
         if (speed > maxLinearSpeed) speed = maxLinearSpeed;
-        
+
         float dragStep = isRadians ? 1.0f / RAD_DEGREE_CONV : 1.0f;
         float minVal   = 0.0f;
-        float maxVal   = isRadians ? 360.0f / RAD_DEGREE_CONV : 360.0f; 
-        
-        ImGui::DragFloat("Max Angular Speed##maxAngSpeed", &maxAngularSpeed, dragStep, minVal, maxVal, "%.3f",ImGuiSliderFlags_AlwaysClamp);
+        float maxVal   = isRadians ? 360.0f / RAD_DEGREE_CONV : 360.0f;
+
+        ImGui::DragFloat(
+            "Max Angular Speed##maxAngSpeed", &maxAngularSpeed, dragStep, minVal, maxVal, "%.3f",
+            ImGuiSliderFlags_AlwaysClamp
+        );
 
         if (maxAngularSpeed > maxVal) maxAngularSpeed = maxVal;
 
@@ -132,17 +135,17 @@ void CharacterControllerComponent::RenderEditorInspector()
 
 void CharacterControllerComponent::Move(const float3& direction, float deltaTime)
 {
-    float finalSpeed = std::min(speed, maxLinearSpeed);
+    float finalSpeed      = std::min(speed, maxLinearSpeed);
 
     float3 movementOffset = direction * finalSpeed * deltaTime;
 
-    GameObject* parentGO = GetParent();
+    GameObject* parentGO  = GetParent();
     if (!parentGO) return;
 
-    float4x4 localTr = parentGO->GetLocalTransform();
+    float4x4 localTr           = parentGO->GetLocalTransform();
     float4x4 translationMatrix = float4x4::FromTRS(movementOffset, float4x4::identity.RotatePart(), float3::one);
 
-    localTr = localTr * translationMatrix;
+    localTr                    = localTr * translationMatrix;
 
     parentGO->SetLocalTransform(localTr);
     parentGO->UpdateTransformForGOBranch();
@@ -151,14 +154,14 @@ void CharacterControllerComponent::Move(const float3& direction, float deltaTime
 void CharacterControllerComponent::Rotate(float rotationDirection, float deltaTime)
 {
     float angleDeg = 0.0f;
-    
+
     if (isRadians)
     {
         angleDeg = maxAngularSpeed * rotationDirection * deltaTime;
     }
     else
     {
-        angleDeg = (maxAngularSpeed * rotationDirection * deltaTime) / RAD_DEGREE_CONV; 
+        angleDeg = (maxAngularSpeed * rotationDirection * deltaTime) / RAD_DEGREE_CONV;
     }
 
     float4x4 rotationMatrix = float4x4::FromEulerXYZ(0.0f, angleDeg, 0.0f);
@@ -167,12 +170,11 @@ void CharacterControllerComponent::Rotate(float rotationDirection, float deltaTi
     if (!parentGO) return;
 
     float4x4 localTr = parentGO->GetLocalTransform();
-    
-    localTr = localTr * rotationMatrix;
-    
+
+    localTr          = localTr * rotationMatrix;
+
     parentGO->SetLocalTransform(localTr);
     parentGO->UpdateTransformForGOBranch();
-
 }
 
 void CharacterControllerComponent::HandleInput(float deltaTime)
@@ -199,11 +201,8 @@ void CharacterControllerComponent::HandleInput(float deltaTime)
     {
         Rotate(rotationDir, deltaTime);
     }
-    //else
+    // else
     //{
-    //    //TODO: StateMachine IDLE
-    //}
-
+    //     //TODO: StateMachine IDLE
+    // }
 }
-
-
