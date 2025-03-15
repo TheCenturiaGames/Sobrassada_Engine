@@ -79,6 +79,7 @@ enum update_status
 #define SCENES_PLAY_PATH "Library/Scenes/"
 #define TEXTURES_PATH    "Library/Textures/"
 #define MATERIALS_PATH   "Library/Materials/"
+#define STATEMACHINES_PATH "Library/StateMachines/"
 
 #define ASSET_EXTENSION    ".gltf"
 #define MESH_EXTENSION     ".sobrassada"
@@ -87,6 +88,7 @@ enum update_status
 #define SCENE_EXTENSION    ".scene"
 #define MODEL_EXTENSION    ".model"
 #define META_EXTENSION     ".smeta"
+#define STATEMACHINE_EXTENSION ".smachine"
 
 #define MAX_COMPONENT_NAME_LENGTH 64;
 

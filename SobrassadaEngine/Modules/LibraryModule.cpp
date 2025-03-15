@@ -241,6 +241,11 @@ void LibraryModule::AddModel(UID modelUID, const std::string& modelPath)
     modelMap[modelPath] = modelUID;
 }
 
+void LibraryModule::AddStateMachine(UID stateMachineUID, const std::string& stMachPath)
+{
+    stateMachinèMap[stMachPath] = stateMachineUID;
+}
+
 UID LibraryModule::GetTextureUID(const std::string& texturePath) const
 {
     auto it = textureMap.find(texturePath);
@@ -278,6 +283,17 @@ UID LibraryModule::GetModelUID(const std::string& modelPath) const
 {
     auto it = materialMap.find(modelPath);
     if (it != materialMap.end())
+    {
+        return it->second;
+    }
+
+    return INVALID_UID;
+}
+
+UID LibraryModule::GetStateMachinelUID(const std::string& stMachPath) const
+{
+    auto it = stateMachinèMap.find(stMachPath);
+    if (it != stateMachinèMap.end())
     {
         return it->second;
     }

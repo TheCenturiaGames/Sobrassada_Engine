@@ -19,6 +19,7 @@ struct HashString
 
     bool operator==(const HashString& other) const { return hash == other.hash; }
     bool operator!=(const HashString& other) const { return !(*this == other); }
+    const std::string& GetString() const { return original; }
 };
 
 struct Clip
@@ -66,6 +67,9 @@ class ResourceStateMachine : public Resource
     const Transition* GetTransition(const std::string& fromState, const std::string& toState) const;
 
     bool ClipExists(const std::string& clipName) const;
+
+    void Save(const std::string& path) const;
+    bool Load(const std::string& path);
 
   private:
 

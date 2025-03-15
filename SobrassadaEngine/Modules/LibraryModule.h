@@ -19,7 +19,8 @@ enum class FileType
     Texture,
     Material,
     Scene,
-    Model
+    Model,
+    StateMachine
 };
 
 class LibraryModule : public Module
@@ -41,6 +42,7 @@ class LibraryModule : public Module
     void AddMesh(UID meshUID, const std::string& matPath);
     void AddMaterial(UID materialUID, const std::string& sobPath);
     void AddModel(UID modelUID, const std::string &modelPath);
+    void AddStateMachine(UID stateMachineUID, const std::string& stMachPath);
     void AddName(const std::string& resourceName, UID resourceUID);
     void AddResource(const std::string& resourcePath, UID resourceUID);
 
@@ -48,6 +50,7 @@ class LibraryModule : public Module
     UID GetMeshUID(const std::string& meshPath) const;
     UID GetMaterialUID(const std::string& materialPath) const;
     UID GetModelUID(const std::string &modelPath) const;
+    UID GetStateMachinelUID(const std::string& stMachPath) const;
 
     const std::string& GetResourceName(UID resourceID) const;
 
@@ -57,13 +60,15 @@ class LibraryModule : public Module
     const std::unordered_map<std::string, UID>& GetMaterialMap() const { return materialMap; }
     const std::unordered_map<std::string, UID>& GetMeshMap() const { return meshMap; }
     const std::unordered_map<std::string, UID> &GetModelMap() const { return modelMap; }
+    const std::unordered_map<std::string, UID>& GetStateMachinePath() const { return stateMachinèMap; }
 
   private:
     // maps for user visuals | name -> UID
     std::unordered_map<std::string, UID> textureMap;
     std::unordered_map<std::string, UID> materialMap;
     std::unordered_map<std::string, UID> meshMap;  
-    std::unordered_map<std::string, UID> modelMap;    
+    std::unordered_map<std::string, UID> modelMap;  
+    std::unordered_map<std::string, UID> stateMachinèMap;  
     // inversed map          | UID -> name
     std::unordered_map<UID, std::string> namesMap;
 
