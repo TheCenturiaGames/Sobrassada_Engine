@@ -98,14 +98,10 @@ class SceneModule : public Module
     
     Octree* GetSceneOctree() const { return loadedScene != nullptr ? loadedScene->GetOctree() : nullptr; }
 
-    float GetCurrentDeltaTime() const { return currentDeltaTime; } 
-
-private:
     void SetMainCamera(CameraComponent* camera) { loadedScene->SetMainCamera(camera); }
 
   private:
     Scene* loadedScene = nullptr;
     const std::string scenePath;
     bool inPlayMode = false;
-    float currentDeltaTime;
 };

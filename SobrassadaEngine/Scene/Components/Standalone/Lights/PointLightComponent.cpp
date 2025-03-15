@@ -66,7 +66,7 @@ void PointLightComponent::RenderEditorInspector()
     }
 }
 
-void PointLightComponent::Render()
+void PointLightComponent::Render(float deltaTime)
 {
     if (!enabled || !drawGizmos || App->GetSceneModule()->GetInPlayMode()) return;
 

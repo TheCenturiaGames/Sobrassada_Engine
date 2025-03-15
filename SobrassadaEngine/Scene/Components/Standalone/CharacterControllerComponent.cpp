@@ -77,13 +77,11 @@ void CharacterControllerComponent::Update()
 {
 }
 
-void CharacterControllerComponent::Render()
+void CharacterControllerComponent::Render(float deltaTime)
 {
     if (!enabled) return;
 
     if (!App->GetSceneModule()->GetInPlayMode()) return;
-
-    float deltaTime = App->GetSceneModule()->GetCurrentDeltaTime();
 
     if (deltaTime <= 0.0f) return;
 
@@ -187,8 +185,8 @@ void CharacterControllerComponent::HandleInput(float deltaTime)
 
     float3 direction(0.0f, 0.0f, 0.0f);
 
-    if (keyboard[SDL_SCANCODE_W] == KEY_REPEAT) direction += targetDirection;
-    if (keyboard[SDL_SCANCODE_S] == KEY_REPEAT) direction -= targetDirection;
+    if (keyboard[SDL_SCANCODE_W] == KEY_REPEAT) direction -= targetDirection;
+    if (keyboard[SDL_SCANCODE_S] == KEY_REPEAT) direction += targetDirection;
 
     float rotationDir = 0.0f;
 

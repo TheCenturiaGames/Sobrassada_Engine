@@ -14,7 +14,7 @@ public:
 	void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
 
 	void Update() override;
-    void Render() override;
+    void Render(float deltaTime) override;
 	void RenderEditorInspector() override;
 
 	const float3& GetTargetDirection() const { return targetDirection; }

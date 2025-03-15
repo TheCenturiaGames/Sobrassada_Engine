@@ -62,7 +62,7 @@ class GameObject
 
     void OnAABBUpdated();
 
-    void Render() const;
+    void Render(float deltatime) const;
     void RenderEditor();
 
     const float4x4& GetGlobalTransform() const { return globalTransform; }

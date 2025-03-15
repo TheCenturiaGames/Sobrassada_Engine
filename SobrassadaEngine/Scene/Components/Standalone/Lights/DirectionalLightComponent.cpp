@@ -28,7 +28,7 @@ void DirectionalLightComponent::Save(rapidjson::Value& targetState, rapidjson::D
     LightComponent::Save(targetState, allocator);
 }
 
-void DirectionalLightComponent::Render()
+void DirectionalLightComponent::Render(float deltaTime)
 {
     if (!enabled || !drawGizmos || App->GetSceneModule()->GetInPlayMode()) return;
 
