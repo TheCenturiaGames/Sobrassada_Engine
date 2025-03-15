@@ -11,11 +11,11 @@ class ProjectModule : public Module
 
     bool Init() override;
     update_status RenderEditor(float deltaTime) override;
+    
+    void CloseCurrentProject();
 
     const std::string& GetLoadedProjectPath() const { return loadedProjectAbsolutePath; }
     const std::string& GetLoadedProjectName() const { return loadedProjectName; }
-
-    void CloseCurrentProject();
 
     bool IsProjectLoaded() const { return projectLoaded; }
 
