@@ -1,0 +1,9 @@
+{
+    "UID": 1192831711282167,
+    "name": "Gun0",
+    "assetPath": "Assets/Player.gltf",
+    "lastModifiedDate": 1739979581,
+    "importOptions": {
+        "generateTangents": false
+    }
+}

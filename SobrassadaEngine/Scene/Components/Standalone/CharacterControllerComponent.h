@@ -1,0 +1,36 @@
+#pragma once
+#include "Component.h"
+
+class CharacterControllerComponent : public Component
+{
+
+  public:
+    CharacterControllerComponent(UID uid, UID uidParent);
+    CharacterControllerComponent(const rapidjson::Value& initialState);
+
+    ~CharacterControllerComponent() override;
+
+    void Update() override;
+    void Render(float deltaTime) override;
+    void RenderEditorInspector() override;
+    void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
+
+    void Move(const float3& direction, float deltaTime);
+    void Rotate(float rotationDirection, float deltaTime);
+    void HandleInput(float deltaTime);
+
+    const float3& GetTargetDirection() const { return targetDirection; }
+    const float& GetSpeed() const { return speed; }
+
+    void SetTargetDirection(float3 newTargetDirection) { targetDirection = newTargetDirection; }
+    void SetSpeed(float newSpeed) { speed = newSpeed; }
+
+  private:
+    float3 targetDirection;
+
+    float speed;
+    float maxLinearSpeed;
+    float maxAngularSpeed;
+
+    bool isRadians;
+};
