@@ -8,10 +8,6 @@
 #include <Math/float4x4.h>
 #include <string>
 
-#ifdef _DEBUG
-#include "MemoryLeaks.h"
-#endif
-
 Component::Component(UID uid, UID parentUID, const char* initName, ComponentType type)
     : uid(uid), parentUID(parentUID), type(type), enabled(true)
 {

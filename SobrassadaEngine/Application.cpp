@@ -17,7 +17,6 @@
 
 #ifdef _DEBUG
 #include "optick.h"
-#include "MemoryLeaks.h"
 #endif
 
 Application::Application()

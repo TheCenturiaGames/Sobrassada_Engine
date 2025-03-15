@@ -25,10 +25,6 @@
 #define TINYGLTF_IMPLEMENTATION /* Only in one of the includes */
 #include <tiny_gltf.h>          // TODO Remove
 
-#ifdef _DEBUG
-#include "MemoryLeaks.h"
-#endif
-
 EditorUIModule::EditorUIModule() : width(0), height(0)
 {
 }

@@ -8,10 +8,6 @@
 #include "MaterialImporter.h"
 #include "ModelImporter.h"
 
-#ifdef _DEBUG
-#include "MemoryLeaks.h"
-#endif
-
 Resource* Importer::Load(UID uid)
 {
     const ResourceType type = Resource::GetResourceTypeForUID(uid);

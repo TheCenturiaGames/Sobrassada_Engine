@@ -26,10 +26,6 @@
 // guizmo after imgui include
 #include "./Libs/ImGuizmo/ImGuizmo.h"
 
-#ifdef _DEBUG
-#include "MemoryLeaks.h"
-#endif
-
 Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 {
     memcpy(this->sceneName, sceneName, strlen(sceneName));
