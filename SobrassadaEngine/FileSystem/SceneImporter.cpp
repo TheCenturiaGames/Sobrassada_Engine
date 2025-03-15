@@ -1,4 +1,4 @@
-#include "SceneImporter.h"
+ #include "SceneImporter.h"
 
 #include "FileSystem.h"
 #include "MaterialImporter.h"
@@ -52,9 +52,9 @@ namespace SceneImporter
         }
 
          GLOG("Total .gltf meshes: %d", gltfMeshes.size());
-
+        
         // Import Model
-        ModelImporter::ImportModel(model.nodes, gltfMeshes, filePath);
+        ModelImporter::ImportModel(model, gltfMeshes, filePath);
     }
 
     tinygltf::Model LoadModelGLTF(const char* filePath)
@@ -138,6 +138,11 @@ namespace SceneImporter
         }
     }
 
+    void ImportModelFromMetadata(const std::string& filePath, const std::string& name, UID sourceUID)
+    {
+        ModelImporter::CopyModel(filePath, name, sourceUID);
+    }
+
     void CreateLibraryDirectories()
     {
         if (!FileSystem::IsDirectory(ASSETS_PATH))
@@ -152,6 +157,13 @@ namespace SceneImporter
             if (!FileSystem::CreateDirectories(SCENES_PATH))
             {
                 GLOG("Failed to create directory: %s", SCENES_PATH);
+            }
+        }
+        if (!FileSystem::IsDirectory(MODELS_ASSETS_PATH))
+        {
+            if (!FileSystem::CreateDirectories(MODELS_ASSETS_PATH))
+            {
+                GLOG("Failed to create directory: %s", MODELS_ASSETS_PATH);
             }
         }
         if (!FileSystem::IsDirectory(METADATA_PATH))
@@ -175,11 +187,11 @@ namespace SceneImporter
                 GLOG("Failed to create directory: %s", AUDIO_PATH);
             }
         }
-        if (!FileSystem::IsDirectory(MODELS_PATH))
+        if (!FileSystem::IsDirectory(MODELS_LIB_PATH))
         {
-            if (!FileSystem::CreateDirectories(MODELS_PATH))
+            if (!FileSystem::CreateDirectories(MODELS_LIB_PATH))
             {
-                GLOG("Failed to create directory: %s", MODELS_PATH);
+                GLOG("Failed to create directory: %s", MODELS_LIB_PATH);
             }
         }
         if (!FileSystem::IsDirectory(MESHES_PATH))
