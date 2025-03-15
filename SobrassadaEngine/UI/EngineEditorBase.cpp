@@ -5,7 +5,7 @@
 bool EngineEditorBase::RenderEditor()
 {
     bool stillOpen = true;
-   
+
     if (!ImGui::Begin(name.c_str(), &stillOpen))
     {
         ImGui::End();
@@ -19,5 +19,3 @@ bool EngineEditorBase::RenderEditor()
     ImGui::End();
     return stillOpen;
 }
-
-

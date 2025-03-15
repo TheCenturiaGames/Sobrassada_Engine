@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Globals.h"
 #include <string>
 
@@ -9,8 +10,6 @@ class EngineEditorBase
 
     virtual ~EngineEditorBase() {}
     virtual bool RenderEditor();
-
-   
 
     UID GetUID() const { return uid; }
 

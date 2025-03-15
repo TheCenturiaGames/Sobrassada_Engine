@@ -1,20 +1,18 @@
 #include "UI/NodeEditor.h"
 #include "UI/CustomNode.h"
 
+#include "UI/EngineEditorBase.h"
 
 NodeEditor::~NodeEditor()
 {
 }
 
-
-
 bool NodeEditor::RenderEditor()
 {
-   if (!EngineEditorBase::RenderEditor()) return false;
-    
-    
+    if (!EngineEditorBase::RenderEditor()) return false;
+
     ImGui::Begin(name.c_str());
-    
+
     myGrid->update();
 
     myGrid->rightClickPopUpContent(
@@ -24,10 +22,10 @@ bool NodeEditor::RenderEditor()
             {
                 if (ImGui::MenuItem("Add Node"))
                 {
-                   
-                    ImVec2 mousePos  = ImGui::GetMousePos();
-                    ImVec2 gridPos   = myGrid->screen2grid(mousePos);
-                    auto newNode     = myGrid->placeNodeAt<CustomNode>(gridPos);
+
+                    ImVec2 mousePos = ImGui::GetMousePos();
+                    ImVec2 gridPos  = myGrid->screen2grid(mousePos);
+                    auto newNode    = myGrid->placeNodeAt<CustomNode>(gridPos);
                 }
             }
         }
@@ -64,18 +62,4 @@ bool NodeEditor::RenderEditor()
 
     ImGui::End();
     return true;
-   
-
-    
-    
-   
 }
-
-
-
-
-
-
-
-
-

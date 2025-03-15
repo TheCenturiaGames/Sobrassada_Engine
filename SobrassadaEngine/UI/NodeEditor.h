@@ -1,12 +1,12 @@
 #pragma once
-#include "UI/EngineEditorBase.h"
+
 #include "Globals.h"
 #include "imgui.h"
+
 #include "Libs/ImNodeFlow-1.2.2/include/ImNodeFlow.h"
-#include <vector>
+
 #include <string>
-
-
+#include <vector>
 
 class NodeEditor : public EngineEditorBase
 {
@@ -17,16 +17,11 @@ class NodeEditor : public EngineEditorBase
     {
     }
     ~NodeEditor();
-  
 
-    private:
+  private:
     bool RenderEditor() override;
-    
-  
-    
 
   private:
     UID uid;
     std::unique_ptr<ImFlow::ImNodeFlow> myGrid;
-    
 };
