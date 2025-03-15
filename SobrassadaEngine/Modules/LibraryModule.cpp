@@ -169,19 +169,19 @@ bool LibraryModule::LoadLibraryMaps()
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 else SceneImporter::ImportMaterialFromMetadata(assetPath, assetName, assetUID);
                 break;
-            // case 14:
-            //     AddMaterial(assetUID, assetName);
-            //     AddName(assetName, assetUID);
-            //     libraryPath = MODELS_PATH + std::to_string(assetUID) + MODEL_EXTENSION;
-            //     if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
-            //     else SceneImporter::ImportMaterialFromMetadata(assetPath, assetName, assetUID);
-            //     break;
             case 16:
                 AddPrefab(assetUID, assetName);
                 AddName(assetName, assetUID);
                 libraryPath = PREFABS_LIB_PATH + std::to_string(assetUID) + PREFAB_EXTENSION;
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 else SceneImporter::CopyPrefab(assetPath, assetName, assetUID);
+                break;
+            case 14:
+                AddModel(assetUID, assetName);
+                AddName(assetName, assetUID);
+                libraryPath = MODELS_LIB_PATH + std::to_string(assetUID) + MODEL_EXTENSION;
+                if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
+                else SceneImporter::ImportModelFromMetadata(assetPath, assetName, assetUID);
                 break;
             default:
                 GLOG("Unknown UID prefix (%s) for: %s", std::to_string(prefix).c_str(), assetName.c_str());
@@ -241,6 +241,11 @@ void LibraryModule::AddMaterial(UID materialUID, const std::string& matName)
     materialMap[matName] = materialUID;
 }
 
+void LibraryModule::AddModel(UID modelUID, const std::string& modelName)
+{
+    modelMap[modelName] = modelUID;
+}
+
 void LibraryModule::AddName(const std::string& resourceName, UID resourceUID)
 {
     namesMap[resourceUID] = resourceName;
@@ -291,8 +296,8 @@ UID LibraryModule::GetMaterialUID(const std::string& materialPath) const
 
 UID LibraryModule::GetModelUID(const std::string& modelPath) const
 {
-    auto it = materialMap.find(modelPath);
-    if (it != materialMap.end())
+    auto it = modelMap.find(modelPath);
+    if (it != modelMap.end())
     {
         return it->second;
     }

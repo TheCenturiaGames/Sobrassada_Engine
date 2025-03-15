@@ -63,7 +63,7 @@ class GameObject
 
     void OnAABBUpdated();
 
-    void Render() const;
+    void Render(float deltatime) const;
     void RenderEditor();
 
     const float4x4& GetGlobalTransform() const { return globalTransform; }
@@ -78,8 +78,7 @@ class GameObject
     const std::unordered_map<ComponentType, Component*>& GetComponents() const { return components; }
     Component* GetComponentByType(ComponentType type) const;
 
-    const MeshComponent* GetMeshComponent() const;
-    void AddModel(UID meshUid, UID materialUid) const;
+    MeshComponent* GetMeshComponent() const;
 
     void SetLocalTransform(const float4x4& newTransform) { localTransform = newTransform; }
     void DrawGizmos() const;

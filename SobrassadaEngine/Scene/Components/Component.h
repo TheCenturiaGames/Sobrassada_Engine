@@ -18,7 +18,7 @@ class Component
     virtual void Clone(const Component* other)  = 0;
 
     virtual void Update() = 0;
-    virtual void Render() = 0;
+    virtual void Render(float deltaTime) = 0;
     virtual void RenderEditorInspector();
 
     UID GetUID() const { return uid; }

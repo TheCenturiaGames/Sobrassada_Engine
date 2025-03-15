@@ -45,7 +45,7 @@ void DirectionalLightComponent::Clone(const Component* other)
     }
 }
 
-void DirectionalLightComponent::Render()
+void DirectionalLightComponent::Render(float deltaTime)
 {
     if (!enabled || !drawGizmos || App->GetSceneModule()->GetInPlayMode()) return;
 

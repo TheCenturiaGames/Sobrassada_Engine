@@ -11,7 +11,7 @@ class DirectionalLightComponent : public LightComponent
     DirectionalLightComponent(const rapidjson::Value& initialState);
     ~DirectionalLightComponent() override;
 
-    void Render() override;
+    void Render(float deltaTime = 0) override;
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
     void Clone(const Component* other) override;
 

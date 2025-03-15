@@ -298,7 +298,7 @@ void CameraComponent::Update()
     frustumPlanes.UpdateFrustumPlanes(camera.ViewMatrix(), camera.ProjectionMatrix());
 }
 
-void CameraComponent::Render()
+void CameraComponent::Render(float deltaTime)
 {
     if (!enabled || !drawGizmos || App->GetSceneModule()->GetInPlayMode()) return;
     DebugDrawModule* debug = App->GetDebugDrawModule();

@@ -17,7 +17,7 @@ class CameraComponent : public Component
     void Clone(const Component* other) override;
 
     void Update() override;
-    void Render() override;
+    void Render(float deltaTime) override;
     void RenderEditorInspector() override;
 
     void ChangeToPerspective();
