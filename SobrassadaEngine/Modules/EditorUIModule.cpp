@@ -659,6 +659,15 @@ void EditorUIModule::ImportDialog(bool& importMenu)
         loadFiles      = true;
     }
 
+    if (!importMenu) {
+        accPaths.clear();
+        accPaths.shrink_to_fit();
+        files.clear();
+        files.shrink_to_fit();
+        filteredFiles.clear();
+        filteredFiles.shrink_to_fit();
+    }
+
     ImGui::End();
 }
 
