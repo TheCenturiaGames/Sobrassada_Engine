@@ -25,7 +25,7 @@ namespace SceneImporter
 
     void ImportGLTF(const char* filePath, const std::string& targetFilePath)
     {
-        tinygltf::Model model = LoadModelGLTF(filePath);
+        tinygltf::Model model = LoadModelGLTF(filePath, targetFilePath);
 
         std::vector<std::vector<std::pair<UID, UID>>> gltfMeshes;
         std::vector<int> matIndices;
@@ -62,7 +62,7 @@ namespace SceneImporter
         ModelImporter::ImportModel(model, gltfMeshes, filePath, targetFilePath);
     }
 
-    tinygltf::Model LoadModelGLTF(const char* filePath)
+    tinygltf::Model LoadModelGLTF(const char* filePath, const std::string& targetFilePath)
     {
         tinygltf::TinyGLTF gltfContext;
         tinygltf::Model model;
@@ -89,7 +89,7 @@ namespace SceneImporter
 
         {
             // Copy gltf to Assets folder
-            std::string copyPath = App->GetProjectModule()->GetLoadedProjectPath() + ASSETS_PATH + FileSystem::GetFileNameWithExtension(filePath);
+            std::string copyPath = targetFilePath + ASSETS_PATH + FileSystem::GetFileNameWithExtension(filePath);
             if (!FileSystem::Exists(copyPath.c_str())) FileSystem::Copy(filePath, copyPath.c_str());
         }
         {
@@ -99,7 +99,7 @@ namespace SceneImporter
             for (const auto& srcBuffers : model.buffers)
             {
                 std::string binPath     = path + srcBuffers.uri;
-                std::string copyBinPath = App->GetProjectModule()->GetLoadedProjectPath() + ASSETS_PATH + FileSystem::GetFileNameWithExtension(binPath);
+                std::string copyBinPath = targetFilePath + ASSETS_PATH + FileSystem::GetFileNameWithExtension(binPath);
                 if (!FileSystem::Exists(copyBinPath.c_str())) FileSystem::Copy(binPath.c_str(), copyBinPath.c_str());
             }
         }
@@ -109,7 +109,7 @@ namespace SceneImporter
 
     void ImportMeshFromMetadata(const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID)
     {
-        tinygltf::Model model = LoadModelGLTF(filePath.c_str());
+        tinygltf::Model model = LoadModelGLTF(filePath.c_str(), targetFilePath);
 
         std::string nameNoExt = name;
         if (!name.empty()) nameNoExt.pop_back(); // remove last character (extension)
@@ -130,7 +130,7 @@ namespace SceneImporter
 
     void ImportMaterialFromMetadata(const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID)
     {
-        tinygltf::Model model = LoadModelGLTF(filePath.c_str());
+        tinygltf::Model model = LoadModelGLTF(filePath.c_str(), targetFilePath);
 
         // find material name that equals to name
         for (int i = 0; i < model.materials.size(); i++)
