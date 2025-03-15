@@ -1,9 +1,0 @@
-{
-    "UID": 1131921335193485,
-    "name": "Robot0",
-    "assetPath": "Assets/Robot.gltf",
-    "lastModifiedDate": 0,
-    "importOptions": {
-        "generateTangents": true
-    }
-}
