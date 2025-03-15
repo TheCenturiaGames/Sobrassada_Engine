@@ -177,6 +177,7 @@ void GameObject::RenderEditorInspector()
 
     if (uid != App->GetSceneModule()->GetGameObjectRootUID())
     {
+        ImGui::SameLine();
         if (ImGui::Checkbox("Draw nodes", &drawNodes)) OnDrawConnectionsToggle();
         if (ImGui::Button("Add Component"))
         {
@@ -298,23 +299,13 @@ void GameObject::UpdateTransformForGOBranch() const
     App->GetSceneModule()->RegenerateTree();
 }
 
-const MeshComponent* GameObject::GetMeshComponent() const
+MeshComponent* GameObject::GetMeshComponent() const
 {
     if (components.find(COMPONENT_MESH) != components.end())
     {
-        return dynamic_cast<const MeshComponent*>(components.at(COMPONENT_MESH));
+        return dynamic_cast<MeshComponent*>(components.at(COMPONENT_MESH));
     }
     return nullptr;
-}
-
-void GameObject::AddModel(UID meshUid, UID materialUid) const
-{
-    if (components.find(COMPONENT_MESH) != components.end())
-    {
-        MeshComponent* mesh = static_cast<MeshComponent*>(components.at(COMPONENT_MESH));
-        mesh->AddMaterial(materialUid);
-        mesh->AddMesh(meshUid);
-    }
 }
 
 void GameObject::OnTransformUpdated()

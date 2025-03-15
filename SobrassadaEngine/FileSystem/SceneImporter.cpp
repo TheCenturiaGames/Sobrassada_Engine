@@ -56,9 +56,9 @@ namespace SceneImporter
         }
 
          GLOG("Total .gltf meshes: %d", gltfMeshes.size());
-
+        
         // Import Model
-        ModelImporter::ImportModel(model.nodes, gltfMeshes, filePath);
+        ModelImporter::ImportModel(model, gltfMeshes, filePath);
     }
 
     tinygltf::Model LoadModelGLTF(const char* filePath)
@@ -142,6 +142,11 @@ namespace SceneImporter
         }
     }
 
+    void ImportModelFromMetadata(const std::string& filePath, const std::string& name, UID sourceUID)
+    {
+        ModelImporter::CopyModel(filePath, name, sourceUID);
+    }
+
     void CreateLibraryDirectories(const std::string& projectFilePath)
     {
         const std::string convertedAssetPath = projectFilePath + ASSETS_PATH;
@@ -158,6 +163,14 @@ namespace SceneImporter
             if (!FileSystem::CreateDirectories(convertedScenePath.c_str()))
             {
                 GLOG("Failed to create directory: %s", convertedScenePath.c_str());
+            }
+        }
+        const std::string convertedModelAssetsPath = projectFilePath + MODELS_ASSETS_PATH;
+        if (!FileSystem::IsDirectory(convertedModelAssetsPath.c_str()))
+        {
+            if (!FileSystem::CreateDirectories(convertedModelAssetsPath.c_str()))
+            {
+                GLOG("Failed to create directory: %s", convertedModelAssetsPath.c_str());
             }
         }
         const std::string convertedMetadataPath = projectFilePath + METADATA_PATH;
@@ -184,7 +197,7 @@ namespace SceneImporter
                 GLOG("Failed to create directory: %s", convertedAudioPath.c_str());
             }
         }
-        const std::string convertedBonesPath = projectFilePath + MODELS_PATH;
+        const std::string convertedBonesPath = projectFilePath + MODELS_LIB_PATH;
         if (!FileSystem::IsDirectory(convertedBonesPath.c_str()))
         {
             if (!FileSystem::CreateDirectories(convertedBonesPath.c_str()))
