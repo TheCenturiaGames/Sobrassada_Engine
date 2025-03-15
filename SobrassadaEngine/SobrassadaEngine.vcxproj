@@ -197,6 +197,7 @@
     <ClCompile Include="Modules\EditorUIModule.cpp" />
     <ClCompile Include="Modules\ProjectModule.cpp" />
     <ClCompile Include="Modules\UserInterfaceModule.cpp"/>
+    <ClCompile Include="Scene\Components\Standalone\CharacterControllerComponent.cpp" />
     <ClCompile Include="Utils\EngineTimer.cpp" />
     <ClCompile Include="FileSystem\Importer.cpp" />
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp" />
@@ -294,6 +295,7 @@
     <ClInclude Include="Modules\ResourcesModule.h" />
     <ClInclude Include="Modules\SceneModule.h" />
     <ClInclude Include="FileSystem\ModelImporter.h" />
+    <ClInclude Include="Utils\Interpolation.h" />
     <ClInclude Include="Utils\RaycastController.h" />
     <ClInclude Include="ResourceManagement\Resources\Resource.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceMaterial.h" />
@@ -307,6 +309,7 @@
     <ClInclude Include="FileSystem\Mesh.h" />
     <ClInclude Include="FileSystem\MeshImporter.h" />
     <ClInclude Include="FileSystem\SceneImporter.h" />
+    <ClInclude Include="Scene\Components\Standalone\CharacterControllerComponent.h" />
     <ClInclude Include="Modules\UserInterfaceModule.h" />
     <ClInclude Include="UI\EngineEditors\EngineEditorBase.h" />
     <ClInclude Include="Utils\EngineTimer.h" />

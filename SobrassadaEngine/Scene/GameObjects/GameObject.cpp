@@ -500,11 +500,11 @@ void GameObject::OnAABBUpdated()
     OnTransformUpdated();
 }
 
-void GameObject::Render() const
+void GameObject::Render(float deltaTime) const
 {
     for (auto& component : components)
     {
-        component.second->Render();
+        component.second->Render(deltaTime);
     }
 }
 

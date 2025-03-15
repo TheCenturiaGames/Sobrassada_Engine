@@ -65,6 +65,6 @@ void LightComponent::Update()
 {
 }
 
-void LightComponent::Render()
+void LightComponent::Render(float deltaTime)
 {
 }

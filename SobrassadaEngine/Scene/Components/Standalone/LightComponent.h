@@ -12,7 +12,7 @@ class LightComponent : public Component
     LightComponent(const rapidjson::Value& initialState);
 
     void Update() override;
-    virtual void Render() override;
+    virtual void Render(float deltaTime) override;
     virtual void RenderEditorInspector() override;
     virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
 
