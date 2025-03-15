@@ -16,7 +16,7 @@ class NodeEditor : public EngineEditorBase
           myGrid(std::make_unique<ImFlow::ImNodeFlow>("FlowGrid" + std::to_string(uid)))
     {
     }
-    ~NodeEditor();
+    ~NodeEditor() override;
 
   private:
     bool RenderEditor() override;
