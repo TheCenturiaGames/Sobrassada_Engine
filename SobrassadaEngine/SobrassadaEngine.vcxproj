@@ -143,7 +143,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
-    <ClCompile Include="Modules\UserInterfaceModule.cpp" />
     <ClCompile Include="FileSystem\MetaModel.cpp" />
     <ClCompile Include="Scene\Components\CameraComponent.cpp" />
     <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp" />
@@ -358,7 +357,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
-    <ClInclude Include="Modules\UserInterfaceModule.h" />
     <ClInclude Include="Scene\Components\CameraComponent.h" />
     <ClInclude Include="Utils\DebugUtils.h" />
     <ClInclude Include="FileSystem\Importer.h" />
