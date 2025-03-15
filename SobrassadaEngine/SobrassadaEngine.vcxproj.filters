@@ -292,8 +292,6 @@
       <Filter>External\Recast</Filter>
     </ClCompile>
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp" />
-    <ClCompile Include="Tests\MockGameObject.cpp" />
-    <ClCompile Include="UI\QuadtreeViewer.cpp" />
     <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
       <Filter>UI\EngineEditors</Filter>
     </ClCompile>
@@ -321,6 +319,8 @@
     <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
       <Filter>UI\EngineEditors</Filter>
     </ClCompile>
+    <ClCompile Include="ResourceStateMachine.cpp" />
+    <ClCompile Include="StateMachineImporter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -572,6 +572,8 @@
     <ClInclude Include="UserInterfaceModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
+    <ClInclude Include="ResourceStateMachine.h" />
+    <ClInclude Include="StateMachineImporter.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl">
