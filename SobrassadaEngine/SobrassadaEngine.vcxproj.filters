@@ -316,11 +316,17 @@
     <ClCompile Include="Scene\Components\CameraComponent.cpp">
       <Filter>Scene\Components</Filter>
     </ClCompile>
+    <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
+      <Filter>UI\EngineEditors</Filter>
+    </ClCompile>
     <ClCompile Include="Modules\UserInterfaceModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
     <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
       <Filter>UI\EngineEditors</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\UserInterfaceModule.cpp">
+      <Filter>Modules</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -569,6 +575,9 @@
     </ClInclude>
     <ClInclude Include="UI\EngineEditors\EngineEditorBase.h">
       <Filter>UI\EngineEditors</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Interpolation.h">
+      <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="Scene\Components\CameraComponent.h">
       <Filter>Scene\Components</Filter>
