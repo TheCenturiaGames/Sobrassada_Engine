@@ -151,6 +151,79 @@ bool ResourceStateMachine::EditState(
     return false;
 }
 
+void ResourceStateMachine::AddTransition(
+    const std::string& fromState, const std::string& toState, const std::string& trigger, unsigned interpolationTime
+)
+{
+    HashString hashFrom(fromState);
+    HashString hashTo(toState);
+
+    bool fromExists = false, toExists = false;
+    for (const auto& state : states)
+    {
+        if (state.name == hashFrom) fromExists = true;
+        if (state.name == hashTo) toExists = true;
+    }
+    if (!fromExists || !toExists)
+    {
+        GLOG("Cannot add transition: one or both states do not exist.");
+        return;
+    }
+
+    for (const auto& transition : transitions)
+    {
+        if (transition.fromState == hashFrom && transition.toState == hashTo)
+        {
+            GLOG("Transition from '%s' to '%s' already exists!", fromState.c_str(), toState.c_str());
+            return;
+        }
+    }
+
+    Transition newTransition;
+    newTransition.fromState         = hashFrom;
+    newTransition.toState           = hashTo;
+    newTransition.triggerName       = HashString(trigger);
+    newTransition.interpolationTime = interpolationTime;
+
+    transitions.push_back(newTransition);
+
+}
+
+bool ResourceStateMachine::RemoveTransition(const std::string& fromState, const std::string& toState)
+{
+    HashString hashFrom(fromState);
+    HashString hashTo(toState);
+
+    for (auto it = transitions.begin(); it != transitions.end(); ++it)
+    {
+        if (it->fromState == hashFrom && it->toState == hashTo)
+        {
+            transitions.erase(it);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool ResourceStateMachine::EditTransition(
+    const std::string& fromState, const std::string& toState, const std::string& newTrigger, unsigned newInterpolationTime
+)
+{
+    HashString hashFrom(fromState);
+    HashString hashTo(toState);
+
+    for (auto& transition : transitions)
+    {
+        if (transition.fromState == hashFrom && transition.toState == hashTo)
+        {
+            transition.triggerName       = HashString(newTrigger);
+            transition.interpolationTime = newInterpolationTime;
+            return true;
+        }
+    }
+    return false;
+}
+
 
 
 const Clip* ResourceStateMachine::GetClip(const std::string& name) const
@@ -172,6 +245,21 @@ const State* ResourceStateMachine::GetState(const std::string& name) const
     }
     return nullptr;
 }
+
+const Transition* ResourceStateMachine::GetTransition(const std::string& fromState, const std::string& toState) const
+{
+    HashString hashFrom(fromState);
+    HashString hashTo(toState);
+    for (const auto& transition : transitions)
+    {
+        if (transition.fromState == hashFrom && transition.toState == hashTo)
+        {
+            return &transition;
+        }
+    }
+    return nullptr;
+}
+
 
 bool ResourceStateMachine::ClipExists(const std::string& clipName) const
 {
