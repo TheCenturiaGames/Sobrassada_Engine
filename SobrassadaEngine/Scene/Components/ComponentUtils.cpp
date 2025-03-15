@@ -10,6 +10,10 @@
 
 #include <cstdint>
 
+#ifdef _DEBUG
+#include "MemoryLeaks.h"
+#endif
+
 Component* ComponentUtils::CreateEmptyComponent(ComponentType type, UID uid, UID uidParent)
 {
     switch (type)
