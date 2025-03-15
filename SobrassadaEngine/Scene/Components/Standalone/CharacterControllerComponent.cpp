@@ -108,7 +108,7 @@ void CharacterControllerComponent::RenderEditorInspector()
 
         if (speed > maxLinearSpeed) speed = maxLinearSpeed;
         
-        float dragStep = useRad ? 1.0 / RAD_DEGREE_CONV : 1.0f;
+        float dragStep = useRad ? 1.0f / RAD_DEGREE_CONV : 1.0f;
         float minVal   = 0.0f;
         float maxVal   = useRad ? 360.0f / RAD_DEGREE_CONV : 360.0f; 
         

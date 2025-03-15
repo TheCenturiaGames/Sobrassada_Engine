@@ -9,16 +9,16 @@ public:
 	CharacterControllerComponent(UID uid, UID uidParent);
     CharacterControllerComponent(const rapidjson::Value& initialState);
 
-	~CharacterControllerComponent();
+	~CharacterControllerComponent() override;
 
-	void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
+	void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
 
 	void Update() override;
     void Render() override;
 	void RenderEditorInspector() override;
 
-	float3 GetTargetDirection() const { return targetDirection; }
-	float  GetSpeed() const{ return speed; }
+	const float3& GetTargetDirection() const { return targetDirection; }
+	const float&  GetSpeed() const{ return speed; }
 
     void SetTargetDirection(float3 newTargetDir) { targetDirection = newTargetDir; }
     void SetSpeed(float newSpeed) { speed = newSpeed; }
