@@ -11,6 +11,7 @@ class GameObject;
 class Component;
 class RootComponent;
 class Octree;
+class CameraComponent;
 
 class Scene
 {
@@ -30,6 +31,7 @@ class Scene
     void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
     void LoadModel(const UID modelUID);
 
+    update_status Update(float deltaTime);
     update_status Render(float deltaTime) const;
     update_status RenderEditor(float deltaTime);
 
@@ -55,6 +57,9 @@ class Scene
 
     LightsConfig* GetLightsConfig() { return lightsConfig; }
 
+    void SetMainCamera(CameraComponent* camera) { mainCamera = camera; }
+    CameraComponent* GetMainCamera() { return mainCamera; }
+
     bool GetDoInputs() const { return doInputs; }
     bool GetStopPlaying() const { return stopPlaying; }
 
@@ -76,6 +81,7 @@ class Scene
     UID sceneUID;
     UID gameObjectRootUID;
     UID selectedGameObjectUID;
+    CameraComponent* mainCamera;
     bool stopPlaying = false;
     bool doInputs    = false;
 
