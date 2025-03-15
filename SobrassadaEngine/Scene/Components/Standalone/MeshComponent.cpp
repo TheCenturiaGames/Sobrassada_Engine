@@ -124,7 +124,7 @@ void MeshComponent::Update()
 {
 }
 
-void MeshComponent::Render()
+void MeshComponent::Render(float deltaTime)
 {
     if (enabled && currentMesh != nullptr)
     {

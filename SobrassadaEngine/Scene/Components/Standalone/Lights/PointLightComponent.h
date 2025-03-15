@@ -11,7 +11,7 @@ class PointLightComponent : public LightComponent
     PointLightComponent(const rapidjson::Value& initialState);
     ~PointLightComponent() override;
 
-    void Render() override;
+    void Render(float deltaTime = 0) override;
     void RenderEditorInspector() override;
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
 
