@@ -80,7 +80,8 @@ enum update_status
 #define SCENES_PLAY_PATH   "Library/Scenes/"
 #define TEXTURES_PATH      "Library/Textures/"
 #define MATERIALS_PATH     "Library/Materials/"
-#define STATEMACHINES_PATH "Library/StateMachines/"
+#define STATEMACHINES_LIB_PATH "Library/StateMachines/"
+#define STATEMACHINES_ASSETS_PATH "Assets/StateMachines/"
 
 #define ASSET_EXTENSION    ".gltf"
 #define MESH_EXTENSION     ".sobrassada"

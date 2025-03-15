@@ -46,6 +46,10 @@ struct Transition
 class ResourceStateMachine : public Resource
 {
   public:
+    std::vector<Clip> clips;
+    std::vector<State> states;
+    std::vector<Transition> transitions;
+
     ResourceStateMachine(UID uid, const std::string& name);
     ~ResourceStateMachine() override = default;
 
@@ -66,17 +70,6 @@ class ResourceStateMachine : public Resource
     const State* GetState(const std::string& name) const;
     const Transition* GetTransition(const std::string& fromState, const std::string& toState) const;
 
-    bool ClipExists(const std::string& clipName) const;
-
-    void Save(const std::string& path) const;
-    bool Load(const std::string& path);
-
-  private:
-
-    std::vector<Clip> clips;
-    std::vector<State> states;
-    std::vector<Transition> transitions;
-
-    
+    bool ClipExists(const std::string& clipName) const; 
 
 };
