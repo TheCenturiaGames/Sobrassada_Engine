@@ -1,8 +1,6 @@
 #include "UI/NodeEditor.h"
 #include "UI/CustomNode.h"
 
-#include "UI/EngineEditorBase.h"
-
 NodeEditor::~NodeEditor()
 {
 }

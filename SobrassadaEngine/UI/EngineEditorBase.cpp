@@ -2,6 +2,10 @@
 #include "UI/EngineEditorBase.h"
 #include "imgui.h"
 
+EngineEditorBase::~EngineEditorBase()
+{
+}
+
 bool EngineEditorBase::RenderEditor()
 {
     bool stillOpen = true;
