@@ -1,0 +1,139 @@
+{
+    "Scene": {
+        "UID": 11490696202025324432,
+        "Name": "prueba",
+        "RootGameObject": 6875571593147687099,
+        "GameObjects": [
+            {
+                "UID": 6875571593147687099,
+                "ParentUID": 0,
+                "Name": "SceneModule GameObject",
+                "Mobility": 1,
+                "LocalTransform": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "Components": [],
+                "Children": [
+                    5192173784057470971,
+                    5534988211679898895
+                ]
+            },
+            {
+                "UID": 5192173784057470971,
+                "ParentUID": 6875571593147687099,
+                "Name": "new Game Object",
+                "Mobility": 1,
+                "LocalTransform": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    -5.462120056152344,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "Components": [
+                    {
+                        "UID": 4221862185,
+                        "ParentUID": 5192173784057470971,
+                        "Type": 1,
+                        "Enabled": true,
+                        "Name": "Mesh",
+                        "Mesh": 1199065820978570,
+                        "Material": 1302428436367250
+                    }
+                ],
+                "Children": []
+            },
+            {
+                "UID": 5534988211679898895,
+                "ParentUID": 6875571593147687099,
+                "Name": "new Game Object",
+                "Mobility": 1,
+                "LocalTransform": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "Components": [
+                    {
+                        "UID": 632897537,
+                        "ParentUID": 5534988211679898895,
+                        "Type": 5,
+                        "Enabled": true,
+                        "Name": "Camera",
+                        "MainCamera": true,
+                        "DrawGizmos": true,
+                        "CameraType": 0,
+                        "CameraPosition": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "CameraFront": [
+                            -0.0,
+                            -0.0,
+                            -1.0
+                        ],
+                        "CameraUp": [
+                            0.0,
+                            1.0,
+                            0.0
+                        ],
+                        "CameraNearPlane": 0.10000000149011612,
+                        "CameraFarPlane": 50.0,
+                        "CameraHFOV": 1.5707963705062866,
+                        "CameraVFOV": 1.024778962135315
+                    }
+                ],
+                "Children": []
+            }
+        ],
+        "Lights Config": {
+            "Ambient Color": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Ambient Intensity": 0.20000000298023224,
+            "Skybox UID": 1211595514475110
+        }
+    }
+}

@@ -36,6 +36,10 @@ update_status SceneModule::PreUpdate(float deltaTime)
 
 update_status SceneModule::Update(float deltaTime)
 {
+    if (loadedScene != nullptr)
+    {
+        return loadedScene->Update(deltaTime);
+    }
     return UPDATE_CONTINUE;
 }
 

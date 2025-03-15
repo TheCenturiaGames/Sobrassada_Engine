@@ -71,7 +71,6 @@ bool CameraModule::Init()
 
 void CameraModule::UpdateUBO()
 {
-
     matrices.projectionMatrix = GetProjectionMatrix();
     matrices.viewMatrix       = GetViewMatrix();
 
@@ -304,9 +303,9 @@ void CameraModule::RotateCamera(float yaw, float pitch)
         if ((currentPitchAngle + pitch) > maximumNegativePitch && (currentPitchAngle + pitch) < maximumPositivePitch)
         {
             currentPitchAngle  += pitch;
-            Quat pitchRotation  = Quat::RotateAxisAngle(camera.WorldRight(), pitch);
-            camera.front        = pitchRotation.Mul(camera.front).Normalized();
-            camera.up           = pitchRotation.Mul(camera.up).Normalized();
+            Quat pitchRotation = Quat::RotateAxisAngle(camera.WorldRight(), pitch);
+            camera.front       = pitchRotation.Mul(camera.front).Normalized();
+            camera.up          = pitchRotation.Mul(camera.up).Normalized();
         }
     }
 }

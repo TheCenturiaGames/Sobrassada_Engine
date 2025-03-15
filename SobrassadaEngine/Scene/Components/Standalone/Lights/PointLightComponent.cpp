@@ -68,7 +68,7 @@ void PointLightComponent::RenderEditorInspector()
 
 void PointLightComponent::Render()
 {
-    if (!enabled || !drawGizmos) return;
+    if (!enabled || !drawGizmos || App->GetSceneModule()->GetInPlayMode()) return;
 
     std::vector<float3> directions;
     directions.push_back(float3::unitX);
