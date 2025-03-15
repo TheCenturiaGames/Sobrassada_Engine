@@ -264,9 +264,66 @@
     <ClCompile Include="Modules\EditorUIModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourNavMesh.cpp">
+      <Filter>External\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourNavMeshBuilder.cpp">
+      <Filter>External\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourNavMeshQuery.cpp">
+      <Filter>External\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourNode.cpp">
+      <Filter>External\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourAlloc.cpp">
+      <Filter>External\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourAssert.cpp">
+      <Filter>External\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourCommon.cpp">
+      <Filter>External\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastArea.cpp">
+      <Filter>External\Recast</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastAssert.cpp">
+      <Filter>External\Recast</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastContour.cpp">
+      <Filter>External\Recast</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastFilter.cpp">
+      <Filter>External\Recast</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastLayers.cpp">
+      <Filter>External\Recast</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastMesh.cpp">
+      <Filter>External\Recast</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastMeshDetail.cpp">
+      <Filter>External\Recast</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastRasterization.cpp">
+      <Filter>External\Recast</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastRegion.cpp">
+      <Filter>External\Recast</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\Recast.cpp">
+      <Filter>External\Recast</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastAlloc.cpp">
+      <Filter>External\Recast</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp" />
+    <ClCompile Include="Tests\MockGameObject.cpp" />
+    <ClCompile Include="UI\QuadtreeViewer.cpp" />
     <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
       <Filter>UI\EngineEditors</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp">
       <Filter>External\ImGuizmo</Filter>
     </ClCompile>
@@ -284,9 +341,15 @@
     </ClCompile>
     <ClCompile Include="Scene\Components\Standalone\CharacterControllerComponent.cpp">
       <Filter>Scene\Components</Filter>
-	</ClCompile>
-    <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp">
-      <Filter>External\ImGuizmo</Filter>
+	  </ClCompile>
+    <ClCompile Include="Scene\Components\CameraComponent.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="UserInterfaceModule.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
+      <Filter>UI\EngineEditors</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -326,11 +389,20 @@
     <Filter Include="External\MathGeoLib">
       <UniqueIdentifier>{77ec05ef-e581-4de2-bda3-50c6c7bcc0d2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="UI\EngineEditors">
-      <UniqueIdentifier>{86a4c6bd-9fcf-4173-8393-657c59aa19cf}</UniqueIdentifier>
-	</Filter>
     <Filter Include="FileSystem\Meta">
       <UniqueIdentifier>{0325771a-d106-4c90-8e61-78de9e68b286}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{9096db94-8011-467c-8549-ccc0382ca11f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\EngineEditors">
+      <UniqueIdentifier>{db4cb5a0-8fe4-429c-9895-ea191f1f3f3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\Detour">
+      <UniqueIdentifier>{2caa9ea7-72e8-450d-adad-4b1805c68bb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\Recast">
+      <UniqueIdentifier>{da958ebe-ba34-4c0a-9248-41019fc9f888}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -503,9 +575,6 @@
     <ClInclude Include="Modules\EditorUIModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
-    <ClInclude Include="UI\EngineEditors\EngineEditorBase.h">
-      <Filter>UI\EngineEditors</Filter>
-	</ClInclude>
     <ClInclude Include="FileSystem\MetaFile.h">
       <Filter>FileSystem\Meta</Filter>
     </ClInclude>
@@ -526,6 +595,15 @@
     </ClInclude>
     <ClInclude Include="Scene\Components\Standalone\CharacterControllerComponent.h">
       <Filter>Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\EngineEditors\EngineEditorBase.h">
+      <Filter>UI\EngineEditors</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\CameraComponent.h">
+      <Filter>Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="UserInterfaceModule.h">
+      <Filter>Modules</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

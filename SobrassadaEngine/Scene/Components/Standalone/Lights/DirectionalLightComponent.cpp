@@ -30,7 +30,7 @@ void DirectionalLightComponent::Save(rapidjson::Value& targetState, rapidjson::D
 
 void DirectionalLightComponent::Render()
 {
-    if (!enabled || !drawGizmos) return;
+    if (!enabled || !drawGizmos || App->GetSceneModule()->GetInPlayMode()) return;
 
     DebugDrawModule* debug = App->GetDebugDrawModule();
     debug->DrawLine(

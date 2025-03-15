@@ -13,6 +13,7 @@
 #include "SceneModule.h"
 #include "ShaderModule.h"
 #include "WindowModule.h"
+#include "UserInterfaceModule.h"
 
 #ifdef _DEBUG
 #include "optick.h"
@@ -30,6 +31,7 @@ Application::Application()
     modules.push_back(cameraModule = new CameraModule());
     modules.push_back(debugDraw = new DebugDrawModule());
     modules.push_back(editorUIModule = new EditorUIModule());
+    modules.push_back(UIModule = new UserInterfaceModule());
 
     engineTimer = new EngineTimer();
     engineTimer->Start();
