@@ -92,6 +92,16 @@ void Scene::Init()
         root->UpdateTransformForGOBranch();
     }
 
+    // Initialize the skinning for all the gameObjects that need it
+    for (const auto& gameObject : gameObjectsContainer)
+    {
+        MeshComponent* mesh = gameObject.second->GetMeshComponent();
+        if (mesh != nullptr)
+        {
+            mesh->InitSkin();
+        }
+    }
+
     lightsConfig->InitSkybox();
     lightsConfig->InitLightBuffers();
 
@@ -170,6 +180,20 @@ void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGa
     }
 
     UpdateSpatialDataStruct();
+}
+
+update_status Scene::Update(float deltaTime)
+{
+
+    for (auto& gameObject : gameObjectsContainer)
+    {
+        std::unordered_map<ComponentType, Component*> componentList = gameObject.second->GetComponents();
+        for (auto& component : componentList)
+        {
+            component.second->Update();
+        }
+    }
+    return UPDATE_CONTINUE;
 }
 
 update_status Scene::Render(float deltaTime) const
@@ -382,7 +406,10 @@ void Scene::RenderScene()
     if (framebuffer->GetTextureWidth() != windowSize.x || framebuffer->GetTextureHeight() != windowSize.y)
     {
         float aspectRatio = windowSize.y / windowSize.x;
-        App->GetCameraModule()->SetAspectRatio(aspectRatio);
+        if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr)
+        {
+            App->GetSceneModule()->GetMainCamera()->SetAspectRatio(aspectRatio);
+        } else App->GetCameraModule()->SetAspectRatio(aspectRatio);
         framebuffer->Resize((int)windowSize.x, (int)windowSize.y);
     }
 
@@ -516,7 +543,9 @@ void Scene::UpdateSpatialDataStruct()
 void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects) const
 {
     std::vector<GameObject*> queriedObjects;
-    const FrustumPlanes& frustumPlanes = App->GetCameraModule()->GetFrustrumPlanes();
+    FrustumPlanes frustumPlanes = App->GetCameraModule()->GetFrustrumPlanes();
+    if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr)
+        frustumPlanes = App->GetSceneModule()->GetMainCamera()->GetFrustrumPlanes();
 
     sceneOctree->QueryElements<FrustumPlanes>(frustumPlanes, queriedObjects);
 
@@ -547,59 +576,76 @@ void Scene::LoadModel(const UID modelUID)
         const Model& model                 = newModel->GetModelData();
         const std::vector<NodeData>& nodes = model.GetNodes();
 
-        GameObject* object                 = new GameObject(GetGameObjectRootUID(), nodes[0].name);
-        object->SetLocalTransform(nodes[0].transform);
+        GameObject* rootObject                 = new GameObject(GetGameObjectRootUID(), App->GetLibraryModule()->GetResourceName(modelUID));
+        rootObject->SetLocalTransform(nodes[0].transform);
 
         // Add the gameObject to the rootObject
-        GetGameObjectByUID(GetGameObjectRootUID())->AddGameObject(object->GetUID());
-        AddGameObject(object->GetUID(), object);
+        GetGameObjectByUID(GetGameObjectRootUID())->AddGameObject(rootObject->GetUID());
+        AddGameObject(rootObject->GetUID(), rootObject);
 
         std::vector<GameObject*> gameObjectsArray;
-        gameObjectsArray.push_back(object);
+        gameObjectsArray.push_back(rootObject);
 
         for (int i = 1; i < nodes.size(); ++i)
         {
-            if (nodes[i].meshes.size() >
-                0) // If has meshes, create a container object and one gameObject per mesh as children
-            {
-                GLOG("Node %s has %d meshes", nodes[i].name.c_str(), nodes[i].meshes.size());
-                GameObject* gameObject =
-                    new GameObject(gameObjectsArray[nodes[i].parentIndex]->GetUID(), nodes[i].name);
-                // gameObject->SetLocalTransform(nodes[0].transform);
+            GameObject* gameObject = new GameObject(gameObjectsArray[nodes[i].parentIndex]->GetUID(), nodes[i].name);
+            gameObject->SetLocalTransform(nodes[i].transform);
 
-                gameObjectsArray.emplace_back(gameObject);
-                GetGameObjectByUID(gameObjectsArray[nodes[i].parentIndex]->GetUID())
-                    ->AddGameObject(gameObject->GetUID());
-                AddGameObject(gameObject->GetUID(), gameObject);
+            gameObjectsArray.emplace_back(gameObject);
+            GetGameObjectByUID(gameObjectsArray[nodes[i].parentIndex]->GetUID())->AddGameObject(gameObject->GetUID());
+            AddGameObject(gameObject->GetUID(), gameObject);
+        }
+
+        // Iterate again to add the meshes and skins. Can't be done in the same loop because the bones have
+        // to be already created
+        for (int i = 0; i < nodes.size(); ++i)
+        {
+            // If mesh has skin, add the reference here
+            if (nodes[i].meshes.size() > 0)
+            {
+                GameObject* currentGameObject = gameObjectsArray[i];
+                GLOG("Node %s has %d meshes", nodes[i].name.c_str(), nodes[i].meshes.size());
 
                 unsigned meshNum = 1;
                 for (const auto& mesh : nodes[i].meshes)
                 {
-                    GameObject* meshObject = new GameObject(gameObject->GetUID(), "Mesh " + std::to_string(meshNum));
+                    GameObject* meshObject = new GameObject(
+                        currentGameObject->GetUID(), currentGameObject->GetName() + " Mesh " + std::to_string(meshNum)
+                    );
                     ++meshNum;
 
-                    meshObject->CreateComponent(COMPONENT_MESH);
-                    meshObject->AddModel(mesh.first, mesh.second);
+                    if (meshObject->CreateComponent(COMPONENT_MESH))
+                    {
+                        currentGameObject->AddGameObject(meshObject->GetUID());
+                        AddGameObject(meshObject->GetUID(), meshObject);
 
-                    meshObject->SetLocalTransform(nodes[i].transform);
+                        MeshComponent* meshComponent = meshObject->GetMeshComponent();
+                        meshComponent->SetModelUID(modelUID);
+                        meshComponent->AddMesh(mesh.first);
+                        meshComponent->AddMaterial(mesh.second);
 
-                    gameObject->AddGameObject(meshObject->GetUID());
-                    AddGameObject(meshObject->GetUID(), meshObject);
+                        // Add skin to meshComponent
+                        if (nodes[i].skinIndex != -1)
+                        {
+                            GLOG("Node %s has skin index: %d", nodes[i].name.c_str(), nodes[i].skinIndex);
+                            Skin skin = model.GetSkin(nodes[i].skinIndex);
+
+                            std::vector<GameObject*> bones;
+                            std::vector<UID> bonesIds;
+                            for (int index : skin.bonesIndices)
+                            {
+                                bonesIds.push_back(gameObjectsArray[index]->GetUID());
+                                bones.push_back(gameObjectsArray[index]);
+                            }
+                            meshComponent->SetBones(bones, bonesIds);
+                            meshComponent->SetBindMatrices(skin.inverseBindMatrices);
+                            meshComponent->SetSkinIndex(nodes[i].skinIndex);
+                        }
+                    }
                 }
             }
-            else
-            {
-                GameObject* gameObject =
-                    new GameObject(gameObjectsArray[nodes[i].parentIndex]->GetUID(), nodes[i].name);
-
-                gameObject->SetLocalTransform(nodes[i].transform);
-
-                gameObjectsArray.emplace_back(gameObject);
-                GetGameObjectByUID(gameObjectsArray[nodes[i].parentIndex]->GetUID())
-                    ->AddGameObject(gameObject->GetUID());
-                AddGameObject(gameObject->GetUID(), gameObject);
-            }
         }
-        object->UpdateTransformForGOBranch();
+
+        rootObject->UpdateTransformForGOBranch();
     }
 }

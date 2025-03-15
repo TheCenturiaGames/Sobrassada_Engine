@@ -71,14 +71,15 @@ enum update_status
 #define SCENES_PATH   "Assets/Scenes/"
 #define METADATA_PATH "Assets/Metadata/"
 
-#define LIBRARY_PATH     "Library/"
-#define ANIMATIONS_PATH  "Library/Animations/"
-#define AUDIO_PATH       "Library/Audio/"
-#define MODELS_PATH      "Library/Models/"
-#define MESHES_PATH      "Library/Meshes/"
-#define SCENES_PLAY_PATH "Library/Scenes/"
-#define TEXTURES_PATH    "Library/Textures/"
-#define MATERIALS_PATH   "Library/Materials/"
+#define LIBRARY_PATH       "Library/"
+#define ANIMATIONS_PATH    "Library/Animations/"
+#define AUDIO_PATH         "Library/Audio/"
+#define MODELS_ASSETS_PATH "Assets/Models/"
+#define MODELS_LIB_PATH    "Library/Models/"
+#define MESHES_PATH        "Library/Meshes/"
+#define SCENES_PLAY_PATH   "Library/Scenes/"
+#define TEXTURES_PATH      "Library/Textures/"
+#define MATERIALS_PATH     "Library/Materials/"
 
 #define ASSET_EXTENSION    ".gltf"
 #define MESH_EXTENSION     ".sobrassada"
@@ -91,19 +92,19 @@ enum update_status
 #define MAX_COMPONENT_NAME_LENGTH 64;
 
 // SHADER PATHS
-constexpr const char* LIGHTS_VERTEX_SHADER_PATH   = "./Test/VertexShader.glsl";
+constexpr const char* LIGHTS_VERTEX_SHADER_PATH     = "./Test/VertexShader.glsl";
 
-constexpr const char* UNLIT_FRAGMENT_SHADER_PATH = "./Test/UnlitFragmentShader.glsl";
+constexpr const char* UNLIT_FRAGMENT_SHADER_PATH    = "./Test/UnlitFragmentShader.glsl";
 constexpr const char* SPECULAR_FRAGMENT_SHADER_PATH = "./Test/BRDFPhongFragmentShader.glsl";
 constexpr const char* METALLIC_FRAGMENT_SHADER_PATH = "./Test/BRDFCookTorranceShader.glsl";
 
 // DEBUG RENDER OPTIONS
-constexpr const char* RENDER_LIGTHS               = "Render Lights";
-constexpr const char* RENDER_WIREFRAME            = "Render Wireframe";
-constexpr const char* RENDER_AABB                 = "AABB";
-constexpr const char* RENDER_OBB                  = "OBB";
-constexpr const char* RENDER_OCTREE               = "Octree";
-constexpr const char* RENDER_CAMERA_RAY           = "Camera Ray";
+constexpr const char* RENDER_LIGTHS                 = "Render Lights";
+constexpr const char* RENDER_WIREFRAME              = "Render Wireframe";
+constexpr const char* RENDER_AABB                   = "AABB";
+constexpr const char* RENDER_OBB                    = "OBB";
+constexpr const char* RENDER_OCTREE                 = "Octree";
+constexpr const char* RENDER_CAMERA_RAY             = "Camera Ray";
 
 #define UID uint64_t
 
@@ -119,6 +120,7 @@ constexpr uint32_t CONSTANT_NO_TEXTURE_UUID             = 0;
 
 constexpr float PI                                      = 3.14159265359f;
 constexpr float RAD_DEGREE_CONV                         = 180.f / PI;
+constexpr float DEGREE_RAD_CONV                         = PI / 180.f;
 
 constexpr float MINIMUM_TREE_LEAF_SIZE                  = 1.f;
 
