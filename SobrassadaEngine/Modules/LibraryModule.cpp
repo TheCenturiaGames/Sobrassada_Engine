@@ -167,7 +167,7 @@ bool LibraryModule::LoadLibraryMaps(const std::string& projectPath)
             case 14:
                 AddModel(assetUID, assetName);
                 AddName(assetName, assetUID);
-                libraryPath = MODELS_LIB_PATH + std::to_string(assetUID) + MODEL_EXTENSION;
+                libraryPath = projectPath + MODELS_LIB_PATH + std::to_string(assetUID) + MODEL_EXTENSION;
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 else SceneImporter::ImportModelFromMetadata(assetPath, assetName, assetUID);
                 break;
