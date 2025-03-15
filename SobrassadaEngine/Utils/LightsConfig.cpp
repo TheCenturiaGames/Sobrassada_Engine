@@ -32,6 +32,9 @@ LightsConfig::~LightsConfig()
     glDeleteBuffers(1, &directionalBufferId);
     glDeleteBuffers(1, &pointBufferId);
     glDeleteBuffers(1, &spotBufferId);
+    glDeleteBuffers(1, &skyboxVao);
+    glDeleteBuffers(1, &skyboxVbo);
+    glDeleteProgram(skyboxProgram);
 }
 
 void LightsConfig::InitSkybox()
@@ -55,15 +58,14 @@ void LightsConfig::InitSkybox()
                               1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f};
 
     // Generate VBO
-    unsigned int vbo;
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glGenBuffers(1, &skyboxVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, skyboxVbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), skyboxVertices, GL_STATIC_DRAW);
 
     // Generato VAO
     glGenVertexArrays(1, &skyboxVao);
     glBindVertexArray(skyboxVao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, skyboxVbo);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
