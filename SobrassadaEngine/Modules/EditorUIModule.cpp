@@ -360,6 +360,12 @@ void EditorUIModule::LoadDialog(bool& loadMenu)
         loadMenu  = false;
     }
 
+    if (!saveMenu)
+    {
+        files.clear();
+        files.shrink_to_fit();
+    }
+
     ImGui::End();
 }
 
@@ -462,6 +468,13 @@ void EditorUIModule::SaveDialog(bool& saveMenu)
         inputFile[0] = '\0';
         saveMenu     = false;
     }
+
+    if (!saveMenu)
+    {
+        files.clear();
+        files.shrink_to_fit();
+    }
+
 
     ImGui::End();
 }
