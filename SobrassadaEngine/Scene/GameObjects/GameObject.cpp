@@ -391,9 +391,14 @@ void GameObject::HandleNodeClick(UID& selectedGameObjectUUID)
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DRAG_DROP_GAMEOBJECT"))
         {
             UID draggedUID = *static_cast<const UID*>(payload->Data);
-            if (draggedUID != uid)
+            GameObject* draggedGO = App->GetSceneModule()->GetGameObjectByUID(draggedUID);
+
+            if (draggedGO != nullptr && !draggedGO->TargetIsChildren(uid))
             {
-                UpdateGameObjectHierarchy(draggedUID);
+                if (draggedUID != uid)
+                {
+                    UpdateGameObjectHierarchy(draggedUID);
+                }
             }
         }
 
@@ -469,27 +474,26 @@ void GameObject::RenameGameObjectHierarchy()
 
 bool GameObject::TargetIsChildren(UID uidTarget)
 {
-    bool isGOChildren = false;
 
-    if (children.size() <= 0) return isGOChildren;
+    if (children.size() <= 0) return false;
 
     for (auto childUID : children)
     {
         if (childUID == uidTarget)
         {
-            isGOChildren = true;
-            break;
+            return true;
         }
         else
         {
-            GameObject* childGO = App->GetSceneModule()->GetGameObjectByUUID(childUID);
-            isGOChildren        = TargetIsChildren(childUID);
+            GameObject* childGO = App->GetSceneModule()->GetGameObjectByUID(childUID);
+            
+            if (childGO->TargetIsChildren(uidTarget)) return true;
         }
     }
-    return isGOChildren;
+    return false;
 }
 
-const MeshComponent* GameObject::GetMeshComponent() const;
+//const MeshComponent* GameObject::GetMeshComponent() const;
 void GameObject::UpdateGameObjectHierarchy(UID sourceUID)
 {
     GameObject* sourceGameObject = App->GetSceneModule()->GetGameObjectByUID(sourceUID);
