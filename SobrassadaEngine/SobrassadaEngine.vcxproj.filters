@@ -319,8 +319,12 @@
     <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
       <Filter>UI\EngineEditors</Filter>
     </ClCompile>
-    <ClCompile Include="ResourceStateMachine.cpp" />
-    <ClCompile Include="StateMachineImporter.cpp" />
+    <ClCompile Include="ResourceManagement\Resources\ResourceStateMachine.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\StateMachineImporter.cpp">
+      <Filter>FileSystem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -572,8 +576,12 @@
     <ClInclude Include="UserInterfaceModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
-    <ClInclude Include="ResourceStateMachine.h" />
-    <ClInclude Include="StateMachineImporter.h" />
+    <ClInclude Include="ResourceManagement\Resources\ResourceStateMachine.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\StateMachineImporter.h">
+      <Filter>FileSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl">
