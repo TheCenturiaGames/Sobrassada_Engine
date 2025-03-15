@@ -54,12 +54,15 @@ bool ResourceStateMachine::EditClipInfo(
             clip.clipUID = newUID;
             clip.loop    = newLoop;
 
-            for (const auto& clip : clips)
+            if (HashString(newName) != hashOld)
             {
-                if (HashString(newName) != hashOld && clip.clipName == HashString(newName))
+                for (const auto& clip : clips)
                 {
-                    GLOG("Clip with name '%s' already exists!", newName.c_str());
-                    return false;
+                    if (clip.clipName == HashString(newName))
+                    {
+                        GLOG("Clip with name '%s' already exists!", newName.c_str());
+                        return false;
+                    }
                 }
             }
             clip.clipName = HashString(newName);
@@ -71,6 +74,85 @@ bool ResourceStateMachine::EditClipInfo(
     return true;
 }
 
+void ResourceStateMachine::AddState(const std::string& stateName, const std::string& clipName)
+{
+    HashString stateHash(stateName);
+
+    for (const auto& state : states)
+    {
+        if (state.name == stateHash)
+        {
+            GLOG("State with name '%s' already exists!", stateName.c_str());
+            return;
+        }
+    }
+
+    if (!ClipExists(clipName))
+    {
+        GLOG("Clip with name '%s' does not exist. Cannot associate to state.", clipName.c_str());
+        return;
+    }
+
+    State newState;
+    newState.name     = stateHash;
+    newState.clipName = HashString(clipName);
+
+    states.push_back(newState);
+}
+
+bool ResourceStateMachine::RemoveState(const std::string& stateName)
+{
+    HashString stateHash(stateName);
+    for (auto it = states.begin(); it != states.end(); ++it)
+    {
+        if (it->name == stateHash)
+        {
+            states.erase(it);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool ResourceStateMachine::EditState(
+    const std::string& oldStateName, const std::string& newStateName, const std::string& newClipName
+)
+{
+    HashString hashOldState(oldStateName);
+    for (auto& state : states)
+    {
+        if (state.name == hashOldState)
+        {
+            HashString hashNewState(newStateName);
+            if (hashNewState != hashOldState)
+            {
+                for (const auto& s : states)
+                {
+                    if (s.name == hashNewState)
+                    {
+                        GLOG("Another state with name '%s' already exists!", newStateName.c_str());
+                        return false;
+                    }
+                }
+            }
+
+            if (!ClipExists(newClipName))
+            {
+                GLOG("Clip with name '%s' does not exist. Cannot assign to state.", newClipName.c_str());
+                return false;
+            }
+
+            state.name     = hashNewState;
+            state.clipName = HashString(newClipName);
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
 const Clip* ResourceStateMachine::GetClip(const std::string& name) const
 {
     HashString hashName(name);
@@ -79,4 +161,24 @@ const Clip* ResourceStateMachine::GetClip(const std::string& name) const
         if (clip.clipName == hashName) return &clip;
     }
     return nullptr;
+}
+
+const State* ResourceStateMachine::GetState(const std::string& name) const
+{
+    HashString hashName(name);
+    for (const auto& state : states)
+    {
+        if (state.name == hashName) return &state;
+    }
+    return nullptr;
+}
+
+bool ResourceStateMachine::ClipExists(const std::string& clipName) const
+{
+    HashString hashClip(clipName);
+    for (const auto& clip : clips)
+    {
+        if (clip.clipName == hashClip) return true;
+    }
+    return false;
 }

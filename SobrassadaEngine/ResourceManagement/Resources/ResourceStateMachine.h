@@ -52,7 +52,14 @@ class ResourceStateMachine : public Resource
     bool RemoveClip(const std::string& name);
     bool EditClipInfo(const std::string& oldName, UID newUID, const std::string& newName, bool newLoop);
 
+    void AddState(const std::string& stateName, const std::string& clipName);
+    bool RemoveState(const std::string& stateName);
+    bool EditState(const std::string& oldStateName, const std::string& newStateName, const std::string& newClipName);
+
     const Clip* GetClip(const std::string& name) const;
+    const State* GetState(const std::string& name) const;
+
+    bool ClipExists(const std::string& clipName) const;
 
   private:
 
