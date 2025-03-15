@@ -18,22 +18,23 @@ struct HashString
     }
 
     bool operator==(const HashString& other) const { return hash == other.hash; }
+    bool operator!=(const HashString& other) const { return !(*this == other); }
 };
 
-struct AnimationClip
+struct Clip
 {
     UID clipUID;
     HashString clipName;
     bool loop;
 };
 
-struct AnimationState
+struct State
 {
     HashString name;
     HashString clipName;
 };
 
-struct StateTransition
+struct Transition
 {
     HashString fromState;
     HashString toState;
@@ -47,7 +48,18 @@ class ResourceStateMachine : public Resource
     ResourceStateMachine(UID uid, const std::string& name);
     ~ResourceStateMachine() override = default;
 
-    std::vector<AnimationClip> clips;
-    std::vector<AnimationState> states;
-    std::vector<StateTransition> transitions;
+    void AddClip(UID clipUID, const std::string& name, bool loop);
+    bool RemoveClip(const std::string& name);
+    bool EditClipInfo(const std::string& oldName, UID newUID, const std::string& newName, bool newLoop);
+
+    const Clip* GetClip(const std::string& name) const;
+
+  private:
+
+    std::vector<Clip> clips;
+    std::vector<State> states;
+    std::vector<Transition> transitions;
+
+    
+
 };
