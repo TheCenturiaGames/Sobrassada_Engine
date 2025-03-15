@@ -18,7 +18,7 @@ CharacterControllerComponent::CharacterControllerComponent(UID uid, UID uidParen
     speed = 1;
     maxLinearSpeed = 10;
     maxAngularSpeed = 90/RAD_DEGREE_CONV;
-    useRad          = true;
+    isRadians       = true;
     targetDirection.Set(0.0f, 0.0f, 1.0f);
 }
 
@@ -50,9 +50,8 @@ CharacterControllerComponent::CharacterControllerComponent(const rapidjson::Valu
     }
     if (initialState.HasMember("isRadians"))
     {
-        useRad = initialState["isRadians"].GetBool();
+        isRadians = initialState["isRadians"].GetBool();
     }
-
 }
 
 CharacterControllerComponent::~CharacterControllerComponent()
@@ -70,7 +69,7 @@ void CharacterControllerComponent::Save(rapidjson::Value& targetState, rapidjson
     targetState.AddMember("Speed", speed, allocator);
     targetState.AddMember("MaxLinearSpeed", maxLinearSpeed, allocator);
     targetState.AddMember("MaxAngularSpeed", maxAngularSpeed, allocator);
-    targetState.AddMember("isRadians", useRad, allocator);
+    targetState.AddMember("isRadians", isRadians, allocator);
 }
 
 void CharacterControllerComponent::Update()
@@ -92,8 +91,6 @@ void CharacterControllerComponent::RenderEditorInspector()
 {
     Component::RenderEditorInspector();
 
-
-    
     if (enabled)
     {
         float availableWidth = ImGui::GetContentRegionAvail().x;
@@ -106,25 +103,22 @@ void CharacterControllerComponent::RenderEditorInspector()
 
         if (speed > maxLinearSpeed) speed = maxLinearSpeed;
         
-        float dragStep = useRad ? 1.0f / RAD_DEGREE_CONV : 1.0f;
+        float dragStep = isRadians ? 1.0f / RAD_DEGREE_CONV : 1.0f;
         float minVal   = 0.0f;
-        float maxVal   = useRad ? 360.0f / RAD_DEGREE_CONV : 360.0f; 
+        float maxVal   = isRadians ? 360.0f / RAD_DEGREE_CONV : 360.0f; 
         
-        ImGui::DragFloat(
-            "Max Angular Speed##maxAngSpeed", &maxAngularSpeed, dragStep, minVal, maxVal, "%.3f",
-            ImGuiSliderFlags_AlwaysClamp
-        );
+        ImGui::DragFloat("Max Angular Speed##maxAngSpeed", &maxAngularSpeed, dragStep, minVal, maxVal, "%.3f",ImGuiSliderFlags_AlwaysClamp);
 
         if (maxAngularSpeed > maxVal) maxAngularSpeed = maxVal;
 
-        bool prevUseRad = useRad;
+        bool prevUseRad = isRadians;
 
         ImGui::SameLine();
-        ImGui::Checkbox("Radians##maxAngCheck", &useRad);
+        ImGui::Checkbox("Radians##maxAngCheck", &isRadians);
 
-        if (useRad != prevUseRad)
+        if (isRadians != prevUseRad)
         {
-            if (useRad)
+            if (isRadians)
             {
                 maxAngularSpeed /= RAD_DEGREE_CONV;
             }
@@ -154,17 +148,17 @@ void CharacterControllerComponent::Move(const float3& direction, float deltaTime
     parentGO->UpdateTransformForGOBranch();
 }
 
-void CharacterControllerComponent::Rotate(float rotationDir, float deltaTime)
+void CharacterControllerComponent::Rotate(float rotationDirection, float deltaTime)
 {
     float angleDeg = 0.0f;
     
-    if (useRad)
+    if (isRadians)
     {
-        angleDeg = maxAngularSpeed * rotationDir * deltaTime;
+        angleDeg = maxAngularSpeed * rotationDirection * deltaTime;
     }
     else
     {
-        angleDeg = (maxAngularSpeed * rotationDir * deltaTime) / RAD_DEGREE_CONV; 
+        angleDeg = (maxAngularSpeed * rotationDirection * deltaTime) / RAD_DEGREE_CONV; 
     }
 
     float4x4 rotationMatrix = float4x4::FromEulerXYZ(0.0f, angleDeg, 0.0f);
@@ -173,7 +167,9 @@ void CharacterControllerComponent::Rotate(float rotationDir, float deltaTime)
     if (!parentGO) return;
 
     float4x4 localTr = parentGO->GetLocalTransform();
-    localTr          = localTr * rotationMatrix;
+    
+    localTr = localTr * rotationMatrix;
+    
     parentGO->SetLocalTransform(localTr);
     parentGO->UpdateTransformForGOBranch();
 
