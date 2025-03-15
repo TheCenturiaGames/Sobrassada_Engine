@@ -13,6 +13,9 @@ UID MaterialImporter::ImportMaterial(
     const tinygltf::Model& model, int materialIndex, const char* sourceFilePath, UID sourceUID
 )
 {
+    // If it has no materials exit
+    if (materialIndex == -1) return INVALID_UID;
+
     std::string path                       = FileSystem::GetFilePath(sourceFilePath);
     bool useOcclusion                      = false;
     const tinygltf::Material& gltfMaterial = model.materials[materialIndex];
