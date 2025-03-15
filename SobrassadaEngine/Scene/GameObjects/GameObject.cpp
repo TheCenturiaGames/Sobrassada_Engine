@@ -11,6 +11,7 @@
 
 #include <stack>
 
+
 GameObject::GameObject(std::string name) : name(name)
 {
     uid        = GenerateUID();
@@ -474,26 +475,35 @@ void GameObject::RenameGameObjectHierarchy()
 
 bool GameObject::TargetIsChildren(UID uidTarget)
 {
-
     if (children.size() <= 0) return false;
 
-    for (auto childUID : children)
+    std::stack<UID> nodesToVisit;
+
+    for (UID childUID : children)
     {
-        if (childUID == uidTarget)
+        nodesToVisit.push(childUID);
+    }
+
+    while (!nodesToVisit.empty())
+    {
+        UID currentUID = nodesToVisit.top();
+        nodesToVisit.pop();
+
+        if (currentUID == uidTarget) return true;
+
+        GameObject* currentGO = App->GetSceneModule()->GetGameObjectByUID(currentUID);
+
+        if (currentGO != nullptr)
         {
-            return true;
-        }
-        else
-        {
-            GameObject* childGO = App->GetSceneModule()->GetGameObjectByUID(childUID);
-            
-            if (childGO->TargetIsChildren(uidTarget)) return true;
+            for (UID grandChildUID : currentGO->children)
+            {
+                nodesToVisit.push(grandChildUID);
+            }
         }
     }
     return false;
 }
 
-//const MeshComponent* GameObject::GetMeshComponent() const;
 void GameObject::UpdateGameObjectHierarchy(UID sourceUID)
 {
     GameObject* sourceGameObject = App->GetSceneModule()->GetGameObjectByUID(sourceUID);
