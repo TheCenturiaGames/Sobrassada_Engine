@@ -159,6 +159,13 @@ namespace SceneImporter
                 GLOG("Failed to create directory: %s", SCENES_PATH);
             }
         }
+        if (!FileSystem::IsDirectory(MODELS_ASSETS_PATH))
+        {
+            if (!FileSystem::CreateDirectories(MODELS_ASSETS_PATH))
+            {
+                GLOG("Failed to create directory: %s", MODELS_ASSETS_PATH);
+            }
+        }
         if (!FileSystem::IsDirectory(METADATA_PATH))
         {
             if (!FileSystem::CreateDirectories(METADATA_PATH))
@@ -180,11 +187,11 @@ namespace SceneImporter
                 GLOG("Failed to create directory: %s", AUDIO_PATH);
             }
         }
-        if (!FileSystem::IsDirectory(MODELS_PATH))
+        if (!FileSystem::IsDirectory(MODELS_LIB_PATH))
         {
-            if (!FileSystem::CreateDirectories(MODELS_PATH))
+            if (!FileSystem::CreateDirectories(MODELS_LIB_PATH))
             {
-                GLOG("Failed to create directory: %s", MODELS_PATH);
+                GLOG("Failed to create directory: %s", MODELS_LIB_PATH);
             }
         }
         if (!FileSystem::IsDirectory(MESHES_PATH))

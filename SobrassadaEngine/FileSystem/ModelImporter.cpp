@@ -76,7 +76,7 @@ namespace ModelImporter
             UID modelUID              = GenerateUID();
             finalModelUID             = App->GetLibraryModule()->AssignFiletypeUID(modelUID, FileType::Model);
 
-            assetPath = ASSETS_PATH + std::string("Models/") + modelName + MODEL_EXTENSION;
+            assetPath = MODELS_ASSETS_PATH + modelName + MODEL_EXTENSION;
             MetaModel meta(finalModelUID, assetPath);
             meta.Save(modelName, assetPath);
         }
@@ -166,7 +166,7 @@ namespace ModelImporter
         rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
         doc.Accept(writer);
 
-        std::string saveFilePath  = MODELS_PATH + std::to_string(finalModelUID) + MODEL_EXTENSION;
+        std::string saveFilePath  = MODELS_LIB_PATH + std::to_string(finalModelUID) + MODEL_EXTENSION;
         unsigned int bytesWritten = (unsigned int
         )FileSystem::Save(saveFilePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
         if (bytesWritten == 0)
@@ -197,7 +197,7 @@ namespace ModelImporter
 
     void CopyModel(const std::string& filePath, const std::string& name, const UID sourceUID)
     {
-        std::string destination = MODELS_PATH + std::to_string(sourceUID) + MODEL_EXTENSION;
+        std::string destination = MODELS_LIB_PATH + std::to_string(sourceUID) + MODEL_EXTENSION;
         FileSystem::Copy(filePath.c_str(), destination.c_str());
 
         App->GetLibraryModule()->AddModel(sourceUID, name);
@@ -292,7 +292,7 @@ namespace ModelImporter
                 if (skinJSON.HasMember("BonesIndices") && skinJSON["BonesIndices"].IsArray())
                 {
                     const rapidjson::Value& initBonesIndices = skinJSON["BonesIndices"];
-                    for (int i = 0; i < initBonesIndices.Size(); ++i)
+                    for (unsigned int i = 0; i < initBonesIndices.Size(); ++i)
                     {
                         newSkin.bonesIndices.push_back(initBonesIndices[i].GetInt());
                     }
@@ -301,7 +301,7 @@ namespace ModelImporter
                 if (skinJSON.HasMember("InverseBindMatrices") && skinJSON["InverseBindMatrices"].IsArray())
                 {
                     const rapidjson::Value& initMatrices = skinJSON["InverseBindMatrices"];
-                    for (int i = 0; i < initMatrices.Size(); ++i)
+                    for (unsigned int i = 0; i < initMatrices.Size(); ++i)
                     {
                         if (initMatrices[i].IsArray() && initMatrices[i].Size() == 16)
                         {

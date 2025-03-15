@@ -133,14 +133,14 @@ void MeshComponent::Render()
 
         if (currentMaterial != nullptr)
         {
-            if(!currentMaterial->GetIsMetallicRoughness()) program = App->GetShaderModule()->GetSpecularGlossinessProgram();
+            if (!currentMaterial->GetIsMetallicRoughness())
+                program = App->GetShaderModule()->GetSpecularGlossinessProgram();
         }
         if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr)
             cameraUBO = App->GetSceneModule()->GetMainCamera()->GetUbo();
-        
+
         currentMesh->Render(
-            App->GetShaderModule()->GetProgramID(), GetParent()->GetGlobalTransform(), cameraUBO, currentMaterial,
-            bones, bindMatrices
+            program, GetParent()->GetGlobalTransform(), cameraUBO, currentMaterial, bones, bindMatrices
         );
     }
 }
