@@ -343,9 +343,6 @@
     <ClCompile Include="FileSystem\MetaPrefab.cpp">
       <Filter>FileSystem\Meta</Filter>
     </ClCompile>
-    <ClCompile Include="FileSystem\PrefabManager.cpp">
-      <Filter>FileSystem\Meta</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\Components\Standalone\CharacterControllerComponent.cpp">
       <Filter>Scene\Components</Filter>
     </ClCompile>
@@ -366,6 +363,9 @@
     </ClCompile>
     <ClCompile Include="Modules\UserInterfaceModule.cpp">
       <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\PrefabManager.cpp">
+      <Filter>FileSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -642,6 +642,7 @@
     <ClInclude Include="Modules\UserInterfaceModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
+    <ClInclude Include="Scene\AABBUpdatable.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl">

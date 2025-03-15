@@ -246,19 +246,14 @@ void LibraryModule::AddModel(UID modelUID, const std::string& modelName)
     modelMap[modelName] = modelUID;
 }
 
+void LibraryModule::AddPrefab(UID prefabUID, const std::string& prefabName)
+{
+    prefabMap[prefabName] = prefabUID;
+}
+
 void LibraryModule::AddName(const std::string& resourceName, UID resourceUID)
 {
     namesMap[resourceUID] = resourceName;
-}
-
-void LibraryModule::AddModel(UID modelUID, const std::string& modelPath)
-{
-    modelMap[modelPath] = modelUID;
-}
-
-void LibraryModule::AddPrefab(UID prefabUID, const std::string& prefabPath)
-{
-    prefabMap[prefabPath] = prefabUID; // Map the prefab UID to its path
 }
 
 UID LibraryModule::GetTextureUID(const std::string& texturePath) const
