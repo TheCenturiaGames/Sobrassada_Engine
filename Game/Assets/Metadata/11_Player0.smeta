@@ -1,0 +1,9 @@
+{
+    "UID": 1112657476181657,
+    "name": "Player0",
+    "assetPath": "Assets/Player.gltf",
+    "lastModifiedDate": 1739979581,
+    "importOptions": {
+        "generateTangents": false
+    }
+}
