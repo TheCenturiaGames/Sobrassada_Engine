@@ -18,6 +18,7 @@
 #include "Scene/Components/ComponentUtils.h"
 #include "Scene/Components/Standalone/MeshComponent.h"
 #include "SceneModule.h"
+#include "DebugUtils.h"
 
 #include "SDL_mouse.h"
 #include "imgui.h"
@@ -181,9 +182,23 @@ void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGa
     UpdateSpatialDataStruct();
 }
 
+update_status Scene::Update(float deltaTime)
+{
+
+    for (auto& gameObject : gameObjectsContainer)
+    {
+        std::unordered_map<ComponentType, Component*> componentList = gameObject.second->GetComponents();
+        for (auto& component : componentList)
+        {
+            component.second->Update();
+        }
+    }
+    return UPDATE_CONTINUE;
+}
+
 update_status Scene::Render(float deltaTime) const
 {
-    lightsConfig->RenderSkybox();
+    if (!debugShaderOptions[RENDER_WIREFRAME]) lightsConfig->RenderSkybox();
     lightsConfig->RenderLights();
 
     std::vector<GameObject*> objectsToRender;
@@ -300,6 +315,42 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
     ImGui::SetNextItemWidth(100.0f);
     if (ImGui::SliderFloat("Time scale", &timeScale, 0, 4)) gameTimer->SetTimeScale(timeScale);
 
+    ImGui::SameLine();
+
+    // RENDER OPTIONS
+    if (ImGui::Button("Render options"))
+    {
+        ImGui::OpenPopup("RenderOptions");
+    }
+
+    if (ImGui::BeginPopup("RenderOptions"))
+    {
+        float listBoxSize = debugShaderOptions.size() + debugRenderOptions.size() + 0.5f;
+        if (ImGui::BeginListBox(
+            "##RenderOptionsList",
+            ImVec2(ImGui::CalcItemWidth(), ImGui::GetFrameHeightWithSpacing() * listBoxSize)
+        ))
+        {
+            ImGui::Checkbox(RENDER_LIGTHS, &debugShaderOptions[RENDER_LIGTHS]);
+            if (ImGui::Checkbox("Render Wireframe", &debugShaderOptions[RENDER_WIREFRAME]))
+            {
+                App->GetOpenGLModule()->SetRenderWireframe(debugShaderOptions[RENDER_WIREFRAME]);
+            }
+
+            ImGui::Separator();
+
+            for (auto& debugOption : debugRenderOptions)
+            {
+                if (ImGui::Checkbox(debugOption.first.c_str(), &debugOption.second))
+                {
+                }
+            }
+
+            ImGui::EndListBox();
+        }
+
+        ImGui::EndPopup();
+    }
     if (App->GetSceneModule()->GetInPlayMode())
     {
         ImGui::SeparatorText("Playing");
@@ -355,7 +406,10 @@ void Scene::RenderScene()
     if (framebuffer->GetTextureWidth() != windowSize.x || framebuffer->GetTextureHeight() != windowSize.y)
     {
         float aspectRatio = windowSize.y / windowSize.x;
-        App->GetCameraModule()->SetAspectRatio(aspectRatio);
+        if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr)
+        {
+            App->GetSceneModule()->GetMainCamera()->SetAspectRatio(aspectRatio);
+        } else App->GetCameraModule()->SetAspectRatio(aspectRatio);
         framebuffer->Resize((int)windowSize.x, (int)windowSize.y);
     }
 
@@ -472,6 +526,7 @@ void Scene::CreateSpatialDataStruct()
     {
         AABB objectBB = objectIterator.second->GetGlobalAABB();
 
+        if (objectIterator.second->GetUID() == gameObjectRootUID) continue;
         if (objectBB.Size().x == 0 && objectBB.Size().y == 0 && objectBB.Size().z == 0) continue;
 
         sceneOctree->InsertElement(objectIterator.second);
@@ -488,13 +543,15 @@ void Scene::UpdateSpatialDataStruct()
 void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects) const
 {
     std::vector<GameObject*> queriedObjects;
-    const FrustumPlanes& frustumPlanes = App->GetCameraModule()->GetFrustrumPlanes();
+    FrustumPlanes frustumPlanes = App->GetCameraModule()->GetFrustrumPlanes();
+    if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr)
+        frustumPlanes = App->GetSceneModule()->GetMainCamera()->GetFrustrumPlanes();
 
     sceneOctree->QueryElements<FrustumPlanes>(frustumPlanes, queriedObjects);
 
     for (auto gameObject : queriedObjects)
     {
-        AABB objectOBB = gameObject->GetGlobalAABB();
+        OBB objectOBB = gameObject->GetGlobalOBB();
 
         if (frustumPlanes.Intersects(objectOBB)) outRenderGameObjects.push_back(gameObject);
     }

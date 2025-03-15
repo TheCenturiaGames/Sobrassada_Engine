@@ -11,6 +11,7 @@ class GameObject;
 class Component;
 class RootComponent;
 class Octree;
+class CameraComponent;
 
 class Scene
 {
@@ -30,6 +31,7 @@ class Scene
     void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
     void LoadModel(const UID modelUID);
 
+    update_status Update(float deltaTime);
     update_status Render(float deltaTime) const;
     update_status RenderEditor(float deltaTime);
 
@@ -54,7 +56,9 @@ class Scene
     GameObject* GetGameObjectByUID(UID gameObjectUID); // TODO: Change when filesystem defined
 
     LightsConfig* GetLightsConfig() { return lightsConfig; }
-    const Octree* GetOctree() const { return sceneOctree; }
+
+    void SetMainCamera(CameraComponent* camera) { mainCamera = camera; }
+    CameraComponent* GetMainCamera() { return mainCamera; }
 
     bool GetDoInputs() const { return doInputs; }
     bool GetStopPlaying() const { return stopPlaying; }
@@ -62,6 +66,7 @@ class Scene
     const std::tuple<float, float>& GetWindowPosition() const { return sceneWindowPosition; };
     const std::tuple<float, float>& GetWindowSize() const { return sceneWindowSize; };
     const std::tuple<float, float>& GetMousePosition() const { return mousePosition; };
+    Octree* GetOctree() const { return sceneOctree; }
 
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
 
@@ -76,6 +81,7 @@ class Scene
     const UID sceneUID;
     UID gameObjectRootUID;
     UID selectedGameObjectUID;
+    CameraComponent* mainCamera;
     bool stopPlaying = false;
     bool doInputs    = false;
 

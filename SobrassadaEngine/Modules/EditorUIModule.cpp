@@ -31,6 +31,11 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
 
 EditorUIModule::~EditorUIModule()
 {
+    for (auto values : openEditors)
+    {
+        delete values.second;
+    }
+    openEditors.clear();
 }
 
 bool EditorUIModule::Init()
@@ -80,6 +85,20 @@ update_status EditorUIModule::Update(float deltaTime)
 update_status EditorUIModule::RenderEditor(float deltaTime)
 {
     Draw();
+    for (auto it = openEditors.cbegin(); it != openEditors.cend();)
+    {
+        
+        if (!it->second->RenderEditor())
+        {
+            delete it->second;
+            it = openEditors.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+ 
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -257,6 +276,15 @@ void EditorUIModule::MainMenu()
             if (ImGui::MenuItem("Inspector", "", inspectorMenu)) inspectorMenu = !inspectorMenu;
             ImGui::EndDisabled();
 
+            ImGui::EndMenu();
+        }
+
+       
+
+        if (ImGui::BeginMenu("Engine Editor Window"))
+        {
+              
+            if (ImGui::MenuItem("Mockup Base Engine Editor", "")) OpenEditor(CreateEditor(EditorType::BASE));
             ImGui::EndMenu();
         }
 
@@ -829,6 +857,15 @@ T EditorUIModule::RenderResourceSelectDialog(
     return result;
 }
 
+
+void EditorUIModule::OpenEditor(EngineEditorBase* editorToOpen)
+{
+    if (editorToOpen != nullptr)
+    {
+        openEditors.insert({editorToOpen->GetUID(), editorToOpen});
+    }
+}
+
 void EditorUIModule::About(bool& aboutMenu) const
 {
     std::string title = "About " + std::string(ENGINE_NAME);
@@ -860,6 +897,8 @@ void EditorUIModule::About(bool& aboutMenu) const
     ImGui::Text(" - Geometry loader: TinyGLTF v2.9.3");
     ImGui::Text(" - Math: MathGeoLib v1.5");
     ImGui::Text(" - JSON: rapidjson v1.1");
+    ImGui::Text(" - UI: FreeType: v2.13.3");
+    ImGui::Text(" - RecastNavigation: v1.6.0");
     ImGui::Text("%s is licensed under the MIT License, see LICENSE for more information.", ENGINE_NAME);
 
     static bool show_config_info = false;
@@ -1019,6 +1058,20 @@ void EditorUIModule::About(bool& aboutMenu) const
         ImGui::EndChild();
     }
     ImGui::End();
+}
+
+EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
+{
+    UID uid = GenerateUID();
+    switch (type)
+    {
+    case EditorType::BASE:
+
+        return new EngineEditorBase("Base Editor " + std::to_string(uid), uid);
+
+    default:
+        return nullptr;
+    }
 }
 
 void EditorUIModule::EditorSettings(bool& editorSettingsMenu)

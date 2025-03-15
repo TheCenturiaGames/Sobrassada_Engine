@@ -1,4 +1,4 @@
-﻿#include "MeshComponent.h"
+#include "MeshComponent.h"
 
 #include "Application.h"
 #include "CameraModule.h"
@@ -12,6 +12,7 @@
 // #include "Scene/GameObjects/GameObject.h"
 
 #include "imgui.h"
+
 #include <Math/Quat.h>
 
 MeshComponent::MeshComponent(const UID uid, const UID uidParent) : Component(uid, uidParent, "Mesh", COMPONENT_MESH)
@@ -128,6 +129,15 @@ void MeshComponent::Render()
     if (enabled && currentMesh != nullptr)
     {
         unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
+        int program            = App->GetShaderModule()->GetMetallicRoughnessProgram();
+
+        if (currentMaterial != nullptr)
+        {
+            if(!currentMaterial->GetIsMetallicRoughness()) program = App->GetShaderModule()->GetSpecularGlossinessProgram();
+        }
+        if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr)
+            cameraUBO = App->GetSceneModule()->GetMainCamera()->GetUbo();
+        
         currentMesh->Render(
             App->GetShaderModule()->GetProgramID(), GetParent()->GetGlobalTransform(), cameraUBO, currentMaterial,
             bones, bindMatrices

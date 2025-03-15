@@ -5,6 +5,7 @@
 #include "GameObject.h"
 #include "OpenGLModule.h"
 #include "ResourceMaterial.h"
+#include "SceneModule.h"
 
 #include <Math/float2.h>
 #include <Math/float4x4.h>
@@ -101,8 +102,11 @@ void ResourceMesh::Render(
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     glUniformMatrix4fv(3, 1, GL_TRUE, modelMatrix.ptr());
+    float3 cameraPos;
+    if (App->GetSceneModule()->GetMainCamera() != nullptr && App->GetSceneModule()->GetInPlayMode())
+        cameraPos = App->GetSceneModule()->GetMainCamera()->GetCameraPosition();
+    else cameraPos = App->GetCameraModule()->GetCameraPosition();
 
-    float3 cameraPos = App->GetCameraModule()->GetCameraPosition();
     glUniform3fv(glGetUniformLocation(program, "cameraPos"), 1, &cameraPos[0]);
 
     // CPU Skinning

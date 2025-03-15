@@ -1,6 +1,5 @@
 #include "ResourcesModule.h"
 
-#include "Application.h"
 #include "FileSystem/Importer.h"
 #include "FileSystem/MeshImporter.h"
 #include "LibraryModule.h"
@@ -76,6 +75,7 @@ Resource* ResourcesModule::CreateNewResource(UID uid)
     if (loadedResource != nullptr)
     {
         resources.insert(std::pair(uid, loadedResource));
+        loadedResource->AddReference();
         return loadedResource;
     }
     return nullptr;
