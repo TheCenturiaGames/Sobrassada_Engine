@@ -61,6 +61,8 @@ bool EditorUIModule::Init()
 
 update_status EditorUIModule::PreUpdate(float deltaTime)
 {
+    #ifndef GAME
+
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
@@ -69,21 +71,29 @@ update_status EditorUIModule::PreUpdate(float deltaTime)
     // ImGuizmo::SetOrthographic(false);
     // ImGuizmo::AllowAxisFlip(false);
     // ImGuizmo::SetPlaneLimit(0);
-
+    
     ImGui::DockSpaceOverViewport();
+
+    #endif
 
     return UPDATE_CONTINUE;
 }
 
 update_status EditorUIModule::Update(float deltaTime)
 {
+    #ifndef GAME
+
     UpdateGizmoTransformMode();
     AddFramePlotData(deltaTime);
+
+    #endif
+
     return UPDATE_CONTINUE;
 }
 
 update_status EditorUIModule::RenderEditor(float deltaTime)
 {
+    #ifndef GAME
     Draw();
     for (auto it = openEditors.cbegin(); it != openEditors.cend();)
     {
@@ -103,11 +113,14 @@ update_status EditorUIModule::RenderEditor(float deltaTime)
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
+    #endif
     return UPDATE_CONTINUE;
 }
 
 update_status EditorUIModule::PostUpdate(float deltaTime)
 {
+    #ifndef GAME
+
     if (closeApplication) return UPDATE_STOP;
 
     if (closeScene)
@@ -115,6 +128,7 @@ update_status EditorUIModule::PostUpdate(float deltaTime)
         App->GetSceneModule()->CloseScene();
         closeScene = false;
     }
+    #endif
 
     return UPDATE_CONTINUE;
 }

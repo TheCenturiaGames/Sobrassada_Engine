@@ -51,12 +51,17 @@ update_status OpenGLModule::PreUpdate(float deltaTime)
     int CurrentHeight = 0;
     SDL_GetWindowSize(App->GetWindowModule()->window, &CurrentWidth, &CurrentHeight);
 
+    #ifndef GAME
     framebuffer->Bind();
+    #endif
 
     if (CurrentWidth && CurrentHeight)
     {
+        #ifndef GAME
         glViewport(0, 0, framebuffer->GetTextureWidth(), framebuffer->GetTextureHeight());
-
+        #else
+        glViewport(0, 0, CurrentWidth, CurrentHeight);
+        #endif
         glClearColor(clearColorRed, clearColorGreen, clearColorBlue, 1.0f);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -76,7 +81,9 @@ update_status OpenGLModule::Update(float deltaTime)
 
 update_status OpenGLModule::PostUpdate(float deltaTime)
 {
+    #ifndef GAME
     framebuffer->CheckResize();
+    #endif
 
     SDL_GL_SwapWindow(App->GetWindowModule()->window);
 
