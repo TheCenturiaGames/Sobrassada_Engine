@@ -2,7 +2,6 @@
 #include "DebugUtils.h"
 #include "Globals.h"
 
-#include "vld.h"
 #include "SDL.h"
 #pragma comment(lib, "Libs/SDL/lib/SDL2.lib")
 #pragma comment(lib, "Libs/SDL/lib/SDL2main.lib")
