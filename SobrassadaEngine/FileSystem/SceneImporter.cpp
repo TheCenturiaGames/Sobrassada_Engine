@@ -1,8 +1,10 @@
- #include "SceneImporter.h"
+#include "SceneImporter.h"
 
+#include "Application.h"
 #include "FileSystem.h"
 #include "MaterialImporter.h"
 #include "MeshImporter.h"
+#include "ProjectModule.h"
 #include "TextureImporter.h"
 #include "ModelImporter.h"
 
@@ -10,17 +12,20 @@ namespace SceneImporter
 {
     void Import(const char* filePath)
     {
-        CreateLibraryDirectories();
+        // TODO Is it necessary to create directories here? They should be already created
+        const std::string engineDefaultPath = ENGINE_DEFAULT_ASSETS;
+        CreateLibraryDirectories(App->GetProjectModule()->GetLoadedProjectPath());
+        CreateLibraryDirectories(engineDefaultPath);
 
         std::string extension = FileSystem::GetFileExtension(filePath);
 
-        if (extension == ASSET_EXTENSION) ImportGLTF(filePath);
-        else TextureImporter::Import(filePath);
+        if (extension == ASSET_EXTENSION) ImportGLTF(filePath, App->GetProjectModule()->GetLoadedProjectPath());
+        else TextureImporter::Import(filePath, App->GetProjectModule()->GetLoadedProjectPath());
     }
 
-    void ImportGLTF(const char* filePath)
+    void ImportGLTF(const char* filePath, const std::string& targetFilePath)
     {
-        tinygltf::Model model = LoadModelGLTF(filePath);
+        tinygltf::Model model = LoadModelGLTF(filePath, targetFilePath);
 
         std::vector<std::vector<std::pair<UID, UID>>> gltfMeshes;
         std::vector<int> matIndices;
@@ -33,7 +38,7 @@ namespace SceneImporter
             for (const auto& primitive : srcMesh.primitives)
             {
                 std::string name = srcMesh.name + std::to_string(n);
-                UID meshUID = MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath);
+                UID meshUID = MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath, targetFilePath);
                 n++;
 
                 UID matUID = INVALID_UID;
@@ -41,7 +46,7 @@ namespace SceneImporter
                 if (matIndex == -1) GLOG("Material index invalid for mesh: %s", name.c_str())
                 else if (std::find(matIndices.begin(), matIndices.end(), matIndex) == matIndices.end())
                 {
-                    matUID = MaterialImporter::ImportMaterial(model, matIndex, filePath);
+                    matUID = MaterialImporter::ImportMaterial(model, matIndex, filePath, targetFilePath);
                     matIndices.push_back(matIndex);
                 }
 
@@ -54,10 +59,10 @@ namespace SceneImporter
          GLOG("Total .gltf meshes: %d", gltfMeshes.size());
         
         // Import Model
-        ModelImporter::ImportModel(model, gltfMeshes, filePath);
+        ModelImporter::ImportModel(model, gltfMeshes, filePath, targetFilePath);
     }
 
-    tinygltf::Model LoadModelGLTF(const char* filePath)
+    tinygltf::Model LoadModelGLTF(const char* filePath, const std::string& targetFilePath)
     {
         tinygltf::TinyGLTF gltfContext;
         tinygltf::Model model;
@@ -84,7 +89,7 @@ namespace SceneImporter
 
         {
             // Copy gltf to Assets folder
-            std::string copyPath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(filePath);
+            std::string copyPath = targetFilePath + ASSETS_PATH + FileSystem::GetFileNameWithExtension(filePath);
             if (!FileSystem::Exists(copyPath.c_str())) FileSystem::Copy(filePath, copyPath.c_str());
         }
         {
@@ -94,7 +99,7 @@ namespace SceneImporter
             for (const auto& srcBuffers : model.buffers)
             {
                 std::string binPath     = path + srcBuffers.uri;
-                std::string copyBinPath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(binPath);
+                std::string copyBinPath = targetFilePath + ASSETS_PATH + FileSystem::GetFileNameWithExtension(binPath);
                 if (!FileSystem::Exists(copyBinPath.c_str())) FileSystem::Copy(binPath.c_str(), copyBinPath.c_str());
             }
         }
@@ -102,9 +107,9 @@ namespace SceneImporter
         return model;
     }
 
-    void ImportMeshFromMetadata(const std::string& filePath, const std::string& name, UID sourceUID)
+    void ImportMeshFromMetadata(const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID)
     {
-        tinygltf::Model model = LoadModelGLTF(filePath.c_str());
+        tinygltf::Model model = LoadModelGLTF(filePath.c_str(), targetFilePath);
 
         std::string nameNoExt = name;
         if (!name.empty()) nameNoExt.pop_back(); // remove last character (extension)
@@ -116,110 +121,121 @@ namespace SceneImporter
             {
                 for (const auto& primitive : srcMesh.primitives)
                 {
-                    MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath.c_str(), sourceUID);
+                    MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath.c_str(), targetFilePath, sourceUID);
                     return; // only one mesh with the same name
                 }
             }
         }
     }
 
-    void ImportMaterialFromMetadata(const std::string& filePath, const std::string& name, UID sourceUID)
+    void ImportMaterialFromMetadata(const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID)
     {
-        tinygltf::Model model = LoadModelGLTF(filePath.c_str());
+        tinygltf::Model model = LoadModelGLTF(filePath.c_str(), targetFilePath);
 
         // find material name that equals to name
         for (int i = 0; i < model.materials.size(); i++)
         {
             if (model.materials[i].name == name)
             {
-                MaterialImporter::ImportMaterial(model, i, filePath.c_str(), sourceUID);
+                MaterialImporter::ImportMaterial(model, i, filePath.c_str(), targetFilePath, sourceUID);
                 return; // only one material with the same name
             }
         }
     }
 
-    void ImportModelFromMetadata(const std::string& filePath, const std::string& name, UID sourceUID)
+    void ImportModelFromMetadata(const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID)
     {
-        ModelImporter::CopyModel(filePath, name, sourceUID);
+        ModelImporter::CopyModel(filePath, targetFilePath, name, sourceUID);
     }
 
-    void CreateLibraryDirectories()
+    void CreateLibraryDirectories(const std::string& projectFilePath)
     {
-        if (!FileSystem::IsDirectory(ASSETS_PATH))
+        const std::string convertedAssetPath = projectFilePath + ASSETS_PATH;
+        if (!FileSystem::IsDirectory(convertedAssetPath.c_str()))
         {
-            if (!FileSystem::CreateDirectories(ASSETS_PATH))
+            if (!FileSystem::CreateDirectories(convertedAssetPath.c_str()))
             {
-                GLOG("Failed to create directory: %s", ASSETS_PATH);
+                GLOG("Failed to create directory: %s", convertedAssetPath.c_str());
             }
         }
-        if (!FileSystem::IsDirectory(SCENES_PATH))
+        const std::string convertedScenePath = projectFilePath + SCENES_PATH;
+        if (!FileSystem::IsDirectory(convertedScenePath.c_str()))
         {
-            if (!FileSystem::CreateDirectories(SCENES_PATH))
+            if (!FileSystem::CreateDirectories(convertedScenePath.c_str()))
             {
-                GLOG("Failed to create directory: %s", SCENES_PATH);
+                GLOG("Failed to create directory: %s", convertedScenePath.c_str());
             }
         }
-        if (!FileSystem::IsDirectory(MODELS_ASSETS_PATH))
+        const std::string convertedModelAssetsPath = projectFilePath + MODELS_ASSETS_PATH;
+        if (!FileSystem::IsDirectory(convertedModelAssetsPath.c_str()))
         {
-            if (!FileSystem::CreateDirectories(MODELS_ASSETS_PATH))
+            if (!FileSystem::CreateDirectories(convertedModelAssetsPath.c_str()))
             {
-                GLOG("Failed to create directory: %s", MODELS_ASSETS_PATH);
+                GLOG("Failed to create directory: %s", convertedModelAssetsPath.c_str());
             }
         }
-        if (!FileSystem::IsDirectory(METADATA_PATH))
+        const std::string convertedMetadataPath = projectFilePath + METADATA_PATH;
+        if (!FileSystem::IsDirectory(convertedMetadataPath.c_str()))
         {
-            if (!FileSystem::CreateDirectories(METADATA_PATH))
+            if (!FileSystem::CreateDirectories(convertedMetadataPath.c_str()))
             {
-                GLOG("Failed to create directory: %s", METADATA_PATH);
+                GLOG("Failed to create directory: %s", convertedMetadataPath.c_str());
             }
         }
-        if (!FileSystem::IsDirectory(ANIMATIONS_PATH))
+        const std::string convertedAnimationsPath = projectFilePath + ANIMATIONS_PATH;
+        if (!FileSystem::IsDirectory(convertedAnimationsPath.c_str()))
         {
-            if (!FileSystem::CreateDirectories(ANIMATIONS_PATH))
+            if (!FileSystem::CreateDirectories(convertedAnimationsPath.c_str()))
             {
-                GLOG("Failed to create directory: %s", ANIMATIONS_PATH);
+                GLOG("Failed to create directory: %s", convertedAnimationsPath.c_str());
             }
         }
-        if (!FileSystem::IsDirectory(AUDIO_PATH))
+        const std::string convertedAudioPath = projectFilePath + AUDIO_PATH;
+        if (!FileSystem::IsDirectory(convertedAudioPath.c_str()))
         {
-            if (!FileSystem::CreateDirectories(AUDIO_PATH))
+            if (!FileSystem::CreateDirectories(convertedAudioPath.c_str()))
             {
-                GLOG("Failed to create directory: %s", AUDIO_PATH);
+                GLOG("Failed to create directory: %s", convertedAudioPath.c_str());
             }
         }
-        if (!FileSystem::IsDirectory(MODELS_LIB_PATH))
+        const std::string convertedBonesPath = projectFilePath + MODELS_LIB_PATH;
+        if (!FileSystem::IsDirectory(convertedBonesPath.c_str()))
         {
-            if (!FileSystem::CreateDirectories(MODELS_LIB_PATH))
+            if (!FileSystem::CreateDirectories(convertedBonesPath.c_str()))
             {
-                GLOG("Failed to create directory: %s", MODELS_LIB_PATH);
+                GLOG("Failed to create directory: %s", convertedBonesPath.c_str());
             }
         }
-        if (!FileSystem::IsDirectory(MESHES_PATH))
+        const std::string convertedMeshesPath = projectFilePath + MESHES_PATH;
+        if (!FileSystem::IsDirectory(convertedMeshesPath.c_str()))
         {
-            if (!FileSystem::CreateDirectories(MESHES_PATH))
+            if (!FileSystem::CreateDirectories(convertedMeshesPath.c_str()))
             {
-                GLOG("Failed to create directory: %s", MESHES_PATH);
+                GLOG("Failed to create directory: %s", convertedMeshesPath.c_str());
             }
         }
-        if (!FileSystem::IsDirectory(SCENES_PLAY_PATH))
+        const std::string convertedPlayScenePath = projectFilePath + SCENES_PLAY_PATH;
+        if (!FileSystem::IsDirectory(convertedPlayScenePath.c_str()))
         {
-            if (!FileSystem::CreateDirectories(SCENES_PLAY_PATH))
+            if (!FileSystem::CreateDirectories(convertedPlayScenePath.c_str()))
             {
-                GLOG("Failed to create directory: %s", SCENES_PLAY_PATH);
+                GLOG("Failed to create directory: %s", convertedPlayScenePath.c_str());
             }
         }
-        if (!FileSystem::IsDirectory(TEXTURES_PATH))
+        const std::string convertedTexturesPath = projectFilePath + TEXTURES_PATH;
+        if (!FileSystem::IsDirectory(convertedTexturesPath.c_str()))
         {
-            if (!FileSystem::CreateDirectories(TEXTURES_PATH))
+            if (!FileSystem::CreateDirectories(convertedTexturesPath.c_str()))
             {
-                GLOG("Failed to create directory: %s", TEXTURES_PATH);
+                GLOG("Failed to create directory: %s", convertedTexturesPath.c_str());
             }
         }
-        if (!FileSystem::IsDirectory(MATERIALS_PATH))
+        const std::string convertedMaterialsPath = projectFilePath + MATERIALS_PATH;
+        if (!FileSystem::IsDirectory(convertedMaterialsPath.c_str()))
         {
-            if (!FileSystem::CreateDirectories(MATERIALS_PATH))
+            if (!FileSystem::CreateDirectories(convertedMaterialsPath.c_str()))
             {
-                GLOG("Failed to create directory: %s", MATERIALS_PATH);
+                GLOG("Failed to create directory: %s", convertedMaterialsPath.c_str());
             }
         }
 

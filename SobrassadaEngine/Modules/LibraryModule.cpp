@@ -5,6 +5,7 @@
 #include "ComponentUtils.h"
 #include "FileSystem.h"
 #include "GameObject.h"
+#include "ProjectModule.h"
 #include "SceneImporter.h"
 #include "SceneModule.h"
 #include "TextureImporter.h"
@@ -27,8 +28,14 @@ LibraryModule::~LibraryModule()
 
 bool LibraryModule::Init()
 {
-    SceneImporter::CreateLibraryDirectories();
-    LoadLibraryMaps();
+    if (App->GetProjectModule()->IsProjectLoaded())
+    {
+        const std::string engineDefaultPath = ENGINE_DEFAULT_ASSETS;
+        SceneImporter::CreateLibraryDirectories(App->GetProjectModule()->GetLoadedProjectPath());
+        SceneImporter::CreateLibraryDirectories(engineDefaultPath);
+        LoadLibraryMaps(App->GetProjectModule()->GetLoadedProjectPath());
+        LoadLibraryMaps(engineDefaultPath);
+    }
 
     return true;
 }
@@ -41,23 +48,9 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
     Scene* loadedScene = App->GetSceneModule()->GetScene();
     if (loadedScene != nullptr)
     {
-        UID sceneUID = INVALID_UID;
-        std::string sceneName;
-        switch (saveMode)
-        {
-        case SaveMode::Save:
-            sceneUID  = loadedScene->GetSceneUID();
-            sceneName = loadedScene->GetSceneName();
-            break;
-        case SaveMode::SaveAs:
-            sceneUID  = GenerateUID();
-            sceneName = std::string(path);
-            break;
-        case SaveMode::SavePlayMode:
-            sceneUID  = loadedScene->GetSceneUID();
-            sceneName = loadedScene->GetSceneName();
-            break;
-        }
+        UID sceneUID = loadedScene->GetSceneUID();
+        const std::string& sceneName =
+            saveMode == SaveMode::SaveAs ? FileSystem::GetFileNameWithoutExtension(path) : loadedScene->GetSceneName();
 
         if (sceneName == DEFAULT_SCENE_NAME && saveMode == SaveMode::Save) return false;
 
@@ -68,7 +61,7 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
 
         rapidjson::Value scene(rapidjson::kObjectType);
 
-        if (saveMode == SaveMode::SaveAs) loadedScene->Save(scene, allocator, sceneUID, sceneName);
+        if (saveMode == SaveMode::SaveAs) loadedScene->Save(scene, allocator, GenerateUID(), sceneName.c_str());
         else loadedScene->Save(scene, allocator);
 
         doc.AddMember("Scene", scene, allocator);
@@ -81,8 +74,10 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
         std::string sceneFilePath;
 
         if (saveMode == SaveMode::SavePlayMode)
-            sceneFilePath = SCENES_PLAY_PATH + std::to_string(sceneUID) + SCENE_EXTENSION;
-        else sceneFilePath = SCENES_PATH + sceneName + SCENE_EXTENSION;
+            sceneFilePath = App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PLAY_PATH +
+                            std::to_string(sceneUID) + SCENE_EXTENSION;
+        else
+            sceneFilePath = App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PATH + sceneName + SCENE_EXTENSION;
 
         unsigned int bytesWritten = (unsigned int
         )FileSystem::Save(sceneFilePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
@@ -105,8 +100,8 @@ bool LibraryModule::LoadScene(const char* file, bool reload) const
     rapidjson::Document doc;
 
     std::string path;
-    if (reload) path = SCENES_PLAY_PATH;
-    else path = SCENES_PATH;
+    if (reload) path = App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PLAY_PATH;
+    else path = App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PATH;
 
     bool loaded = FileSystem::LoadJSON((path + std::string(file)).c_str(), doc);
 
@@ -128,9 +123,9 @@ bool LibraryModule::LoadScene(const char* file, bool reload) const
     return true;
 }
 
-bool LibraryModule::LoadLibraryMaps()
+bool LibraryModule::LoadLibraryMaps(const std::string& projectPath)
 {
-    for (const auto& entry : std::filesystem::recursive_directory_iterator(METADATA_PATH))
+    for (const auto& entry : std::filesystem::recursive_directory_iterator(projectPath + METADATA_PATH))
     {
         if (entry.is_regular_file() && (FileSystem::GetFileExtension(entry.path().string()) == META_EXTENSION))
         {
@@ -141,7 +136,7 @@ bool LibraryModule::LoadLibraryMaps()
 
             UID assetUID          = doc["UID"].GetUint64();
             std::string assetName = doc["name"].GetString();
-            std::string assetPath = doc["assetPath"].GetString();
+            std::string assetPath = projectPath + doc["assetPath"].GetString();
 
             UID prefix            = assetUID / UID_PREFIX_DIVISOR;
             std::string libraryPath;
@@ -151,30 +146,30 @@ bool LibraryModule::LoadLibraryMaps()
             case 11:
                 AddMesh(assetUID, assetName);
                 AddName(assetName, assetUID);
-                libraryPath = MESHES_PATH + std::to_string(assetUID) + MESH_EXTENSION;
+                libraryPath = projectPath + MESHES_PATH + std::to_string(assetUID) + MESH_EXTENSION;
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
-                else SceneImporter::ImportMeshFromMetadata(assetPath, assetName, assetUID);
+                else SceneImporter::ImportMeshFromMetadata(assetPath, projectPath, assetName, assetUID);
                 break;
             case 12:
                 AddTexture(assetUID, assetName);
                 AddName(assetName, assetUID);
-                libraryPath = TEXTURES_PATH + std::to_string(assetUID) + TEXTURE_EXTENSION;
+                libraryPath = projectPath + TEXTURES_PATH + std::to_string(assetUID) + TEXTURE_EXTENSION;
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
-                else TextureImporter::Import(assetPath.c_str(), assetUID);
+                else TextureImporter::Import(assetPath.c_str(), projectPath, assetUID);
                 break;
             case 13:
                 AddMaterial(assetUID, assetName);
                 AddName(assetName, assetUID);
-                libraryPath = MATERIALS_PATH + std::to_string(assetUID) + MATERIAL_EXTENSION;
+                libraryPath = projectPath + MATERIALS_PATH + std::to_string(assetUID) + MATERIAL_EXTENSION;
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
-                else SceneImporter::ImportMaterialFromMetadata(assetPath, assetName, assetUID);
+                else SceneImporter::ImportMaterialFromMetadata(assetPath, projectPath, assetName, assetUID);
                 break;
             case 14:
                 AddModel(assetUID, assetName);
                 AddName(assetName, assetUID);
-                libraryPath = MODELS_LIB_PATH + std::to_string(assetUID) + MODEL_EXTENSION;
+                libraryPath = projectPath + MODELS_LIB_PATH + std::to_string(assetUID) + MODEL_EXTENSION;
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
-                else SceneImporter::ImportModelFromMetadata(assetPath, assetName, assetUID);
+                else SceneImporter::ImportModelFromMetadata(assetPath, projectPath, assetName, assetUID);
                 break;
             default:
                 GLOG("Unknown UID prefix (%s) for: %s", std::to_string(prefix).c_str(), assetName.c_str());
