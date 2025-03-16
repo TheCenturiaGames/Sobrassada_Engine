@@ -43,7 +43,7 @@ bool EditorUIModule::Init()
     ImGuiContext* context = ImGui::CreateContext();
     ImGuizmo::SetImGuiContext(context);
     ImGuiIO& io     = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+    io.ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // IF using Docking Branch
 
@@ -65,7 +65,6 @@ update_status EditorUIModule::PreUpdate(float deltaTime)
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
     ImGuizmo::BeginFrame();
-
     // ImGuizmo::SetOrthographic(false);
     // ImGuizmo::AllowAxisFlip(false);
     // ImGuizmo::SetPlaneLimit(0);
