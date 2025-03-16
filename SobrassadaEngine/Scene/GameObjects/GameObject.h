@@ -14,8 +14,8 @@ class MeshComponent;
 
 enum ComponentMobilitySettings
 {
-    STATIC  = 0,
-    DYNAMIC = 1,
+    DYNAMIC = 0,
+    STATIC  = 1,
 };
 
 class GameObject
@@ -113,5 +113,5 @@ class GameObject
     float4x4 globalTransform             = float4x4::identity;
 
     ComponentType selectedComponentIndex = COMPONENT_NONE;
-    int mobilitySettings                 = DYNAMIC;
+    int mobilitySettings                 = STATIC;
 };
