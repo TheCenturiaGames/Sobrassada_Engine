@@ -78,6 +78,7 @@ Scene::~Scene()
 
     delete lightsConfig;
     delete sceneOctree;
+    
     lightsConfig = nullptr;
     sceneOctree  = nullptr;
 
