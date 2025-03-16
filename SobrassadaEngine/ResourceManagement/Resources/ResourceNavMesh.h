@@ -5,6 +5,7 @@
 #include "Libs/RecastDetour/Recast/Include/Recast.h"
 #include "Resource.h"
 
+
 class ResourceMesh;
 
 enum SamplePartitionType
@@ -57,9 +58,12 @@ class ResourceNavMesh : public Resource
     void SetContourOptions(float maxSimplificationError, int maxEdgeLen, int maxVertsPerPoly);
     void SetPolyMeshOptions(int maxVertsPerPoly, float detailSampleDist, float detailSampleMaxError);
 
+    void RenderNavmeshEditor();
+
     dtNavMesh* GetDetourNavMesh() { return navMesh; }
     dtNavMeshQuery* GetDetourNavMeshQuery() { return navQuery; }
-
+    
+    
   private:
     rcConfig config;
 
@@ -78,8 +82,7 @@ class ResourceNavMesh : public Resource
 
     float m_agentMaxClimb;
     float m_agentHeight;
-    float m_agentRadius;
-
+    float m_agentRadius; 
     unsigned char* triAreas;
 
     int partitionType;

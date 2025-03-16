@@ -4,6 +4,7 @@
 #include "DetourNavMeshBuilder.h"
 #include "ResourceMesh.h"
 #include "ResourcesModule.h"
+#include "EditorUIModule.h"
 
 #include "algorithm"
 
@@ -45,9 +46,9 @@ ResourceNavMesh::ResourceNavMesh(UID uid, const std::string& name) : Resource(ui
 
     // Default Walkable Options
     config.walkableSlopeAngle                        = 45.0f; // Max slope an agent can walk on
-    config.walkableClimb                             = 0.3f;  // Max step height agent can climb
-    config.walkableHeight                            = 2.0f;  // Min height required to pass
-    config.walkableRadius                            = 0.5f;  // Agent radius
+    config.walkableClimb                             = 1;  // Max step height agent can climb
+    config.walkableHeight                            = 2;  // Min height required to pass
+    config.walkableRadius                            = 1;  // Agent radius
 
     // Default Partition Options
     partitionType                                    = SAMPLE_PARTITION_MONOTONE;
@@ -489,4 +490,47 @@ void ResourceNavMesh::SetPolyMeshOptions(int maxVertsPerPoly, float detailSample
     config.maxVertsPerPoly      = maxVertsPerPoly;
     config.detailSampleDist     = detailSampleDist;
     config.detailSampleMaxError = detailSampleMaxError;
+}
+
+void ResourceNavMesh::RenderNavmeshEditor()
+{
+
+    ImGui::DragFloat("Cell Size", &config.cs, 0.1f, 0.1f, 2);
+    ImGui::DragFloat("Cell Height", &config.ch, 0.1f, 0.1f, 2);
+
+    ImGui::DragInt("Max Navmesh Width", &config.width, 1, 10, 10000);
+    ImGui::DragInt("Max Navmesh Height", &config.height, 1, 10, 10000);
+
+    ImGui::DragFloat("Max Walkable Slope Angle", &config.walkableSlopeAngle, 0.1f, 0.f, 90.f);
+    ImGui::DragInt("Max Walkable Climb", &config.walkableClimb, 1, 1, 100);
+    ImGui::DragInt("Max Walkable Height", &config.walkableHeight, 1, 1, 100);
+    ImGui::DragInt("Agent raidus", &config.walkableRadius, 1, 1, 100);
+
+    static SamplePartitionType currentSelection = SamplePartitionType ::SAMPLE_PARTITION_MONOTONE;
+    int currentIndex                            = static_cast<int>(currentSelection);
+
+    const char* partitionLabels[]               = {"SIMPLE_PARTITION_WATERSHED", "SAMPLE_PARTITION_MONOTONE", "SIMEPLE_PARTITION_LAYERS"};
+    if (ImGui::ListBox("Partition Type", &currentIndex, partitionLabels, IM_ARRAYSIZE(partitionLabels)))
+    {
+        partitionType = static_cast<SamplePartitionType>(currentIndex);
+    }
+
+    ImGui::DragInt("Minimum Region Area", &config.minRegionArea, 1, 1, 100);
+    ImGui::DragInt("Merge Region Area", &config.walkableHeight, 10, 10, 100);
+
+    ImGui::DragFloat("Max Simplification Error", &config.maxSimplificationError, 0.1f, 0.1f, 5);
+    ImGui::DragInt("Max Edges Length", &config.maxEdgeLen, 1, 1, 100);
+    ImGui::DragInt("Max Vertices Per Polygon", &config.maxVertsPerPoly, 1, 1, 100);
+
+    ImGui::DragFloat("Detail Sample Distance (hiher - more accurate but slower)", &config.detailSampleDist, 0.1f, 0.1f, 5);
+    ImGui::DragFloat("Detail Sample Max Error (higher - smoother but less accurate)", &config.detailSampleMaxError, 0.1f, 0.1f, 5);
+
+    ImGui::Checkbox("Filter Low hanging Obstacles", &m_filterLowHangingObstacles);
+    ImGui::Checkbox("Filter Ledge Spans", &m_filterLedgeSpans);
+    ImGui::Checkbox("Filter Walkable Low Height Spans", &m_filterWalkableLowHeightSpans);
+
+    ImGui::DragFloat("Detour Agent Height", &m_agentHeight, 0.1f, 0.1f, 5);
+    ImGui::DragFloat("Detour Max Agent Climb", &m_agentMaxClimb, 0.1f, 0.1f, 5);
+    ImGui::DragFloat("Detour Agent Radius", &m_agentRadius, 0.1f, 0.1f, 5);
+
 }

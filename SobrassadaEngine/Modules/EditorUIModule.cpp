@@ -700,6 +700,8 @@ void EditorUIModule::NavMesh(bool& navmesh)
         ImGui::Text("NavMesh created!");
     }
 
+    App->GetResourcesModule()->GetNavMesh()->RenderNavmeshEditor();
+
     ImGui::End();
 }
 
