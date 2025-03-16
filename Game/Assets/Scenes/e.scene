@@ -1,0 +1,44 @@
+{
+    "Scene": {
+        "UID": 15693650908823296033,
+        "Name": "e",
+        "RootGameObject": 7446305663875824892,
+        "GameObjects": [
+            {
+                "UID": 7446305663875824892,
+                "ParentUID": 0,
+                "Name": "SceneModule GameObject",
+                "Mobility": 1,
+                "LocalTransform": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "Components": [],
+                "Children": []
+            }
+        ],
+        "Lights Config": {
+            "Ambient Color": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Ambient Intensity": 0.20000000298023224,
+            "Skybox UID": 1224424059366999
+        }
+    }
+}

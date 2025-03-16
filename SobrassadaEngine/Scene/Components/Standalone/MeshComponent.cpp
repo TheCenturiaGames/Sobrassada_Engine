@@ -94,6 +94,8 @@ void MeshComponent::Clone(const Component* other)
         currentMaterialName = otherMesh->currentMaterialName;
         currentMaterial     = otherMesh->currentMaterial;
         currentMaterial->AddReference();
+
+        bindMatrices = otherMesh->bindMatrices;
     }
     else
     {

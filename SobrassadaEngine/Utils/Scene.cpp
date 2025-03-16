@@ -108,7 +108,7 @@ void Scene::Init()
     {
         OverridePrefabs(prefab);
     }
-    
+
     // Initialize the skinning for all the gameObjects that need it
     for (const auto& gameObject : gameObjectsContainer)
     {
@@ -424,7 +424,8 @@ void Scene::RenderScene()
         if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr)
         {
             App->GetSceneModule()->GetMainCamera()->SetAspectRatio(aspectRatio);
-        } else App->GetCameraModule()->SetAspectRatio(aspectRatio);
+        }
+        else App->GetCameraModule()->SetAspectRatio(aspectRatio);
         framebuffer->Resize((int)windowSize.x, (int)windowSize.y);
     }
 
@@ -610,7 +611,8 @@ void Scene::LoadModel(const UID modelUID)
         const Model& model                 = newModel->GetModelData();
         const std::vector<NodeData>& nodes = model.GetNodes();
 
-        GameObject* rootObject                 = new GameObject(GetGameObjectRootUID(), App->GetLibraryModule()->GetResourceName(modelUID));
+        GameObject* rootObject =
+            new GameObject(GetGameObjectRootUID(), App->GetLibraryModule()->GetResourceName(modelUID));
         rootObject->SetLocalTransform(nodes[0].transform);
 
         // Add the gameObject to the rootObject
@@ -634,7 +636,6 @@ void Scene::LoadModel(const UID modelUID)
         // to be already created
         for (int i = 0; i < nodes.size(); ++i)
         {
-            // If mesh has skin, add the reference here
             if (nodes[i].meshes.size() > 0)
             {
                 GameObject* currentGameObject = gameObjectsArray[i];
@@ -688,6 +689,8 @@ void Scene::LoadPrefab(const UID prefabUID, const ResourcePrefab* prefab, const 
 {
     if (prefabUID != INVALID_UID)
     {
+        std::map<UID, UID> remappingTable; // Reference UID | New GameObject UID
+
         const ResourcePrefab* resourcePrefab =
             prefab == nullptr ? (const ResourcePrefab*)App->GetResourcesModule()->RequestResource(prefabUID) : prefab;
         const std::vector<GameObject*>& referenceObjects = resourcePrefab->GetGameObjectsVector();
@@ -699,18 +702,43 @@ void Scene::LoadPrefab(const UID prefabUID, const ResourcePrefab* prefab, const 
         // If new, always appear at origin. If overriden, stay in place
         newObjects[0]->SetLocalTransform(transform);
 
-        // Right now it is loaded to the root gameObject
+        // First instantiate all gameObjects and components
         newObjects[0]->SetPrefabUID(prefabUID);
         GetGameObjectByUID(GetGameObjectRootUID())->AddGameObject(newObjects[0]->GetUID());
         AddGameObject(newObjects[0]->GetUID(), newObjects[0]);
+        remappingTable.insert({referenceObjects[0]->GetUID(), newObjects[0]->GetUID()});
 
-        // Add the gameObject to the scene. The parents will always be added before the children
         for (int i = 1; i < referenceObjects.size(); ++i)
         {
             UID parentUID = newObjects[parentIndices[i]]->GetUID();
             newObjects.push_back(new GameObject(parentUID, referenceObjects[i]));
             newObjects[parentIndices[i]]->AddGameObject(newObjects[i]->GetUID());
             AddGameObject(newObjects[i]->GetUID(), newObjects[i]);
+            remappingTable.insert({referenceObjects[i]->GetUID(), newObjects[i]->GetUID()});
+        }
+
+        // Then do a second loop to update all components UIDs reference (ex. skinning)
+        for (int i = 0; i < newObjects.size(); ++i)
+        {
+            MeshComponent* mesh = referenceObjects[i]->GetMeshComponent();
+            if (mesh != nullptr && mesh->GetBones().size() > 0)
+            {
+                // Remap the bones references
+                const std::vector<UID>& bones = mesh->GetBones();
+                std::vector<UID> newBonesUIDs;
+                std::vector<GameObject*> newBonesObjects;
+
+                for (const UID bone : bones)
+                {
+                    const UID uid = remappingTable.find(bone)->second;
+                    newBonesUIDs.push_back(uid);
+                    newBonesObjects.emplace_back(GetGameObjectByUID(uid));
+                }
+
+                // This should never be nullptr
+                MeshComponent* newMesh = newObjects[i]->GetMeshComponent();
+                newMesh->SetBones(newBonesObjects, newBonesUIDs);
+            }
         }
 
         if (prefab == nullptr) App->GetResourcesModule()->ReleaseResource(resourcePrefab);

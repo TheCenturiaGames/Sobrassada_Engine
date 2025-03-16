@@ -32,6 +32,7 @@ class MeshComponent : public Component
     void AddMesh(UID resource, bool updateParent = true);
     void AddMaterial(UID resource);
 
+    const std::vector<UID>& GetBones() const { return bonesUIDs; }
     void SetBones(const std::vector<GameObject*>& bones, const std::vector<UID> bonesIds)
     {
         this->bones     = bones;
