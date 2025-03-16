@@ -102,11 +102,11 @@ void ResourcesModule::CreateNavMesh()
             {
                 const MeshComponent* meshComponent = gameObject->GetMeshComponent();
                 const float4x4 globalMatrix        = gameObject->GetGlobalTransform();
-                aabb                               = gameObject->GetGlobalAABB();
+                
                 if (meshComponent)
                 {
                     const ResourceMesh* resourceMesh = meshComponent->GetResourceMesh();
-
+                    aabb                             = gameObject->GetGlobalAABB();
                     meshes.push_back(std::pair(resourceMesh, globalMatrix));
                 }
             }

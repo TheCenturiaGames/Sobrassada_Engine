@@ -40,19 +40,19 @@ ResourceNavMesh::ResourceNavMesh(UID uid, const std::string& name) : Resource(ui
     config.bmax[0] = config.bmax[1] = config.bmax[2] = 0.0f;
     config.cs                                        = 0.3f; // Default cell size
     config.ch                                        = 0.2f; // Default cell height
-    config.width                                     = 100;  // Arbitrary default width
-    config.height                                    = 100;  // Arbitrary default height
+    config.width                                     = 1000;  // Arbitrary default width
+    config.height                                    = 1000;  // Arbitrary default height
 
     // Default Walkable Options
     config.walkableSlopeAngle                        = 45.0f; // Max slope an agent can walk on
-    config.walkableClimb                             = 0.9f;  // Max step height agent can climb
+    config.walkableClimb                             = 0.5f;  // Max step height agent can climb
     config.walkableHeight                            = 2.0f;  // Min height required to pass
     config.walkableRadius                            = 0.5f;  // Agent radius
 
     // Default Partition Options
     partitionType                                    = SAMPLE_PARTITION_WATERSHED;
-    config.minRegionArea                             = 8;  // Min region area (small regions will be removed)
-    config.mergeRegionArea                           = 20; // Merge regions smaller than this size
+    config.minRegionArea                             = 10;  // Min region area (small regions will be removed)
+    config.mergeRegionArea                           = 30; // Merge regions smaller than this size
 
     // Default Contour Options
     config.maxSimplificationError                    = 1.3f;
@@ -60,17 +60,17 @@ ResourceNavMesh::ResourceNavMesh(UID uid, const std::string& name) : Resource(ui
     config.maxVertsPerPoly                           = 6;
 
     // Default PolyMesh Options
-    config.detailSampleDist                          = 6.0f; // Higher = more accurate, lower = faster
-    config.detailSampleMaxError                      = 1.0f; // Higher = more smooth, lower = accurate
+    config.detailSampleDist                          = 1.0f; // Higher = more accurate, lower = faster
+    config.detailSampleMaxError                      = 0.5f; // Higher = more smooth, lower = accurate
 
     // Default Filters
     m_filterLowHangingObstacles                      = true;
     m_filterLedgeSpans                               = true;
     m_filterWalkableLowHeightSpans                   = true;
 
-    m_agentHeight                                    = 100.0f;
-    m_agentMaxClimb                                  = 100.0f;
-    m_agentRadius                                    = 100.0f;
+    m_agentHeight                                    = 2.0f;
+    m_agentMaxClimb                                  = 0.5f;
+    m_agentRadius                                    = 0.5f;
 
     context                                          = nullptr;
     heightfield                                      = nullptr;
@@ -104,6 +104,7 @@ bool ResourceNavMesh::BuildNavMesh(
         const float3& maxBounds  = maxPoint;
 
         // Update the global AABB if necessary
+
         config.bmin[0]           = std::min(config.bmin[0], minBounds.x);
         config.bmin[1]           = std::min(config.bmin[1], minBounds.y);
         config.bmin[2]           = std::min(config.bmin[2], minBounds.z);
