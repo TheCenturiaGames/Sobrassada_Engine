@@ -73,6 +73,18 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
 
         doc.AddMember("Scene", scene, allocator);
 
+        LightsConfig* lightConfig = App->GetSceneModule()->GetLightsConfig();
+
+        if (lightConfig != nullptr)
+        {
+            rapidjson::Value lights(rapidjson::kObjectType);
+
+            lightConfig->SaveData(lights, allocator);
+
+            doc.AddMember("Lights Config", lights, allocator);
+        }
+        else GLOG("Light Config not found");
+
         // Save file like JSON
         rapidjson::StringBuffer buffer;
         rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
@@ -125,6 +137,12 @@ bool LibraryModule::LoadScene(const char* file, bool reload) const
     rapidjson::Value& scene = doc["Scene"];
 
     App->GetSceneModule()->LoadScene(scene, reload);
+
+    if (doc.HasMember("Lights Config") && doc["Lights Config"].IsObject())
+    {
+         LightsConfig* lightConfig = App->GetSceneModule()->GetLightsConfig();
+         lightConfig->LoadData(doc["Lights Config"]);
+    }
     return true;
 }
 
