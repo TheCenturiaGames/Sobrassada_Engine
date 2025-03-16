@@ -87,14 +87,11 @@ void MeshComponent::Clone(const Component* other)
         const MeshComponent* otherMesh = static_cast<const MeshComponent*>(other);
         enabled                        = otherMesh->enabled;
 
-        currentMeshName                = otherMesh->currentMeshName;
-        currentMesh                    = otherMesh->currentMesh;
-        currentMesh->AddReference();
+        AddMesh(otherMesh->currentMesh->GetUID());
+        AddMaterial(otherMesh->currentMaterial->GetUID());
 
-        currentMaterialName = otherMesh->currentMaterialName;
-        currentMaterial     = otherMesh->currentMaterial;
-        currentMaterial->AddReference();
-
+        modelUID     = otherMesh->modelUID;
+        skinIndex    = otherMesh->skinIndex;
         bindMatrices = otherMesh->bindMatrices;
     }
     else
@@ -170,6 +167,7 @@ void MeshComponent::Render(float deltaTime)
 
 void MeshComponent::InitSkin()
 {
+    if (bonesUIDs.size() > 0) return;
     for (UID uid : bonesUIDs)
     {
         bones.emplace_back(App->GetSceneModule()->GetGameObjectByUID(uid));

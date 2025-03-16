@@ -114,10 +114,7 @@ void Scene::Init()
     for (const auto& gameObject : gameObjectsContainer)
     {
         MeshComponent* mesh = gameObject.second->GetMeshComponent();
-        if (mesh != nullptr)
-        {
-            mesh->InitSkin();
-        }
+        if (mesh != nullptr) mesh->InitSkin();
     }
 
     lightsConfig->InitSkybox();
@@ -733,7 +730,7 @@ void Scene::LoadPrefab(const UID prefabUID, const ResourcePrefab* prefab, const 
                 {
                     const UID uid = remappingTable.find(bone)->second;
                     newBonesUIDs.push_back(uid);
-                    newBonesObjects.emplace_back(GetGameObjectByUID(uid));
+                    newBonesObjects.push_back(GetGameObjectByUID(uid));
                 }
 
                 // This should never be nullptr
@@ -754,7 +751,7 @@ void Scene::LoadPrefab(const UID prefabUID, const ResourcePrefab* prefab, const 
 void Scene::OverridePrefabs(const UID prefabUID)
 {
     const ResourcePrefab* prefab = (const ResourcePrefab*)App->GetResourcesModule()->RequestResource(prefabUID);
-
+    
     // If prefab is null, it no longer exists, then remove the prefab UID from all objects that may have it
     if (prefab == nullptr)
     {
@@ -764,7 +761,7 @@ void Scene::OverridePrefabs(const UID prefabUID)
         }
         return;
     }
-
+    
     // Store uids and transforms. We need transforms so when we override the prefab, the objects
     // stay in place. UIDs to delete the duplicates
     std::vector<UID> updatedObjects;
@@ -780,16 +777,16 @@ void Scene::OverridePrefabs(const UID prefabUID)
             }
         }
     }
-
+    
     for (const UID object : updatedObjects)
     {
         RemoveGameObjectHierarchy(object);
     }
-
+    
     for (const float4x4& transform : transforms)
     {
         LoadPrefab(prefabUID, prefab, transform);
     }
-
+    
     App->GetResourcesModule()->ReleaseResource(prefab);
 }
