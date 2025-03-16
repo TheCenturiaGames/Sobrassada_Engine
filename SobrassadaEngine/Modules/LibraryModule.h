@@ -35,7 +35,7 @@ class LibraryModule : public Module
     bool SaveScene(const char* path, SaveMode saveMode) const;
     bool LoadScene(const char* fileName, bool reload = false) const;
 
-    bool LoadLibraryMaps();
+    bool LoadLibraryMaps(const std::string& projectPath);
     UID AssignFiletypeUID(UID originalUID, FileType fileType);
 
     void AddTexture(UID textureUID, const std::string& ddsPath);
