@@ -8,6 +8,7 @@
 #include "InputModule.h"
 #include "LibraryModule.h"
 #include "OpenGLModule.h"
+#include "ProjectModule.h"
 #include "SceneImporter.h"
 #include "SceneModule.h"
 #include "WindowModule.h"
@@ -53,8 +54,7 @@ bool EditorUIModule::Init()
     width      = App->GetWindowModule()->GetWidth();
     height     = App->GetWindowModule()->GetHeight();
 
-    startPath  = std::filesystem::current_path().string();
-    scenesPath = startPath + DELIMITER + SCENES_PATH;
+    scenesPath = App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PATH;
 
     return true;
 }
@@ -84,21 +84,23 @@ update_status EditorUIModule::Update(float deltaTime)
 
 update_status EditorUIModule::RenderEditor(float deltaTime)
 {
-    Draw();
-    for (auto it = openEditors.cbegin(); it != openEditors.cend();)
+    if (App->GetProjectModule()->IsProjectLoaded())
     {
-        
-        if (!it->second->RenderEditor())
+        Draw();
+        for (auto it = openEditors.cbegin(); it != openEditors.cend();)
         {
-            delete it->second;
-            it = openEditors.erase(it);
-        }
-        else
-        {
-            ++it;
+
+            if (!it->second->RenderEditor())
+            {
+                delete it->second;
+                it = openEditors.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
         }
     }
- 
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -219,6 +221,7 @@ void EditorUIModule::MainMenu()
     // File tab menu
     if (ImGui::BeginMenu("File"))
     {
+        if (ImGui::MenuItem("Change Project", "")) App->GetProjectModule()->CloseCurrentProject();
 
         if (ImGui::MenuItem("Create", "")) App->GetSceneModule()->CreateScene();
 
@@ -279,11 +282,9 @@ void EditorUIModule::MainMenu()
             ImGui::EndMenu();
         }
 
-       
-
         if (ImGui::BeginMenu("Engine Editor Window"))
         {
-              
+
             if (ImGui::MenuItem("Mockup Base Engine Editor", "")) OpenEditor(CreateEditor(EditorType::BASE));
             ImGui::EndMenu();
         }
@@ -454,7 +455,7 @@ void EditorUIModule::SaveDialog(bool& saveMenu)
     {
         if (strlen(inputFile) > 0)
         {
-            std::string savePath = inputFile;
+            std::string savePath = scenesPath + inputFile + SCENE_EXTENSION;
             App->GetLibraryModule()->SaveScene(savePath.c_str(), SaveMode::SaveAs);
         }
         inputFile[0] = '\0';
@@ -479,17 +480,18 @@ void EditorUIModule::SaveDialog(bool& saveMenu)
     ImGui::End();
 }
 
-void EditorUIModule::ImportDialog(bool& importMenu)
+std::string EditorUIModule::RenderFileDialog(bool& window, const char* windowTitle, bool selectFolder) const
 {
     ImGui::SetNextWindowSize(ImVec2(width * 0.4f, height * 0.4f), ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin("Import Asset", &importMenu, ImGuiWindowFlags_NoCollapse))
+    if (!ImGui::Begin(windowTitle, &window, ImGuiWindowFlags_NoCollapse))
     {
         ImGui::End();
-        return;
+        return "";
     }
 
-    static std::string currentPath = startPath;
+    static std::string currentPath = App->GetProjectModule()->GetLoadedProjectPath();
+    if (currentPath == "") currentPath = "C:";
     static std::vector<std::string> accPaths;
     static bool loadButtons = true;
 
@@ -620,11 +622,20 @@ void EditorUIModule::ImportDialog(bool& importMenu)
                     loadFiles      = true;
                     loadButtons    = true;
                 }
-                else if (isDirectory)
+                else if (isDirectory && !selectFolder)
                 {
                     currentPath = filePath;
                     inputFile   = "";
                     selected    = -1;
+                    FileSystem::GetFilesSorted(currentPath, files);
+                    searchQuery[0] = '\0';
+                    loadFiles      = true;
+                    loadButtons    = true;
+                }
+                else if (isDirectory && selectFolder)
+                {
+                    currentPath = filePath;
+                    inputFile   = FileSystem::GetFileNameWithExtension(file);
                     FileSystem::GetFilesSorted(currentPath, files);
                     searchQuery[0] = '\0';
                     loadFiles      = true;
@@ -648,8 +659,8 @@ void EditorUIModule::ImportDialog(bool& importMenu)
     if (ImGui::Button("Cancel", ImVec2(0, 0)))
     {
         inputFile      = "";
-        currentPath    = startPath;
-        importMenu     = false;
+        currentPath    = App->GetProjectModule()->GetLoadedProjectPath();
+        window         = false;
         showDrives     = false;
         searchQuery[0] = '\0';
         loadFiles      = true;
@@ -659,17 +670,28 @@ void EditorUIModule::ImportDialog(bool& importMenu)
 
     if (ImGui::Button("Ok", ImVec2(0, 0)))
     {
+        std::string importPath = "";
         if (!inputFile.empty())
         {
-            std::string importPath = currentPath + DELIMITER + inputFile;
-            SceneImporter::Import(importPath.c_str());
+            if (selectFolder)
+            {
+                importPath = currentPath;
+            }
+            else
+            {
+                importPath = currentPath + DELIMITER + inputFile;
+            }
         }
+
         inputFile      = "";
-        currentPath    = startPath;
-        importMenu     = false;
+        currentPath    = App->GetProjectModule()->GetLoadedProjectPath();
+        window         = false;
         showDrives     = false;
         searchQuery[0] = '\0';
         loadFiles      = true;
+
+        ImGui::End();
+        return importPath;
     }
 
     if (!importMenu) {
@@ -682,6 +704,17 @@ void EditorUIModule::ImportDialog(bool& importMenu)
     }
 
     ImGui::End();
+
+    return "";
+}
+
+void EditorUIModule::ImportDialog(bool& import)
+{
+    const std::string resultingPath = RenderFileDialog(import, "Import Asset");
+    if (!resultingPath.empty())
+    {
+        SceneImporter::Import(resultingPath.c_str());
+    }
 }
 
 void EditorUIModule::Console(bool& consoleMenu) const
@@ -878,7 +911,6 @@ T EditorUIModule::RenderResourceSelectDialog(
     }
     return result;
 }
-
 
 void EditorUIModule::OpenEditor(EngineEditorBase* editorToOpen)
 {
