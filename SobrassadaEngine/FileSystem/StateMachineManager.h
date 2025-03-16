@@ -5,13 +5,14 @@
 
 #include "Math/float4x4.h"
 
-class ResourceStateMachine;
-
 namespace StateMachineManager
 {
 
-    void Save(ResourceStateMachine* stateMachine, const std::string& path);
+    void Save(
+        const std::vector<Clip>& clips, const std::vector<State>& states, const std::vector<Transition>& transitions,
+        const std::string& path, const UID sourceUID
+    );
     void CopyMachine(const std::string& filePath, const std::string& name, const UID sourceUID);
-    bool Load(ResourceStateMachine* stateMachine, const std::string& path);
+    ResourceStateMachine* Load(UID stateMachineUID);
 
 }; // namespace StateMachineManager

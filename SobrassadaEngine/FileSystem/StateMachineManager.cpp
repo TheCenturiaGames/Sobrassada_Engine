@@ -13,18 +13,21 @@
 
 namespace StateMachineManager
 {
-    void Save(ResourceStateMachine* stateMachine, const std::string& path)
+    void Save(
+        const std::vector<Clip>& clips, const std::vector<State>& states, const std::vector<Transition>& transitions,
+        const std::string& path, const UID sourceUID
+    )
     {
         std::vector<char> buffer;
 
         // --- Save Clips ---
-        uint32_t numClips = static_cast<uint32_t>(stateMachine->clips.size());
+        uint32_t numClips = static_cast<uint32_t>(clips.size());
         buffer.insert(
             buffer.end(), reinterpret_cast<const char*>(&numClips),
             reinterpret_cast<const char*>(&numClips) + sizeof(uint32_t)
         );
 
-        for (const auto& clip : stateMachine->clips)
+        for (const auto& clip : clips)
         {
             buffer.insert(
                 buffer.end(), reinterpret_cast<const char*>(&clip.clipUID),
@@ -44,13 +47,13 @@ namespace StateMachineManager
         }
 
         // --- Save States ---
-        uint32_t numStates = static_cast<uint32_t>(stateMachine->states.size());
+        uint32_t numStates = static_cast<uint32_t>(states.size());
         buffer.insert(
             buffer.end(), reinterpret_cast<const char*>(&numStates),
             reinterpret_cast<const char*>(&numStates) + sizeof(uint32_t)
         );
 
-        for (const auto& state : stateMachine->states)
+        for (const auto& state : states)
         {
             uint32_t nameSize = static_cast<uint32_t>(state.name.GetString().size());
             buffer.insert(
@@ -68,13 +71,13 @@ namespace StateMachineManager
         }
 
         // --- Save Transitions ---
-        uint32_t numTransitions = static_cast<uint32_t>(stateMachine->transitions.size());
+        uint32_t numTransitions = static_cast<uint32_t>(transitions.size());
         buffer.insert(
             buffer.end(), reinterpret_cast<const char*>(&numTransitions),
             reinterpret_cast<const char*>(&numTransitions) + sizeof(uint32_t)
         );
 
-        for (const auto& t : stateMachine->transitions)
+        for (const auto& t : transitions)
         {
             uint32_t fromSize = static_cast<uint32_t>(t.fromState.GetString().size());
             buffer.insert(
@@ -104,20 +107,25 @@ namespace StateMachineManager
         }
 
         const std::string stateMachineName = FileSystem::GetFileNameWithoutExtension(path);
-        UID finalStateMachineUID;
-        UID stateMachineUID  = GenerateUID();
-        finalStateMachineUID = App->GetLibraryModule()->AssignFiletypeUID(stateMachineUID, FileType::StateMachine);
 
-        std::string saveFilePath =
-            STATEMACHINES_LIB_PATH + std::to_string(finalStateMachineUID) + STATEMACHINE_EXTENSION;
+       UID finalStateMachineUID;
 
-        if (stateMachineUID == INVALID_UID)
+        if (sourceUID == INVALID_UID)
         {
+            UID stateMachineUID = GenerateUID();
+            finalStateMachineUID  =
+                App->GetLibraryModule()->AssignFiletypeUID(stateMachineUID, FileType::StateMachine);
+
             std::string assetPath = STATEMACHINES_ASSETS_PATH + stateMachineName + MODEL_EXTENSION;
-            MetaModel meta(finalStateMachineUID, saveFilePath);
+            MetaModel meta(finalStateMachineUID, assetPath);
             meta.Save(stateMachineName, assetPath);
         }
-
+        else
+        {
+            finalStateMachineUID = sourceUID;
+        }
+        std::string saveFilePath =
+            STATEMACHINES_LIB_PATH + std::to_string(finalStateMachineUID) + STATEMACHINE_EXTENSION;
         FileSystem::Save(saveFilePath.c_str(), buffer.data(), buffer.size(), true);
 
         App->GetLibraryModule()->AddStateMachine(finalStateMachineUID, stateMachineName);
@@ -135,17 +143,27 @@ namespace StateMachineManager
         App->GetLibraryModule()->AddResource(destination, sourceUID);
     }
 
-    bool Load(ResourceStateMachine* stateMachine, const std::string& path)
+   ResourceStateMachine* Load(UID stateMachineUID)
     {
+        std::string path = App->GetLibraryModule()->GetResourcePath(stateMachineUID);
+        if (path.empty())
+        {
+            GLOG("Invalid path for StateMachine UID %llu", stateMachineUID);
+            return nullptr;
+        }
+
         char* buffer  = nullptr;
         uint32_t size = FileSystem::Load(path.c_str(), &buffer);
-        if (!buffer || size == 0) return false;
+        if (!buffer || size == 0)
+        {
+            GLOG("Failed to load StateMachine file: %s", path.c_str());
+            return nullptr;
+        }
 
         char* cursor = buffer;
 
-        stateMachine->clips.clear();
-        stateMachine->states.clear();
-        stateMachine->transitions.clear();
+        ResourceStateMachine* stateMachine =
+            new ResourceStateMachine(stateMachineUID, FileSystem::GetFileNameWithoutExtension(path));
 
         // --- Load Clips ---
         uint32_t numClips = 0;
@@ -158,9 +176,9 @@ namespace StateMachineManager
             memcpy(&clip.clipUID, cursor, sizeof(UID));
             cursor += sizeof(UID);
             memcpy(&clip.loop, cursor, sizeof(bool));
-            cursor            += sizeof(bool);
+            cursor += sizeof(bool);
 
-            uint32_t nameSize  = 0;
+            uint32_t nameSize;
             memcpy(&nameSize, cursor, sizeof(uint32_t));
             cursor += sizeof(uint32_t);
             std::string name(cursor, nameSize);
@@ -179,18 +197,18 @@ namespace StateMachineManager
         {
             State state;
 
-            uint32_t nameSize = 0;
+            uint32_t nameSize;
             memcpy(&nameSize, cursor, sizeof(uint32_t));
             cursor += sizeof(uint32_t);
             std::string stateName(cursor, nameSize);
-            cursor            += nameSize;
-            state.name         = HashString(stateName);
+            cursor     += nameSize;
+            state.name  = HashString(stateName);
 
-            uint32_t clipSize  = 0;
-            memcpy(&clipSize, cursor, sizeof(uint32_t));
+            uint32_t clipNameSize;
+            memcpy(&clipNameSize, cursor, sizeof(uint32_t));
             cursor += sizeof(uint32_t);
-            std::string clipName(cursor, clipSize);
-            cursor         += clipSize;
+            std::string clipName(cursor, clipNameSize);
+            cursor         += clipNameSize;
             state.clipName  = HashString(clipName);
 
             stateMachine->states.push_back(state);
@@ -205,21 +223,21 @@ namespace StateMachineManager
         {
             Transition t;
 
-            uint32_t fromSize = 0;
+            uint32_t fromSize;
             memcpy(&fromSize, cursor, sizeof(uint32_t));
             cursor += sizeof(uint32_t);
             std::string from(cursor, fromSize);
-            cursor          += fromSize;
-            t.fromState      = HashString(from);
+            cursor      += fromSize;
+            t.fromState  = HashString(from);
 
-            uint32_t toSize  = 0;
+            uint32_t toSize;
             memcpy(&toSize, cursor, sizeof(uint32_t));
             cursor += sizeof(uint32_t);
             std::string to(cursor, toSize);
-            cursor               += toSize;
-            t.toState             = HashString(to);
+            cursor    += toSize;
+            t.toState  = HashString(to);
 
-            uint32_t triggerSize  = 0;
+            uint32_t triggerSize;
             memcpy(&triggerSize, cursor, sizeof(uint32_t));
             cursor += sizeof(uint32_t);
             std::string trigger(cursor, triggerSize);
@@ -233,6 +251,9 @@ namespace StateMachineManager
         }
 
         delete[] buffer;
-        return true;
+
+        GLOG("StateMachine %llu loaded successfully from: %s", stateMachineUID, path.c_str());
+
+        return stateMachine;
     }
 } // namespace StateMachineManager
