@@ -5,6 +5,7 @@
 #include "FileSystem.h"
 #include "LibraryModule.h"
 #include "Octree.h"
+#include "Quadtree.h"
 
 #include "Application.h"
 #include "InputModule.h"
@@ -70,8 +71,8 @@ update_status SceneModule::PostUpdate(float deltaTime)
         const KeyState* keyboard     = App->GetInputModule()->GetKeyboard();
         if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_DOWN && !keyboard[SDL_SCANCODE_LALT])
         {
-            GameObject* selectedObject = RaycastController::GetRayIntersection<Octree>(
-                App->GetCameraModule()->CastCameraRay(), loadedScene->GetOctree()
+            GameObject* selectedObject = RaycastController::GetRayIntersectionTrees<Octree, Quadtree>(
+                App->GetCameraModule()->CastCameraRay(), loadedScene->GetOctree(), loadedScene->GetDynamicTree()
             );
 
             if (selectedObject != nullptr)

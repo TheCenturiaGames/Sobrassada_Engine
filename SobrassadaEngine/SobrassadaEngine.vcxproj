@@ -349,6 +349,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Modules\OpenGLModule.cpp" />
     <ClCompile Include="Modules\ShaderModule.cpp" />
+    <ClCompile Include="Utils\RaycastController.cpp" />
     <ClCompile Include="Utils\Scene.cpp" />
     <ClCompile Include="Utils\GameTimer.cpp" />
     <ClCompile Include="Modules\WindowModule.cpp" />
