@@ -100,6 +100,7 @@ class LightsConfig
 
   private:
     UID skyboxUID;
+    unsigned int skyboxVbo;
     unsigned int skyboxVao;
     unsigned int skyboxTexture;
     unsigned int skyboxProgram;

@@ -110,7 +110,6 @@ void ResourceMaterial::LoadMaterialData(Material mat)
 
         metallicTexture.width  = metallicRoughnessTexture->GetTextureWidth();
         metallicTexture.height = metallicRoughnessTexture->GetTextureHeight();
-
     }
 
     if (metallicTexture.textureID == 0)
@@ -128,6 +127,8 @@ void ResourceMaterial::LoadMaterialData(Material mat)
 
             material.shininessInAlpha = true;
         }
+
+        delete specTexture;
     }
 
     ResourceTexture* normTexture = TextureImporter::LoadTexture(mat.GetNormalTexture());
@@ -147,6 +148,10 @@ void ResourceMaterial::LoadMaterialData(Material mat)
     glBindBuffer(GL_UNIFORM_BUFFER, ubo);
     glBufferData(GL_UNIFORM_BUFFER, sizeof(MaterialGPU), &material, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    delete diffTexture;
+    delete metallicRoughnessTexture;
+    delete normTexture;
 }
 
 void ResourceMaterial::RenderMaterial(int program) const
@@ -170,6 +175,7 @@ void ResourceMaterial::FreeMaterials() const
     glDeleteTextures(1, &metallicTexture.textureID);
     glDeleteTextures(1, &specularTexture.textureID);
     glDeleteTextures(1, &normalTexture.textureID);
+
     glDeleteBuffers(1, &ubo);
 }
 
