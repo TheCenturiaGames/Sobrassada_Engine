@@ -361,6 +361,12 @@ void EditorUIModule::LoadDialog(bool& loadMenu)
         loadMenu  = false;
     }
 
+    if (!loadMenu)
+    {
+        files.clear();
+        files.shrink_to_fit();
+    }
+
     ImGui::End();
 }
 
@@ -463,6 +469,13 @@ void EditorUIModule::SaveDialog(bool& saveMenu)
         inputFile[0] = '\0';
         saveMenu     = false;
     }
+
+    if (!saveMenu)
+    {
+        files.clear();
+        files.shrink_to_fit();
+    }
+
 
     ImGui::End();
 }
@@ -679,6 +692,15 @@ std::string EditorUIModule::RenderFileDialog(bool& window, const char* windowTit
 
         ImGui::End();
         return importPath;
+    }
+
+    if (!importMenu) {
+        accPaths.clear();
+        accPaths.shrink_to_fit();
+        files.clear();
+        files.shrink_to_fit();
+        filteredFiles.clear();
+        filteredFiles.shrink_to_fit();
     }
 
     ImGui::End();
