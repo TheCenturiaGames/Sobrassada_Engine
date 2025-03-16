@@ -360,7 +360,7 @@ void EditorUIModule::LoadDialog(bool& loadMenu)
         loadMenu  = false;
     }
 
-    if (!saveMenu)
+    if (!loadMenu)
     {
         files.clear();
         files.shrink_to_fit();
