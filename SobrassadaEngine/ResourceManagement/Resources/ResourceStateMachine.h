@@ -61,9 +61,7 @@ class ResourceStateMachine : public Resource
     bool RemoveState(const std::string& stateName);
     bool EditState(const std::string& oldStateName, const std::string& newStateName, const std::string& newClipName);
 
-    void AddTransition(
-        const std::string& fromState, const std::string& toState, const std::string& trigger, unsigned interpolationTime
-    );
+    void AddTransition(const std::string& fromState, const std::string& toState, const std::string& trigger, unsigned interpolationTime);
     bool RemoveTransition(const std::string& fromState, const std::string& toState);
     bool EditTransition(
         const std::string& fromState, const std::string& toState, const std::string& newTrigger,
