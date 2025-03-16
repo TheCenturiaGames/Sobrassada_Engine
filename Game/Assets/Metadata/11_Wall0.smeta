@@ -1,0 +1,9 @@
+{
+    "UID": 1185072238712738,
+    "name": "Wall0",
+    "assetPath": "Assets/Wall.gltf",
+    "lastModifiedDate": 1739979581,
+    "importOptions": {
+        "generateTangents": true
+    }
+}

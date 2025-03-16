@@ -362,6 +362,12 @@ void EditorUIModule::LoadDialog(bool& loadMenu)
         loadMenu  = false;
     }
 
+    if (!loadMenu)
+    {
+        files.clear();
+        files.shrink_to_fit();
+    }
+
     ImGui::End();
 }
 
@@ -464,6 +470,13 @@ void EditorUIModule::SaveDialog(bool& saveMenu)
         inputFile[0] = '\0';
         saveMenu     = false;
     }
+
+    if (!saveMenu)
+    {
+        files.clear();
+        files.shrink_to_fit();
+    }
+
 
     ImGui::End();
 }
@@ -659,6 +672,15 @@ void EditorUIModule::ImportDialog(bool& importMenu)
         showDrives     = false;
         searchQuery[0] = '\0';
         loadFiles      = true;
+    }
+
+    if (!importMenu) {
+        accPaths.clear();
+        accPaths.shrink_to_fit();
+        files.clear();
+        files.shrink_to_fit();
+        filteredFiles.clear();
+        filteredFiles.shrink_to_fit();
     }
 
     ImGui::End();

@@ -16,7 +16,7 @@ class CameraComponent : public Component
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
 
     void Update() override;
-    void Render() override;
+    void Render(float deltaTime) override;
     void RenderEditorInspector() override;
 
     void ChangeToPerspective();

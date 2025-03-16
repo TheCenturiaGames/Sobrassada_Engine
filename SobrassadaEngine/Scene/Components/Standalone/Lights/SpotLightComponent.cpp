@@ -72,7 +72,7 @@ void SpotLightComponent::RenderEditorInspector()
     }
 }
 
-void SpotLightComponent::Render()
+void SpotLightComponent::Render(float deltaTime)
 {
     if (!enabled || !drawGizmos || App->GetSceneModule()->GetInPlayMode()) return;
 

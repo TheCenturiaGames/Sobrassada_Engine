@@ -300,23 +300,13 @@ void GameObject::UpdateTransformForGOBranch() const
     App->GetSceneModule()->RegenerateTree();
 }
 
-const MeshComponent* GameObject::GetMeshComponent() const
+MeshComponent* GameObject::GetMeshComponent() const
 {
     if (components.find(COMPONENT_MESH) != components.end())
     {
-        return dynamic_cast<const MeshComponent*>(components.at(COMPONENT_MESH));
+        return dynamic_cast<MeshComponent*>(components.at(COMPONENT_MESH));
     }
     return nullptr;
-}
-
-void GameObject::AddModel(UID meshUid, UID materialUid) const
-{
-    if (components.find(COMPONENT_MESH) != components.end())
-    {
-        MeshComponent* mesh = static_cast<MeshComponent*>(components.at(COMPONENT_MESH));
-        mesh->AddMesh(meshUid);
-        mesh->AddMaterial(materialUid);
-    }
 }
 
 void GameObject::OnTransformUpdated()
@@ -511,11 +501,11 @@ void GameObject::OnAABBUpdated()
     OnTransformUpdated();
 }
 
-void GameObject::Render() const
+void GameObject::Render(float deltaTime) const
 {
     for (auto& component : components)
     {
-        component.second->Render();
+        component.second->Render(deltaTime);
     }
 }
 
