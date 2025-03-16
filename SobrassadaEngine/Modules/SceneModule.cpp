@@ -58,10 +58,12 @@ update_status SceneModule::Render(float deltaTime)
 
 update_status SceneModule::RenderEditor(float deltaTime)
 {
+    #ifndef GAME
     if (loadedScene != nullptr)
     {
         return loadedScene->RenderEditor(deltaTime);
     }
+    #endif
     return UPDATE_CONTINUE;
 }
 

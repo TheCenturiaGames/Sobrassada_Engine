@@ -369,6 +369,9 @@
     <ClCompile Include="FileSystem\Config\EngineConfig.cpp">
       <Filter>FileSystem\Config</Filter>
     </ClCompile>
+    <ClCompile Include="FileSystem\Config\ProjectConfig.cpp">
+      <Filter>FileSystem\Config</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -669,6 +672,9 @@
       <Filter>FileSystem\Config</Filter>
     </ClInclude>
     <ClInclude Include="FileSystem\Config\ConfigFile.h">
+      <Filter>FileSystem\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\Config\ProjectConfig.h">
       <Filter>FileSystem\Config</Filter>
     </ClInclude>
   </ItemGroup>
