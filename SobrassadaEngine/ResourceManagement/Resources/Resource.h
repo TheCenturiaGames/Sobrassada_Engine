@@ -12,7 +12,8 @@ enum class ResourceType
     Mesh,      // 11
     Texture,   // 12
     Material,  // 13
-    Model      // 14
+    Model,     // 14
+    NavMesh    // 15  
 };
 
 class Resource

@@ -2,6 +2,7 @@
 
 #include "Module.h"
 #include "ResourceManagement/Resources/Resource.h"
+#include "ResourceManagement/Resources/ResourceNavMesh.h"
 
 #include <map>
 
@@ -15,7 +16,9 @@ class ResourcesModule : public Module
     bool ShutDown() override;
 
     Resource* RequestResource(UID uid);
+    void CreateNavMesh();
     void ReleaseResource(const Resource* resource);
+    ResourceNavMesh* GetNavMesh() { return &myNavmesh; }
 
   private:
     Resource* CreateNewResource(UID uid);
@@ -25,4 +28,5 @@ class ResourcesModule : public Module
     int specularGlossinessProgram = -1;
     int metallicRoughnessProgram  = -1;
     std::map<UID, Resource*> resources;
+    ResourceNavMesh myNavmesh;
 };

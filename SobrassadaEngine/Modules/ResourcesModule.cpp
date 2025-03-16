@@ -1,17 +1,20 @@
 #include "ResourcesModule.h"
-
+#include "Application.h"
 #include "FileSystem/Importer.h"
 #include "FileSystem/MeshImporter.h"
 #include "LibraryModule.h"
 #include "ResourceManagement/Resources/ResourceMaterial.h"
 #include "ResourceManagement/Resources/ResourceMesh.h"
 #include "ResourceManagement/Resources/ResourceTexture.h"
+#include "ResourceManagement/Resources/ResourceNavMesh.h"
 #include "SceneModule.h"
+#include "Scene/Components/Standalone/MeshComponent.h"
 #include "ShaderModule.h"
+#include <vector>
 
 #include <Algorithm/Random/LCG.h> // TODO: LCG remove includes
 
-ResourcesModule::ResourcesModule()
+ResourcesModule::ResourcesModule() : myNavmesh(15345456565, "defaultName")
 {
 }
 
@@ -79,4 +82,35 @@ Resource* ResourcesModule::CreateNewResource(UID uid)
         return loadedResource;
     }
     return nullptr;
+}
+
+void ResourcesModule::CreateNavMesh()
+{
+
+    UID navMeshUID          = 15345456565; // Some unique identifier
+    std::string navMeshName = "testnavmesh";
+    std::vector<std::pair<const ResourceMesh*, const float4x4&>> meshes;
+    AABB aabb;
+    const std::unordered_map<UID, GameObject*>* gameObjects = App->GetSceneModule()->GetAllGameObjects();
+
+    if (gameObjects)
+    {
+        for (const auto& pair : *gameObjects)
+        {
+            GameObject* gameObject = pair.second;
+            if (gameObject)
+            {
+                const MeshComponent* meshComponent = gameObject->GetMeshComponent();
+                const float4x4 globalMatrix        = gameObject->GetGlobalTransform();
+                aabb                               = gameObject->GetGlobalAABB();
+                if (meshComponent)
+                {
+                    const ResourceMesh* resourceMesh = meshComponent->GetResourceMesh();
+
+                    meshes.push_back(std::pair(resourceMesh, globalMatrix));
+                }
+            }
+        }
+    }
+    myNavmesh.BuildNavMesh(meshes, aabb.minPoint, aabb.maxPoint);
 }

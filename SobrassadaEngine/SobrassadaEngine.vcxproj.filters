@@ -358,6 +358,9 @@
     <ClCompile Include="Modules\UserInterfaceModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
+    <ClCompile Include="ResourceManagement\Resources\ResourceNavMesh.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -617,6 +620,9 @@
     </ClInclude>
     <ClInclude Include="Modules\UserInterfaceModule.h">
       <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManagement\Resources\ResourceNavMesh.h">
+      <Filter>Resources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

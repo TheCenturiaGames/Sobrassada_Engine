@@ -11,6 +11,7 @@
 #include "SceneImporter.h"
 #include "SceneModule.h"
 #include "WindowModule.h"
+#include "ResourcesModule.h"
 
 #include "glew.h"
 #include "imgui.h"
@@ -206,6 +207,8 @@ void EditorUIModule::Draw()
 
     if (saveMenu) SaveDialog(saveMenu);
 
+    if (navmesh) NavMesh(navmesh);
+
     if (editorSettingsMenu) EditorSettings(editorSettingsMenu);
 }
 
@@ -236,6 +239,8 @@ void EditorUIModule::MainMenu()
         ImGui::BeginDisabled(!sceneLoaded);
         if (ImGui ::MenuItem("Close")) closeScene = true;
         ImGui::EndDisabled();
+
+        if (ImGui::MenuItem("Navmesh", "", navmesh)) navmesh = !navmesh;
 
         if (ImGui::MenuItem("Quit")) closeApplication = true;
 
@@ -661,6 +666,21 @@ void EditorUIModule::ImportDialog(bool& importMenu)
 
     ImGui::End();
 }
+
+void EditorUIModule::NavMesh(bool& navmesh)
+{
+
+    ImGui::Begin("NavMesh Creation");
+
+    if (ImGui::Button("Create NavMesh"))
+    {
+        App->GetResourcesModule()->CreateNavMesh();
+        ImGui::Text("NavMesh created!");
+    }
+
+    ImGui::End();
+}
+
 
 void EditorUIModule::Console(bool& consoleMenu) const
 {

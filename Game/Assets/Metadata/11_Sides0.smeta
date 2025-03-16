@@ -1,8 +1,8 @@
 {
-    "UID": 1183804472616880,
+    "UID": 1119176808103771,
     "name": "Sides0",
     "assetPath": "Assets/Floor.gltf",
-    "lastModifiedDate": 1739979581,
+    "lastModifiedDate": 1739843131,
     "importOptions": {
         "generateTangents": true
     }

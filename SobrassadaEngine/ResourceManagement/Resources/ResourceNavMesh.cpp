@@ -1,0 +1,496 @@
+#include "ResourceNavMesh.h"
+#include "Application.h"
+#include "DebugDrawModule.h"
+#include "DetourNavMeshBuilder.h"
+#include "ResourceMesh.h"
+#include "ResourcesModule.h"
+
+#include "algorithm"
+
+ResourceNavMesh::~ResourceNavMesh()
+{
+    if (navMesh)
+    {
+        dtFree(navMesh);   // Free the navMesh memory
+        navMesh = nullptr; // Set the pointer to null for safety
+    }
+
+    if (polymesh)
+    {
+        rcFreePolyMesh(polymesh); // Free the polymesh memory
+        polymesh = nullptr;
+    }
+
+    if (polymeshDetail)
+    {
+        rcFreePolyMeshDetail(polymeshDetail); // Free the detail polymesh memory
+        polymeshDetail = nullptr;
+    }
+    if (navQuery)
+    {
+        dtFreeNavMeshQuery(navQuery);
+        navQuery = nullptr;
+    }
+}
+
+ResourceNavMesh::ResourceNavMesh(UID uid, const std::string& name) : Resource(uid, name, ResourceType::NavMesh)
+{
+    // Default Heightfield Options
+    config.bmin[0] = config.bmin[1] = config.bmin[2] = 0.0f;
+    config.bmax[0] = config.bmax[1] = config.bmax[2] = 0.0f;
+    config.cs                                        = 0.3f; // Default cell size
+    config.ch                                        = 0.2f; // Default cell height
+    config.width                                     = 100;  // Arbitrary default width
+    config.height                                    = 100;  // Arbitrary default height
+
+    // Default Walkable Options
+    config.walkableSlopeAngle                        = 45.0f; // Max slope an agent can walk on
+    config.walkableClimb                             = 0.9f;  // Max step height agent can climb
+    config.walkableHeight                            = 2.0f;  // Min height required to pass
+    config.walkableRadius                            = 0.5f;  // Agent radius
+
+    // Default Partition Options
+    partitionType                                    = SAMPLE_PARTITION_WATERSHED;
+    config.minRegionArea                             = 8;  // Min region area (small regions will be removed)
+    config.mergeRegionArea                           = 20; // Merge regions smaller than this size
+
+    // Default Contour Options
+    config.maxSimplificationError                    = 1.3f;
+    config.maxEdgeLen                                = 12;
+    config.maxVertsPerPoly                           = 6;
+
+    // Default PolyMesh Options
+    config.detailSampleDist                          = 6.0f; // Higher = more accurate, lower = faster
+    config.detailSampleMaxError                      = 1.0f; // Higher = more smooth, lower = accurate
+
+    // Default Filters
+    m_filterLowHangingObstacles                      = true;
+    m_filterLedgeSpans                               = true;
+    m_filterWalkableLowHeightSpans                   = true;
+
+    m_agentHeight                                    = 100.0f;
+    m_agentMaxClimb                                  = 100.0f;
+    m_agentRadius                                    = 100.0f;
+
+    context                                          = nullptr;
+    heightfield                                      = nullptr;
+    compactHeightfield                               = nullptr;
+    triAreas                                         = nullptr;
+    contourSet                                       = nullptr;
+    polymesh                                         = nullptr;
+    polymeshDetail                                   = nullptr;
+    navMesh                                          = nullptr;
+    navQuery                                         = dtAllocNavMeshQuery();
+}
+// add together all meshes to create navmesh - needs the direction to a vector of resourcemesh pointers
+bool ResourceNavMesh::BuildNavMesh(
+    const std::vector<std::pair<const ResourceMesh*, const float4x4&>>& meshes, float3& minPoint, float3& maxPoint
+)
+{
+    int allVertexCount   = 0;
+    int allTriangleCount = 0;
+    int indexOffset      = 0;
+
+    context              = new rcContext;
+
+    // first pass to get necessary sizes and AABB
+    for (const auto& mesh : meshes)
+    {
+        allVertexCount          += mesh.first->GetVertexCount();
+        allTriangleCount        += (mesh.first->GetIndexCount() / 3);
+
+        // Get each mesh AABB
+        const float3& minBounds  = minPoint;
+        const float3& maxBounds  = maxPoint;
+
+        // Update the global AABB if necessary
+        config.bmin[0]           = std::min(config.bmin[0], minBounds.x);
+        config.bmin[1]           = std::min(config.bmin[1], minBounds.y);
+        config.bmin[2]           = std::min(config.bmin[2], minBounds.z);
+
+        config.bmax[0]           = std::max(config.bmax[0], maxBounds.x);
+        config.bmax[1]           = std::max(config.bmax[1], maxBounds.y);
+        config.bmax[2]           = std::max(config.bmax[2], maxBounds.z);
+    }
+
+    std::vector<float> navmeshVertices;
+    std::vector<int> navmeshTriangles;
+
+    // needs to be just float insteaf of float3
+    navmeshVertices.reserve(allVertexCount * 3);
+    navmeshTriangles.reserve(allTriangleCount);
+
+    // needs to add all vertices and indices from every single mesh in the navmesh
+    for (const auto& mesh : meshes)
+    {
+        if (!mesh.first) continue;
+
+        const std::vector<Vertex>& meshVerts         = mesh.first->GetLocalVertices();
+        const std::vector<unsigned int>& meshIndices = mesh.first->GetIndices();
+
+        int indexCount                               = mesh.first->GetIndexCount();
+        int vertexCount                              = mesh.first->GetVertexCount();
+        int meshVertexCount                          = meshVerts.size();
+        int meshTriangleCount                        = indexCount / 3; // triangles
+
+        for (const Vertex& vertex : meshVerts)
+        {
+            float4 tmpvertex(vertex.position.x, vertex.position.y, vertex.position.z, 1);
+            // mesh.second.Transform(tmpvertex);
+
+            tmpvertex = mesh.second.Transform(tmpvertex);
+            navmeshVertices.push_back(tmpvertex.x);
+            navmeshVertices.push_back(tmpvertex.y);
+            navmeshVertices.push_back(tmpvertex.z);
+        }
+
+        for (const unsigned int& index : meshIndices)
+        {
+            navmeshTriangles.push_back(index + indexOffset);
+        }
+        indexOffset += vertexCount;
+    }
+
+    heightfield = rcAllocHeightfield();
+
+    if (!heightfield)
+    {
+        GLOG("Failed to allocate heightfield!");
+        delete context;
+        return false;
+    }
+
+    if (!rcCreateHeightfield(
+            context, *heightfield, config.width, config.height, config.bmin, config.bmax, config.cs, config.ch
+        ))
+    {
+        GLOG("Failed to create heightfield");
+        delete context;
+        return false;
+    }
+
+    triAreas = new unsigned char[allTriangleCount]();
+
+    rcMarkWalkableTriangles(
+        context, config.walkableSlopeAngle, navmeshVertices.data(), allVertexCount, navmeshTriangles.data(),
+        allTriangleCount, triAreas
+    );
+
+    if (!rcRasterizeTriangles(
+            context, navmeshVertices.data(), allVertexCount, navmeshTriangles.data(), triAreas, allTriangleCount,
+            *heightfield, config.walkableClimb
+        ))
+    {
+        GLOG("Failed to rasterize triangles for navmesh!");
+        delete[] triAreas;
+        rcFreeHeightField(heightfield);
+        delete context;
+        return false;
+    }
+
+    delete[] triAreas;
+    triAreas = 0;
+
+    if (m_filterLowHangingObstacles) rcFilterLowHangingWalkableObstacles(context, config.walkableClimb, *heightfield);
+    if (m_filterLedgeSpans) rcFilterLedgeSpans(context, config.walkableHeight, config.walkableClimb, *heightfield);
+    if (m_filterWalkableLowHeightSpans) rcFilterWalkableLowHeightSpans(context, config.walkableHeight, *heightfield);
+
+    // make a compact heightfield from the heightfield
+    compactHeightfield = rcAllocCompactHeightfield();
+
+    if (!compactHeightfield)
+    {
+        GLOG("buildNavigation: Compact heightfield out of memory.");
+        rcFreeHeightField(heightfield);
+        delete context;
+        return false;
+    }
+    if (!rcBuildCompactHeightfield(
+            context, config.walkableHeight, config.walkableClimb, *heightfield, *compactHeightfield
+        ))
+    {
+        GLOG("buildNavigation: Could not build compact data.");
+        rcFreeHeightField(heightfield);
+        delete context;
+        return false;
+    }
+
+    rcFreeHeightField(heightfield);
+    heightfield = 0;
+
+    // Erode the walkable area by agent radius.
+    if (!rcErodeWalkableArea(context, config.walkableRadius, *compactHeightfield))
+    {
+        GLOG("buildNavigation: Could not erode compact heightfield .");
+        rcFreeCompactHeightfield(compactHeightfield);
+        delete context;
+        return false;
+    }
+
+    if (partitionType == SAMPLE_PARTITION_WATERSHED)
+    {
+        // Prepare for region partitioning, by calculating distance field along the walkable surface.
+        if (!rcBuildDistanceField(context, *compactHeightfield))
+        {
+            GLOG("buildNavigation: Could not build distance field.");
+            rcFreeCompactHeightfield(compactHeightfield);
+            delete context;
+            return false;
+        }
+
+        // Partition the walkable surface into simple regions without holes.
+        if (!rcBuildRegions(context, *compactHeightfield, 0, config.minRegionArea, config.mergeRegionArea))
+        {
+            GLOG("buildNavigation: Could not build watershed regions.");
+            rcFreeCompactHeightfield(compactHeightfield);
+            delete context;
+            return false;
+        }
+    }
+    else if (partitionType == SAMPLE_PARTITION_MONOTONE)
+    {
+        // Partition the walkable surface into simple regions without holes.
+        // Monotone partitioning does not need distancefield.
+        if (!rcBuildRegionsMonotone(context, *compactHeightfield, 0, config.minRegionArea, config.mergeRegionArea))
+        {
+            GLOG("buildNavigation: Could not build monotone regions.");
+            rcFreeCompactHeightfield(compactHeightfield);
+            delete context;
+            return false;
+        }
+    }
+    else // SAMPLE_PARTITION_LAYERS
+    {
+        // Partition the walkable surface into simple regions without holes.
+        if (!rcBuildLayerRegions(context, *compactHeightfield, 0, config.minRegionArea))
+        {
+            GLOG("buildNavigation: Could not build layer regions.");
+            rcFreeCompactHeightfield(compactHeightfield);
+            delete context;
+            return false;
+        }
+    }
+
+    // allocate and build contourSet (for tracing region contours)
+    contourSet = rcAllocContourSet();
+    if (!contourSet)
+    {
+        GLOG("buildNavigation: ContourSet out of memory ");
+        rcFreeCompactHeightfield(compactHeightfield);
+        delete context;
+        return false;
+    }
+    if (!rcBuildContours(context, *compactHeightfield, config.maxSimplificationError, config.maxEdgeLen, *contourSet))
+    {
+        GLOG("buildNavigation: Could not create contours.");
+        delete context;
+        rcFreeCompactHeightfield(compactHeightfield);
+        rcFreeContourSet(contourSet);
+        return false;
+    }
+
+    // Build polygon navmesh from the contours.
+    polymesh = rcAllocPolyMesh();
+    if (!polymesh)
+    {
+        GLOG("buildNavigation: Out of memory for polymesh");
+        delete context;
+        rcFreeCompactHeightfield(compactHeightfield);
+        rcFreeContourSet(contourSet);
+        return false;
+    }
+    if (!rcBuildPolyMesh(context, *contourSet, config.maxVertsPerPoly, *polymesh))
+    {
+        GLOG("buildNavigation: Could not triangulate contours.");
+        delete context;
+        rcFreeCompactHeightfield(compactHeightfield);
+        rcFreeContourSet(contourSet);
+        return false;
+    }
+
+    polymeshDetail = rcAllocPolyMeshDetail();
+    if (!polymeshDetail)
+    {
+        GLOG("buildNavigation: Out of memory for detailed polymesh.");
+        delete context;
+        rcFreeCompactHeightfield(compactHeightfield);
+        rcFreeContourSet(contourSet);
+        return false;
+    }
+
+    if (!rcBuildPolyMeshDetail(
+            context, *polymesh, *compactHeightfield, config.detailSampleDist, config.detailSampleMaxError,
+            *polymeshDetail
+        ))
+    {
+        GLOG("buildNavigation: Could not build detail mesh.");
+        delete context;
+        rcFreeCompactHeightfield(compactHeightfield);
+        rcFreeContourSet(contourSet);
+        return false;
+    }
+
+    rcFreeCompactHeightfield(compactHeightfield);
+    rcFreeContourSet(contourSet);
+
+    if (config.maxVertsPerPoly <= DT_VERTS_PER_POLYGON)
+    {
+        unsigned char* navData = 0;
+        int navDataSize        = 0;
+
+        // Update poly flags from areas.
+        for (int i = 0; i < polymesh->npolys; ++i)
+        {
+            if (polymesh->areas[i] == RC_WALKABLE_AREA) polymesh->areas[i] = SAMPLE_POLYAREA_GROUND;
+
+            if (polymesh->areas[i] == SAMPLE_POLYAREA_GROUND || polymesh->areas[i] == SAMPLE_POLYAREA_GRASS ||
+                polymesh->areas[i] == SAMPLE_POLYAREA_ROAD)
+            {
+                polymesh->flags[i] = SAMPLE_POLYFLAGS_WALK;
+            }
+            else if (polymesh->areas[i] == SAMPLE_POLYAREA_WATER)
+            {
+                polymesh->flags[i] = SAMPLE_POLYFLAGS_SWIM;
+            }
+            else if (polymesh->areas[i] == SAMPLE_POLYAREA_DOOR)
+            {
+                polymesh->flags[i] = SAMPLE_POLYFLAGS_WALK | SAMPLE_POLYFLAGS_DOOR;
+            }
+        }
+
+        dtNavMeshCreateParams params;
+        memset(&params, 0, sizeof(params));
+        params.verts            = polymesh->verts;
+        params.vertCount        = polymesh->nverts;
+        params.polys            = polymesh->polys;
+        params.polyAreas        = polymesh->areas;
+        params.polyFlags        = polymesh->flags;
+        params.polyCount        = polymesh->npolys;
+        params.nvp              = polymesh->nvp;
+        params.detailMeshes     = polymeshDetail->meshes;
+        params.detailVerts      = polymeshDetail->verts;
+        params.detailVertsCount = polymeshDetail->nverts;
+        params.detailTris       = polymeshDetail->tris;
+        params.detailTriCount   = polymeshDetail->ntris;
+        /*
+        params.offMeshConVerts  = meshes->getOffMeshConnectionVerts();
+        params.offMeshConRad    = m_geom->getOffMeshConnectionRads();
+        params.offMeshConDir    = m_geom->getOffMeshConnectionDirs();
+        params.offMeshConAreas  = m_geom->getOffMeshConnectionAreas(); This is used for jumping/doors/teleporting
+        params.offMeshConFlags  = m_geom->getOffMeshConnectionFlags();
+        params.offMeshConUserID = m_geom->getOffMeshConnectionId();
+        params.offMeshConCount  = m_geom->getOffMeshConnectionCount();
+        */
+        params.walkableHeight   = m_agentHeight;
+        params.walkableRadius   = m_agentRadius;
+        params.walkableClimb    = m_agentMaxClimb;
+        rcVcopy(params.bmin, polymesh->bmin);
+        rcVcopy(params.bmax, polymesh->bmax);
+        params.cs          = config.cs;
+        params.ch          = config.ch;
+        params.buildBvTree = true;
+
+        if (!dtCreateNavMeshData(&params, &navData, &navDataSize))
+        {
+            GLOG("Could not build Detour navmesh.");
+            return false;
+        }
+
+        navMesh = dtAllocNavMesh();
+        if (!navMesh)
+        {
+            dtFree(navData);
+            GLOG("Could not create Detour navmesh");
+            return false;
+        }
+
+        dtStatus status;
+
+        status = navMesh->init(navData, navDataSize, DT_TILE_FREE_DATA);
+        if (dtStatusFailed(status))
+        {
+            dtFree(navData);
+            GLOG("Could not init Detour navmesh");
+            return false;
+        }
+        status = navQuery->init(navMesh, 2048);
+        if (dtStatusFailed(status))
+        {
+            GLOG("Could not init Detour navmesh query");
+            return false;
+        }
+    }
+
+    delete context;
+}
+
+void ResourceNavMesh::Render()
+{
+    if (!navMesh)
+    {
+        return;
+    }
+    ResourceNavMesh* rsnav   = App->GetResourcesModule()->GetNavMesh();
+    dtNavMesh* navMesh       = App->GetResourcesModule()->GetNavMesh()->GetDetourNavMesh();
+    dtNavMeshQuery* navQuery = App->GetResourcesModule()->GetNavMesh()->GetDetourNavMeshQuery();
+    App->GetDebugDrawModule()->DrawNavMesh(navMesh, navQuery, DRAWNAVMESH_COLOR_TILES);
+}
+
+// ImGUI
+void ResourceNavMesh::SetHeightfieldOptions(const float3 bmin, const float3 bmax, float cellSize, float cellHeight)
+{
+    config.bmin[0] = bmin.x;
+    config.bmin[1] = bmin.y;
+    config.bmin[2] = bmin.z;
+
+    config.bmax[0] = bmax.x;
+    config.bmax[1] = bmax.y;
+    config.bmax[2] = bmax.z;
+
+    config.cs      = cellSize;
+    config.ch      = cellHeight;
+
+    config.width   = static_cast<int>((bmax.x - bmin.x) / cellSize);
+    config.height  = static_cast<int>((bmax.z - bmin.z) / cellSize);
+}
+
+void ResourceNavMesh::SetWalkableOptions(
+    const float walkableSlopeAngle, const float walkableClimb, const float walkableHeight, const float walkableRadius
+)
+{
+    config.walkableSlopeAngle = walkableSlopeAngle;
+    config.walkableClimb      = walkableClimb;
+    config.walkableHeight     = walkableHeight;
+    config.walkableRadius     = walkableRadius;
+}
+
+void ResourceNavMesh::SetFilterOptions(
+    bool m_filterLowHangingObstacles, bool m_filterLedgeSpans, bool m_filterWalkableLowHeightSpans
+)
+{
+    this->m_filterLedgeSpans             = m_filterLedgeSpans;
+    this->m_filterLowHangingObstacles    = m_filterLowHangingObstacles;
+    this->m_filterWalkableLowHeightSpans = m_filterWalkableLowHeightSpans;
+}
+
+void ResourceNavMesh::SetPartitionOptions(int partitionType, int minRegionArea, int mergeRegionArea)
+{
+    config.minRegionArea   = minRegionArea;
+    config.mergeRegionArea = mergeRegionArea;
+
+    this->partitionType    = partitionType;
+}
+
+void ResourceNavMesh::SetContourOptions(float maxSimplificationError, int maxEdgeLen, int maxVertsPerPoly)
+{
+    config.maxSimplificationError = maxSimplificationError;
+    config.maxEdgeLen             = maxEdgeLen;
+    config.maxVertsPerPoly        = maxVertsPerPoly;
+}
+
+void ResourceNavMesh::SetPolyMeshOptions(int maxVertsPerPoly, float detailSampleDist, float detailSampleMaxError)
+{
+    config.maxVertsPerPoly      = maxVertsPerPoly;
+    config.detailSampleDist     = detailSampleDist;
+    config.detailSampleMaxError = detailSampleMaxError;
+}

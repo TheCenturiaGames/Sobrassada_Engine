@@ -1,10 +1,10 @@
 {
-    "UID": 1345546333879267,
+    "UID": 1321073030688760,
     "name": "PlanksMaterial",
     "assetPath": "Assets/Floor.gltf",
-    "lastModifiedDate": 1739979581,
+    "lastModifiedDate": 1739843131,
     "importOptions": {
-        "shader": "2412796668296680541",
+        "shader": "9435241936611833840",
         "useOcclusion": true
     }
 }

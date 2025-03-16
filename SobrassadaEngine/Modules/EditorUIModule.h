@@ -92,6 +92,7 @@ class EditorUIModule : public Module
     void SaveDialog(bool& save);
     void Console(bool& consoleMenu) const;
     void About(bool& aboutMenu) const;
+    void NavMesh(bool& navmesh);
     std::string FormatWithCommas(unsigned int number) const;
 
     void LoadModelDialog(bool& loadModel);
@@ -116,6 +117,8 @@ class EditorUIModule : public Module
     bool editorSettingsMenu = false;
     bool closeScene         = false;
     bool closeApplication   = false;
+    bool navmesh            = false;
+
 
     int maximumPlotData     = 50;
     std::deque<float> framerate;

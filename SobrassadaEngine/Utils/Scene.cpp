@@ -212,6 +212,11 @@ update_status Scene::Render(float deltaTime) const
         }
     }
 
+    if (App->GetResourcesModule()->GetNavMesh())
+    {
+        App->GetResourcesModule()->GetNavMesh()->Render();
+    }
+
     for (const auto& gameObject : gameObjectsContainer)
     {
         gameObject.second->DrawGizmos();
