@@ -219,8 +219,6 @@
     <ClCompile Include="Scene\Components\Standalone\Lights\DirectionalLightComponent.cpp" />
     <ClCompile Include="FileSystem\TextureImporter.cpp" />
     <ClCompile Include="Utils\FrustumPlanes.cpp" />
-    <ClCompile Include="Utils\Octree.cpp" />
-    <ClCompile Include="Utils\Quadtree.cpp" />
     <ClCompile Include="Scene\Components\Standalone\MeshComponent.cpp" />
     <ClCompile Include="Scene\Components\ComponentUtils.cpp" />
     <ClCompile Include="Scene\GameObjects\GameObject.cpp" />
