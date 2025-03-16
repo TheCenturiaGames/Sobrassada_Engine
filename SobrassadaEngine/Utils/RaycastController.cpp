@@ -1,18 +1,21 @@
 #include "RaycastController.h"
 
+#include "Application.h"
 #include "GameObject.h"
+#include "SceneModule.h"
 #include "Standalone/MeshComponent.h"
 
 #include "Geometry/Triangle.h"
 #include "Math/float4x4.h"
-#include <map>
+#include <algorithm>
+#include <vector>
 
 GameObject*
 RaycastController::GetRayIntersectionObjects(const LineSegment& ray, const std::vector<GameObject*>& queriedGameObjects)
 {
     GameObject* selectedGameObject = nullptr;
 
-    std::map<float, GameObject*> sortedGameObjects;
+    std::vector<GameObject*> sortedGameObjects;
 
     // GETTING GAMEOBJECTS THAT INTERSECT WITH THE RAY AND SORT THEM BY DISTANCE
     float closeDistance = 0;
@@ -21,25 +24,25 @@ RaycastController::GetRayIntersectionObjects(const LineSegment& ray, const std::
     {
         if (ray.Intersects(gameObject->GetGlobalAABB(), closeDistance, farDistance))
         {
-            sortedGameObjects.insert({closeDistance, gameObject});
+            sortedGameObjects.push_back(gameObject);
         }
     }
 
     float closestDistance = std::numeric_limits<float>::infinity();
 
     // FOREACH GAMEOBJECT INTERSECTING CHECKING AGAINST THE RAY
-    for (const auto& pair : sortedGameObjects)
+    for (const auto& gameObject : sortedGameObjects)
     {
         LineSegment localRay(ray.a, ray.b);
 
-        const MeshComponent* meshComponent = pair.second->GetMeshComponent();
+        const MeshComponent* meshComponent = gameObject->GetMeshComponent();
         if (meshComponent == nullptr) continue; // TODO Happens occasionally, figure out why
 
         const ResourceMesh* resourceMesh = meshComponent->GetResourceMesh();
 
         if (resourceMesh == nullptr) continue;
 
-        float4x4 globalTransform = pair.second->GetGlobalTransform();
+        float4x4 globalTransform = gameObject->GetGlobalTransform();
         globalTransform.Inverse();
         localRay.Transform(globalTransform);
 
@@ -62,10 +65,29 @@ RaycastController::GetRayIntersectionObjects(const LineSegment& ray, const std::
                 if (distance < closestDistance)
                 {
                     closestDistance    = distance;
-                    selectedGameObject = pair.second;
+                    selectedGameObject = gameObject;
                 }
             }
         }
     }
+
+    if (selectedGameObject)
+    {
+        const MeshComponent* meshComponent = selectedGameObject->GetMeshComponent();
+        if (meshComponent && meshComponent->HasBones())
+        {
+            SceneModule* sceneModule     = App->GetSceneModule();
+
+            UID rootGameObject           = sceneModule->GetGameObjectRootUID();
+            GameObject* parentGameobject = sceneModule->GetGameObjectByUID(selectedGameObject->GetParent());
+
+            while (parentGameobject->GetUID() != rootGameObject)
+            {
+                selectedGameObject = parentGameobject;
+                parentGameobject   = sceneModule->GetGameObjectByUID(selectedGameObject->GetParent());
+            }
+        }
+    }
+
     return selectedGameObject;
 }
