@@ -1,0 +1,10 @@
+{
+    "UID": 1334989118236977,
+    "name": "PlayerMaterial",
+    "assetPath": "Assets/Player.gltf",
+    "lastModifiedDate": 1742067663,
+    "importOptions": {
+        "shader": "9724090286232142199",
+        "useOcclusion": true
+    }
+}

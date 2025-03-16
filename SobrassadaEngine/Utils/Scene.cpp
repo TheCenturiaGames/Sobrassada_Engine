@@ -79,7 +79,7 @@ Scene::~Scene()
 
     delete lightsConfig;
     delete sceneOctree;
-    
+
     lightsConfig = nullptr;
     sceneOctree  = nullptr;
 
@@ -640,17 +640,30 @@ void Scene::LoadModel(const UID modelUID)
                 GLOG("Node %s has %d meshes", nodes[i].name.c_str(), nodes[i].meshes.size());
 
                 unsigned meshNum = 1;
+
                 for (const auto& mesh : nodes[i].meshes)
                 {
-                    GameObject* meshObject = new GameObject(
-                        currentGameObject->GetUID(), currentGameObject->GetName() + " Mesh " + std::to_string(meshNum)
-                    );
-                    ++meshNum;
+                    GameObject* meshObject = nullptr;
+                    if (nodes[i].meshes.size() > 1)
+                    {
+                        meshObject = new GameObject(
+                            currentGameObject->GetUID(),
+                            currentGameObject->GetName() + " Mesh " + std::to_string(meshNum)
+                        );
+                        ++meshNum;
+                    }
+                    else
+                    {
+                        meshObject = currentGameObject;
+                    }
 
                     if (meshObject->CreateComponent(COMPONENT_MESH))
                     {
-                        currentGameObject->AddGameObject(meshObject->GetUID());
-                        AddGameObject(meshObject->GetUID(), meshObject);
+                        if (nodes[i].meshes.size() > 1)
+                        {
+                            currentGameObject->AddGameObject(meshObject->GetUID());
+                            AddGameObject(meshObject->GetUID(), meshObject);
+                        }
 
                         MeshComponent* meshComponent = meshObject->GetMeshComponent();
                         meshComponent->SetModelUID(modelUID);
@@ -751,7 +764,7 @@ void Scene::LoadPrefab(const UID prefabUID, const ResourcePrefab* prefab, const 
 void Scene::OverridePrefabs(const UID prefabUID)
 {
     const ResourcePrefab* prefab = (const ResourcePrefab*)App->GetResourcesModule()->RequestResource(prefabUID);
-    
+
     // If prefab is null, it no longer exists, then remove the prefab UID from all objects that may have it
     if (prefab == nullptr)
     {
@@ -761,7 +774,7 @@ void Scene::OverridePrefabs(const UID prefabUID)
         }
         return;
     }
-    
+
     // Store uids and transforms. We need transforms so when we override the prefab, the objects
     // stay in place. UIDs to delete the duplicates
     std::vector<UID> updatedObjects;
@@ -777,16 +790,16 @@ void Scene::OverridePrefabs(const UID prefabUID)
             }
         }
     }
-    
+
     for (const UID object : updatedObjects)
     {
         RemoveGameObjectHierarchy(object);
     }
-    
+
     for (const float4x4& transform : transforms)
     {
         LoadPrefab(prefabUID, prefab, transform);
     }
-    
+
     App->GetResourcesModule()->ReleaseResource(prefab);
 }
