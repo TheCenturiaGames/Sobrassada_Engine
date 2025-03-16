@@ -26,9 +26,9 @@ std::vector<char*>* Logs                       = NULL;
 
 // DebugUtils for rendering
 std::map<std::string, bool> debugRenderOptions = {
-    {RENDER_AABB, false},
-    {RENDER_OBB,  false},
-    {RENDER_OCTREE, false},
+    {RENDER_AABB,       false},
+    {RENDER_OBB,        false},
+    {RENDER_OCTREE,     false},
     {RENDER_CAMERA_RAY, false}
 };
 
@@ -82,6 +82,19 @@ int main(int argc, char** argv)
             {
                 GLOG("----- Application Update exits with error -----");
                 mainState = MAIN_EXIT;
+            }
+
+            if (update_return == UPDATE_RESTART)
+            {
+                mainState = MAIN_CREATION;
+                App->ShutDown();
+                delete App;
+                // Free memory from log*
+                for (auto log : *Logs)
+                {
+                    free(log);
+                }
+                Logs->clear();
             }
 
             if (update_return == UPDATE_STOP) mainState = MAIN_FINISH;
