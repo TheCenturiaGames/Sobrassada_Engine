@@ -1,9 +1,7 @@
 #include "MetaFile.h"
 
-#include "Application.h"
 #include "FileSystem.h"
 #include "Globals.h"
-#include "ProjectModule.h"
 
 #include "Libs/rapidjson/prettywriter.h"
 #include "Libs/rapidjson/stringbuffer.h"
@@ -38,7 +36,7 @@ void MetaFile::Save(const std::string& name, const std::string& assetPath) const
     doc.Accept(writer);
 
     UID prefix           = assetUID / UID_PREFIX_DIVISOR;
-    std::string savePath = App->GetProjectModule()->GetLoadedProjectPath() + METADATA_PATH + std::to_string(prefix) + FILENAME_SEPARATOR + name + META_EXTENSION;
+    std::string savePath = METADATA_PATH + std::to_string(prefix) + FILENAME_SEPARATOR + name + META_EXTENSION;
     unsigned int bytesWritten =
         (unsigned int)FileSystem::Save(savePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
 

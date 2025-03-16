@@ -1,9 +1,0 @@
-{
-    "UID": 1175652718975713,
-    "name": "Cube0",
-    "assetPath": "Assets/DefaultCube.gltf",
-    "lastModifiedDate": 0,
-    "importOptions": {
-        "generateTangents": true
-    }
-}

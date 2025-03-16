@@ -1,0 +1,9 @@
+{
+    "UID": 1103783502622256,
+    "name": "char_chu0",
+    "assetPath": "Assets/Mesh_Chu_Standar_RM.gltf",
+    "lastModifiedDate": 1742055302,
+    "importOptions": {
+        "generateTangents": false
+    }
+}

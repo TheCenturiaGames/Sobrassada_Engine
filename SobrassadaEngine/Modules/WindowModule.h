@@ -44,8 +44,6 @@ class WindowModule : public Module
         SDL_GL_SetSwapInterval(vsync ? 1 : 0);
     }
 
-    void UpdateProjectNameInWindowTitle(const std::string& newProjectName) const;
-
   public:
     SDL_Window* window         = nullptr;
     SDL_Surface* screenSurface = nullptr;

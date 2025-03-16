@@ -1,9 +1,0 @@
-{
-    "UID": 1194458484681695,
-    "name": "Sphere0",
-    "assetPath": "Assets/DefaultSphere.gltf",
-    "lastModifiedDate": 0,
-    "importOptions": {
-        "generateTangents": true
-    }
-}

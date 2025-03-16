@@ -1,9 +1,0 @@
-{
-    "UID": 1121096887918908,
-    "name": "Cylinder0",
-    "assetPath": "Assets/DefaultCylinder.gltf",
-    "lastModifiedDate": 0,
-    "importOptions": {
-        "generateTangents": false
-    }
-}

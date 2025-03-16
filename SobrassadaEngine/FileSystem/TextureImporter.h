@@ -7,7 +7,7 @@ class ResourceTexture;
 
 namespace TextureImporter
 {
-    UID Import(const char* filePath, const std::string& targetFilePath, UID sourceUID = INVALID_UID);
+    UID Import(const char* filePath, UID sourceUID = INVALID_UID);
     ResourceTexture* LoadTexture(UID textureUID);
     unsigned int LoadCubemap(const char* texturePath);
     bool

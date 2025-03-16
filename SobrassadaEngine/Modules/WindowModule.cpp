@@ -1,8 +1,5 @@
 #include "WindowModule.h"
 
-#include "Application.h"
-#include "ProjectModule.h"
-
 WindowModule::WindowModule()
 {
 }
@@ -37,10 +34,8 @@ bool WindowModule::Init()
 
         if (RESIZABLE == true) flags |= SDL_WINDOW_RESIZABLE;
 
-        window = SDL_CreateWindow(
-            (App->GetProjectModule()->GetLoadedProjectName() + " - " + TITLE).c_str(), SDL_WINDOWPOS_UNDEFINED,
-            SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight, flags
-        );
+        window =
+            SDL_CreateWindow(TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight, flags);
 
         if (window == NULL)
         {
@@ -92,9 +87,4 @@ void WindowModule::SetHeight(const unsigned int height)
 {
     windowHeight = height;
     SDL_SetWindowSize(window, windowWidth, windowHeight);
-}
-
-void WindowModule::UpdateProjectNameInWindowTitle(const std::string& newProjectName) const
-{
-    SDL_SetWindowTitle(window, (newProjectName + " - " + TITLE).c_str());
 }

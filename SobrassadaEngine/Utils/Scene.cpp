@@ -3,7 +3,6 @@
 #include "Application.h"
 #include "CameraModule.h"
 #include "Component.h"
-#include "DebugUtils.h"
 #include "EditorUIModule.h"
 #include "Framebuffer.h"
 #include "GameObject.h"
@@ -19,18 +18,17 @@
 #include "Scene/Components/ComponentUtils.h"
 #include "Scene/Components/Standalone/MeshComponent.h"
 #include "SceneModule.h"
+#include "DebugUtils.h"
 
 #include "SDL_mouse.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 // guizmo after imgui include
 #include "./Libs/ImGuizmo/ImGuizmo.h"
-#include "Importer.h"
-#include "SDL_mouse.h"
 
 Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 {
-    this->sceneName             = sceneName;
+    memcpy(this->sceneName, sceneName, strlen(sceneName));
 
     GameObject* sceneGameObject = new GameObject("SceneModule GameObject");
     selectedGameObjectUID = gameObjectRootUID = sceneGameObject->GetUID();
@@ -42,7 +40,8 @@ Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 
 Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUID(loadedSceneUID)
 {
-    this->sceneName       = initialState["Name"].GetString();
+    const char* initName = initialState["Name"].GetString();
+    memcpy(this->sceneName, initName, strlen(initName));
     gameObjectRootUID     = initialState["RootGameObject"].GetUint64();
     selectedGameObjectUID = gameObjectRootUID;
 
@@ -111,20 +110,19 @@ void Scene::Init()
 }
 
 void Scene::Save(
-    rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator, UID newUID, const char* newName
-)
+    rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator, UID newUID, const std::string& newName
+) const
 {
     if (newUID != INVALID_UID)
     {
-        sceneUID = newUID;
+        targetState.AddMember("UID", newUID, allocator);
+        targetState.AddMember("Name", rapidjson::Value(newName.c_str(), allocator), allocator);
     }
-    if (newName != nullptr)
+    else
     {
-        sceneName = newName;
+        targetState.AddMember("UID", sceneUID, allocator);
+        targetState.AddMember("Name", rapidjson::Value(sceneName, allocator), allocator);
     }
-
-    targetState.AddMember("UID", sceneUID, allocator);
-    targetState.AddMember("Name", rapidjson::Value(sceneName.c_str(), allocator), allocator);
 
     targetState.AddMember("RootGameObject", gameObjectRootUID, allocator);
 
@@ -335,8 +333,9 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
     {
         float listBoxSize = debugShaderOptions.size() + debugRenderOptions.size() + 0.5f;
         if (ImGui::BeginListBox(
-                "##RenderOptionsList", ImVec2(ImGui::CalcItemWidth(), ImGui::GetFrameHeightWithSpacing() * listBoxSize)
-            ))
+            "##RenderOptionsList",
+            ImVec2(ImGui::CalcItemWidth(), ImGui::GetFrameHeightWithSpacing() * listBoxSize)
+        ))
         {
             ImGui::Checkbox(RENDER_LIGTHS, &debugShaderOptions[RENDER_LIGTHS]);
             if (ImGui::Checkbox("Render Wireframe", &debugShaderOptions[RENDER_WIREFRAME]))
@@ -375,7 +374,7 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
 
 void Scene::RenderScene()
 {
-    if (!ImGui::Begin(sceneName.c_str(), nullptr, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar))
+    if (!ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar))
     {
         ImGui::End();
         return;

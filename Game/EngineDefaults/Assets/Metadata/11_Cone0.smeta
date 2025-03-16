@@ -1,9 +1,0 @@
-{
-    "UID": 1148126989747626,
-    "name": "Cone0",
-    "assetPath": "Assets/DefaultCone.gltf",
-    "lastModifiedDate": 0,
-    "importOptions": {
-        "generateTangents": false
-    }
-}

@@ -4,14 +4,13 @@
 #include "FileSystem.h"
 #include "LibraryModule.h"
 #include "MetaMesh.h"
-#include "ProjectModule.h"
 
 namespace MeshImporter
 {
 
     UID ImportMesh(
         const tinygltf::Model& model, const tinygltf::Mesh& mesh, const tinygltf::Primitive& primitive,
-        const std::string& name, const char* sourceFilePath, const std::string& targetFilePath, UID sourceUID
+        const std::string& name, const char* sourceFilePath, UID sourceUID
     )
     {
         enum DataType dataType = UNSIGNED_CHAR;
@@ -319,7 +318,7 @@ namespace MeshImporter
         }
         else finalMeshUID = sourceUID;
 
-        std::string saveFilePath  = targetFilePath + MESHES_PATH + std::to_string(finalMeshUID) + MESH_EXTENSION;
+        std::string saveFilePath  = MESHES_PATH + std::to_string(finalMeshUID) + MESH_EXTENSION;
         unsigned int bytesWritten = (unsigned int)FileSystem::Save(saveFilePath.c_str(), fileBuffer, size, true);
 
         delete[] fileBuffer;

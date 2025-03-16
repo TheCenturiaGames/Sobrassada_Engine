@@ -1,0 +1,10 @@
+{
+    "UID": 1337251468535911,
+    "name": "RobotMaterial",
+    "assetPath": "Assets/Robot.gltf",
+    "lastModifiedDate": 1739979581,
+    "importOptions": {
+        "shader": "15479322802669130030",
+        "useOcclusion": true
+    }
+}
