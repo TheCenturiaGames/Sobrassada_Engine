@@ -127,7 +127,7 @@ bool ResourceNavMesh::BuildNavMesh(
 
         int indexCount                               = mesh.first->GetIndexCount();
         int vertexCount                              = mesh.first->GetVertexCount();
-        int meshVertexCount                          = meshVerts.size();
+        int meshVertexCount                          = (int)meshVerts.size();
         int meshTriangleCount                        = indexCount / 3; // triangles
 
         for (const Vertex& vertex : meshVerts)
@@ -419,8 +419,9 @@ bool ResourceNavMesh::BuildNavMesh(
     }
 
     delete context;
+    return true;
 }
-/**/
+
 void ResourceNavMesh::Render()
 {
     if (!navMesh)
@@ -433,64 +434,6 @@ void ResourceNavMesh::Render()
     //App->GetDebugDrawModule()->DrawNavMesh(navMesh, navQuery, DRAWNAVMESH_COLOR_TILES);
 }
 
-// ImGUI
-void ResourceNavMesh::SetHeightfieldOptions(const float3 bmin, const float3 bmax, float cellSize, float cellHeight)
-{
-    config.bmin[0] = bmin.x;
-    config.bmin[1] = bmin.y;
-    config.bmin[2] = bmin.z;
-
-    config.bmax[0] = bmax.x;
-    config.bmax[1] = bmax.y;
-    config.bmax[2] = bmax.z;
-
-    config.cs      = cellSize;
-    config.ch      = cellHeight;
-
-    config.width   = static_cast<int>((bmax.x - bmin.x) / cellSize);
-    config.height  = static_cast<int>((bmax.z - bmin.z) / cellSize);
-}
-
-void ResourceNavMesh::SetWalkableOptions(
-    const float walkableSlopeAngle, const float walkableClimb, const float walkableHeight, const float walkableRadius
-)
-{
-    config.walkableSlopeAngle = walkableSlopeAngle;
-    config.walkableClimb      = walkableClimb;
-    config.walkableHeight     = walkableHeight;
-    config.walkableRadius     = walkableRadius;
-}
-
-void ResourceNavMesh::SetFilterOptions(
-    bool m_filterLowHangingObstacles, bool m_filterLedgeSpans, bool m_filterWalkableLowHeightSpans
-)
-{
-    this->m_filterLedgeSpans             = m_filterLedgeSpans;
-    this->m_filterLowHangingObstacles    = m_filterLowHangingObstacles;
-    this->m_filterWalkableLowHeightSpans = m_filterWalkableLowHeightSpans;
-}
-
-void ResourceNavMesh::SetPartitionOptions(int partitionType, int minRegionArea, int mergeRegionArea)
-{
-    config.minRegionArea   = minRegionArea;
-    config.mergeRegionArea = mergeRegionArea;
-
-    this->partitionType    = partitionType;
-}
-
-void ResourceNavMesh::SetContourOptions(float maxSimplificationError, int maxEdgeLen, int maxVertsPerPoly)
-{
-    config.maxSimplificationError = maxSimplificationError;
-    config.maxEdgeLen             = maxEdgeLen;
-    config.maxVertsPerPoly        = maxVertsPerPoly;
-}
-
-void ResourceNavMesh::SetPolyMeshOptions(int maxVertsPerPoly, float detailSampleDist, float detailSampleMaxError)
-{
-    config.maxVertsPerPoly      = maxVertsPerPoly;
-    config.detailSampleDist     = detailSampleDist;
-    config.detailSampleMaxError = detailSampleMaxError;
-}
 
 void ResourceNavMesh::RenderNavmeshEditor()
 {

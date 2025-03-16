@@ -46,18 +46,7 @@ class ResourceNavMesh : public Resource
         const std::vector<std::pair<const ResourceMesh*, const float4x4&>>& meshes, float minPoint[3], float maxPoint[3]
     );
     void Render();
-
-    void SetHeightfieldOptions(const float3 bmin, const float3 bmax, float cellSize, float cellHeight);
-    void SetWalkableOptions(
-        const float walkableSlopeAngle, const float walkabkeClimb, const float walkableHeight,
-        const float walkableRadius
-    );
-    void
-    SetFilterOptions(bool m_filterLowHangingObstacles, bool m_filterLedgeSpans, bool m_filterWalkableLowHeightSpans);
-    void SetPartitionOptions(int partitionType, int minRegionArea, int mergeRegionArea);
-    void SetContourOptions(float maxSimplificationError, int maxEdgeLen, int maxVertsPerPoly);
-    void SetPolyMeshOptions(int maxVertsPerPoly, float detailSampleDist, float detailSampleMaxError);
-
+   
     void RenderNavmeshEditor();
 
     dtNavMesh* GetDetourNavMesh() { return navMesh; }
