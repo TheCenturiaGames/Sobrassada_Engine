@@ -200,7 +200,6 @@
     <ClCompile Include="Modules\ProjectModule.cpp" />
     <ClCompile Include="Modules\UserInterfaceModule.cpp"/>
     <ClCompile Include="Scene\Components\Standalone\CharacterControllerComponent.cpp" />
-    <ClCompile Include="Modules\UserInterfaceModule.cpp" />
     <ClCompile Include="UI\EngineEditors\Nodes\CustomNode.cpp" />
     <ClCompile Include="Utils\EngineTimer.cpp" />
     <ClCompile Include="FileSystem\Importer.cpp" />
