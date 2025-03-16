@@ -366,6 +366,7 @@
     </ClCompile>
     <ClCompile Include="UI\EngineEditorBase.cpp">
       <Filter>Editor</Filter>
+    </ClCompile>
     <ClCompile Include="Modules\UserInterfaceModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
@@ -415,6 +416,7 @@
     </Filter>
     <Filter Include="Editor\Nodes">
       <UniqueIdentifier>{ae278cc8-ae42-4c7f-8046-15512836a1b4}</UniqueIdentifier>
+    </Filter>
     <Filter Include="FileSystem\Meta">
       <UniqueIdentifier>{0325771a-d106-4c90-8e61-78de9e68b286}</UniqueIdentifier>
     </Filter>
