@@ -80,3 +80,12 @@ Resource* ResourcesModule::CreateNewResource(UID uid)
     }
     return nullptr;
 }
+
+void ResourcesModule::UnloadAllResources()
+{
+    for (auto resource : resources)
+    {
+        delete resource.second;
+    }
+    resources.clear();
+}

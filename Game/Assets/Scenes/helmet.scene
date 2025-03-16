@@ -1,7 +1,7 @@
 {
     "Scene": {
-        "UID": 11431364678004288087,
-        "Name": "New Scene",
+        "UID": 8562983810033934215,
+        "Name": "helmet",
         "RootGameObject": 12382547037167987164,
         "GameObjects": [
             {
@@ -64,8 +64,8 @@
                         "Type": 1,
                         "Enabled": true,
                         "Name": "Mesh",
-                        "Mesh": 1144256025427112,
-                        "Material": 1332600219378438
+                        "Mesh": 1157318006189490,
+                        "Material": 1349919498992507
                     }
                 ],
                 "Children": []
@@ -158,7 +158,7 @@
                 1.0
             ],
             "Ambient Intensity": 0.20000000298023224,
-            "Skybox UID": 1267325513922394
+            "Skybox UID": 1230233845174612
         }
     }
 }

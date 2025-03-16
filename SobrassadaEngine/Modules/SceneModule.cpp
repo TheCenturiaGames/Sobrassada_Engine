@@ -1,18 +1,18 @@
 #include "SceneModule.h"
 
+#include "Application.h"
 #include "ComponentUtils.h"
 #include "EditorUIModule.h"
 #include "FileSystem.h"
+#include "InputModule.h"
 #include "LibraryModule.h"
 #include "Octree.h"
+#include "RaycastController.h"
+#include "ResourcesModule.h"
 
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_EXTERNAL_IMAGE
-#include "Application.h"
-#include "InputModule.h"
-#include "RaycastController.h"
-
 #include <filesystem>
 #include <tiny_gltf.h>
 
@@ -128,6 +128,7 @@ void SceneModule::CloseScene()
     // TODO Warning dialog before closing scene without saving
     delete loadedScene;
     loadedScene = nullptr;
+    if (App->GetResourcesModule() != nullptr) App->GetResourcesModule()->UnloadAllResources();
 }
 
 void SceneModule::SwitchPlayMode(bool play)

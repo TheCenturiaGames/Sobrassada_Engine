@@ -36,6 +36,7 @@ class Mesh
 {
   public:
     Mesh() = default;
+    ~Mesh() = default;
 
     const std::vector<Vertex>& GetVertices() const { return vertices; }
     const std::vector<unsigned int>& GetIndices() const { return indices; }

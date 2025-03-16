@@ -159,20 +159,8 @@
     <ClCompile Include="FileSystem\FileSystem.cpp">
       <Filter>FileSystem</Filter>
     </ClCompile>
-    <ClCompile Include="FileSystem\MeshImporter.cpp">
-      <Filter>FileSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="FileSystem\SceneImporter.cpp">
-      <Filter>FileSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="FileSystem\TextureImporter.cpp">
-      <Filter>FileSystem</Filter>
-    </ClCompile>
     <ClCompile Include="Modules\LibraryModule.cpp">
       <Filter>Modules</Filter>
-    </ClCompile>
-    <ClCompile Include="FileSystem\MaterialImporter.cpp">
-      <Filter>FileSystem</Filter>
     </ClCompile>
     <ClCompile Include="Scene\Components\ComponentUtils.cpp">
       <Filter>Scene\Components</Filter>
@@ -243,17 +231,11 @@
     <ClCompile Include="Modules\ResourcesModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
-    <ClCompile Include="FileSystem\Importer.cpp">
-      <Filter>FileSystem</Filter>
-    </ClCompile>
     <ClCompile Include="Utils\EngineTimer.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
     <ClCompile Include="ResourceManagement\Resources\ResourceModel.cpp">
       <Filter>Resources</Filter>
-    </ClCompile>
-    <ClCompile Include="FileSystem\ModelImporter.cpp">
-      <Filter>FileSystem</Filter>
     </ClCompile>
     <ClCompile Include="Modules\DebugDrawModule.cpp">
       <Filter>Modules</Filter>
@@ -358,6 +340,24 @@
     <ClCompile Include="Modules\UserInterfaceModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
+    <ClCompile Include="FileSystem\MaterialImporter.cpp">
+      <Filter>FileSystem\Importers</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\MeshImporter.cpp">
+      <Filter>FileSystem\Importers</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\ModelImporter.cpp">
+      <Filter>FileSystem\Importers</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\SceneImporter.cpp">
+      <Filter>FileSystem\Importers</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\TextureImporter.cpp">
+      <Filter>FileSystem\Importers</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\Importer.cpp">
+      <Filter>FileSystem\Importers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -410,6 +410,9 @@
     </Filter>
     <Filter Include="External\Recast">
       <UniqueIdentifier>{da958ebe-ba34-4c0a-9248-41019fc9f888}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FileSystem\Importers">
+      <UniqueIdentifier>{e42785ca-ffeb-4d71-a9ce-3ee68d865b08}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -472,18 +475,6 @@
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="FileSystem\FileSystem.h">
-      <Filter>FileSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="FileSystem\MeshImporter.h">
-      <Filter>FileSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="FileSystem\SceneImporter.h">
-      <Filter>FileSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="FileSystem\TextureImporter.h">
-      <Filter>FileSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="FileSystem\MaterialImporter.h">
       <Filter>FileSystem</Filter>
     </ClInclude>
     <ClInclude Include="FileSystem\Material.h">
@@ -555,9 +546,6 @@
     <ClInclude Include="Utils\FrustumPlanes.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="FileSystem\Importer.h">
-      <Filter>FileSystem</Filter>
-    </ClInclude>
     <ClInclude Include="Modules\ResourcesModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
@@ -566,9 +554,6 @@
     </ClInclude>
     <ClInclude Include="ResourceManagement\Resources\ResourceModel.h">
       <Filter>Resources</Filter>
-    </ClInclude>
-    <ClInclude Include="FileSystem\ModelImporter.h">
-      <Filter>FileSystem</Filter>
     </ClInclude>
     <ClInclude Include="FileSystem\Model.h">
       <Filter>FileSystem</Filter>
@@ -617,6 +602,24 @@
     </ClInclude>
     <ClInclude Include="Modules\UserInterfaceModule.h">
       <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\MaterialImporter.h">
+      <Filter>FileSystem\Importers</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\MeshImporter.h">
+      <Filter>FileSystem\Importers</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\ModelImporter.h">
+      <Filter>FileSystem\Importers</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\SceneImporter.h">
+      <Filter>FileSystem\Importers</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\TextureImporter.h">
+      <Filter>FileSystem\Importers</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\Importer.h">
+      <Filter>FileSystem\Importers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

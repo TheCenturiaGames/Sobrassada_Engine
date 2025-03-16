@@ -48,6 +48,7 @@ class CameraModule : public Module
 
     unsigned int GetUbo() const { return ubo; }
     const LineSegment& GetLastCastedRay() const { return lastCastedRay; }
+    bool GetOrbiting() const { return orbiting; }
 
     void SetAspectRatio(float newAspectRatio);
 
@@ -82,6 +83,7 @@ class CameraModule : public Module
     float currentPitchAngle   = 0.f;
 
     bool isCameraDetached     = false;
+    bool orbiting             = false;
 
     CameraMatrices matrices;
 

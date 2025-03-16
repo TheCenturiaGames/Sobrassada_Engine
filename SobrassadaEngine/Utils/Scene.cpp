@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "CameraModule.h"
 #include "Component.h"
+#include "DebugUtils.h"
 #include "EditorUIModule.h"
 #include "Framebuffer.h"
 #include "GameObject.h"
@@ -18,7 +19,6 @@
 #include "Scene/Components/ComponentUtils.h"
 #include "Scene/Components/Standalone/MeshComponent.h"
 #include "SceneModule.h"
-#include "DebugUtils.h"
 
 #include "SDL_mouse.h"
 #include "imgui.h"
@@ -327,9 +327,8 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
     {
         float listBoxSize = debugShaderOptions.size() + debugRenderOptions.size() + 0.5f;
         if (ImGui::BeginListBox(
-            "##RenderOptionsList",
-            ImVec2(ImGui::CalcItemWidth(), ImGui::GetFrameHeightWithSpacing() * listBoxSize)
-        ))
+                "##RenderOptionsList", ImVec2(ImGui::CalcItemWidth(), ImGui::GetFrameHeightWithSpacing() * listBoxSize)
+            ))
         {
             ImGui::Checkbox(RENDER_LIGTHS, &debugShaderOptions[RENDER_LIGTHS]);
             if (ImGui::Checkbox("Render Wireframe", &debugShaderOptions[RENDER_WIREFRAME]))
@@ -409,7 +408,8 @@ void Scene::RenderScene()
         if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr)
         {
             App->GetSceneModule()->GetMainCamera()->SetAspectRatio(aspectRatio);
-        } else App->GetCameraModule()->SetAspectRatio(aspectRatio);
+        }
+        else App->GetCameraModule()->SetAspectRatio(aspectRatio);
         framebuffer->Resize((int)windowSize.x, (int)windowSize.y);
     }
 
@@ -576,7 +576,8 @@ void Scene::LoadModel(const UID modelUID)
         const Model& model                 = newModel->GetModelData();
         const std::vector<NodeData>& nodes = model.GetNodes();
 
-        GameObject* rootObject                 = new GameObject(GetGameObjectRootUID(), App->GetLibraryModule()->GetResourceName(modelUID));
+        GameObject* rootObject =
+            new GameObject(GetGameObjectRootUID(), App->GetLibraryModule()->GetResourceName(modelUID));
         rootObject->SetLocalTransform(nodes[0].transform);
 
         // Add the gameObject to the rootObject

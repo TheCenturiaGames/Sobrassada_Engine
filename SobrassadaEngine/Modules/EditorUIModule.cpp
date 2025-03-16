@@ -87,7 +87,7 @@ update_status EditorUIModule::RenderEditor(float deltaTime)
     Draw();
     for (auto it = openEditors.cbegin(); it != openEditors.cend();)
     {
-        
+
         if (!it->second->RenderEditor())
         {
             delete it->second;
@@ -98,7 +98,6 @@ update_status EditorUIModule::RenderEditor(float deltaTime)
             ++it;
         }
     }
- 
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -279,11 +278,9 @@ void EditorUIModule::MainMenu()
             ImGui::EndMenu();
         }
 
-       
-
         if (ImGui::BeginMenu("Engine Editor Window"))
         {
-              
+
             if (ImGui::MenuItem("Mockup Base Engine Editor", "")) OpenEditor(CreateEditor(EditorType::BASE));
             ImGui::EndMenu();
         }
@@ -768,7 +765,8 @@ bool EditorUIModule::RenderImGuizmo(
     ImGuizmo::OPERATION operation = GetImGuizmoOperation();
     ImGuizmo::MODE mode           = GetImGuizmoTransformMode();
 
-    ImGuizmo::Enable(true);
+    if (App->GetCameraModule()->GetOrbiting()) ImGuizmo::Enable(false);
+    else ImGuizmo::Enable(true);
     ImGuizmo::Manipulate(
         view.ptr(), proj.ptr(), operation, mode, transform.ptr(), nullptr, snapEnabled ? snapValues.ptr() : nullptr,
         nullptr, nullptr
@@ -856,7 +854,6 @@ T EditorUIModule::RenderResourceSelectDialog(
     }
     return result;
 }
-
 
 void EditorUIModule::OpenEditor(EngineEditorBase* editorToOpen)
 {
