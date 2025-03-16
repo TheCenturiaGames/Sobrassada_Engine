@@ -3,10 +3,11 @@
 #include "Application.h"
 #include "FileSystem.h"
 #include "LibraryModule.h"
+#include "MetaPrefab.h"
+#include "ProjectModule.h"
 #include "ResourceManagement/Resources/ResourcePrefab.h"
 #include "Scene/GameObjects/GameObject.h"
 #include "SceneModule.h"
-#include "MetaPrefab.h"
 
 #include "prettywriter.h"
 #include "stringbuffer.h"
@@ -29,7 +30,8 @@ namespace PrefabManager
         std::string savePath = PREFABS_LIB_PATH + std::string("Prefab") + PREFAB_EXTENSION;
         UID finalPrefabUID =
             override ? gameObject->GetPrefabUID() : App->GetLibraryModule()->AssignFiletypeUID(uid, FileType::Prefab);
-        savePath                = PREFABS_LIB_PATH + std::to_string(finalPrefabUID) + PREFAB_EXTENSION;
+        savePath = App->GetProjectModule()->GetLoadedProjectPath() + PREFABS_LIB_PATH + std::to_string(finalPrefabUID) +
+                   PREFAB_EXTENSION;
         const std::string& name = gameObject->GetName();
 
         // Create structure
@@ -72,8 +74,9 @@ namespace PrefabManager
         MetaPrefab meta(finalPrefabUID, assetPath);
         meta.Save(name, assetPath);
 
+        assetPath = App->GetProjectModule()->GetLoadedProjectPath() + PREFABS_ASSETS_PATH + name + PREFAB_EXTENSION;
         // Save in assets
-        unsigned int bytesWritten   = (unsigned int
+        unsigned int bytesWritten = (unsigned int
         )FileSystem::Save(assetPath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
         if (bytesWritten == 0)
         {
@@ -98,9 +101,11 @@ namespace PrefabManager
         return finalPrefabUID;
     }
 
-    void CopyPrefab(const std::string& filePath, const std::string& name, const UID sourceUID)
+    void CopyPrefab(
+        const std::string& filePath, const std::string& targetFilePath, const std::string& name, const UID sourceUID
+    )
     {
-        std::string destination = PREFABS_LIB_PATH + std::to_string(sourceUID) + PREFAB_EXTENSION;
+        std::string destination = targetFilePath + PREFABS_LIB_PATH + std::to_string(sourceUID) + PREFAB_EXTENSION;
         FileSystem::Copy(filePath.c_str(), destination.c_str());
 
         App->GetLibraryModule()->AddPrefab(sourceUID, name);
@@ -146,7 +151,8 @@ namespace PrefabManager
                     if (obj->GetUID() == newObject->GetParent()) break;
                     ++index;
                 }
-                parentIndices.push_back(index); // We will ignore the parent index of the root object, so it's fine this is also 0 for it
+                parentIndices.push_back(index
+                ); // We will ignore the parent index of the root object, so it's fine this is also 0 for it
                 loadedGameObjects.push_back(newObject);
             }
         }

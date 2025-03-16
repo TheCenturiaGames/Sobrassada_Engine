@@ -1,0 +1,10 @@
+{
+    "UID": 1363449262095788,
+    "name": "GunMaterial",
+    "assetPath": "Assets/Player.gltf",
+    "lastModifiedDate": 0,
+    "importOptions": {
+        "shader": "8257305719033006640",
+        "useOcclusion": true
+    }
+}

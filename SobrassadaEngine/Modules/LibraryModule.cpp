@@ -164,19 +164,19 @@ bool LibraryModule::LoadLibraryMaps(const std::string& projectPath)
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 else SceneImporter::ImportMaterialFromMetadata(assetPath, projectPath, assetName, assetUID);
                 break;
-            case 16:
-                AddPrefab(assetUID, assetName);
-                AddName(assetName, assetUID);
-                libraryPath = PREFABS_LIB_PATH + std::to_string(assetUID) + PREFAB_EXTENSION;
-                if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
-                else SceneImporter::CopyPrefab(assetPath, assetName, assetUID);
-                break;
             case 14:
                 AddModel(assetUID, assetName);
                 AddName(assetName, assetUID);
                 libraryPath = projectPath + MODELS_LIB_PATH + std::to_string(assetUID) + MODEL_EXTENSION;
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
-                else SceneImporter::ImportModelFromMetadata(assetPath, projectPath, assetName, assetUID);
+                else SceneImporter::CopyModel(assetPath, projectPath, assetName, assetUID);
+                break;
+            case 16:
+                AddPrefab(assetUID, assetName);
+                AddName(assetName, assetUID);
+                libraryPath = projectPath + PREFABS_LIB_PATH + std::to_string(assetUID) + PREFAB_EXTENSION;
+                if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
+                else SceneImporter::CopyPrefab(assetPath, projectPath, assetName, assetUID);
                 break;
             default:
                 GLOG("Unknown UID prefix (%s) for: %s", std::to_string(prefix).c_str(), assetName.c_str());
