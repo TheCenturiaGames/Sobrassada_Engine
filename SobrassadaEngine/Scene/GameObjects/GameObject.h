@@ -42,6 +42,7 @@ class GameObject
 
     void UpdateGameObjectHierarchy(UID sourceUID);
     void RenameGameObjectHierarchy();
+    bool TargetIsChildren(UID uidTarget);
 
     const std::string& GetName() const { return name; }
     void SetName(const std::string& newName) { name = newName; }
@@ -62,7 +63,7 @@ class GameObject
 
     void OnAABBUpdated();
 
-    void Render() const;
+    void Render(float deltatime) const;
     void RenderEditor();
 
     const float4x4& GetGlobalTransform() const { return globalTransform; }

@@ -11,6 +11,7 @@
 
 #include <stack>
 
+
 GameObject::GameObject(std::string name) : name(name)
 {
     uid        = GenerateUID();
@@ -391,9 +392,14 @@ void GameObject::HandleNodeClick(UID& selectedGameObjectUUID)
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DRAG_DROP_GAMEOBJECT"))
         {
             UID draggedUID = *static_cast<const UID*>(payload->Data);
-            if (draggedUID != uid)
+            GameObject* draggedGO = App->GetSceneModule()->GetGameObjectByUID(draggedUID);
+
+            if (draggedGO != nullptr && !draggedGO->TargetIsChildren(uid))
             {
-                UpdateGameObjectHierarchy(draggedUID);
+                if (draggedUID != uid)
+                {
+                    UpdateGameObjectHierarchy(draggedUID);
+                }
             }
         }
 
@@ -467,6 +473,37 @@ void GameObject::RenameGameObjectHierarchy()
     }
 }
 
+bool GameObject::TargetIsChildren(UID uidTarget)
+{
+    if (children.size() <= 0) return false;
+
+    std::stack<UID> nodesToVisit;
+
+    for (UID childUID : children)
+    {
+        nodesToVisit.push(childUID);
+    }
+
+    while (!nodesToVisit.empty())
+    {
+        UID currentUID = nodesToVisit.top();
+        nodesToVisit.pop();
+
+        if (currentUID == uidTarget) return true;
+
+        GameObject* currentGO = App->GetSceneModule()->GetGameObjectByUID(currentUID);
+
+        if (currentGO != nullptr)
+        {
+            for (UID grandChildUID : currentGO->children)
+            {
+                nodesToVisit.push(grandChildUID);
+            }
+        }
+    }
+    return false;
+}
+
 void GameObject::UpdateGameObjectHierarchy(UID sourceUID)
 {
     GameObject* sourceGameObject = App->GetSceneModule()->GetGameObjectByUID(sourceUID);
@@ -501,11 +538,11 @@ void GameObject::OnAABBUpdated()
     OnTransformUpdated();
 }
 
-void GameObject::Render() const
+void GameObject::Render(float deltaTime) const
 {
     for (auto& component : components)
     {
-        component.second->Render();
+        component.second->Render(deltaTime);
     }
 }
 

@@ -78,6 +78,7 @@ Scene::~Scene()
 
     delete lightsConfig;
     delete sceneOctree;
+    
     lightsConfig = nullptr;
     sceneOctree  = nullptr;
 
@@ -208,7 +209,7 @@ update_status Scene::Render(float deltaTime) const
     {
         if (gameObject != nullptr)
         {
-            gameObject->Render();
+            gameObject->Render(deltaTime);
         }
     }
 

@@ -141,12 +141,6 @@
     <ClCompile Include="Utils\Framebuffer.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Utils\Quadtree.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="Utils\Octree.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\Components\Component.cpp">
       <Filter>Scene\Components</Filter>
     </ClCompile>
@@ -209,6 +203,33 @@
     </ClCompile>
     <ClCompile Include="Utils\LightsConfig.cpp">
       <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\Quadtree.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\Octree.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Component.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\GameObjects\GameObject.cpp">
+      <Filter>Scene\GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\SceneModule.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\MeshComponent.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Component.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\ComponentUtils.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\Scene.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
     <ClCompile Include="Utils\FrustumPlanes.cpp">
       <Filter>Utils</Filter>
@@ -291,7 +312,6 @@
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastAlloc.cpp">
       <Filter>External\Recast</Filter>
     </ClCompile>
-    <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp" />
     <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
       <Filter>UI\EngineEditors</Filter>
     </ClCompile>
@@ -310,6 +330,9 @@
     <ClCompile Include="FileSystem\MetaTexture.cpp">
       <Filter>FileSystem\Meta</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\CharacterControllerComponent.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
     <ClCompile Include="FileSystem\MetaModel.cpp">
       <Filter>FileSystem\Meta</Filter>
     </ClCompile>
@@ -327,6 +350,15 @@
     </ClCompile>
     <ClCompile Include="Modules\UserInterfaceModule.cpp">
       <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\Trees\Octree.cpp">
+      <Filter>Utils\Tree</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\Trees\Quadtree.cpp">
+      <Filter>Utils\Tree</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp">
+      <Filter>External\ImGuizmo</Filter>
     </ClCompile>
     <ClCompile Include="ResourceManagement\Resources\ResourceStateMachine.cpp">
       <Filter>Resources</Filter>
@@ -386,6 +418,9 @@
     </Filter>
     <Filter Include="External\Recast">
       <UniqueIdentifier>{da958ebe-ba34-4c0a-9248-41019fc9f888}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils\Tree">
+      <UniqueIdentifier>{61fcf3e0-b467-4423-83c3-ae806c0b6ff3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -522,12 +557,6 @@
     <ClInclude Include="Utils\LightsConfig.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="Utils\Quadtree.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils\Octree.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Utils\FrustumPlanes.h">
       <Filter>Utils</Filter>
     </ClInclude>
@@ -579,6 +608,9 @@
     <ClInclude Include="Utils\DebugUtils.h">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\CharacterControllerComponent.h">
+      <Filter>Scene\Components</Filter>
+    </ClInclude>
     <ClInclude Include="UI\EngineEditors\EngineEditorBase.h">
       <Filter>UI\EngineEditors</Filter>
     </ClInclude>
@@ -590,6 +622,18 @@
     </ClInclude>
     <ClInclude Include="Modules\UserInterfaceModule.h">
       <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Trees\Quadtree.h">
+      <Filter>Utils\Tree</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Trees\Octree.h">
+      <Filter>Utils\Tree</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Delegate.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\EventDispatcher.h">
+      <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="ResourceManagement\Resources\ResourceStateMachine.h">
       <Filter>Resources</Filter>

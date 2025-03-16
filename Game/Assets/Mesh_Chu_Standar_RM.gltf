@@ -1,0 +1,171 @@
+{
+    "asset" : {
+        "generator" : "Khronos glTF Blender I/O v1.5.17",
+        "version" : "2.0"
+    },
+    "scene" : 0,
+    "scenes" : [
+        {
+            "name" : "Scene",
+            "nodes" : [
+                0
+            ]
+        }
+    ],
+    "nodes" : [
+        {
+            "mesh" : 0,
+            "name" : "char_chu",
+            "rotation" : [
+                0.7071068286895752,
+                0,
+                0,
+                0.7071067094802856
+            ],
+            "scale" : [
+                0.019999999552965164,
+                0.019999999552965164,
+                0.019999999552965164
+            ],
+            "translation" : [
+                0,
+                0.12053347378969193,
+                0
+            ]
+        }
+    ],
+    "materials" : [
+        {
+            "doubleSided" : true,
+            "name" : "M_chu",
+            "normalTexture" : {
+                "index" : 0
+            },
+            "pbrMetallicRoughness" : {
+                "baseColorTexture" : {
+                    "index" : 1
+                },
+                "metallicRoughnessTexture" : {
+                    "index" : 2
+                }
+            }
+        }
+    ],
+    "meshes" : [
+        {
+            "name" : "char_chu",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "POSITION" : 0,
+                        "NORMAL" : 1,
+                        "TEXCOORD_0" : 2
+                    },
+                    "indices" : 3,
+                    "material" : 0
+                }
+            ]
+        }
+    ],
+    "textures" : [
+        {
+            "sampler" : 0,
+            "source" : 0
+        },
+        {
+            "sampler" : 0,
+            "source" : 1
+        },
+        {
+            "sampler" : 0,
+            "source" : 2
+        }
+    ],
+    "images" : [
+        {
+            "mimeType" : "image/png",
+            "name" : "T_MC_Chu_UV_V02_Normal",
+            "uri" : "T_MC_Chu_UV_V02_Normal.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "T_MC_Chu_UV_V02_BaseColor",
+            "uri" : "T_MC_Chu_UV_V02_BaseColor.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "T_MC_Chu_UV_V02_OcclusionRoughnessMetallic",
+            "uri" : "T_MC_Chu_UV_V02_OcclusionRoughnessMetallic.png"
+        }
+    ],
+    "accessors" : [
+        {
+            "bufferView" : 0,
+            "componentType" : 5126,
+            "count" : 8120,
+            "max" : [
+                55.067508697509766,
+                20.70749855041504,
+                91.36554718017578
+            ],
+            "min" : [
+                -55.067508697509766,
+                -20.962522506713867,
+                -83.78702545166016
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 1,
+            "componentType" : 5126,
+            "count" : 8120,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 2,
+            "componentType" : 5126,
+            "count" : 8120,
+            "type" : "VEC2"
+        },
+        {
+            "bufferView" : 3,
+            "componentType" : 5123,
+            "count" : 35769,
+            "type" : "SCALAR"
+        }
+    ],
+    "bufferViews" : [
+        {
+            "buffer" : 0,
+            "byteLength" : 97440,
+            "byteOffset" : 0
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 97440,
+            "byteOffset" : 97440
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 64960,
+            "byteOffset" : 194880
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 71538,
+            "byteOffset" : 259840
+        }
+    ],
+    "samplers" : [
+        {
+            "magFilter" : 9729,
+            "minFilter" : 9987
+        }
+    ],
+    "buffers" : [
+        {
+            "byteLength" : 331380,
+            "uri" : "Mesh_Chu_Standar_RM.bin"
+        }
+    ]
+}

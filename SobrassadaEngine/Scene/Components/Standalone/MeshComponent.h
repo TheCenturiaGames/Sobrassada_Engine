@@ -22,7 +22,7 @@ class MeshComponent : public Component
 
     void RenderEditorInspector() override;
     void Update() override;
-    void Render() override;
+    void Render(float deltaTime) override;
 
     void InitSkin();
 
