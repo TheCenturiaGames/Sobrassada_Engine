@@ -99,12 +99,8 @@ bool Octree::InsertElement(GameObject* gameObject)
         {
             if (currentNode->IsLeaf())
             {
-                if (currentNode->currentArea.HalfSize().x <= MINIMUM_TREE_LEAF_SIZE)
-                {
-                    currentNode->elements.push_back(octreeElement);
-                    inserted = true;
-                }
-                else if (currentNode->elements.size() < currentNode->elementsCapacity)
+                if (currentNode->currentArea.HalfSize().x <= MINIMUM_TREE_LEAF_SIZE ||
+                    currentNode->elements.size() < currentNode->elementsCapacity)
                 {
                     currentNode->elements.push_back(octreeElement);
                     inserted = true;
