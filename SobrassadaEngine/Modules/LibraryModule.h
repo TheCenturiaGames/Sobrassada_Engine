@@ -35,7 +35,7 @@ class LibraryModule : public Module
     bool SaveScene(const char* path, SaveMode saveMode) const;
     bool LoadScene(const char* fileName, bool reload = false) const;
 
-    bool LoadLibraryMaps();
+    bool LoadLibraryMaps(const std::string& projectPath);
     UID AssignFiletypeUID(UID originalUID, FileType fileType);
 
     void AddTexture(UID textureUID, const std::string& ddsPath);
@@ -49,7 +49,7 @@ class LibraryModule : public Module
     UID GetTextureUID(const std::string& texturePath) const;
     UID GetMeshUID(const std::string& meshPath) const;
     UID GetMaterialUID(const std::string& materialPath) const;
-    UID GetModelUID(const std::string &modelPath) const;
+    UID GetModelUID(const std::string& modelPath) const;
 
     const std::string& GetResourceName(UID resourceID) const;
 

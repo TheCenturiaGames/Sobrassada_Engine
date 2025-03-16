@@ -84,7 +84,10 @@ class SceneModule : public Module
 
     Scene* GetScene() const { return loadedScene; }
     UID GetSceneUID() const { return loadedScene != nullptr ? loadedScene->GetSceneUID() : INVALID_UID; }
-    const char* GetSceneName() const { return loadedScene != nullptr ? loadedScene->GetSceneName() : "Not loaded"; }
+    const std::string& GetSceneName() const
+    {
+        return loadedScene != nullptr ? loadedScene->GetSceneName() : unloadedSceneName;
+    }
     LightsConfig* GetLightsConfig() { return loadedScene != nullptr ? loadedScene->GetLightsConfig() : nullptr; }
     bool GetInPlayMode() const { return inPlayMode; }
     CameraComponent* GetMainCamera() { return loadedScene->GetMainCamera(); }
@@ -102,7 +105,7 @@ class SceneModule : public Module
     void SetMainCamera(CameraComponent* camera) { loadedScene->SetMainCamera(camera); }
 
   private:
-    Scene* loadedScene = nullptr;
-    const std::string scenePath;
-    bool inPlayMode = false;
+    Scene* loadedScene                  = nullptr;
+    bool inPlayMode                     = false;
+    const std::string unloadedSceneName = "UnloadedScene";
 };

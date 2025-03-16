@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "LibraryModule.h"
 #include "MetaModel.h"
+#include "ProjectModule.h"
 #include "ResourceManagement/Resources/ResourceModel.h"
 
 #include "Math/Quat.h"
@@ -14,7 +15,7 @@ namespace ModelImporter
 {
     UID ImportModel(
         const tinygltf::Model& model, const std::vector<std::vector<std::pair<UID, UID>>>& meshesUIDs,
-        const char* filePath, const UID sourceUID
+        const char* filePath, const std::string& targetFilePath, const UID sourceUID
     )
     {
         // Get Nodes data
@@ -69,18 +70,19 @@ namespace ModelImporter
         rapidjson::Value modelJSON(rapidjson::kObjectType);
 
         const std::string modelName = FileSystem::GetFileNameWithoutExtension(filePath);
-        std::string assetPath       = "";
+        std::string assetPath       = MODELS_ASSETS_PATH + modelName + MODEL_EXTENSION;
         UID finalModelUID;
         if (sourceUID == INVALID_UID)
         {
             UID modelUID              = GenerateUID();
             finalModelUID             = App->GetLibraryModule()->AssignFiletypeUID(modelUID, FileType::Model);
-
-            assetPath = MODELS_ASSETS_PATH + modelName + MODEL_EXTENSION;
+            
             MetaModel meta(finalModelUID, assetPath);
             meta.Save(modelName, assetPath);
         }
         else finalModelUID = sourceUID;
+
+        assetPath = targetFilePath + assetPath;
 
         newModel.SetUID(finalModelUID);
 
@@ -166,7 +168,7 @@ namespace ModelImporter
         rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
         doc.Accept(writer);
 
-        std::string saveFilePath  = MODELS_LIB_PATH + std::to_string(finalModelUID) + MODEL_EXTENSION;
+        std::string saveFilePath  = App->GetProjectModule()->GetLoadedProjectPath() + MODELS_LIB_PATH + std::to_string(finalModelUID) + MODEL_EXTENSION;
         unsigned int bytesWritten = (unsigned int
         )FileSystem::Save(saveFilePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
         if (bytesWritten == 0)
@@ -195,9 +197,9 @@ namespace ModelImporter
         return finalModelUID;
     }
 
-    void CopyModel(const std::string& filePath, const std::string& name, const UID sourceUID)
+    void CopyModel(const std::string& filePath, const std::string& targetFilePath, const std::string& name, const UID sourceUID)
     {
-        std::string destination = MODELS_LIB_PATH + std::to_string(sourceUID) + MODEL_EXTENSION;
+        std::string destination = targetFilePath + MODELS_LIB_PATH + std::to_string(sourceUID) + MODEL_EXTENSION;
         FileSystem::Copy(filePath.c_str(), destination.c_str());
 
         App->GetLibraryModule()->AddModel(sourceUID, name);

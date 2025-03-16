@@ -1,0 +1,9 @@
+{
+    "UID": 1281272330578818,
+    "name": "cubemap",
+    "assetPath": "Assets/cubemap.dds",
+    "lastModifiedDate": 0,
+    "importOptions": {
+        "mipmaps": 1
+    }
+}

@@ -25,9 +25,9 @@ class Scene
 
     void Init();
     void Save(
-        rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator, UID saveUID = INVALID_UID,
-        const std::string& newName = ""
-    ) const;
+        rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator, UID newUID = INVALID_UID,
+        const char* newName = nullptr
+    );
 
     void LoadComponents() const;
     void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
@@ -49,7 +49,7 @@ class Scene
     void AddGameObject(UID uid, GameObject* newGameObject) { gameObjectsContainer.insert({uid, newGameObject}); }
     void RemoveGameObjectHierarchy(UID gameObjectUUID);
 
-    const char* GetSceneName() const { return sceneName; }
+    const std::string& GetSceneName() const { return sceneName; }
     UID GetSceneUID() const { return sceneUID; }
     UID GetGameObjectRootUID() const { return gameObjectRootUID; }
     GameObject* GetSelectedGameObject() { return GetGameObjectByUID(selectedGameObjectUID); }
@@ -81,8 +81,8 @@ class Scene
     void CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects) const;
 
   private:
-    char sceneName[64];
-    const UID sceneUID;
+    std::string sceneName;
+    UID sceneUID;
     UID gameObjectRootUID;
     UID selectedGameObjectUID;
     CameraComponent* mainCamera;
