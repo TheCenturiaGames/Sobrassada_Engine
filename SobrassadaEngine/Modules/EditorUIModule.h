@@ -2,7 +2,7 @@
 #include "Module.h"
 #include "ResourceManagement/Resources/Resource.h"
 #include "EngineEditors/EngineEditorBase.h"
-
+#include "EngineEditors/Editor/NodeEditor.h"
 
 #include "SDL.h"
 #include "imgui_internal.h"

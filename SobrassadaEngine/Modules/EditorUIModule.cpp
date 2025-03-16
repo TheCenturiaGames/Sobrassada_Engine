@@ -285,6 +285,7 @@ void EditorUIModule::MainMenu()
         {
               
             if (ImGui::MenuItem("Mockup Base Engine Editor", "")) OpenEditor(CreateEditor(EditorType::BASE));
+            if (ImGui::MenuItem("Node Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::NODE));
             ImGui::EndMenu();
         }
 
@@ -1090,6 +1091,9 @@ EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
     case EditorType::BASE:
 
         return new EngineEditorBase("Base Editor " + std::to_string(uid), uid);
+        break;
+    case EditorType::NODE:
+        return new NodeEditor("NodeEditor" + std::to_string(uid), uid);
 
     default:
         return nullptr;
