@@ -1,8 +1,9 @@
 #pragma once
+#include "EngineEditors/EngineEditorBase.h"
 #include "Module.h"
 #include "ResourceManagement/Resources/Resource.h"
 #include "EngineEditors/EngineEditorBase.h"
-
+#include "EngineEditors/Editor/NodeEditor.h"
 
 #include "SDL.h"
 #include "imgui_internal.h"
@@ -39,6 +40,13 @@ enum class GizmoTransform
     WORLD
 };
 
+enum class GizmoDragState
+{
+    IDLE,
+    DRAGGING,
+    RELEASED
+};
+
 class EditorUIModule : public Module
 {
   public:
@@ -60,9 +68,12 @@ class EditorUIModule : public Module
         const char* id, const std::unordered_map<std::string, T>& availableResources, const T& defaultResource
     );
 
+    std::string RenderFileDialog(bool& window, const char* windowTitle, bool selectFolder = false) const;
+
     GizmoOperation& GetCurrentGizmoOperation() { return currentGizmoOperation; }
     GizmoTransform& GetTransformType() { return transformType; }
     float3& GetSnapValues() { return snapValues; }
+    GizmoDragState GetImGuizmoDragState() const { return guizmoDragState; };
 
   private:
     void RenderBasicTransformModifiers(
@@ -73,8 +84,8 @@ class EditorUIModule : public Module
     void UpdateGizmoTransformMode();
     ImGuizmo::OPERATION GetImGuizmoOperation() const;
     ImGuizmo::MODE GetImGuizmoTransformMode() const;
-    void AddFramePlotData(float deltaTime);
 
+    void AddFramePlotData(float deltaTime);
     void Draw();
     void MainMenu();
     void EditorSettings(bool& editorSettingsMenu);
@@ -99,6 +110,8 @@ class EditorUIModule : public Module
     void OpenEditor(EngineEditorBase* editorToOpen);
     EngineEditorBase* CreateEditor(EditorType type);
 
+    void UpdateGizmoDragState();
+
   public:
     bool editorControlMenu = true;
     bool hierarchyMenu     = true;
@@ -121,11 +134,12 @@ class EditorUIModule : public Module
     std::deque<float> framerate;
     std::deque<float> frametime;
 
-    std::string startPath;
     std::string scenesPath;
 
     GizmoOperation currentGizmoOperation = GizmoOperation::TRANSLATE;
     GizmoTransform transformType         = GizmoTransform::LOCAL;
+    GizmoDragState guizmoDragState = GizmoDragState::IDLE;
+
     float3 snapValues                    = {1.f, 1.f, 1.f};
     std::unordered_map<UID, EngineEditorBase*> openEditors;
 };

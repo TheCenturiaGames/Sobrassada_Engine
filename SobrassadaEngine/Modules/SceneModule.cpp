@@ -5,6 +5,8 @@
 #include "FileSystem.h"
 #include "LibraryModule.h"
 #include "Octree.h"
+#include "Quadtree.h"
+#include "ProjectModule.h"
 
 #include "Application.h"
 #include "InputModule.h"
@@ -13,7 +15,7 @@
 #include <filesystem>
 #include <tiny_gltf.h>
 
-SceneModule::SceneModule() : scenePath(std::filesystem::current_path().string() + DELIMITER)
+SceneModule::SceneModule()
 {
 }
 
@@ -61,15 +63,17 @@ update_status SceneModule::RenderEditor(float deltaTime)
 
 update_status SceneModule::PostUpdate(float deltaTime)
 {
+    if (loadedScene == nullptr) return UPDATE_CONTINUE;
+
     // CAST RAY WHEN LEFT CLICK IS RELEASED
-    if (loadedScene != nullptr && GetDoInputsScene() && !ImGuizmo::IsUsingAny())
+    if (GetDoInputsScene() && !ImGuizmo::IsUsingAny())
     {
         const KeyState* mouseButtons = App->GetInputModule()->GetMouseButtons();
         const KeyState* keyboard     = App->GetInputModule()->GetKeyboard();
         if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_DOWN && !keyboard[SDL_SCANCODE_LALT])
         {
-            GameObject* selectedObject = RaycastController::GetRayIntersection<Octree>(
-                App->GetCameraModule()->CastCameraRay(), loadedScene->GetOctree()
+            GameObject* selectedObject = RaycastController::GetRayIntersectionTrees<Octree, Quadtree>(
+                App->GetCameraModule()->CastCameraRay(), loadedScene->GetOctree(), loadedScene->GetDynamicTree()
             );
 
             if (selectedObject != nullptr)
@@ -78,7 +82,22 @@ update_status SceneModule::PostUpdate(float deltaTime)
             }
         }
     }
-    if (loadedScene != nullptr && loadedScene->GetStopPlaying()) SwitchPlayMode(false);
+
+    // CHECKING FOR UPDATED STATIC AND DYNAMIC OBJECTS
+    GizmoDragState currentGizmoState = App->GetEditorUIModule()->GetImGuizmoDragState();
+    if (currentGizmoState == GizmoDragState::RELEASED || currentGizmoState == GizmoDragState::IDLE)
+    {
+        if (loadedScene->IsStaticModified())
+        {
+            RegenerateStaticTree();
+        }
+        if (loadedScene->IsDynamicModified())
+        {
+            RegenerateDynamicTree();
+        }
+    }
+
+    if (loadedScene->GetStopPlaying()) SwitchPlayMode(false);
 
     return UPDATE_CONTINUE;
 }
@@ -117,7 +136,8 @@ void SceneModule::CloseScene()
 {
     if (inPlayMode)
     {
-        std::string tmpScene = SCENES_PLAY_PATH + std::to_string(loadedScene->GetSceneUID()) + SCENE_EXTENSION;
+        std::string tmpScene = App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PLAY_PATH +
+                               std::to_string(loadedScene->GetSceneUID()) + SCENE_EXTENSION;
         FileSystem::Delete(tmpScene.c_str());
         inPlayMode = false;
     }
@@ -136,7 +156,7 @@ void SceneModule::SwitchPlayMode(bool play)
         std::string tmpScene = std::to_string(loadedScene->GetSceneUID()) + SCENE_EXTENSION;
         if (App->GetLibraryModule()->LoadScene(tmpScene.c_str(), true))
         {
-            FileSystem::Delete((scenePath + SCENES_PLAY_PATH + tmpScene).c_str());
+            FileSystem::Delete((App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PLAY_PATH + tmpScene).c_str());
             inPlayMode = false;
             loadedScene->SetStopPlaying(false);
         }

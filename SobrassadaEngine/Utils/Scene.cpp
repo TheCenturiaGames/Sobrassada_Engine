@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "CameraModule.h"
 #include "Component.h"
+#include "DebugUtils.h"
 #include "EditorUIModule.h"
 #include "Framebuffer.h"
 #include "GameObject.h"
@@ -11,6 +12,7 @@
 #include "InputModule.h"
 #include "LibraryModule.h"
 #include "Octree.h"
+#include "Quadtree.h"
 #include "OpenGLModule.h"
 #include "ResourceManagement/Resources/Resource.h"
 #include "ResourceManagement/Resources/ResourceModel.h"
@@ -18,17 +20,18 @@
 #include "Scene/Components/ComponentUtils.h"
 #include "Scene/Components/Standalone/MeshComponent.h"
 #include "SceneModule.h"
-#include "DebugUtils.h"
 
 #include "SDL_mouse.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 // guizmo after imgui include
 #include "./Libs/ImGuizmo/ImGuizmo.h"
+#include "Importer.h"
+#include "SDL_mouse.h"
 
 Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 {
-    memcpy(this->sceneName, sceneName, strlen(sceneName));
+    this->sceneName             = sceneName;
 
     GameObject* sceneGameObject = new GameObject("SceneModule GameObject");
     selectedGameObjectUID = gameObjectRootUID = sceneGameObject->GetUID();
@@ -40,8 +43,7 @@ Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 
 Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUID(loadedSceneUID)
 {
-    const char* initName = initialState["Name"].GetString();
-    memcpy(this->sceneName, initName, strlen(initName));
+    this->sceneName       = initialState["Name"].GetString();
     gameObjectRootUID     = initialState["RootGameObject"].GetUint64();
     selectedGameObjectUID = gameObjectRootUID;
 
@@ -78,9 +80,11 @@ Scene::~Scene()
 
     delete lightsConfig;
     delete sceneOctree;
+    delete dynamicTree;
     
     lightsConfig = nullptr;
     sceneOctree  = nullptr;
+    dynamicTree  = nullptr;
 
     GLOG("%s scene closed", sceneName);
 }
@@ -106,23 +110,25 @@ void Scene::Init()
     lightsConfig->InitSkybox();
     lightsConfig->InitLightBuffers();
 
-    UpdateSpatialDataStruct();
+    UpdateStaticSpatialStructure();
+    UpdateDynamicSpatialStructure();
 }
 
 void Scene::Save(
-    rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator, UID newUID, const std::string& newName
-) const
+    rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator, UID newUID, const char* newName
+)
 {
     if (newUID != INVALID_UID)
     {
-        targetState.AddMember("UID", newUID, allocator);
-        targetState.AddMember("Name", rapidjson::Value(newName.c_str(), allocator), allocator);
+        sceneUID = newUID;
     }
-    else
+    if (newName != nullptr)
     {
-        targetState.AddMember("UID", sceneUID, allocator);
-        targetState.AddMember("Name", rapidjson::Value(sceneName, allocator), allocator);
+        sceneName = newName;
     }
+
+    targetState.AddMember("UID", sceneUID, allocator);
+    targetState.AddMember("Name", rapidjson::Value(sceneName.c_str(), allocator), allocator);
 
     targetState.AddMember("RootGameObject", gameObjectRootUID, allocator);
 
@@ -180,7 +186,8 @@ void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGa
         root->UpdateTransformForGOBranch();
     }
 
-    UpdateSpatialDataStruct();
+    UpdateStaticSpatialStructure();
+    UpdateDynamicSpatialStructure();
 }
 
 update_status Scene::Update(float deltaTime)
@@ -328,9 +335,8 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
     {
         float listBoxSize = debugShaderOptions.size() + debugRenderOptions.size() + 0.5f;
         if (ImGui::BeginListBox(
-            "##RenderOptionsList",
-            ImVec2(ImGui::CalcItemWidth(), ImGui::GetFrameHeightWithSpacing() * listBoxSize)
-        ))
+                "##RenderOptionsList", ImVec2(ImGui::CalcItemWidth(), ImGui::GetFrameHeightWithSpacing() * listBoxSize)
+            ))
         {
             ImGui::Checkbox(RENDER_LIGTHS, &debugShaderOptions[RENDER_LIGTHS]);
             if (ImGui::Checkbox("Render Wireframe", &debugShaderOptions[RENDER_WIREFRAME]))
@@ -369,7 +375,7 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
 
 void Scene::RenderScene()
 {
-    if (!ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar))
+    if (!ImGui::Begin(sceneName.c_str(), nullptr, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar))
     {
         ImGui::End();
         return;
@@ -461,7 +467,6 @@ void Scene::RenderHierarchyUI(bool& hierarchyMenu)
         if (ImGui::Button("Delete GameObject"))
         {
             RemoveGameObjectHierarchy(selectedGameObjectUID);
-            App->GetSceneModule()->RegenerateTree();
         }
     }
 
@@ -480,6 +485,10 @@ void Scene::RemoveGameObjectHierarchy(UID gameObjectUID)
     if (!gameObjectsContainer.count(gameObjectUID) || gameObjectUID == gameObjectRootUID) return;
 
     GameObject* gameObject = GetGameObjectByUID(gameObjectUID);
+    
+    // 
+    if (gameObject->IsStatic()) SetStaticModified();
+    else SetDynamicModified();
 
     for (UID childUID : gameObject->GetChildren())
     {
@@ -499,6 +508,10 @@ void Scene::RemoveGameObjectHierarchy(UID gameObjectUID)
     // TODO: change when filesystem defined
     gameObjectsContainer.erase(gameObjectUID);
 
+    // CARE, WHEN THIS IS CHANGED TO ITERATIVE -> THIS CHECK MUST BE DONE FOR EACH GAME OBJECT BEING DELETED
+    if (gameObject->IsStatic()) SetStaticModified();
+    else SetDynamicModified();
+
     delete gameObject;
 }
 
@@ -515,7 +528,7 @@ const std::unordered_map<UID, Component*> Scene::GetAllComponents() const
     return collectedComponents;
 }
 
-void Scene::CreateSpatialDataStruct()
+void Scene::CreateStaticSpatialDataStruct()
 {
     // PARAMETRIZED IN FUTURE
     float3 octreeCenter = float3::zero;
@@ -527,6 +540,7 @@ void Scene::CreateSpatialDataStruct()
     {
         AABB objectBB = objectIterator.second->GetGlobalAABB();
 
+        if (!objectIterator.second->IsStatic()) continue;
         if (objectIterator.second->GetUID() == gameObjectRootUID) continue;
         if (objectBB.Size().x == 0 && objectBB.Size().y == 0 && objectBB.Size().z == 0) continue;
 
@@ -534,11 +548,42 @@ void Scene::CreateSpatialDataStruct()
     }
 }
 
-void Scene::UpdateSpatialDataStruct()
+void Scene::CreateDynamicSpatialDataStruct()
 {
+    // PARAMETRIZED IN FUTURE
+    float3 center = float3::zero;
+    float length  = 200;
+    int nodeCapacity    = 5;
+    dynamicTree      = new Quadtree(center, length, nodeCapacity);
+
+    for (const auto& objectIterator : gameObjectsContainer)
+    {
+        AABB objectBB = objectIterator.second->GetGlobalAABB();
+
+        if (objectIterator.second->IsStatic()) continue;
+        if (objectIterator.second->GetUID() == gameObjectRootUID) continue;
+        if (objectBB.Size().x == 0 && objectBB.Size().y == 0 && objectBB.Size().z == 0) continue;
+
+        dynamicTree->InsertElement(objectIterator.second);
+    }
+}
+
+void Scene::UpdateStaticSpatialStructure()
+{
+    staticModified = false;
+
     delete sceneOctree;
 
-    CreateSpatialDataStruct();
+    CreateStaticSpatialDataStruct();
+}
+
+void Scene::UpdateDynamicSpatialStructure()
+{
+    dynamicModified = false;
+
+    delete dynamicTree;
+
+    CreateDynamicSpatialDataStruct();
 }
 
 void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects) const
@@ -549,6 +594,7 @@ void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects)
         frustumPlanes = App->GetSceneModule()->GetMainCamera()->GetFrustrumPlanes();
 
     sceneOctree->QueryElements<FrustumPlanes>(frustumPlanes, queriedObjects);
+    dynamicTree->QueryElements<FrustumPlanes>(frustumPlanes, queriedObjects);
 
     for (auto gameObject : queriedObjects)
     {

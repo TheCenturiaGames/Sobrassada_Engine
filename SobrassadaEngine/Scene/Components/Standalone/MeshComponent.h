@@ -23,11 +23,12 @@ class MeshComponent : public Component
     void RenderEditorInspector() override;
     void Update() override;
     void Render(float deltaTime) override;
+    bool HasBones() const { return bones.size() > 0; }
 
     void InitSkin();
 
     const ResourceMesh* GetResourceMesh() const { return currentMesh; }
-
+    
     void AddMesh(UID resource, bool updateParent = true);
     void AddMaterial(UID resource);
 
@@ -39,6 +40,8 @@ class MeshComponent : public Component
     void SetBindMatrices(const std::vector<float4x4>& bindTransforms) { this->bindMatrices = bindTransforms; }
     void SetModelUID(const UID newModelUID) { this->modelUID = newModelUID; }
     void SetSkinIndex(const int newIndex) { this->skinIndex = newIndex; }
+
+  private:
 
   private:
     std::string currentMeshName       = "Not selected";

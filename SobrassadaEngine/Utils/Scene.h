@@ -11,6 +11,7 @@ class GameObject;
 class Component;
 class RootComponent;
 class Octree;
+class Quadtree;
 class CameraComponent;
 
 class Scene
@@ -23,9 +24,9 @@ class Scene
 
     void Init();
     void Save(
-        rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator, UID saveUID = INVALID_UID,
-        const std::string& newName = ""
-    ) const;
+        rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator, UID newUID = INVALID_UID,
+        const char* newName = nullptr
+    );
 
     void LoadComponents() const;
     void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
@@ -40,19 +41,23 @@ class Scene
     void RenderSelectedGameObjectUI();
     void RenderHierarchyUI(bool& hierarchyMenu);
 
-    void UpdateSpatialDataStruct();
+    bool IsStaticModified() const { return staticModified; };
+    bool IsDynamicModified() const { return dynamicModified; };
+
+    void UpdateStaticSpatialStructure();
+    void UpdateDynamicSpatialStructure();
 
     void AddGameObject(UID uid, GameObject* newGameObject) { gameObjectsContainer.insert({uid, newGameObject}); }
     void RemoveGameObjectHierarchy(UID gameObjectUUID);
 
-    const char* GetSceneName() const { return sceneName; }
+    const std::string& GetSceneName() const { return sceneName; }
     UID GetSceneUID() const { return sceneUID; }
     UID GetGameObjectRootUID() const { return gameObjectRootUID; }
     GameObject* GetSelectedGameObject() { return GetGameObjectByUID(selectedGameObjectUID); }
 
     const std::unordered_map<UID, GameObject*>& GetAllGameObjects() const { return gameObjectsContainer; }
     const std::unordered_map<UID, Component*> GetAllComponents() const;
-
+    
     GameObject* GetGameObjectByUID(UID gameObjectUID); // TODO: Change when filesystem defined
 
     LightsConfig* GetLightsConfig() { return lightsConfig; }
@@ -67,18 +72,23 @@ class Scene
     const std::tuple<float, float>& GetWindowSize() const { return sceneWindowSize; };
     const std::tuple<float, float>& GetMousePosition() const { return mousePosition; };
     Octree* GetOctree() const { return sceneOctree; }
+    Quadtree* GetDynamicTree() const { return dynamicTree; }
 
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
 
     void SetStopPlaying(bool stop) { stopPlaying = stop; }
+    
+    void SetStaticModified() { staticModified = true; }
+    void SetDynamicModified() { dynamicModified = true; }
 
   private:
-    void CreateSpatialDataStruct();
+    void CreateStaticSpatialDataStruct();
+    void CreateDynamicSpatialDataStruct();
     void CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects) const;
 
   private:
-    char sceneName[64];
-    const UID sceneUID;
+    std::string sceneName;
+    UID sceneUID;
     UID gameObjectRootUID;
     UID selectedGameObjectUID;
     CameraComponent* mainCamera;
@@ -89,9 +99,13 @@ class Scene
 
     LightsConfig* lightsConfig                   = nullptr;
     Octree* sceneOctree                          = nullptr;
+    Quadtree* dynamicTree                        = nullptr;
 
     // IMGUI WINDOW DATA
     std::tuple<float, float> sceneWindowPosition = std::make_tuple(0.f, 0.f);
     std::tuple<float, float> sceneWindowSize     = std::make_tuple(0.f, 0.f);
     std::tuple<float, float> mousePosition       = std::make_tuple(0.f, 0.f);
+
+    bool staticModified                          = false;
+    bool dynamicModified                         = false;
 };

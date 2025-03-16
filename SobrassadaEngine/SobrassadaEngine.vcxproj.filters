@@ -336,9 +336,6 @@
     <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
       <Filter>UI\EngineEditors</Filter>
     </ClCompile>
-    <ClCompile Include="Modules\UserInterfaceModule.cpp">
-      <Filter>Modules</Filter>
-    </ClCompile>
     <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
       <Filter>UI\EngineEditors</Filter>
     </ClCompile>
@@ -353,6 +350,24 @@
     </ClCompile>
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp">
       <Filter>External\ImGuizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\ImNodeFlow-1.2.2\src\ImNodeFlow.cpp">
+      <Filter>External\ImNodeFlow</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\EngineEditors\Editor\NodeEditor.cpp">
+      <Filter>UI\EngineEditors</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\EngineEditors\Nodes\CustomNode.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\RaycastController.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\ProjectModule.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\Config\EngineConfig.cpp">
+      <Filter>FileSystem\Config</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -409,6 +424,12 @@
     </Filter>
     <Filter Include="Utils\Tree">
       <UniqueIdentifier>{61fcf3e0-b467-4423-83c3-ae806c0b6ff3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\ImNodeFlow">
+      <UniqueIdentifier>{fd84e3fc-74ec-4cf3-a7ee-7b8e3e63ad2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FileSystem\Config">
+      <UniqueIdentifier>{621d253f-9e89-43c0-ab1c-8b44994ca80d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -623,11 +644,47 @@
     <ClInclude Include="Utils\EventDispatcher.h">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="Libs\ImNodeFlow-1.2.2\include\ImNodeFlow.h">
+      <Filter>External\ImNodeFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\context_wrapper.h">
+      <Filter>External\ImNodeFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_bezier_math.h">
+      <Filter>External\ImNodeFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_extra_math.h">
+      <Filter>External\ImNodeFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\EngineEditors\Editor\NodeEditor.h">
+      <Filter>UI\EngineEditors</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\EngineEditors\Nodes\CustomNode.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\ProjectModule.h">
+      <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\Config\EngineConfig.h">
+      <Filter>FileSystem\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\Config\ConfigFile.h">
+      <Filter>FileSystem\Config</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl">
       <Filter>External\MathGeoLib</Filter>
     </None>
     <None Include=".clang-format" />
+    <None Include="Libs\ImNodeFlow-1.2.2\src\imgui_bezier_math.inl">
+      <Filter>External\ImNodeFlow</Filter>
+    </None>
+    <None Include="Libs\ImNodeFlow-1.2.2\src\imgui_extra_math.inl">
+      <Filter>External\ImNodeFlow</Filter>
+    </None>
+    <None Include="Libs\ImNodeFlow-1.2.2\src\ImNodeFlow.inl">
+      <Filter>External\ImNodeFlow</Filter>
+    </None>
   </ItemGroup>
 </Project>
