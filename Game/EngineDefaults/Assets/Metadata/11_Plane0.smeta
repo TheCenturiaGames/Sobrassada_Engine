@@ -1,0 +1,9 @@
+{
+    "UID": 1165703895193424,
+    "name": "Plane0",
+    "assetPath": "Assets/DefaultPlane.gltf",
+    "lastModifiedDate": 0,
+    "importOptions": {
+        "generateTangents": true
+    }
+}

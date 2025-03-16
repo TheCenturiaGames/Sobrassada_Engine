@@ -4,15 +4,17 @@
 #include "FileSystem.h"
 #include "LibraryModule.h"
 #include "MetaTexture.h"
+#include "ProjectModule.h"
 #include "glew.h"
 #include <string>
 
 namespace TextureImporter
 {
-    UID Import(const char* sourceFilePath, UID sourceUID)
+    UID Import(const char* sourceFilePath, const std::string& targetFilePath, UID sourceUID)
     {
         // Copy image to Assets folder
-        std::string copyPath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
+        const std::string relativePath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
+        std::string copyPath = targetFilePath + relativePath;
         if (!FileSystem::Exists(copyPath.c_str()))
         {
             FileSystem::Copy(sourceFilePath, copyPath.c_str());
@@ -57,12 +59,12 @@ namespace TextureImporter
             UID textureUID  = GenerateUID();
             finalTextureUID = App->GetLibraryModule()->AssignFiletypeUID(textureUID, FileType::Texture);
 
-            MetaTexture meta(finalTextureUID, copyPath, (int)image.GetMetadata().mipLevels);
-            meta.Save(fileName, copyPath);
+            MetaTexture meta(finalTextureUID, relativePath, (int)image.GetMetadata().mipLevels);
+            meta.Save(fileName, relativePath);
         }
         else finalTextureUID = sourceUID;
 
-        std::string saveFilePath = TEXTURES_PATH + std::to_string(finalTextureUID) + TEXTURE_EXTENSION;
+        std::string saveFilePath = targetFilePath + TEXTURES_PATH + std::to_string(finalTextureUID) + TEXTURE_EXTENSION;
         unsigned int bytesWritten =
             FileSystem::Save(saveFilePath.c_str(), blob.GetBufferPointer(), (unsigned int)blob.GetBufferSize());
 
@@ -85,6 +87,8 @@ namespace TextureImporter
     ResourceTexture* LoadTexture(UID textureUID)
     {
         std::string path     = App->GetLibraryModule()->GetResourcePath(textureUID);
+
+        if (path.empty()) return nullptr;   // TODO Use fallback texture instead
 
         std::string fileName = FileSystem::GetFileNameWithoutExtension(path);
 

@@ -27,7 +27,7 @@ class MeshComponent : public Component
     void InitSkin();
 
     const ResourceMesh* GetResourceMesh() const { return currentMesh; }
-
+    
     void AddMesh(UID resource, bool updateParent = true);
     void AddMaterial(UID resource);
 
@@ -39,6 +39,8 @@ class MeshComponent : public Component
     void SetBindMatrices(const std::vector<float4x4>& bindTransforms) { this->bindMatrices = bindTransforms; }
     void SetModelUID(const UID newModelUID) { this->modelUID = newModelUID; }
     void SetSkinIndex(const int newIndex) { this->skinIndex = newIndex; }
+
+  private:
 
   private:
     std::string currentMeshName       = "Not selected";

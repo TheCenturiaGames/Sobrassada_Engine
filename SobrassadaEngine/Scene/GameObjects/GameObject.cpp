@@ -180,7 +180,6 @@ void GameObject::RenderEditorInspector()
     {
         ImGui::SameLine();
         if (ImGui::Checkbox("Draw nodes", &drawNodes)) OnDrawConnectionsToggle();
-
         if (ImGui::Button("Add Component"))
         {
             ImGui::OpenPopup("ComponentSelection");
