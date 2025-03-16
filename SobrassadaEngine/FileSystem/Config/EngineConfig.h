@@ -18,9 +18,12 @@ class EngineConfig : public ConfigFile
     const std::string& GetStartupProjectPath() const { return startupProjectPath; }
     const std::unordered_set<std::string>& GetProjectPaths() const { return previouslyLoadedProjectPaths; }
 
+    bool ShouldStartGameOnStartup() const { return startGameOnStartup; }
+
     void SetStartupProjectPath(const std::string& newStartupProjectPath);
 
   private:
-    std::string startupProjectPath;
+    std::string startupProjectPath = "";
     std::unordered_set<std::string> previouslyLoadedProjectPaths;
+    bool startGameOnStartup;
 };

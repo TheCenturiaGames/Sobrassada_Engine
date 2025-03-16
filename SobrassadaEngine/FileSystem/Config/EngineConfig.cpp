@@ -36,7 +36,10 @@ void EngineConfig::Load()
         return;
     }
 
-    startupProjectPath = doc["StartupProject"].GetString();
+    if (doc.HasMember("StartupProject"))
+        startupProjectPath = doc["StartupProject"].GetString();
+    if (doc.HasMember("StartGameOnStartup"))
+        startGameOnStartup = doc["StartGameOnStartup"].GetBool();
 
     if (doc.HasMember("PreviouslyLoaded") && doc["PreviouslyLoaded"].IsArray())
     {
@@ -57,6 +60,7 @@ void EngineConfig::Save() const
     rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
 
     doc.AddMember("StartupProject", rapidjson::Value(startupProjectPath.c_str(), allocator), allocator);
+    doc.AddMember("StartGameOnStartup", startGameOnStartup, allocator);
     rapidjson::Value valChildren(rapidjson::kArrayType);
 
     for (const std::string& projectPath : previouslyLoadedProjectPaths)
