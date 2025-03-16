@@ -711,7 +711,17 @@ void Scene::LoadPrefab(const UID prefabUID, const ResourcePrefab* prefab, const 
         newObjects.push_back(new GameObject(GetGameObjectRootUID(), referenceObjects[0]));
 
         // If new, always appear at origin. If overriden, stay in place
-        newObjects[0]->SetLocalTransform(transform);
+        if (prefab != nullptr)
+        {
+            newObjects[0]->SetLocalTransform(transform);
+        }
+        else
+        {
+            // This probably won't be needed when gltfDefaults are there, but for now it is
+            float4x4 newTrans = newObjects[0]->GetLocalTransform();
+            newTrans.SetTranslatePart(float3(0, 0, 0));
+            newObjects[0]->SetLocalTransform(newTrans);
+        }
 
         // First instantiate all gameObjects and components
         newObjects[0]->SetPrefabUID(prefabUID);
