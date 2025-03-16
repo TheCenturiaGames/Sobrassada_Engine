@@ -85,16 +85,16 @@ update_status EditorUIModule::Update(float deltaTime)
 
     UpdateGizmoTransformMode();
     AddFramePlotData(deltaTime);
+    UpdateGizmoDragState();
 
     #endif
-
-    UpdateGizmoDragState();
 
     return UPDATE_CONTINUE;
 }
 
 update_status EditorUIModule::RenderEditor(float deltaTime)
 {
+    #ifndef GAME
     if (App->GetProjectModule()->IsProjectLoaded())
     {
         Draw();
@@ -131,6 +131,7 @@ update_status EditorUIModule::PostUpdate(float deltaTime)
         App->GetSceneModule()->CloseScene();
         closeScene = false;
     }
+
     #endif
 
     return UPDATE_CONTINUE;
