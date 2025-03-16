@@ -104,6 +104,7 @@ constexpr const char* RENDER_WIREFRAME              = "Render Wireframe";
 constexpr const char* RENDER_AABB                   = "AABB";
 constexpr const char* RENDER_OBB                    = "OBB";
 constexpr const char* RENDER_OCTREE                 = "Octree";
+constexpr const char* RENDER_DYNAMICTREE            = "Dynamic tree";
 constexpr const char* RENDER_CAMERA_RAY             = "Camera Ray";
 
 #define UID uint64_t

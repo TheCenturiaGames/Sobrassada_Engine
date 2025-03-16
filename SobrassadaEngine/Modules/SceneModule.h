@@ -17,6 +17,7 @@ class GameObject;
 class Component;
 class RootComponent;
 class Octree;
+class Quadtree;
 
 class SceneModule : public Module
 {
@@ -98,6 +99,7 @@ class SceneModule : public Module
     bool GetDoInputsGame() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() && inPlayMode : false; }
     
     Octree* GetSceneOctree() const { return loadedScene != nullptr ? loadedScene->GetOctree() : nullptr; }
+    Quadtree* GetSceneDynamicTree() const { return loadedScene != nullptr ? loadedScene->GetDynamicTree() : nullptr; }
 
     void SetMainCamera(CameraComponent* camera) { loadedScene->SetMainCamera(camera); }
     void SetStaticObjectUpdated() const
