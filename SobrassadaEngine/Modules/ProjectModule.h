@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Module.h"
+#include "Config/ProjectConfig.h"
 
 #include <string>
 
@@ -7,15 +8,18 @@ class ProjectModule : public Module
 {
   public:
     ProjectModule()           = default;
-    ~ProjectModule() override = default;
+    ~ProjectModule() override;
 
     bool Init() override;
     update_status RenderEditor(float deltaTime) override;
     
     void CloseCurrentProject();
+    void SetAsStartupScene(const std::string& newScenePath) const;
 
     const std::string& GetLoadedProjectPath() const { return loadedProjectAbsolutePath; }
     const std::string& GetLoadedProjectName() const { return loadedProjectName; }
+
+    const std::string& GetStartupSceneName() const { return projectConfig != nullptr ? projectConfig->GetStartupScene() : DEFAULT_EMPTY_STRING; }
 
     bool IsProjectLoaded() const { return projectLoaded; }
 
@@ -36,4 +40,8 @@ class ProjectModule : public Module
     std::string loadedProjectName    = "No project loaded";
     std::string loadedProjectAbsolutePath;
     std::vector<char*> previouslyLoadedProjects;
+
+    ProjectConfig* projectConfig = nullptr;
+
+    std::string DEFAULT_EMPTY_STRING          = "";
 };
