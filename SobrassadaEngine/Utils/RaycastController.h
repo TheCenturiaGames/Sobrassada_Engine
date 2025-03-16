@@ -1,87 +1,51 @@
 #pragma once
 
-#include "GameObject.h"
 #include "Geometry/LineSegment.h"
-#include "Standalone/MeshComponent.h"
-
-#include "Geometry/Triangle.h"
-#include "Math/float4x4.h"
-#include <map>
 #include <vector>
+
+namespace math
+{
+    class LineSegment;
+}
 
 class GameObject;
 
 class RaycastController
 {
   public:
-    template <typename Tree> static GameObject* GetRayIntersection(const LineSegment& ray, const Tree* tree);
+    template <typename Tree> static GameObject* GetRayIntersectionSingleTree(const LineSegment& ray, const Tree* tree);
+    template <typename... Tree> static GameObject* GetRayIntersectionTrees(const LineSegment& ray, const Tree*... trees);
+
+  private:
+    static GameObject* GetRayIntersectionObjects(const LineSegment& ray, const std::vector<GameObject*>& queriedGameObjects);
 };
 
 template <typename Tree>
-inline GameObject* RaycastController::GetRayIntersection(const LineSegment& ray, const Tree* tree)
+inline GameObject* RaycastController::GetRayIntersectionSingleTree(const LineSegment& ray, const Tree* tree)
 {
     GameObject* selectedGameObject = nullptr;
     if (tree == nullptr) return selectedGameObject;
 
     std::vector<GameObject*> queriedGameObjects;
 
-    // GET ELEMENTS THAT INTERSECT WITH OCTREE
+    // GET ELEMENTS THAT INTERSECT WITH TREE
     tree->template QueryElements<LineSegment>(ray, queriedGameObjects);
 
-    std::map<float, GameObject*> sortedGameObjects;
+    selectedGameObject = GetRayIntersectionObjects(ray, queriedGameObjects);
 
-    // GETTING GAMEOBJECTS THAT INTERSECT WITH THE RAY AND SORT THEM BY DISTANCE
-    float closeDistance = 0;
-    float farDistance   = 0;
-    for (const auto& gameObject : queriedGameObjects)
-    {
-        if (ray.Intersects(gameObject->GetGlobalAABB(), closeDistance, farDistance))
-        {
-            sortedGameObjects.insert({closeDistance, gameObject});
-        }
-    }
+    return selectedGameObject;
+}
 
-    float closestDistance = std::numeric_limits<float>::infinity();
+template <typename... Tree>
+inline GameObject* RaycastController::GetRayIntersectionTrees(const LineSegment& ray, const Tree*... trees)
+{
+    GameObject* selectedGameObject = nullptr;
+    if (((trees == nullptr) || ...)) return selectedGameObject;
 
-    // FOREACH GAMEOBJECT INTERSECTING CHECKING AGAINST THE RAY
-    for (const auto& pair : sortedGameObjects)
-    {
-        LineSegment localRay(ray.a, ray.b);
+    std::vector<GameObject*> queriedGameObjects;
+    (trees->template QueryElements<LineSegment>(ray, queriedGameObjects), ...);
 
-        const MeshComponent* meshComponent = pair.second->GetMeshComponent();
-        if (meshComponent == nullptr) continue; // TODO Happens occasionally, figure out why
-        
-        const ResourceMesh* resourceMesh = meshComponent->GetResourceMesh();
+    selectedGameObject = GetRayIntersectionObjects(ray, queriedGameObjects);
 
-        if (resourceMesh == nullptr) continue;
-
-        float4x4 globalTransform = pair.second->GetGlobalTransform();
-        globalTransform.Inverse();
-        localRay.Transform(globalTransform);
-
-        const std::vector<Vertex>& vertices      = resourceMesh->GetLocalVertices();
-        const std::vector<unsigned int>& indices = resourceMesh->GetIndices();
-
-        for (int vertexIndex = 2; vertexIndex < indices.size(); vertexIndex += 3)
-        {
-            float3 firstVertex  = vertices[indices[vertexIndex - 2]].position;
-            float3 secondVertex = vertices[indices[vertexIndex - 1]].position;
-            float3 thirdVertex  = vertices[indices[vertexIndex]].position;
-
-            Triangle currentTriangle(firstVertex, secondVertex, thirdVertex);
-
-            float distance = std::numeric_limits<float>::infinity();
-            float3 hitPoint;
-
-            if (localRay.Intersects(currentTriangle, &distance, &hitPoint))
-            {
-                if (distance < closestDistance)
-                {
-                    closestDistance    = distance;
-                    selectedGameObject = pair.second;
-                }
-            }
-        }
-    }
     return selectedGameObject;
 }

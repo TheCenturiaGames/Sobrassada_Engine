@@ -342,6 +342,18 @@
     <ClCompile Include="UI\EngineEditors\Nodes\CustomNode.cpp">
       <Filter>UI</Filter>
     </ClCompile>
+    <ClCompile Include="Utils\RaycastController.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\ProjectModule.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\Config\EngineConfig.cpp">
+      <Filter>FileSystem\Config</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\Importer.cpp">
+      <Filter>FileSystem\Importers</Filter>
+    </ClCompile>
     <ClCompile Include="FileSystem\MaterialImporter.cpp">
       <Filter>FileSystem\Importers</Filter>
     </ClCompile>
@@ -356,15 +368,6 @@
     </ClCompile>
     <ClCompile Include="FileSystem\TextureImporter.cpp">
       <Filter>FileSystem\Importers</Filter>
-    </ClCompile>
-    <ClCompile Include="Modules\ProjectModule.cpp">
-      <Filter>Modules</Filter>
-    </ClCompile>
-    <ClCompile Include="FileSystem\Importer.cpp">
-      <Filter>FileSystem\Importers</Filter>
-    </ClCompile>
-    <ClCompile Include="FileSystem\Config\EngineConfig.cpp">
-      <Filter>FileSystem\Config</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -425,11 +428,11 @@
     <Filter Include="External\ImNodeFlow">
       <UniqueIdentifier>{fd84e3fc-74ec-4cf3-a7ee-7b8e3e63ad2e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="FileSystem\Importers">
-      <UniqueIdentifier>{96d87580-e969-46a7-9220-ffac58bcb74d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="FileSystem\Config">
-      <UniqueIdentifier>{c4d2df42-7078-49d1-9b57-53136e2b57ca}</UniqueIdentifier>
+      <UniqueIdentifier>{621d253f-9e89-43c0-ab1c-8b44994ca80d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FileSystem\Importers">
+      <UniqueIdentifier>{16f8a1d8-a659-4cc6-8af0-fff819224bf0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -644,6 +647,18 @@
     <ClInclude Include="UI\EngineEditors\Nodes\CustomNode.h">
       <Filter>UI</Filter>
     </ClInclude>
+    <ClInclude Include="Modules\ProjectModule.h">
+      <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\Config\EngineConfig.h">
+      <Filter>FileSystem\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\Config\ConfigFile.h">
+      <Filter>FileSystem\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\Importer.h">
+      <Filter>FileSystem\Importers</Filter>
+    </ClInclude>
     <ClInclude Include="FileSystem\MaterialImporter.h">
       <Filter>FileSystem\Importers</Filter>
     </ClInclude>
@@ -658,18 +673,6 @@
     </ClInclude>
     <ClInclude Include="FileSystem\TextureImporter.h">
       <Filter>FileSystem\Importers</Filter>
-    </ClInclude>
-    <ClInclude Include="Modules\ProjectModule.h">
-      <Filter>Modules</Filter>
-    </ClInclude>
-    <ClInclude Include="FileSystem\Importer.h">
-      <Filter>FileSystem\Importers</Filter>
-    </ClInclude>
-    <ClInclude Include="FileSystem\Config\EngineConfig.h">
-      <Filter>FileSystem\Config</Filter>
-    </ClInclude>
-    <ClInclude Include="FileSystem\Config\ConfigFile.h">
-      <Filter>FileSystem\Config</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

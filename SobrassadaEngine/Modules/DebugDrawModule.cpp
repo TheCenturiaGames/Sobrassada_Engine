@@ -9,8 +9,11 @@
 #include "MathGeoLib.h"
 #include "Octree.h"
 #include "OpenGLModule.h"
-#include "SceneModule.h"
-#include "WindowModule.h"
+#include "Quadtree.h"
+#include "Framebuffer.h"
+#include "DebugUtils.h"
+#include "Octree.h"
+#include "GameObject.h"
 
 #include "SDL_video.h"
 #define DEBUG_DRAW_IMPLEMENTATION
@@ -746,6 +749,12 @@ void DebugDrawModule::HandleDebugRenderOptions()
     {
         Octree* octree = sceneModule->GetSceneOctree();
         if (octree != nullptr) RenderLines(octree->GetDrawLines(), float3(1.f, 0.f, 0.f));
+    }
+
+    if (debugRenderOptions[RENDER_DYNAMICTREE])
+    {
+        Quadtree* quadtree = sceneModule->GetSceneDynamicTree();
+        if (quadtree != nullptr) RenderLines(quadtree->GetDrawLines(), float3(0.467f, 0.647f, 0.91f));
     }
 
     if (debugRenderOptions[RENDER_CAMERA_RAY])

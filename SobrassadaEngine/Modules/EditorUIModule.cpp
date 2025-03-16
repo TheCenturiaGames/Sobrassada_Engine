@@ -78,6 +78,8 @@ update_status EditorUIModule::Update(float deltaTime)
 {
     UpdateGizmoTransformMode();
     AddFramePlotData(deltaTime);
+    UpdateGizmoDragState();
+
     return UPDATE_CONTINUE;
 }
 
@@ -1131,6 +1133,13 @@ EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
     default:
         return nullptr;
     }
+}
+
+void EditorUIModule::UpdateGizmoDragState()
+{
+    if (ImGuizmo::IsUsingAny()) guizmoDragState = GizmoDragState::DRAGGING;
+    else if (guizmoDragState == GizmoDragState::DRAGGING) guizmoDragState = GizmoDragState::RELEASED;
+    else guizmoDragState = GizmoDragState::IDLE;
 }
 
 void EditorUIModule::EditorSettings(bool& editorSettingsMenu)
