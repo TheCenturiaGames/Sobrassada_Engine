@@ -24,6 +24,10 @@ SceneModule::~SceneModule()
 
 bool SceneModule::Init()
 {
+    if (App->GetProjectModule()->IsProjectLoaded() && !App->GetProjectModule()->GetStartupSceneName().empty())
+    {
+        App->GetLibraryModule()->LoadScene((App->GetProjectModule()->GetStartupSceneName() + SCENE_EXTENSION).c_str());
+    }
     return true;
 }
 

@@ -10,6 +10,11 @@
 #include <direct.h>
 #include <filesystem>
 
+ProjectModule::~ProjectModule()
+{
+    delete projectConfig;
+}
+
 bool ProjectModule::Init()
 {
     _getcwd(engineWorkingDirectory, 255);
@@ -21,6 +26,7 @@ bool ProjectModule::Init()
             loadedProjectName = loadedProjectAbsolutePath;
             FileSystem::RemoveDelimiterIfPresent(loadedProjectName);
             loadedProjectName = FileSystem::GetFileNameWithoutExtension(loadedProjectName);
+            projectConfig = new ProjectConfig();
             projectLoaded     = true;
         }
         else
@@ -158,6 +164,14 @@ update_status ProjectModule::RenderEditor(float deltaTime)
 void ProjectModule::CloseCurrentProject()
 {
     CloseProject();
+}
+
+void ProjectModule::SetAsStartupScene(const std::string& newSceneName) const
+{
+    if (projectConfig != nullptr)
+    {
+        projectConfig->SetStartupScene(newSceneName);
+    }
 }
 
 void ProjectModule::CreateNewProject(const std::string& projectPath, const std::string& projectName)

@@ -26,6 +26,7 @@
 // guizmo after imgui include
 #include "./Libs/ImGuizmo/ImGuizmo.h"
 #include "Importer.h"
+#include "ProjectModule.h"
 #include "SDL_mouse.h"
 
 Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
@@ -157,7 +158,11 @@ void Scene::Save(
 
         targetState.AddMember("Lights Config", lights, allocator);
     }
+    
     else GLOG("Light Config not found");
+    
+    // TODO Convert to parameter which can be set later manually instead of saving a scene as default "on scene save"
+    App->GetProjectModule()->SetAsStartupScene(sceneName);
 }
 
 void Scene::LoadComponents() const
