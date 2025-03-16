@@ -17,7 +17,8 @@ enum update_status
 {
     UPDATE_CONTINUE = 1,
     UPDATE_STOP,
-    UPDATE_ERROR
+    UPDATE_ERROR,
+    UPDATE_RESTART
 };
 
 // Deletes an array of buffers
@@ -67,14 +68,16 @@ enum update_status
 #define DEFAULT_CAMERA_WHEEL_SENSITIVITY     2.f;
 #define DEFAULT_CAMERA_ZOOM_SENSITIVITY      0.5f;
 
+#define ENGINE_DEFAULT_ASSETS "EngineDefaults/";
+
 #define ASSETS_PATH   "Assets/"
 #define SCENES_PATH   "Assets/Scenes/"
 #define METADATA_PATH "Assets/Metadata/"
+#define MODELS_ASSETS_PATH "Assets/Models/"
 
 #define LIBRARY_PATH       "Library/"
 #define ANIMATIONS_PATH    "Library/Animations/"
 #define AUDIO_PATH         "Library/Audio/"
-#define MODELS_ASSETS_PATH "Assets/Models/"
 #define MODELS_LIB_PATH    "Library/Models/"
 #define MESHES_PATH        "Library/Meshes/"
 #define SCENES_PLAY_PATH   "Library/Scenes/"
@@ -92,11 +95,11 @@ enum update_status
 #define MAX_COMPONENT_NAME_LENGTH 64;
 
 // SHADER PATHS
-constexpr const char* LIGHTS_VERTEX_SHADER_PATH     = "./Test/VertexShader.glsl";
+constexpr const char* LIGHTS_VERTEX_SHADER_PATH     = "./EngineDefaults/Shader/Vertex/VertexShader.glsl";
 
-constexpr const char* UNLIT_FRAGMENT_SHADER_PATH    = "./Test/UnlitFragmentShader.glsl";
-constexpr const char* SPECULAR_FRAGMENT_SHADER_PATH = "./Test/BRDFPhongFragmentShader.glsl";
-constexpr const char* METALLIC_FRAGMENT_SHADER_PATH = "./Test/BRDFCookTorranceShader.glsl";
+constexpr const char* UNLIT_FRAGMENT_SHADER_PATH    = "./EngineDefaults/Shader/Fragment/UnlitFragmentShader.glsl";
+constexpr const char* SPECULAR_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader/Fragment/BRDFPhongFragmentShader.glsl";
+constexpr const char* METALLIC_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader/Fragment/BRDFCookTorranceShader.glsl";
 
 // DEBUG RENDER OPTIONS
 constexpr const char* RENDER_LIGTHS                 = "Render Lights";
@@ -111,6 +114,7 @@ constexpr const char* RENDER_NAVMESH                = "Navmesh";
 
 constexpr UID INVALID_UID                               = 0;
 constexpr UID UID_PREFIX_DIVISOR                        = 100000000000000;
+constexpr UID FALLBACK_TEXTURE_UID                      = 1200000000000000;
 
 constexpr const char* CONSTANT_MESH_SELECT_DIALOG_ID    = "mesh-select";
 constexpr const char* CONSTANT_TEXTURE_SELECT_DIALOG_ID = "texture-select";
