@@ -141,12 +141,6 @@
     <ClCompile Include="Utils\Framebuffer.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Utils\Quadtree.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="Utils\Octree.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\Components\Component.cpp">
       <Filter>Scene\Components</Filter>
     </ClCompile>
@@ -196,12 +190,6 @@
       <Filter>Scene\Components</Filter>
     </ClCompile>
     <ClCompile Include="Utils\LightsConfig.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="Utils\Quadtree.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="Utils\Octree.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
     <ClCompile Include="Scene\Components\Component.cpp">
@@ -300,7 +288,6 @@
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastAlloc.cpp">
       <Filter>External\Recast</Filter>
     </ClCompile>
-    <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp" />
     <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
       <Filter>UI\EngineEditors</Filter>
     </ClCompile>
@@ -331,14 +318,29 @@
     <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
       <Filter>UI\EngineEditors</Filter>
     </ClCompile>
-    <ClCompile Include="Modules\UserInterfaceModule.cpp">
-      <Filter>Modules</Filter>
-    </ClCompile>
     <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
       <Filter>UI\EngineEditors</Filter>
     </ClCompile>
     <ClCompile Include="Modules\UserInterfaceModule.cpp">
       <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\Trees\Octree.cpp">
+      <Filter>Utils\Tree</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\Trees\Quadtree.cpp">
+      <Filter>Utils\Tree</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp">
+      <Filter>External\ImGuizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\ImNodeFlow-1.2.2\src\ImNodeFlow.cpp">
+      <Filter>External\ImNodeFlow</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\EngineEditors\Editor\NodeEditor.cpp">
+      <Filter>UI\EngineEditors</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\EngineEditors\Nodes\CustomNode.cpp">
+      <Filter>UI</Filter>
     </ClCompile>
     <ClCompile Include="FileSystem\MaterialImporter.cpp">
       <Filter>FileSystem\Importers</Filter>
@@ -355,8 +357,14 @@
     <ClCompile Include="FileSystem\TextureImporter.cpp">
       <Filter>FileSystem\Importers</Filter>
     </ClCompile>
+    <ClCompile Include="Modules\ProjectModule.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
     <ClCompile Include="FileSystem\Importer.cpp">
       <Filter>FileSystem\Importers</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\Config\EngineConfig.cpp">
+      <Filter>FileSystem\Config</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -411,8 +419,17 @@
     <Filter Include="External\Recast">
       <UniqueIdentifier>{da958ebe-ba34-4c0a-9248-41019fc9f888}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utils\Tree">
+      <UniqueIdentifier>{61fcf3e0-b467-4423-83c3-ae806c0b6ff3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\ImNodeFlow">
+      <UniqueIdentifier>{fd84e3fc-74ec-4cf3-a7ee-7b8e3e63ad2e}</UniqueIdentifier>
+    </Filter>
     <Filter Include="FileSystem\Importers">
-      <UniqueIdentifier>{e42785ca-ffeb-4d71-a9ce-3ee68d865b08}</UniqueIdentifier>
+      <UniqueIdentifier>{96d87580-e969-46a7-9220-ffac58bcb74d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FileSystem\Config">
+      <UniqueIdentifier>{c4d2df42-7078-49d1-9b57-53136e2b57ca}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -537,12 +554,6 @@
     <ClInclude Include="Utils\LightsConfig.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="Utils\Quadtree.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils\Octree.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Utils\FrustumPlanes.h">
       <Filter>Utils</Filter>
     </ClInclude>
@@ -603,6 +614,36 @@
     <ClInclude Include="Modules\UserInterfaceModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
+    <ClInclude Include="Utils\Trees\Quadtree.h">
+      <Filter>Utils\Tree</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Trees\Octree.h">
+      <Filter>Utils\Tree</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Delegate.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\EventDispatcher.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\ImNodeFlow-1.2.2\include\ImNodeFlow.h">
+      <Filter>External\ImNodeFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\context_wrapper.h">
+      <Filter>External\ImNodeFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_bezier_math.h">
+      <Filter>External\ImNodeFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_extra_math.h">
+      <Filter>External\ImNodeFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\EngineEditors\Editor\NodeEditor.h">
+      <Filter>UI\EngineEditors</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\EngineEditors\Nodes\CustomNode.h">
+      <Filter>UI</Filter>
+    </ClInclude>
     <ClInclude Include="FileSystem\MaterialImporter.h">
       <Filter>FileSystem\Importers</Filter>
     </ClInclude>
@@ -618,8 +659,17 @@
     <ClInclude Include="FileSystem\TextureImporter.h">
       <Filter>FileSystem\Importers</Filter>
     </ClInclude>
+    <ClInclude Include="Modules\ProjectModule.h">
+      <Filter>Modules</Filter>
+    </ClInclude>
     <ClInclude Include="FileSystem\Importer.h">
       <Filter>FileSystem\Importers</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\Config\EngineConfig.h">
+      <Filter>FileSystem\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\Config\ConfigFile.h">
+      <Filter>FileSystem\Config</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -627,5 +677,14 @@
       <Filter>External\MathGeoLib</Filter>
     </None>
     <None Include=".clang-format" />
+    <None Include="Libs\ImNodeFlow-1.2.2\src\imgui_bezier_math.inl">
+      <Filter>External\ImNodeFlow</Filter>
+    </None>
+    <None Include="Libs\ImNodeFlow-1.2.2\src\imgui_extra_math.inl">
+      <Filter>External\ImNodeFlow</Filter>
+    </None>
+    <None Include="Libs\ImNodeFlow-1.2.2\src\ImNodeFlow.inl">
+      <Filter>External\ImNodeFlow</Filter>
+    </None>
   </ItemGroup>
 </Project>

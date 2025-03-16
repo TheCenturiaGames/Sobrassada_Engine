@@ -35,20 +35,11 @@ void ResourceMesh::LoadData(
     unsigned int mode, const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices
 )
 {
+    unsigned int bufferSize = sizeof(Vertex);
     this->mode              = mode;
     this->vertexCount       = static_cast<unsigned int>(vertices.size());
-    this->indexCount        = static_cast<unsigned int>(indices.size());
-    unsigned int bufferSize = sizeof(Vertex);
-
     // Store the vertices in bind pose
     bindPoseVertices        = vertices;
-
-    // for (auto vertex : vertices)
-    //{
-    //     GLOG("Joints: %d, %d, %d, %d", vertex.joint[0], vertex.joint[1], vertex.joint[2], vertex.joint[3]);
-    //
-    //     GLOG("Weights: %f, %f, %f, %f", vertex.weights[0], vertex.weights[1], vertex.weights[2], vertex.weights[3]);
-    // }
 
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
@@ -57,9 +48,15 @@ void ResourceMesh::LoadData(
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * bufferSize, vertices.data(), GL_STATIC_DRAW);
 
-    glGenBuffers(1, &ebo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+    if (!indices.empty())
+    {
+        hasIndices       = true;
+        this->indexCount = static_cast<unsigned int>(indices.size());
+
+        glGenBuffers(1, &ebo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+    }
 
     glEnableVertexAttribArray(0); // Position
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
@@ -67,23 +64,23 @@ void ResourceMesh::LoadData(
     glEnableVertexAttribArray(1); // Tangent
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
 
-    glEnableVertexAttribArray(2); // Joint
-    glVertexAttribIPointer(2, 4, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, joint));
+    glEnableVertexAttribArray(2); // Normal
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 
-    glEnableVertexAttribArray(3); // Weights
-    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, weights));
+    glEnableVertexAttribArray(3); // Texture Coordinates
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoord));
 
-    glEnableVertexAttribArray(4); // Normal
-    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+    glEnableVertexAttribArray(4); // Joint
+    glVertexAttribIPointer(4, 4, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, joint));
 
-    glEnableVertexAttribArray(5); // Texture Coordinates
-    glVertexAttribPointer(5, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoord));
+    glEnableVertexAttribArray(5); // Weights
+    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, weights));
 
     // Unbind VAO
     glBindVertexArray(0);
 
     this->vertices = vertices;
-    this->indices  = indices;
+    if (hasIndices) this->indices = indices;
 }
 
 void ResourceMesh::Render(
@@ -113,26 +110,26 @@ void ResourceMesh::Render(
     if (bones.size() > 0 && bindMatrices.size() > 0)
     {
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        
-        //Vertex* vertices = reinterpret_cast<Vertex*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
-        //for (unsigned int i = 0; i < vertexCount; ++i)
+
+        // Vertex* vertices = reinterpret_cast<Vertex*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
+        // for (unsigned int i = 0; i < vertexCount; ++i)
         //{
-        //    float4x4 boneInfluence = float4x4::zero;
-        //    for (int j = 0; j < 4; ++j)
-        //    {
-        //        const float4x4& boneTransform  = bones[vertices[i].joint[j]]->GetGlobalTransform();
-        //        float4x4 skinSpace             = boneTransform * bindMatrices[vertices[i].joint[j]];
-        //        boneInfluence                 += skinSpace * vertices[i].weights[j];
-        //    }
-        //    vertices[i].position = boneInfluence.MulPos(bindPoseVertices[i].position);
+        //     float4x4 boneInfluence = float4x4::zero;
+        //     for (int j = 0; j < 4; ++j)
+        //     {
+        //         const float4x4& boneTransform  = bones[vertices[i].joint[j]]->GetGlobalTransform();
+        //         float4x4 skinSpace             = boneTransform * bindMatrices[vertices[i].joint[j]];
+        //         boneInfluence                 += skinSpace * vertices[i].weights[j];
+        //     }
+        //     vertices[i].position = boneInfluence.MulPos(bindPoseVertices[i].position);
         //
-        //    // TODO: rotate normals and tangents
-        //    vertices[i].normal   = boneInfluence.MulDir(bindPoseVertices[i].normal);
-        //    vertices[i].tangent  = boneInfluence * bindPoseVertices[i].tangent;
-        //}
+        //     // TODO: rotate normals and tangents
+        //     vertices[i].normal   = boneInfluence.MulDir(bindPoseVertices[i].normal);
+        //     vertices[i].tangent  = boneInfluence * bindPoseVertices[i].tangent;
+        // }
         //
-        //glUnmapBuffer(GL_ARRAY_BUFFER);
-        //glBindBuffer(GL_ARRAY_BUFFER, 0);
+        // glUnmapBuffer(GL_ARRAY_BUFFER);
+        // glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         float4x4 palette[64];
         for (size_t i = 0; i < bones.size(); ++i)
@@ -144,7 +141,7 @@ void ResourceMesh::Render(
     }
     else
     {
-       glUniform1i(4, 0); // Tell the shader the mesh has no bones
+        glUniform1i(4, 0); // Tell the shader the mesh has no bones
     }
 
     if (material != nullptr)
@@ -152,26 +149,26 @@ void ResourceMesh::Render(
         material->RenderMaterial(program);
     }
 
-    unsigned int meshTriangles  = 0;
+    unsigned int meshTriangles = 0;
 
-    if (indexCount > 0 && vao)
+    if (hasIndices && vao)
     {
         glBindVertexArray(vao);
-        meshTriangles   = indexCount / 3;
-        App->GetOpenGLModule()->DrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+        meshTriangles = indexCount / 3;
+        App->GetOpenGLModule()->DrawElements(GL_TRIANGLES, static_cast<GLsizei>(indexCount), GL_UNSIGNED_INT, 0);
     }
     else if (vao)
     {
         glBindVertexArray(vao);
-        meshTriangles   = vertexCount / 3;
-        App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, vertexCount);
+        meshTriangles = vertexCount / 3;
+        App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(vertexCount));
     }
 
     glBindVertexArray(0);
 
     auto end                             = std::chrono::high_resolution_clock::now();
     std::chrono::duration<float> elapsed = end - start;
-    
+
     App->GetOpenGLModule()->AddTrianglesPerSecond(meshTriangles / elapsed.count());
     App->GetOpenGLModule()->AddVerticesCount(vertexCount);
 }

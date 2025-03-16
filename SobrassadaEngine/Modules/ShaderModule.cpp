@@ -24,6 +24,10 @@ bool ShaderModule::Init()
 
 bool ShaderModule::ShutDown()
 {
+    glDeleteProgram(specularGlossinessProgram);
+    glDeleteProgram(specularGlossinessProgramUnlit);
+    glDeleteProgram(metallicRoughnessProgram);
+    glDeleteProgram(metallicRoughnessProgramUnlit);
     return true;
 }
 

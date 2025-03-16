@@ -111,13 +111,13 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>.\Tests;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\DirectXTex;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\;.\Modules;.\UI;.\Utils;.\FileSystem;.\DebugDraw;.\Scene\GameObjects;.\Scene\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+        <AdditionalIncludeDirectories>.\Tests;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\DirectXTex;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\;.\Modules;.\UI;.\Utils;.\FileSystem;.\DebugDraw;.\Scene\GameObjects;.\Scene\Components;%(AdditionalIncludeDirectories);.\Utils\Trees</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>.\Libs\glew-2.1.0\lib;.\DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration)\;.\Libs\freetype\lib;.\Libs\Optick_1.4.0\lib\LibDebug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>OptickCore.lib;DirectXTex.lib;glew32.lib;opengl32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+        <AdditionalLibraryDirectories>.\Libs\glew-2.1.0\lib;.\DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration)\;.\Libs\freetype\lib;.\Libs\Optick_1.4.0\lib\LibDebug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+        <AdditionalDependencies>OptickCore.lib;DirectXTex.lib;glew32.lib;opengl32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -129,7 +129,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>.\Tests;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\DirectXTex;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\RecastDetour\Detour\Include;.\;.\Modules;.\UI;.\Utils;.\FileSystem;.\DebugDraw;.\Scene\GameObjects;.\Scene\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Tests;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImNodeFlow-1.2.2;.\Libs\ImGuizmo;.\DirectXTex;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\RecastDetour\Detour\Include;.\;.\Modules;.\UI;.\Utils;.\FileSystem;.\DebugDraw;.\Scene\GameObjects;.\Scene\Components;%(AdditionalIncludeDirectories);.\Utils\Trees</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -137,14 +137,17 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>.\Libs\glew-2.1.0\lib;.\DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration)\;.\Libs\freetype\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>DirectXTex.lib;glew32.lib;opengl32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+        <AdditionalLibraryDirectories>.\Libs\glew-2.1.0\lib;.\DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration)\;.\Libs\freetype\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+        <AdditionalDependencies>DirectXTex.lib;glew32.lib;opengl32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="FileSystem\Config\EngineConfig.cpp" />
     <ClCompile Include="FileSystem\MetaModel.cpp" />
+    <ClCompile Include="Libs\ImNodeFlow-1.2.2\src\ImNodeFlow.cpp" />
     <ClCompile Include="Scene\Components\CameraComponent.cpp" />
+    <ClCompile Include="UI\EngineEditors\Editor\NodeEditor.cpp" />
     <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp" />
     <ClCompile Include="FileSystem\ModelImporter.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceModel.cpp" />
@@ -194,8 +197,10 @@
     </ClCompile>
     <ClCompile Include="Modules\CameraModule.cpp" />
     <ClCompile Include="Modules\EditorUIModule.cpp" />
+    <ClCompile Include="Modules\ProjectModule.cpp" />
+    <ClCompile Include="Modules\UserInterfaceModule.cpp"/>
     <ClCompile Include="Scene\Components\Standalone\CharacterControllerComponent.cpp" />
-    <ClCompile Include="Modules\UserInterfaceModule.cpp" />
+    <ClCompile Include="UI\EngineEditors\Nodes\CustomNode.cpp" />
     <ClCompile Include="Utils\EngineTimer.cpp" />
     <ClCompile Include="FileSystem\Importer.cpp" />
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp" />
@@ -217,91 +222,7 @@
     <ClCompile Include="Scene\Components\Standalone\Lights\DirectionalLightComponent.cpp" />
     <ClCompile Include="FileSystem\TextureImporter.cpp" />
     <ClCompile Include="Utils\FrustumPlanes.cpp" />
-    <ClCompile Include="Utils\Octree.cpp" />
-    <ClCompile Include="Utils\Quadtree.cpp" />
-    <ClCompile Include="Scene\Components\Standalone\MeshComponent.cpp">
-      <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <Optimization>Disabled</Optimization>
-      <SupportJustMyCode>true</SupportJustMyCode>
-      <AssemblerOutput>NoListing</AssemblerOutput>
-      <AssemblerListingLocation>SobrassadaEngine\x64\Debug\</AssemblerListingLocation>
-      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
-      <BrowseInformation>false</BrowseInformation>
-      <BrowseInformationFile>SobrassadaEngine\x64\Debug\</BrowseInformationFile>
-      <CompileAs>Default</CompileAs>
-      <ConformanceMode>true</ConformanceMode>
-      <DiagnosticsFormat>Column</DiagnosticsFormat>
-      <DisableLanguageExtensions>false</DisableLanguageExtensions>
-      <ErrorReporting>Prompt</ErrorReporting>
-      <ExpandAttributedSource>false</ExpandAttributedSource>
-      <ExceptionHandling>Sync</ExceptionHandling>
-      <EnableASAN>false</EnableASAN>
-      <EnableFuzzer>false</EnableFuzzer>
-      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Precise</FloatingPointModel>
-      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
-      <GenerateModuleDependencies>false</GenerateModuleDependencies>
-      <GenerateSourceDependencies>false</GenerateSourceDependencies>
-      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
-      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
-      <IntrinsicFunctions>false</IntrinsicFunctions>
-      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <LanguageStandard_C>Default</LanguageStandard_C>
-      <MinimalRebuild>false</MinimalRebuild>
-      <ModuleDependenciesFile>SobrassadaEngine\x64\Debug\</ModuleDependenciesFile>
-      <ModuleOutputFile>SobrassadaEngine\x64\Debug\</ModuleOutputFile>
-      <OmitDefaultLibName>false</OmitDefaultLibName>
-      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
-      <WholeProgramOptimization>false</WholeProgramOptimization>
-      <ObjectFileName>SobrassadaEngine\x64\Debug\</ObjectFileName>
-      <CallingConvention>Cdecl</CallingConvention>
-      <ProgramDataBaseFileName>SobrassadaEngine\x64\Debug\vc143.pdb</ProgramDataBaseFileName>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>SobrassadaEngine\x64\Debug\SobrassadaEngine.pch</PrecompiledHeaderOutputFile>
-      <PreprocessToFile>false</PreprocessToFile>
-      <PreprocessKeepComments>false</PreprocessKeepComments>
-      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
-      <RemoveUnreferencedCodeData>true</RemoveUnreferencedCodeData>
-      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
-      <ShowIncludes>false</ShowIncludes>
-      <SourceDependenciesFile>SobrassadaEngine\x64\Debug\</SourceDependenciesFile>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
-      <SmallerTypeCheck>false</SmallerTypeCheck>
-      <SpectreMitigation>false</SpectreMitigation>
-      <StructMemberAlignment>Default</StructMemberAlignment>
-      <TrackerLogDirectory>SobrassadaEngine\x64\Debug\SobrassadaEngine.tlog\</TrackerLogDirectory>
-      <TranslateIncludes>false</TranslateIncludes>
-      <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
-      <TreatWarningAsError>false</TreatWarningAsError>
-      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
-      <UseFullPaths>true</UseFullPaths>
-      <WarningLevel>Level3</WarningLevel>
-      <XMLDocumentationFileName>SobrassadaEngine\x64\Debug\</XMLDocumentationFileName>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <IntelJCCErratum>false</IntelJCCErratum>
-      <BuildStlModules>false</BuildStlModules>
-      <TreatAngleIncludeAsExternal>false</TreatAngleIncludeAsExternal>
-      <ExternalWarningLevel>InheritWarningLevel</ExternalWarningLevel>
-      <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
-      <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_MBCS;</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\Tests;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\DirectXTex;.\Libs\Tinygltf;.\;.\Modules;.\UI;.\Utils;.\DebugDraw;</AdditionalIncludeDirectories>
-      <LinkCompiled>true</LinkCompiled>
-      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Default</BasicRuntimeChecks>
-      <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MultiThreadedDLL</RuntimeLibrary>
-      <SupportJustMyCode Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</SupportJustMyCode>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_NDEBUG;_CONSOLE;_MBCS;</PreprocessorDefinitions>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MaxSpeed</Optimization>
-      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</IntrinsicFunctions>
-      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</WholeProgramOptimization>
-      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ProgramDatabase</DebugInformationFormat>
-    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\MeshComponent.cpp" />
     <ClCompile Include="Scene\Components\ComponentUtils.cpp" />
     <ClCompile Include="Scene\GameObjects\GameObject.cpp" />
     <ClCompile Include="Utils\Framebuffer.cpp" />
@@ -354,10 +275,20 @@
     <ClCompile Include="Utils\Scene.cpp" />
     <ClCompile Include="Utils\GameTimer.cpp" />
     <ClCompile Include="Modules\WindowModule.cpp" />
+    <ClCompile Include="Utils\Trees\Octree.cpp" />
+    <ClCompile Include="Utils\Trees\Quadtree.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="Libs\ImNodeFlow-1.2.2\include\ImNodeFlow.h" />
+    <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\context_wrapper.h" />
+    <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_bezier_math.h" />
+    <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_extra_math.h" />
+    <ClInclude Include="FileSystem\Config\ConfigFile.h" />
+    <ClInclude Include="FileSystem\Config\EngineConfig.h" />
     <ClInclude Include="Scene\Components\CameraComponent.h" />
+    <ClInclude Include="UI\EngineEditors\Editor\NodeEditor.h" />
+    <ClInclude Include="UI\EngineEditors\Nodes\CustomNode.h" />
     <ClInclude Include="Utils\DebugUtils.h" />
     <ClInclude Include="FileSystem\Importer.h" />
     <ClInclude Include="FileSystem\MetaModel.h" />
@@ -369,9 +300,12 @@
     <ClInclude Include="FileSystem\MetaTexture.h" />
     <ClInclude Include="Modules\CameraModule.h" />
     <ClInclude Include="Modules\EditorUIModule.h" />
+    <ClInclude Include="Modules\ProjectModule.h" />
     <ClInclude Include="Modules\ResourcesModule.h" />
     <ClInclude Include="Modules\SceneModule.h" />
     <ClInclude Include="FileSystem\ModelImporter.h" />
+    <ClInclude Include="Utils\Delegate.h" />
+    <ClInclude Include="Utils\EventDispatcher.h" />
     <ClInclude Include="Utils\Interpolation.h" />
     <ClInclude Include="Utils\RaycastController.h" />
     <ClInclude Include="ResourceManagement\Resources\Resource.h" />
@@ -397,8 +331,6 @@
     <ClInclude Include="Scene\Components\Standalone\Lights\DirectionalLightComponent.h" />
     <ClInclude Include="FileSystem\TextureImporter.h" />
     <ClInclude Include="Utils\FrustumPlanes.h" />
-    <ClInclude Include="Utils\Octree.h" />
-    <ClInclude Include="Utils\Quadtree.h" />
     <ClInclude Include="Scene\Components\Standalone\MeshComponent.h" />
     <ClInclude Include="Scene\Components\ComponentUtils.h" />
     <ClInclude Include="Scene\GameObjects\GameObject.h" />
@@ -424,9 +356,14 @@
     <ClInclude Include="Utils\LightsConfig.h" />
     <ClInclude Include="Utils\GameTimer.h" />
     <ClInclude Include="Modules\WindowModule.h" />
+    <ClInclude Include="Utils\Trees\Octree.h" />
+    <ClInclude Include="Utils\Trees\Quadtree.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".clang-format" />
+    <None Include="Libs\ImNodeFlow-1.2.2\src\imgui_bezier_math.inl" />
+    <None Include="Libs\ImNodeFlow-1.2.2\src\imgui_extra_math.inl" />
+    <None Include="Libs\ImNodeFlow-1.2.2\src\ImNodeFlow.inl" />
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl" />
   </ItemGroup>
   <ItemGroup>

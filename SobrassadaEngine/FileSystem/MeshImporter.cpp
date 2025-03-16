@@ -4,13 +4,14 @@
 #include "FileSystem.h"
 #include "LibraryModule.h"
 #include "MetaMesh.h"
+#include "ProjectModule.h"
 
 namespace MeshImporter
 {
 
     UID ImportMesh(
         const tinygltf::Model& model, const tinygltf::Mesh& mesh, const tinygltf::Primitive& primitive,
-        const std::string& name, const char* sourceFilePath, UID sourceUID
+        const std::string& name, const char* sourceFilePath, const std::string& targetFilePath, UID sourceUID
     )
     {
         enum DataType dataType = UNSIGNED_CHAR;
@@ -71,7 +72,7 @@ namespace MeshImporter
             }
         }
 
-        const auto& itPos     = primitive.attributes.find("POSITION");
+        const auto& itPos = primitive.attributes.find("POSITION");
         if (itPos != primitive.attributes.end())
         {
             const tinygltf::Accessor& posAcc    = model.accessors[itPos->second];
@@ -168,11 +169,10 @@ namespace MeshImporter
             for (size_t i = 0; i < posAcc.count; ++i)
             {
                 Vertex vertex;
-                vertex.position = *reinterpret_cast<const float3*>(bufferPos);
-                vertex.tangent  = bufferTan ? *reinterpret_cast<const float4*>(bufferTan) : float4(0, 0, 0, 1);
-                vertex.normal   = bufferNormal ? *reinterpret_cast<const float3*>(bufferNormal) : float3(0, 0, 0);
-                vertex.texCoord = bufferTexCoord ? *reinterpret_cast<const float2*>(bufferTexCoord) : float2(0, 0);
-                vertex.weights  = bufferWeights ? *reinterpret_cast<const float4*>(bufferWeights) : float4(0, 0, 0, 1);
+                vertex.position   = *reinterpret_cast<const float3*>(bufferPos);
+                vertex.tangent    = bufferTan ? *reinterpret_cast<const float4*>(bufferTan) : float4(0, 0, 0, 1);
+                vertex.normal     = bufferNormal ? *reinterpret_cast<const float3*>(bufferNormal) : float3(0, 0, 0);
+                vertex.texCoord   = bufferTexCoord ? *reinterpret_cast<const float2*>(bufferTexCoord) : float2(0, 0);
 
                 // Check all weights don't add up to more than 1
                 float totalWeight = 0;
@@ -220,17 +220,19 @@ namespace MeshImporter
                     vertex.joint[3] = 1;
                 }
 
-                bufferPos += posStride;
+                vertex.weights  = bufferWeights ? *reinterpret_cast<const float4*>(bufferWeights) : float4(0, 0, 0, 1);
+
+                bufferPos      += posStride;
+                if (bufferTan) bufferTan += tanStride;
                 if (bufferNormal) bufferNormal += normStride;
                 if (bufferTexCoord) bufferTexCoord += texStride;
-                if (bufferTan) bufferTan += tanStride;
+
                 if (bufferJoints) bufferJoints += jointStride;
                 if (bufferWeights) bufferWeights += weightsStride;
 
                 vertexBuffer.push_back(vertex);
             }
         }
-
 
         // Extract mode (0:points  1:lines  2:line loop  3:line strip  4:triangles)
         int mode               = (primitive.mode != -1) ? primitive.mode : 4;
@@ -280,7 +282,8 @@ namespace MeshImporter
         memcpy(cursor, header, sizeof(header));
         cursor += sizeof(header);
 
-        // interleaved vertex data (position + tangent + joints + weights + normal + texCoord)
+        // order matters:
+        // interleaved vertex data (position + tangent + normal + texCoord + joints + weights)
         memcpy(cursor, vertexBuffer.data(), sizeof(Vertex) * vertexBuffer.size());
         cursor += sizeof(Vertex) * vertexBuffer.size();
 
@@ -316,7 +319,7 @@ namespace MeshImporter
         }
         else finalMeshUID = sourceUID;
 
-        std::string saveFilePath  = MESHES_PATH + std::to_string(finalMeshUID) + MESH_EXTENSION;
+        std::string saveFilePath  = targetFilePath + MESHES_PATH + std::to_string(finalMeshUID) + MESH_EXTENSION;
         unsigned int bytesWritten = (unsigned int)FileSystem::Save(saveFilePath.c_str(), fileBuffer, size, true);
 
         delete[] fileBuffer;
@@ -379,35 +382,39 @@ namespace MeshImporter
         }
 
         std::vector<unsigned int> tmpIndices;
-        tmpIndices.reserve(indexCount);
 
-        if (indexMode == 2) // unsigned int
+        if (indexMode != -1)
         {
-            const unsigned int* bufferInd = reinterpret_cast<const unsigned int*>(cursor);
-            for (unsigned int i = 0; i < indexCount; ++i)
-            {
-                tmpIndices.push_back(bufferInd[i]);
-            }
-            cursor += sizeof(unsigned int) * indexCount;
-        }
-        else if (indexMode == 1) // unsigned short
-        {
-            const unsigned short* bufferInd = reinterpret_cast<const unsigned short*>(cursor);
+            tmpIndices.reserve(indexCount);
 
-            for (unsigned short i = 0; i < indexCount; ++i)
+            if (indexMode == 0) // unsigned byte
             {
-                tmpIndices.push_back(bufferInd[i]);
+                const unsigned char* bufferInd = reinterpret_cast<const unsigned char*>(cursor);
+                for (unsigned char i = 0; i < indexCount; ++i)
+                {
+                    tmpIndices.push_back(bufferInd[i]);
+                }
+                cursor += sizeof(unsigned char) * indexCount;
             }
-            cursor += sizeof(unsigned short) * indexCount;
-        }
-        else if (indexMode == 0) // unsigned byte
-        {
-            const unsigned char* bufferInd = reinterpret_cast<const unsigned char*>(cursor);
-            for (unsigned char i = 0; i < indexCount; ++i)
+            else if (indexMode == 1) // unsigned short
             {
-                tmpIndices.push_back(bufferInd[i]);
+                const unsigned short* bufferInd = reinterpret_cast<const unsigned short*>(cursor);
+
+                for (unsigned short i = 0; i < indexCount; ++i)
+                {
+                    tmpIndices.push_back(bufferInd[i]);
+                }
+                cursor += sizeof(unsigned short) * indexCount;
             }
-            cursor += sizeof(unsigned char) * indexCount;
+            else if (indexMode == 2) // unsigned int
+            {
+                const unsigned int* bufferInd = reinterpret_cast<const unsigned int*>(cursor);
+                for (unsigned int i = 0; i < indexCount; ++i)
+                {
+                    tmpIndices.push_back(bufferInd[i]);
+                }
+                cursor += sizeof(unsigned int) * indexCount;
+            }
         }
         else
         {

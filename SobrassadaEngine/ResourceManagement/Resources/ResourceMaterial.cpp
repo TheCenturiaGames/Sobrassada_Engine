@@ -93,11 +93,26 @@ void ResourceMaterial::LoadMaterialData(Material mat)
     {
         diffuseTexture.textureID = diffTexture->GetTextureID();
 
-        material.diffuseTex   = glGetTextureHandleARB(diffTexture->GetTextureID());
+        material.diffuseTex      = glGetTextureHandleARB(diffTexture->GetTextureID());
         glMakeTextureHandleResidentARB(material.diffuseTex);
 
         diffuseTexture.width  = diffTexture->GetTextureWidth();
         diffuseTexture.height = diffTexture->GetTextureHeight();
+    }
+
+    if (diffuseTexture.textureID == 0)
+    {
+        ResourceTexture* diffTexture = TextureImporter::LoadTexture(FALLBACK_TEXTURE_UID);
+        if (diffTexture != nullptr)
+        {
+            diffuseTexture.textureID = diffTexture->GetTextureID();
+
+            material.diffuseTex      = glGetTextureHandleARB(diffTexture->GetTextureID());
+            glMakeTextureHandleResidentARB(material.diffuseTex);
+
+            diffuseTexture.width  = diffTexture->GetTextureWidth();
+            diffuseTexture.height = diffTexture->GetTextureHeight();
+        }
     }
 
     ResourceTexture* metallicRoughnessTexture = TextureImporter::LoadTexture(mat.GetMetallicRoughnessTexture());
@@ -105,12 +120,11 @@ void ResourceMaterial::LoadMaterialData(Material mat)
     {
         metallicTexture.textureID = metallicRoughnessTexture->GetTextureID();
 
-        material.metallicTex   = glGetTextureHandleARB(metallicRoughnessTexture->GetTextureID());
+        material.metallicTex      = glGetTextureHandleARB(metallicRoughnessTexture->GetTextureID());
         glMakeTextureHandleResidentARB(material.metallicTex);
 
         metallicTexture.width  = metallicRoughnessTexture->GetTextureWidth();
         metallicTexture.height = metallicRoughnessTexture->GetTextureHeight();
-
     }
 
     if (metallicTexture.textureID == 0)
@@ -120,11 +134,30 @@ void ResourceMaterial::LoadMaterialData(Material mat)
         {
             specularTexture.textureID = specTexture->GetTextureID();
 
-            material.specularTex   = glGetTextureHandleARB(specTexture->GetTextureID());
+            material.specularTex      = glGetTextureHandleARB(specTexture->GetTextureID());
             glMakeTextureHandleResidentARB(material.specularTex);
 
-            specularTexture.width  = specTexture->GetTextureWidth();
-            specularTexture.height = specTexture->GetTextureHeight();
+            specularTexture.width     = specTexture->GetTextureWidth();
+            specularTexture.height    = specTexture->GetTextureHeight();
+
+            material.shininessInAlpha = true;
+        }
+
+        delete specTexture;
+    }
+
+    if (specularTexture.textureID == 0 && metallicTexture.textureID == 0)
+    {
+        ResourceTexture* specTexture = TextureImporter::LoadTexture(FALLBACK_TEXTURE_UID);
+        if (specTexture != nullptr)
+        {
+            specularTexture.textureID = specTexture->GetTextureID();
+
+            material.specularTex      = glGetTextureHandleARB(specTexture->GetTextureID());
+            glMakeTextureHandleResidentARB(material.specularTex);
+
+            specularTexture.width     = specTexture->GetTextureWidth();
+            specularTexture.height    = specTexture->GetTextureHeight();
 
             material.shininessInAlpha = true;
         }
@@ -136,7 +169,7 @@ void ResourceMaterial::LoadMaterialData(Material mat)
         GLOG("%s has normal", normTexture->GetName().c_str());
         normalTexture.textureID = normTexture->GetTextureID();
 
-        material.normalTex = glGetTextureHandleARB(normTexture->GetTextureID());
+        material.normalTex      = glGetTextureHandleARB(normTexture->GetTextureID());
         glMakeTextureHandleResidentARB(material.normalTex);
 
         normalTexture.width  = normTexture->GetTextureWidth();
@@ -147,6 +180,10 @@ void ResourceMaterial::LoadMaterialData(Material mat)
     glBindBuffer(GL_UNIFORM_BUFFER, ubo);
     glBufferData(GL_UNIFORM_BUFFER, sizeof(MaterialGPU), &material, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    delete diffTexture;
+    delete metallicRoughnessTexture;
+    delete normTexture;
 }
 
 void ResourceMaterial::RenderMaterial(int program) const
@@ -161,15 +198,28 @@ void ResourceMaterial::RenderMaterial(int program) const
 
 void ResourceMaterial::FreeMaterials() const
 {
-    glMakeTextureHandleNonResidentARB(material.diffuseTex);
-    glMakeTextureHandleNonResidentARB(material.specularTex);
-    glMakeTextureHandleNonResidentARB(material.metallicTex);
-    glMakeTextureHandleNonResidentARB(material.normalTex);
+    if (material.diffuseTex != 0)
+    {
+        glMakeTextureHandleNonResidentARB(material.diffuseTex);
+        glDeleteTextures(1, &diffuseTexture.textureID);
+    }
+    if (material.specularTex != 0)
+    {
+        glMakeTextureHandleNonResidentARB(material.specularTex);
+        glDeleteTextures(1, &specularTexture.textureID);
+    }
+    if (material.metallicTex != 0)
+    {
+        glMakeTextureHandleNonResidentARB(material.metallicTex);
+        glDeleteTextures(1, &metallicTexture.textureID);
+    }
 
-    glDeleteTextures(1, &diffuseTexture.textureID);
-    glDeleteTextures(1, &metallicTexture.textureID);
-    glDeleteTextures(1, &specularTexture.textureID);
-    glDeleteTextures(1, &normalTexture.textureID);
+    if (material.normalTex != 0)
+    {
+        glMakeTextureHandleNonResidentARB(material.normalTex);
+        glDeleteTextures(1, &normalTexture.textureID);
+    }
+    
     glDeleteBuffers(1, &ubo);
 }
 

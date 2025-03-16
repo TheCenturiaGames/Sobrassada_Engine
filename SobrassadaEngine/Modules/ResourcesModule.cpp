@@ -8,6 +8,8 @@
 #include "ResourceManagement/Resources/ResourceTexture.h"
 #include "SceneModule.h"
 #include "ShaderModule.h"
+//test
+#include "Globals.h"
 
 #include <Algorithm/Random/LCG.h> // TODO: LCG remove includes
 
@@ -43,6 +45,7 @@ Resource* ResourcesModule::RequestResource(UID uid)
     if (it != resources.end())
     {
         it->second->AddReference();
+        GLOG("Reference count when adding: %d", it->second->GetReferenceCount());
 
         return it->second;
     }
@@ -62,6 +65,7 @@ void ResourcesModule::ReleaseResource(const Resource* resource)
             it->second->RemoveReference();
             if (it->second->GetReferenceCount() <= 0)
             {
+                GLOG("Reference count when deleting: %d", it->second->GetReferenceCount());
                 delete it->second;
                 resources.erase(it);
             }
@@ -76,6 +80,7 @@ Resource* ResourcesModule::CreateNewResource(UID uid)
     {
         resources.insert(std::pair(uid, loadedResource));
         loadedResource->AddReference();
+        GLOG("Reference count when creating: %d", loadedResource->GetReferenceCount());
         return loadedResource;
     }
     return nullptr;

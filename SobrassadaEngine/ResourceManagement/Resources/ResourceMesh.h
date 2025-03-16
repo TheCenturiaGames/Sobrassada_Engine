@@ -45,6 +45,7 @@ class ResourceMesh : public Resource
     unsigned int mode        = 0;
     unsigned int vertexCount = 0;
     unsigned int indexCount  = 0;
+    bool hasIndices          = false;
     AABB aabb;
 
     std::vector<Vertex> bindPoseVertices;
