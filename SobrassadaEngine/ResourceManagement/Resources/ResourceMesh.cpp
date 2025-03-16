@@ -144,7 +144,7 @@ void ResourceMesh::Render(
     }
     else
     {
-        glUniform1i(4, 0); // Tell the shader the mesh has no bones
+       glUniform1i(4, 0); // Tell the shader the mesh has no bones
     }
 
     if (material != nullptr)

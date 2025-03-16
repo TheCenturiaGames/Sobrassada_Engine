@@ -233,7 +233,5 @@ ResourceMaterial* MaterialImporter::LoadMaterial(UID materialUID)
 
     delete[] buffer;
 
-    // App->GetLibraryModule()->AddResource(savePath, finalMeshUID);
-
     return material;
 }

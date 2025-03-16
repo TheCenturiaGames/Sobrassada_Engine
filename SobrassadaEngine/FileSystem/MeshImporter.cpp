@@ -337,12 +337,6 @@ namespace MeshImporter
         return finalMeshUID;
     }
 
-    UID ImportMeshFromMetadata(const std::string& filePath, const std::string& name, UID sourceUID)
-    {
-
-        return 0;
-    }
-
     ResourceMesh* LoadMesh(UID meshUID)
     {
         char* buffer          = nullptr;
