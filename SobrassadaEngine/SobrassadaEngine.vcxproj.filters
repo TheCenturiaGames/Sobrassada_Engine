@@ -204,12 +204,6 @@
     <ClCompile Include="Utils\LightsConfig.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Utils\Quadtree.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="Utils\Octree.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\Components\Component.cpp">
       <Filter>Scene\Components</Filter>
     </ClCompile>
@@ -315,9 +309,6 @@
     <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
       <Filter>UI\EngineEditors</Filter>
     </ClCompile>
-    <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp">
-      <Filter>External\ImGuizmo</Filter>
-    </ClCompile>
     <ClCompile Include="FileSystem\MetaFile.cpp">
       <Filter>FileSystem\Meta</Filter>
     </ClCompile>
@@ -351,10 +342,8 @@
     <ClCompile Include="Modules\UserInterfaceModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
-<<<<<<< HEAD
     <ClCompile Include="ResourceManagement\Resources\ResourceNavMesh.cpp">
       <Filter>Resources</Filter>
-=======
     <ClCompile Include="Utils\Trees\Octree.cpp">
       <Filter>Utils\Tree</Filter>
     </ClCompile>
@@ -363,7 +352,6 @@
     </ClCompile>
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp">
       <Filter>External\ImGuizmo</Filter>
->>>>>>> main
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -622,10 +610,9 @@
     <ClInclude Include="Modules\UserInterfaceModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
-<<<<<<< HEAD
     <ClInclude Include="ResourceManagement\Resources\ResourceNavMesh.h">
       <Filter>Resources</Filter>
-=======
+    </ClInclude>
     <ClInclude Include="Utils\Trees\Quadtree.h">
       <Filter>Utils\Tree</Filter>
     </ClInclude>
@@ -637,7 +624,6 @@
     </ClInclude>
     <ClInclude Include="Utils\EventDispatcher.h">
       <Filter>Utils</Filter>
->>>>>>> main
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
