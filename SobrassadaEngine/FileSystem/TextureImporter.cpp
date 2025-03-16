@@ -88,6 +88,8 @@ namespace TextureImporter
     {
         std::string path     = App->GetLibraryModule()->GetResourcePath(textureUID);
 
+        if (path.empty()) return nullptr;   // TODO Use fallback texture instead
+
         std::string fileName = FileSystem::GetFileNameWithoutExtension(path);
 
         std::wstring wPath   = std::wstring(path.begin(), path.end());

@@ -113,6 +113,7 @@ constexpr const char* RENDER_CAMERA_RAY             = "Camera Ray";
 
 constexpr UID INVALID_UID                               = 0;
 constexpr UID UID_PREFIX_DIVISOR                        = 100000000000000;
+constexpr UID FALLBACK_TEXTURE_UID                      = 1200000000000000;
 
 constexpr const char* CONSTANT_MESH_SELECT_DIALOG_ID    = "mesh-select";
 constexpr const char* CONSTANT_TEXTURE_SELECT_DIALOG_ID = "texture-select";
