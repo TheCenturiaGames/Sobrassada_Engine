@@ -45,22 +45,22 @@ ResourceNavMesh::ResourceNavMesh(UID uid, const std::string& name) : Resource(ui
 
     // Default Walkable Options
     config.walkableSlopeAngle                        = 45.0f; // Max slope an agent can walk on
-    config.walkableClimb                             = 0.5f;  // Max step height agent can climb
+    config.walkableClimb                             = 0.3f;  // Max step height agent can climb
     config.walkableHeight                            = 2.0f;  // Min height required to pass
     config.walkableRadius                            = 0.5f;  // Agent radius
 
     // Default Partition Options
-    partitionType                                    = SAMPLE_PARTITION_WATERSHED;
-    config.minRegionArea                             = 10;  // Min region area (small regions will be removed)
-    config.mergeRegionArea                           = 30; // Merge regions smaller than this size
+    partitionType                                    = SAMPLE_PARTITION_MONOTONE;
+    config.minRegionArea                             = 4;  // Min region area (small regions will be removed)
+    config.mergeRegionArea                           = 10; // Merge regions smaller than this size
 
     // Default Contour Options
-    config.maxSimplificationError                    = 1.3f;
-    config.maxEdgeLen                                = 12;
+    config.maxSimplificationError                    = 2.0f;
+    config.maxEdgeLen                                = 15;
     config.maxVertsPerPoly                           = 6;
 
     // Default PolyMesh Options
-    config.detailSampleDist                          = 1.0f; // Higher = more accurate, lower = faster
+    config.detailSampleDist                          = 0.5f; // Higher = more accurate, lower = faster
     config.detailSampleMaxError                      = 0.5f; // Higher = more smooth, lower = accurate
 
     // Default Filters
@@ -84,7 +84,7 @@ ResourceNavMesh::ResourceNavMesh(UID uid, const std::string& name) : Resource(ui
 }
 // add together all meshes to create navmesh - needs the direction to a vector of resourcemesh pointers
 bool ResourceNavMesh::BuildNavMesh(
-    const std::vector<std::pair<const ResourceMesh*, const float4x4&>>& meshes, float3& minPoint, float3& maxPoint
+    const std::vector<std::pair<const ResourceMesh*, const float4x4&>>& meshes, float minPoint[3], float maxPoint[3]
 )
 {
     int allVertexCount   = 0;
@@ -99,20 +99,15 @@ bool ResourceNavMesh::BuildNavMesh(
         allVertexCount          += mesh.first->GetVertexCount();
         allTriangleCount        += (mesh.first->GetIndexCount() / 3);
 
-        // Get each mesh AABB
-        const float3& minBounds  = minPoint;
-        const float3& maxBounds  = maxPoint;
-
-        // Update the global AABB if necessary
-
-        config.bmin[0]           = std::min(config.bmin[0], minBounds.x);
-        config.bmin[1]           = std::min(config.bmin[1], minBounds.y);
-        config.bmin[2]           = std::min(config.bmin[2], minBounds.z);
-
-        config.bmax[0]           = std::max(config.bmax[0], maxBounds.x);
-        config.bmax[1]           = std::max(config.bmax[1], maxBounds.y);
-        config.bmax[2]           = std::max(config.bmax[2], maxBounds.z);
     }
+
+    config.bmin[0] = minPoint[0];
+    config.bmin[1] = minPoint[1];
+    config.bmin[2] = minPoint[2];
+
+    config.bmax[0] = maxPoint[0];
+    config.bmax[1] = maxPoint[0];
+    config.bmax[2] = maxPoint[0];
 
     std::vector<float> navmeshVertices;
     std::vector<int> navmeshTriangles;

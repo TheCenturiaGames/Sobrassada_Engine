@@ -804,6 +804,7 @@ void DebugDrawModule::DrawNavMesh(const dtNavMesh* navMesh, const dtNavMeshQuery
 
             std::vector<LineSegment> lines;
 
+
             for (int k = 0; k < pd->triCount; ++k)
             {
                 const unsigned char* t = &tile->detailTris[(pd->triBase + k) * 4];
@@ -819,9 +820,11 @@ void DebugDrawModule::DrawNavMesh(const dtNavMesh* navMesh, const dtNavMeshQuery
                 lines.push_back(LineSegment(v[0], v[1]));
                 lines.push_back(LineSegment(v[1], v[2]));
                 lines.push_back(LineSegment(v[2], v[0]));
+
             }
 
             RenderLines(lines, float3(0.0f, 1.0f, 0.0f)); // Green color
+
         }
     }
 }

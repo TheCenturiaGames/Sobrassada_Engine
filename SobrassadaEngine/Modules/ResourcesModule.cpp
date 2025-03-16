@@ -87,10 +87,10 @@ Resource* ResourcesModule::CreateNewResource(UID uid)
 void ResourcesModule::CreateNavMesh()
 {
 
-    UID navMeshUID          = 15345456565; // Some unique identifier
-    std::string navMeshName = "testnavmesh";
     std::vector<std::pair<const ResourceMesh*, const float4x4&>> meshes;
-    AABB aabb;
+    float minPos[3] = {0, 0, 0};
+    float maxPos[3] = {0, 0, 0};
+
     const std::unordered_map<UID, GameObject*>* gameObjects = App->GetSceneModule()->GetAllGameObjects();
 
     if (gameObjects)
@@ -106,11 +106,21 @@ void ResourcesModule::CreateNavMesh()
                 if (meshComponent)
                 {
                     const ResourceMesh* resourceMesh = meshComponent->GetResourceMesh();
-                    aabb                             = gameObject->GetGlobalAABB();
+                    AABB aabb                        = gameObject->GetGlobalAABB();
+
+                    
+                    minPos[0]                        = std::min(minPos[0], aabb.minPoint.x);
+                    minPos[1]                        = std::min(minPos[1], aabb.minPoint.y);
+                    minPos[2]                        = std::min(minPos[2], aabb.minPoint.z);
+
+                    maxPos[0]                        = std::max(maxPos[0], aabb.maxPoint.x);
+                    maxPos[1]                        = std::max(maxPos[1], aabb.maxPoint.y);
+                    maxPos[2]                        = std::max(maxPos[2], aabb.maxPoint.z);
+
                     meshes.push_back(std::pair(resourceMesh, globalMatrix));
                 }
             }
         }
     }
-    myNavmesh.BuildNavMesh(meshes, aabb.minPoint, aabb.maxPoint);
+    myNavmesh.BuildNavMesh(meshes, minPos, maxPos);
 }

@@ -42,7 +42,7 @@ class ResourceNavMesh : public Resource
     ~ResourceNavMesh() override;
 
     bool BuildNavMesh(
-        const std::vector<std::pair<const ResourceMesh*, const float4x4&>>& meshes, float3& minPoint, float3& maxPoint
+        const std::vector<std::pair<const ResourceMesh*, const float4x4&>>& meshes, float minPoint[3], float maxPoint[3]
     );
     void Render();
 
