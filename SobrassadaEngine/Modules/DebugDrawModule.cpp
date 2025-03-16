@@ -2,24 +2,24 @@
 
 #include "Application.h"
 #include "CameraModule.h"
+#include "DebugUtils.h"
+#include "Framebuffer.h"
+#include "GameObject.h"
 #include "Globals.h"
 #include "MathGeoLib.h"
-#include "WindowModule.h"
-#include "SceneModule.h"
-#include "OpenGLModule.h"
-#include "SceneModule.h"
-#include "Framebuffer.h"
-#include "DebugUtils.h"
 #include "Octree.h"
-#include "GameObject.h"
+#include "OpenGLModule.h"
+#include "ResourcesModule.h"
+#include "SceneModule.h"
+#include "WindowModule.h"
 
 #include "SDL_video.h"
 #define DEBUG_DRAW_IMPLEMENTATION
 #include "DebugDraw.h" // Debug Draw API. Notice that we need the DEBUG_DRAW_IMPLEMENTATION macro here!
-#include "glew.h"
-#include "imgui.h"
 #include "Geometry/AABB.h"
 #include "Geometry/OBB.h"
+#include "glew.h"
+#include "imgui.h"
 #include <unordered_map>
 
 class DDRenderInterfaceCoreGL final : public dd::RenderInterface
@@ -618,7 +618,7 @@ bool DebugDrawModule::ShutDown()
 update_status DebugDrawModule::Render(float deltaTime)
 {
     // dd::axisTriad(float4x4::identity, 0.1f, 1.0f);
-    if(!App->GetSceneModule()->GetInPlayMode()) dd::xzSquareGrid(-10, 10, 0.0f, 1.0f, dd::colors::Blue);
+    if (!App->GetSceneModule()->GetInPlayMode()) dd::xzSquareGrid(-10, 10, 0.0f, 1.0f, dd::colors::Blue);
 
     // Probably should go somewhere else, but must go after skybox and meshes
     Draw();
@@ -629,7 +629,6 @@ update_status DebugDrawModule::Render(float deltaTime)
 void DebugDrawModule::Draw()
 {
     CameraModule* cameraModule = App->GetCameraModule();
-    
 
     const float4x4& projection = cameraModule->GetProjectionMatrix();
     const float4x4& view       = cameraModule->GetViewMatrix();
@@ -648,9 +647,9 @@ void DebugDrawModule::Draw()
 
     HandleDebugRenderOptions();
 
-    auto framebuffer = App->GetOpenGLModule()->GetFramebuffer();
+    auto framebuffer          = App->GetOpenGLModule()->GetFramebuffer();
     width                     = framebuffer->GetTextureWidth();
-    height                     = framebuffer->GetTextureHeight();
+    height                    = framebuffer->GetTextureHeight();
 
     implementation->width     = width;
     implementation->height    = height;
@@ -721,10 +720,10 @@ void DebugDrawModule::DrawAxisTriad(const float4x4& transform, bool depthEnabled
 
 void DebugDrawModule::HandleDebugRenderOptions()
 {
-    SceneModule* sceneModule = App->GetSceneModule();
+    SceneModule* sceneModule   = App->GetSceneModule();
     CameraModule* cameraModule = App->GetCameraModule();
 
-    const auto& gameObjects  = sceneModule->GetAllGameObjects();
+    const auto& gameObjects    = sceneModule->GetAllGameObjects();
 
     if (debugRenderOptions[RENDER_AABB])
     {
@@ -753,6 +752,17 @@ void DebugDrawModule::HandleDebugRenderOptions()
     if (debugRenderOptions[RENDER_CAMERA_RAY])
     {
         DrawLineSegment(cameraModule->GetLastCastedRay(), float3(1.f, 1.f, 0.f));
+    }
+    if (debugRenderOptions[RENDER_NAVMESH])
+    {
+        if (App->GetResourcesModule()->GetNavMesh())
+        {
+            DrawNavMesh(
+                App->GetResourcesModule()->GetNavMesh()->GetDetourNavMesh(),
+                App->GetResourcesModule()->GetNavMesh()->GetDetourNavMeshQuery(), DRAWNAVMESH_COLOR_TILES
+            );
+        }
+
     }
 }
 
@@ -804,7 +814,6 @@ void DebugDrawModule::DrawNavMesh(const dtNavMesh* navMesh, const dtNavMeshQuery
 
             std::vector<LineSegment> lines;
 
-
             for (int k = 0; k < pd->triCount; ++k)
             {
                 const unsigned char* t = &tile->detailTris[(pd->triBase + k) * 4];
@@ -820,11 +829,9 @@ void DebugDrawModule::DrawNavMesh(const dtNavMesh* navMesh, const dtNavMeshQuery
                 lines.push_back(LineSegment(v[0], v[1]));
                 lines.push_back(LineSegment(v[1], v[2]));
                 lines.push_back(LineSegment(v[2], v[0]));
-
             }
 
             RenderLines(lines, float3(0.0f, 1.0f, 0.0f)); // Green color
-
         }
     }
 }

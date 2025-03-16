@@ -105,6 +105,7 @@ constexpr const char* RENDER_AABB                   = "AABB";
 constexpr const char* RENDER_OBB                    = "OBB";
 constexpr const char* RENDER_OCTREE                 = "Octree";
 constexpr const char* RENDER_CAMERA_RAY             = "Camera Ray";
+constexpr const char* RENDER_NAVMESH                = "Navmesh";
 
 #define UID uint64_t
 

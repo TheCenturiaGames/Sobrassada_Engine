@@ -420,7 +420,7 @@ bool ResourceNavMesh::BuildNavMesh(
 
     delete context;
 }
-
+/**/
 void ResourceNavMesh::Render()
 {
     if (!navMesh)
@@ -430,7 +430,7 @@ void ResourceNavMesh::Render()
     ResourceNavMesh* rsnav   = App->GetResourcesModule()->GetNavMesh();
     dtNavMesh* navMesh       = App->GetResourcesModule()->GetNavMesh()->GetDetourNavMesh();
     dtNavMeshQuery* navQuery = App->GetResourcesModule()->GetNavMesh()->GetDetourNavMeshQuery();
-    App->GetDebugDrawModule()->DrawNavMesh(navMesh, navQuery, DRAWNAVMESH_COLOR_TILES);
+    //App->GetDebugDrawModule()->DrawNavMesh(navMesh, navQuery, DRAWNAVMESH_COLOR_TILES);
 }
 
 // ImGUI
