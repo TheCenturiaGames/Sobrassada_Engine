@@ -39,6 +39,13 @@ enum class GizmoTransform
     WORLD
 };
 
+enum class GizmoDragState
+{
+    IDLE,
+    DRAGGING,
+    RELEASED
+};
+
 class EditorUIModule : public Module
 {
   public:
@@ -63,6 +70,7 @@ class EditorUIModule : public Module
     GizmoOperation& GetCurrentGizmoOperation() { return currentGizmoOperation; }
     GizmoTransform& GetTransformType() { return transformType; }
     float3& GetSnapValues() { return snapValues; }
+    GizmoDragState GetImGuizmoDragState() const { return guizmoDragState; };
 
   private:
     void RenderBasicTransformModifiers(
@@ -73,8 +81,8 @@ class EditorUIModule : public Module
     void UpdateGizmoTransformMode();
     ImGuizmo::OPERATION GetImGuizmoOperation() const;
     ImGuizmo::MODE GetImGuizmoTransformMode() const;
-    void AddFramePlotData(float deltaTime);
 
+    void AddFramePlotData(float deltaTime);
     void Draw();
     void MainMenu();
     void EditorSettings(bool& editorSettingsMenu);
@@ -98,6 +106,8 @@ class EditorUIModule : public Module
 
     void OpenEditor(EngineEditorBase* editorToOpen);
     EngineEditorBase* CreateEditor(EditorType type);
+
+    void UpdateGizmoDragState();
 
   public:
     bool editorControlMenu = true;
@@ -126,6 +136,8 @@ class EditorUIModule : public Module
 
     GizmoOperation currentGizmoOperation = GizmoOperation::TRANSLATE;
     GizmoTransform transformType         = GizmoTransform::LOCAL;
+    GizmoDragState guizmoDragState = GizmoDragState::IDLE;
+
     float3 snapValues                    = {1.f, 1.f, 1.f};
     std::unordered_map<UID, EngineEditorBase*> openEditors;
 };

@@ -30,6 +30,8 @@ class GameObject
 
     const float4x4& GetParentGlobalTransform() const;
 
+    bool IsStatic() const { return mobilitySettings == ComponentMobilitySettings::STATIC; };
+
     bool AddGameObject(UID gameObjectUID);
     bool RemoveGameObject(UID gameObjectUID);
 
@@ -81,6 +83,8 @@ class GameObject
 
     void SetLocalTransform(const float4x4& newTransform) { localTransform = newTransform; }
     void DrawGizmos() const;
+
+    void SetMobility(ComponentMobilitySettings newMobility) { mobilitySettings = newMobility; };
 
   private:
     void OnTransformUpdated();

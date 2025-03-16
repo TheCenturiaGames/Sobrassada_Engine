@@ -61,8 +61,10 @@ update_status SceneModule::RenderEditor(float deltaTime)
 
 update_status SceneModule::PostUpdate(float deltaTime)
 {
+    if (loadedScene == nullptr) return UPDATE_CONTINUE;
+
     // CAST RAY WHEN LEFT CLICK IS RELEASED
-    if (loadedScene != nullptr && GetDoInputsScene() && !ImGuizmo::IsUsingAny())
+    if (GetDoInputsScene() && !ImGuizmo::IsUsingAny())
     {
         const KeyState* mouseButtons = App->GetInputModule()->GetMouseButtons();
         const KeyState* keyboard     = App->GetInputModule()->GetKeyboard();
@@ -78,7 +80,22 @@ update_status SceneModule::PostUpdate(float deltaTime)
             }
         }
     }
-    if (loadedScene != nullptr && loadedScene->GetStopPlaying()) SwitchPlayMode(false);
+
+    // CHECKING FOR UPDATED STATIC AND DYNAMIC OBJECTS
+    GizmoDragState currentGizmoState = App->GetEditorUIModule()->GetImGuizmoDragState();
+    if (currentGizmoState == GizmoDragState::RELEASED || currentGizmoState == GizmoDragState::IDLE)
+    {
+        if (loadedScene->IsStaticModified())
+        {
+            RegenerateStaticTree();
+        }
+        if (loadedScene->IsDynamicModified())
+        {
+            RegenerateDynamicTree();
+        }
+    }
+
+    if (loadedScene->GetStopPlaying()) SwitchPlayMode(false);
 
     return UPDATE_CONTINUE;
 }
