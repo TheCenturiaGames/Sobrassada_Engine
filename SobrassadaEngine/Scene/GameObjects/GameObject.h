@@ -42,6 +42,7 @@ class GameObject
 
     void UpdateGameObjectHierarchy(UID sourceUID);
     void RenameGameObjectHierarchy();
+    bool TargetIsChildren(UID uidTarget);
 
     const std::string& GetName() const { return name; }
     void SetName(const std::string& newName) { name = newName; }
