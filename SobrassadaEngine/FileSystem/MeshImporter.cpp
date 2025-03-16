@@ -231,14 +231,12 @@ namespace MeshImporter
             }
         }
 
-        // Extract material
+
         // Extract mode (0:points  1:lines  2:line loop  3:line strip  4:triangles)
-        // check for no mateiral and default to triangle mode
-        // int materialIndex      = (primitive.material != -1) ? primitive.material : 0;
         int mode               = (primitive.mode != -1) ? primitive.mode : 4;
 
         // save to binary file.
-        // 1 - NUMBER OF INDICES,  2 - NUMBER OF VERTICES  3 - MATERIAL  4 - DRAWING MODE
+        // 1 - NUMBER OF INDICES,  2 - NUMBER OF VERTICES  3 - MODE  4 - INDEX MODE
         unsigned int header[4] = {0, 0, 0, 0};
 
         int indexBufferSize    = 0;
@@ -371,7 +369,6 @@ namespace MeshImporter
 
         unsigned int indexCount   = header[0];
         unsigned int vertexCount  = header[1];
-        // unsigned int materialIndex  = header[2];
         unsigned int mode         = header[2];
         unsigned int indexMode    = header[3];
         GLOG("The mode for the mesh is %d", mode);
