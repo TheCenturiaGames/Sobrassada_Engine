@@ -12,6 +12,7 @@
 #include "InputModule.h"
 #include "LibraryModule.h"
 #include "Octree.h"
+#include "Quadtree.h"
 #include "OpenGLModule.h"
 #include "ResourceManagement/Resources/Resource.h"
 #include "ResourceManagement/Resources/ResourceModel.h"
@@ -80,9 +81,11 @@ Scene::~Scene()
 
     delete lightsConfig;
     delete sceneOctree;
-
+    delete dynamicTree;
+    
     lightsConfig = nullptr;
     sceneOctree  = nullptr;
+    dynamicTree  = nullptr;
 
     GLOG("%s scene closed", sceneName);
 }
@@ -121,7 +124,8 @@ void Scene::Init()
     lightsConfig->InitSkybox();
     lightsConfig->InitLightBuffers();
 
-    UpdateSpatialDataStruct();
+    UpdateStaticSpatialStructure();
+    UpdateDynamicSpatialStructure();
 }
 
 void Scene::Save(
@@ -196,7 +200,8 @@ void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGa
         root->UpdateTransformForGOBranch();
     }
 
-    UpdateSpatialDataStruct();
+    UpdateStaticSpatialStructure();
+    UpdateDynamicSpatialStructure();
 }
 
 update_status Scene::Update(float deltaTime)
@@ -476,7 +481,6 @@ void Scene::RenderHierarchyUI(bool& hierarchyMenu)
         if (ImGui::Button("Delete GameObject"))
         {
             RemoveGameObjectHierarchy(selectedGameObjectUID);
-            App->GetSceneModule()->RegenerateTree();
         }
     }
 
@@ -496,6 +500,7 @@ void Scene::RemoveGameObjectHierarchy(UID gameObjectUID)
 
     std::stack<UID> toDelete;
     toDelete.push(gameObjectUID);
+    GameObject* gameObject = GetGameObjectByUID(gameObjectUID);
 
     std::vector<UID> collectedUIDs;
 
@@ -528,6 +533,9 @@ void Scene::RemoveGameObjectHierarchy(UID gameObjectUID)
     // Delete collected game objects
     for (UID uid : collectedUIDs)
     {
+        if (gameObject->IsStatic()) SetStaticModified();
+        else SetDynamicModified();
+
         delete gameObjectsContainer[uid];
         gameObjectsContainer.erase(uid);
     }
@@ -549,7 +557,7 @@ const std::vector<Component*> Scene::GetAllComponents() const
     return collectedComponents;
 }
 
-void Scene::CreateSpatialDataStruct()
+void Scene::CreateStaticSpatialDataStruct()
 {
     // PARAMETRIZED IN FUTURE
     float3 octreeCenter = float3::zero;
@@ -561,6 +569,7 @@ void Scene::CreateSpatialDataStruct()
     {
         AABB objectBB = objectIterator.second->GetGlobalAABB();
 
+        if (!objectIterator.second->IsStatic()) continue;
         if (objectIterator.second->GetUID() == gameObjectRootUID) continue;
         if (objectBB.Size().x == 0 && objectBB.Size().y == 0 && objectBB.Size().z == 0) continue;
 
@@ -568,11 +577,42 @@ void Scene::CreateSpatialDataStruct()
     }
 }
 
-void Scene::UpdateSpatialDataStruct()
+void Scene::CreateDynamicSpatialDataStruct()
 {
+    // PARAMETRIZED IN FUTURE
+    float3 center = float3::zero;
+    float length  = 200;
+    int nodeCapacity    = 5;
+    dynamicTree      = new Quadtree(center, length, nodeCapacity);
+
+    for (const auto& objectIterator : gameObjectsContainer)
+    {
+        AABB objectBB = objectIterator.second->GetGlobalAABB();
+
+        if (objectIterator.second->IsStatic()) continue;
+        if (objectIterator.second->GetUID() == gameObjectRootUID) continue;
+        if (objectBB.Size().x == 0 && objectBB.Size().y == 0 && objectBB.Size().z == 0) continue;
+
+        dynamicTree->InsertElement(objectIterator.second);
+    }
+}
+
+void Scene::UpdateStaticSpatialStructure()
+{
+    staticModified = false;
+
     delete sceneOctree;
 
-    CreateSpatialDataStruct();
+    CreateStaticSpatialDataStruct();
+}
+
+void Scene::UpdateDynamicSpatialStructure()
+{
+    dynamicModified = false;
+
+    delete dynamicTree;
+
+    CreateDynamicSpatialDataStruct();
 }
 
 void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects) const
@@ -583,6 +623,7 @@ void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects)
         frustumPlanes = App->GetSceneModule()->GetMainCamera()->GetFrustrumPlanes();
 
     sceneOctree->QueryElements<FrustumPlanes>(frustumPlanes, queriedObjects);
+    dynamicTree->QueryElements<FrustumPlanes>(frustumPlanes, queriedObjects);
 
     for (auto gameObject : queriedObjects)
     {

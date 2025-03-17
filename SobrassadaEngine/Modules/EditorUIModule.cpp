@@ -79,6 +79,8 @@ update_status EditorUIModule::Update(float deltaTime)
 {
     UpdateGizmoTransformMode();
     AddFramePlotData(deltaTime);
+    UpdateGizmoDragState();
+
     return UPDATE_CONTINUE;
 }
 
@@ -291,6 +293,7 @@ void EditorUIModule::MainMenu()
         {
 
             if (ImGui::MenuItem("Mockup Base Engine Editor", "")) OpenEditor(CreateEditor(EditorType::BASE));
+            if (ImGui::MenuItem("Node Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::NODE));
             ImGui::EndMenu();
         }
 
@@ -999,6 +1002,7 @@ void EditorUIModule::About(bool& aboutMenu) const
     ImGui::Text(" - JSON: rapidjson v1.1");
     ImGui::Text(" - UI: FreeType: v2.13.3");
     ImGui::Text(" - RecastNavigation: v1.6.0");
+    ImGui::Text(" - ImNodeFlow: v1.2.2");
     ImGui::Text("%s is licensed under the MIT License, see LICENSE for more information.", ENGINE_NAME);
 
     static bool show_config_info = false;
@@ -1168,10 +1172,20 @@ EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
     case EditorType::BASE:
 
         return new EngineEditorBase("Base Editor " + std::to_string(uid), uid);
+        break;
+    case EditorType::NODE:
+        return new NodeEditor("NodeEditor" + std::to_string(uid), uid);
 
     default:
         return nullptr;
     }
+}
+
+void EditorUIModule::UpdateGizmoDragState()
+{
+    if (ImGuizmo::IsUsingAny()) guizmoDragState = GizmoDragState::DRAGGING;
+    else if (guizmoDragState == GizmoDragState::DRAGGING) guizmoDragState = GizmoDragState::RELEASED;
+    else guizmoDragState = GizmoDragState::IDLE;
 }
 
 void EditorUIModule::EditorSettings(bool& editorSettingsMenu)

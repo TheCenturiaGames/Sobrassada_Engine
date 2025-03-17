@@ -14,8 +14,8 @@ class MeshComponent;
 
 enum ComponentMobilitySettings
 {
-    STATIC  = 0,
-    DYNAMIC = 1,
+    DYNAMIC = 0,
+    STATIC  = 1,
 };
 
 class GameObject
@@ -30,6 +30,8 @@ class GameObject
     ~GameObject();
 
     const float4x4& GetParentGlobalTransform() const;
+
+    bool IsStatic() const { return mobilitySettings == ComponentMobilitySettings::STATIC; };
 
     bool AddGameObject(UID gameObjectUID);
     bool RemoveGameObject(UID gameObjectUID);
@@ -87,6 +89,7 @@ class GameObject
     void CreatePrefab();
     UID GetPrefabUID() const { return prefabUID; }
     void SetPrefabUID(const UID uid) { prefabUID = uid; }
+    void SetMobility(ComponentMobilitySettings newMobility) { mobilitySettings = newMobility; };
 
   private:
     void OnTransformUpdated();
@@ -120,5 +123,5 @@ class GameObject
     float4x4 globalTransform             = float4x4::identity;
 
     ComponentType selectedComponentIndex = COMPONENT_NONE;
-    int mobilitySettings                 = DYNAMIC;
+    int mobilitySettings                 = STATIC;
 };

@@ -13,6 +13,7 @@ class Component;
 class RootComponent;
 class Octree;
 class ResourcePrefab;
+class Quadtree;
 class CameraComponent;
 
 class Scene
@@ -44,7 +45,11 @@ class Scene
     void RenderSelectedGameObjectUI();
     void RenderHierarchyUI(bool& hierarchyMenu);
 
-    void UpdateSpatialDataStruct();
+    bool IsStaticModified() const { return staticModified; };
+    bool IsDynamicModified() const { return dynamicModified; };
+
+    void UpdateStaticSpatialStructure();
+    void UpdateDynamicSpatialStructure();
 
     void AddGameObject(UID uid, GameObject* newGameObject) { gameObjectsContainer.insert({uid, newGameObject}); }
     void RemoveGameObjectHierarchy(UID gameObjectUUID);
@@ -71,13 +76,18 @@ class Scene
     const std::tuple<float, float>& GetWindowSize() const { return sceneWindowSize; };
     const std::tuple<float, float>& GetMousePosition() const { return mousePosition; };
     Octree* GetOctree() const { return sceneOctree; }
+    Quadtree* GetDynamicTree() const { return dynamicTree; }
 
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
 
     void SetStopPlaying(bool stop) { stopPlaying = stop; }
+    
+    void SetStaticModified() { staticModified = true; }
+    void SetDynamicModified() { dynamicModified = true; }
 
   private:
-    void CreateSpatialDataStruct();
+    void CreateStaticSpatialDataStruct();
+    void CreateDynamicSpatialDataStruct();
     void CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects) const;
 
   private:
@@ -93,9 +103,13 @@ class Scene
 
     LightsConfig* lightsConfig                   = nullptr;
     Octree* sceneOctree                          = nullptr;
+    Quadtree* dynamicTree                        = nullptr;
 
     // IMGUI WINDOW DATA
     std::tuple<float, float> sceneWindowPosition = std::make_tuple(0.f, 0.f);
     std::tuple<float, float> sceneWindowSize     = std::make_tuple(0.f, 0.f);
     std::tuple<float, float> mousePosition       = std::make_tuple(0.f, 0.f);
+
+    bool staticModified                          = false;
+    bool dynamicModified                         = false;
 };

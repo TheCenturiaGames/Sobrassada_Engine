@@ -12,7 +12,6 @@
 
 #include <stack>
 
-
 GameObject::GameObject(std::string name) : name(name)
 {
     uid        = GenerateUID();
@@ -236,10 +235,25 @@ void GameObject::RenderEditorInspector()
         }
 
         // Casting to use ImGui to set values and at the same type keep the enum type for the variable
+        int previousMobility = mobilitySettings;
         ImGui::SeparatorText("Mobility");
-        ImGui::RadioButton("Static", &mobilitySettings, STATIC);
+        if (ImGui::RadioButton("Static", &mobilitySettings, STATIC))
+        {
+            if (previousMobility != mobilitySettings)
+            {
+                App->GetSceneModule()->SetStaticObjectUpdated();
+                App->GetSceneModule()->SetDynamicObjectUpdated();
+            }
+        }
         ImGui::SameLine();
-        ImGui::RadioButton("Dynamic", &mobilitySettings, DYNAMIC);
+        if (ImGui::RadioButton("Dynamic", &mobilitySettings, DYNAMIC))
+        {
+            if (previousMobility != mobilitySettings)
+            {
+                App->GetSceneModule()->SetStaticObjectUpdated();
+                App->GetSceneModule()->SetDynamicObjectUpdated();
+            }
+        }
 
         ImGui::SeparatorText("Component hierarchy");
 
@@ -320,8 +334,6 @@ void GameObject::UpdateTransformForGOBranch() const
                 childrenBuffer.push(child);
         }
     }
-
-    App->GetSceneModule()->RegenerateTree();
 }
 
 Component* GameObject::GetComponentByType(ComponentType type) const
@@ -347,6 +359,9 @@ void GameObject::OnTransformUpdated()
     globalTransform = GetParentGlobalTransform() * localTransform;
     globalOBB       = localAABB.Transform(globalTransform);
     globalAABB      = AABB(globalOBB);
+
+    if (mobilitySettings == STATIC) App->GetSceneModule()->SetStaticObjectUpdated();
+    else App->GetSceneModule()->SetDynamicObjectUpdated();
 }
 
 void GameObject::UpdateLocalTransform(const float4x4& parentGlobalTransform)
@@ -428,7 +443,7 @@ void GameObject::HandleNodeClick(UID& selectedGameObjectUUID)
     {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DRAG_DROP_GAMEOBJECT"))
         {
-            UID draggedUID = *static_cast<const UID*>(payload->Data);
+            UID draggedUID        = *static_cast<const UID*>(payload->Data);
             GameObject* draggedGO = App->GetSceneModule()->GetGameObjectByUID(draggedUID);
 
             if (draggedGO != nullptr && !draggedGO->TargetIsChildren(uid))
@@ -452,7 +467,9 @@ void GameObject::RenderContextMenu()
         {
             auto newGameObject = new GameObject(uid, "new Game Object");
             App->GetSceneModule()->AddGameObject(newGameObject->GetUID(), newGameObject);
-            App->GetSceneModule()->RegenerateTree();
+
+            if (newGameObject->IsStatic()) App->GetSceneModule()->SetStaticObjectUpdated();
+            else App->GetSceneModule()->SetDynamicObjectUpdated();
         }
 
         if (ImGui::MenuItem("Rename"))
@@ -480,7 +497,6 @@ void GameObject::RenderContextMenu()
         if (uid != App->GetSceneModule()->GetGameObjectRootUID() && ImGui::MenuItem("Delete"))
         {
             App->GetSceneModule()->RemoveGameObjectHierarchy(uid);
-            App->GetSceneModule()->RegenerateTree();
         }
 
         ImGui::EndPopup();
