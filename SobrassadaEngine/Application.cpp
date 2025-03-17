@@ -16,6 +16,7 @@
 #include "ShaderModule.h"
 #include "WindowModule.h"
 #include "UserInterfaceModule.h"
+#include "ComponentUtils.h"
 
 #ifdef _DEBUG
 #include "optick.h"
@@ -49,6 +50,8 @@ Application::~Application()
     {
         delete *it;
     }
+    delete engineConfig;
+    engineConfig = nullptr;
 }
 
 bool Application::Init()
