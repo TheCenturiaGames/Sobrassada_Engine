@@ -36,7 +36,13 @@ enum update_status
 #define SCREEN_HEIGHT 720
 
 #define FULLSCREEN   false
+
+#ifdef GAME
+#define FULL_DESKTOP true
+#else
 #define FULL_DESKTOP false
+#endif
+
 #define BORDERLESS   false
 #define RESIZABLE    true
 #define VSYNC        true

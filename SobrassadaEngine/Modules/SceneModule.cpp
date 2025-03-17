@@ -7,10 +7,10 @@
 #include "Octree.h"
 #include "Quadtree.h"
 #include "ProjectModule.h"
-
 #include "Application.h"
 #include "InputModule.h"
 #include "RaycastController.h"
+#include "Config/EngineConfig.h"
 
 #include <filesystem>
 #include <tiny_gltf.h>
@@ -28,6 +28,8 @@ bool SceneModule::Init()
     if (App->GetProjectModule()->IsProjectLoaded() && !App->GetProjectModule()->GetStartupSceneName().empty())
     {
         App->GetLibraryModule()->LoadScene((App->GetProjectModule()->GetStartupSceneName() + SCENE_EXTENSION).c_str());
+
+        if (App->GetEngineConfig()->ShouldStartGameOnStartup()) inPlayMode = true;
     }
     return true;
 }
