@@ -533,7 +533,7 @@ void Scene::RemoveGameObjectHierarchy(UID gameObjectUID)
     // Delete collected game objects
     for (UID uid : collectedUIDs)
     {
-        if (gameObject->IsStatic()) SetStaticModified();
+        if (GetGameObjectByUID(uid)->IsStatic()) SetStaticModified();
         else SetDynamicModified();
 
         delete gameObjectsContainer[uid];
