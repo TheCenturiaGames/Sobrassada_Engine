@@ -29,7 +29,7 @@ std::map<std::string, bool> debugRenderOptions = {
     {RENDER_AABB, false},
     {RENDER_OBB,  false},
     {RENDER_OCTREE, false},
-    {RENDER_CAMERA_RAY, false},
+    {RENDER_DYNAMICTREE, false},
     {RENDER_NAVMESH, false}
 };
 

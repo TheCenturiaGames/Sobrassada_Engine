@@ -23,6 +23,7 @@ class MeshComponent : public Component
     void RenderEditorInspector() override;
     void Update() override;
     void Render(float deltaTime) override;
+    bool HasBones() const { return bones.size() > 0; }
 
     void InitSkin();
 

@@ -17,6 +17,7 @@ class GameObject;
 class Component;
 class RootComponent;
 class Octree;
+class Quadtree;
 
 class SceneModule : public Module
 {
@@ -47,7 +48,8 @@ class SceneModule : public Module
         loadedScene != nullptr ? loadedScene->AddGameObject(uid, newGameObject) : void();
     }
 
-    void RegenerateTree() const { loadedScene->UpdateSpatialDataStruct(); }
+    void RegenerateStaticTree() const { loadedScene->UpdateStaticSpatialStructure(); }
+    void RegenerateDynamicTree() const { loadedScene->UpdateDynamicSpatialStructure(); }
 
     void RenderHierarchyUI(bool& hierarchyMenu) const
     {
@@ -100,8 +102,17 @@ class SceneModule : public Module
 
     
     Octree* GetSceneOctree() const { return loadedScene != nullptr ? loadedScene->GetOctree() : nullptr; }
+    Quadtree* GetSceneDynamicTree() const { return loadedScene != nullptr ? loadedScene->GetDynamicTree() : nullptr; }
 
     void SetMainCamera(CameraComponent* camera) { loadedScene->SetMainCamera(camera); }
+    void SetStaticObjectUpdated() const
+    {
+        if (loadedScene != nullptr) loadedScene->SetStaticModified();
+    }
+    void SetDynamicObjectUpdated() const
+    {
+        if (loadedScene != nullptr) loadedScene->SetDynamicModified();
+    }
 
   private:
     Scene* loadedScene                  = nullptr;

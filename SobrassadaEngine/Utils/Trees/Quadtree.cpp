@@ -41,12 +41,8 @@ bool Quadtree::InsertElement(GameObject* gameObject)
         {
             if (currentNode->IsLeaf())
             {
-                if (currentNode->currentArea.Size().x <= MINIMUM_TREE_LEAF_SIZE)
-                {
-                    currentNode->elements.push_back(quadtreeElement);
-                    inserted = true;
-                }
-                else if (currentNode->elements.size() < currentNode->elementsCapacity)
+                if (currentNode->currentArea.Size().x <= MINIMUM_TREE_LEAF_SIZE ||
+                    currentNode->elements.size() < currentNode->elementsCapacity)
                 {
                     currentNode->elements.push_back(quadtreeElement);
                     inserted = true;
