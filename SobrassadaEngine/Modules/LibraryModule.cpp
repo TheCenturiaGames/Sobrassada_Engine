@@ -289,12 +289,6 @@ const std::string& LibraryModule::GetResourcePath(UID resourceID) const
         GLOG("obtained path: %s", it->second.c_str());
         return it->second;
     }
-    it = resourcePathsMap.find(FALLBACK_TEXTURE_UID);
-    if (it != resourcePathsMap.end())
-    {
-        GLOG("Texture not found, using fallback texture: %llu", FALLBACK_TEXTURE_UID);
-        return it->second;
-    }
     static const std::string emptyString = "";
     return emptyString;
 }
