@@ -15,6 +15,7 @@
 #include "Octree.h"
 #include "GameObject.h"
 #include "ResourcesModule.h"
+#include "SceneModule.h"
 
 #include "SDL_video.h"
 #define DEBUG_DRAW_IMPLEMENTATION
