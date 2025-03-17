@@ -12,7 +12,6 @@
 
 ProjectModule::~ProjectModule()
 {
-    delete projectConfig;
 }
 
 bool ProjectModule::Init()
@@ -159,6 +158,13 @@ update_status ProjectModule::RenderEditor(float deltaTime)
     }
 
     return projectReloadRequested ? UPDATE_RESTART : UPDATE_CONTINUE;
+}
+
+bool ProjectModule::ShutDown()
+{
+    delete projectConfig;
+
+    return true;
 }
 
 void ProjectModule::CloseCurrentProject()

@@ -12,6 +12,7 @@ class ProjectModule : public Module
 
     bool Init() override;
     update_status RenderEditor(float deltaTime) override;
+    bool ShutDown() override;
     
     void CloseCurrentProject();
     void SetAsStartupScene(const std::string& newScenePath) const;
