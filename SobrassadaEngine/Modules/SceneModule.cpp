@@ -29,7 +29,7 @@ bool SceneModule::Init()
     {
         App->GetLibraryModule()->LoadScene((App->GetProjectModule()->GetStartupSceneName() + SCENE_EXTENSION).c_str());
 
-        if (App->GetEngineConfig()->ShouldStartGameOnStartup()) inPlayMode = true;
+        if (App->GetEngineConfig()->ShouldStartGameOnStartup()) SwitchPlayMode(true);
     }
     return true;
 }
