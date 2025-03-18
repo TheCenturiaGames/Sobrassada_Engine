@@ -40,6 +40,7 @@ class SceneModule : public Module
     void CloseScene();
 
     void LoadModel(const UID modelUID) { loadedScene != nullptr ? loadedScene->LoadModel(modelUID) : void(); }
+    void LoadPrefab(const UID prefabUid) const { loadedScene != nullptr ? loadedScene->LoadPrefab(prefabUid) : void(); }
 
     void SwitchPlayMode(bool play);
 
@@ -99,7 +100,7 @@ class SceneModule : public Module
     bool GetDoInputs() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() : false; }
     bool GetDoInputsScene() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() && !inPlayMode : false; }
     bool GetDoInputsGame() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() && inPlayMode : false; }
-
+    void OverridePrefabs(UID prefabUID) const { loadedScene != nullptr ? loadedScene->OverridePrefabs(prefabUID) : void(); }
     
     Octree* GetSceneOctree() const { return loadedScene != nullptr ? loadedScene->GetOctree() : nullptr; }
     Quadtree* GetSceneDynamicTree() const { return loadedScene != nullptr ? loadedScene->GetDynamicTree() : nullptr; }

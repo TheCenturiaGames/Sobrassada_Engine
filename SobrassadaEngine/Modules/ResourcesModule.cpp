@@ -46,7 +46,6 @@ Resource* ResourcesModule::RequestResource(UID uid)
     if (it != resources.end())
     {
         it->second->AddReference();
-
         return it->second;
     }
 
