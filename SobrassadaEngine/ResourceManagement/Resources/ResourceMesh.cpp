@@ -26,23 +26,9 @@ ResourceMesh::ResourceMesh(UID uid, const std::string& name, const float3& maxPo
 
 ResourceMesh::~ResourceMesh()
 {
-    if (vao)
-    {
-        glDeleteVertexArrays(1, &vao);
-        vao = 0;
-    }
-
-    if (vbo)
-    {
-        glDeleteBuffers(1, &vbo);
-        vbo = 0;
-    }
-
-    if (ebo)
-    {
-        glDeleteBuffers(1, &ebo);
-        ebo = 0;
-    }
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &vbo);
+    glDeleteBuffers(1, &ebo);
 }
 
 void ResourceMesh::LoadData(
@@ -79,8 +65,7 @@ void ResourceMesh::LoadData(
     glEnableVertexAttribArray(5); // Weights
     glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, weights));
 
-    hasIndices = !indices.empty();
-    if (hasIndices)
+    if (!indices.empty())
     {
         this->indexCount = static_cast<unsigned int>(indices.size());
         this->indices    = indices;
@@ -148,12 +133,9 @@ void ResourceMesh::Render(
             palette[i] = bones[i]->GetGlobalTransform() * bindMatrices[i];
         }
         glUniformMatrix4fv(glGetUniformLocation(program, "palette"), (GLsizei)bones.size(), GL_TRUE, palette[0].ptr());
-        glUniform1i(4, 1); // Tell the shader the mesh has bones
+        glUniform1i(4, 1); // mesh has bones
     }
-    else
-    {
-        glUniform1i(4, 0); // Tell the shader the mesh has no bones
-    }
+    else glUniform1i(4, 0); // mesh has no bones
 
     if (material != nullptr)
     {
@@ -163,9 +145,8 @@ void ResourceMesh::Render(
     unsigned int meshTriangles = 0;
     glBindVertexArray(vao);
 
-    if (hasIndices && vao)
+    if (ebo && vao)
     {
-
         meshTriangles = indexCount / 3;
         App->GetOpenGLModule()->DrawElements(GL_TRIANGLES, static_cast<GLsizei>(indexCount), GL_UNSIGNED_INT, 0);
     }

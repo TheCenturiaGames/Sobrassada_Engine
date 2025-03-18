@@ -25,13 +25,13 @@ LightsConfig::LightsConfig()
 
 LightsConfig::~LightsConfig()
 {
-    if (ambientBufferId) glDeleteBuffers(1, &ambientBufferId);
-    if (directionalBufferId) glDeleteBuffers(1, &directionalBufferId);
-    if (pointBufferId) glDeleteBuffers(1, &pointBufferId);
-    if (spotBufferId) glDeleteBuffers(1, &spotBufferId);
-    if (skyboxVao) glDeleteVertexArrays(1, &skyboxVao);
-    if (skyboxVbo) glDeleteBuffers(1, &skyboxVbo);
-    if (skyboxProgram) glDeleteProgram(skyboxProgram);
+    glDeleteBuffers(1, &ambientBufferId);
+    glDeleteBuffers(1, &directionalBufferId);
+    glDeleteBuffers(1, &pointBufferId);
+    glDeleteBuffers(1, &spotBufferId);
+    glDeleteVertexArrays(1, &skyboxVao);
+    glDeleteBuffers(1, &skyboxVbo);
+    glDeleteProgram(skyboxProgram);
 }
 
 void LightsConfig::InitSkybox()

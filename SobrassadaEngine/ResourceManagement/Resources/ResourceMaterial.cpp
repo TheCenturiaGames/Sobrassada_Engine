@@ -198,28 +198,19 @@ void ResourceMaterial::RenderMaterial(int program) const
 
 void ResourceMaterial::FreeMaterials() const
 {
-    if (material.diffuseTex != 0)
-    {
-        glMakeTextureHandleNonResidentARB(material.diffuseTex);
-        glDeleteTextures(1, &diffuseTexture.textureID);
-    }
-    if (material.specularTex != 0)
-    {
-        glMakeTextureHandleNonResidentARB(material.specularTex);
-        glDeleteTextures(1, &specularTexture.textureID);
-    }
-    if (material.metallicTex != 0)
-    {
-        glMakeTextureHandleNonResidentARB(material.metallicTex);
-        glDeleteTextures(1, &metallicTexture.textureID);
-    }
 
-    if (material.normalTex != 0)
-    {
-        glMakeTextureHandleNonResidentARB(material.normalTex);
-        glDeleteTextures(1, &normalTexture.textureID);
-    }
-    
+    glMakeTextureHandleNonResidentARB(material.diffuseTex);
+    glDeleteTextures(1, &diffuseTexture.textureID);
+
+    glMakeTextureHandleNonResidentARB(material.specularTex);
+    glDeleteTextures(1, &specularTexture.textureID);
+
+    glMakeTextureHandleNonResidentARB(material.metallicTex);
+    glDeleteTextures(1, &metallicTexture.textureID);
+
+    glMakeTextureHandleNonResidentARB(material.normalTex);
+    glDeleteTextures(1, &normalTexture.textureID);
+
     glDeleteBuffers(1, &ubo);
 }
 
