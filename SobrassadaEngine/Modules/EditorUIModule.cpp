@@ -45,8 +45,8 @@ bool EditorUIModule::Init()
     ImGuizmo::SetImGuiContext(context);
     ImGuiIO& io     = ImGui::GetIO();
     io.ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // IF using Docking Branch
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;      // IF using Docking Branch
 
     ImGui_ImplSDL2_InitForOpenGL(App->GetWindowModule()->window, App->GetOpenGLModule()->GetContext());
     ImGui_ImplOpenGL3_Init("#version 460");
@@ -386,7 +386,7 @@ void EditorUIModule::LoadPrefabDialog(bool& loadPrefab) const
         return;
     }
 
-    static UID prefabUid         = INVALID_UID;
+    static UID prefabUid        = INVALID_UID;
     static char searchText[255] = "";
     ImGui::InputText("Search", searchText, 255);
 
@@ -402,7 +402,7 @@ void EditorUIModule::LoadPrefabDialog(bool& loadPrefab) const
             {
                 if (ImGui::Selectable(valuePair.first.c_str(), selected == i))
                 {
-                    selected = i;
+                    selected  = i;
                     prefabUid = valuePair.second;
                 }
             }
@@ -524,7 +524,6 @@ void EditorUIModule::SaveDialog(bool& saveMenu)
         files.shrink_to_fit();
     }
 
-
     ImGui::End();
 }
 
@@ -539,7 +538,8 @@ std::string EditorUIModule::RenderFileDialog(bool& window, const char* windowTit
     }
 
     static std::string currentPath = App->GetProjectModule()->GetLoadedProjectPath();
-    if (currentPath == "") currentPath = "C:";
+    if (currentPath == "" && !selectFolder) currentPath = App->GetProjectModule()->GetLoadedProjectPath();
+    else if (currentPath == "") currentPath = "C:";
     static std::vector<std::string> accPaths;
     static bool loadButtons = true;
 
@@ -707,53 +707,46 @@ std::string EditorUIModule::RenderFileDialog(bool& window, const char* windowTit
     if (ImGui::Button("Cancel", ImVec2(0, 0)))
     {
         inputFile      = "";
-        currentPath    = App->GetProjectModule()->GetLoadedProjectPath();
         window         = false;
         showDrives     = false;
         searchQuery[0] = '\0';
         loadFiles      = true;
+        loadButtons    = true;
     }
 
     ImGui::SameLine();
 
+    std::string importPath = "";
     if (ImGui::Button("Ok", ImVec2(0, 0)))
     {
-        std::string importPath = "";
         if (!inputFile.empty())
         {
-            if (selectFolder)
-            {
-                importPath = currentPath;
-            }
-            else
-            {
-                importPath = currentPath + DELIMITER + inputFile;
-            }
+            if (selectFolder) importPath = currentPath;
+            else importPath = currentPath + DELIMITER + inputFile;
         }
 
         inputFile      = "";
-        currentPath    = App->GetProjectModule()->GetLoadedProjectPath();
         window         = false;
         showDrives     = false;
         searchQuery[0] = '\0';
         loadFiles      = true;
-
-        ImGui::End();
-        return importPath;
+        loadButtons    = true;
     }
 
-    if (!importMenu) {
+    if (!window)
+    {
         accPaths.clear();
         accPaths.shrink_to_fit();
         files.clear();
         files.shrink_to_fit();
         filteredFiles.clear();
         filteredFiles.shrink_to_fit();
+        loadButtons = true;
     }
 
     ImGui::End();
 
-    return "";
+    return importPath;
 }
 
 void EditorUIModule::ImportDialog(bool& import)
