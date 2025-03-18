@@ -20,12 +20,29 @@ DirectionalLightComponent::DirectionalLightComponent(const rapidjson::Value& ini
 
 DirectionalLightComponent::~DirectionalLightComponent()
 {
-    App->GetSceneModule()->GetLightsConfig()->RemoveDirectionalLight();
+    App->GetSceneModule()->GetLightsConfig()->RemoveDirectionalLight(this);
 }
 
 void DirectionalLightComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
 {
     LightComponent::Save(targetState, allocator);
+}
+
+void DirectionalLightComponent::Clone(const Component* other)
+{
+    if (other->GetType() == ComponentType::COMPONENT_DIRECTIONAL_LIGHT)
+    {
+        const DirectionalLightComponent* otherLight = static_cast<const DirectionalLightComponent*>(other);
+        enabled                                     = otherLight->enabled;
+
+        intensity                                   = otherLight->intensity;
+        color                                       = otherLight->color;
+        drawGizmos                                  = otherLight->drawGizmos;
+    }
+    else
+    {
+        GLOG("It is not possible to clone a component of a different type!");
+    }
 }
 
 void DirectionalLightComponent::Render(float deltaTime)

@@ -14,6 +14,7 @@ class CameraComponent : public Component
     ~CameraComponent() override;
 
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
+    void Clone(const Component* other) override;
 
     void Update() override;
     void Render(float deltaTime) override;

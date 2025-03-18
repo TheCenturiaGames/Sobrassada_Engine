@@ -80,6 +80,26 @@ void MeshComponent::Save(rapidjson::Value& targetState, rapidjson::Document::All
     }
 }
 
+void MeshComponent::Clone(const Component* other)
+{
+    if (other->GetType() == ComponentType::COMPONENT_MESH)
+    {
+        const MeshComponent* otherMesh = static_cast<const MeshComponent*>(other);
+        enabled                        = otherMesh->enabled;
+
+        AddMesh(otherMesh->currentMesh->GetUID());
+        AddMaterial(otherMesh->currentMaterial->GetUID());
+
+        modelUID     = otherMesh->modelUID;
+        skinIndex    = otherMesh->skinIndex;
+        bindMatrices = otherMesh->bindMatrices;
+    }
+    else
+    {
+        GLOG("It is not possible to clone a component of a different type!");
+    }
+}
+
 void MeshComponent::RenderEditorInspector()
 {
     Component::RenderEditorInspector();
@@ -147,6 +167,7 @@ void MeshComponent::Render(float deltaTime)
 
 void MeshComponent::InitSkin()
 {
+    if (bonesUIDs.size() > 0) return;
     for (UID uid : bonesUIDs)
     {
         bones.emplace_back(App->GetSceneModule()->GetGameObjectByUID(uid));
