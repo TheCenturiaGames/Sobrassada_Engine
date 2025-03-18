@@ -16,6 +16,7 @@
 #include "OpenGLModule.h"
 #include "ResourceManagement/Resources/Resource.h"
 #include "ResourceManagement/Resources/ResourceModel.h"
+#include "ResourceManagement/Resources/ResourcePrefab.h"
 #include "ResourcesModule.h"
 #include "Scene/Components/ComponentUtils.h"
 #include "Scene/Components/Standalone/MeshComponent.h"
@@ -97,14 +98,27 @@ void Scene::Init()
         root->UpdateTransformForGOBranch();
     }
 
+    // When loading a scene, overrides all gameObjects that have a prefabUID. That is because if the prefab has been
+    // modified, the scene file may have not, so the prefabs need to be updated when loading the scene again
+    std::vector<UID> prefabs;
+    for (const auto& gameObject : gameObjectsContainer)
+    {
+        if (gameObject.second->GetPrefabUID() == INVALID_UID) continue;
+
+        // Add to prefabs UIDs if not existing, only once each
+        std::vector<UID>::iterator it = std::find(prefabs.begin(), prefabs.end(), gameObject.second->GetPrefabUID());
+        if (it == prefabs.end()) prefabs.emplace_back(gameObject.second->GetPrefabUID());
+    }
+    for (const UID prefab : prefabs)
+    {
+        OverridePrefabs(prefab);
+    }
+
     // Initialize the skinning for all the gameObjects that need it
     for (const auto& gameObject : gameObjectsContainer)
     {
         MeshComponent* mesh = gameObject.second->GetMeshComponent();
-        if (mesh != nullptr)
-        {
-            mesh->InitSkin();
-        }
+        if (mesh != nullptr) mesh->InitSkin();
     }
 
     lightsConfig->InitSkybox();
@@ -192,7 +206,6 @@ void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGa
 
 update_status Scene::Update(float deltaTime)
 {
-
     for (auto& gameObject : gameObjectsContainer)
     {
         std::unordered_map<ComponentType, Component*> componentList = gameObject.second->GetComponents();
@@ -207,7 +220,7 @@ update_status Scene::Update(float deltaTime)
 update_status Scene::Render(float deltaTime) const
 {
     if (!debugShaderOptions[RENDER_WIREFRAME]) lightsConfig->RenderSkybox();
-    lightsConfig->RenderLights();
+    lightsConfig->SetLightsShaderData();
 
     std::vector<GameObject*> objectsToRender;
     CheckObjectsToRender(objectsToRender);
@@ -485,20 +498,31 @@ void Scene::RemoveGameObjectHierarchy(UID gameObjectUID)
     // TODO: Change when filesystem defined
     if (!gameObjectsContainer.count(gameObjectUID) || gameObjectUID == gameObjectRootUID) return;
 
+    std::stack<UID> toDelete;
+    toDelete.push(gameObjectUID);
     GameObject* gameObject = GetGameObjectByUID(gameObjectUID);
-    
-    // 
-    if (gameObject->IsStatic()) SetStaticModified();
-    else SetDynamicModified();
 
-    for (UID childUID : gameObject->GetChildren())
+    std::vector<UID> collectedUIDs;
+
+    // Collect all UIDs to delete
+    while (!toDelete.empty())
     {
-        RemoveGameObjectHierarchy(childUID);
+        UID currentUID = toDelete.top();
+        toDelete.pop();
+
+        GameObject* gameObject = GetGameObjectByUID(currentUID);
+        if (gameObject == nullptr) continue;
+
+        collectedUIDs.push_back(currentUID);
+
+        for (UID childUID : gameObject->GetChildren())
+        {
+            toDelete.push(childUID);
+        }
     }
 
-    UID parentUID = gameObject->GetParent();
-
-    // TODO: change when filesystem defined
+    // Remove from parent
+    UID parentUID = GetGameObjectByUID(gameObjectUID)->GetParent();
     if (gameObjectsContainer.count(parentUID))
     {
         GameObject* parentGameObject = GetGameObjectByUID(parentUID);
@@ -506,24 +530,28 @@ void Scene::RemoveGameObjectHierarchy(UID gameObjectUID)
         selectedGameObjectUID = parentUID;
     }
 
-    // TODO: change when filesystem defined
-    gameObjectsContainer.erase(gameObjectUID);
+    // Delete collected game objects
+    for (UID uid : collectedUIDs)
+    {
+        if (GetGameObjectByUID(uid)->IsStatic()) SetStaticModified();
+        else SetDynamicModified();
 
-    // CARE, WHEN THIS IS CHANGED TO ITERATIVE -> THIS CHECK MUST BE DONE FOR EACH GAME OBJECT BEING DELETED
-    if (gameObject->IsStatic()) SetStaticModified();
-    else SetDynamicModified();
-
-    delete gameObject;
+        delete gameObjectsContainer[uid];
+        gameObjectsContainer.erase(uid);
+    }
 }
 
-const std::unordered_map<UID, Component*> Scene::GetAllComponents() const
+const std::vector<Component*> Scene::GetAllComponents() const
 {
-    std::unordered_map<UID, Component*> collectedComponents;
-    for (auto& pair : gameObjectsContainer)
+    std::vector<Component*> collectedComponents;
+    for (const auto& pair : gameObjectsContainer)
     {
         if (pair.second != nullptr)
         {
-            collectedComponents.insert(pair.second->GetComponents().begin(), pair.second->GetComponents().end());
+            for (const auto& component : pair.second->GetComponents())
+            {
+                collectedComponents.push_back(component.second);
+            }
         }
     }
     return collectedComponents;
@@ -649,24 +677,36 @@ void Scene::LoadModel(const UID modelUID)
         // to be already created
         for (int i = 0; i < nodes.size(); ++i)
         {
-            // If mesh has skin, add the reference here
             if (nodes[i].meshes.size() > 0)
             {
                 GameObject* currentGameObject = gameObjectsArray[i];
                 GLOG("Node %s has %d meshes", nodes[i].name.c_str(), nodes[i].meshes.size());
 
                 unsigned meshNum = 1;
+
                 for (const auto& mesh : nodes[i].meshes)
                 {
-                    GameObject* meshObject = new GameObject(
-                        currentGameObject->GetUID(), currentGameObject->GetName() + " Mesh " + std::to_string(meshNum)
-                    );
-                    ++meshNum;
+                    GameObject* meshObject = nullptr;
+                    if (nodes[i].meshes.size() > 1)
+                    {
+                        meshObject = new GameObject(
+                            currentGameObject->GetUID(),
+                            currentGameObject->GetName() + " Mesh " + std::to_string(meshNum)
+                        );
+                        ++meshNum;
+                    }
+                    else
+                    {
+                        meshObject = currentGameObject;
+                    }
 
                     if (meshObject->CreateComponent(COMPONENT_MESH))
                     {
-                        currentGameObject->AddGameObject(meshObject->GetUID());
-                        AddGameObject(meshObject->GetUID(), meshObject);
+                        if (nodes[i].meshes.size() > 1)
+                        {
+                            currentGameObject->AddGameObject(meshObject->GetUID());
+                            AddGameObject(meshObject->GetUID(), meshObject);
+                        }
 
                         MeshComponent* meshComponent = meshObject->GetMeshComponent();
                         meshComponent->SetModelUID(modelUID);
@@ -697,4 +737,122 @@ void Scene::LoadModel(const UID modelUID)
 
         rootObject->UpdateTransformForGOBranch();
     }
+}
+
+void Scene::LoadPrefab(const UID prefabUID, const ResourcePrefab* prefab, const float4x4& transform)
+{
+    if (prefabUID != INVALID_UID)
+    {
+        std::map<UID, UID> remappingTable; // Reference UID | New GameObject UID
+
+        const ResourcePrefab* resourcePrefab =
+            prefab == nullptr ? (const ResourcePrefab*)App->GetResourcesModule()->RequestResource(prefabUID) : prefab;
+        const std::vector<GameObject*>& referenceObjects = resourcePrefab->GetGameObjectsVector();
+        const std::vector<int>& parentIndices            = resourcePrefab->GetParentIndices();
+
+        std::vector<GameObject*> newObjects;
+        newObjects.push_back(new GameObject(GetGameObjectRootUID(), referenceObjects[0]));
+
+        // If new, always appear at origin. If overriden, stay in place
+        if (prefab != nullptr)
+        {
+            newObjects[0]->SetLocalTransform(transform);
+        }
+        else
+        {
+            // This probably won't be needed when gltfDefaults are there, but for now it is
+            float4x4 newTrans = newObjects[0]->GetLocalTransform();
+            newTrans.SetTranslatePart(float3(0, 0, 0));
+            newObjects[0]->SetLocalTransform(newTrans);
+        }
+
+        // First instantiate all gameObjects and components
+        newObjects[0]->SetPrefabUID(prefabUID);
+        GetGameObjectByUID(GetGameObjectRootUID())->AddGameObject(newObjects[0]->GetUID());
+        AddGameObject(newObjects[0]->GetUID(), newObjects[0]);
+        remappingTable.insert({referenceObjects[0]->GetUID(), newObjects[0]->GetUID()});
+
+        for (int i = 1; i < referenceObjects.size(); ++i)
+        {
+            UID parentUID = newObjects[parentIndices[i]]->GetUID();
+            newObjects.push_back(new GameObject(parentUID, referenceObjects[i]));
+            newObjects[parentIndices[i]]->AddGameObject(newObjects[i]->GetUID());
+            AddGameObject(newObjects[i]->GetUID(), newObjects[i]);
+            remappingTable.insert({referenceObjects[i]->GetUID(), newObjects[i]->GetUID()});
+        }
+
+        // Then do a second loop to update all components UIDs reference (ex. skinning)
+        for (int i = 0; i < newObjects.size(); ++i)
+        {
+            MeshComponent* mesh = referenceObjects[i]->GetMeshComponent();
+            if (mesh != nullptr && mesh->GetBones().size() > 0)
+            {
+                // Remap the bones references
+                const std::vector<UID>& bones = mesh->GetBones();
+                std::vector<UID> newBonesUIDs;
+                std::vector<GameObject*> newBonesObjects;
+
+                for (const UID bone : bones)
+                {
+                    const UID uid = remappingTable.find(bone)->second;
+                    newBonesUIDs.push_back(uid);
+                    newBonesObjects.push_back(GetGameObjectByUID(uid));
+                }
+
+                // This should never be nullptr
+                MeshComponent* newMesh = newObjects[i]->GetMeshComponent();
+                newMesh->SetBones(newBonesObjects, newBonesUIDs);
+            }
+        }
+
+        if (prefab == nullptr) App->GetResourcesModule()->ReleaseResource(resourcePrefab);
+        newObjects[0]->UpdateTransformForGOBranch();
+
+        // Get all scene lights, because if the prefab has lights when creating them they won't be added to the scene,
+        // as the gameObject is still not part of the scene
+        if (lightsConfig != nullptr) lightsConfig->GetAllSceneLights();
+    }
+}
+
+void Scene::OverridePrefabs(const UID prefabUID)
+{
+    const ResourcePrefab* prefab = (const ResourcePrefab*)App->GetResourcesModule()->RequestResource(prefabUID);
+
+    // If prefab is null, it no longer exists, then remove the prefab UID from all objects that may have it
+    if (prefab == nullptr)
+    {
+        for (const auto& gameObject : gameObjectsContainer)
+        {
+            if (gameObject.second != nullptr) gameObject.second->SetPrefabUID(INVALID_UID);
+        }
+        return;
+    }
+
+    // Store uids and transforms. We need transforms so when we override the prefab, the objects
+    // stay in place. UIDs to delete the duplicates
+    std::vector<UID> updatedObjects;
+    std::vector<float4x4> transforms;
+    for (const auto& gameObject : gameObjectsContainer)
+    {
+        if (gameObject.second != nullptr)
+        {
+            if (gameObject.second->GetPrefabUID() == prefabUID)
+            {
+                updatedObjects.push_back(gameObject.first);
+                transforms.emplace_back(gameObject.second->GetGlobalTransform());
+            }
+        }
+    }
+
+    for (const UID object : updatedObjects)
+    {
+        RemoveGameObjectHierarchy(object);
+    }
+
+    for (const float4x4& transform : transforms)
+    {
+        LoadPrefab(prefabUID, prefab, transform);
+    }
+
+    App->GetResourcesModule()->ReleaseResource(prefab);
 }

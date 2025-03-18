@@ -45,8 +45,6 @@ Resource* ResourcesModule::RequestResource(UID uid)
     if (it != resources.end())
     {
         it->second->AddReference();
-        GLOG("Reference count when adding: %d", it->second->GetReferenceCount());
-
         return it->second;
     }
 
@@ -65,7 +63,6 @@ void ResourcesModule::ReleaseResource(const Resource* resource)
             it->second->RemoveReference();
             if (it->second->GetReferenceCount() <= 0)
             {
-                GLOG("Reference count when deleting: %d", it->second->GetReferenceCount());
                 delete it->second;
                 resources.erase(it);
             }
@@ -80,7 +77,6 @@ Resource* ResourcesModule::CreateNewResource(UID uid)
     {
         resources.insert(std::pair(uid, loadedResource));
         loadedResource->AddReference();
-        GLOG("Reference count when creating: %d", loadedResource->GetReferenceCount());
         return loadedResource;
     }
     return nullptr;
@@ -88,9 +84,9 @@ Resource* ResourcesModule::CreateNewResource(UID uid)
 
 void ResourcesModule::UnloadAllResources()
 {
-    //for (auto resource : resources)
-    //{
-    //    delete resource.second;
-    //}
-    //resources.clear();
+    for (auto resource : resources)
+    {
+        delete resource.second;
+    }
+    resources.clear();
 }

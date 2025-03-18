@@ -40,7 +40,7 @@ SpotLightComponent::SpotLightComponent(const rapidjson::Value& initialState) : L
 
 SpotLightComponent::~SpotLightComponent()
 {
-    App->GetSceneModule()->GetLightsConfig()->RemoveSpotLight(uid);
+    App->GetSceneModule()->GetLightsConfig()->RemoveSpotLight(this);
 }
 
 void SpotLightComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
@@ -50,6 +50,27 @@ void SpotLightComponent::Save(rapidjson::Value& targetState, rapidjson::Document
     targetState.AddMember("Range", range, allocator);
     targetState.AddMember("InnerAngle", innerAngle, allocator);
     targetState.AddMember("OuterAngle", outerAngle, allocator);
+}
+
+void SpotLightComponent::Clone(const Component* other)
+{
+    if (other->GetType() == ComponentType::COMPONENT_SPOT_LIGHT)
+    {
+        const SpotLightComponent* otherLight = static_cast<const SpotLightComponent*>(other);
+        enabled                              = otherLight->enabled;
+
+        intensity                            = otherLight->intensity;
+        color                                = otherLight->color;
+        drawGizmos                           = otherLight->drawGizmos;
+
+        range                                = otherLight->range;
+        innerAngle                           = otherLight->innerAngle;
+        outerAngle                           = otherLight->outerAngle;
+    }
+    else
+    {
+        GLOG("It is not possible to clone a component of a different type!");
+    }
 }
 
 void SpotLightComponent::RenderEditorInspector()

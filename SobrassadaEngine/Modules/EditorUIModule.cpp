@@ -210,6 +210,8 @@ void EditorUIModule::Draw()
     if (saveMenu) SaveDialog(saveMenu);
 
     if (editorSettingsMenu) EditorSettings(editorSettingsMenu);
+
+    if (loadPrefab) LoadPrefabDialog(loadPrefab);
 }
 
 void EditorUIModule::MainMenu()
@@ -257,7 +259,10 @@ void EditorUIModule::MainMenu()
             if (ImGui::MenuItem("Load Model"))
             {
                 loadModel = !loadModel;
-                ImGui::OpenPopup(CONSTANT_MODEL_SELECT_DIALOG_ID);
+            }
+            if (ImGui::MenuItem("Load Prefab"))
+            {
+                loadPrefab = !loadPrefab;
             }
             ImGui::EndDisabled();
 
@@ -297,7 +302,6 @@ void EditorUIModule::MainMenu()
 
         ImGui::EndMenu();
     }
-
     ImGui::EndMainMenuBar();
 }
 
@@ -372,7 +376,49 @@ void EditorUIModule::LoadDialog(bool& loadMenu)
     ImGui::End();
 }
 
-void EditorUIModule::LoadModelDialog(bool& loadModel)
+void EditorUIModule::LoadPrefabDialog(bool& loadPrefab) const
+{
+    ImGui::SetNextWindowSize(ImVec2(width * 0.25f, height * 0.4f), ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin("Load Prefab", &loadPrefab, ImGuiWindowFlags_NoCollapse))
+    {
+        ImGui::End();
+        return;
+    }
+
+    static UID prefabUid         = INVALID_UID;
+    static char searchText[255] = "";
+    ImGui::InputText("Search", searchText, 255);
+
+    ImGui::Separator();
+    if (ImGui::BeginListBox("##PrefabsList", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
+    {
+        static int selected = -1;
+        int i               = 0;
+        for (const auto& valuePair : App->GetLibraryModule()->GetPrefabMap())
+        {
+            ++i;
+            if (valuePair.first.find(searchText) != std::string::npos)
+            {
+                if (ImGui::Selectable(valuePair.first.c_str(), selected == i))
+                {
+                    selected = i;
+                    prefabUid = valuePair.second;
+                }
+            }
+        }
+        ImGui::EndListBox();
+    }
+
+    if (ImGui::Button("Ok"))
+    {
+        App->GetSceneModule()->LoadPrefab(prefabUid);
+    }
+
+    ImGui::End();
+}
+
+void EditorUIModule::LoadModelDialog(bool& loadModel) const
 {
     ImGui::SetNextWindowSize(ImVec2(width * 0.25f, height * 0.4f), ImGuiCond_FirstUseEver);
 
