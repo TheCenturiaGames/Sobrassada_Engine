@@ -38,6 +38,13 @@ std::map<std::string, bool> debugShaderOptions = {
     {RENDER_WIREFRAME, false},
 };
 
+//Fuck Intel GPUs
+extern "C"
+{
+    _declspec(dllexport) DWORD NvOptimusEnablement                = 1;
+    _declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+}
+
 int main(int argc, char** argv)
 {
     int mainReturn      = EXIT_SUCCESS;
