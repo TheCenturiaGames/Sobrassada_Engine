@@ -13,6 +13,7 @@
 #include "SceneModule.h"
 #include "WindowModule.h"
 
+
 #include "glew.h"
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
@@ -25,6 +26,7 @@
 #define TINYGLTF_NO_EXTERNAL_IMAGE
 #define TINYGLTF_IMPLEMENTATION /* Only in one of the includes */
 #include <tiny_gltf.h>          // TODO Remove
+#include <TextureImporter.h>
 
 EditorUIModule::EditorUIModule() : width(0), height(0)
 {
@@ -197,6 +199,7 @@ void EditorUIModule::Draw()
 
     MainMenu();
     // ImGui::ShowDemoWindow();
+    ShowTextureLibrary();
 
     if (consoleMenu) Console(consoleMenu);
 
@@ -1516,4 +1519,132 @@ std::string EditorUIModule::FormatWithCommas(unsigned int number) const
     ss.imbue(std::locale("en_US.UTF-8")); // use commas
     ss << number;
     return ss.str();
+}
+
+void EditorUIModule::ShowTextureLibrary()
+{
+    if (!ImGui::Begin("Texture Library"))
+    {
+        ImGui::End();
+        return;
+    }
+
+    const auto& textureMap = App->GetLibraryModule()->GetTextureMap();
+
+    if (textureMap.empty())
+    {
+        ImGui::Text("No textures loaded.");
+        ImGui::End();
+        return;
+    }
+
+    ImGui::Text("Loaded Textures:");
+    ImGui::Separator();
+
+    // Table 4 columns
+    ImGui::Columns(4, "textures", false);
+    ImGui::Text("Name");
+    ImGui::NextColumn();
+    ImGui::Text("Width");
+    ImGui::NextColumn();
+    ImGui::Text("Height");
+    ImGui::NextColumn();
+    ImGui::Text("Memory Size (KB)");
+    ImGui::NextColumn();
+    ImGui::Separator();
+
+    static std::string selectedTextureName  = "";
+    static ResourceTexture* selectedTexture = nullptr;
+
+    for (const auto& [name, textureUID] : textureMap)
+    {
+        ResourceTexture* texture = TextureImporter::LoadTexture(textureUID);
+        if (!texture) continue;
+
+        // Texture info
+        int width  = texture->GetTextureWidth();
+        int height = texture->GetTextureHeight();
+        int sizeKB = (width * height * 4) / 1024; // 4 bytes per píxel (RGBA)
+
+        // Allow to select texture
+        if (ImGui::Selectable(name.c_str(), selectedTextureName == name))
+        {
+            selectedTextureName = name;
+            selectedTexture     = texture;
+        }
+
+        ImGui::NextColumn();
+        ImGui::Text("%d", width);
+        ImGui::NextColumn();
+        ImGui::Text("%d", height);
+        ImGui::NextColumn();
+        ImGui::Text("%d KB", sizeKB);
+        ImGui::NextColumn();
+    }
+
+    ImGui::Columns(1);
+    ImGui::End();
+
+    // Viewport if texture selected
+    if (selectedTexture)
+    {
+        ShowTextureViewport(selectedTexture);
+    }
+}
+
+void EditorUIModule::ShowTextureViewport(ResourceTexture* texture)
+{
+    if (!texture) return;
+
+    if (!ImGui::Begin("Texture Viewport"))
+    {
+        ImGui::End();
+        return;
+    }
+    float fixedSize = 256.0f;
+
+
+    // CUBEMAP
+    //if (texture->IsCubemap())
+    //{
+    //    ImGui::Text("Cubemap Faces:");
+    //    const char* faceNames[6] = {"Right", "Left", "Top", "Bottom", "Front", "Back"};
+
+    //    ImGui::Columns(3);
+    //    for (int i = 0; i < 6; ++i)
+    //    {
+    //        ResourceTexture* faceTexture = texture->GetCubemapFace(i);
+    //        if (!faceTexture) continue;
+
+    //        ImGui::Text("%s", faceNames[i]);
+    //        ImGui::Image(
+    //            faceTexture->GetImGuiTextureID(),
+    //            ImVec2(faceTexture->GetTextureWidth() / 2.0f, faceTexture->GetTextureHeight() / 2.0f)
+    //        );
+    //        ImGui::NextColumn();
+    //    }
+    //    ImGui::Columns(1);
+    //}
+    
+    ImGui::Text("Full Texture:");
+    ImGui::Image(texture->GetTextureID(), ImVec2(fixedSize, fixedSize));
+    ImGui::Separator();
+
+    ImGui::Text("R Channel:");
+    ImGui::Image(texture->GetTextureID(), ImVec2(fixedSize, fixedSize), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 0, 0, 1)
+    );
+
+    ImGui::Text("G Channel:");
+    ImGui::Image(texture->GetTextureID(), ImVec2(fixedSize, fixedSize), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0, 1, 0, 1)
+    );
+
+    ImGui::Text("B Channel:");
+    ImGui::Image(texture->GetTextureID(), ImVec2(fixedSize, fixedSize), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0, 0, 1, 1)
+    );
+
+    ImGui::Text("A Channel (placeholder):");
+    ImGui::Image(texture->GetTextureID(), ImVec2(fixedSize, fixedSize));
+    
+
+    ImGui::End();
 }

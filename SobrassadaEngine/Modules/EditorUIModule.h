@@ -2,10 +2,13 @@
 #include "EngineEditors/EngineEditorBase.h"
 #include "Module.h"
 #include "ResourceManagement/Resources/Resource.h"
+#include "ResourceManagement/Resources/ResourceTexture.h"
+
 #include "EngineEditors/EngineEditorBase.h"
 #include "EngineEditors/Editor/NodeEditor.h"
 
 #include "SDL.h"
+
 #include "imgui_internal.h"
 #include <Math/float3.h>
 #include <Math/float4x4.h>
@@ -104,6 +107,9 @@ class EditorUIModule : public Module
     void Console(bool& consoleMenu) const;
     void About(bool& aboutMenu) const;
     std::string FormatWithCommas(unsigned int number) const;
+
+    void ShowTextureLibrary();
+    void ShowTextureViewport(ResourceTexture* texture);
 
     void LoadModelDialog(bool& loadModel);
 
