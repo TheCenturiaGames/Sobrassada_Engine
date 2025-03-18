@@ -88,9 +88,9 @@ Resource* ResourcesModule::CreateNewResource(UID uid)
 
 void ResourcesModule::UnloadAllResources()
 {
-    for (auto resource : resources)
-    {
-        delete resource.second;
-    }
-    resources.clear();
+    //for (auto resource : resources)
+    //{
+    //    delete resource.second;
+    //}
+    //resources.clear();
 }

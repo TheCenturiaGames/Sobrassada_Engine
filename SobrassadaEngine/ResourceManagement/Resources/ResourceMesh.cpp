@@ -26,37 +26,40 @@ ResourceMesh::ResourceMesh(UID uid, const std::string& name, const float3& maxPo
 
 ResourceMesh::~ResourceMesh()
 {
-    glDeleteBuffers(1, &vbo);
-    glDeleteBuffers(1, &ebo);
-    glDeleteBuffers(1, &vao);
+    if (vao)
+    {
+        glDeleteVertexArrays(1, &vao);
+        vao = 0;
+    }
+
+    if (vbo)
+    {
+        glDeleteBuffers(1, &vbo);
+        vbo = 0;
+    }
+
+    if (ebo)
+    {
+        glDeleteBuffers(1, &ebo);
+        ebo = 0;
+    }
 }
 
 void ResourceMesh::LoadData(
     unsigned int mode, const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices
 )
 {
-    unsigned int bufferSize = sizeof(Vertex);
-    this->mode              = mode;
-    this->vertexCount       = static_cast<unsigned int>(vertices.size());
-    // Store the vertices in bind pose
-    bindPoseVertices        = vertices;
+    this->mode        = mode;
+    this->vertexCount = static_cast<unsigned int>(vertices.size());
+    this->vertices    = vertices;
+    bindPoseVertices  = vertices;
 
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * bufferSize, vertices.data(), GL_STATIC_DRAW);
-
-    if (!indices.empty())
-    {
-        hasIndices       = true;
-        this->indexCount = static_cast<unsigned int>(indices.size());
-
-        glGenBuffers(1, &ebo);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
-    }
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0); // Position
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
@@ -76,11 +79,19 @@ void ResourceMesh::LoadData(
     glEnableVertexAttribArray(5); // Weights
     glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, weights));
 
+    hasIndices = !indices.empty();
+    if (hasIndices)
+    {
+        this->indexCount = static_cast<unsigned int>(indices.size());
+        this->indices    = indices;
+
+        glGenBuffers(1, &ebo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+    }
+
     // Unbind VAO
     glBindVertexArray(0);
-
-    this->vertices = vertices;
-    if (hasIndices) this->indices = indices;
 }
 
 void ResourceMesh::Render(
@@ -150,16 +161,16 @@ void ResourceMesh::Render(
     }
 
     unsigned int meshTriangles = 0;
+    glBindVertexArray(vao);
 
     if (hasIndices && vao)
     {
-        glBindVertexArray(vao);
+
         meshTriangles = indexCount / 3;
         App->GetOpenGLModule()->DrawElements(GL_TRIANGLES, static_cast<GLsizei>(indexCount), GL_UNSIGNED_INT, 0);
     }
     else if (vao)
     {
-        glBindVertexArray(vao);
         meshTriangles = vertexCount / 3;
         App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(vertexCount));
     }

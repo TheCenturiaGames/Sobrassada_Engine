@@ -96,8 +96,10 @@ enum update_status
 
 // SHADER PATHS
 constexpr const char* LIGHTS_VERTEX_SHADER_PATH     = "./EngineDefaults/Shader/Vertex/VertexShader.glsl";
+constexpr const char* SKYBOX_VERTEX_SHADER_PATH     = "./EngineDefaults/Shader/Vertex/SkyboxVertex.glsl";
 
 constexpr const char* UNLIT_FRAGMENT_SHADER_PATH    = "./EngineDefaults/Shader/Fragment/UnlitFragmentShader.glsl";
+constexpr const char* SKYBOX_FRAGMENT_SHADER_PATH   = "./EngineDefaults/Shader/Fragment/SkyboxFragment.glsl";
 constexpr const char* SPECULAR_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader/Fragment/BRDFPhongFragmentShader.glsl";
 constexpr const char* METALLIC_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader/Fragment/BRDFCookTorranceShader.glsl";
 
