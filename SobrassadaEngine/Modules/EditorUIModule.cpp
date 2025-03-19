@@ -26,23 +26,6 @@
 #define TINYGLTF_IMPLEMENTATION /* Only in one of the includes */
 #include <tiny_gltf.h>          // TODO Remove
 
-const CPUFeature features[] = {
-    {SDL_HasRDTSC,   "RDTSC"  },
-    {SDL_HasAltiVec, "AltiVec"},
-    {SDL_HasMMX,     "MMX"    },
-    {SDL_Has3DNow,   "3DNow"  },
-    {SDL_HasSSE,     "SSE"    },
-    {SDL_HasSSE2,    "SSE2"   },
-    {SDL_HasSSE3,    "SSE3"   },
-    {SDL_HasSSE41,   "SSE41"  },
-    {SDL_HasSSE42,   "SSE42"  },
-    {SDL_HasAVX,     "AVX"    },
-    {SDL_HasAVX2,    "AVX2"   },
-    {SDL_HasAVX512F, "AVX512F"},
-    {SDL_HasARMSIMD, "ARMSIMD"},
-    {SDL_HasNEON,    "NEON"   }
-};
-
 EditorUIModule::EditorUIModule() : width(0), height(0)
 {
     fullscreen    = FULLSCREEN;
@@ -1484,6 +1467,23 @@ void EditorUIModule::HardwareConfig() const
 
 void EditorUIModule::ShowCaps() const
 {
+    const CPUFeature features[] = {
+        {SDL_HasRDTSC,   "RDTSC"  },
+        {SDL_HasAltiVec, "AltiVec"},
+        {SDL_HasMMX,     "MMX"    },
+        {SDL_Has3DNow,   "3DNow"  },
+        {SDL_HasSSE,     "SSE"    },
+        {SDL_HasSSE2,    "SSE2"   },
+        {SDL_HasSSE3,    "SSE3"   },
+        {SDL_HasSSE41,   "SSE41"  },
+        {SDL_HasSSE42,   "SSE42"  },
+        {SDL_HasAVX,     "AVX"    },
+        {SDL_HasAVX2,    "AVX2"   },
+        {SDL_HasAVX512F, "AVX512F"},
+        {SDL_HasARMSIMD, "ARMSIMD"},
+        {SDL_HasNEON,    "NEON"   }
+    };
+
     int cont = 0;
     for (const auto& feature : features)
     {
