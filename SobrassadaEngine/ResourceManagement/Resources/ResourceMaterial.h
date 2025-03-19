@@ -1,9 +1,11 @@
 ﻿#pragma once
 
 #include "Resource.h"
-#include "FileSystem/Material.h"
 
+#include <Math/float3.h>
 #include <Math/float4.h>
+
+class Material;
 
 namespace tinygltf
 {
@@ -20,17 +22,19 @@ struct TextureInfo
 
 struct MaterialGPU
 {
-    float4 diffColor     = {1.0f, 0.0f, 0.0f, 1.0f};
-    float3 specColor     = {1.0f, 0.0f, 0.0f};
-    float shininess      = 500.0f;
+    float4 diffColor      = {1.0f, 0.0f, 0.0f, 1.0f};
+    float3 specColor      = {1.0f, 0.0f, 0.0f};
+    float shininess       = 500.0f;
     bool shininessInAlpha = false;
     float metallicFactor  = 1.0f;
     float roughnessFactor = 1.0f;
-    UID diffuseTex = 0;
-    UID specularTex = 0;
-    UID metallicTex = 0;
-    UID normalTex = 0;
+    UID diffuseTex        = 0;
+    UID specularTex       = 0;
+    UID metallicTex       = 0;
+    UID normalTex         = 0;
 };
+
+class Material;
 
 class ResourceMaterial : public Resource
 {

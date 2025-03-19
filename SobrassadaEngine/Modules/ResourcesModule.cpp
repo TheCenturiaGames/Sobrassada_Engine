@@ -8,6 +8,8 @@
 #include "ResourceManagement/Resources/ResourceTexture.h"
 #include "SceneModule.h"
 #include "ShaderModule.h"
+//test
+#include "Globals.h"
 
 #include <Algorithm/Random/LCG.h> // TODO: LCG remove includes
 
@@ -43,7 +45,6 @@ Resource* ResourcesModule::RequestResource(UID uid)
     if (it != resources.end())
     {
         it->second->AddReference();
-
         return it->second;
     }
 
@@ -79,4 +80,13 @@ Resource* ResourcesModule::CreateNewResource(UID uid)
         return loadedResource;
     }
     return nullptr;
+}
+
+void ResourcesModule::UnloadAllResources()
+{
+    for (auto resource : resources)
+    {
+        delete resource.second;
+    }
+    resources.clear();
 }

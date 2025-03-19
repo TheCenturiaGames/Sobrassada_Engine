@@ -15,12 +15,14 @@ class Component
     virtual ~Component() = default;
 
     virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
+    virtual void Clone(const Component* other)  = 0;
 
     virtual void Update(float deltaTime) = 0;
     virtual void Render(float deltaTime) = 0;
     virtual void RenderEditorInspector();
 
     UID GetUID() const { return uid; }
+    UID GetParentUID() const { return parentUID; }
 
     const AABB& GetLocalAABB() const { return localComponentAABB; }
 
@@ -28,6 +30,7 @@ class Component
     const char* GetName() const { return name; }
 
     const float4x4& GetGlobalTransform();
+
 
   protected:
     GameObject* GetParent();

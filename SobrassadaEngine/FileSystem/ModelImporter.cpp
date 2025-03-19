@@ -1,8 +1,10 @@
 #include "ModelImporter.h"
 
 #include "Application.h"
+#include "FileSystem.h"
 #include "LibraryModule.h"
 #include "MetaModel.h"
+#include "Model.h"
 #include "ProjectModule.h"
 #include "ResourceManagement/Resources/ResourceModel.h"
 
@@ -10,6 +12,7 @@
 #include "Math/float4x4.h"
 #include "prettywriter.h"
 #include "stringbuffer.h"
+#include <tiny_gltf.h>
 
 namespace ModelImporter
 {
@@ -74,9 +77,9 @@ namespace ModelImporter
         UID finalModelUID;
         if (sourceUID == INVALID_UID)
         {
-            UID modelUID              = GenerateUID();
-            finalModelUID             = App->GetLibraryModule()->AssignFiletypeUID(modelUID, FileType::Model);
-            
+            UID modelUID  = GenerateUID();
+            finalModelUID = App->GetLibraryModule()->AssignFiletypeUID(modelUID, FileType::Model);
+
             MetaModel meta(finalModelUID, assetPath);
             meta.Save(modelName, assetPath);
         }
@@ -168,7 +171,8 @@ namespace ModelImporter
         rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
         doc.Accept(writer);
 
-        std::string saveFilePath  = App->GetProjectModule()->GetLoadedProjectPath() + MODELS_LIB_PATH + std::to_string(finalModelUID) + MODEL_EXTENSION;
+        std::string saveFilePath = App->GetProjectModule()->GetLoadedProjectPath() + MODELS_LIB_PATH +
+                                   std::to_string(finalModelUID) + MODEL_EXTENSION;
         unsigned int bytesWritten = (unsigned int
         )FileSystem::Save(saveFilePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
         if (bytesWritten == 0)
@@ -197,7 +201,9 @@ namespace ModelImporter
         return finalModelUID;
     }
 
-    void CopyModel(const std::string& filePath, const std::string& targetFilePath, const std::string& name, const UID sourceUID)
+    void CopyModel(
+        const std::string& filePath, const std::string& targetFilePath, const std::string& name, const UID sourceUID
+    )
     {
         std::string destination = targetFilePath + MODELS_LIB_PATH + std::to_string(sourceUID) + MODEL_EXTENSION;
         FileSystem::Copy(filePath.c_str(), destination.c_str());

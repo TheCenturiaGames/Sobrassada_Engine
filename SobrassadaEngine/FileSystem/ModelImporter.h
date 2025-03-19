@@ -1,13 +1,18 @@
 #pragma once
 
-#include "FileSystem.h"
-#include "Model.h"
-#include "ResourceManagement/Resources/ResourceModel.h"
+#include "Globals.h"
 
-#include "Math/float4x4.h"
-#include "tiny_gltf.h"
+#include <string>
+#include <vector>
+
+namespace tinygltf
+{
+    class Model;
+    class Node;
+} // namespace tinygltf
 
 class ResourceModel;
+struct NodeData;
 
 namespace ModelImporter
 {
@@ -15,7 +20,9 @@ namespace ModelImporter
         const tinygltf::Model& model, const std::vector<std::vector<std::pair<UID, UID>>>& meshesUIDs,
         const char* filePath, const std::string& targetFilePath, const UID sourceUID = INVALID_UID
     );
-    void CopyModel(const std::string& filePath, const std::string& targetFilePath, const std::string& name, const UID sourceUID);
+    void CopyModel(
+        const std::string& filePath, const std::string& targetFilePath, const std::string& name, const UID sourceUID
+    );
     ResourceModel* LoadModel(UID modelUID);
     void FillNodes(
         const std::vector<tinygltf::Node>& nodesList, int nodeId, int parentId,

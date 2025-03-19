@@ -14,6 +14,7 @@ class CharacterControllerComponent : public Component
     void Render(float deltaTime) override;
     void RenderEditorInspector() override;
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
+    void Clone(const Component* other) override;
 
     void Move(const float3& direction, float deltaTime);
     void Rotate(float rotationDirection, float deltaTime);

@@ -165,7 +165,7 @@ void main()
 
     vec3 N = normalize(normal);
     // Retrive normal for normal map
-    if (normalTex != 0) {
+    if (normalTex.r != 0 || normalTex.g != 0) {
         mat3 space = CreateTBN();
         vec3 texNormal = (texture(sampler2D(normalTex), uv0).xyz*2.0-1.0);
         vec3 final_normal = space * texNormal;

@@ -1,6 +1,7 @@
 #include "RaycastController.h"
 
 #include "Application.h"
+#include "FileSystem/Mesh.h"
 #include "GameObject.h"
 #include "SceneModule.h"
 #include "Standalone/MeshComponent.h"

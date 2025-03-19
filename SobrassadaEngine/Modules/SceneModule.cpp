@@ -1,8 +1,10 @@
 #include "SceneModule.h"
 
+#include "Application.h"
 #include "ComponentUtils.h"
 #include "EditorUIModule.h"
 #include "FileSystem.h"
+#include "InputModule.h"
 #include "LibraryModule.h"
 #include "Octree.h"
 #include "Quadtree.h"
@@ -10,10 +12,10 @@
 #include "Application.h"
 #include "InputModule.h"
 #include "RaycastController.h"
+#include "ResourcesModule.h"
 #include "Config/EngineConfig.h"
 
 #include <filesystem>
-#include <tiny_gltf.h>
 
 SceneModule::SceneModule()
 {
@@ -153,6 +155,7 @@ void SceneModule::CloseScene()
     // TODO Warning dialog before closing scene without saving
     delete loadedScene;
     loadedScene = nullptr;
+    if (App->GetResourcesModule() != nullptr) App->GetResourcesModule()->UnloadAllResources();
 }
 
 void SceneModule::SwitchPlayMode(bool play)

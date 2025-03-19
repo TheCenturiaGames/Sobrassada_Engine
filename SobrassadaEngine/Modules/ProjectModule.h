@@ -3,6 +3,7 @@
 #include "Config/ProjectConfig.h"
 
 #include <string>
+#include <vector>
 
 class ProjectModule : public Module
 {
@@ -31,7 +32,7 @@ class ProjectModule : public Module
 
   private:
     char engineWorkingDirectory[255];
-    
+
     bool projectReloadRequested      = false;
     bool projectLoaded               = false;
     bool showCreateProjectFileDialog = false;
@@ -41,6 +42,9 @@ class ProjectModule : public Module
     std::string loadedProjectName    = "No project loaded";
     std::string loadedProjectAbsolutePath;
     std::vector<char*> previouslyLoadedProjects;
+
+    char newProjectPath[255];
+    char newProjectName[255];
 
     ProjectConfig* projectConfig = nullptr;
 

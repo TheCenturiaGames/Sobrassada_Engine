@@ -67,21 +67,22 @@ class LightsConfig
     LightsConfig();
     ~LightsConfig();
 
-    void EditorParams();
+    void EditorParams(bool& lightConfig);
 
     void InitSkybox();
     void RenderSkybox() const;
 
     void InitLightBuffers();
-    void RenderLights() const;
+    void SetLightsShaderData() const;
+    void GetAllSceneLights();
 
     void AddDirectionalLight(DirectionalLightComponent* newDirectional);
     void AddPointLight(PointLightComponent* newPoint);
     void AddSpotLight(SpotLightComponent* newSpot);
 
-    void RemoveDirectionalLight();
-    void RemovePointLight(UID pointUid);
-    void RemoveSpotLight(UID spotUid);
+    void RemoveDirectionalLight(DirectionalLightComponent* directional);
+    void RemovePointLight(PointLightComponent* point);
+    void RemoveSpotLight(SpotLightComponent* spot);
 
     void SaveData(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
     void LoadData(const rapidjson::Value& lights);
@@ -89,27 +90,27 @@ class LightsConfig
   private:
     unsigned int LoadSkyboxTexture(UID cubemapUID);
 
-    void GetAllSceneLights();
-    void GetAllPointLights(const std::unordered_map<UID, Component*>& components);
-    void GetAllSpotLights(const std::unordered_map<UID, Component*>& components);
-    void GetDirectionalLight(const std::unordered_map<UID, Component*>& components);
+    void GetAllPointLights(const std::vector<Component*>& components);
+    void GetAllSpotLights(const std::vector<Component*>& components);
+    void GetDirectionalLight(const std::vector<Component*>& components);
 
     void SetDirectionalLightShaderData() const;
     void SetPointLightsShaderData() const;
     void SetSpotLightsShaderData() const;
 
   private:
-    UID skyboxUID;
-    unsigned int skyboxVbo;
-    unsigned int skyboxVao;
-    unsigned int skyboxTexture;
-    unsigned int skyboxProgram;
+    UID skyboxUID              = 0;
+    unsigned int skyboxVbo     = 0;
+    unsigned int skyboxVao     = 0;
+    unsigned int skyboxTexture = 0;
+    unsigned int skyboxProgram = 0;
+
     float3 ambientColor;
     float ambientIntensity;
-    unsigned int directionalBufferId;
-    unsigned int ambientBufferId;
-    unsigned int pointBufferId;
-    unsigned int spotBufferId;
+    unsigned int directionalBufferId            = 0;
+    unsigned int ambientBufferId                = 0;
+    unsigned int pointBufferId                  = 0;
+    unsigned int spotBufferId                   = 0;
 
     DirectionalLightComponent* directionalLight = nullptr;
     std::vector<PointLightComponent*> pointLights;

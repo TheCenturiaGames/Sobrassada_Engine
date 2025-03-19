@@ -12,6 +12,9 @@
 #include "SceneImporter.h"
 #include "SceneModule.h"
 #include "WindowModule.h"
+#include "TextureLibraryEditor.h"
+#include <TextureImporter.h>
+
 
 #include "glew.h"
 #include "imgui.h"
@@ -20,14 +23,24 @@
 #include <cstring>
 #include <filesystem>
 #include <string>
-#define TINYGLTF_NO_STB_IMAGE_WRITE
-#define TINYGLTF_NO_STB_IMAGE
-#define TINYGLTF_NO_EXTERNAL_IMAGE
-#define TINYGLTF_IMPLEMENTATION /* Only in one of the includes */
-#include <tiny_gltf.h>          // TODO Remove
+
 
 EditorUIModule::EditorUIModule() : width(0), height(0)
 {
+    standaloneComponents = {
+        {"Mesh",              COMPONENT_MESH             },
+        {"Point Light",       COMPONENT_POINT_LIGHT      },
+        {"Spot Light",        COMPONENT_SPOT_LIGHT       },
+        {"Directional Light", COMPONENT_DIRECTIONAL_LIGHT},
+        {"Character Controller", COMPONENT_CHARACTER_CONTROLLER},
+        {"Camera",            COMPONENT_CAMERA           }
+    };
+    fullscreen    = FULLSCREEN;
+    full_desktop  = FULL_DESKTOP;
+    borderless    = BORDERLESS;
+    resizable     = RESIZABLE;
+    frontFaceMode = GL_CCW;
+    vsync         = VSYNC;
 }
 
 EditorUIModule::~EditorUIModule()
@@ -37,6 +50,7 @@ EditorUIModule::~EditorUIModule()
         delete values.second;
     }
     openEditors.clear();
+    standaloneComponents.clear();
 }
 
 bool EditorUIModule::Init()
@@ -44,17 +58,18 @@ bool EditorUIModule::Init()
     ImGuiContext* context = ImGui::CreateContext();
     ImGuizmo::SetImGuiContext(context);
     ImGuiIO& io     = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // IF using Docking Branch
+    io.ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;      // IF using Docking Branch
 
     ImGui_ImplSDL2_InitForOpenGL(App->GetWindowModule()->window, App->GetOpenGLModule()->GetContext());
     ImGui_ImplOpenGL3_Init("#version 460");
 
-    width      = App->GetWindowModule()->GetWidth();
-    height     = App->GetWindowModule()->GetHeight();
+    width                 = App->GetWindowModule()->GetWidth();
+    height                = App->GetWindowModule()->GetHeight();
 
-    scenesPath = App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PATH;
+    scenesPath            = App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PATH;
+    fileDialogCurrentPath = App->GetProjectModule()->GetLoadedProjectPath();
 
     return true;
 }
@@ -67,7 +82,6 @@ update_status EditorUIModule::PreUpdate(float deltaTime)
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
     ImGuizmo::BeginFrame();
-
     // ImGuizmo::SetOrthographic(false);
     // ImGuizmo::AllowAxisFlip(false);
     // ImGuizmo::SetPlaneLimit(0);
@@ -188,8 +202,8 @@ void EditorUIModule::AddFramePlotData(float deltaTime)
 {
     if (deltaTime == 0) return;
 
-    float newFrametime = deltaTime * 1000.f;
-    float newFramerate = 1.f / deltaTime;
+    const float newFrametime = deltaTime * 1000.f;
+    const float newFramerate = 1.f / deltaTime;
 
     if (frametime.size() < maximumPlotData)
     {
@@ -222,6 +236,8 @@ void EditorUIModule::Draw()
 
     if (loadModel) LoadModelDialog(loadModel);
 
+    if (loadPrefab) LoadPrefabDialog(loadPrefab);
+
     if (saveMenu) SaveDialog(saveMenu);
 
     if (editorSettingsMenu) EditorSettings(editorSettingsMenu);
@@ -231,8 +247,8 @@ void EditorUIModule::MainMenu()
 {
     ImGui::BeginMainMenuBar();
 
-    bool sceneLoaded = App->GetSceneModule()->IsSceneLoaded();
-    bool inPlayMode  = App->GetSceneModule()->GetInPlayMode();
+    const bool sceneLoaded = App->GetSceneModule()->IsSceneLoaded();
+    const bool inPlayMode  = App->GetSceneModule()->GetInPlayMode();
 
     // File tab menu
     if (ImGui::BeginMenu("File"))
@@ -269,11 +285,9 @@ void EditorUIModule::MainMenu()
         if (ImGui::BeginMenu("Resource Loader"))
         {
             ImGui::BeginDisabled(!sceneLoaded);
-            if (ImGui::MenuItem("Load Model"))
-            {
-                loadModel = !loadModel;
-                ImGui::OpenPopup(CONSTANT_MODEL_SELECT_DIALOG_ID);
-            }
+            if (ImGui::MenuItem("Load Model", "", loadModel)) loadModel = !loadModel;
+
+            if (ImGui::MenuItem("Load Prefab", "", loadPrefab)) loadPrefab = !loadPrefab;
             ImGui::EndDisabled();
 
             ImGui::EndMenu();
@@ -293,18 +307,24 @@ void EditorUIModule::MainMenu()
             if (ImGui::MenuItem("Editor Control", "", editorControlMenu)) editorControlMenu = !editorControlMenu;
             if (ImGui::MenuItem("Hierarchy", "", hierarchyMenu)) hierarchyMenu = !hierarchyMenu;
             if (ImGui::MenuItem("Inspector", "", inspectorMenu)) inspectorMenu = !inspectorMenu;
+            if (ImGui::MenuItem("Lights Config", "", lightConfig)) lightConfig = !lightConfig;
             ImGui::EndDisabled();
 
             ImGui::EndMenu();
         }
 
-        if (ImGui::BeginMenu("Engine Editor Window"))
+       if (ImGui::BeginMenu("Engine Editor Window"))
         {
-
             if (ImGui::MenuItem("Mockup Base Engine Editor", "")) OpenEditor(CreateEditor(EditorType::BASE));
+
             if (ImGui::MenuItem("Node Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::NODE));
+
+            if (ImGui::MenuItem("Texture Library"))               OpenEditor(new TextureLibraryEditor("Texture Library", GenerateUID()));
+
             ImGui::EndMenu();
         }
+
+
 
         if (ImGui::MenuItem("Editor settings", "", editorSettingsMenu)) editorSettingsMenu = !editorSettingsMenu;
 
@@ -312,7 +332,6 @@ void EditorUIModule::MainMenu()
 
         ImGui::EndMenu();
     }
-
     ImGui::EndMainMenuBar();
 }
 
@@ -326,27 +345,21 @@ void EditorUIModule::LoadDialog(bool& loadMenu)
         return;
     }
 
-    static std::string inputFile = "";
-    static std::vector<std::string> files;
-
     ImGui::BeginChild("scrollFiles", ImVec2(0, -30), ImGuiChildFlags_Borders);
 
     if (FileSystem::Exists(scenesPath.c_str()))
     {
-        // Only scenes library folder for now
-        if (ImGui::TreeNodeEx("Scenes/", ImGuiTreeNodeFlags_DefaultOpen))
+        if (ImGui::TreeNodeEx("Scenes", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            FileSystem::GetFilesSorted(scenesPath, files);
+            FileSystem::GetFilesSorted(scenesPath, filesLoad);
 
-            static int selected = -1;
-
-            for (int i = 0; i < files.size(); i++)
+            for (int i = 0; i < filesLoad.size(); i++)
             {
-                const std::string& file = files[i];
-                if (ImGui::Selectable(file.c_str(), selected == i))
+                const std::string& file = filesLoad[i];
+                if (ImGui::Selectable(file.c_str(), selectedLoad == i))
                 {
-                    selected  = i;
-                    inputFile = file;
+                    selectedLoad  = i;
+                    inputFileLoad = file;
                 }
             }
 
@@ -356,35 +369,76 @@ void EditorUIModule::LoadDialog(bool& loadMenu)
 
     ImGui::EndChild();
 
-    ImGui::InputText("##filename", &inputFile[0], inputFile.size(), ImGuiInputTextFlags_ReadOnly);
+    ImGui::InputText("##filename", &inputFileLoad[0], inputFileLoad.size(), ImGuiInputTextFlags_ReadOnly);
 
     ImGui::SameLine();
 
     if (ImGui::Button("Ok", ImVec2(0, 0)))
     {
-        if (!inputFile.empty())
+        if (!inputFileLoad.empty())
         {
-            App->GetLibraryModule()->LoadScene(inputFile.c_str());
+            App->GetLibraryModule()->LoadScene(inputFileLoad.c_str());
         }
-        inputFile = "";
-        loadMenu  = false;
+        loadMenu = false;
     }
 
     ImGui::SameLine();
 
-    if (ImGui::Button("Cancel", ImVec2(0, 0)))
-    {
-        inputFile = "";
-        loadMenu  = false;
-    }
+    if (ImGui::Button("Cancel", ImVec2(0, 0))) loadMenu = false;
+
+    ImGui::End();
 
     if (!loadMenu)
     {
-        files.clear();
-        files.shrink_to_fit();
+        filesLoad.clear();
+        filesLoad.shrink_to_fit();
+        selectedLoad  = -1;
+        inputFileLoad = "";
+    }
+}
+
+void EditorUIModule::LoadPrefabDialog(bool& loadPrefab)
+{
+    ImGui::SetNextWindowSize(ImVec2(width * 0.25f, height * 0.4f), ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin("Load Prefab", &loadPrefab, ImGuiWindowFlags_NoCollapse))
+    {
+        ImGui::End();
+        return;
     }
 
+    ImGui::InputText("Search", searchTextPrefab, IM_ARRAYSIZE(searchTextPrefab));
+
+    ImGui::Separator();
+    if (ImGui::BeginListBox("##PrefabsList", ImVec2(-FLT_MIN, -40)))
+    {
+        int i = 0;
+        for (const auto& valuePair : App->GetLibraryModule()->GetPrefabMap())
+        {
+            ++i;
+            if (valuePair.first.find(searchTextPrefab) != std::string::npos)
+            {
+                if (ImGui::Selectable(valuePair.first.c_str(), selectedPrefab == i))
+                {
+                    selectedPrefab = i;
+                    prefabUID      = valuePair.second;
+                }
+            }
+        }
+        ImGui::EndListBox();
+    }
+
+    ImGui::Dummy(ImVec2(0, 3));
+
+    if (ImGui::Button("Ok", ImVec2(0, 0))) App->GetSceneModule()->LoadPrefab(prefabUID);
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Cancel", ImVec2(0, 0))) loadPrefab = false;
+
     ImGui::End();
+
+    if (!loadPrefab) searchTextPrefab[0] = '\0';
 }
 
 void EditorUIModule::LoadModelDialog(bool& loadModel)
@@ -397,36 +451,38 @@ void EditorUIModule::LoadModelDialog(bool& loadModel)
         return;
     }
 
-    static UID modelUid         = INVALID_UID;
-    static char searchText[255] = "";
-    ImGui::InputText("Search", searchText, 255);
+    ImGui::InputText("Search", searchTextModel, IM_ARRAYSIZE(searchTextModel));
 
     ImGui::Separator();
-    if (ImGui::BeginListBox("##ModelsList", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
+    if (ImGui::BeginListBox("##ModelsList", ImVec2(-FLT_MIN, -40)))
     {
-        static int selected = -1;
-        int i               = 0;
+        int i = 0;
         for (const auto& valuePair : App->GetLibraryModule()->GetModelMap())
         {
             ++i;
-            if (valuePair.first.find(searchText) != std::string::npos)
+            if (valuePair.first.find(searchTextModel) != std::string::npos)
             {
-                if (ImGui::Selectable(valuePair.first.c_str(), selected == i))
+                if (ImGui::Selectable(valuePair.first.c_str(), selectedModel == i))
                 {
-                    selected = i;
-                    modelUid = valuePair.second;
+                    selectedModel = i;
+                    modelUID      = valuePair.second;
                 }
             }
         }
         ImGui::EndListBox();
     }
 
-    if (ImGui::Button("Ok"))
-    {
-        App->GetSceneModule()->LoadModel(modelUid);
-    }
+    ImGui::Dummy(ImVec2(0, 3));
+
+    if (ImGui::Button("Ok", ImVec2(0, 0))) App->GetSceneModule()->LoadModel(modelUID);
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Cancel", ImVec2(0, 0))) loadModel = false;
 
     ImGui::End();
+
+    if (!loadModel) searchTextModel[0] = '\0';
 }
 
 void EditorUIModule::SaveDialog(bool& saveMenu)
@@ -439,20 +495,17 @@ void EditorUIModule::SaveDialog(bool& saveMenu)
         return;
     }
 
-    static std::vector<std::string> files;
-    static char inputFile[32];
-
     ImGui::BeginChild("scrollFiles", ImVec2(0, -30), ImGuiChildFlags_Borders);
 
     if (FileSystem::Exists(scenesPath.c_str()))
     {
-        if (ImGui::TreeNodeEx("Scenes/", ImGuiTreeNodeFlags_DefaultOpen))
+        if (ImGui::TreeNodeEx("Scenes", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            FileSystem::GetFilesSorted(scenesPath, files);
+            FileSystem::GetFilesSorted(scenesPath, filesSave);
 
-            for (int i = 0; i < files.size(); i++)
+            for (int i = 0; i < filesSave.size(); i++)
             {
-                const std::string& file = files[i];
+                const std::string& file = filesSave[i];
                 if (ImGui::Selectable(file.c_str()))
                 {
                 }
@@ -464,40 +517,35 @@ void EditorUIModule::SaveDialog(bool& saveMenu)
 
     ImGui::EndChild();
 
-    ImGui::InputText("##filename", inputFile, IM_ARRAYSIZE(inputFile));
+    ImGui::InputText("##filename", inputFileSave, IM_ARRAYSIZE(inputFileSave));
 
     ImGui::SameLine();
 
     if (ImGui::Button("Ok", ImVec2(0, 0)))
     {
-        if (strlen(inputFile) > 0)
+        if (strlen(inputFileSave) > 0)
         {
-            std::string savePath = scenesPath + inputFile + SCENE_EXTENSION;
+            std::string savePath = scenesPath + inputFileSave + SCENE_EXTENSION;
             App->GetLibraryModule()->SaveScene(savePath.c_str(), SaveMode::SaveAs);
         }
-        inputFile[0] = '\0';
-        saveMenu     = false;
+        saveMenu = false;
     }
 
     ImGui::SameLine();
 
-    if (ImGui::Button("Cancel", ImVec2(0, 0)))
-    {
-        inputFile[0] = '\0';
-        saveMenu     = false;
-    }
+    if (ImGui::Button("Cancel", ImVec2(0, 0))) saveMenu = false;
+
+    ImGui::End();
 
     if (!saveMenu)
     {
-        files.clear();
-        files.shrink_to_fit();
+        filesSave.clear();
+        filesSave.shrink_to_fit();
+        inputFileSave[0] = '\0';
     }
-
-
-    ImGui::End();
 }
 
-std::string EditorUIModule::RenderFileDialog(bool& window, const char* windowTitle, bool selectFolder) const
+std::string EditorUIModule::RenderFileDialog(bool& window, const char* windowTitle, bool selectFolder)
 {
     ImGui::SetNextWindowSize(ImVec2(width * 0.4f, height * 0.4f), ImGuiCond_FirstUseEver);
 
@@ -507,23 +555,11 @@ std::string EditorUIModule::RenderFileDialog(bool& window, const char* windowTit
         return "";
     }
 
-    static std::string currentPath = App->GetProjectModule()->GetLoadedProjectPath();
-    if (currentPath == "") currentPath = "C:";
-    static std::vector<std::string> accPaths;
-    static bool loadButtons = true;
-
-    static std::vector<std::string> files;
-    static bool loadFiles = false;
-    static std::vector<std::string> filteredFiles;
-    static bool loadFilteredFiles = false;
-
-    static char searchQuery[32];
-    static char lastQuery[32] = "default";
-    static bool showDrives    = false;
+    if (fileDialogCurrentPath == "") fileDialogCurrentPath = "C:";
 
     if (ImGui::Button("Drives"))
     {
-        FileSystem::GetDrives(files);
+        FileSystem::GetDrives(filesFileDialog);
         showDrives = true;
     }
 
@@ -536,23 +572,24 @@ std::string EditorUIModule::RenderFileDialog(bool& window, const char* windowTit
 
         if (loadButtons)
         {
-            FileSystem::SplitAccumulatedPath(currentPath, accPaths);
+            FileSystem::SplitAccumulatedPath(fileDialogCurrentPath, accPaths);
             loadButtons = false;
         }
 
         for (size_t i = 0; i < accPaths.size(); i++)
         {
-            const std::string& accPath = accPaths[i];
+            const std::string& accPath     = accPaths[i];
 
-            std::string buttonLabel    = (i == 0) ? accPath : FileSystem::GetFileNameWithExtension(accPath);
+            const std::string& buttonLabel = (i == 0) ? accPath : FileSystem::GetFileNameWithExtension(accPath);
 
             if (ImGui::Button(buttonLabel.c_str()))
             {
-                currentPath    = accPath;
-                showDrives     = false;
-                loadFiles      = true;
-                loadButtons    = true;
-                searchQuery[0] = '\0';
+                fileDialogCurrentPath    = accPath;
+                showDrives               = false;
+                doLoadFiles              = true;
+                loadButtons              = true;
+                searchQueryFileDialog[0] = '\0';
+                FileSystem::SplitAccumulatedPath(fileDialogCurrentPath, accPaths);
             }
 
             if (i < accPaths.size() - 1) ImGui::SameLine();
@@ -563,49 +600,48 @@ std::string EditorUIModule::RenderFileDialog(bool& window, const char* windowTit
 
     ImGui::Text("Search:");
     ImGui::SameLine();
-    ImGui::InputText("##search", searchQuery, IM_ARRAYSIZE(searchQuery));
-
-    static std::string inputFile = "";
+    ImGui::InputText("##search", searchQueryFileDialog, IM_ARRAYSIZE(searchQueryFileDialog));
 
     ImGui::BeginChild("scrollFiles", ImVec2(0, -70), ImGuiChildFlags_Borders);
 
     if (showDrives)
     {
-        for (const std::string& drive : files)
+        for (const std::string& drive : filesFileDialog)
         {
             if (ImGui::Selectable(drive.c_str()))
             {
-                currentPath = drive;
-                showDrives  = false;
-                loadFiles   = true;
-                loadButtons = true;
+                fileDialogCurrentPath = drive;
+                showDrives            = false;
+                doLoadFiles           = true;
+                loadButtons           = true;
             }
         }
     }
     else
     {
         // root directory add delimiter
-        if (currentPath.back() == ':') currentPath += DELIMITER;
+        if (fileDialogCurrentPath.back() == ':') fileDialogCurrentPath += DELIMITER;
 
-        if (files.empty() || loadFiles)
+        if (filesFileDialog.empty() || doLoadFiles)
         {
-            FileSystem::GetFilesSorted(currentPath, files);
+            FileSystem::GetFilesSorted(fileDialogCurrentPath, filesFileDialog);
 
-            files.insert(files.begin(), "..");
+            if (accPaths.size() > 1) filesFileDialog.insert(filesFileDialog.begin(), "..");
 
-            loadFiles         = false;
+            doLoadFiles       = false;
             loadFilteredFiles = true;
         }
 
-        if (strcmp(lastQuery, searchQuery) != 0 || loadFilteredFiles) // if the search query has changed
+        if (strcmp(lastQueryFileDialog, searchQueryFileDialog) != 0 ||
+            loadFilteredFiles) // if the search query has changed
         {
-            strcpy_s(lastQuery, searchQuery);
+            strcpy_s(lastQueryFileDialog, searchQueryFileDialog);
 
             filteredFiles.clear();
 
-            for (const std::string& file : files)
+            for (const std::string& file : filesFileDialog)
             {
-                if (file.find(searchQuery) != std::string::npos)
+                if (file.find(searchQueryFileDialog) != std::string::npos)
                 {
                     filteredFiles.push_back(file);
                 }
@@ -614,53 +650,51 @@ std::string EditorUIModule::RenderFileDialog(bool& window, const char* windowTit
             loadFilteredFiles = false;
         }
 
-        static int selected = -1;
-
         for (int i = 0; i < filteredFiles.size(); i++)
         {
             const std::string& file = filteredFiles[i];
-            std::string filePath    = currentPath + DELIMITER + file;
+            std::string filePath    = fileDialogCurrentPath + DELIMITER + file;
             bool isDirectory        = FileSystem::IsDirectory(filePath.c_str());
 
             std::string tag         = isDirectory ? "[Dir] " : "[File] ";
             std::string fileWithTag = tag + file;
 
-            if (ImGui::Selectable(fileWithTag.c_str(), selected == i))
+            if (ImGui::Selectable(fileWithTag.c_str(), selectedFileDialog == i))
             {
-                selected = i;
+                selectedFileDialog = i;
 
                 if (file == "..")
                 {
-                    currentPath = FileSystem::GetParentPath(currentPath);
-                    inputFile   = "";
-                    selected    = -1;
-                    FileSystem::GetFilesSorted(currentPath, files);
-                    searchQuery[0] = '\0';
-                    loadFiles      = true;
-                    loadButtons    = true;
+                    fileDialogCurrentPath = FileSystem::GetParentPath(fileDialogCurrentPath);
+                    inputFileDialog       = "";
+                    selectedFileDialog    = -1;
+                    FileSystem::GetFilesSorted(fileDialogCurrentPath, filesFileDialog);
+                    searchQueryFileDialog[0] = '\0';
+                    doLoadFiles              = true;
+                    loadButtons              = true;
                 }
                 else if (isDirectory && !selectFolder)
                 {
-                    currentPath = filePath;
-                    inputFile   = "";
-                    selected    = -1;
-                    FileSystem::GetFilesSorted(currentPath, files);
-                    searchQuery[0] = '\0';
-                    loadFiles      = true;
-                    loadButtons    = true;
+                    fileDialogCurrentPath = filePath;
+                    inputFileDialog       = "";
+                    selectedFileDialog    = -1;
+                    FileSystem::GetFilesSorted(fileDialogCurrentPath, filesFileDialog);
+                    searchQueryFileDialog[0] = '\0';
+                    doLoadFiles              = true;
+                    loadButtons              = true;
                 }
                 else if (isDirectory && selectFolder)
                 {
-                    currentPath = filePath;
-                    inputFile   = FileSystem::GetFileNameWithExtension(file);
-                    FileSystem::GetFilesSorted(currentPath, files);
-                    searchQuery[0] = '\0';
-                    loadFiles      = true;
-                    loadButtons    = true;
+                    fileDialogCurrentPath = filePath;
+                    inputFileDialog       = FileSystem::GetFileNameWithExtension(file);
+                    FileSystem::GetFilesSorted(fileDialogCurrentPath, filesFileDialog);
+                    searchQueryFileDialog[0] = '\0';
+                    doLoadFiles              = true;
+                    loadButtons              = true;
                 }
                 else
                 {
-                    inputFile = FileSystem::GetFileNameWithExtension(file);
+                    inputFileDialog = FileSystem::GetFileNameWithExtension(file);
                 }
             }
         }
@@ -671,58 +705,42 @@ std::string EditorUIModule::RenderFileDialog(bool& window, const char* windowTit
     ImGui::Dummy(ImVec2(0, 10));
     ImGui::Text("File Name:");
     ImGui::SameLine();
-    ImGui::InputText("##filename", &inputFile[0], inputFile.size(), ImGuiInputTextFlags_ReadOnly);
+    ImGui::InputText("##filename", &inputFileDialog[0], inputFileDialog.size(), ImGuiInputTextFlags_ReadOnly);
 
-    if (ImGui::Button("Cancel", ImVec2(0, 0)))
+    std::string importPath = "";
+    if (ImGui::Button("Ok", ImVec2(0, 0)))
     {
-        inputFile      = "";
-        currentPath    = App->GetProjectModule()->GetLoadedProjectPath();
-        window         = false;
-        showDrives     = false;
-        searchQuery[0] = '\0';
-        loadFiles      = true;
+        if (!inputFileDialog.empty())
+        {
+            if (selectFolder) importPath = fileDialogCurrentPath;
+            else importPath = fileDialogCurrentPath + DELIMITER + inputFileDialog;
+        }
+
+        window = false;
     }
 
     ImGui::SameLine();
 
-    if (ImGui::Button("Ok", ImVec2(0, 0)))
-    {
-        std::string importPath = "";
-        if (!inputFile.empty())
-        {
-            if (selectFolder)
-            {
-                importPath = currentPath;
-            }
-            else
-            {
-                importPath = currentPath + DELIMITER + inputFile;
-            }
-        }
-
-        inputFile      = "";
-        currentPath    = App->GetProjectModule()->GetLoadedProjectPath();
-        window         = false;
-        showDrives     = false;
-        searchQuery[0] = '\0';
-        loadFiles      = true;
-
-        ImGui::End();
-        return importPath;
-    }
-
-    if (!importMenu) {
-        accPaths.clear();
-        accPaths.shrink_to_fit();
-        files.clear();
-        files.shrink_to_fit();
-        filteredFiles.clear();
-        filteredFiles.shrink_to_fit();
-    }
+    if (ImGui::Button("Cancel", ImVec2(0, 0))) window = false;
 
     ImGui::End();
 
-    return "";
+    if (!window)
+    {
+        accPaths.clear();
+        accPaths.shrink_to_fit();
+        filesFileDialog.clear();
+        filesFileDialog.shrink_to_fit();
+        filteredFiles.clear();
+        filteredFiles.shrink_to_fit();
+        showDrives               = false;
+        inputFileDialog          = "";
+        searchQueryFileDialog[0] = '\0';
+        doLoadFiles              = true;
+        loadButtons              = true;
+    }
+
+    return importPath;
 }
 
 void EditorUIModule::ImportDialog(bool& import)
@@ -770,7 +788,6 @@ bool EditorUIModule::RenderTransformWidget(
     float3 outputRotation     = Quat(outputTransform.RotatePart()).ToEulerXYZ();
 
     bool positionValueChanged = false, rotationValueChanged = false, scaleValueChanged = false;
-    static bool lockScaleAxis = false;
     float3 originalScale      = float3(outputScale);
 
     std::string transformName = std::string(transformType == GizmoTransform::LOCAL ? "Local " : "World ") + "Transform";
@@ -840,7 +857,8 @@ bool EditorUIModule::RenderImGuizmo(
     ImGuizmo::OPERATION operation = GetImGuizmoOperation();
     ImGuizmo::MODE mode           = GetImGuizmoTransformMode();
 
-    ImGuizmo::Enable(true);
+    if (App->GetCameraModule()->GetOrbiting()) ImGuizmo::Enable(false);
+    else ImGuizmo::Enable(true);
     ImGuizmo::Manipulate(
         view.ptr(), proj.ptr(), operation, mode, transform.ptr(), nullptr, snapEnabled ? snapValues.ptr() : nullptr,
         nullptr, nullptr
@@ -875,8 +893,6 @@ void EditorUIModule::RenderBasicTransformModifiers(
     bool& positionValueChanged, bool& rotationValueChanged, bool& scaleValueChanged
 )
 {
-    static bool bUseRad   = true;
-
     positionValueChanged |= ImGui::InputFloat3("Position", &outputPosition[0]);
 
     if (!bUseRad)
@@ -903,8 +919,7 @@ T EditorUIModule::RenderResourceSelectDialog(
     T result = defaultResource;
     if (ImGui::BeginPopup(id))
     {
-        static char searchText[255] = "";
-        ImGui::InputText("Search", searchText, 255);
+        ImGui::InputText("Search", searchTextResource, IM_ARRAYSIZE(searchTextResource));
 
         ImGui::Separator();
         if (ImGui::BeginListBox("##ComponentList", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
@@ -912,7 +927,7 @@ T EditorUIModule::RenderResourceSelectDialog(
             for (const auto& valuePair : availableResources)
             {
                 {
-                    if (valuePair.first.find(searchText) != std::string::npos)
+                    if (valuePair.first.find(searchTextResource) != std::string::npos)
                     {
                         if (ImGui::Selectable(valuePair.first.c_str(), false))
                         {
@@ -937,7 +952,7 @@ void EditorUIModule::OpenEditor(EngineEditorBase* editorToOpen)
     }
 }
 
-void EditorUIModule::About(bool& aboutMenu) const
+void EditorUIModule::About(bool& aboutMenu)
 {
     std::string title = "About " + std::string(ENGINE_NAME);
     if (!ImGui::Begin(title.c_str(), &aboutMenu))
@@ -973,9 +988,8 @@ void EditorUIModule::About(bool& aboutMenu) const
     ImGui::Text(" - ImNodeFlow: v1.2.2");
     ImGui::Text("%s is licensed under the MIT License, see LICENSE for more information.", ENGINE_NAME);
 
-    static bool show_config_info = false;
-    ImGui::Checkbox("Config/Build Information", &show_config_info);
-    if (show_config_info)
+    ImGui::Checkbox("Config/Build Information", &showConfigInfo);
+    if (showConfigInfo)
     {
         ImGuiIO& io            = ImGui::GetIO();
         ImGuiStyle& style      = ImGui::GetStyle();
@@ -1164,8 +1178,6 @@ void EditorUIModule::EditorSettings(bool& editorSettingsMenu)
         return;
     }
 
-    static bool vsync = VSYNC;
-
     if (ImGui::CollapsingHeader("Application"))
     {
         ImGui::SeparatorText("Information");
@@ -1249,34 +1261,28 @@ void EditorUIModule::EditorSettings(bool& editorSettingsMenu)
 
 void EditorUIModule::FramePlots(bool& vsync)
 {
-    static int refreshRate = App->GetWindowModule()->GetDesktopDisplayMode().refresh_rate;
+    const int refreshRate = App->GetWindowModule()->GetDesktopDisplayMode().refresh_rate;
 
-    static float maxYAxis;
     if (vsync) maxYAxis = refreshRate * 1.66f;
     else maxYAxis = 1000.f * 1.66f;
 
     char title[25];
-    std::vector<float> frametimeVector(frametime.begin(), frametime.end());
+    const std::vector<float> frametimeVector(frametime.begin(), frametime.end());
     sprintf_s(title, 25, "Milliseconds %0.1f", frametime.back());
     ImGui::PlotHistogram(
         "##milliseconds", &frametimeVector[0], (int)frametimeVector.size(), 0, title, 0.0f, 40.0f, ImVec2(310, 100)
     );
 
-    std::vector<float> framerateVector(framerate.begin(), framerate.end());
+    const std::vector<float> framerateVector(framerate.begin(), framerate.end());
     sprintf_s(title, 25, "Framerate %.1f", framerate.back());
     ImGui::PlotHistogram(
         "##framerate", &framerateVector.front(), (int)framerateVector.size(), 0, title, 0.0f, maxYAxis, ImVec2(310, 100)
     );
 }
 
-void EditorUIModule::WindowConfig(bool& vsync) const
+void EditorUIModule::WindowConfig(bool& vsync)
 {
-    static bool fullscreen   = FULLSCREEN;
-    static bool full_desktop = FULL_DESKTOP;
-    static bool borderless   = BORDERLESS;
-    static bool resizable    = RESIZABLE;
-
-    float brightness         = App->GetWindowModule()->GetBrightness();
+    float brightness = App->GetWindowModule()->GetBrightness();
     if (ImGui::SliderFloat("Brightness", &brightness, 0, 1)) App->GetWindowModule()->SetBrightness(brightness);
 
     SDL_DisplayMode& displayMode = App->GetWindowModule()->GetDesktopDisplayMode();
@@ -1311,7 +1317,7 @@ void EditorUIModule::CameraConfig() const
 {
 }
 
-void EditorUIModule::OpenGLConfig() const
+void EditorUIModule::OpenGLConfig()
 {
     OpenGLModule* openGLModule = App->GetOpenGLModule();
 
@@ -1336,21 +1342,16 @@ void EditorUIModule::OpenGLConfig() const
 
     ImGui::Separator();
 
-    static bool depthTest = true;
-
     if (ImGui::Checkbox("Depth test", &depthTest))
     {
         openGLModule->SetDepthTest(depthTest);
     }
 
-    static bool faceCulling = true;
     if (ImGui::Checkbox("Face cull", &faceCulling))
     {
         openGLModule->SetFaceCull(faceCulling);
     }
 
-    static int frontFaceMode = GL_CCW;
-    bool changed             = false;
     ImGui::Text("Front face mode");
     if (ImGui::RadioButton("Counter clock-wise", &frontFaceMode, GL_CCW))
     {
@@ -1368,15 +1369,13 @@ void EditorUIModule::OpenGLConfig() const
     ImGui::SameLine();
     ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%d", App->GetOpenGLModule()->GetDrawCallsCount());
 
-    float currentTime     = App->GetEngineTimer()->GetTime() / 1000.f;
-    static float lastTime = 0.f;
+    const float currentTime = App->GetEngineTimer()->GetTime() / 1000.f;
 
-    static std::string tpsStr;
-    if (currentTime - lastTime > 1.f)
+    if (currentTime - lastTimeOpenGL > 1.f)
     {
-        unsigned int tps = static_cast<unsigned int>(App->GetOpenGLModule()->GetTrianglesPerSecond());
-        lastTime         = currentTime;
-        tpsStr           = FormatWithCommas(tps);
+        const unsigned int tps = static_cast<unsigned int>(App->GetOpenGLModule()->GetTrianglesPerSecond());
+        lastTimeOpenGL         = currentTime;
+        tpsStr                 = FormatWithCommas(tps);
     }
 
     ImGui::Text("Triangles per second:");
@@ -1495,7 +1494,7 @@ void EditorUIModule::HardwareConfig() const
 
 void EditorUIModule::ShowCaps() const
 {
-    static const CPUFeature features[] = {
+    const CPUFeature features[] = {
         {SDL_HasRDTSC,   "RDTSC"  },
         {SDL_HasAltiVec, "AltiVec"},
         {SDL_HasMMX,     "MMX"    },

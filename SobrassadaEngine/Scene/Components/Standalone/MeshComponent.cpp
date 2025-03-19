@@ -21,13 +21,13 @@ MeshComponent::MeshComponent(const UID uid, const UID uidParent) : Component(uid
 
 MeshComponent::MeshComponent(const rapidjson::Value& initialState) : Component(initialState)
 {
-    if (initialState.HasMember("Material"))
-    {
-        AddMaterial(initialState["Material"].GetUint64());
-    }
     if (initialState.HasMember("Mesh"))
     {
         AddMesh(initialState["Mesh"].GetUint64(), false);
+    }
+    if (initialState.HasMember("Material"))
+    {
+        AddMaterial(initialState["Material"].GetUint64());
     }
     if (initialState.HasMember("Bones"))
     {
@@ -77,6 +77,26 @@ void MeshComponent::Save(rapidjson::Value& targetState, rapidjson::Document::All
         // Save the resource model UID used to load this mesh, so it can get the bind matrices when loading
         if (modelUID != INVALID_UID) targetState.AddMember("ModelUID", modelUID, allocator);
         if (skinIndex != -1) targetState.AddMember("SkinIndex", skinIndex, allocator);
+    }
+}
+
+void MeshComponent::Clone(const Component* other)
+{
+    if (other->GetType() == ComponentType::COMPONENT_MESH)
+    {
+        const MeshComponent* otherMesh = static_cast<const MeshComponent*>(other);
+        enabled                        = otherMesh->enabled;
+
+        AddMesh(otherMesh->currentMesh->GetUID());
+        AddMaterial(otherMesh->currentMaterial->GetUID());
+
+        modelUID     = otherMesh->modelUID;
+        skinIndex    = otherMesh->skinIndex;
+        bindMatrices = otherMesh->bindMatrices;
+    }
+    else
+    {
+        GLOG("It is not possible to clone a component of a different type!");
     }
 }
 
@@ -148,6 +168,7 @@ void MeshComponent::Render(float deltaTime)
 
 void MeshComponent::InitSkin()
 {
+    if (bonesUIDs.size() > 0) return;
     for (UID uid : bonesUIDs)
     {
         bones.emplace_back(App->GetSceneModule()->GetGameObjectByUID(uid));
@@ -177,6 +198,8 @@ void MeshComponent::AddMesh(UID resource, bool updateParent)
 
 void MeshComponent::AddMaterial(UID resource)
 {
+    if (resource == INVALID_UID) return;
+
     if (currentMaterial != nullptr && currentMaterial->GetUID() == resource) return;
 
     ResourceMaterial* newMaterial =

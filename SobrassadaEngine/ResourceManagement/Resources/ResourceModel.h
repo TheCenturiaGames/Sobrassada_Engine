@@ -1,7 +1,9 @@
 #pragma once
 
-#include "Resource.h"
 #include "FileSystem/Model.h"
+#include "Resource.h"
+
+class Model;
 
 class ResourceModel : public Resource
 {
@@ -13,6 +15,6 @@ class ResourceModel : public Resource
 
     void SetModelData(const Model&& model) { modelData = model; }
 
-   private:
+  private:
     Model modelData;
 };

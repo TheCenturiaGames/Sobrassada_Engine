@@ -72,7 +72,30 @@ void CharacterControllerComponent::Save(rapidjson::Value& targetState, rapidjson
     targetState.AddMember("isRadians", isRadians, allocator);
 }
 
-void CharacterControllerComponent::Update(float deltaTime)
+void CharacterControllerComponent::Clone(const Component* other)
+{
+    if (other->GetType() == ComponentType::COMPONENT_CHARACTER_CONTROLLER)
+    {
+        const CharacterControllerComponent* otherCharacter = static_cast<const CharacterControllerComponent*>(other);
+        enabled                                            = otherCharacter->enabled;
+
+        speed                                              = otherCharacter->speed;
+        maxLinearSpeed                                     = otherCharacter->maxLinearSpeed;
+        maxAngularSpeed                                    = otherCharacter->maxAngularSpeed;
+
+        isRadians                                          = otherCharacter->isRadians;
+    }
+    else
+    {
+        GLOG("It is not possible to clone a component of a different type!");
+    }
+}
+
+void CharacterControllerComponent::Update()
+{
+}
+
+void CharacterControllerComponent::Render(float deltaTime)
 {
     if (!enabled) return;
 

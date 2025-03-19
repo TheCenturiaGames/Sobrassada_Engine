@@ -16,6 +16,7 @@
 #include "ShaderModule.h"
 #include "WindowModule.h"
 #include "UserInterfaceModule.h"
+#include "ComponentUtils.h"
 
 #ifdef _DEBUG
 #include "optick.h"
@@ -49,6 +50,8 @@ Application::~Application()
     {
         delete *it;
     }
+    delete engineConfig;
+    engineConfig = nullptr;
 }
 
 bool Application::Init()
@@ -95,7 +98,6 @@ update_status Application::Update()
     #ifndef GAME
     // Unbinding frame buffer so ui gets rendered
     App->GetOpenGLModule()->GetFramebuffer()->Unbind();
-
     for (std::list<Module*>::iterator it = modules.begin(); it != modules.end() && returnStatus == UPDATE_CONTINUE;
          ++it)
         returnStatus = (*it)->RenderEditor(deltaTime);
@@ -106,6 +108,7 @@ update_status Application::Update()
     for (std::list<Module*>::iterator it = modules.begin(); it != modules.end() && returnStatus == UPDATE_CONTINUE;
          ++it)
         returnStatus = (*it)->PostUpdate(deltaTime);
+
 
     return returnStatus;
 }

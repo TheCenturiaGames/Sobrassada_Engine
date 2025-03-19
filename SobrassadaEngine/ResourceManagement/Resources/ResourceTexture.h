@@ -11,12 +11,6 @@ struct OpenGLMetadata
     unsigned type;
 };
 
-namespace DirectX
-{
-    struct TexMetadata;
-    class ScratchImage;
-} // namespace DirectX
-
 class ResourceTexture : public Resource
 {
   public:

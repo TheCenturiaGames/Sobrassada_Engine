@@ -16,7 +16,7 @@ Framebuffer::Framebuffer(int witdh, int height, bool useRbo)
 Framebuffer::~Framebuffer()
 {
     glDeleteFramebuffers(1, &fbo);
-    if (useRbo) glDeleteRenderbuffers(1, &rbo);
+    glDeleteRenderbuffers(1, &rbo);
 
     glDeleteTextures(1, &framebufferTexture);
 }
