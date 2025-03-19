@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "LibraryModule.h"
 #include "TextureImporter.h"
+#include "FileSystem/Material.h"
 
 #include "DirectXTex/DirectXTex.h"
 #include "imgui.h"

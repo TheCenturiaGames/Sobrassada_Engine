@@ -1,9 +1,10 @@
 ﻿#pragma once
 
 #include "Resource.h"
-#include "FileSystem/Material.h"
 
 #include <Math/float4.h>
+
+class Material;
 
 namespace tinygltf
 {
