@@ -302,6 +302,7 @@ void EditorUIModule::MainMenu()
             if (ImGui::MenuItem("Editor Control", "", editorControlMenu)) editorControlMenu = !editorControlMenu;
             if (ImGui::MenuItem("Hierarchy", "", hierarchyMenu)) hierarchyMenu = !hierarchyMenu;
             if (ImGui::MenuItem("Inspector", "", inspectorMenu)) inspectorMenu = !inspectorMenu;
+            if (ImGui::MenuItem("Lights Config", "", lightConfig)) lightConfig = !lightConfig;
             ImGui::EndDisabled();
 
             ImGui::EndMenu();

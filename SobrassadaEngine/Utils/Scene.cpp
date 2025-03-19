@@ -241,12 +241,13 @@ update_status Scene::Render(float deltaTime) const
 
 update_status Scene::RenderEditor(float deltaTime)
 {
-    if (App->GetEditorUIModule()->editorControlMenu) RenderEditorControl(App->GetEditorUIModule()->editorControlMenu);
+    EditorUIModule* editor = App->GetEditorUIModule();
+    if (editor->editorControlMenu) RenderEditorControl(editor->editorControlMenu);
 
     RenderScene();
 
     RenderSelectedGameObjectUI();
-    lightsConfig->EditorParams();
+    if (editor->lightConfig) lightsConfig->EditorParams(editor->lightConfig);
 
     return UPDATE_CONTINUE;
 }

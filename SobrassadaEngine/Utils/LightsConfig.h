@@ -67,7 +67,7 @@ class LightsConfig
     LightsConfig();
     ~LightsConfig();
 
-    void EditorParams();
+    void EditorParams(bool& lightConfig);
 
     void InitSkybox();
     void RenderSkybox() const;

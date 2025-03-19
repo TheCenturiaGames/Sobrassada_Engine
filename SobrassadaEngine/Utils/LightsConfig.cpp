@@ -144,9 +144,9 @@ void LightsConfig::LoadData(const rapidjson::Value& lights)
     skyboxTexture    = LoadSkyboxTexture(lights["Skybox UID"].GetUint64());
 }
 
-void LightsConfig::EditorParams()
+void LightsConfig::EditorParams(bool& lightConfig)
 {
-    if (!ImGui::Begin("Lights Config"))
+    if (!ImGui::Begin("Lights Config", &lightConfig))
     {
         ImGui::End();
         return;

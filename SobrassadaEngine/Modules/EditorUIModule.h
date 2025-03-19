@@ -116,6 +116,7 @@ class EditorUIModule : public Module
     bool editorControlMenu = true;
     bool hierarchyMenu     = true;
     bool inspectorMenu     = true;
+    bool lightConfig       = false;
     bool snapEnabled       = false;
 
   private:
