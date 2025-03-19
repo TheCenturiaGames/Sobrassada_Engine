@@ -26,15 +26,6 @@ enum ComponentType
     LAST  = COMPONENT_CAMERA
 };
 
-static const std::unordered_map<std::string, ComponentType> standaloneComponents = {
-    {"Mesh",              COMPONENT_MESH             },
-    {"Point Light",       COMPONENT_POINT_LIGHT      },
-    {"Spot Light",        COMPONENT_SPOT_LIGHT       },
-    {"Directional Light", COMPONENT_DIRECTIONAL_LIGHT},
-    {"Character Controller", COMPONENT_CHARACTER_CONTROLLER},
-    {"Camera",            COMPONENT_CAMERA           }
-};
-
 class ComponentUtils
 {
   public:

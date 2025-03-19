@@ -5,6 +5,7 @@
 #include "ResourceManagement/Resources/Resource.h"
 
 #include "SDL.h"
+
 #include "imgui_internal.h"
 #include <Math/float3.h>
 #include <Math/float4x4.h>
@@ -12,6 +13,7 @@
 #include <string>
 #include <unordered_map>
 // imguizmo include after imgui
+#include "ComponentUtils.h"
 #include "./Libs/ImGuizmo/ImGuizmo.h"
 
 enum EditorType
@@ -75,6 +77,11 @@ class EditorUIModule : public Module
     float3& GetSnapValues() { return snapValues; }
     GizmoDragState GetImGuizmoDragState() const { return guizmoDragState; };
 
+    const std::unordered_map<std::string, ComponentType>& GetStandaloneComponents() const
+    {
+        return standaloneComponents;
+    }
+
     void SetFileDialogCurrentPath(char* newProjectPath) { fileDialogCurrentPath = newProjectPath; }
 
   private:
@@ -110,6 +117,7 @@ class EditorUIModule : public Module
     std::string FormatWithCommas(unsigned int number) const;
 
     void OpenEditor(EngineEditorBase* editorToOpen);
+
     EngineEditorBase* CreateEditor(EditorType type);
 
     void UpdateGizmoDragState();
@@ -205,4 +213,5 @@ class EditorUIModule : public Module
     int frontFaceMode            = 0;
     float lastTimeOpenGL         = 0.f;
     std::string tpsStr;
+    std::unordered_map<std::string, ComponentType> standaloneComponents;
 };

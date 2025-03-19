@@ -12,6 +12,9 @@
 #include "SceneImporter.h"
 #include "SceneModule.h"
 #include "WindowModule.h"
+#include "TextureLibraryEditor.h"
+#include <TextureImporter.h>
+
 
 #include "glew.h"
 #include "imgui.h"
@@ -21,8 +24,17 @@
 #include <filesystem>
 #include <string>
 
+
 EditorUIModule::EditorUIModule() : width(0), height(0)
 {
+    standaloneComponents = {
+        {"Mesh",              COMPONENT_MESH             },
+        {"Point Light",       COMPONENT_POINT_LIGHT      },
+        {"Spot Light",        COMPONENT_SPOT_LIGHT       },
+        {"Directional Light", COMPONENT_DIRECTIONAL_LIGHT},
+        {"Character Controller", COMPONENT_CHARACTER_CONTROLLER},
+        {"Camera",            COMPONENT_CAMERA           }
+    };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;
     borderless    = BORDERLESS;
@@ -38,6 +50,7 @@ EditorUIModule::~EditorUIModule()
         delete values.second;
     }
     openEditors.clear();
+    standaloneComponents.clear();
 }
 
 bool EditorUIModule::Init()
@@ -286,13 +299,18 @@ void EditorUIModule::MainMenu()
             ImGui::EndMenu();
         }
 
-        if (ImGui::BeginMenu("Engine Editor Window"))
+       if (ImGui::BeginMenu("Engine Editor Window"))
         {
-
             if (ImGui::MenuItem("Mockup Base Engine Editor", "")) OpenEditor(CreateEditor(EditorType::BASE));
+
             if (ImGui::MenuItem("Node Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::NODE));
+
+            if (ImGui::MenuItem("Texture Library"))               OpenEditor(new TextureLibraryEditor("Texture Library", GenerateUID()));
+
             ImGui::EndMenu();
         }
+
+
 
         if (ImGui::MenuItem("Editor settings", "", editorSettingsMenu)) editorSettingsMenu = !editorSettingsMenu;
 

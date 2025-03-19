@@ -5,6 +5,8 @@
 #include <Math/float3.h>
 #include <Math/float4.h>
 
+class Material;
+
 namespace tinygltf
 {
     class Model;
