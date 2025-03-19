@@ -724,11 +724,11 @@ void DebugDrawModule::HandleDebugRenderOptions()
     SceneModule* sceneModule   = App->GetSceneModule();
     CameraModule* cameraModule = App->GetCameraModule();
 
-    const auto& gameObjects    = sceneModule->GetAllGameObjects();
+    const auto& gameObjects    = sceneModule->GetScene()->GetAllGameObjects();
 
     if (debugOptionValues[(int)DebugOptions::RENDER_AABB])
     {
-        for (const auto& gameObject : *gameObjects)
+        for (const auto& gameObject : gameObjects)
         {
             for (int i = 0; i < 12; ++i)
                 DrawLineSegment(gameObject.second->GetGlobalAABB().Edge(i), float3(0.f, 1.f, 0.f));
@@ -737,7 +737,7 @@ void DebugDrawModule::HandleDebugRenderOptions()
 
     if (debugOptionValues[(int)DebugOptions::RENDER_OBB])
     {
-        for (const auto& gameObject : *gameObjects)
+        for (const auto& gameObject : gameObjects)
         {
             for (int i = 0; i < 12; ++i)
                 DrawLineSegment(gameObject.second->GetGlobalOBB().Edge(i), float3(0.f, 1.f, 0.f));
@@ -746,13 +746,13 @@ void DebugDrawModule::HandleDebugRenderOptions()
 
     if (debugOptionValues[(int)DebugOptions::RENDER_OCTREE])
     {
-        Octree* octree = sceneModule->GetSceneOctree();
+        Octree* octree = sceneModule->GetScene()->GetOctree();
         if (octree != nullptr) RenderLines(octree->GetDrawLines(), float3(1.f, 0.f, 0.f));
     }
 
     if (debugOptionValues[(int)DebugOptions::RENDER_DYNAMICTREE])
     {
-        Quadtree* quadtree = sceneModule->GetSceneDynamicTree();
+        Quadtree* quadtree = sceneModule->GetScene()->GetDynamicTree();
         if (quadtree != nullptr) RenderLines(quadtree->GetDrawLines(), float3(0.467f, 0.647f, 0.91f));
     }
 

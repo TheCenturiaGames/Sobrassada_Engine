@@ -11,8 +11,8 @@
 #include <algorithm>
 #include <cmath>
 
-CharacterControllerComponent::CharacterControllerComponent(UID uid, UID uidParent)
-    : Component(uid, uidParent, "Character Controller", COMPONENT_CHARACTER_CONTROLLER)
+CharacterControllerComponent::CharacterControllerComponent(UID uid, GameObject* parent)
+    : Component(uid, parent, "Character Controller", COMPONENT_CHARACTER_CONTROLLER)
 {
     speed           = 1;
     maxLinearSpeed  = 10;
@@ -21,8 +21,7 @@ CharacterControllerComponent::CharacterControllerComponent(UID uid, UID uidParen
     targetDirection.Set(0.0f, 0.0f, 1.0f);
 }
 
-CharacterControllerComponent::CharacterControllerComponent(const rapidjson::Value& initialState)
-    : Component(initialState)
+CharacterControllerComponent::CharacterControllerComponent(const rapidjson::Value& initialState, GameObject* parent) : Component(initialState, parent)
 {
     if (initialState.HasMember("TargetDirectionX"))
     {
@@ -152,22 +151,19 @@ void CharacterControllerComponent::RenderEditorInspector()
     }
 }
 
-void CharacterControllerComponent::Move(const float3& direction, float deltaTime)
+void CharacterControllerComponent::Move(const float3& direction, float deltaTime) const
 {
     float finalSpeed      = std::min(speed, maxLinearSpeed);
 
     float3 movementOffset = direction * finalSpeed * deltaTime;
 
-    GameObject* parentGO  = GetParent();
-    if (!parentGO) return;
-
-    float4x4 localTr           = parentGO->GetLocalTransform();
+    float4x4 localTr           = parent->GetLocalTransform();
     float4x4 translationMatrix = float4x4::FromTRS(movementOffset, float4x4::identity.RotatePart(), float3::one);
 
     localTr                    = localTr * translationMatrix;
 
-    parentGO->SetLocalTransform(localTr);
-    parentGO->UpdateTransformForGOBranch();
+    parent->SetLocalTransform(localTr);
+    parent->UpdateTransformForGOBranch();
 }
 
 void CharacterControllerComponent::Rotate(float rotationDirection, float deltaTime)
@@ -185,15 +181,12 @@ void CharacterControllerComponent::Rotate(float rotationDirection, float deltaTi
 
     float4x4 rotationMatrix = float4x4::FromEulerXYZ(0.0f, angleDeg, 0.0f);
 
-    GameObject* parentGO    = GetParent();
-    if (!parentGO) return;
-
-    float4x4 localTr = parentGO->GetLocalTransform();
+    float4x4 localTr = parent->GetLocalTransform();
 
     localTr          = localTr * rotationMatrix;
 
-    parentGO->SetLocalTransform(localTr);
-    parentGO->UpdateTransformForGOBranch();
+    parent->SetLocalTransform(localTr);
+    parent->UpdateTransformForGOBranch();
 }
 
 void CharacterControllerComponent::HandleInput(float deltaTime)

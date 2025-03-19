@@ -29,6 +29,8 @@ class GameObject
 
     ~GameObject();
 
+    void Init() const;
+
     const float4x4& GetParentGlobalTransform() const;
 
     bool IsStatic() const { return mobilitySettings == ComponentMobilitySettings::STATIC; };

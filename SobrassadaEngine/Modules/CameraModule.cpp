@@ -81,9 +81,9 @@ void CameraModule::UpdateUBO()
 
 const LineSegment& CameraModule::CastCameraRay()
 {
-    auto& windowPosition = App->GetSceneModule()->GetWindowPosition();
-    auto& windowSize     = App->GetSceneModule()->GetWindowSize();
-    auto& mousePos       = App->GetSceneModule()->GetMousePosition();
+    auto& windowPosition = App->GetSceneModule()->GetScene()->GetWindowPosition();
+    auto& windowSize     = App->GetSceneModule()->GetScene()->GetWindowSize();
+    auto& mousePos       = App->GetSceneModule()->GetScene()->GetMousePosition();
 
     float windowMinX     = std::get<0>(windowPosition);
     float windowMaxX     = std::get<0>(windowPosition) + std::get<0>(windowSize);
@@ -315,7 +315,7 @@ void CameraModule::RotateCamera(float yaw, float pitch)
 
 void CameraModule::FocusCamera()
 {
-    AABB focusedObjectAABB = App->GetSceneModule()->GetSelectedGameObject()->GetGlobalAABB();
+    AABB focusedObjectAABB = App->GetSceneModule()->GetScene()->GetSelectedGameObject()->GetGlobalAABB();
     float3 center          = focusedObjectAABB.CenterPoint();
 
     if (IsNan(center.x))

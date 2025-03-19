@@ -1,6 +1,7 @@
 #include "ResourceMesh.h"
 
 #include "Application.h"
+#include "CameraComponent.h"
 #include "CameraModule.h"
 #include "FileSystem/Mesh.h"
 #include "GameObject.h"
@@ -94,8 +95,8 @@ void ResourceMesh::Render(
 
     glUniformMatrix4fv(3, 1, GL_TRUE, modelMatrix.ptr());
     float3 cameraPos;
-    if (App->GetSceneModule()->GetMainCamera() != nullptr && App->GetSceneModule()->GetInPlayMode())
-        cameraPos = App->GetSceneModule()->GetMainCamera()->GetCameraPosition();
+    if (App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr && App->GetSceneModule()->GetInPlayMode())
+        cameraPos = App->GetSceneModule()->GetScene()->GetMainCamera()->GetCameraPosition();
     else cameraPos = App->GetCameraModule()->GetCameraPosition();
 
     glUniform3fv(glGetUniformLocation(program, "cameraPos"), 1, &cameraPos[0]);

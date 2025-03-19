@@ -1,21 +1,20 @@
 #include "SceneModule.h"
 
 #include "Application.h"
-#include "ComponentUtils.h"
+#include "CameraModule.h"
 #include "EditorUIModule.h"
 #include "FileSystem.h"
+#include "GameObject.h"
+#include "ImGuizmo.h"
 #include "InputModule.h"
 #include "LibraryModule.h"
-#include "Octree.h"
-#include "Quadtree.h"
 #include "ProjectModule.h"
-#include "Application.h"
-#include "InputModule.h"
 #include "RaycastController.h"
 #include "ResourcesModule.h"
 #include "Config/EngineConfig.h"
 
-#include <filesystem>
+#include <SDL_mouse.h>
+
 
 SceneModule::SceneModule()
 {
@@ -27,11 +26,14 @@ SceneModule::~SceneModule()
 
 bool SceneModule::Init()
 {
-    if (App->GetProjectModule()->IsProjectLoaded() && !App->GetProjectModule()->GetStartupSceneName().empty())
+    if (App->GetProjectModule()->IsProjectLoaded() && !App->GetProjectModule()->GetProjectConfig()->GetStartupScene().empty())
     {
-        App->GetLibraryModule()->LoadScene((App->GetProjectModule()->GetStartupSceneName() + SCENE_EXTENSION).c_str());
+        App->GetLibraryModule()->LoadScene((App->GetProjectModule()->GetProjectConfig()->GetStartupScene() + SCENE_EXTENSION).c_str());
 
         if (App->GetEngineConfig()->ShouldStartGameOnStartup()) SwitchPlayMode(true);
+    } else
+    {
+        CreateScene();
     }
     return true;
 }
@@ -73,8 +75,6 @@ update_status SceneModule::RenderEditor(float deltaTime)
 
 update_status SceneModule::PostUpdate(float deltaTime)
 {
-    if (loadedScene == nullptr) return UPDATE_CONTINUE;
-
     // CAST RAY WHEN LEFT CLICK IS RELEASED
     if (GetDoInputsScene() && !ImGuizmo::IsUsingAny())
     {
@@ -99,11 +99,11 @@ update_status SceneModule::PostUpdate(float deltaTime)
     {
         if (loadedScene->IsStaticModified())
         {
-            RegenerateStaticTree();
+            loadedScene->UpdateStaticSpatialStructure();
         }
         if (loadedScene->IsDynamicModified())
         {
-            RegenerateDynamicTree();
+            loadedScene->UpdateDynamicSpatialStructure();
         }
     }
 

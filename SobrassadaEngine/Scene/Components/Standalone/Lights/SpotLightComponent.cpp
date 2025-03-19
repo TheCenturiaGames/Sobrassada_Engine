@@ -8,18 +8,15 @@
 #include "ImGui.h"
 #include "Math/Quat.h"
 
-SpotLightComponent::SpotLightComponent(UID uid, UID uidParent)
-    : LightComponent(uid, uidParent, "Spot Light", COMPONENT_SPOT_LIGHT)
+SpotLightComponent::SpotLightComponent(UID uid, GameObject* parent)
+    : LightComponent(uid, parent, "Spot Light", COMPONENT_SPOT_LIGHT)
 {
     range                      = 3;
     innerAngle                 = 10;
     outerAngle                 = 20;
-
-    LightsConfig* lightsConfig = App->GetSceneModule()->GetLightsConfig();
-    if (lightsConfig != nullptr) lightsConfig->AddSpotLight(this);
 }
 
-SpotLightComponent::SpotLightComponent(const rapidjson::Value& initialState) : LightComponent(initialState)
+SpotLightComponent::SpotLightComponent(const rapidjson::Value& initialState, GameObject* parent) : LightComponent(initialState, parent)
 {
     if (initialState.HasMember("Range"))
     {
@@ -33,14 +30,16 @@ SpotLightComponent::SpotLightComponent(const rapidjson::Value& initialState) : L
     {
         outerAngle = initialState["OuterAngle"].GetFloat();
     }
-
-    LightsConfig* lightsConfig = App->GetSceneModule()->GetLightsConfig();
-    if (lightsConfig != nullptr) lightsConfig->AddSpotLight(this);
 }
 
 SpotLightComponent::~SpotLightComponent()
 {
-    App->GetSceneModule()->GetLightsConfig()->RemoveSpotLight(this);
+    App->GetSceneModule()->GetScene()->GetLightsConfig()->RemoveSpotLight(this);
+}
+
+void SpotLightComponent::Init()
+{
+    App->GetSceneModule()->GetScene()->GetLightsConfig()->AddSpotLight(this);
 }
 
 void SpotLightComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
@@ -108,7 +107,7 @@ void SpotLightComponent::Render(float deltaTime)
     outerDirections.emplace_back(Quat::RotateZ(outerRads).Transform(-float3::unitY));
     outerDirections.emplace_back(Quat::RotateZ(-outerRads).Transform(-float3::unitY));
 
-    const float4x4& globalTransform = GetParent()->GetGlobalTransform();
+    const float4x4& globalTransform = parent->GetGlobalTransform();
 
     const float3 direction          = (globalTransform.RotatePart() * -float3::unitY).Normalized();
     innerDirections[0]              = (globalTransform.RotatePart() * innerDirections[0]);
@@ -138,5 +137,5 @@ void SpotLightComponent::Render(float deltaTime)
 
 const float3 SpotLightComponent::GetDirection()
 {
-    return (GetParent()->GetGlobalTransform().RotatePart() * -float3::unitY).Normalized();
+    return (parent->GetGlobalTransform().RotatePart() * -float3::unitY).Normalized();
 }

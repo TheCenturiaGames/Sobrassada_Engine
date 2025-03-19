@@ -78,13 +78,13 @@ namespace RaycastController
             {
                 SceneModule* sceneModule     = App->GetSceneModule();
 
-                UID rootGameObject           = sceneModule->GetGameObjectRootUID();
-                GameObject* parentGameobject = sceneModule->GetGameObjectByUID(selectedGameObject->GetParent());
+                UID rootGameObject           = sceneModule->GetScene()->GetGameObjectRootUID();
+                GameObject* parentGameobject = sceneModule->GetScene()->GetGameObjectByUID(selectedGameObject->GetParent());
 
                 while (parentGameobject->GetUID() != rootGameObject)
                 {
                     selectedGameObject = parentGameobject;
-                    parentGameobject   = sceneModule->GetGameObjectByUID(selectedGameObject->GetParent());
+                    parentGameobject   = sceneModule->GetScene()->GetGameObjectByUID(selectedGameObject->GetParent());
                 }
             }
         }

@@ -1,6 +1,7 @@
 #include "LightsConfig.h"
 
 #include "Application.h"
+#include "CameraComponent.h"
 #include "CameraModule.h"
 #include "EditorUIModule.h"
 #include "LibraryModule.h"
@@ -81,16 +82,16 @@ void LightsConfig::RenderSkybox() const
     float4x4 projection;
     float4x4 view;
     bool change = false;
-    if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr)
+    if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
     {
-        if (App->GetSceneModule()->GetMainCamera()->GetType() == 1)
+        if (App->GetSceneModule()->GetScene()->GetMainCamera()->GetType() == 1)
         {
             // We need to change to perspective as ortographic doesnt support cubemap
             change = true;
-            App->GetSceneModule()->GetMainCamera()->ChangeToPerspective();
+            App->GetSceneModule()->GetScene()->GetMainCamera()->ChangeToPerspective();
         }
-        projection = App->GetSceneModule()->GetMainCamera()->GetProjectionMatrix();
-        view       = App->GetSceneModule()->GetMainCamera()->GetViewMatrix();
+        projection = App->GetSceneModule()->GetScene()->GetMainCamera()->GetProjectionMatrix();
+        view       = App->GetSceneModule()->GetScene()->GetMainCamera()->GetViewMatrix();
     }
     else
     {
@@ -110,7 +111,7 @@ void LightsConfig::RenderSkybox() const
 
     glBindVertexArray(0);
 
-    if (change == true) App->GetSceneModule()->GetMainCamera()->ChangeToOrtographic();
+    if (change == true) App->GetSceneModule()->GetScene()->GetMainCamera()->ChangeToOrtographic();
 
     App->GetOpenGLModule()->SetDepthFunc(true);
 }
@@ -274,7 +275,7 @@ void LightsConfig::SetSpotLightsShaderData() const
 void LightsConfig::AddDirectionalLight(DirectionalLightComponent* newDirectional)
 {
     // Check that the gameObject is in the current scene (to avoid including prefab lights)
-    if (App->GetSceneModule()->GetGameObjectByUID(newDirectional->GetParentUID()) == nullptr)
+    if (App->GetSceneModule()->GetScene()->GetGameObjectByUID(newDirectional->GetParentUID()) == nullptr)
     {
         GLOG("The gameObject is not in the current scene, probably a prefab");
         return;
@@ -285,7 +286,7 @@ void LightsConfig::AddDirectionalLight(DirectionalLightComponent* newDirectional
 void LightsConfig::AddPointLight(PointLightComponent* newPoint)
 {
     // Check that the gameObject is in the current scene (to avoid including prefab lights)
-    if (App->GetSceneModule()->GetGameObjectByUID(newPoint->GetParentUID()) == nullptr)
+    if (App->GetSceneModule()->GetScene()->GetGameObjectByUID(newPoint->GetParentUID()) == nullptr)
     {
         GLOG("The gameObject is not in the current scene, probably a prefab");
         return;
@@ -306,7 +307,7 @@ void LightsConfig::AddPointLight(PointLightComponent* newPoint)
 void LightsConfig::AddSpotLight(SpotLightComponent* newSpot)
 {
     // Check that the gameObject is in the current scene (to avoid including prefab lights)
-    if (App->GetSceneModule()->GetGameObjectByUID(newSpot->GetParentUID()) == nullptr)
+    if (App->GetSceneModule()->GetScene()->GetGameObjectByUID(newSpot->GetParentUID()) == nullptr)
     {
         GLOG("The gameObject is not in the current scene, probably a prefab");
         return;
@@ -329,7 +330,7 @@ void LightsConfig::AddSpotLight(SpotLightComponent* newSpot)
 void LightsConfig::RemoveDirectionalLight(DirectionalLightComponent* directional)
 {
     // Check that the gameObject is in the current scene (to avoid including prefab lights)
-    if (App->GetSceneModule()->GetGameObjectByUID(directional->GetParentUID()) == nullptr)
+    if (App->GetSceneModule()->GetScene()->GetGameObjectByUID(directional->GetParentUID()) == nullptr)
     {
         GLOG("The gameObject is not in the current scene, probably a prefab");
         return;
@@ -341,7 +342,7 @@ void LightsConfig::RemoveDirectionalLight(DirectionalLightComponent* directional
 void LightsConfig::RemovePointLight(PointLightComponent* point)
 {
     // Check that the gameObject is in the current scene (to avoid including prefab lights)
-    if (App->GetSceneModule()->GetGameObjectByUID(point->GetParentUID()) == nullptr)
+    if (App->GetSceneModule()->GetScene()->GetGameObjectByUID(point->GetParentUID()) == nullptr)
     {
         GLOG("The gameObject is not in the current scene, probably a prefab");
         return;
@@ -370,7 +371,7 @@ void LightsConfig::RemovePointLight(PointLightComponent* point)
 void LightsConfig::RemoveSpotLight(SpotLightComponent* spot)
 {
     // Check that the gameObject is in the current scene (to avoid including prefab lights)
-    if (App->GetSceneModule()->GetGameObjectByUID(spot->GetParentUID()) == nullptr)
+    if (App->GetSceneModule()->GetScene()->GetGameObjectByUID(spot->GetParentUID()) == nullptr)
     {
         GLOG("The gameObject is not in the current scene, probably a prefab");
         return;

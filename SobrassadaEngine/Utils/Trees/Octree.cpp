@@ -5,6 +5,7 @@
 
 #include <set>
 #include <stack>
+#include <Geometry/LineSegment.h>
 
 Octree::OctreeNode::~OctreeNode()
 {

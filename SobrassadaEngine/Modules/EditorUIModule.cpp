@@ -140,12 +140,6 @@ update_status EditorUIModule::PostUpdate(float deltaTime)
 
     if (closeApplication) return UPDATE_STOP;
 
-    if (closeScene)
-    {
-        App->GetSceneModule()->CloseScene();
-        closeScene = false;
-    }
-
     #endif
 
     return UPDATE_CONTINUE;
@@ -266,10 +260,6 @@ void EditorUIModule::MainMenu()
         }
 
         if (ImGui::MenuItem("Save as", "", saveMenu)) saveMenu = !saveMenu;
-        ImGui::EndDisabled();
-
-        ImGui::BeginDisabled(!sceneLoaded);
-        if (ImGui ::MenuItem("Close")) closeScene = true;
         ImGui::EndDisabled();
 
         if (ImGui::MenuItem("Quit")) closeApplication = true;
@@ -430,7 +420,7 @@ void EditorUIModule::LoadPrefabDialog(bool& loadPrefab)
 
     ImGui::Dummy(ImVec2(0, 3));
 
-    if (ImGui::Button("Ok", ImVec2(0, 0))) App->GetSceneModule()->LoadPrefab(prefabUID);
+    if (ImGui::Button("Ok", ImVec2(0, 0))) App->GetSceneModule()->GetScene()->LoadPrefab(prefabUID);
 
     ImGui::SameLine();
 
@@ -474,7 +464,7 @@ void EditorUIModule::LoadModelDialog(bool& loadModel)
 
     ImGui::Dummy(ImVec2(0, 3));
 
-    if (ImGui::Button("Ok", ImVec2(0, 0))) App->GetSceneModule()->LoadModel(modelUID);
+    if (ImGui::Button("Ok", ImVec2(0, 0))) App->GetSceneModule()->GetScene()->LoadModel(modelUID);
 
     ImGui::SameLine();
 

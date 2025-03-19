@@ -12,9 +12,9 @@
 class MeshComponent : public Component
 {
   public:
-    MeshComponent(UID uid, UID uidParent);
+    MeshComponent(UID uid, GameObject* parent);
 
-    MeshComponent(const rapidjson::Value& initialState);
+    MeshComponent(const rapidjson::Value& initialState, GameObject* parent);
 
     ~MeshComponent() override;
 
@@ -44,8 +44,6 @@ class MeshComponent : public Component
     void SetBindMatrices(const std::vector<float4x4>& bindTransforms) { this->bindMatrices = bindTransforms; }
     void SetModelUID(const UID newModelUID) { this->modelUID = newModelUID; }
     void SetSkinIndex(const int newIndex) { this->skinIndex = newIndex; }
-
-  private:
 
   private:
     std::string currentMeshName       = "Not selected";

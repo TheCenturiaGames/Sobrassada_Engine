@@ -4,23 +4,19 @@
 #include "GameObject.h"
 #include "SceneModule.h"
 
-DirectionalLightComponent::DirectionalLightComponent(UID uid, UID uidParent)
-    : LightComponent(uid, uidParent, "Directional Light", COMPONENT_DIRECTIONAL_LIGHT)
-{
-    LightsConfig* lightsConfig = App->GetSceneModule()->GetLightsConfig();
-    if (lightsConfig != nullptr) lightsConfig->AddDirectionalLight(this);
-}
+DirectionalLightComponent::DirectionalLightComponent(UID uid, GameObject* parent)
+    : LightComponent(uid, parent, "Directional Light", COMPONENT_DIRECTIONAL_LIGHT){}
 
-DirectionalLightComponent::DirectionalLightComponent(const rapidjson::Value& initialState)
-    : LightComponent(initialState)
-{
-    LightsConfig* lightsConfig = App->GetSceneModule()->GetLightsConfig();
-    if (lightsConfig != nullptr) lightsConfig->AddDirectionalLight(this);
-}
+DirectionalLightComponent::DirectionalLightComponent(const rapidjson::Value& initialState, GameObject* parent) : LightComponent(initialState, parent){}
 
 DirectionalLightComponent::~DirectionalLightComponent()
 {
-    App->GetSceneModule()->GetLightsConfig()->RemoveDirectionalLight(this);
+    App->GetSceneModule()->GetScene()->GetLightsConfig()->RemoveDirectionalLight(this);
+}
+
+void DirectionalLightComponent::Init()
+{
+    App->GetSceneModule()->GetScene()->GetLightsConfig()->AddDirectionalLight(this);
 }
 
 void DirectionalLightComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
@@ -51,12 +47,12 @@ void DirectionalLightComponent::Render(float deltaTime)
 
     DebugDrawModule* debug = App->GetDebugDrawModule();
     debug->DrawLine(
-        GetParent()->GetGlobalTransform().TranslatePart(),
-        (GetParent()->GetGlobalTransform().RotatePart() * -float3::unitY).Normalized(), 2, float3(1, 1, 1)
+        parent->GetGlobalTransform().TranslatePart(),
+        (parent->GetGlobalTransform().RotatePart() * -float3::unitY).Normalized(), 2, float3(1, 1, 1)
     );
 }
 
-const float3 DirectionalLightComponent::GetDirection()
+const float3& DirectionalLightComponent::GetDirection() const
 {
-    return (GetParent()->GetGlobalTransform().RotatePart() * -float3::unitY).Normalized();
+    return (parent->GetGlobalTransform().RotatePart() * -float3::unitY).Normalized();
 }
