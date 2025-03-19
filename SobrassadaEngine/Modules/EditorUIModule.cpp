@@ -579,6 +579,7 @@ std::string EditorUIModule::RenderFileDialog(bool& window, const char* windowTit
                 doLoadFiles              = true;
                 loadButtons              = true;
                 searchQueryFileDialog[0] = '\0';
+                FileSystem::SplitAccumulatedPath(fileDialogCurrentPath, accPaths);
             }
 
             if (i < accPaths.size() - 1) ImGui::SameLine();
@@ -615,7 +616,7 @@ std::string EditorUIModule::RenderFileDialog(bool& window, const char* windowTit
         {
             FileSystem::GetFilesSorted(fileDialogCurrentPath, filesFileDialog);
 
-            filesFileDialog.insert(filesFileDialog.begin(), "..");
+            if (accPaths.size() > 1) filesFileDialog.insert(filesFileDialog.begin(), "..");
 
             doLoadFiles       = false;
             loadFilteredFiles = true;
@@ -705,25 +706,12 @@ std::string EditorUIModule::RenderFileDialog(bool& window, const char* windowTit
             else importPath = fileDialogCurrentPath + DELIMITER + inputFileDialog;
         }
 
-        inputFileDialog          = "";
-        window                   = false;
-        showDrives               = false;
-        searchQueryFileDialog[0] = '\0';
-        doLoadFiles              = true;
-        loadButtons              = true;
+        window = false;
     }
 
     ImGui::SameLine();
 
-    if (ImGui::Button("Cancel", ImVec2(0, 0)))
-    {
-        inputFileDialog          = "";
-        window                   = false;
-        showDrives               = false;
-        searchQueryFileDialog[0] = '\0';
-        doLoadFiles              = true;
-        loadButtons              = true;
-    }
+    if (ImGui::Button("Cancel", ImVec2(0, 0))) window = false;
 
     ImGui::End();
 
@@ -735,7 +723,11 @@ std::string EditorUIModule::RenderFileDialog(bool& window, const char* windowTit
         filesFileDialog.shrink_to_fit();
         filteredFiles.clear();
         filteredFiles.shrink_to_fit();
-        loadButtons = true;
+        showDrives               = false;
+        inputFileDialog          = "";
+        searchQueryFileDialog[0] = '\0';
+        doLoadFiles              = true;
+        loadButtons              = true;
     }
 
     return importPath;
