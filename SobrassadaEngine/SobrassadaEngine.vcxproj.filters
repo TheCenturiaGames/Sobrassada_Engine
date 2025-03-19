@@ -617,9 +617,6 @@
     <ClInclude Include="FileSystem\MetaModel.h">
       <Filter>FileSystem\Meta</Filter>
     </ClInclude>
-    <ClInclude Include="Utils\DebugUtils.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Scene\Components\Standalone\CharacterControllerComponent.h">
       <Filter>Scene\Components</Filter>
     </ClInclude>

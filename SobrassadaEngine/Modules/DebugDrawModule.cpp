@@ -9,7 +9,6 @@
 #include "OpenGLModule.h"
 #include "Quadtree.h"
 #include "Framebuffer.h"
-#include "DebugUtils.h"
 #include "Octree.h"
 #include "GameObject.h"
 
@@ -602,6 +601,9 @@ bool DebugDrawModule::Init()
 {
     implementation = new DDRenderInterfaceCoreGL;
     dd::initialize(implementation);
+
+    debugOptionValues.set((int)DebugOptions::RENDER_LIGTHS);
+
     return true;
 }
 
@@ -726,7 +728,7 @@ void DebugDrawModule::HandleDebugRenderOptions()
 
     const auto& gameObjects  = sceneModule->GetAllGameObjects();
 
-    if (debugRenderOptions[RENDER_AABB])
+    if (debugOptionValues[(int)DebugOptions::RENDER_AABB])
     {
         for (const auto& gameObject : *gameObjects)
         {
@@ -735,7 +737,7 @@ void DebugDrawModule::HandleDebugRenderOptions()
         }
     }
 
-    if (debugRenderOptions[RENDER_OBB])
+    if (debugOptionValues[(int)DebugOptions::RENDER_OBB])
     {
         for (const auto& gameObject : *gameObjects)
         {
@@ -744,19 +746,19 @@ void DebugDrawModule::HandleDebugRenderOptions()
         }
     }
 
-    if (debugRenderOptions[RENDER_OCTREE])
+    if (debugOptionValues[(int)DebugOptions::RENDER_OCTREE])
     {
         Octree* octree = sceneModule->GetSceneOctree();
         if (octree != nullptr) RenderLines(octree->GetDrawLines(), float3(1.f, 0.f, 0.f));
     }
 
-    if (debugRenderOptions[RENDER_DYNAMICTREE])
+    if (debugOptionValues[(int)DebugOptions::RENDER_DYNAMICTREE])
     {
         Quadtree* quadtree = sceneModule->GetSceneDynamicTree();
         if (quadtree != nullptr) RenderLines(quadtree->GetDrawLines(), float3(0.467f, 0.647f, 0.91f));
     }
 
-    if (debugRenderOptions[RENDER_CAMERA_RAY])
+    if (debugOptionValues[(int)DebugOptions::RENDER_CAMERA_RAY])
     {
         DrawLineSegment(cameraModule->GetLastCastedRay(), float3(1.f, 1.f, 0.f));
     }

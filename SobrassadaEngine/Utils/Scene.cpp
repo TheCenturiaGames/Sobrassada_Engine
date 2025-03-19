@@ -3,7 +3,7 @@
 #include "Application.h"
 #include "CameraModule.h"
 #include "Component.h"
-#include "DebugUtils.h"
+#include "DebugDrawModule.h"
 #include "EditorUIModule.h"
 #include "Framebuffer.h"
 #include "GameObject.h"
@@ -12,8 +12,9 @@
 #include "InputModule.h"
 #include "LibraryModule.h"
 #include "Octree.h"
-#include "Quadtree.h"
 #include "OpenGLModule.h"
+#include "ProjectModule.h"
+#include "Quadtree.h"
 #include "ResourceManagement/Resources/Resource.h"
 #include "ResourceManagement/Resources/ResourceModel.h"
 #include "ResourcesModule.h"
@@ -26,9 +27,6 @@
 #include "imgui_internal.h"
 // guizmo after imgui include
 #include "./Libs/ImGuizmo/ImGuizmo.h"
-#include "Importer.h"
-#include "ProjectModule.h"
-#include "SDL_mouse.h"
 
 Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 {
@@ -82,7 +80,7 @@ Scene::~Scene()
     delete lightsConfig;
     delete sceneOctree;
     delete dynamicTree;
-    
+
     lightsConfig = nullptr;
     sceneOctree  = nullptr;
     dynamicTree  = nullptr;
@@ -162,9 +160,9 @@ void Scene::Save(
 
         targetState.AddMember("Lights Config", lights, allocator);
     }
-    
+
     else GLOG("Light Config not found");
-    
+
     // TODO Convert to parameter which can be set later manually instead of saving a scene as default "on scene save"
     App->GetProjectModule()->SetAsStartupScene(sceneName);
 }
@@ -211,7 +209,8 @@ update_status Scene::Update(float deltaTime)
 
 update_status Scene::Render(float deltaTime) const
 {
-    if (!debugShaderOptions[RENDER_WIREFRAME]) lightsConfig->RenderSkybox();
+    if (!App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_WIREFRAME))
+        lightsConfig->RenderSkybox();
     lightsConfig->RenderLights();
 
     std::vector<GameObject*> objectsToRender;
@@ -338,23 +337,21 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
 
     if (ImGui::BeginPopup("RenderOptions"))
     {
-        float listBoxSize = debugShaderOptions.size() + debugRenderOptions.size() + 0.5f;
+        int stringCount   = sizeof(DebugStrings) / sizeof(char*);
+        float listBoxSize = (float)stringCount + 0.5f;
         if (ImGui::BeginListBox(
                 "##RenderOptionsList", ImVec2(ImGui::CalcItemWidth(), ImGui::GetFrameHeightWithSpacing() * listBoxSize)
             ))
         {
-            ImGui::Checkbox(RENDER_LIGTHS, &debugShaderOptions[RENDER_LIGTHS]);
-            if (ImGui::Checkbox("Render Wireframe", &debugShaderOptions[RENDER_WIREFRAME]))
+            const auto& debugBitset = App->GetDebugDrawModule()->GetDebugOptionValues();
+            for (int i = 0; i < stringCount; ++i)
             {
-                App->GetOpenGLModule()->SetRenderWireframe(debugShaderOptions[RENDER_WIREFRAME]);
-            }
-
-            ImGui::Separator();
-
-            for (auto& debugOption : debugRenderOptions)
-            {
-                if (ImGui::Checkbox(debugOption.first.c_str(), &debugOption.second))
+                bool currentBitValue = debugBitset[i];
+                if (ImGui::Checkbox(DebugStrings[i], &currentBitValue))
                 {
+                    App->GetDebugDrawModule()->FlipDebugOptionValue(i);
+                    if (i == (int)DebugOptions::RENDER_WIREFRAME)
+                        App->GetOpenGLModule()->SetRenderWireframe(currentBitValue);
                 }
             }
 
@@ -421,7 +418,8 @@ void Scene::RenderScene()
         if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr)
         {
             App->GetSceneModule()->GetMainCamera()->SetAspectRatio(aspectRatio);
-        } else App->GetCameraModule()->SetAspectRatio(aspectRatio);
+        }
+        else App->GetCameraModule()->SetAspectRatio(aspectRatio);
         framebuffer->Resize((int)windowSize.x, (int)windowSize.y);
     }
 
@@ -490,8 +488,8 @@ void Scene::RemoveGameObjectHierarchy(UID gameObjectUID)
     if (!gameObjectsContainer.count(gameObjectUID) || gameObjectUID == gameObjectRootUID) return;
 
     GameObject* gameObject = GetGameObjectByUID(gameObjectUID);
-    
-    // 
+
+    //
     if (gameObject->IsStatic()) SetStaticModified();
     else SetDynamicModified();
 
@@ -556,9 +554,9 @@ void Scene::CreateStaticSpatialDataStruct()
 void Scene::CreateDynamicSpatialDataStruct()
 {
     // PARAMETRIZED IN FUTURE
-    float3 center = float3::zero;
-    float length  = 200;
-    int nodeCapacity    = 5;
+    float3 center    = float3::zero;
+    float length     = 200;
+    int nodeCapacity = 5;
     dynamicTree      = new Quadtree(center, length, nodeCapacity);
 
     for (const auto& objectIterator : gameObjectsContainer)
@@ -628,7 +626,8 @@ void Scene::LoadModel(const UID modelUID)
         const Model& model                 = newModel->GetModelData();
         const std::vector<NodeData>& nodes = model.GetNodes();
 
-        GameObject* rootObject                 = new GameObject(GetGameObjectRootUID(), App->GetLibraryModule()->GetResourceName(modelUID));
+        GameObject* rootObject =
+            new GameObject(GetGameObjectRootUID(), App->GetLibraryModule()->GetResourceName(modelUID));
         rootObject->SetLocalTransform(nodes[0].transform);
 
         // Add the gameObject to the rootObject

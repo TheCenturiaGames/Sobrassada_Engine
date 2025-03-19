@@ -16,32 +16,30 @@ namespace RaycastController
     {
         GameObject* selectedGameObject = nullptr;
 
-        std::vector<GameObject*> sortedGameObjects;
+        std::vector<GameObject*> aabbIntersectedObjects;
 
-        // GETTING GAMEOBJECTS THAT INTERSECT WITH THE RAY AND SORT THEM BY DISTANCE
+        // GETTING GAMEOBJECTS THAT INTERSECT WITH THE RAY
         float closeDistance = 0;
         float farDistance   = 0;
         for (const auto& gameObject : queriedGameObjects)
         {
             if (ray.Intersects(gameObject->GetGlobalAABB(), closeDistance, farDistance))
             {
-                sortedGameObjects.push_back(gameObject);
+                aabbIntersectedObjects.push_back(gameObject);
             }
         }
 
         float closestDistance = std::numeric_limits<float>::infinity();
 
         // FOREACH GAMEOBJECT INTERSECTING CHECKING AGAINST THE RAY
-        for (const auto& gameObject : sortedGameObjects)
+        for (const auto& gameObject : aabbIntersectedObjects)
         {
             LineSegment localRay(ray.a, ray.b);
 
             const MeshComponent* meshComponent = gameObject->GetMeshComponent();
-            if (meshComponent == nullptr) continue; // TODO Happens occasionally, figure out why
+            if (meshComponent == nullptr) continue; // TODO REMOVE WHEN EMPTY GAMEOBJECT DON'T CONTAIN AN AABB
 
             const ResourceMesh* resourceMesh = meshComponent->GetResourceMesh();
-
-            if (resourceMesh == nullptr) continue;
 
             float4x4 globalTransform = gameObject->GetGlobalTransform();
             globalTransform.Inverse();

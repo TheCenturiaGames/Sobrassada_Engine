@@ -428,7 +428,6 @@
     <ClInclude Include="Scene\Components\CameraComponent.h" />
     <ClInclude Include="UI\EngineEditors\Editor\NodeEditor.h" />
     <ClInclude Include="UI\EngineEditors\Nodes\CustomNode.h" />
-    <ClInclude Include="Utils\DebugUtils.h" />
     <ClInclude Include="FileSystem\Importer.h" />
     <ClInclude Include="FileSystem\MetaModel.h" />
     <ClInclude Include="FileSystem\Model.h" />

@@ -1,6 +1,6 @@
 #include "ShaderModule.h"
 #include "Application.h"
-
+#include "DebugDrawModule.h"
 
 #include "glew.h"
 
@@ -18,7 +18,7 @@ bool ShaderModule::Init()
     specularGlossinessProgramUnlit = CreateShaderProgram(LIGHTS_VERTEX_SHADER_PATH, UNLIT_FRAGMENT_SHADER_PATH);
 
     metallicRoughnessProgram       = CreateShaderProgram(LIGHTS_VERTEX_SHADER_PATH, METALLIC_FRAGMENT_SHADER_PATH);
-    metallicRoughnessProgramUnlit = CreateShaderProgram(LIGHTS_VERTEX_SHADER_PATH, UNLIT_FRAGMENT_SHADER_PATH);
+    metallicRoughnessProgramUnlit  = CreateShaderProgram(LIGHTS_VERTEX_SHADER_PATH, UNLIT_FRAGMENT_SHADER_PATH);
     return true;
 }
 
@@ -135,4 +135,19 @@ unsigned int ShaderModule::CreateProgram(unsigned int vertexShader, unsigned fra
 void ShaderModule::DeleteProgram(unsigned int programID)
 {
     glDeleteProgram(programID);
+}
+
+int ShaderModule::GetSpecularGlossinessProgram() const
+{
+
+    return App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_LIGTHS)
+             ? specularGlossinessProgram
+             : specularGlossinessProgramUnlit;
+}
+
+int ShaderModule::GetMetallicRoughnessProgram() const
+{
+    return App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_LIGTHS)
+             ? metallicRoughnessProgram
+             : metallicRoughnessProgramUnlit;
 }
