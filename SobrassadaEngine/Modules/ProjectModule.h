@@ -11,7 +11,7 @@ class ProjectModule : public Module
 
     bool Init() override;
     update_status RenderEditor(float deltaTime) override;
-    
+
     void CloseCurrentProject();
 
     const std::string& GetLoadedProjectPath() const { return loadedProjectAbsolutePath; }
@@ -26,7 +26,7 @@ class ProjectModule : public Module
 
   private:
     char engineWorkingDirectory[255];
-    
+
     bool projectReloadRequested      = false;
     bool projectLoaded               = false;
     bool showCreateProjectFileDialog = false;
@@ -36,4 +36,7 @@ class ProjectModule : public Module
     std::string loadedProjectName    = "No project loaded";
     std::string loadedProjectAbsolutePath;
     std::vector<char*> previouslyLoadedProjects;
+
+    char newProjectPath[255];
+    char newProjectName[255];
 };

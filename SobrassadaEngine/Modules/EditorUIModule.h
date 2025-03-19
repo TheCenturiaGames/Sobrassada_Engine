@@ -75,6 +75,8 @@ class EditorUIModule : public Module
     float3& GetSnapValues() { return snapValues; }
     GizmoDragState GetImGuizmoDragState() const { return guizmoDragState; };
 
+    void SetFileDialogCurrentPath(char* newProjectPath) { fileDialogCurrentPath = newProjectPath; }
+
   private:
     void RenderBasicTransformModifiers(
         float3& outputPosition, float3& outputRotation, float3& outputScale, bool& lockScaleAxis,
