@@ -19,6 +19,7 @@ enum MainState
     MAIN_UPDATE,
     MAIN_FINISH,
     MAIN_EXIT
+
 };
 
 Application* App                               = NULL;
@@ -26,11 +27,11 @@ std::vector<char*>* Logs                       = NULL;
 
 // DebugUtils for rendering
 std::map<std::string, bool> debugRenderOptions = {
-    {RENDER_AABB, false},
-    {RENDER_OBB,  false},
-    {RENDER_OCTREE, false},
+    {RENDER_AABB,        false},
+    {RENDER_OBB,         false},
+    {RENDER_OCTREE,      false},
     {RENDER_DYNAMICTREE, false},
-    {RENDER_CAMERA_RAY, false}
+    {RENDER_CAMERA_RAY,  false}
 };
 
 std::map<std::string, bool> debugShaderOptions = {

@@ -14,30 +14,26 @@ template <typename ReturnValue, typename... Arguments> class EventDispatcher
     EventDispatcher() = default;
     ~EventDispatcher() { subscribedCallbacks.clear(); };
 
-    int SubscribeCallback(Delegate<ReturnValue, Arguments...>&& delegate)
+    auto SubscribeCallback(Delegate<ReturnValue, Arguments...>&& delegate)
     {
-        subscribedCallbacks.insert({++lastID, std::move(delegate)});
-
-        return lastID;
+        return subscribedCallbacks.insert(subscribedCallbacks.end(), std::move(delegate));
     };
 
-    void RemoveCallback(int id)
+    void RemoveCallback(typename std::list<Delegate<ReturnValue, Arguments...>>::iterator delegatePosition)
     {
-        auto iterator = subscribedCallbacks.find(id);
-        if (iterator != subscribedCallbacks.end()) subscribedCallbacks.erase(iterator);
+        subscribedCallbacks.erase(delegatePosition);
     }
 
     void Call(Arguments... args)
     {
         for (auto& callback : subscribedCallbacks)
         {
-            callback.second.Call(args...);
+            callback.Call(args...);
         }
     };
 
   private:
-    std::map<int, Delegate<ReturnValue, Arguments...>> subscribedCallbacks;
-    int lastID = -1;
+    std::list<Delegate<ReturnValue, Arguments...>> subscribedCallbacks;
 };
 
 template <> class EventDispatcher<void>
@@ -46,28 +42,24 @@ template <> class EventDispatcher<void>
     EventDispatcher() = default;
     ~EventDispatcher() { subscribedCallbacks.clear(); };
 
-    int SubscribeCallback(Delegate<void>&& delegate)
+    auto SubscribeCallback(Delegate<void>&& delegate)
     {
-        subscribedCallbacks.insert({++lastID, std::move(delegate)});
-
-        return lastID;
+        return subscribedCallbacks.insert(subscribedCallbacks.end(), std::move(delegate));
     };
 
-    void RemoveCallback(int id)
+    void RemoveCallback(std::list<Delegate<void>>::iterator delegatePosition)
     {
-        auto iterator = subscribedCallbacks.find(id);
-        if (iterator != subscribedCallbacks.end()) subscribedCallbacks.erase(iterator);
+        subscribedCallbacks.erase(delegatePosition);
     }
 
     void Call()
     {
-        for (auto callback : subscribedCallbacks)
+        for (auto& callback : subscribedCallbacks)
         {
-            callback.second.Call();
+            callback.Call();
         }
     };
 
   private:
-    std::map<int, Delegate<void>> subscribedCallbacks;
-    int lastID = -1;
+    std::list<Delegate<void>> subscribedCallbacks;
 };
