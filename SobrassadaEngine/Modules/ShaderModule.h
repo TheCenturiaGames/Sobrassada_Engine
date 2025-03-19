@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Module.h"
-#include "DebugUtils.h"
 
 class ShaderModule : public Module
 {
@@ -15,14 +14,8 @@ class ShaderModule : public Module
     unsigned int CreateShaderProgram(const char* vertexPath, const char* fragmentPath);
     void DeleteProgram(unsigned int programID);
 
-    int GetSpecularGlossinessProgram() const
-    {
-        return debugShaderOptions[RENDER_LIGTHS] ? specularGlossinessProgram : specularGlossinessProgramUnlit;
-    }
-    int GetMetallicRoughnessProgram() const
-    {
-        return debugShaderOptions[RENDER_LIGTHS] ? metallicRoughnessProgram : metallicRoughnessProgramUnlit;
-    }
+    int GetSpecularGlossinessProgram() const;
+    int GetMetallicRoughnessProgram() const;
 
   private:
     char* LoadShaderSource(const char* shaderPath);

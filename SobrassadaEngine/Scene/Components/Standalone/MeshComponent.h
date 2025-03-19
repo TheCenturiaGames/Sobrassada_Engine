@@ -22,8 +22,10 @@ class MeshComponent : public Component
     void Clone(const Component* other) override;
     
     void RenderEditorInspector() override;
-    void Update() override;
+
+    void Update(float deltaTime) override;
     void Render(float deltaTime) override;
+
     bool HasBones() const { return bones.size() > 0; }
 
     void InitSkin();

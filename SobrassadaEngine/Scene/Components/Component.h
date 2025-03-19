@@ -17,7 +17,7 @@ class Component
     virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
     virtual void Clone(const Component* other)  = 0;
 
-    virtual void Update() = 0;
+    virtual void Update(float deltaTime) = 0;
     virtual void Render(float deltaTime) = 0;
     virtual void RenderEditorInspector();
 

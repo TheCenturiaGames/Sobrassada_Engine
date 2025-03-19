@@ -1,5 +1,4 @@
 #include "Application.h"
-#include "DebugUtils.h"
 #include "Globals.h"
 
 #include "SDL.h"
@@ -12,6 +11,13 @@
 
 #include <memory>
 
+extern "C"
+{
+    _declspec(dllexport) DWORD NvOptimusEnablement                = 1;
+    _declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+}
+
+
 enum MainState
 {
     MAIN_CREATION,
@@ -19,31 +25,11 @@ enum MainState
     MAIN_UPDATE,
     MAIN_FINISH,
     MAIN_EXIT
+
 };
 
 Application* App                               = NULL;
 std::vector<char*>* Logs                       = NULL;
-
-// DebugUtils for rendering
-std::map<std::string, bool> debugRenderOptions = {
-    {RENDER_AABB, false},
-    {RENDER_OBB,  false},
-    {RENDER_OCTREE, false},
-    {RENDER_DYNAMICTREE, false},
-    {RENDER_CAMERA_RAY, false}
-};
-
-std::map<std::string, bool> debugShaderOptions = {
-    {RENDER_LIGTHS,    true },
-    {RENDER_WIREFRAME, false},
-};
-
-//Fuck Intel GPUs
-extern "C"
-{
-    _declspec(dllexport) DWORD NvOptimusEnablement                = 1;
-    _declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
-}
 
 int main(int argc, char** argv)
 {
@@ -133,9 +119,6 @@ int main(int argc, char** argv)
     }
     Logs->clear();
     delete Logs;
-
-    debugRenderOptions.clear();
-    debugShaderOptions.clear();
 
     return mainReturn;
 }

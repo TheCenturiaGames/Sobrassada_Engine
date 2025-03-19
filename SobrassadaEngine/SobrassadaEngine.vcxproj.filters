@@ -174,7 +174,7 @@
     <ClCompile Include="ResourceManagement\Resources\Resource.cpp">
       <Filter>Resources</Filter>
     </ClCompile>
-    <ClCompile Include="Utils\Scene.cpp">
+    <ClCompile Include="Scene\Scene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
     <ClCompile Include="Scene\Components\Standalone\Lights\PointLightComponent.cpp">
@@ -358,6 +358,9 @@
       <Filter>Modules</Filter>
     </ClCompile>
     <ClCompile Include="FileSystem\Config\EngineConfig.cpp">
+      <Filter>FileSystem\Config</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\Config\ProjectConfig.cpp">
       <Filter>FileSystem\Config</Filter>
     </ClCompile>
     <ClCompile Include="UI\EngineEditors\Editor\TextureLibraryEditor.cpp">
@@ -557,7 +560,7 @@
     <ClInclude Include="ResourceManagement\Resources\Resource.h">
       <Filter>Resources</Filter>
     </ClInclude>
-    <ClInclude Include="Utils\Scene.h">
+    <ClInclude Include="Scene\Scene.h">
       <Filter>Scene</Filter>
     </ClInclude>
     <ClInclude Include="Scene\Components\Standalone\Lights\SpotLightComponent.h">
@@ -628,9 +631,6 @@
     </ClInclude>
     <ClInclude Include="FileSystem\MetaModel.h">
       <Filter>FileSystem\Meta</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils\DebugUtils.h">
-      <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="FileSystem\MetaPrefab.h">
       <Filter>FileSystem\Meta</Filter>
@@ -715,6 +715,9 @@
     </ClInclude>
     <ClInclude Include="FileSystem\TextureImporter.h">
       <Filter>FileSystem\Importers</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\Config\ProjectConfig.h">
+      <Filter>FileSystem\Config</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

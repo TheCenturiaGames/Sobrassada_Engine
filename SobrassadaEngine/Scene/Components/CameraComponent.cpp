@@ -275,7 +275,7 @@ void CameraComponent::RenderEditorInspector()
     }
 }
 
-void CameraComponent::Update()
+void CameraComponent::Update(float deltaTime)
 {
     if (isMainCamera && App->GetSceneModule()->GetMainCamera() == nullptr) App->GetSceneModule()->SetMainCamera(this);
     float4x4 globalTransform = GetGlobalTransform();

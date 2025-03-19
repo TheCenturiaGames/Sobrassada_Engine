@@ -10,42 +10,15 @@ namespace math
 
 class GameObject;
 
-class RaycastController
+namespace RaycastController
 {
-  public:
-    template <typename Tree> static GameObject* GetRayIntersectionSingleTree(const LineSegment& ray, const Tree* tree);
-    template <typename... Tree> static GameObject* GetRayIntersectionTrees(const LineSegment& ray, const Tree*... trees);
+    GameObject* GetRayIntersectionObject(const LineSegment& ray, const std::vector<GameObject*>& queriedGameObjects);
 
-  private:
-    static GameObject* GetRayIntersectionObjects(const LineSegment& ray, const std::vector<GameObject*>& queriedGameObjects);
-};
+    template <typename... Tree> GameObject* GetRayIntersectionTrees(const LineSegment& ray, const Tree*... trees)
+    {
+        std::vector<GameObject*> queriedGameObjects;
+        (trees->template QueryElements<LineSegment>(ray, queriedGameObjects), ...);
 
-template <typename Tree>
-inline GameObject* RaycastController::GetRayIntersectionSingleTree(const LineSegment& ray, const Tree* tree)
-{
-    GameObject* selectedGameObject = nullptr;
-    if (tree == nullptr) return selectedGameObject;
-
-    std::vector<GameObject*> queriedGameObjects;
-
-    // GET ELEMENTS THAT INTERSECT WITH TREE
-    tree->template QueryElements<LineSegment>(ray, queriedGameObjects);
-
-    selectedGameObject = GetRayIntersectionObjects(ray, queriedGameObjects);
-
-    return selectedGameObject;
-}
-
-template <typename... Tree>
-inline GameObject* RaycastController::GetRayIntersectionTrees(const LineSegment& ray, const Tree*... trees)
-{
-    GameObject* selectedGameObject = nullptr;
-    if (((trees == nullptr) || ...)) return selectedGameObject;
-
-    std::vector<GameObject*> queriedGameObjects;
-    (trees->template QueryElements<LineSegment>(ray, queriedGameObjects), ...);
-
-    selectedGameObject = GetRayIntersectionObjects(ray, queriedGameObjects);
-
-    return selectedGameObject;
+        return GetRayIntersectionObject(ray, queriedGameObjects);
+    }
 }

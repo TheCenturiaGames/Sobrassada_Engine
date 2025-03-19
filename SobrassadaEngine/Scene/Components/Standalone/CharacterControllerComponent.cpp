@@ -91,11 +91,7 @@ void CharacterControllerComponent::Clone(const Component* other)
     }
 }
 
-void CharacterControllerComponent::Update()
-{
-}
-
-void CharacterControllerComponent::Render(float deltaTime)
+void CharacterControllerComponent::Update(float deltaTime)
 {
     if (!enabled) return;
 
@@ -104,6 +100,10 @@ void CharacterControllerComponent::Render(float deltaTime)
     if (deltaTime <= 0.0f) return;
 
     HandleInput(deltaTime);
+}
+
+void CharacterControllerComponent::Render(float deltaTime)
+{
 }
 
 void CharacterControllerComponent::RenderEditorInspector()

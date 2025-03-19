@@ -9,8 +9,11 @@
 #include "Octree.h"
 #include "Quadtree.h"
 #include "ProjectModule.h"
+#include "Application.h"
+#include "InputModule.h"
 #include "RaycastController.h"
 #include "ResourcesModule.h"
+#include "Config/EngineConfig.h"
 
 #include <filesystem>
 
@@ -24,6 +27,12 @@ SceneModule::~SceneModule()
 
 bool SceneModule::Init()
 {
+    if (App->GetProjectModule()->IsProjectLoaded() && !App->GetProjectModule()->GetStartupSceneName().empty())
+    {
+        App->GetLibraryModule()->LoadScene((App->GetProjectModule()->GetStartupSceneName() + SCENE_EXTENSION).c_str());
+
+        if (App->GetEngineConfig()->ShouldStartGameOnStartup()) SwitchPlayMode(true);
+    }
     return true;
 }
 
@@ -53,10 +62,12 @@ update_status SceneModule::Render(float deltaTime)
 
 update_status SceneModule::RenderEditor(float deltaTime)
 {
+    #ifndef GAME
     if (loadedScene != nullptr)
     {
         return loadedScene->RenderEditor(deltaTime);
     }
+    #endif
     return UPDATE_CONTINUE;
 }
 

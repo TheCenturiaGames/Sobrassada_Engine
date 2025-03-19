@@ -14,17 +14,23 @@
 
 GameObject::GameObject(std::string name) : name(name)
 {
-    uid        = GenerateUID();
-    parentUID  = INVALID_UID;
-    localAABB  = AABB(DEFAULT_GAME_OBJECT_AABB);
+    uid       = GenerateUID();
+    parentUID = INVALID_UID;
+
+    localAABB = AABB();
+    localAABB.SetNegativeInfinity();
+
     globalOBB  = OBB(localAABB);
     globalAABB = AABB(globalOBB);
 }
 
 GameObject::GameObject(UID parentUID, std::string name) : parentUID(parentUID), name(name)
 {
-    uid        = GenerateUID();
-    localAABB  = AABB(DEFAULT_GAME_OBJECT_AABB);
+    uid       = GenerateUID();
+
+    localAABB = AABB();
+    localAABB.SetNegativeInfinity();
+
     globalOBB  = OBB(localAABB);
     globalAABB = AABB(globalOBB);
 }
@@ -32,8 +38,11 @@ GameObject::GameObject(UID parentUID, std::string name) : parentUID(parentUID), 
 GameObject::GameObject(UID parentUID, GameObject* refObject)
     : parentUID(parentUID), name(refObject->name), localTransform(refObject->localTransform)
 {
-    uid        = GenerateUID();
-    localAABB  = AABB(DEFAULT_GAME_OBJECT_AABB);
+    uid       = GenerateUID();
+
+    localAABB = AABB();
+    localAABB.SetNegativeInfinity();
+
     globalOBB  = OBB(localAABB);
     globalAABB = AABB(globalOBB);
 
@@ -55,8 +64,8 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
     selectedComponentIndex = COMPONENT_NONE;
     mobilitySettings       = initialState["Mobility"].GetInt();
 
-    if (initialState.HasMember("PrefabUID"))prefabUID = initialState["PrefabUID"].GetUint64();
-    
+    if (initialState.HasMember("PrefabUID")) prefabUID = initialState["PrefabUID"].GetUint64();
+
     if (initialState.HasMember("LocalTransform") && initialState["LocalTransform"].IsArray() &&
         initialState["LocalTransform"].Size() == 16)
     {
@@ -585,7 +594,8 @@ void GameObject::UpdateGameObjectHierarchy(UID sourceUID)
 
 void GameObject::OnAABBUpdated()
 {
-    localAABB = AABB(DEFAULT_GAME_OBJECT_AABB);
+    localAABB = AABB();
+    localAABB.SetNegativeInfinity();
 
     for (auto& component : components)
     {
@@ -678,6 +688,8 @@ bool GameObject::RemoveComponent(ComponentType componentType)
         delete components.at(componentType);
         components.erase(componentType);
         selectedComponentIndex = COMPONENT_NONE;
+
+        OnAABBUpdated();
     }
     return false;
 }
