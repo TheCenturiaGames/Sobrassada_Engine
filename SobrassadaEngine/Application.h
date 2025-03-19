@@ -4,6 +4,7 @@
 #include "Module.h"
 
 #include <list>
+#include <tuple>
 
 class EngineConfig;
 class WindowModule;
@@ -22,7 +23,7 @@ class UserInterfaceModule;
 class EngineTimer;
 class GameTimer;
 
-class Application
+template <typename... Modules> class Application
 {
   public:
     Application();
@@ -51,6 +52,8 @@ class Application
 
     EngineConfig* GetEngineConfig() const { return engineConfig; }
 
+    template <typename ModuleType> ModuleType* GetModule() { return std::get<ModuleType*>(engineModules); }
+
   private:
     std::list<Module*> modules;
 
@@ -71,6 +74,11 @@ class Application
     GameTimer* gameTimer             = nullptr;
 
     EngineConfig* engineConfig       = nullptr;
+
+    std::tuple<Modules...> engineModules;
 };
 
-extern Application* App;
+extern Application<
+    WindowModule, OpenGLModule, ResourcesModule, InputModule, ShaderModule, LibraryModule, EditorUIModule,
+    ProjectModule, SceneModule, CameraModule, DebugDrawModule, UserInterfaceModule, EngineTimer, GameTimer,
+    EngineConfig>* App;

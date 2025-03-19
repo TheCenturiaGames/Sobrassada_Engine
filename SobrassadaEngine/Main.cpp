@@ -17,7 +17,6 @@ extern "C"
     _declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }
 
-
 enum MainState
 {
     MAIN_CREATION,
@@ -25,11 +24,13 @@ enum MainState
     MAIN_UPDATE,
     MAIN_FINISH,
     MAIN_EXIT
-
 };
 
-Application* App                               = NULL;
-std::vector<char*>* Logs                       = NULL;
+Application<
+    WindowModule, OpenGLModule, ResourcesModule, InputModule, ShaderModule, LibraryModule, EditorUIModule,
+    ProjectModule, SceneModule, CameraModule, DebugDrawModule, UserInterfaceModule, EngineTimer, GameTimer,
+    EngineConfig>* App   = NULL;
+std::vector<char*>* Logs = NULL;
 
 int main(int argc, char** argv)
 {
@@ -48,7 +49,10 @@ int main(int argc, char** argv)
         case MAIN_CREATION:
 
             GLOG("----- Application Creation -----");
-            App       = new Application();
+            App = new Application<
+                WindowModule, OpenGLModule, ResourcesModule, InputModule, ShaderModule, LibraryModule, EditorUIModule,
+                ProjectModule, SceneModule, CameraModule, DebugDrawModule, UserInterfaceModule, EngineTimer, GameTimer,
+                EngineConfig>();
             mainState = MAIN_START;
             break;
 

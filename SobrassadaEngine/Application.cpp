@@ -20,9 +20,9 @@
 
 #ifdef _DEBUG
 #include "optick.h"
-#endif
+#endif 
 
-Application::Application()
+template<typename... Modules> Application<Modules...>::Application()
 {
     engineConfig = new EngineConfig();
 
@@ -44,7 +44,7 @@ Application::Application()
     gameTimer = new GameTimer();
 }
 
-Application::~Application()
+template <typename... Modules> Application<Modules...>::~Application()
 {
     for (std::list<Module*>::iterator it = modules.begin(); it != modules.end(); ++it)
     {
@@ -53,8 +53,7 @@ Application::~Application()
     delete engineConfig;
     engineConfig = nullptr;
 }
-
-bool Application::Init()
+template <typename... Modules> bool Application<Modules...>::Init()
 {
     bool returnStatus = true;
 
@@ -64,7 +63,7 @@ bool Application::Init()
     return returnStatus;
 }
 
-update_status Application::Update()
+template <typename... Modules> update_status Application<Modules ...>::Update()
 {
     const float deltaTime = engineTimer->Tick() / 1000.0f;
     gameTimer->Tick();
@@ -113,7 +112,7 @@ update_status Application::Update()
     return returnStatus;
 }
 
-bool Application::ShutDown()
+template <typename... Modules> bool Application<Modules...>::ShutDown()
 {
     bool returnStatus = true;
 
