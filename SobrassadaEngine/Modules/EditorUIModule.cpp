@@ -97,9 +97,12 @@ update_status EditorUIModule::Update(float deltaTime)
 {
     #ifndef GAME
 
-    UpdateGizmoTransformMode();
-    AddFramePlotData(deltaTime);
-    UpdateGizmoDragState();
+    if (App->GetProjectModule()->IsProjectLoaded())
+    {
+        UpdateGizmoTransformMode();
+        AddFramePlotData(deltaTime);
+        UpdateGizmoDragState();
+    }
 
     #endif
 

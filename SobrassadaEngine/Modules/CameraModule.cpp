@@ -9,6 +9,7 @@
 #include "DebugDraw/debugdraw.h"
 #include "Math/Quat.h"
 #include "MathGeoLib.h"
+#include "ProjectModule.h"
 #include "SDL_scancode.h"
 #include "glew.h"
 
@@ -109,7 +110,7 @@ const LineSegment& CameraModule::CastCameraRay()
 update_status CameraModule::Update(float deltaTime)
 {
     orbiting = false;
-    if (App->GetSceneModule()->GetDoInputsScene()) Controls(deltaTime);
+    if (App->GetProjectModule()->IsProjectLoaded() && App->GetSceneModule()->GetDoInputsScene()) Controls(deltaTime);
 
     return UPDATE_CONTINUE;
 }
