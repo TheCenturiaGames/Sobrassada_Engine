@@ -1,6 +1,5 @@
 #include "FileSystem.h"
 
-#include "document.h"
 #include "istreamwrapper.h"
 #include <fstream>
 #include <iostream>
@@ -181,7 +180,10 @@ namespace FileSystem
     void SplitAccumulatedPath(const std::string& path, std::vector<std::string>& accPaths)
     {
         accPaths.clear();
-        std::stringstream ss(path);
+        std::string modifiedPath = path;
+        std::replace(modifiedPath.begin(), modifiedPath.end(), '/', '\\');
+
+        std::stringstream ss(modifiedPath);
         std::string part;
         std::string accumulatedPath;
 

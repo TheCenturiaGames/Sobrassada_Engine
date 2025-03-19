@@ -6,12 +6,15 @@
 #include "Material.h"
 #include "MetaMaterial.h"
 #include "ProjectModule.h"
+#include "ResourceManagement/Resources/ResourceMaterial.h"
 #include "TextureImporter.h"
 
 #include <FileSystem>
+#include <tiny_gltf.h>
 
 UID MaterialImporter::ImportMaterial(
-    const tinygltf::Model& model, int materialIndex, const char* sourceFilePath, const std::string& targetFilePath, UID sourceUID
+    const tinygltf::Model& model, int materialIndex, const char* sourceFilePath, const std::string& targetFilePath,
+    UID sourceUID
 )
 {
     // If it has no materials exit
@@ -51,7 +54,8 @@ UID MaterialImporter::ImportMaterial(
             const tinygltf::Value& diffuseTex = specGloss.Get("diffuseTexture");
             int texIndex                      = diffuseTex.Get("index").Get<int>();
 
-            UID diffuseUID = HandleTextureImport(path + model.images[model.textures[texIndex].source].uri, targetFilePath);
+            UID diffuseUID =
+                HandleTextureImport(path + model.images[model.textures[texIndex].source].uri, targetFilePath);
 
             if (diffuseUID != INVALID_UID)
             {
@@ -86,7 +90,8 @@ UID MaterialImporter::ImportMaterial(
             const tinygltf::Value& specTex = specGloss.Get("specularGlossinessTexture");
             int texIndex                   = specTex.Get("index").Get<int>();
 
-            UID specularGlossinessUID = HandleTextureImport(path + model.images[model.textures[texIndex].source].uri, targetFilePath);
+            UID specularGlossinessUID =
+                HandleTextureImport(path + model.images[model.textures[texIndex].source].uri, targetFilePath);
 
             if (specularGlossinessUID != INVALID_UID)
             {
@@ -109,8 +114,9 @@ UID MaterialImporter::ImportMaterial(
         // Base Color Texture
         if (pbr.baseColorTexture.index >= 0)
         {
-            int texIndex   = pbr.baseColorTexture.index;
-            UID diffuseUID = HandleTextureImport(path + model.images[model.textures[texIndex].source].uri, targetFilePath);
+            int texIndex = pbr.baseColorTexture.index;
+            UID diffuseUID =
+                HandleTextureImport(path + model.images[model.textures[texIndex].source].uri, targetFilePath);
 
             if (diffuseUID != INVALID_UID)
             {
@@ -121,7 +127,8 @@ UID MaterialImporter::ImportMaterial(
         if (pbr.metallicRoughnessTexture.index >= 0)
         {
             int texIndex = pbr.metallicRoughnessTexture.index;
-            UID metallicRoughnessTextureUID = HandleTextureImport(path + model.images[model.textures[texIndex].source].uri, targetFilePath);
+            UID metallicRoughnessTextureUID =
+                HandleTextureImport(path + model.images[model.textures[texIndex].source].uri, targetFilePath);
             if (metallicRoughnessTextureUID != INVALID_UID)
             {
                 material.SetMetallicRoughnessTexture(metallicRoughnessTextureUID);
@@ -152,7 +159,8 @@ UID MaterialImporter::ImportMaterial(
         useOcclusion = true;
         material.SetOcclusionStrength(static_cast<float>(gltfMaterial.occlusionTexture.strength));
 
-        UID occlusionUID = HandleTextureImport(path + model.images[model.textures[texIndex].source].uri, targetFilePath);
+        UID occlusionUID =
+            HandleTextureImport(path + model.images[model.textures[texIndex].source].uri, targetFilePath);
         if (occlusionUID != INVALID_UID)
         {
             material.SetOcclusionTexture(occlusionUID);
@@ -233,8 +241,6 @@ ResourceMaterial* MaterialImporter::LoadMaterial(UID materialUID)
     material->LoadMaterialData(mat);
 
     delete[] buffer;
-
-    // App->GetLibraryModule()->AddResource(savePath, finalMeshUID);
 
     return material;
 }

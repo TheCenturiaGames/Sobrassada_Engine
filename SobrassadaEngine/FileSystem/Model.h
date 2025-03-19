@@ -27,6 +27,7 @@ class Model
     Model() = default;
     Model(const UID id, const std::vector<NodeData>& nodes, const std::vector<Skin>& skins)
         : uid(id), nodes(nodes), skins(skins) {};
+    ~Model() = default;
 
     const std::vector<NodeData>& GetNodes() const { return nodes; }
     const Skin& GetSkin(int skinIndex) const { return skins[skinIndex]; }

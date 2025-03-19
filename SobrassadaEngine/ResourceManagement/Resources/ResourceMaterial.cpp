@@ -1,18 +1,15 @@
 ﻿#include "ResourceMaterial.h"
 
 #include "Application.h"
+#include "FileSystem/Material.h"
 #include "LibraryModule.h"
+#include "ResourceManagement/Resources/ResourceTexture.h"
 #include "TextureImporter.h"
 #include "FileSystem/Material.h"
 
-#include "DirectXTex/DirectXTex.h"
 #include "imgui.h"
 #include <glew.h>
 #include <unordered_set>
-#define TINYGLTF_NO_STB_IMAGE_WRITE
-#define TINYGLTF_NO_STB_IMAGE
-#define TINYGLTF_NO_EXTERNAL_IMAGE
-#include <tiny_gltf.h>
 
 ResourceMaterial::ResourceMaterial(UID uid, const std::string& name) : Resource(uid, name, ResourceType::Material)
 {
@@ -199,14 +196,17 @@ void ResourceMaterial::RenderMaterial(int program) const
 
 void ResourceMaterial::FreeMaterials() const
 {
-    glMakeTextureHandleNonResidentARB(material.diffuseTex);
-    glMakeTextureHandleNonResidentARB(material.specularTex);
-    glMakeTextureHandleNonResidentARB(material.metallicTex);
-    glMakeTextureHandleNonResidentARB(material.normalTex);
 
+    glMakeTextureHandleNonResidentARB(material.diffuseTex);
     glDeleteTextures(1, &diffuseTexture.textureID);
-    glDeleteTextures(1, &metallicTexture.textureID);
+
+    glMakeTextureHandleNonResidentARB(material.specularTex);
     glDeleteTextures(1, &specularTexture.textureID);
+
+    glMakeTextureHandleNonResidentARB(material.metallicTex);
+    glDeleteTextures(1, &metallicTexture.textureID);
+
+    glMakeTextureHandleNonResidentARB(material.normalTex);
     glDeleteTextures(1, &normalTexture.textureID);
 
     glDeleteBuffers(1, &ubo);

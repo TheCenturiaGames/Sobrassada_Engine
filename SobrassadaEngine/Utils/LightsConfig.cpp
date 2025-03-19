@@ -19,9 +19,6 @@
 
 LightsConfig::LightsConfig()
 {
-    skyboxTexture    = 0;
-    skyboxVao        = 0;
-    skyboxProgram    = 0;
     ambientColor     = float3(1.0f, 1.0f, 1.0f);
     ambientIntensity = 0.2f;
 }
@@ -32,7 +29,7 @@ LightsConfig::~LightsConfig()
     glDeleteBuffers(1, &directionalBufferId);
     glDeleteBuffers(1, &pointBufferId);
     glDeleteBuffers(1, &spotBufferId);
-    glDeleteBuffers(1, &skyboxVao);
+    glDeleteVertexArrays(1, &skyboxVao);
     glDeleteBuffers(1, &skyboxVbo);
     glDeleteProgram(skyboxProgram);
 }
@@ -57,15 +54,14 @@ void LightsConfig::InitSkybox()
                               -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f,
                               1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f};
 
+    // Generato VAO
+    glGenVertexArrays(1, &skyboxVao);
+    glBindVertexArray(skyboxVao);
+
     // Generate VBO
     glGenBuffers(1, &skyboxVbo);
     glBindBuffer(GL_ARRAY_BUFFER, skyboxVbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), skyboxVertices, GL_STATIC_DRAW);
-
-    // Generato VAO
-    glGenVertexArrays(1, &skyboxVao);
-    glBindVertexArray(skyboxVao);
-    glBindBuffer(GL_ARRAY_BUFFER, skyboxVbo);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
@@ -76,7 +72,7 @@ void LightsConfig::InitSkybox()
     skyboxTexture = LoadSkyboxTexture(App->GetLibraryModule()->GetTextureUID("cubemap"));
 
     // Load the skybox shaders
-    skyboxProgram = App->GetShaderModule()->CreateShaderProgram("EngineDefaults/Shader/Vertex/skyboxVertex.glsl", "EngineDefaults/Shader/Fragment/skyboxFragment.glsl");
+    skyboxProgram = App->GetShaderModule()->CreateShaderProgram(SKYBOX_VERTEX_SHADER_PATH, SKYBOX_FRAGMENT_SHADER_PATH);
 }
 
 void LightsConfig::RenderSkybox() const
@@ -89,7 +85,7 @@ void LightsConfig::RenderSkybox() const
     {
         if (App->GetSceneModule()->GetMainCamera()->GetType() == 1)
         {
-            //We need to change to perspective as ortographic doesnt support cubemap
+            // We need to change to perspective as ortographic doesnt support cubemap
             change = true;
             App->GetSceneModule()->GetMainCamera()->ChangeToPerspective();
         }
@@ -114,7 +110,7 @@ void LightsConfig::RenderSkybox() const
 
     glBindVertexArray(0);
 
-    if(change == true) App->GetSceneModule()->GetMainCamera()->ChangeToOrtographic();
+    if (change == true) App->GetSceneModule()->GetMainCamera()->ChangeToOrtographic();
 
     App->GetOpenGLModule()->SetDepthFunc(true);
 }
@@ -148,9 +144,9 @@ void LightsConfig::LoadData(const rapidjson::Value& lights)
     skyboxTexture    = LoadSkyboxTexture(lights["Skybox UID"].GetUint64());
 }
 
-void LightsConfig::EditorParams()
+void LightsConfig::EditorParams(bool& lightConfig)
 {
-    if (!ImGui::Begin("Lights Config"))
+    if (!ImGui::Begin("Lights Config", &lightConfig))
     {
         ImGui::End();
         return;

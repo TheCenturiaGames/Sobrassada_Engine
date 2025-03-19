@@ -2,6 +2,8 @@
 
 #include "Resource.h"
 
+#include <vector>
+
 class GameObject;
 
 class ResourcePrefab : public Resource

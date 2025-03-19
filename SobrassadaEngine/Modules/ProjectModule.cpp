@@ -12,7 +12,7 @@
 
 bool ProjectModule::Init()
 {
-    _getcwd(engineWorkingDirectory, 255);
+    _getcwd(engineWorkingDirectory, IM_ARRAYSIZE(engineWorkingDirectory));
     if (!App->GetEngineConfig()->GetStartupProjectPath().empty())
     {
         loadedProjectAbsolutePath = App->GetEngineConfig()->GetStartupProjectPath();
@@ -35,121 +35,115 @@ bool ProjectModule::Init()
 
 update_status ProjectModule::RenderEditor(float deltaTime)
 {
-    if (!projectLoaded)
+    if (!projectLoaded && ImGui::Begin("Project manager"))
     {
-        static char newProjectPath[255];
-        static char newProjectName[255];
-
-        if (ImGui::Begin("Project manager"))
+        ImGui::BeginTabBar("##ProjectLoaderBar", ImGuiTabBarFlags_None);
         {
-            ImGui::BeginTabBar("##ProjectLoaderBar", ImGuiTabBarFlags_None);
+            if (ImGui::BeginTabItem("Create new project"))
             {
-                if (ImGui::BeginTabItem("Create new project"))
+                ImGui::InputText("Path", newProjectPath, IM_ARRAYSIZE(newProjectPath));
+                ImGui::SameLine();
+                if (ImGui::Button("Select path"))
                 {
-                    ImGui::InputText("Path", newProjectPath, 255);
+                    showOpenProjectFileDialog = true;
+                    App->GetEditorUIModule()->SetFileDialogCurrentPath(newProjectPath);
+                }
+                ImGui::InputText("Name", newProjectName, IM_ARRAYSIZE(newProjectName));
+                if (strlen(newProjectName) == 0)
+                {
                     ImGui::SameLine();
-                    if (ImGui::Button("Select path"))
-                    {
-                        showOpenProjectFileDialog = true;
-                    }
-                    ImGui::InputText("Name", newProjectName, 255);
-                    if (strlen(newProjectName) == 0)
-                    {
-                        ImGui::SameLine();
 
-                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 0, 0, 1));
-                        ImGui::Text("Name for the project folder is required!");
-                        ImGui::PopStyleColor();
-                    }
-                    if (FileSystem::IsAbsolute(newProjectPath))
-                        ImGui::Text("Absolute project path: %s\\%s", newProjectPath, newProjectName);
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 0, 0, 1));
+                    ImGui::Text("Name for the project folder is required!");
+                    ImGui::PopStyleColor();
+                }
+                if (FileSystem::IsAbsolute(newProjectPath))
+                    ImGui::Text("Absolute project path: %s\\%s", newProjectPath, newProjectName);
+                else
+                {
+                    if (strlen(newProjectPath) == 0)
+                        ImGui::Text("Absolute project path: %s\\%s", engineWorkingDirectory, newProjectName);
                     else
-                    {
-                        if (strlen(newProjectPath) == 0)
-                            ImGui::Text("Absolute project path: %s\\%s", engineWorkingDirectory, newProjectName);
-                        else
-                            ImGui::Text(
-                                "Absolute project path: %s\\%s\\%s", engineWorkingDirectory, newProjectPath,
-                                newProjectName
-                            );
-                    }
-
-                    if (strlen(newProjectName) != 0 && ImGui::Button("Create"))
-                    {
-                        if (FileSystem::IsAbsolute(newProjectPath)) CreateNewProject(newProjectPath, newProjectName);
-                        else
-                            CreateNewProject(
-                                std::string(engineWorkingDirectory) + DELIMITER + newProjectPath, newProjectName
-                            );
-                    }
-                    ImGui::EndTabItem();
+                        ImGui::Text(
+                            "Absolute project path: %s\\%s\\%s", engineWorkingDirectory, newProjectPath, newProjectName
+                        );
                 }
-                if (ImGui::BeginTabItem("Load project"))
+
+                if (strlen(newProjectName) != 0 && ImGui::Button("Create"))
                 {
-
-                    ImGui::InputText("Path", newProjectPath, 255);
-                    ImGui::SameLine();
-                    if (ImGui::Button("Select path"))
-                    {
-                        showCreateProjectFileDialog = true;
-                    }
-
-                    if (ImGui::BeginListBox("Previous projects"))
-                    {
-                        for (const auto& path : App->GetEngineConfig()->GetProjectPaths())
-                        {
-                            if (ImGui::Selectable(path.c_str(), false)) memcpy(newProjectPath, path.c_str(), 255);
-                        }
-                        ImGui::EndListBox();
-                    }
-
-                    if (ImGui::Button("Clear previous projects"))
-                    {
-                        App->GetEngineConfig()->ClearPreviouslyLoadedProjectPaths();
-                    }
-                    if (FileSystem::IsAbsolute(newProjectPath))
-                        ImGui::Text("Absolute project path: %s", newProjectPath);
+                    if (FileSystem::IsAbsolute(newProjectPath)) CreateNewProject(newProjectPath, newProjectName);
                     else
-                    {
-                        if (strlen(newProjectPath) == 0)
-                            ImGui::Text("Absolute project path: %s", engineWorkingDirectory);
-                        else ImGui::Text("Absolute project path: %s\\%s", engineWorkingDirectory, newProjectPath);
-                    }
-
-                    if (ImGui::Button("Load"))
-                    {
-                        if (FileSystem::IsAbsolute(newProjectPath)) LoadProject(newProjectPath);
-                        else LoadProject(std::string(engineWorkingDirectory) + DELIMITER + newProjectPath);
-                    }
-                    ImGui::EndTabItem();
+                        CreateNewProject(
+                            std::string(engineWorkingDirectory) + DELIMITER + newProjectPath, newProjectName
+                        );
                 }
-
-                ImGui::EndTabBar();
+                ImGui::EndTabItem();
             }
-
-            ImGui::End();
-
-            if (showCreateProjectFileDialog)
+            if (ImGui::BeginTabItem("Load project"))
             {
-                const std::string resultingPath =
-                    App->GetEditorUIModule()->RenderFileDialog(showCreateProjectFileDialog, "Select project", true);
-                if (!resultingPath.empty())
+
+                ImGui::InputText("Path", newProjectPath, IM_ARRAYSIZE(newProjectPath));
+                ImGui::SameLine();
+                if (ImGui::Button("Select path"))
                 {
-                    memcpy(newProjectPath, resultingPath.c_str(), 255);
-                    memcpy(newProjectName, FileSystem::GetFileNameWithoutExtension(newProjectPath).c_str(), 255);
+                    showCreateProjectFileDialog = true;
+                    App->GetEditorUIModule()->SetFileDialogCurrentPath(newProjectPath);
                 }
-            }
-            else if (showOpenProjectFileDialog)
-            {
-                const std::string resultingPath =
-                    App->GetEditorUIModule()->RenderFileDialog(showOpenProjectFileDialog, "Select save location", true);
-                if (!resultingPath.empty())
+
+                if (ImGui::BeginListBox("Previous projects"))
                 {
-                    memcpy(newProjectPath, resultingPath.c_str(), 255);
+                    for (const auto& path : App->GetEngineConfig()->GetProjectPaths())
+                    {
+                        if (ImGui::Selectable(path.c_str(), false)) memcpy(newProjectPath, path.c_str(), path.size());
+                    }
+                    ImGui::EndListBox();
                 }
+
+                if (ImGui::Button("Clear previous projects"))
+                {
+                    App->GetEngineConfig()->ClearPreviouslyLoadedProjectPaths();
+                }
+                if (FileSystem::IsAbsolute(newProjectPath)) ImGui::Text("Absolute project path: %s", newProjectPath);
+                else
+                {
+                    if (strlen(newProjectPath) == 0) ImGui::Text("Absolute project path: %s", engineWorkingDirectory);
+                    else ImGui::Text("Absolute project path: %s\\%s", engineWorkingDirectory, newProjectPath);
+                }
+
+                if (ImGui::Button("Load"))
+                {
+                    if (FileSystem::IsAbsolute(newProjectPath)) LoadProject(newProjectPath);
+                    else LoadProject(std::string(engineWorkingDirectory) + DELIMITER + newProjectPath);
+                }
+                ImGui::EndTabItem();
             }
-            return UPDATE_CONTINUE;
+
+            ImGui::EndTabBar();
         }
+
+        ImGui::End();
+
+        if (showCreateProjectFileDialog)
+        {
+            const std::string resultingPath =
+                App->GetEditorUIModule()->RenderFileDialog(showCreateProjectFileDialog, "Select project", true);
+            if (!resultingPath.empty())
+            {
+                memcpy(newProjectPath, resultingPath.c_str(), resultingPath.size());
+                std::string newProjectPathWithoutExt = FileSystem::GetFileNameWithoutExtension(newProjectPath);
+                memcpy(newProjectName, newProjectPathWithoutExt.c_str(), newProjectPathWithoutExt.size());
+            }
+        }
+        else if (showOpenProjectFileDialog)
+        {
+            const std::string resultingPath =
+                App->GetEditorUIModule()->RenderFileDialog(showOpenProjectFileDialog, "Select save location", true);
+            if (!resultingPath.empty())
+            {
+                memcpy(newProjectPath, resultingPath.c_str(), resultingPath.size());
+            }
+        }
+        return UPDATE_CONTINUE;
     }
 
     return projectReloadRequested ? UPDATE_RESTART : UPDATE_CONTINUE;

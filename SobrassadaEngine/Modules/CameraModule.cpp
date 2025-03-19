@@ -108,6 +108,7 @@ const LineSegment& CameraModule::CastCameraRay()
 
 update_status CameraModule::Update(float deltaTime)
 {
+    orbiting = false;
     if (App->GetSceneModule()->GetDoInputsScene()) Controls(deltaTime);
 
     return UPDATE_CONTINUE;
@@ -235,6 +236,8 @@ void CameraModule::Controls(float deltaTime)
         RotateCamera(-mouseX * deltaRotationAngle, -mouseY * deltaRotationAngle);
 
         TriggerFocusCamera();
+
+        orbiting = true;
     }
 
     viewMatrix         = camera.ViewMatrix();

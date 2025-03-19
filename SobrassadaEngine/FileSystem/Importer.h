@@ -1,6 +1,8 @@
 ﻿#pragma once
 
-#include "ResourceManagement/Resources/Resource.h"
+#include "Globals.h"
+
+class Resource;
 
 namespace Importer
 {

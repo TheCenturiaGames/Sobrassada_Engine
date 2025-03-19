@@ -67,7 +67,7 @@ class LightsConfig
     LightsConfig();
     ~LightsConfig();
 
-    void EditorParams();
+    void EditorParams(bool& lightConfig);
 
     void InitSkybox();
     void RenderSkybox() const;
@@ -99,17 +99,18 @@ class LightsConfig
     void SetSpotLightsShaderData() const;
 
   private:
-    UID skyboxUID;
-    unsigned int skyboxVbo;
-    unsigned int skyboxVao;
-    unsigned int skyboxTexture;
-    unsigned int skyboxProgram;
+    UID skyboxUID              = 0;
+    unsigned int skyboxVbo     = 0;
+    unsigned int skyboxVao     = 0;
+    unsigned int skyboxTexture = 0;
+    unsigned int skyboxProgram = 0;
+
     float3 ambientColor;
     float ambientIntensity;
-    unsigned int directionalBufferId;
-    unsigned int ambientBufferId;
-    unsigned int pointBufferId;
-    unsigned int spotBufferId;
+    unsigned int directionalBufferId            = 0;
+    unsigned int ambientBufferId                = 0;
+    unsigned int pointBufferId                  = 0;
+    unsigned int spotBufferId                   = 0;
 
     DirectionalLightComponent* directionalLight = nullptr;
     std::vector<PointLightComponent*> pointLights;
