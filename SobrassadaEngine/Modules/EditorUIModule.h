@@ -108,12 +108,10 @@ class EditorUIModule : public Module
     void About(bool& aboutMenu) const;
     std::string FormatWithCommas(unsigned int number) const;
 
-    void ShowTextureLibrary();
-    void ShowTextureViewport(ResourceTexture* texture);
-
     void LoadModelDialog(bool& loadModel);
 
     void OpenEditor(EngineEditorBase* editorToOpen);
+
     EngineEditorBase* CreateEditor(EditorType type);
 
     void UpdateGizmoDragState();
