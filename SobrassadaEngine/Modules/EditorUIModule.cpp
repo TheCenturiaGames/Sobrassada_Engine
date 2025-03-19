@@ -12,6 +12,9 @@
 #include "SceneImporter.h"
 #include "SceneModule.h"
 #include "WindowModule.h"
+#include "TextureLibraryEditor.h"
+
+
 
 #include "glew.h"
 #include "imgui.h"
@@ -25,6 +28,8 @@
 #define TINYGLTF_NO_EXTERNAL_IMAGE
 #define TINYGLTF_IMPLEMENTATION /* Only in one of the includes */
 #include <tiny_gltf.h>          // TODO Remove
+#include <TextureImporter.h>
+
 
 EditorUIModule::EditorUIModule() : width(0), height(0)
 {
@@ -298,13 +303,18 @@ void EditorUIModule::MainMenu()
             ImGui::EndMenu();
         }
 
-        if (ImGui::BeginMenu("Engine Editor Window"))
+       if (ImGui::BeginMenu("Engine Editor Window"))
         {
-
             if (ImGui::MenuItem("Mockup Base Engine Editor", "")) OpenEditor(CreateEditor(EditorType::BASE));
+
             if (ImGui::MenuItem("Node Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::NODE));
+
+            if (ImGui::MenuItem("Texture Library"))               OpenEditor(new TextureLibraryEditor("Texture Library", GenerateUID()));
+
             ImGui::EndMenu();
         }
+
+
 
         if (ImGui::MenuItem("Editor settings", "", editorSettingsMenu)) editorSettingsMenu = !editorSettingsMenu;
 

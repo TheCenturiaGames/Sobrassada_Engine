@@ -378,6 +378,9 @@
     <ClCompile Include="FileSystem\Config\EngineConfig.cpp">
       <Filter>FileSystem\Config</Filter>
     </ClCompile>
+    <ClCompile Include="UI\EngineEditors\Editor\TextureLibraryEditor.cpp">
+      <Filter>UI\EngineEditors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -694,6 +697,9 @@
     </ClInclude>
     <ClInclude Include="FileSystem\Config\ConfigFile.h">
       <Filter>FileSystem\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\EngineEditors\Editor\TextureLibraryEditor.h">
+      <Filter>UI\EngineEditors</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

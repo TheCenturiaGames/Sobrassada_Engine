@@ -2,10 +2,13 @@
 #include "EngineEditors/EngineEditorBase.h"
 #include "Module.h"
 #include "ResourceManagement/Resources/Resource.h"
+#include "ResourceManagement/Resources/ResourceTexture.h"
+
 #include "EngineEditors/EngineEditorBase.h"
 #include "EngineEditors/Editor/NodeEditor.h"
 
 #include "SDL.h"
+
 #include "imgui_internal.h"
 #include <Math/float3.h>
 #include <Math/float4x4.h>
@@ -115,6 +118,7 @@ private:
     void LoadPrefabDialog(bool& loadPrefab) const;
 
     void OpenEditor(EngineEditorBase* editorToOpen);
+
     EngineEditorBase* CreateEditor(EditorType type);
 
     void UpdateGizmoDragState();
