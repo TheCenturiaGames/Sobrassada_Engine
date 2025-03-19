@@ -2,7 +2,6 @@
 
 #include "Application.h"
 #include "CameraModule.h"
-#include "DebugUtils.h"
 #include "Framebuffer.h"
 #include "GameObject.h"
 #include "Globals.h"
@@ -10,9 +9,6 @@
 #include "Octree.h"
 #include "OpenGLModule.h"
 #include "Quadtree.h"
-#include "Framebuffer.h"
-#include "Octree.h"
-#include "GameObject.h"
 #include "SceneModule.h"
 
 #include "SDL_video.h"

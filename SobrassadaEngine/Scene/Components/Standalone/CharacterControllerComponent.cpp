@@ -91,11 +91,7 @@ void CharacterControllerComponent::Clone(const Component* other)
     }
 }
 
-void CharacterControllerComponent::Update()
-{
-}
-
-void CharacterControllerComponent::Render(float deltaTime)
+void CharacterControllerComponent::Update(float deltaTime)
 {
     if (!enabled) return;
 

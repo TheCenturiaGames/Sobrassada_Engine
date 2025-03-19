@@ -122,7 +122,6 @@ bool Application::ShutDown()
 
     delete engineTimer;
     delete gameTimer;
-    delete engineConfig;
 
     return returnStatus;
 }

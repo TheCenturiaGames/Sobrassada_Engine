@@ -224,7 +224,7 @@ update_status Scene::Render(float deltaTime) const
 {
     if (!App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_WIREFRAME))
         lightsConfig->RenderSkybox();
-    lightsConfig->RenderLights();
+    lightsConfig->SetLightsShaderData();
 
     std::vector<GameObject*> objectsToRender;
     CheckObjectsToRender(objectsToRender);

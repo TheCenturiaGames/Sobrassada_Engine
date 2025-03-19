@@ -11,6 +11,13 @@
 
 #include <memory>
 
+extern "C"
+{
+    _declspec(dllexport) DWORD NvOptimusEnablement                = 1;
+    _declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+}
+
+
 enum MainState
 {
     MAIN_CREATION,
