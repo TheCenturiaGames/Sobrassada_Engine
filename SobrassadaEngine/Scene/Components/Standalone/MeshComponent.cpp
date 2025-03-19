@@ -3,7 +3,7 @@
 #include "Application.h"
 #include "CameraModule.h"
 #include "EditorUIModule.h"
-#include "FileSystem/MeshImporter.h"
+#include "MeshImporter.h"
 #include "LibraryModule.h"
 #include "ResourceManagement/Resources/ResourceModel.h"
 #include "ResourcesModule.h"
