@@ -11,7 +11,7 @@ class LightComponent : public Component
     LightComponent(UID uid, UID uidParent, const char* uiName, ComponentType lightType);
     LightComponent(const rapidjson::Value& initialState);
 
-    void Update() override;
+    void Update(float deltaTime) override;
     virtual void Render(float deltaTime) override;
     virtual void RenderEditorInspector() override;
     virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;

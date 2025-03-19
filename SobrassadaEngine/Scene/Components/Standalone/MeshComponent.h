@@ -21,8 +21,10 @@ class MeshComponent : public Component
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
 
     void RenderEditorInspector() override;
-    void Update() override;
+
+    void Update(float deltaTime) override;
     void Render(float deltaTime) override;
+
     bool HasBones() const { return bones.size() > 0; }
 
     void InitSkin();

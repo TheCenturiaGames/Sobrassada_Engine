@@ -61,7 +61,7 @@ void LightComponent::RenderEditorInspector()
     }
 }
 
-void LightComponent::Update()
+void LightComponent::Update(float deltaTime)
 {
 }
 

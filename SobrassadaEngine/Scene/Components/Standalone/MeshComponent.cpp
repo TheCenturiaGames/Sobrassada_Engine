@@ -120,7 +120,8 @@ void MeshComponent::RenderEditorInspector()
     }
 }
 
-void MeshComponent::Update()
+
+void MeshComponent::Update(float deltaTime)
 {
 }
 

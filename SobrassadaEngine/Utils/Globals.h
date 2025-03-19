@@ -132,5 +132,3 @@ inline UID GenerateUID()
     UID uid = static_cast<UID>(rng.IntFast()) << 32 | rng.IntFast(); // Combine two 32-bit values
     return uid;
 }
-
-static AABB DEFAULT_GAME_OBJECT_AABB = AABB(float3(-1, -1, -1), float3(1, 1, 1));

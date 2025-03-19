@@ -201,7 +201,7 @@ update_status Scene::Update(float deltaTime)
         std::unordered_map<ComponentType, Component*> componentList = gameObject.second->GetComponents();
         for (auto& component : componentList)
         {
-            component.second->Update();
+            component.second->Update(deltaTime);
         }
     }
     return UPDATE_CONTINUE;
@@ -545,7 +545,7 @@ void Scene::CreateStaticSpatialDataStruct()
 
         if (!objectIterator.second->IsStatic()) continue;
         if (objectIterator.second->GetUID() == gameObjectRootUID) continue;
-        if (objectBB.Size().x == 0 && objectBB.Size().y == 0 && objectBB.Size().z == 0) continue;
+        if (objectBB.IsDegenerate()) continue;
 
         sceneOctree->InsertElement(objectIterator.second);
     }
