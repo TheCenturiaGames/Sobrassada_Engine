@@ -209,7 +209,7 @@ void GameObject::RenderEditorInspector()
         }
 
         auto selectedType = App->GetEditorUIModule()->RenderResourceSelectDialog<ComponentType>(
-            "ComponentSelection", standaloneComponents, COMPONENT_NONE
+            "ComponentSelection", App->GetEditorUIModule()->GetStandaloneComponents(), COMPONENT_NONE
         );
         if (selectedType != COMPONENT_NONE)
         {

@@ -13,6 +13,7 @@
 #include <string>
 #include <unordered_map>
 // imguizmo include after imgui
+#include "ComponentUtils.h"
 #include "./Libs/ImGuizmo/ImGuizmo.h"
 
 enum EditorType
@@ -75,7 +76,12 @@ class EditorUIModule : public Module
     float3& GetSnapValues() { return snapValues; }
     GizmoDragState GetImGuizmoDragState() const { return guizmoDragState; };
 
-  private:
+    const std::unordered_map<std::string, ComponentType>& GetStandaloneComponents() const
+    {
+        return standaloneComponents;
+    }
+
+private:
     void RenderBasicTransformModifiers(
         float3& outputPosition, float3& outputRotation, float3& outputScale, bool& lockScaleAxis,
         bool& positionValueChanged, bool& rotationValueChanged, bool& scaleValueChanged
@@ -144,4 +150,5 @@ class EditorUIModule : public Module
 
     float3 snapValues                    = {1.f, 1.f, 1.f};
     std::unordered_map<UID, EngineEditorBase*> openEditors;
+    std::unordered_map<std::string, ComponentType> standaloneComponents;
 };
