@@ -2,6 +2,7 @@
 #include "Module.h"
 
 #include <string>
+#include <vector>
 
 class ProjectModule : public Module
 {

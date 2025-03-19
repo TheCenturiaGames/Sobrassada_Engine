@@ -3,8 +3,13 @@
 #include "Application.h"
 #include "FileSystem.h"
 #include "LibraryModule.h"
+#include "Mesh.h"
 #include "MetaMesh.h"
 #include "ProjectModule.h"
+#include "ResourceManagement/Resources/ResourceMesh.h"
+
+#include <memory>
+#include <tiny_gltf.h>
 
 namespace MeshImporter
 {

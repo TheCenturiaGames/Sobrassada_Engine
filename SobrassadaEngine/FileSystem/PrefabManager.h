@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Globals.h"
-#include "ResourceManagement/Resources/ResourcePrefab.h"
+
+#include <string>
 
 class ResourcePrefab;
 class GameObject;
@@ -13,4 +14,4 @@ namespace PrefabManager
         const std::string& filePath, const std::string& targetFilePath, const std::string& name, const UID sourceUID
     );
     ResourcePrefab* LoadPrefab(UID prefabUID);
-}
+} // namespace PrefabManager

@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "CameraModule.h"
+#include "FileSystem/Mesh.h"
 #include "GameObject.h"
 #include "OpenGLModule.h"
 #include "ResourceMaterial.h"
@@ -12,10 +13,7 @@
 #include <SDL_assert.h>
 #include <chrono>
 #include <glew.h>
-#define TINYGLTF_NO_STB_IMAGE_WRITE
-#define TINYGLTF_NO_STB_IMAGE
-#define TINYGLTF_NO_EXTERNAL_IMAGE
-#include "tiny_gltf.h"
+#include <tiny_gltf.h>
 
 ResourceMesh::ResourceMesh(UID uid, const std::string& name, const float3& maxPos, const float3& minPos)
     : Resource(uid, name, ResourceType::Mesh)

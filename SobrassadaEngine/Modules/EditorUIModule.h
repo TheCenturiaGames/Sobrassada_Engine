@@ -147,6 +147,9 @@ class EditorUIModule : public Module
     float3 snapValues                    = {1.f, 1.f, 1.f};
     std::unordered_map<UID, EngineEditorBase*> openEditors;
 
+    bool lockScaleAxis        = false;
+    bool bUseRad              = true;
+
     // load dialog
     std::string inputFileLoad = "";
     std::vector<std::string> filesLoad;
@@ -179,9 +182,6 @@ class EditorUIModule : public Module
     bool showDrives              = false;
     std::string inputFileDialog  = "";
     int selectedFileDialog       = -1;
-
-    bool lockScaleAxis           = false;
-    bool bUseRad                 = true;
 
     // render resource select dialog
     char searchTextResource[255] = "";

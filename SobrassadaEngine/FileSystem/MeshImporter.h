@@ -1,15 +1,15 @@
 #pragma once
 
-#include "FileSystem.h"
 #include "Globals.h"
-#include "Mesh.h"
-#include "ResourceManagement/Resources/ResourceMesh.h"
 
-#include <memory>
-#define TINYGLTF_NO_STB_IMAGE_WRITE
-#define TINYGLTF_NO_STB_IMAGE
-#define TINYGLTF_NO_EXTERNAL_IMAGE
-#include "tiny_gltf.h"
+#include <string>
+
+namespace tinygltf
+{
+    class Model;
+    struct Mesh;
+    struct Primitive;
+} // namespace tinygltf
 
 enum DataType
 {
@@ -17,6 +17,8 @@ enum DataType
     UNSIGNED_SHORT,
     UNSIGNED_INT
 };
+
+class ResourceMesh;
 
 namespace MeshImporter
 {

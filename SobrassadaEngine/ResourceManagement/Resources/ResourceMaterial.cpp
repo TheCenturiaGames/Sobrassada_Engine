@@ -1,17 +1,14 @@
 ﻿#include "ResourceMaterial.h"
 
 #include "Application.h"
+#include "FileSystem/Material.h"
 #include "LibraryModule.h"
+#include "ResourceManagement/Resources/ResourceTexture.h"
 #include "TextureImporter.h"
 
-#include "DirectXTex/DirectXTex.h"
 #include "imgui.h"
 #include <glew.h>
 #include <unordered_set>
-#define TINYGLTF_NO_STB_IMAGE_WRITE
-#define TINYGLTF_NO_STB_IMAGE
-#define TINYGLTF_NO_EXTERNAL_IMAGE
-#include <tiny_gltf.h>
 
 ResourceMaterial::ResourceMaterial(UID uid, const std::string& name) : Resource(uid, name, ResourceType::Material)
 {

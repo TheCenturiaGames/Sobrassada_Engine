@@ -5,8 +5,10 @@
 #include "LibraryModule.h"
 #include "MetaTexture.h"
 #include "ProjectModule.h"
+#include "ResourceManagement/Resources/ResourceTexture.h"
+
+#include "DirectXTex/DirectXTex.h"
 #include "glew.h"
-#include <string>
 
 namespace TextureImporter
 {
@@ -14,7 +16,7 @@ namespace TextureImporter
     {
         // Copy image to Assets folder
         const std::string relativePath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
-        std::string copyPath = targetFilePath + relativePath;
+        std::string copyPath           = targetFilePath + relativePath;
         if (!FileSystem::Exists(copyPath.c_str()))
         {
             FileSystem::Copy(sourceFilePath, copyPath.c_str());
@@ -86,9 +88,9 @@ namespace TextureImporter
 
     ResourceTexture* LoadTexture(UID textureUID)
     {
-        std::string path     = App->GetLibraryModule()->GetResourcePath(textureUID);
+        std::string path = App->GetLibraryModule()->GetResourcePath(textureUID);
 
-        if (path.empty()) return nullptr;   // TODO Use fallback texture instead
+        if (path.empty()) return nullptr; // TODO Use fallback texture instead
 
         std::string fileName = FileSystem::GetFileNameWithoutExtension(path);
 

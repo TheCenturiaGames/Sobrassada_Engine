@@ -1,6 +1,5 @@
 #include "FileSystem.h"
 
-#include "document.h"
 #include "istreamwrapper.h"
 #include <fstream>
 #include <iostream>

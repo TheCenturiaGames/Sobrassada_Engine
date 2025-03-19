@@ -13,7 +13,6 @@
 #include "ResourcesModule.h"
 
 #include <filesystem>
-#include <tiny_gltf.h>
 
 SceneModule::SceneModule()
 {
