@@ -211,7 +211,7 @@ UID LibraryModule::AssignFiletypeUID(UID originalUID, FileType fileType)
         prefix = 16;
         break;
     case FileType::StateMachine:
-        prefix = 16;
+        prefix = 17;
         break;
     default:
         GLOG("Category: Unknown File Type (10)");
