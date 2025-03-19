@@ -400,7 +400,7 @@ void EditorUIModule::LoadPrefabDialog(bool& loadPrefab)
     ImGui::InputText("Search", searchTextPrefab, IM_ARRAYSIZE(searchTextPrefab));
 
     ImGui::Separator();
-    if (ImGui::BeginListBox("##PrefabsList", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
+    if (ImGui::BeginListBox("##PrefabsList", ImVec2(-FLT_MIN, -40)))
     {
         int i = 0;
         for (const auto& valuePair : App->GetLibraryModule()->GetPrefabMap())
@@ -417,6 +417,8 @@ void EditorUIModule::LoadPrefabDialog(bool& loadPrefab)
         }
         ImGui::EndListBox();
     }
+
+    ImGui::Dummy(ImVec2(0, 3));
 
     if (ImGui::Button("Ok", ImVec2(0, 0))) App->GetSceneModule()->LoadPrefab(prefabUID);
 
@@ -442,7 +444,7 @@ void EditorUIModule::LoadModelDialog(bool& loadModel)
     ImGui::InputText("Search", searchTextModel, IM_ARRAYSIZE(searchTextModel));
 
     ImGui::Separator();
-    if (ImGui::BeginListBox("##ModelsList", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing())))
+    if (ImGui::BeginListBox("##ModelsList", ImVec2(-FLT_MIN, -40)))
     {
         int i = 0;
         for (const auto& valuePair : App->GetLibraryModule()->GetModelMap())
@@ -459,6 +461,8 @@ void EditorUIModule::LoadModelDialog(bool& loadModel)
         }
         ImGui::EndListBox();
     }
+
+    ImGui::Dummy(ImVec2(0, 3));
 
     if (ImGui::Button("Ok", ImVec2(0, 0))) App->GetSceneModule()->LoadModel(modelUID);
 
