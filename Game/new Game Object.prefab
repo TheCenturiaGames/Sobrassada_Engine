@@ -1,0 +1,15 @@
+{
+    "Prefab": {
+        "UID": 10636783861779207120,
+        "Name": "new Game Object",
+        "GameObjects": [
+            {
+                "UID": 9960920670630372782,
+                "ParentUID": 16624638970781276239,
+                "Name": "new Game Object",
+                "Children": [],
+                "RootComponentUID": 2319903781
+            }
+        ]
+    }
+}

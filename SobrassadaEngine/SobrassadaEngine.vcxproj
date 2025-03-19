@@ -143,6 +143,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="FileSystem\PrefabManager.cpp" />
     <ClCompile Include="FileSystem\Config\EngineConfig.cpp" />
     <ClCompile Include="FileSystem\MetaModel.cpp" />
     <ClCompile Include="Libs\ImNodeFlow-1.2.2\src\ImNodeFlow.cpp" />
@@ -151,6 +152,7 @@
     <ClCompile Include="UI\EngineEditors\Editor\TextureLibraryEditor.cpp" />
     <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp" />
     <ClCompile Include="FileSystem\ModelImporter.cpp" />
+    <ClCompile Include="FileSystem\MetaPrefab.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceModel.cpp" />
     <ClCompile Include="FileSystem\MetaFile.cpp" />
     <ClCompile Include="FileSystem\MetaMaterial.cpp" />
@@ -198,6 +200,7 @@
     </ClCompile>
     <ClCompile Include="Modules\CameraModule.cpp" />
     <ClCompile Include="Modules\EditorUIModule.cpp" />
+    <ClCompile Include="ResourceManagement\Resources\ResourcePrefab.cpp" />
     <ClCompile Include="Modules\ProjectModule.cpp" />
     <ClCompile Include="Modules\UserInterfaceModule.cpp" />
     <ClCompile Include="Scene\Components\Standalone\CharacterControllerComponent.cpp" />
@@ -297,8 +300,10 @@
     <ClInclude Include="UI\EngineEditors\Nodes\CustomNode.h" />
     <ClInclude Include="Utils\DebugUtils.h" />
     <ClInclude Include="FileSystem\Importer.h" />
+    <ClInclude Include="FileSystem\PrefabManager.h" />
     <ClInclude Include="FileSystem\MetaModel.h" />
     <ClInclude Include="FileSystem\Model.h" />
+    <ClInclude Include="FileSystem\MetaPrefab.h" />
     <ClInclude Include="Libs\ImGuizmo\ImGuizmo.h" />
     <ClInclude Include="FileSystem\MetaFile.h" />
     <ClInclude Include="FileSystem\MetaMaterial.h" />
@@ -319,6 +324,8 @@
     <ClInclude Include="ResourceManagement\Resources\ResourceMesh.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceModel.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceTexture.h" />
+    <ClInclude Include="ResourceManagement\Resources\ResourcePrefab.h" />
+    <ClInclude Include="Scene\AABBUpdatable.h" />
     <ClInclude Include="FileSystem\FileSystem.h" />
     <ClInclude Include="Modules\LibraryModule.h" />
     <ClInclude Include="FileSystem\Material.h" />

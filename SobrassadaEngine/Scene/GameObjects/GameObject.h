@@ -23,6 +23,7 @@ class GameObject
   public:
     GameObject(std::string name);
     GameObject(UID parentUID, std::string name);
+    GameObject(UID parentUID, GameObject* refObject);
 
     GameObject(const rapidjson::Value& initialState);
 
@@ -49,7 +50,7 @@ class GameObject
     const std::string& GetName() const { return name; }
     void SetName(const std::string& newName) { name = newName; }
 
-    const std::vector<UID>& GetChildren() { return children; }
+    const std::vector<UID>& GetChildren() const { return children; }
     void AddChildren(UID childUID) { children.push_back(childUID); }
 
     UID GetParent() const { return parentUID; }
@@ -78,12 +79,16 @@ class GameObject
     void UpdateTransformForGOBranch() const;
 
     const std::unordered_map<ComponentType, Component*>& GetComponents() const { return components; }
+    Component* GetComponentByType(ComponentType type) const;
 
     MeshComponent* GetMeshComponent() const;
 
     void SetLocalTransform(const float4x4& newTransform) { localTransform = newTransform; }
     void DrawGizmos() const;
 
+    void CreatePrefab();
+    UID GetPrefabUID() const { return prefabUID; }
+    void SetPrefabUID(const UID uid) { prefabUID = uid; }
     void SetMobility(ComponentMobilitySettings newMobility) { mobilitySettings = newMobility; };
 
   private:
@@ -111,6 +116,7 @@ class GameObject
     bool isRenaming = false;
     char renameBuffer[128];
 
+    UID prefabUID = INVALID_UID;
     bool drawNodes                       = false;
 
     float4x4 localTransform              = float4x4::identity;
