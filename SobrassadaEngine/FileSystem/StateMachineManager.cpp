@@ -126,7 +126,7 @@ namespace StateMachineManager
         }
         std::string saveFilePath =
             STATEMACHINES_LIB_PATH + std::to_string(finalStateMachineUID) + STATEMACHINE_EXTENSION;
-        FileSystem::Save(saveFilePath.c_str(), buffer.data(), buffer.size(), true);
+        FileSystem::Save(saveFilePath.c_str(), buffer.data(), static_cast<unsigned int>(buffer.size()), true);
 
         App->GetLibraryModule()->AddStateMachine(finalStateMachineUID, stateMachineName);
         App->GetLibraryModule()->AddName(stateMachineName, finalStateMachineUID);

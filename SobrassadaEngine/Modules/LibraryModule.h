@@ -63,7 +63,7 @@ class LibraryModule : public Module
     const std::unordered_map<std::string, UID>& GetMeshMap() const { return meshMap; }
     const std::unordered_map<std::string, UID>& GetModelMap() const { return modelMap; }
     const std::unordered_map<std::string, UID>& GetPrefabMap() const { return prefabMap; }
-    const std::unordered_map<std::string, UID>& GetStateMachinePath() const { return stateMachinèMap; }
+    const std::unordered_map<std::string, UID>& GetStateMachinePath() const { return stateMachineMap; }
 
   private:
     // maps for user visuals | name -> UID
@@ -72,7 +72,7 @@ class LibraryModule : public Module
     std::unordered_map<std::string, UID> meshMap;  
     std::unordered_map<std::string, UID> prefabMap; 
     std::unordered_map<std::string, UID> modelMap;  
-    std::unordered_map<std::string, UID> stateMachinèMap;
+    std::unordered_map<std::string, UID> stateMachineMap;
     // inversed map          | UID -> name
     std::unordered_map<UID, std::string> namesMap;
 
