@@ -256,7 +256,7 @@ void LibraryModule::AddName(const std::string& resourceName, UID resourceUID)
 
 void LibraryModule::AddStateMachine(UID stateMachineUID, const std::string& stMachPath)
 {
-    stateMachinèMap[stMachPath] = stateMachineUID;
+    stateMachineMap[stMachPath] = stateMachineUID;
 }
 
 UID LibraryModule::GetTextureUID(const std::string& texturePath) const
@@ -305,8 +305,8 @@ UID LibraryModule::GetModelUID(const std::string& modelPath) const
 
 UID LibraryModule::GetStateMachinelUID(const std::string& stMachPath) const
 {
-    auto it = stateMachinèMap.find(stMachPath);
-    if (it != stateMachinèMap.end())
+    auto it = stateMachineMap.find(stMachPath);
+    if (it != stateMachineMap.end())
     {
         return it->second;
     }
