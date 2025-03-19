@@ -381,6 +381,12 @@
     <ClCompile Include="FileSystem\TextureImporter.cpp">
       <Filter>FileSystem\Importers</Filter>
     </ClCompile>
+    <ClCompile Include="ResourceManagement\Resources\ResourceStateMachine.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\StateMachineManager.cpp">
+      <Filter>FileSystem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -682,6 +688,12 @@
     </ClInclude>
     <ClInclude Include="FileSystem\Config\ConfigFile.h">
       <Filter>FileSystem\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManagement\Resources\ResourceStateMachine.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\StateMachineManager.h">
+      <Filter>FileSystem</Filter>
     </ClInclude>
     <ClInclude Include="UI\EngineEditors\Editor\TextureLibraryEditor.h">
       <Filter>UI\EngineEditors</Filter>

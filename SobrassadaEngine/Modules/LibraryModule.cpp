@@ -210,6 +210,9 @@ UID LibraryModule::AssignFiletypeUID(UID originalUID, FileType fileType)
     case FileType::Prefab:
         prefix = 16;
         break;
+    case FileType::StateMachine:
+        prefix = 17;
+        break;
     default:
         GLOG("Category: Unknown File Type (10)");
         break;
@@ -251,6 +254,11 @@ void LibraryModule::AddName(const std::string& resourceName, UID resourceUID)
     namesMap[resourceUID] = resourceName;
 }
 
+void LibraryModule::AddStateMachine(UID stateMachineUID, const std::string& stMachPath)
+{
+    stateMachineMap[stMachPath] = stateMachineUID;
+}
+
 UID LibraryModule::GetTextureUID(const std::string& texturePath) const
 {
     auto it = textureMap.find(texturePath);
@@ -288,6 +296,17 @@ UID LibraryModule::GetModelUID(const std::string& modelPath) const
 {
     auto it = modelMap.find(modelPath);
     if (it != modelMap.end())
+    {
+        return it->second;
+    }
+
+    return INVALID_UID;
+}
+
+UID LibraryModule::GetStateMachinelUID(const std::string& stMachPath) const
+{
+    auto it = stateMachineMap.find(stMachPath);
+    if (it != stateMachineMap.end())
     {
         return it->second;
     }
