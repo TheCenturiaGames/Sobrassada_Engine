@@ -17,6 +17,7 @@ class GameObject;
 class Component;
 class RootComponent;
 class Octree;
+class Quadtree;
 
 class SceneModule : public Module
 {
@@ -39,6 +40,7 @@ class SceneModule : public Module
     void CloseScene();
 
     void LoadModel(const UID modelUID) { loadedScene != nullptr ? loadedScene->LoadModel(modelUID) : void(); }
+    void LoadPrefab(const UID prefabUid) const { loadedScene != nullptr ? loadedScene->LoadPrefab(prefabUid) : void(); }
 
     void SwitchPlayMode(bool play);
 
@@ -47,7 +49,8 @@ class SceneModule : public Module
         loadedScene != nullptr ? loadedScene->AddGameObject(uid, newGameObject) : void();
     }
 
-    void RegenerateTree() const { loadedScene->UpdateSpatialDataStruct(); }
+    void RegenerateStaticTree() const { loadedScene->UpdateStaticSpatialStructure(); }
+    void RegenerateDynamicTree() const { loadedScene->UpdateDynamicSpatialStructure(); }
 
     void RenderHierarchyUI(bool& hierarchyMenu) const
     {
@@ -97,11 +100,20 @@ class SceneModule : public Module
     bool GetDoInputs() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() : false; }
     bool GetDoInputsScene() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() && !inPlayMode : false; }
     bool GetDoInputsGame() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() && inPlayMode : false; }
-
+    void OverridePrefabs(UID prefabUID) const { loadedScene != nullptr ? loadedScene->OverridePrefabs(prefabUID) : void(); }
     
     Octree* GetSceneOctree() const { return loadedScene != nullptr ? loadedScene->GetOctree() : nullptr; }
+    Quadtree* GetSceneDynamicTree() const { return loadedScene != nullptr ? loadedScene->GetDynamicTree() : nullptr; }
 
     void SetMainCamera(CameraComponent* camera) { loadedScene->SetMainCamera(camera); }
+    void SetStaticObjectUpdated() const
+    {
+        if (loadedScene != nullptr) loadedScene->SetStaticModified();
+    }
+    void SetDynamicObjectUpdated() const
+    {
+        if (loadedScene != nullptr) loadedScene->SetDynamicModified();
+    }
 
   private:
     Scene* loadedScene                  = nullptr;

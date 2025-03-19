@@ -69,10 +69,10 @@ enum update_status
 #define DEFAULT_CAMERA_ZOOM_SENSITIVITY      0.5f;
 
 #define ENGINE_DEFAULT_ASSETS "EngineDefaults/";
-
-#define ASSETS_PATH   "Assets/"
-#define SCENES_PATH   "Assets/Scenes/"
-#define METADATA_PATH "Assets/Metadata/"
+#define ASSETS_PATH         "Assets/"
+#define SCENES_PATH         "Assets/Scenes/"
+#define METADATA_PATH       "Assets/Metadata/"
+#define PREFABS_ASSETS_PATH "Assets/Prefabs/"
 #define MODELS_ASSETS_PATH "Assets/Models/"
 
 #define LIBRARY_PATH       "Library/"
@@ -85,12 +85,14 @@ enum update_status
 #define MATERIALS_PATH     "Library/Materials/"
 #define STATEMACHINES_LIB_PATH "Library/StateMachines/"
 #define STATEMACHINES_ASSETS_PATH "Assets/StateMachines/"
+#define PREFABS_LIB_PATH "Library/Prefabs/"
 
 #define ASSET_EXTENSION    ".gltf"
 #define MESH_EXTENSION     ".sobrassada"
 #define TEXTURE_EXTENSION  ".dds"
 #define MATERIAL_EXTENSION ".mat"
 #define SCENE_EXTENSION    ".scene"
+#define PREFAB_EXTENSION   ".prefab"
 #define MODEL_EXTENSION    ".model"
 #define META_EXTENSION     ".smeta"
 #define STATEMACHINE_EXTENSION ".smachine"
@@ -110,6 +112,7 @@ constexpr const char* RENDER_WIREFRAME              = "Render Wireframe";
 constexpr const char* RENDER_AABB                   = "AABB";
 constexpr const char* RENDER_OBB                    = "OBB";
 constexpr const char* RENDER_OCTREE                 = "Octree";
+constexpr const char* RENDER_DYNAMICTREE            = "Dynamic tree";
 constexpr const char* RENDER_CAMERA_RAY             = "Camera Ray";
 
 #define UID uint64_t
@@ -120,6 +123,7 @@ constexpr UID FALLBACK_TEXTURE_UID                      = 1200000000000000;
 
 constexpr const char* CONSTANT_MESH_SELECT_DIALOG_ID    = "mesh-select";
 constexpr const char* CONSTANT_TEXTURE_SELECT_DIALOG_ID = "texture-select";
+constexpr const char* CONSTANT_PREFAB_SELECT_DIALOG_ID  = "prefab-select";
 constexpr const char* CONSTANT_MODEL_SELECT_DIALOG_ID   = "model-select";
 
 constexpr uint32_t CONSTANT_NO_MESH_UUID                = 0;

@@ -169,7 +169,14 @@ bool LibraryModule::LoadLibraryMaps(const std::string& projectPath)
                 AddName(assetName, assetUID);
                 libraryPath = projectPath + MODELS_LIB_PATH + std::to_string(assetUID) + MODEL_EXTENSION;
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
-                else SceneImporter::ImportModelFromMetadata(assetPath, projectPath, assetName, assetUID);
+                else SceneImporter::CopyModel(assetPath, projectPath, assetName, assetUID);
+                break;
+            case 16:
+                AddPrefab(assetUID, assetName);
+                AddName(assetName, assetUID);
+                libraryPath = projectPath + PREFABS_LIB_PATH + std::to_string(assetUID) + PREFAB_EXTENSION;
+                if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
+                else SceneImporter::CopyPrefab(assetPath, projectPath, assetName, assetUID);
                 break;
             default:
                 GLOG("Unknown UID prefix (%s) for: %s", std::to_string(prefix).c_str(), assetName.c_str());
@@ -199,6 +206,9 @@ UID LibraryModule::AssignFiletypeUID(UID originalUID, FileType fileType)
         break;
     case FileType::Model:
         prefix = 14;
+        break;
+    case FileType::Prefab:
+        prefix = 16;
         break;
     case FileType::StateMachine:
         prefix = 16;
@@ -232,6 +242,11 @@ void LibraryModule::AddMaterial(UID materialUID, const std::string& matName)
 void LibraryModule::AddModel(UID modelUID, const std::string& modelName)
 {
     modelMap[modelName] = modelUID;
+}
+
+void LibraryModule::AddPrefab(UID prefabUID, const std::string& prefabName)
+{
+    prefabMap[prefabName] = prefabUID;
 }
 
 void LibraryModule::AddName(const std::string& resourceName, UID resourceUID)

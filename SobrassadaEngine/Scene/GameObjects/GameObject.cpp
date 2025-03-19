@@ -4,13 +4,13 @@
 #include "Component.h"
 #include "DebugDrawModule.h"
 #include "EditorUIModule.h"
+#include "PrefabManager.h"
 #include "SceneModule.h"
-
 #include "Standalone/MeshComponent.h"
+
 #include "imgui.h"
 
 #include <stack>
-
 
 GameObject::GameObject(std::string name) : name(name)
 {
@@ -29,6 +29,25 @@ GameObject::GameObject(UID parentUID, std::string name) : parentUID(parentUID), 
     globalAABB = AABB(globalOBB);
 }
 
+GameObject::GameObject(UID parentUID, GameObject* refObject)
+    : parentUID(parentUID), name(refObject->name), localTransform(refObject->localTransform)
+{
+    uid        = GenerateUID();
+    localAABB  = AABB(DEFAULT_GAME_OBJECT_AABB);
+    globalOBB  = OBB(localAABB);
+    globalAABB = AABB(globalOBB);
+
+    // Must make a copy of each manually
+    for (const auto& component : refObject->components)
+    {
+        CreateComponent(component.first);
+        Component* newComponent = GetComponentByType(component.first);
+        newComponent->Clone(component.second);
+    }
+
+    OnAABBUpdated();
+}
+
 GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState["UID"].GetUint64())
 {
     parentUID              = initialState["ParentUID"].GetUint64();
@@ -36,6 +55,8 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
     selectedComponentIndex = COMPONENT_NONE;
     mobilitySettings       = initialState["Mobility"].GetInt();
 
+    if (initialState.HasMember("PrefabUID"))prefabUID = initialState["PrefabUID"].GetUint64();
+    
     if (initialState.HasMember("LocalTransform") && initialState["LocalTransform"].IsArray() &&
         initialState["LocalTransform"].Size() == 16)
     {
@@ -116,8 +137,10 @@ void GameObject::Save(rapidjson::Value& targetState, rapidjson::Document::Alloca
     targetState.AddMember("UID", uid, allocator);
     targetState.AddMember("ParentUID", parentUID, allocator);
     targetState.AddMember("Name", rapidjson::Value(name.c_str(), allocator), allocator);
-
     targetState.AddMember("Mobility", mobilitySettings, allocator);
+
+    if (prefabUID != INVALID_UID) targetState.AddMember("PrefabUID", prefabUID, allocator);
+
     rapidjson::Value valLocalTransform(rapidjson::kArrayType);
     valLocalTransform.PushBack(localTransform.ptr()[0], allocator)
         .PushBack(localTransform.ptr()[1], allocator)
@@ -212,10 +235,25 @@ void GameObject::RenderEditorInspector()
         }
 
         // Casting to use ImGui to set values and at the same type keep the enum type for the variable
+        int previousMobility = mobilitySettings;
         ImGui::SeparatorText("Mobility");
-        ImGui::RadioButton("Static", &mobilitySettings, STATIC);
+        if (ImGui::RadioButton("Static", &mobilitySettings, STATIC))
+        {
+            if (previousMobility != mobilitySettings)
+            {
+                App->GetSceneModule()->SetStaticObjectUpdated();
+                App->GetSceneModule()->SetDynamicObjectUpdated();
+            }
+        }
         ImGui::SameLine();
-        ImGui::RadioButton("Dynamic", &mobilitySettings, DYNAMIC);
+        if (ImGui::RadioButton("Dynamic", &mobilitySettings, DYNAMIC))
+        {
+            if (previousMobility != mobilitySettings)
+            {
+                App->GetSceneModule()->SetStaticObjectUpdated();
+                App->GetSceneModule()->SetDynamicObjectUpdated();
+            }
+        }
 
         ImGui::SeparatorText("Component hierarchy");
 
@@ -296,8 +334,15 @@ void GameObject::UpdateTransformForGOBranch() const
                 childrenBuffer.push(child);
         }
     }
+}
 
-    App->GetSceneModule()->RegenerateTree();
+Component* GameObject::GetComponentByType(ComponentType type) const
+{
+    if (components.find(type) != components.end())
+    {
+        return components.at(type);
+    }
+    return nullptr;
 }
 
 MeshComponent* GameObject::GetMeshComponent() const
@@ -314,6 +359,9 @@ void GameObject::OnTransformUpdated()
     globalTransform = GetParentGlobalTransform() * localTransform;
     globalOBB       = localAABB.Transform(globalTransform);
     globalAABB      = AABB(globalOBB);
+
+    if (mobilitySettings == STATIC) App->GetSceneModule()->SetStaticObjectUpdated();
+    else App->GetSceneModule()->SetDynamicObjectUpdated();
 }
 
 void GameObject::UpdateLocalTransform(const float4x4& parentGlobalTransform)
@@ -341,7 +389,12 @@ void GameObject::RenderHierarchyNode(UID& selectedGameObjectUUID)
     }
     else
     {
-        nodeOpen = ImGui::TreeNodeEx(name.c_str(), flags);
+        std::string objectName = name;
+        if (prefabUID != INVALID_UID)
+        {
+            objectName += "(prefab " + std::to_string(prefabUID) + ')';
+        }
+        nodeOpen = ImGui::TreeNodeEx(objectName.c_str(), flags);
     }
 
     HandleNodeClick(selectedGameObjectUUID);
@@ -390,7 +443,7 @@ void GameObject::HandleNodeClick(UID& selectedGameObjectUUID)
     {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DRAG_DROP_GAMEOBJECT"))
         {
-            UID draggedUID = *static_cast<const UID*>(payload->Data);
+            UID draggedUID        = *static_cast<const UID*>(payload->Data);
             GameObject* draggedGO = App->GetSceneModule()->GetGameObjectByUID(draggedUID);
 
             if (draggedGO != nullptr && !draggedGO->TargetIsChildren(uid))
@@ -414,7 +467,9 @@ void GameObject::RenderContextMenu()
         {
             auto newGameObject = new GameObject(uid, "new Game Object");
             App->GetSceneModule()->AddGameObject(newGameObject->GetUID(), newGameObject);
-            App->GetSceneModule()->RegenerateTree();
+
+            if (newGameObject->IsStatic()) App->GetSceneModule()->SetStaticObjectUpdated();
+            else App->GetSceneModule()->SetDynamicObjectUpdated();
         }
 
         if (ImGui::MenuItem("Rename"))
@@ -436,10 +491,12 @@ void GameObject::RenderContextMenu()
             currentRenamingUID = uid;
         }
 
+        const char* label = prefabUID == INVALID_UID ? "Create Prefab" : "Update Prefab";
+        if (ImGui::MenuItem(label)) CreatePrefab();
+
         if (uid != App->GetSceneModule()->GetGameObjectRootUID() && ImGui::MenuItem("Delete"))
         {
             App->GetSceneModule()->RemoveGameObjectHierarchy(uid);
-            App->GetSceneModule()->RegenerateTree();
         }
 
         ImGui::EndPopup();
@@ -601,7 +658,8 @@ bool GameObject::CreateComponent(const ComponentType componentType)
     if (components.find(componentType) == components.end())
     // TODO Allow override of components after displaying an info box
     {
-        Component* createdComponent = ComponentUtils::CreateEmptyComponent(componentType, LCG().IntFast(), uid); // TODO: CHANGE LCG for UID
+        Component* createdComponent =
+            ComponentUtils::CreateEmptyComponent(componentType, LCG().IntFast(), uid); // TODO: CHANGE LCG for UID
         if (createdComponent != nullptr)
         {
             components.insert({componentType, createdComponent});
@@ -622,4 +680,16 @@ bool GameObject::RemoveComponent(ComponentType componentType)
         selectedComponentIndex = COMPONENT_NONE;
     }
     return false;
+}
+
+void GameObject::CreatePrefab()
+{
+    bool override = this->prefabUID == INVALID_UID ? false : true;
+    prefabUID     = PrefabManager::SavePrefab(this, override);
+
+    if (override)
+    {
+        // Update all prefabs
+        App->GetSceneModule()->OverridePrefabs(prefabUID);
+    }
 }

@@ -20,6 +20,7 @@ enum class FileType
     Material,
     Scene,
     Model,
+    Prefab,
     StateMachine
 };
 
@@ -41,6 +42,7 @@ class LibraryModule : public Module
     void AddTexture(UID textureUID, const std::string& ddsPath);
     void AddMesh(UID meshUID, const std::string& matPath);
     void AddMaterial(UID materialUID, const std::string& sobPath);
+    void AddPrefab(UID prefabUID, const std::string& prefabPath);
     void AddModel(UID modelUID, const std::string &modelPath);
     void AddStateMachine(UID stateMachineUID, const std::string& stMachPath);
     void AddName(const std::string& resourceName, UID resourceUID);
@@ -59,7 +61,8 @@ class LibraryModule : public Module
     const std::unordered_map<std::string, UID>& GetTextureMap() const { return textureMap; }
     const std::unordered_map<std::string, UID>& GetMaterialMap() const { return materialMap; }
     const std::unordered_map<std::string, UID>& GetMeshMap() const { return meshMap; }
-    const std::unordered_map<std::string, UID> &GetModelMap() const { return modelMap; }
+    const std::unordered_map<std::string, UID>& GetModelMap() const { return modelMap; }
+    const std::unordered_map<std::string, UID>& GetPrefabMap() const { return prefabMap; }
     const std::unordered_map<std::string, UID>& GetStateMachinePath() const { return stateMachinèMap; }
 
   private:
@@ -67,8 +70,9 @@ class LibraryModule : public Module
     std::unordered_map<std::string, UID> textureMap;
     std::unordered_map<std::string, UID> materialMap;
     std::unordered_map<std::string, UID> meshMap;  
+    std::unordered_map<std::string, UID> prefabMap; 
     std::unordered_map<std::string, UID> modelMap;  
-    std::unordered_map<std::string, UID> stateMachinèMap;  
+    std::unordered_map<std::string, UID> stateMachinèMap;
     // inversed map          | UID -> name
     std::unordered_map<UID, std::string> namesMap;
 

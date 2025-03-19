@@ -14,8 +14,8 @@ class MeshComponent;
 
 enum ComponentMobilitySettings
 {
-    STATIC  = 0,
-    DYNAMIC = 1,
+    DYNAMIC = 0,
+    STATIC  = 1,
 };
 
 class GameObject
@@ -23,12 +23,15 @@ class GameObject
   public:
     GameObject(std::string name);
     GameObject(UID parentUID, std::string name);
+    GameObject(UID parentUID, GameObject* refObject);
 
     GameObject(const rapidjson::Value& initialState);
 
     ~GameObject();
 
     const float4x4& GetParentGlobalTransform() const;
+
+    bool IsStatic() const { return mobilitySettings == ComponentMobilitySettings::STATIC; };
 
     bool AddGameObject(UID gameObjectUID);
     bool RemoveGameObject(UID gameObjectUID);
@@ -47,7 +50,7 @@ class GameObject
     const std::string& GetName() const { return name; }
     void SetName(const std::string& newName) { name = newName; }
 
-    const std::vector<UID>& GetChildren() { return children; }
+    const std::vector<UID>& GetChildren() const { return children; }
     void AddChildren(UID childUID) { children.push_back(childUID); }
 
     UID GetParent() const { return parentUID; }
@@ -76,11 +79,17 @@ class GameObject
     void UpdateTransformForGOBranch() const;
 
     const std::unordered_map<ComponentType, Component*>& GetComponents() const { return components; }
+    Component* GetComponentByType(ComponentType type) const;
 
     MeshComponent* GetMeshComponent() const;
 
     void SetLocalTransform(const float4x4& newTransform) { localTransform = newTransform; }
     void DrawGizmos() const;
+
+    void CreatePrefab();
+    UID GetPrefabUID() const { return prefabUID; }
+    void SetPrefabUID(const UID uid) { prefabUID = uid; }
+    void SetMobility(ComponentMobilitySettings newMobility) { mobilitySettings = newMobility; };
 
   private:
     void OnTransformUpdated();
@@ -107,11 +116,12 @@ class GameObject
     bool isRenaming = false;
     char renameBuffer[128];
 
+    UID prefabUID = INVALID_UID;
     bool drawNodes                       = false;
 
     float4x4 localTransform              = float4x4::identity;
     float4x4 globalTransform             = float4x4::identity;
 
     ComponentType selectedComponentIndex = COMPONENT_NONE;
-    int mobilitySettings                 = DYNAMIC;
+    int mobilitySettings                 = STATIC;
 };

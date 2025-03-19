@@ -94,7 +94,6 @@ update_status Application::Update()
 #endif
     // Unbinding frame buffer so ui gets rendered
     App->GetOpenGLModule()->GetFramebuffer()->Unbind();
-
     for (std::list<Module*>::iterator it = modules.begin(); it != modules.end() && returnStatus == UPDATE_CONTINUE;
          ++it)
         returnStatus = (*it)->RenderEditor(deltaTime);
@@ -105,6 +104,7 @@ update_status Application::Update()
     for (std::list<Module*>::iterator it = modules.begin(); it != modules.end() && returnStatus == UPDATE_CONTINUE;
          ++it)
         returnStatus = (*it)->PostUpdate(deltaTime);
+
 
     return returnStatus;
 }

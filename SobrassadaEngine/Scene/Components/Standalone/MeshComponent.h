@@ -19,10 +19,12 @@ class MeshComponent : public Component
     ~MeshComponent() override;
 
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
-
+    void Clone(const Component* other) override;
+    
     void RenderEditorInspector() override;
     void Update() override;
     void Render(float deltaTime) override;
+    bool HasBones() const { return bones.size() > 0; }
 
     void InitSkin();
 
@@ -31,6 +33,7 @@ class MeshComponent : public Component
     void AddMesh(UID resource, bool updateParent = true);
     void AddMaterial(UID resource);
 
+    const std::vector<UID>& GetBones() const { return bonesUIDs; }
     void SetBones(const std::vector<GameObject*>& bones, const std::vector<UID> bonesIds)
     {
         this->bones     = bones;
