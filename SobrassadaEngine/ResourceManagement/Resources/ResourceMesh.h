@@ -1,12 +1,11 @@
 ﻿#pragma once
 
-#include "FileSystem/Mesh.h"
 #include "Resource.h"
 
+#include "Math/float3.h"
+#include "Math/float4x4.h"
 #include <Geometry/AABB.h>
-
-class ResourceMaterial;
-class GameObject;
+#include <vector>
 
 namespace tinygltf
 {
@@ -14,6 +13,10 @@ namespace tinygltf
     struct Mesh;
     struct Primitive;
 } // namespace tinygltf
+
+class ResourceMaterial;
+class GameObject;
+struct Vertex;
 
 class ResourceMesh : public Resource
 {
@@ -45,6 +48,7 @@ class ResourceMesh : public Resource
     unsigned int mode        = 0;
     unsigned int vertexCount = 0;
     unsigned int indexCount  = 0;
+    bool hasIndices          = false;
     AABB aabb;
 
     std::vector<Vertex> bindPoseVertices;

@@ -17,11 +17,13 @@ class ResourcesModule : public Module
     Resource* RequestResource(UID uid);
     void ReleaseResource(const Resource* resource);
 
+    void UnloadAllResources();
+
   private:
     Resource* CreateNewResource(UID uid);
 
   private:
-    //We will need to do a resourceProgram
+    // We will need to do a resourceProgram
     int specularGlossinessProgram = -1;
     int metallicRoughnessProgram  = -1;
     std::map<UID, Resource*> resources;

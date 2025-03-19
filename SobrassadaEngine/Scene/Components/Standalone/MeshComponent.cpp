@@ -21,13 +21,13 @@ MeshComponent::MeshComponent(const UID uid, const UID uidParent) : Component(uid
 
 MeshComponent::MeshComponent(const rapidjson::Value& initialState) : Component(initialState)
 {
-    if (initialState.HasMember("Material"))
-    {
-        AddMaterial(initialState["Material"].GetUint64());
-    }
     if (initialState.HasMember("Mesh"))
     {
         AddMesh(initialState["Mesh"].GetUint64(), false);
+    }
+    if (initialState.HasMember("Material"))
+    {
+        AddMaterial(initialState["Material"].GetUint64());
     }
     if (initialState.HasMember("Bones"))
     {
@@ -197,6 +197,8 @@ void MeshComponent::AddMesh(UID resource, bool updateParent)
 
 void MeshComponent::AddMaterial(UID resource)
 {
+    if (resource == INVALID_UID) return;
+
     if (currentMaterial != nullptr && currentMaterial->GetUID() == resource) return;
 
     ResourceMaterial* newMaterial =

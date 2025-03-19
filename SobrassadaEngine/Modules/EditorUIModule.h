@@ -1,11 +1,11 @@
 #pragma once
+#include "EngineEditors/Editor/NodeEditor.h"
 #include "EngineEditors/EngineEditorBase.h"
 #include "Module.h"
 #include "ResourceManagement/Resources/Resource.h"
-#include "EngineEditors/EngineEditorBase.h"
-#include "EngineEditors/Editor/NodeEditor.h"
 
 #include "SDL.h"
+
 #include "imgui_internal.h"
 #include <Math/float3.h>
 #include <Math/float4x4.h>
@@ -13,6 +13,7 @@
 #include <string>
 #include <unordered_map>
 // imguizmo include after imgui
+#include "ComponentUtils.h"
 #include "./Libs/ImGuizmo/ImGuizmo.h"
 
 enum EditorType
@@ -21,6 +22,7 @@ enum EditorType
     ANIMATION,
     NODE
 };
+
 struct CPUFeature
 {
     SDL_bool (*check)();
@@ -68,12 +70,19 @@ class EditorUIModule : public Module
         const char* id, const std::unordered_map<std::string, T>& availableResources, const T& defaultResource
     );
 
-    std::string RenderFileDialog(bool& window, const char* windowTitle, bool selectFolder = false) const;
+    std::string RenderFileDialog(bool& window, const char* windowTitle, bool selectFolder = false);
 
     GizmoOperation& GetCurrentGizmoOperation() { return currentGizmoOperation; }
     GizmoTransform& GetTransformType() { return transformType; }
     float3& GetSnapValues() { return snapValues; }
     GizmoDragState GetImGuizmoDragState() const { return guizmoDragState; };
+
+    const std::unordered_map<std::string, ComponentType>& GetStandaloneComponents() const
+    {
+        return standaloneComponents;
+    }
+
+    void SetFileDialogCurrentPath(char* newProjectPath) { fileDialogCurrentPath = newProjectPath; }
 
   private:
     void RenderBasicTransformModifiers(
@@ -91,24 +100,24 @@ class EditorUIModule : public Module
     void EditorSettings(bool& editorSettingsMenu);
 
     void FramePlots(bool& vsync);
-    void WindowConfig(bool& vsync) const;
+    void WindowConfig(bool& vsync);
     void CameraConfig() const;
-    void OpenGLConfig() const;
+    void OpenGLConfig();
     void GameTimerConfig() const;
     void HardwareConfig() const;
     void ShowCaps() const;
 
     void ImportDialog(bool& import);
     void LoadDialog(bool& load);
+    void LoadModelDialog(bool& loadModel);
+    void LoadPrefabDialog(bool& loadPrefab);
     void SaveDialog(bool& save);
     void Console(bool& consoleMenu) const;
-    void About(bool& aboutMenu) const;
+    void About(bool& aboutMenu);
     std::string FormatWithCommas(unsigned int number) const;
 
-    void LoadModelDialog(bool& loadModel) const;
-    void LoadPrefabDialog(bool& loadPrefab) const;
-
     void OpenEditor(EngineEditorBase* editorToOpen);
+
     EngineEditorBase* CreateEditor(EditorType type);
 
     void UpdateGizmoDragState();
@@ -117,6 +126,7 @@ class EditorUIModule : public Module
     bool editorControlMenu = true;
     bool hierarchyMenu     = true;
     bool inspectorMenu     = true;
+    bool lightConfig       = false;
     bool snapEnabled       = false;
 
   private:
@@ -140,8 +150,68 @@ class EditorUIModule : public Module
 
     GizmoOperation currentGizmoOperation = GizmoOperation::TRANSLATE;
     GizmoTransform transformType         = GizmoTransform::LOCAL;
-    GizmoDragState guizmoDragState = GizmoDragState::IDLE;
+    GizmoDragState guizmoDragState       = GizmoDragState::IDLE;
 
     float3 snapValues                    = {1.f, 1.f, 1.f};
     std::unordered_map<UID, EngineEditorBase*> openEditors;
+
+    bool lockScaleAxis        = false;
+    bool bUseRad              = true;
+
+    // load dialog
+    std::string inputFileLoad = "";
+    std::vector<std::string> filesLoad;
+    int selectedLoad = -1;
+
+    // save dialog
+    char inputFileSave[32];
+    std::vector<std::string> filesSave;
+
+    // load prefab dialog
+    UID prefabUID              = INVALID_UID;
+    char searchTextPrefab[255] = "";
+    int selectedPrefab         = -1;
+
+    // load model dialog
+    UID modelUID               = INVALID_UID;
+    char searchTextModel[255]  = "";
+    int selectedModel          = -1;
+
+    // render file dialog
+    std::string fileDialogCurrentPath;
+    std::vector<std::string> accPaths;
+    bool loadButtons = true;
+    std::vector<std::string> filesFileDialog;
+    bool doLoadFiles = false;
+    std::vector<std::string> filteredFiles;
+    bool loadFilteredFiles = false;
+    char searchQueryFileDialog[32];
+    char lastQueryFileDialog[32] = "default";
+    bool showDrives              = false;
+    std::string inputFileDialog  = "";
+    int selectedFileDialog       = -1;
+
+    // render resource select dialog
+    char searchTextResource[255] = "";
+
+    // about
+    bool showConfigInfo          = false;
+
+    // frame plots
+    float maxYAxis               = 0;
+
+    // window config
+    bool fullscreen              = false;
+    bool full_desktop            = false;
+    bool borderless              = false;
+    bool resizable               = false;
+    bool vsync                   = false;
+
+    // opengl config
+    bool depthTest               = true;
+    bool faceCulling             = true;
+    int frontFaceMode            = 0;
+    float lastTimeOpenGL         = 0.f;
+    std::string tpsStr;
+    std::unordered_map<std::string, ComponentType> standaloneComponents;
 };

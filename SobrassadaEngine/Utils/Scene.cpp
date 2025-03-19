@@ -12,8 +12,8 @@
 #include "InputModule.h"
 #include "LibraryModule.h"
 #include "Octree.h"
-#include "Quadtree.h"
 #include "OpenGLModule.h"
+#include "Quadtree.h"
 #include "ResourceManagement/Resources/Resource.h"
 #include "ResourceManagement/Resources/ResourceModel.h"
 #include "ResourceManagement/Resources/ResourcePrefab.h"
@@ -27,8 +27,6 @@
 #include "imgui_internal.h"
 // guizmo after imgui include
 #include "./Libs/ImGuizmo/ImGuizmo.h"
-#include "Importer.h"
-#include "SDL_mouse.h"
 
 Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 {
@@ -68,7 +66,7 @@ Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUI
         lightsConfig->LoadData(initialState["Lights Config"]);
     }
 
-    GLOG("%s scene loaded", sceneName);
+    GLOG("%s scene loaded", sceneName.c_str());
 }
 
 Scene::~Scene()
@@ -82,12 +80,12 @@ Scene::~Scene()
     delete lightsConfig;
     delete sceneOctree;
     delete dynamicTree;
-    
+
     lightsConfig = nullptr;
     sceneOctree  = nullptr;
     dynamicTree  = nullptr;
 
-    GLOG("%s scene closed", sceneName);
+    GLOG("%s scene closed", sceneName.c_str());
 }
 
 void Scene::Init()
@@ -243,12 +241,13 @@ update_status Scene::Render(float deltaTime) const
 
 update_status Scene::RenderEditor(float deltaTime)
 {
-    if (App->GetEditorUIModule()->editorControlMenu) RenderEditorControl(App->GetEditorUIModule()->editorControlMenu);
+    EditorUIModule* editor = App->GetEditorUIModule();
+    if (editor->editorControlMenu) RenderEditorControl(editor->editorControlMenu);
 
     RenderScene();
 
     RenderSelectedGameObjectUI();
-    lightsConfig->EditorParams();
+    if (editor->lightConfig) lightsConfig->EditorParams(editor->lightConfig);
 
     return UPDATE_CONTINUE;
 }
@@ -580,9 +579,9 @@ void Scene::CreateStaticSpatialDataStruct()
 void Scene::CreateDynamicSpatialDataStruct()
 {
     // PARAMETRIZED IN FUTURE
-    float3 center = float3::zero;
-    float length  = 200;
-    int nodeCapacity    = 5;
+    float3 center    = float3::zero;
+    float length     = 200;
+    int nodeCapacity = 5;
     dynamicTree      = new Quadtree(center, length, nodeCapacity);
 
     for (const auto& objectIterator : gameObjectsContainer)

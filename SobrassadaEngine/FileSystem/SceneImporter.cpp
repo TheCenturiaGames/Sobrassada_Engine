@@ -9,6 +9,12 @@
 #include "ProjectModule.h"
 #include "TextureImporter.h"
 
+#define TINYGLTF_NO_STB_IMAGE_WRITE
+#define TINYGLTF_NO_STB_IMAGE
+#define TINYGLTF_NO_EXTERNAL_IMAGE
+#define TINYGLTF_IMPLEMENTATION /* Only in one of the includes */
+#include <tiny_gltf.h>
+
 namespace SceneImporter
 {
     void Import(const char* filePath)
@@ -150,14 +156,14 @@ namespace SceneImporter
         }
     }
 
-    void CopyPrefab(const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID)
+    void
+    CopyPrefab(const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID)
     {
         PrefabManager::CopyPrefab(filePath, targetFilePath, name, sourceUID);
     }
 
-    void CopyModel(
-        const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID
-    )
+    void
+    CopyModel(const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID)
     {
         ModelImporter::CopyModel(filePath, targetFilePath, name, sourceUID);
     }
