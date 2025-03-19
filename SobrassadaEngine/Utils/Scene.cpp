@@ -12,8 +12,8 @@
 #include "InputModule.h"
 #include "LibraryModule.h"
 #include "Octree.h"
-#include "Quadtree.h"
 #include "OpenGLModule.h"
+#include "Quadtree.h"
 #include "ResourceManagement/Resources/Resource.h"
 #include "ResourceManagement/Resources/ResourceModel.h"
 #include "ResourceManagement/Resources/ResourcePrefab.h"
@@ -27,8 +27,6 @@
 #include "imgui_internal.h"
 // guizmo after imgui include
 #include "./Libs/ImGuizmo/ImGuizmo.h"
-#include "Importer.h"
-#include "SDL_mouse.h"
 
 Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 {
@@ -82,7 +80,7 @@ Scene::~Scene()
     delete lightsConfig;
     delete sceneOctree;
     delete dynamicTree;
-    
+
     lightsConfig = nullptr;
     sceneOctree  = nullptr;
     dynamicTree  = nullptr;
@@ -580,9 +578,9 @@ void Scene::CreateStaticSpatialDataStruct()
 void Scene::CreateDynamicSpatialDataStruct()
 {
     // PARAMETRIZED IN FUTURE
-    float3 center = float3::zero;
-    float length  = 200;
-    int nodeCapacity    = 5;
+    float3 center    = float3::zero;
+    float length     = 200;
+    int nodeCapacity = 5;
     dynamicTree      = new Quadtree(center, length, nodeCapacity);
 
     for (const auto& objectIterator : gameObjectsContainer)
