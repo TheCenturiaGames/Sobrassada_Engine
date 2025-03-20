@@ -1,13 +1,12 @@
 #pragma once
 
 #include "Globals.h"
-#include "Libs/rapidjson/document.h"
+#include <Libs/rapidjson/document.h>
 #include <ctime>
 #include <string>
 
 class MetaFile
 {
-
   public:
     MetaFile(UID uid, const std::string& assetPath);
     virtual ~MetaFile() = default;

@@ -2,6 +2,7 @@
 
 #include "Globals.h"
 
+#include <Math/float4x4.h>
 #include <string>
 
 namespace tinygltf
@@ -9,6 +10,7 @@ namespace tinygltf
     class Model;
     struct Mesh;
     struct Primitive;
+    class Node;
 } // namespace tinygltf
 
 enum DataType
@@ -26,5 +28,7 @@ namespace MeshImporter
         const tinygltf::Model& model, const tinygltf::Mesh& mesh, const tinygltf::Primitive& primitive,
         const std::string& name, const char* filePath, const std::string& targetFilePath, UID sourceUID = INVALID_UID
     );
+    const float4x4 GetMeshDefaultTransform(const tinygltf::Model& model, const std::string& name);
+    const float4x4 GetNodeTransform(const tinygltf::Node& node);
     ResourceMesh* LoadMesh(UID meshUID);
 }; // namespace MeshImporter

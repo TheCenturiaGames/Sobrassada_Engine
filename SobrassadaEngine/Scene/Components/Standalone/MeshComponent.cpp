@@ -160,6 +160,7 @@ void MeshComponent::Render(float deltaTime)
         if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr)
             cameraUBO = App->GetSceneModule()->GetMainCamera()->GetUbo();
 
+        
         currentMesh->Render(
             program, GetParent()->GetGlobalTransform(), cameraUBO, currentMaterial, bones, bindMatrices
         );

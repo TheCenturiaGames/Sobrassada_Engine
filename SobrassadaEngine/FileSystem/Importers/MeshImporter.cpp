@@ -8,8 +8,12 @@
 #include "ProjectModule.h"
 #include "ResourceManagement/Resources/ResourceMesh.h"
 
+#include <Libs/rapidjson/document.h>
+#include <Math/Quat.h>
+#include <algorithm>
 #include <memory>
 #include <tiny_gltf.h>
+#include <vector>
 
 namespace MeshImporter
 {
@@ -318,8 +322,12 @@ namespace MeshImporter
             UID meshUID           = GenerateUID();
             finalMeshUID          = App->GetLibraryModule()->AssignFiletypeUID(meshUID, FileType::Mesh);
 
-            std::string assetPath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
-            MetaMesh meta(finalMeshUID, assetPath, generateTangents);
+            std::string nameNoExt = name;
+            if (!name.empty()) nameNoExt.pop_back(); // remove last character (number)
+            const float4x4& meshTransform = GetMeshDefaultTransform(model, nameNoExt);
+
+            std::string assetPath         = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
+            MetaMesh meta(finalMeshUID, assetPath, generateTangents, meshTransform);
             meta.Save(name, assetPath);
         }
         else finalMeshUID = sourceUID;
@@ -343,6 +351,58 @@ namespace MeshImporter
         GLOG("%s saved as binary", name.c_str());
 
         return finalMeshUID;
+    }
+
+    const float4x4 GetMeshDefaultTransform(const tinygltf::Model& model, const std::string& name)
+    {
+        const std::vector<tinygltf::Node>& nodes = model.nodes;
+
+        const auto& it                           = std::find_if(
+            nodes.begin(), nodes.end(),
+            [&name](const tinygltf::Node& node) { return node.mesh != -1 && node.name == name; }
+        );
+
+        if (it == nodes.end())
+        {
+            return float4x4::identity;
+        }
+
+        const tinygltf::Node& node = *it;
+
+        return GetNodeTransform(node);
+    }
+
+    const float4x4 GetNodeTransform(const tinygltf::Node& node)
+    {
+        if (!node.matrix.empty())
+        {
+            // glTF stores matrices in COLUMN-MAJOR order, same as MathGeoLib
+            float4x4 matrix = float4x4(
+                (float)node.matrix[0], (float)node.matrix[1], (float)node.matrix[2], (float)node.matrix[3],
+                (float)node.matrix[4], (float)node.matrix[5], (float)node.matrix[6], (float)node.matrix[7],
+                (float)node.matrix[8], (float)node.matrix[9], (float)node.matrix[10], (float)node.matrix[11],
+                (float)node.matrix[12], (float)node.matrix[13], (float)node.matrix[14], (float)node.matrix[15]
+            );
+            return matrix.Transposed(); // Probably need the Transposed(), but has not been tested
+        }
+
+        // Default values
+        float3 translation = float3::zero;
+        Quat rotation      = Quat::identity;
+        float3 scale       = float3::one;
+
+        if (!node.translation.empty())
+            translation = float3((float)node.translation[0], (float)node.translation[1], (float)node.translation[2]);
+
+        if (!node.rotation.empty())
+            rotation = Quat(
+                (float)node.rotation[0], (float)node.rotation[1], (float)node.rotation[2], (float)node.rotation[3]
+            ); // glTF stores as [x, y, z, w]
+
+        if (!node.scale.empty()) scale = float3((float)node.scale[0], (float)node.scale[1], (float)node.scale[2]);
+
+        float4x4 matrix = float4x4::FromTRS(translation, rotation, scale);
+        return matrix;
     }
 
     ResourceMesh* LoadMesh(UID meshUID)
@@ -426,18 +486,20 @@ namespace MeshImporter
             GLOG("No indices");
         }
 
-        float3 minPos       = *reinterpret_cast<float3*>(cursor);
-        cursor             += sizeof(float3);
-        float3 maxPos       = *reinterpret_cast<float3*>(cursor);
-        cursor             += sizeof(float3);
+        float3 minPos  = *reinterpret_cast<float3*>(cursor);
+        cursor        += sizeof(float3);
+        float3 maxPos  = *reinterpret_cast<float3*>(cursor);
+        cursor        += sizeof(float3);
 
-        ResourceMesh* mesh  = new ResourceMesh(meshUID, name, maxPos, minPos);
+        rapidjson::Document doc;
+        rapidjson::Value importOptions;
+        App->GetLibraryModule()->GetImportOptions(meshUID, doc, importOptions);
+
+        ResourceMesh* mesh = new ResourceMesh(meshUID, name, maxPos, minPos, importOptions);
 
         mesh->LoadData(mode, tmpVertices, tmpIndices);
 
         delete[] buffer;
-
-        // App->GetLibraryModule()->AddResource(savePath, finalMeshUID);
 
         return mesh;
     }
