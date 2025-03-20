@@ -371,9 +371,9 @@ MeshComponent* GameObject::GetMeshComponent() const
 
 void GameObject::OnTransformUpdated()
 {
-    globalTransform = GetParentGlobalTransform() * localTransform;
-    globalOBB       = localAABB.Transform(globalTransform);
-    globalAABB      = AABB(globalOBB);
+    globalTransform              = GetParentGlobalTransform() * localTransform;
+    globalOBB                    = globalTransform * OBB(localAABB);
+    globalAABB                   = AABB(globalOBB);
 
     MeshComponent* meshComponent = GetMeshComponent();
     if (meshComponent != nullptr)
@@ -605,7 +605,7 @@ void GameObject::UpdateGameObjectHierarchy(UID sourceUID)
 
 void GameObject::OnAABBUpdated()
 {
-    localAABB = AABB();
+    localAABB = localAABB;
     localAABB.SetNegativeInfinity();
 
     for (auto& component : components)
@@ -679,8 +679,7 @@ bool GameObject::CreateComponent(const ComponentType componentType)
     if (components.find(componentType) == components.end())
     // TODO Allow override of components after displaying an info box
     {
-        Component* createdComponent =
-            ComponentUtils::CreateEmptyComponent(componentType, GetUID(), this);
+        Component* createdComponent = ComponentUtils::CreateEmptyComponent(componentType, GetUID(), this);
         if (createdComponent != nullptr)
         {
             components.insert({componentType, createdComponent});

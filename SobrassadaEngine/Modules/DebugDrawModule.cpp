@@ -731,7 +731,7 @@ void DebugDrawModule::HandleDebugRenderOptions()
         for (const auto& gameObject : gameObjects)
         {
             for (int i = 0; i < 12; ++i)
-                DrawLineSegment(gameObject.second->GetGlobalAABB().Edge(i), float3(0.f, 1.f, 0.f));
+                DrawLineSegment(gameObject.second->GetGlobalAABB().Edge(i), float3(0.f, 0.5f, 0.5f));
         }
     }
 
