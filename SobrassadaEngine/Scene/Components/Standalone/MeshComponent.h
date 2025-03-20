@@ -45,6 +45,10 @@ class MeshComponent : public Component
     void SetModelUID(const UID newModelUID) { this->modelUID = newModelUID; }
     void SetSkinIndex(const int newIndex) { this->skinIndex = newIndex; }
 
+    void OnTransformUpdated();
+
+    const float4x4& GetCombinedMatrix() const { return combinedMatrix; }
+
   private:
     std::string currentMeshName       = "Not selected";
     ResourceMesh* currentMesh         = nullptr;
@@ -58,4 +62,6 @@ class MeshComponent : public Component
 
     UID modelUID  = INVALID_UID;
     int skinIndex = -1;
+
+    float4x4 combinedMatrix = float4x4::identity;
 };

@@ -375,6 +375,11 @@ void GameObject::OnTransformUpdated()
     globalOBB       = localAABB.Transform(globalTransform);
     globalAABB      = AABB(globalOBB);
 
+    MeshComponent* meshComponent = GetMeshComponent();
+    if (meshComponent != nullptr)
+    {
+        meshComponent->OnTransformUpdated();
+    }
     if (mobilitySettings == STATIC) App->GetSceneModule()->GetScene()->SetStaticModified();
     else App->GetSceneModule()->GetScene()->SetDynamicModified();
 }

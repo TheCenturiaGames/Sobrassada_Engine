@@ -161,9 +161,7 @@ void MeshComponent::Render(float deltaTime)
         if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
             cameraUBO = App->GetSceneModule()->GetScene()->GetMainCamera()->GetUbo();
 
-        currentMesh->Render(
-            program, parent->GetGlobalTransform(), cameraUBO, currentMaterial, bones, bindMatrices
-        );
+        currentMesh->Render(program, combinedMatrix, cameraUBO, currentMaterial, bones, bindMatrices);
     }
 }
 
@@ -189,6 +187,7 @@ void MeshComponent::AddMesh(UID resource, bool updateParent)
         currentMeshName    = newMesh->GetName();
         currentMesh        = newMesh;
         localComponentAABB = AABB(currentMesh->GetAABB());
+        OnTransformUpdated();
         if (updateParent)
             parent->OnAABBUpdated();
     }
@@ -207,5 +206,14 @@ void MeshComponent::AddMaterial(UID resource)
         App->GetResourcesModule()->ReleaseResource(currentMaterial);
         currentMaterial     = newMaterial;
         currentMaterialName = currentMaterial->GetName();
+    }
+}
+
+void MeshComponent::OnTransformUpdated()
+{
+    combinedMatrix = parent->GetGlobalTransform();
+    if (currentMesh != nullptr)
+    {
+        combinedMatrix *= currentMesh->GetDefaultTransform();   
     }
 }
