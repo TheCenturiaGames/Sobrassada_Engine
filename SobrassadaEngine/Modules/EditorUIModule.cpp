@@ -769,17 +769,10 @@ bool EditorUIModule::RenderTransformWidget(
     float3& scale
 )
 {
-    float4x4 outputTransform = float4x4(transformType == GizmoTransform::LOCAL ? localTransform : globalTransform);
-
-    float3 outputScale       = outputTransform.GetScale();
-    outputTransform.ScaleCol3(0, outputScale.x != 0 ? 1 / outputScale.x : 1);
-    outputTransform.ScaleCol3(1, outputScale.y != 0 ? 1 / outputScale.y : 1);
-    outputTransform.ScaleCol3(2, outputScale.z != 0 ? 1 / outputScale.z : 1);
-    float3 outputPosition     = outputTransform.TranslatePart();
-    float3 outputRotation     = Quat(outputTransform.RotatePart()).ToEulerXYZ();
+    float4x4 outputTransform  = float4x4(transformType == GizmoTransform::LOCAL ? localTransform : globalTransform);
 
     bool positionValueChanged = false, rotationValueChanged = false, scaleValueChanged = false;
-    float3 originalScale      = float3(outputScale);
+    float3 originalScale      = float3(scale);
 
     std::string transformName = std::string(transformType == GizmoTransform::LOCAL ? "Local " : "World ") + "Transform";
     ImGui::SeparatorText(transformName.c_str());
@@ -792,21 +785,41 @@ bool EditorUIModule::RenderTransformWidget(
     {
         if (scaleValueChanged && lockScaleAxis)
         {
-            float scaleFactor = 1;
-            if (outputScale.x != originalScale.x)
+            if (originalScale.IsZero())
             {
-                scaleFactor = originalScale.x == 0 ? 1 : outputScale.x / originalScale.x;
+                float scaleFactor = 1;
+                if (scale.x != originalScale.x)
+                {
+                    scaleFactor = scale.x;
+                }
+                else if (scale.y != originalScale.y)
+                {
+                    scaleFactor = scale.y;
+                }
+                else if (scale.z != originalScale.z)
+                {
+                    scaleFactor = scale.z;
+                }
+                scale = float3(scaleFactor, scaleFactor, scaleFactor);
             }
-            else if (outputScale.y != originalScale.y)
+            else
             {
-                scaleFactor = originalScale.y == 0 ? 1 : outputScale.y / originalScale.y;
+                float scaleFactor = 1;
+                if (scale.x != originalScale.x)
+                {
+                    scaleFactor = originalScale.x == 0 ? 1 : scale.x / originalScale.x;
+                }
+                else if (scale.y != originalScale.y)
+                {
+                    scaleFactor = originalScale.y == 0 ? 1 : scale.y / originalScale.y;
+                }
+                else if (scale.z != originalScale.z)
+                {
+                    scaleFactor = originalScale.z == 0 ? 1 : scale.z / originalScale.z;
+                }
+                originalScale *= scaleFactor;
+                scale          = originalScale;
             }
-            else if (outputScale.z != originalScale.z)
-            {
-                scaleFactor = originalScale.z == 0 ? 1 : outputScale.z / originalScale.z;
-            }
-            originalScale *= scaleFactor;
-            outputScale    = originalScale;
         }
 
         outputTransform = float4x4::FromTRS(pos, Quat::FromEulerXYZ(rot.x, rot.y, rot.z), scale);
