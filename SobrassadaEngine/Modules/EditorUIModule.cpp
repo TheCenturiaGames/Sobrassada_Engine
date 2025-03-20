@@ -848,9 +848,9 @@ bool EditorUIModule::RenderImGuizmo(
     float4x4 proj = float4x4(App->GetCameraModule()->GetProjectionMatrix());
     proj.Transpose();
 
-    float maxDistance  = App->GetCameraModule()->GetFarPlaneDistance() * 0.9f;
+    float maxDistance = App->GetCameraModule()->GetFarPlaneDistance() * 0.9f;
 
-    //float4x4 transform = float4x4(globalTransform);
+    // float4x4 transform = float4x4(globalTransform);
     float4x4 transform;
     float3 tmpRot = rot * RAD_DEGREE_CONV;
     ImGuizmo::RecomposeMatrixFromComponents(&pos[0], &tmpRot[0], &scale[0], transform.ptr());
@@ -878,7 +878,7 @@ bool EditorUIModule::RenderImGuizmo(
         }
         ImGuizmo::DecomposeMatrixToComponents(transform.ptr(), &pos[0], &rot[0], &scale[0]);
         rot            *= DEGREE_RAD_CONV;
-        localTransform = parentTransform.Inverted() * transform;
+        localTransform  = parentTransform.Inverted() * transform;
     }
 
     return true;
