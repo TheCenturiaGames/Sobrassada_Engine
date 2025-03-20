@@ -53,7 +53,7 @@ namespace PrefabManager
 
             for (UID child : currentGameObject->GetChildren())
             {
-                queue.push(App->GetSceneModule()->GetGameObjectByUID(child));
+                queue.push(App->GetSceneModule()->GetScene()->GetGameObjectByUID(child));
             }
 
             queue.pop();

@@ -11,15 +11,16 @@
 #include "ShaderModule.h"
 // #include "Scene/GameObjects/GameObject.h"
 
+#include "CameraComponent.h"
 #include "imgui.h"
 
 #include <Math/Quat.h>
 
-MeshComponent::MeshComponent(const UID uid, const UID uidParent) : Component(uid, uidParent, "Mesh", COMPONENT_MESH)
+MeshComponent::MeshComponent(const UID uid, GameObject* parent) : Component(uid, parent, "Mesh", COMPONENT_MESH)
 {
 }
 
-MeshComponent::MeshComponent(const rapidjson::Value& initialState) : Component(initialState)
+MeshComponent::MeshComponent(const rapidjson::Value& initialState, GameObject* parent) : Component(initialState, parent)
 {
     if (initialState.HasMember("Mesh"))
     {
@@ -157,13 +158,10 @@ void MeshComponent::Render(float deltaTime)
             if (!currentMaterial->GetIsMetallicRoughness())
                 program = App->GetShaderModule()->GetSpecularGlossinessProgram();
         }
-        if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr)
-            cameraUBO = App->GetSceneModule()->GetMainCamera()->GetUbo();
+        if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
+            cameraUBO = App->GetSceneModule()->GetScene()->GetMainCamera()->GetUbo();
 
-        
-        currentMesh->Render(
-            program, GetParent()->GetGlobalTransform(), cameraUBO, currentMaterial, bones, bindMatrices
-        );
+        currentMesh->Render(program, combinedMatrix, cameraUBO, currentMaterial, bones, bindMatrices);
     }
 }
 
@@ -172,7 +170,7 @@ void MeshComponent::InitSkin()
     if (bonesUIDs.size() > 0) return;
     for (UID uid : bonesUIDs)
     {
-        bones.emplace_back(App->GetSceneModule()->GetGameObjectByUID(uid));
+        bones.emplace_back(App->GetSceneModule()->GetScene()->GetGameObjectByUID(uid));
     }
 }
 
@@ -189,11 +187,8 @@ void MeshComponent::AddMesh(UID resource, bool updateParent)
         currentMeshName    = newMesh->GetName();
         currentMesh        = newMesh;
         localComponentAABB = AABB(currentMesh->GetAABB());
-        GameObject* parent = GetParent();
-        if (parent != nullptr)
-        {
+        if (updateParent)
             parent->OnAABBUpdated();
-        }
     }
 }
 
@@ -210,5 +205,14 @@ void MeshComponent::AddMaterial(UID resource)
         App->GetResourcesModule()->ReleaseResource(currentMaterial);
         currentMaterial     = newMaterial;
         currentMaterialName = currentMaterial->GetName();
+    }
+}
+
+void MeshComponent::OnTransformUpdated()
+{
+    combinedMatrix = parent->GetGlobalTransform();
+    if (currentMesh != nullptr)
+    {
+        combinedMatrix = combinedMatrix * currentMesh->GetDefaultTransform();   
     }
 }

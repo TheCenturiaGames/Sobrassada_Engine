@@ -139,7 +139,6 @@ class EditorUIModule : public Module
     bool loadPrefab         = false;
     bool aboutMenu          = false;
     bool editorSettingsMenu = false;
-    bool closeScene         = false;
     bool closeApplication   = false;
 
     int maximumPlotData     = 50;

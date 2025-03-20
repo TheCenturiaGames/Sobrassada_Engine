@@ -8,17 +8,14 @@
 #include "ImGui.h"
 #include <vector>
 
-PointLightComponent::PointLightComponent(UID uid, UID uidParent)
-    : LightComponent(uid, uidParent, "Point Light", COMPONENT_POINT_LIGHT)
+PointLightComponent::PointLightComponent(UID uid, GameObject* parent)
+    : LightComponent(uid, parent, "Point Light", COMPONENT_POINT_LIGHT)
 {
     range                      = 1;
     gizmosMode                 = 0;
-
-    LightsConfig* lightsConfig = App->GetSceneModule()->GetLightsConfig();
-    if (lightsConfig != nullptr) lightsConfig->AddPointLight(this);
 }
 
-PointLightComponent::PointLightComponent(const rapidjson::Value& initialState) : LightComponent(initialState)
+PointLightComponent::PointLightComponent(const rapidjson::Value& initialState, GameObject* parent) : LightComponent(initialState, parent)
 {
 
     if (initialState.HasMember("Range"))
@@ -29,13 +26,16 @@ PointLightComponent::PointLightComponent(const rapidjson::Value& initialState) :
     {
         gizmosMode = initialState["GizmosMode"].GetInt();
     }
-    LightsConfig* lightsConfig = App->GetSceneModule()->GetLightsConfig();
-    if (lightsConfig != nullptr) lightsConfig->AddPointLight(this);
 }
 
 PointLightComponent::~PointLightComponent()
 {
-    App->GetSceneModule()->GetLightsConfig()->RemovePointLight(this);
+    App->GetSceneModule()->GetScene()->GetLightsConfig()->RemovePointLight(this);
+}
+
+void PointLightComponent::Init()
+{
+    App->GetSceneModule()->GetScene()->GetLightsConfig()->AddPointLight(this);
 }
 
 void PointLightComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
@@ -128,11 +128,11 @@ void PointLightComponent::Render(float deltaTime)
     {
         for (int i = 0; i < directions.size(); ++i)
         {
-            debug->DrawLine(GetParent()->GetGlobalTransform().TranslatePart(), directions[i], range, float3(1, 1, 1));
+            debug->DrawLine(parent->GetGlobalTransform().TranslatePart(), directions[i], range, float3(1, 1, 1));
         }
     }
     else
     {
-        debug->DrawSphere(GetParent()->GetGlobalTransform().TranslatePart(), float3(1, 1, 1), range);
+        debug->DrawSphere(parent->GetGlobalTransform().TranslatePart(), float3(1, 1, 1), range);
     }
 }

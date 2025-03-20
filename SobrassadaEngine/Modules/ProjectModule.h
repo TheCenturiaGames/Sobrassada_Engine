@@ -21,9 +21,9 @@ class ProjectModule : public Module
     const std::string& GetLoadedProjectPath() const { return loadedProjectAbsolutePath; }
     const std::string& GetLoadedProjectName() const { return loadedProjectName; }
 
-    const std::string& GetStartupSceneName() const { return projectConfig != nullptr ? projectConfig->GetStartupScene() : DEFAULT_EMPTY_STRING; }
-
     bool IsProjectLoaded() const { return projectLoaded; }
+
+    ProjectConfig* GetProjectConfig() const { return projectConfig; }
 
   private:
     void CreateNewProject(const std::string& projectPath, const std::string& projectName);
@@ -47,6 +47,4 @@ class ProjectModule : public Module
     char newProjectName[255];
 
     ProjectConfig* projectConfig = nullptr;
-
-    std::string DEFAULT_EMPTY_STRING          = "";
 };

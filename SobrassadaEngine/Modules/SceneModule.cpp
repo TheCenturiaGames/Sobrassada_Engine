@@ -1,21 +1,20 @@
 #include "SceneModule.h"
 
 #include "Application.h"
-#include "ComponentUtils.h"
+#include "CameraModule.h"
 #include "EditorUIModule.h"
 #include "FileSystem.h"
+#include "GameObject.h"
+#include "ImGuizmo.h"
 #include "InputModule.h"
 #include "LibraryModule.h"
-#include "Octree.h"
-#include "Quadtree.h"
 #include "ProjectModule.h"
-#include "Application.h"
-#include "InputModule.h"
 #include "RaycastController.h"
 #include "ResourcesModule.h"
 #include "Config/EngineConfig.h"
 
-#include <filesystem>
+#include <SDL_mouse.h>
+
 
 SceneModule::SceneModule()
 {
@@ -27,11 +26,17 @@ SceneModule::~SceneModule()
 
 bool SceneModule::Init()
 {
-    if (App->GetProjectModule()->IsProjectLoaded() && !App->GetProjectModule()->GetStartupSceneName().empty())
+    if (App->GetProjectModule()->IsProjectLoaded())
     {
-        App->GetLibraryModule()->LoadScene((App->GetProjectModule()->GetStartupSceneName() + SCENE_EXTENSION).c_str());
+        if (!App->GetProjectModule()->GetProjectConfig()->GetStartupScene().empty())
+        {
+            App->GetLibraryModule()->LoadScene((App->GetProjectModule()->GetProjectConfig()->GetStartupScene() + SCENE_EXTENSION).c_str());
 
-        if (App->GetEngineConfig()->ShouldStartGameOnStartup()) SwitchPlayMode(true);
+            if (App->GetEngineConfig()->ShouldStartGameOnStartup()) SwitchPlayMode(true);
+        } else
+        {
+            CreateScene();
+        }
     }
     return true;
 }
@@ -73,42 +78,43 @@ update_status SceneModule::RenderEditor(float deltaTime)
 
 update_status SceneModule::PostUpdate(float deltaTime)
 {
-    if (loadedScene == nullptr) return UPDATE_CONTINUE;
-
-    // CAST RAY WHEN LEFT CLICK IS RELEASED
-    if (GetDoInputsScene() && !ImGuizmo::IsUsingAny())
+    if (App->GetProjectModule()->IsProjectLoaded())
     {
-        const KeyState* mouseButtons = App->GetInputModule()->GetMouseButtons();
-        const KeyState* keyboard     = App->GetInputModule()->GetKeyboard();
-        if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_DOWN && !keyboard[SDL_SCANCODE_LALT])
+        // CAST RAY WHEN LEFT CLICK IS RELEASED
+        if (GetDoInputsScene() && !ImGuizmo::IsUsingAny())
         {
-            GameObject* selectedObject = RaycastController::GetRayIntersectionTrees<Octree, Quadtree>(
-                App->GetCameraModule()->CastCameraRay(), loadedScene->GetOctree(), loadedScene->GetDynamicTree()
-            );
-
-            if (selectedObject != nullptr)
+            const KeyState* mouseButtons = App->GetInputModule()->GetMouseButtons();
+            const KeyState* keyboard     = App->GetInputModule()->GetKeyboard();
+            if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_DOWN && !keyboard[SDL_SCANCODE_LALT])
             {
-                loadedScene->SetSelectedGameObject(selectedObject->GetUID());
+                GameObject* selectedObject = RaycastController::GetRayIntersectionTrees<Octree, Quadtree>(
+                    App->GetCameraModule()->CastCameraRay(), loadedScene->GetOctree(), loadedScene->GetDynamicTree()
+                );
+
+                if (selectedObject != nullptr)
+                {
+                    loadedScene->SetSelectedGameObject(selectedObject->GetUID());
+                }
             }
         }
-    }
 
-    // CHECKING FOR UPDATED STATIC AND DYNAMIC OBJECTS
-    GizmoDragState currentGizmoState = App->GetEditorUIModule()->GetImGuizmoDragState();
-    if (currentGizmoState == GizmoDragState::RELEASED || currentGizmoState == GizmoDragState::IDLE)
-    {
-        if (loadedScene->IsStaticModified())
+        // CHECKING FOR UPDATED STATIC AND DYNAMIC OBJECTS
+        GizmoDragState currentGizmoState = App->GetEditorUIModule()->GetImGuizmoDragState();
+        if (currentGizmoState == GizmoDragState::RELEASED || currentGizmoState == GizmoDragState::IDLE)
         {
-            RegenerateStaticTree();
+            if (loadedScene->IsStaticModified())
+            {
+                loadedScene->UpdateStaticSpatialStructure();
+            }
+            if (loadedScene->IsDynamicModified())
+            {
+                loadedScene->UpdateDynamicSpatialStructure();
+            }
         }
-        if (loadedScene->IsDynamicModified())
-        {
-            RegenerateDynamicTree();
-        }
+
+        if (loadedScene->GetStopPlaying()) SwitchPlayMode(false);
     }
-
-    if (loadedScene->GetStopPlaying()) SwitchPlayMode(false);
-
+    
     return UPDATE_CONTINUE;
 }
 

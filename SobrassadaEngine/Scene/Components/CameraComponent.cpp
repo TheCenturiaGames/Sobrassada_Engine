@@ -11,7 +11,7 @@
 #include "ImGui.h"
 #include <vector>
 
-CameraComponent::CameraComponent(UID uid, UID uidParent) : Component(uid, uidParent, "Camera", COMPONENT_CAMERA)
+CameraComponent::CameraComponent(UID uid, GameObject* parent) : Component(uid, parent, "Camera", COMPONENT_CAMERA)
 {
     float4x4 globalTransform  = GetGlobalTransform();
     camera.type               = FrustumType::PerspectiveFrustum;
@@ -44,14 +44,14 @@ CameraComponent::CameraComponent(UID uid, UID uidParent) : Component(uid, uidPar
     orthographicWidth  = 10.0f;
     orthographicHeight = orthographicWidth * ((float)height / (float)width);
 
-    if (App->GetSceneModule()->GetMainCamera() == nullptr)
+    if (App->GetSceneModule()->GetScene()->GetMainCamera() == nullptr)
     {
         isMainCamera = true;
-        App->GetSceneModule()->SetMainCamera(this);
+        App->GetSceneModule()->GetScene()->SetMainCamera(this);
     }
 }
 
-CameraComponent::CameraComponent(const rapidjson::Value& initialState) : Component(initialState)
+CameraComponent::CameraComponent(const rapidjson::Value& initialState, GameObject* parent) : Component(initialState, parent)
 {
     if (initialState.HasMember("MainCamera"))
     {
@@ -134,9 +134,9 @@ CameraComponent::CameraComponent(const rapidjson::Value& initialState) : Compone
 
 CameraComponent::~CameraComponent()
 {
-    if (App->GetSceneModule()->GetMainCamera() == this)
+    if (App->GetSceneModule()->GetScene()->GetMainCamera() == this)
     {
-        App->GetSceneModule()->SetMainCamera(nullptr);
+        App->GetSceneModule()->GetScene()->SetMainCamera(nullptr);
     }
     glDeleteBuffers(1, &ubo);
 }
@@ -217,13 +217,13 @@ void CameraComponent::RenderEditorInspector()
     if (enabled)
     {
         ImGui::SeparatorText("Camera");
-        if (App->GetSceneModule()->GetMainCamera() != nullptr)
-            isMainCamera = (App->GetSceneModule()->GetMainCamera()->GetUbo() == ubo);
+        if (App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
+            isMainCamera = (App->GetSceneModule()->GetScene()->GetMainCamera()->GetUbo() == ubo);
         if (ImGui::Checkbox("Main Camera", &isMainCamera))
         {
             if (isMainCamera)
             {
-                App->GetSceneModule()->SetMainCamera(this);
+                App->GetSceneModule()->GetScene()->SetMainCamera(this);
             }
         }
         ImGui::Checkbox("Draw gizmos", &drawGizmos);
@@ -277,7 +277,7 @@ void CameraComponent::RenderEditorInspector()
 
 void CameraComponent::Update(float deltaTime)
 {
-    if (isMainCamera && App->GetSceneModule()->GetMainCamera() == nullptr) App->GetSceneModule()->SetMainCamera(this);
+    if (isMainCamera && App->GetSceneModule()->GetScene()->GetMainCamera() == nullptr) App->GetSceneModule()->GetScene()->SetMainCamera(this);
     float4x4 globalTransform = GetGlobalTransform();
     camera.pos               = float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
     camera.front     = -float3(globalTransform[0][2], globalTransform[1][2], globalTransform[2][2]).Normalized();

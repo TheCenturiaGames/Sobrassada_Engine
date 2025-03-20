@@ -42,7 +42,7 @@ namespace RaycastController
 
             const ResourceMesh* resourceMesh = meshComponent->GetResourceMesh();
 
-            float4x4 globalTransform = gameObject->GetGlobalTransform();
+            float4x4 globalTransform         = meshComponent->GetCombinedMatrix();
             globalTransform.Inverse();
             localRay.Transform(globalTransform);
 
@@ -78,13 +78,13 @@ namespace RaycastController
             {
                 SceneModule* sceneModule     = App->GetSceneModule();
 
-                UID rootGameObject           = sceneModule->GetGameObjectRootUID();
-                GameObject* parentGameobject = sceneModule->GetGameObjectByUID(selectedGameObject->GetParent());
+                UID rootGameObject           = sceneModule->GetScene()->GetGameObjectRootUID();
+                GameObject* parentGameobject = sceneModule->GetScene()->GetGameObjectByUID(selectedGameObject->GetParent());
 
                 while (parentGameobject->GetUID() != rootGameObject)
                 {
                     selectedGameObject = parentGameobject;
-                    parentGameobject   = sceneModule->GetGameObjectByUID(selectedGameObject->GetParent());
+                    parentGameobject   = sceneModule->GetScene()->GetGameObjectByUID(selectedGameObject->GetParent());
                 }
             }
         }
