@@ -405,10 +405,16 @@ void Scene::RenderScene()
         ImGui::SetWindowFocus();
 
     // do inputs only if window is focused
-    if (ImGui::IsWindowFocused(ImGuiFocusedFlags_DockHierarchy) &&
-        ImGui::IsWindowHovered(ImGuiFocusedFlags_DockHierarchy))
-        doInputs = true;
-    else doInputs = false;
+    if (ImGui::IsWindowHovered(ImGuiFocusedFlags_DockHierarchy))
+    {
+        doMouseInputs = true;
+        if (ImGui::IsWindowFocused(ImGuiFocusedFlags_DockHierarchy)) doInputs = true;
+    }
+    else
+    {
+        doInputs = false;
+        doMouseInputs = false;
+    }
 
     const auto& framebuffer = App->GetOpenGLModule()->GetFramebuffer();
 

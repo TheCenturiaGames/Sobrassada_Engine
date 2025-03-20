@@ -70,6 +70,7 @@ class Scene
     CameraComponent* GetMainCamera() { return mainCamera; }
 
     bool GetDoInputs() const { return doInputs; }
+    bool GetDoMouseInputs() const { return doMouseInputs; }
     bool GetStopPlaying() const { return stopPlaying; }
 
     const std::tuple<float, float>& GetWindowPosition() const { return sceneWindowPosition; };
@@ -98,6 +99,7 @@ class Scene
     CameraComponent* mainCamera;
     bool stopPlaying = false;
     bool doInputs    = false;
+    bool doMouseInputs = false;
 
     std::unordered_map<UID, GameObject*> gameObjectsContainer;
 

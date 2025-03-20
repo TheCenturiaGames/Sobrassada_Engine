@@ -29,6 +29,7 @@ class SceneModule : public Module
     void ReenerateDynamicTree() const { loadedScene->UpdateDynamicSpatialStructure(); }
 
     bool GetDoInputsScene() const { return loadedScene->GetDoInputs() && !inPlayMode; }
+    bool GetDoMouseInputsScene() const { return loadedScene->GetDoMouseInputs() && !inPlayMode; }
     bool GetDoInputsGame() const { return loadedScene->GetDoInputs() && inPlayMode; }
     
     bool IsSceneLoaded() const { return loadedScene != nullptr; }
