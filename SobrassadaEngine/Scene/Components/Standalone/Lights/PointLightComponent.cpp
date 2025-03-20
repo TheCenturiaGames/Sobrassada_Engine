@@ -11,11 +11,12 @@
 PointLightComponent::PointLightComponent(UID uid, GameObject* parent)
     : LightComponent(uid, parent, "Point Light", COMPONENT_POINT_LIGHT)
 {
-    range                      = 1;
-    gizmosMode                 = 0;
+    range      = 1;
+    gizmosMode = 0;
 }
 
-PointLightComponent::PointLightComponent(const rapidjson::Value& initialState, GameObject* parent) : LightComponent(initialState, parent)
+PointLightComponent::PointLightComponent(const rapidjson::Value& initialState, GameObject* parent)
+    : LightComponent(initialState, parent)
 {
 
     if (initialState.HasMember("Range"))
@@ -51,13 +52,13 @@ void PointLightComponent::Clone(const Component* other)
     if (other->GetType() == ComponentType::COMPONENT_POINT_LIGHT)
     {
         const PointLightComponent* otherLight = static_cast<const PointLightComponent*>(other);
-        enabled                              = otherLight->enabled;
+        enabled                               = otherLight->enabled;
 
         intensity                             = otherLight->intensity;
         color                                 = otherLight->color;
         drawGizmos                            = otherLight->drawGizmos;
 
-        range                                = otherLight->range;
+        range                                 = otherLight->range;
         gizmosMode                            = otherLight->gizmosMode;
     }
     else

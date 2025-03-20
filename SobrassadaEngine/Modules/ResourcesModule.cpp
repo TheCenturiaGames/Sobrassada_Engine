@@ -1,8 +1,8 @@
 #include "ResourcesModule.h"
 
 #include "Importer.h"
-#include "MeshImporter.h"
 #include "LibraryModule.h"
+#include "MeshImporter.h"
 #include "ResourceManagement/Resources/ResourceMaterial.h"
 #include "ResourceManagement/Resources/ResourceMesh.h"
 #include "ResourceManagement/Resources/ResourceTexture.h"
@@ -17,7 +17,6 @@ ResourcesModule::ResourcesModule()
 
 ResourcesModule::~ResourcesModule()
 {
-    
 }
 
 bool ResourcesModule::Init()

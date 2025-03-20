@@ -3,8 +3,8 @@
 #include "Application.h"
 #include "CameraModule.h"
 #include "EditorUIModule.h"
-#include "MeshImporter.h"
 #include "LibraryModule.h"
+#include "MeshImporter.h"
 #include "ResourceManagement/Resources/ResourceModel.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
@@ -141,7 +141,6 @@ void MeshComponent::RenderEditorInspector()
     }
 }
 
-
 void MeshComponent::Update(float deltaTime)
 {
 }
@@ -187,8 +186,7 @@ void MeshComponent::AddMesh(UID resource, bool updateParent)
         currentMeshName    = newMesh->GetName();
         currentMesh        = newMesh;
         localComponentAABB = AABB(currentMesh->GetAABB());
-        if (updateParent)
-            parent->OnAABBUpdated();
+        if (updateParent) parent->OnAABBUpdated();
     }
 }
 
@@ -213,6 +211,6 @@ void MeshComponent::OnTransformUpdated()
     combinedMatrix = parent->GetGlobalTransform();
     if (currentMesh != nullptr)
     {
-        combinedMatrix = combinedMatrix * currentMesh->GetDefaultTransform();   
+        combinedMatrix = combinedMatrix * currentMesh->GetDefaultTransform();
     }
 }

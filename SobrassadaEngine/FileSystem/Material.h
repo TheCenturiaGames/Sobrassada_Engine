@@ -8,8 +8,8 @@
 class Material
 {
   public:
-    Material() = default;
-    ~Material()   = default;
+    Material()  = default;
+    ~Material() = default;
 
     // Getters (const refs or pointers to avoid copies)
     const float4& GetDiffuseFactor() const { return diffuseFactor; }

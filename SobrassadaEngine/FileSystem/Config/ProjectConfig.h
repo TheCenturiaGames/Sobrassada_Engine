@@ -5,7 +5,7 @@
 
 class ProjectConfig : public ConfigFile
 {
-public:
+  public:
     ProjectConfig();
     ~ProjectConfig() override;
 
@@ -16,6 +16,6 @@ public:
 
     void SetStartupScene(const std::string& newStartupSceneName);
 
-private:
+  private:
     std::string startupSceneName = "";
 };

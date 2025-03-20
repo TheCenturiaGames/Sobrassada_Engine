@@ -27,8 +27,8 @@
 #include "imgui.h"
 #include "imgui_internal.h"
 // guizmo after imgui include
-#include "CameraComponent.h"
 #include "./Libs/ImGuizmo/ImGuizmo.h"
+#include "CameraComponent.h"
 
 Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 {
@@ -96,7 +96,7 @@ void Scene::Init()
     {
         gameObject.second->Init();
     }
-    
+
     GetGameObjectByUID(gameObjectRootUID)->UpdateTransformForGOBranch();
 
     // When loading a scene, overrides all gameObjects that have a prefabUID. That is because if the prefab has been
@@ -412,7 +412,7 @@ void Scene::RenderScene()
     }
     else
     {
-        doInputs = false;
+        doInputs      = false;
         doMouseInputs = false;
     }
 

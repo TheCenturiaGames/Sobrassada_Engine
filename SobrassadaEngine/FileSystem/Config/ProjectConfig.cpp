@@ -26,7 +26,8 @@ void ProjectConfig::SetStartupScene(const std::string& newStartupSceneName)
 void ProjectConfig::Load()
 {
     rapidjson::Document doc;
-    bool loaded = FileSystem::LoadJSON((App->GetProjectModule()->GetLoadedProjectPath() + "ProjectConfig.json").c_str() , doc);
+    bool loaded =
+        FileSystem::LoadJSON((App->GetProjectModule()->GetLoadedProjectPath() + "ProjectConfig.json").c_str(), doc);
 
     if (!loaded)
     {
@@ -35,8 +36,7 @@ void ProjectConfig::Load()
         return;
     }
 
-    if (doc.HasMember("StartupScenePath"))
-        startupSceneName = doc["StartupScenePath"].GetString();
+    if (doc.HasMember("StartupScenePath")) startupSceneName = doc["StartupScenePath"].GetString();
 }
 
 void ProjectConfig::Save() const

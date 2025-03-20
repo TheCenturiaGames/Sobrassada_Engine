@@ -32,7 +32,7 @@ ResourceMesh::ResourceMesh(
     {
         const rapidjson::Value& transformValue = importOptions["transform"];
 
-        defaultTransform                         = float4x4(
+        defaultTransform                       = float4x4(
             transformValue[0].GetFloat(), transformValue[1].GetFloat(), transformValue[2].GetFloat(),
             transformValue[3].GetFloat(), transformValue[4].GetFloat(), transformValue[5].GetFloat(),
             transformValue[6].GetFloat(), transformValue[7].GetFloat(), transformValue[8].GetFloat(),

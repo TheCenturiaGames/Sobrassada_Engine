@@ -3,9 +3,9 @@
 #include "GameObject.h"
 #include "Standalone/MeshComponent.h"
 
+#include <Geometry/LineSegment.h>
 #include <set>
 #include <stack>
-#include <Geometry/LineSegment.h>
 
 Octree::OctreeNode::~OctreeNode()
 {

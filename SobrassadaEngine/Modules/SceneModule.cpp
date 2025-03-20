@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "CameraModule.h"
+#include "Config/EngineConfig.h"
 #include "EditorUIModule.h"
 #include "FileSystem.h"
 #include "GameObject.h"
@@ -11,10 +12,8 @@
 #include "ProjectModule.h"
 #include "RaycastController.h"
 #include "ResourcesModule.h"
-#include "Config/EngineConfig.h"
 
 #include <SDL_mouse.h>
-
 
 SceneModule::SceneModule()
 {
@@ -30,10 +29,13 @@ bool SceneModule::Init()
     {
         if (!App->GetProjectModule()->GetProjectConfig()->GetStartupScene().empty())
         {
-            App->GetLibraryModule()->LoadScene((App->GetProjectModule()->GetProjectConfig()->GetStartupScene() + SCENE_EXTENSION).c_str());
+            App->GetLibraryModule()->LoadScene(
+                (App->GetProjectModule()->GetProjectConfig()->GetStartupScene() + SCENE_EXTENSION).c_str()
+            );
 
             if (App->GetEngineConfig()->ShouldStartGameOnStartup()) SwitchPlayMode(true);
-        } else
+        }
+        else
         {
             CreateScene();
         }
@@ -67,12 +69,12 @@ update_status SceneModule::Render(float deltaTime)
 
 update_status SceneModule::RenderEditor(float deltaTime)
 {
-    #ifndef GAME
+#ifndef GAME
     if (loadedScene != nullptr)
     {
         return loadedScene->RenderEditor(deltaTime);
     }
-    #endif
+#endif
     return UPDATE_CONTINUE;
 }
 
@@ -114,7 +116,7 @@ update_status SceneModule::PostUpdate(float deltaTime)
 
         if (loadedScene->GetStopPlaying()) SwitchPlayMode(false);
     }
-    
+
     return UPDATE_CONTINUE;
 }
 

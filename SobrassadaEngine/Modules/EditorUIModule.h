@@ -1,11 +1,11 @@
 #pragma once
+#include "ComponentUtils.h"
 #include "EngineEditors/Editor/NodeEditor.h"
 #include "EngineEditors/EngineEditorBase.h"
 #include "Module.h"
 #include "ResourceManagement/Resources/Resource.h"
 
 #include "SDL.h"
-
 #include "imgui_internal.h"
 #include <Math/float3.h>
 #include <Math/float4x4.h>
@@ -13,7 +13,6 @@
 #include <string>
 #include <unordered_map>
 // imguizmo include after imgui
-#include "ComponentUtils.h"
 #include "./Libs/ImGuizmo/ImGuizmo.h"
 
 enum EditorType

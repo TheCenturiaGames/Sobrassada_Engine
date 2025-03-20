@@ -1,12 +1,12 @@
 ﻿#include "ComponentUtils.h"
 
+#include "CameraComponent.h"
 #include "Component.h"
+#include "Standalone/CharacterControllerComponent.h"
 #include "Standalone/Lights/DirectionalLightComponent.h"
 #include "Standalone/Lights/PointLightComponent.h"
 #include "Standalone/Lights/SpotLightComponent.h"
 #include "Standalone/MeshComponent.h"
-#include "Standalone/CharacterControllerComponent.h"
-#include "CameraComponent.h"
 
 #include <cstdint>
 
@@ -19,28 +19,28 @@ Component* ComponentUtils::CreateEmptyComponent(const ComponentType type, const 
         return nullptr;
     case COMPONENT_MESH:
         generatedComponent = new MeshComponent(uid, parent);
-            break;
+        break;
     case COMPONENT_POINT_LIGHT:
         generatedComponent = new PointLightComponent(uid, parent);
-            break;
+        break;
     case COMPONENT_SPOT_LIGHT:
         generatedComponent = new SpotLightComponent(uid, parent);
-            break;
+        break;
     case COMPONENT_DIRECTIONAL_LIGHT:
         generatedComponent = new DirectionalLightComponent(uid, parent);
-            break;
+        break;
     case COMPONENT_CHARACTER_CONTROLLER:
         generatedComponent = new CharacterControllerComponent(uid, parent);
-            break;
+        break;
     case COMPONENT_CAMERA:
         generatedComponent = new CameraComponent(uid, parent);
-            break;
+        break;
     default:
         return nullptr;
     }
-    
+
     generatedComponent->Init();
-    
+
     return generatedComponent;
 }
 

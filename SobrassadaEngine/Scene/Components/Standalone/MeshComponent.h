@@ -20,7 +20,7 @@ class MeshComponent : public Component
 
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
     void Clone(const Component* other) override;
-    
+
     void RenderEditorInspector() override;
 
     void Update(float deltaTime) override;
@@ -31,7 +31,7 @@ class MeshComponent : public Component
     void InitSkin();
 
     const ResourceMesh* GetResourceMesh() const { return currentMesh; }
-    
+
     void AddMesh(UID resource, bool updateParent = true);
     void AddMaterial(UID resource);
 
@@ -60,8 +60,8 @@ class MeshComponent : public Component
     std::vector<GameObject*> bones;
     std::vector<float4x4> bindMatrices;
 
-    UID modelUID  = INVALID_UID;
-    int skinIndex = -1;
+    UID modelUID            = INVALID_UID;
+    int skinIndex           = -1;
 
     float4x4 combinedMatrix = float4x4::identity;
 };

@@ -12,7 +12,8 @@ LightComponent::LightComponent(const UID uid, GameObject* parent, const char* ui
     drawGizmos = true;
 }
 
-LightComponent::LightComponent(const rapidjson::Value& initialState, GameObject* parent) : Component(initialState, parent)
+LightComponent::LightComponent(const rapidjson::Value& initialState, GameObject* parent)
+    : Component(initialState, parent)
 {
     if (initialState.HasMember("Intensity"))
     {

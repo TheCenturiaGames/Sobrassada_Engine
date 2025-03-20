@@ -76,10 +76,11 @@ namespace RaycastController
             const MeshComponent* meshComponent = selectedGameObject->GetMeshComponent();
             if (meshComponent && meshComponent->HasBones())
             {
-                SceneModule* sceneModule     = App->GetSceneModule();
+                SceneModule* sceneModule = App->GetSceneModule();
 
-                UID rootGameObject           = sceneModule->GetScene()->GetGameObjectRootUID();
-                GameObject* parentGameobject = sceneModule->GetScene()->GetGameObjectByUID(selectedGameObject->GetParent());
+                UID rootGameObject       = sceneModule->GetScene()->GetGameObjectRootUID();
+                GameObject* parentGameobject =
+                    sceneModule->GetScene()->GetGameObjectByUID(selectedGameObject->GetParent());
 
                 while (parentGameobject->GetUID() != rootGameObject)
                 {
@@ -91,4 +92,4 @@ namespace RaycastController
 
         return selectedGameObject;
     }
-}
+} // namespace RaycastController

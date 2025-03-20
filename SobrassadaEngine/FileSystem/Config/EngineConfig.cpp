@@ -36,10 +36,8 @@ void EngineConfig::Load()
         return;
     }
 
-    if (doc.HasMember("StartupProject"))
-        startupProjectPath = doc["StartupProject"].GetString();
-    if (doc.HasMember("StartGameOnStartup"))
-        startGameOnStartup = doc["StartGameOnStartup"].GetBool();
+    if (doc.HasMember("StartupProject")) startupProjectPath = doc["StartupProject"].GetString();
+    if (doc.HasMember("StartGameOnStartup")) startGameOnStartup = doc["StartGameOnStartup"].GetBool();
 
     if (doc.HasMember("PreviouslyLoaded") && doc["PreviouslyLoaded"].IsArray())
     {

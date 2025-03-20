@@ -51,7 +51,8 @@ CameraComponent::CameraComponent(UID uid, GameObject* parent) : Component(uid, p
     }
 }
 
-CameraComponent::CameraComponent(const rapidjson::Value& initialState, GameObject* parent) : Component(initialState, parent)
+CameraComponent::CameraComponent(const rapidjson::Value& initialState, GameObject* parent)
+    : Component(initialState, parent)
 {
     if (initialState.HasMember("MainCamera"))
     {
@@ -277,7 +278,8 @@ void CameraComponent::RenderEditorInspector()
 
 void CameraComponent::Update(float deltaTime)
 {
-    if (isMainCamera && App->GetSceneModule()->GetScene()->GetMainCamera() == nullptr) App->GetSceneModule()->GetScene()->SetMainCamera(this);
+    if (isMainCamera && App->GetSceneModule()->GetScene()->GetMainCamera() == nullptr)
+        App->GetSceneModule()->GetScene()->SetMainCamera(this);
     float4x4 globalTransform = GetGlobalTransform();
     camera.pos               = float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
     camera.front     = -float3(globalTransform[0][2], globalTransform[1][2], globalTransform[2][2]).Normalized();

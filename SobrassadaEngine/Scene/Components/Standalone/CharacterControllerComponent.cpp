@@ -21,7 +21,8 @@ CharacterControllerComponent::CharacterControllerComponent(UID uid, GameObject* 
     targetDirection.Set(0.0f, 0.0f, 1.0f);
 }
 
-CharacterControllerComponent::CharacterControllerComponent(const rapidjson::Value& initialState, GameObject* parent) : Component(initialState, parent)
+CharacterControllerComponent::CharacterControllerComponent(const rapidjson::Value& initialState, GameObject* parent)
+    : Component(initialState, parent)
 {
     if (initialState.HasMember("TargetDirectionX"))
     {
@@ -153,9 +154,9 @@ void CharacterControllerComponent::RenderEditorInspector()
 
 void CharacterControllerComponent::Move(const float3& direction, float deltaTime) const
 {
-    float finalSpeed      = std::min(speed, maxLinearSpeed);
+    float finalSpeed           = std::min(speed, maxLinearSpeed);
 
-    float3 movementOffset = direction * finalSpeed * deltaTime;
+    float3 movementOffset      = direction * finalSpeed * deltaTime;
 
     float4x4 localTr           = parent->GetLocalTransform();
     float4x4 translationMatrix = float4x4::FromTRS(movementOffset, float4x4::identity.RotatePart(), float3::one);
@@ -181,9 +182,9 @@ void CharacterControllerComponent::Rotate(float rotationDirection, float deltaTi
 
     float4x4 rotationMatrix = float4x4::FromEulerXYZ(0.0f, angleDeg, 0.0f);
 
-    float4x4 localTr = parent->GetLocalTransform();
+    float4x4 localTr        = parent->GetLocalTransform();
 
-    localTr          = localTr * rotationMatrix;
+    localTr                 = localTr * rotationMatrix;
 
     parent->SetLocalTransform(localTr);
     parent->UpdateTransformForGOBranch();

@@ -11,10 +11,9 @@
 #include "ProjectModule.h"
 #include "SceneImporter.h"
 #include "SceneModule.h"
-#include "WindowModule.h"
 #include "TextureLibraryEditor.h"
+#include "WindowModule.h"
 #include <TextureImporter.h>
-
 
 #include "glew.h"
 #include "imgui.h"
@@ -24,16 +23,15 @@
 #include <filesystem>
 #include <string>
 
-
 EditorUIModule::EditorUIModule() : width(0), height(0)
 {
     standaloneComponents = {
-        {"Mesh",              COMPONENT_MESH             },
-        {"Point Light",       COMPONENT_POINT_LIGHT      },
-        {"Spot Light",        COMPONENT_SPOT_LIGHT       },
-        {"Directional Light", COMPONENT_DIRECTIONAL_LIGHT},
+        {"Mesh",                 COMPONENT_MESH                },
+        {"Point Light",          COMPONENT_POINT_LIGHT         },
+        {"Spot Light",           COMPONENT_SPOT_LIGHT          },
+        {"Directional Light",    COMPONENT_DIRECTIONAL_LIGHT   },
         {"Character Controller", COMPONENT_CHARACTER_CONTROLLER},
-        {"Camera",            COMPONENT_CAMERA           }
+        {"Camera",               COMPONENT_CAMERA              }
     };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;
@@ -76,7 +74,7 @@ bool EditorUIModule::Init()
 
 update_status EditorUIModule::PreUpdate(float deltaTime)
 {
-    #ifndef GAME
+#ifndef GAME
 
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame();
@@ -85,17 +83,17 @@ update_status EditorUIModule::PreUpdate(float deltaTime)
     // ImGuizmo::SetOrthographic(false);
     // ImGuizmo::AllowAxisFlip(false);
     // ImGuizmo::SetPlaneLimit(0);
-    
+
     ImGui::DockSpaceOverViewport();
 
-    #endif
+#endif
 
     return UPDATE_CONTINUE;
 }
 
 update_status EditorUIModule::Update(float deltaTime)
 {
-    #ifndef GAME
+#ifndef GAME
 
     if (App->GetProjectModule()->IsProjectLoaded())
     {
@@ -104,14 +102,14 @@ update_status EditorUIModule::Update(float deltaTime)
         UpdateGizmoDragState();
     }
 
-    #endif
+#endif
 
     return UPDATE_CONTINUE;
 }
 
 update_status EditorUIModule::RenderEditor(float deltaTime)
 {
-    #ifndef GAME
+#ifndef GAME
     if (App->GetProjectModule()->IsProjectLoaded())
     {
         Draw();
@@ -133,17 +131,17 @@ update_status EditorUIModule::RenderEditor(float deltaTime)
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-    #endif
+#endif
     return UPDATE_CONTINUE;
 }
 
 update_status EditorUIModule::PostUpdate(float deltaTime)
 {
-    #ifndef GAME
+#ifndef GAME
 
     if (closeApplication) return UPDATE_STOP;
 
-    #endif
+#endif
 
     return UPDATE_CONTINUE;
 }
@@ -306,18 +304,17 @@ void EditorUIModule::MainMenu()
             ImGui::EndMenu();
         }
 
-       if (ImGui::BeginMenu("Engine Editor Window"))
+        if (ImGui::BeginMenu("Engine Editor Window"))
         {
             if (ImGui::MenuItem("Mockup Base Engine Editor", "")) OpenEditor(CreateEditor(EditorType::BASE));
 
             if (ImGui::MenuItem("Node Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::NODE));
 
-            if (ImGui::MenuItem("Texture Library"))               OpenEditor(new TextureLibraryEditor("Texture Library", GenerateUID()));
+            if (ImGui::MenuItem("Texture Library"))
+                OpenEditor(new TextureLibraryEditor("Texture Library", GenerateUID()));
 
             ImGui::EndMenu();
         }
-
-
 
         if (ImGui::MenuItem("Editor settings", "", editorSettingsMenu)) editorSettingsMenu = !editorSettingsMenu;
 
@@ -788,8 +785,7 @@ bool EditorUIModule::RenderTransformWidget(
     ImGui::SeparatorText(transformName.c_str());
 
     RenderBasicTransformModifiers(
-        pos, rot, scale, lockScaleAxis, positionValueChanged, rotationValueChanged,
-        scaleValueChanged
+        pos, rot, scale, lockScaleAxis, positionValueChanged, rotationValueChanged, scaleValueChanged
     );
 
     if (positionValueChanged || rotationValueChanged || scaleValueChanged)
@@ -854,7 +850,6 @@ bool EditorUIModule::RenderImGuizmo(
         nullptr, nullptr
     );
 
-
     if (!ImGuizmo::IsUsing()) return false;
 
     ImGuizmo::DecomposeMatrixToComponents(transform.ptr(), &pos[0], &rot[0], &scale[0]);
@@ -888,15 +883,13 @@ void EditorUIModule::RenderBasicTransformModifiers(
 {
     positionValueChanged |= ImGui::InputFloat3("Position", &outputPosition[0]);
 
-
-    outputRotation *= RAD_DEGREE_CONV;
+    outputRotation       *= RAD_DEGREE_CONV;
 
     rotationValueChanged |= ImGui::InputFloat3("Rotation", &outputRotation[0]);
 
-    outputRotation /= RAD_DEGREE_CONV;
-    
+    outputRotation       /= RAD_DEGREE_CONV;
 
-    scaleValueChanged |= ImGui::InputFloat3("Scale", &outputScale[0]);
+    scaleValueChanged    |= ImGui::InputFloat3("Scale", &outputScale[0]);
     ImGui::SameLine();
     ImGui::Checkbox("Lock axis", &lockScaleAxis);
 }

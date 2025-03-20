@@ -25,7 +25,7 @@ bool ProjectModule::Init()
             loadedProjectName = loadedProjectAbsolutePath;
             FileSystem::RemoveDelimiterIfPresent(loadedProjectName);
             loadedProjectName = FileSystem::GetFileNameWithoutExtension(loadedProjectName);
-            projectConfig = new ProjectConfig();
+            projectConfig     = new ProjectConfig();
             projectLoaded     = true;
         }
         else

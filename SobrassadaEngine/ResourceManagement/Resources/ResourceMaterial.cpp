@@ -5,7 +5,6 @@
 #include "LibraryModule.h"
 #include "ResourceManagement/Resources/ResourceTexture.h"
 #include "TextureImporter.h"
-#include "FileSystem/Material.h"
 
 #include "imgui.h"
 #include <glew.h>

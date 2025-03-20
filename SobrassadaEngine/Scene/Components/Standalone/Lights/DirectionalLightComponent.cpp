@@ -5,9 +5,14 @@
 #include "SceneModule.h"
 
 DirectionalLightComponent::DirectionalLightComponent(UID uid, GameObject* parent)
-    : LightComponent(uid, parent, "Directional Light", COMPONENT_DIRECTIONAL_LIGHT){}
+    : LightComponent(uid, parent, "Directional Light", COMPONENT_DIRECTIONAL_LIGHT)
+{
+}
 
-DirectionalLightComponent::DirectionalLightComponent(const rapidjson::Value& initialState, GameObject* parent) : LightComponent(initialState, parent){}
+DirectionalLightComponent::DirectionalLightComponent(const rapidjson::Value& initialState, GameObject* parent)
+    : LightComponent(initialState, parent)
+{
+}
 
 DirectionalLightComponent::~DirectionalLightComponent()
 {

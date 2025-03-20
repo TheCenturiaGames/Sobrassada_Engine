@@ -11,12 +11,13 @@
 SpotLightComponent::SpotLightComponent(UID uid, GameObject* parent)
     : LightComponent(uid, parent, "Spot Light", COMPONENT_SPOT_LIGHT)
 {
-    range                      = 3;
-    innerAngle                 = 10;
-    outerAngle                 = 20;
+    range      = 3;
+    innerAngle = 10;
+    outerAngle = 20;
 }
 
-SpotLightComponent::SpotLightComponent(const rapidjson::Value& initialState, GameObject* parent) : LightComponent(initialState, parent)
+SpotLightComponent::SpotLightComponent(const rapidjson::Value& initialState, GameObject* parent)
+    : LightComponent(initialState, parent)
 {
     if (initialState.HasMember("Range"))
     {

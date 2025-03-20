@@ -1,8 +1,8 @@
 #pragma once
 
-#include <vector>
 #include "Octree.h"
 #include "Quadtree.h"
+#include <vector>
 
 namespace math
 {
@@ -13,7 +13,8 @@ class GameObject;
 
 namespace RaycastController
 {
-    GameObject* GetRayIntersectionObject(const math::LineSegment& ray, const std::vector<GameObject*>& queriedGameObjects);
+    GameObject*
+    GetRayIntersectionObject(const math::LineSegment& ray, const std::vector<GameObject*>& queriedGameObjects);
 
     template <typename... Tree> GameObject* GetRayIntersectionTrees(const math::LineSegment& ray, const Tree*... trees)
     {
@@ -22,4 +23,4 @@ namespace RaycastController
 
         return GetRayIntersectionObject(ray, queriedGameObjects);
     }
-}
+} // namespace RaycastController

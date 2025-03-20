@@ -10,7 +10,6 @@
 #include "prettywriter.h"
 #include "stringbuffer.h"
 
-
 namespace StateMachineManager
 {
     void Save(
@@ -108,13 +107,12 @@ namespace StateMachineManager
 
         const std::string stateMachineName = FileSystem::GetFileNameWithoutExtension(path);
 
-       UID finalStateMachineUID;
+        UID finalStateMachineUID;
 
         if (sourceUID == INVALID_UID)
         {
-            UID stateMachineUID = GenerateUID();
-            finalStateMachineUID  =
-                App->GetLibraryModule()->AssignFiletypeUID(stateMachineUID, FileType::StateMachine);
+            UID stateMachineUID   = GenerateUID();
+            finalStateMachineUID  = App->GetLibraryModule()->AssignFiletypeUID(stateMachineUID, FileType::StateMachine);
 
             std::string assetPath = STATEMACHINES_ASSETS_PATH + stateMachineName + MODEL_EXTENSION;
             MetaModel meta(finalStateMachineUID, assetPath);
@@ -143,7 +141,7 @@ namespace StateMachineManager
         App->GetLibraryModule()->AddResource(destination, sourceUID);
     }
 
-   ResourceStateMachine* Load(UID stateMachineUID)
+    ResourceStateMachine* Load(UID stateMachineUID)
     {
         std::string path = App->GetLibraryModule()->GetResourcePath(stateMachineUID);
         if (path.empty())

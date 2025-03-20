@@ -35,7 +35,7 @@ enum update_status
 #define SCREEN_WIDTH  1280
 #define SCREEN_HEIGHT 720
 
-#define FULLSCREEN   false
+#define FULLSCREEN false
 
 #ifdef GAME
 #define FULL_DESKTOP true
@@ -43,9 +43,9 @@ enum update_status
 #define FULL_DESKTOP false
 #endif
 
-#define BORDERLESS   false
-#define RESIZABLE    true
-#define VSYNC        true
+#define BORDERLESS false
+#define RESIZABLE  true
+#define VSYNC      true
 
 #define TITLE             "Sobrassada Engine"
 #define ENGINE_NAME       "Sobrassada"
@@ -75,32 +75,32 @@ enum update_status
 #define DEFAULT_CAMERA_ZOOM_SENSITIVITY      0.5f;
 
 #define ENGINE_DEFAULT_ASSETS "EngineDefaults/";
-#define ASSETS_PATH         "Assets/"
-#define SCENES_PATH         "Assets/Scenes/"
-#define METADATA_PATH       "Assets/Metadata/"
-#define PREFABS_ASSETS_PATH "Assets/Prefabs/"
-#define MODELS_ASSETS_PATH "Assets/Models/"
+#define ASSETS_PATH           "Assets/"
+#define SCENES_PATH           "Assets/Scenes/"
+#define METADATA_PATH         "Assets/Metadata/"
+#define PREFABS_ASSETS_PATH   "Assets/Prefabs/"
+#define MODELS_ASSETS_PATH    "Assets/Models/"
 
-#define LIBRARY_PATH       "Library/"
-#define ANIMATIONS_PATH    "Library/Animations/"
-#define AUDIO_PATH         "Library/Audio/"
-#define MODELS_LIB_PATH    "Library/Models/"
-#define MESHES_PATH        "Library/Meshes/"
-#define SCENES_PLAY_PATH   "Library/Scenes/"
-#define TEXTURES_PATH      "Library/Textures/"
-#define MATERIALS_PATH     "Library/Materials/"
-#define STATEMACHINES_LIB_PATH "Library/StateMachines/"
+#define LIBRARY_PATH              "Library/"
+#define ANIMATIONS_PATH           "Library/Animations/"
+#define AUDIO_PATH                "Library/Audio/"
+#define MODELS_LIB_PATH           "Library/Models/"
+#define MESHES_PATH               "Library/Meshes/"
+#define SCENES_PLAY_PATH          "Library/Scenes/"
+#define TEXTURES_PATH             "Library/Textures/"
+#define MATERIALS_PATH            "Library/Materials/"
+#define STATEMACHINES_LIB_PATH    "Library/StateMachines/"
 #define STATEMACHINES_ASSETS_PATH "Assets/StateMachines/"
-#define PREFABS_LIB_PATH "Library/Prefabs/"
+#define PREFABS_LIB_PATH          "Library/Prefabs/"
 
-#define ASSET_EXTENSION    ".gltf"
-#define MESH_EXTENSION     ".sobrassada"
-#define TEXTURE_EXTENSION  ".dds"
-#define MATERIAL_EXTENSION ".mat"
-#define SCENE_EXTENSION    ".scene"
-#define PREFAB_EXTENSION   ".prefab"
-#define MODEL_EXTENSION    ".model"
-#define META_EXTENSION     ".smeta"
+#define ASSET_EXTENSION        ".gltf"
+#define MESH_EXTENSION         ".sobrassada"
+#define TEXTURE_EXTENSION      ".dds"
+#define MATERIAL_EXTENSION     ".mat"
+#define SCENE_EXTENSION        ".scene"
+#define PREFAB_EXTENSION       ".prefab"
+#define MODEL_EXTENSION        ".model"
+#define META_EXTENSION         ".smeta"
 #define STATEMACHINE_EXTENSION ".smachine"
 
 #define MAX_COMPONENT_NAME_LENGTH 64;

@@ -203,8 +203,7 @@ void LibraryModule::GetImportOptions(UID uid, rapidjson::Document& doc, rapidjso
 
 void LibraryModule::SearchImportOptionsFromUID(
     UID uid, const std::string& path, rapidjson::Document& doc, rapidjson::Value& outImportOptions
-)
-    const
+) const
 {
     for (const auto& entry : std::filesystem::recursive_directory_iterator(path + METADATA_PATH))
     {

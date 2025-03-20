@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include "Module.h"
 #include "Config/ProjectConfig.h"
+#include "Module.h"
 
 #include <string>
 #include <vector>
@@ -8,13 +8,13 @@
 class ProjectModule : public Module
 {
   public:
-    ProjectModule()           = default;
+    ProjectModule() = default;
     ~ProjectModule() override;
 
     bool Init() override;
     update_status RenderEditor(float deltaTime) override;
     bool ShutDown() override;
-    
+
     void CloseCurrentProject();
     void SetAsStartupScene(const std::string& newScenePath) const;
 

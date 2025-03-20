@@ -51,24 +51,24 @@ update_status OpenGLModule::PreUpdate(float deltaTime)
     int CurrentHeight = 0;
     SDL_GetWindowSize(App->GetWindowModule()->window, &CurrentWidth, &CurrentHeight);
 
-    #ifndef GAME
+#ifndef GAME
     framebuffer->Bind();
-    #endif
+#endif
 
     if (CurrentWidth && CurrentHeight)
     {
-        #ifndef GAME
+#ifndef GAME
         glViewport(0, 0, framebuffer->GetTextureWidth(), framebuffer->GetTextureHeight());
-        #else
+#else
         glViewport(0, 0, CurrentWidth, CurrentHeight);
-        #endif
+#endif
         glClearColor(clearColorRed, clearColorGreen, clearColorBlue, 1.0f);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    drawCallsCount = 0;
-    verticesCount  = 0;
+    drawCallsCount     = 0;
+    verticesCount      = 0;
     trianglesPerSecond = 0;
 
     return UPDATE_CONTINUE;
@@ -81,9 +81,9 @@ update_status OpenGLModule::Update(float deltaTime)
 
 update_status OpenGLModule::PostUpdate(float deltaTime)
 {
-    #ifndef GAME
+#ifndef GAME
     framebuffer->CheckResize();
-    #endif
+#endif
 
     SDL_GL_SwapWindow(App->GetWindowModule()->window);
 
