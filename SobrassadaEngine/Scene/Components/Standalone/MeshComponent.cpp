@@ -1,6 +1,7 @@
 #include "MeshComponent.h"
 
 #include "Application.h"
+#include "CameraComponent.h"
 #include "CameraModule.h"
 #include "EditorUIModule.h"
 #include "LibraryModule.h"
@@ -11,9 +12,7 @@
 #include "ShaderModule.h"
 // #include "Scene/GameObjects/GameObject.h"
 
-#include "CameraComponent.h"
 #include "imgui.h"
-
 #include <Math/Quat.h>
 
 MeshComponent::MeshComponent(const UID uid, GameObject* parent) : Component(uid, parent, "Mesh", COMPONENT_MESH)
@@ -166,7 +165,7 @@ void MeshComponent::Render(float deltaTime)
 
 void MeshComponent::InitSkin()
 {
-    if (bonesUIDs.size() > 0) return;
+    if (bones.size() > 0) return;
     for (UID uid : bonesUIDs)
     {
         bones.emplace_back(App->GetSceneModule()->GetScene()->GetGameObjectByUID(uid));
