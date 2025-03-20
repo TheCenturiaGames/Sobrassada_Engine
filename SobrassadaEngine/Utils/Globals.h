@@ -32,95 +32,95 @@ enum update_status
     }
 
 // Configuration -----------
-#define SCREEN_WIDTH  1280
-#define SCREEN_HEIGHT 720
+constexpr int SCREEN_WIDTH  = 1280;
+constexpr int SCREEN_HEIGHT = 720;
 
-#define FULLSCREEN false
+constexpr bool FULLSCREEN   = false;
 
 #ifdef GAME
-#define FULL_DESKTOP true
+constexpr bool FULL_DESKTOP = true;
 #else
-#define FULL_DESKTOP false
+constexpr bool FULL_DESKTOP = false;
 #endif
 
-#define BORDERLESS false
-#define RESIZABLE  true
-#define VSYNC      true
+constexpr bool BORDERLESS               = false;
+constexpr bool RESIZABLE                = true;
+constexpr bool VSYNC                    = true;
 
-#define TITLE             "Sobrassada Engine"
-#define ENGINE_NAME       "Sobrassada"
-#define ORGANIZATION_NAME "Hound of Ulster"
-#define ENGINE_VERSION    "0.1.0"
-#define HFOV              90
+constexpr const char* TITLE             = "Sobrassada Engine";
+constexpr const char* ENGINE_NAME       = "Sobrassada";
+constexpr const char* ORGANIZATION_NAME = "Hound of Ulster";
+constexpr const char* ENGINE_VERSION    = "0.1.0";
+constexpr int HFOV                      = 90;
 
 #ifdef _WIN32
-#define DELIMITER '\\'
+constexpr char DELIMITER = '\\';
 #else
-#define DELIMITER '/'
+constexpr char DELIMITER = '/';
 #endif
 
-#define FILENAME_SEPARATOR "_"
-#define DEFAULT_SCENE_NAME "New Scene"
+constexpr const char* FILENAME_SEPARATOR             = "_";
+constexpr const char* DEFAULT_SCENE_NAME             = "New Scene";
 
-#define DEFAULT_GL_CLEAR_COLOR_RED   0.5f
-#define DEFAULT_GL_CLEAR_COLOR_GREEN 0.5f
-#define DEFAULT_GL_CLEAR_COLOR_BLUE  0.5f
+constexpr float DEFAULT_GL_CLEAR_COLOR_RED           = 0.5f;
+constexpr float DEFAULT_GL_CLEAR_COLOR_GREEN         = 0.5f;
+constexpr float DEFAULT_GL_CLEAR_COLOR_BLUE          = 0.5f;
 
-#define DEFAULT_CAMERA_MOVEMENT_SCALE_FACTOR 1.f;
-#define DEFAULT_CAMERA_MOVEMENT_SPEED        7.5f;
-#define DEFAULT_CAMERA_MOUSE_SENSITIVITY     0.1f;
-#define DEFAULT_CAMERA_ROTATE_SENSITIVITY    0.006f;
-#define DEFAULT_CAMERA_DRAG_SENSITIVITY      0.05f;
-#define DEFAULT_CAMERA_WHEEL_SENSITIVITY     2.f;
-#define DEFAULT_CAMERA_ZOOM_SENSITIVITY      0.5f;
+constexpr float DEFAULT_CAMERA_MOVEMENT_SCALE_FACTOR = 1.f;
+constexpr float DEFAULT_CAMERA_MOVEMENT_SPEED        = 7.5f;
+constexpr float DEFAULT_CAMERA_MOUSE_SENSITIVITY     = 0.1f;
+constexpr float DEFAULT_CAMERA_ROTATE_SENSITIVITY    = 0.006f;
+constexpr float DEFAULT_CAMERA_DRAG_SENSITIVITY      = 0.05f;
+constexpr float DEFAULT_CAMERA_WHEEL_SENSITIVITY     = 2.f;
+constexpr float DEFAULT_CAMERA_ZOOM_SENSITIVITY      = 0.5f;
 
-#define ENGINE_DEFAULT_ASSETS "EngineDefaults/";
-#define ASSETS_PATH           "Assets/"
-#define SCENES_PATH           "Assets/Scenes/"
-#define METADATA_PATH         "Assets/Metadata/"
-#define PREFABS_ASSETS_PATH   "Assets/Prefabs/"
-#define MODELS_ASSETS_PATH    "Assets/Models/"
+constexpr const char* ENGINE_DEFAULT_ASSETS          = "EngineDefaults/";
+constexpr const char* ASSETS_PATH                    = "Assets/";
+constexpr const char* SCENES_PATH                    = "Assets/Scenes/";
+constexpr const char* METADATA_PATH                  = "Assets/Metadata/";
+constexpr const char* PREFABS_ASSETS_PATH            = "Assets/Prefabs/";
+constexpr const char* MODELS_ASSETS_PATH             = "Assets/Models/";
+constexpr const char* STATEMACHINES_ASSETS_PATH      = "Assets/StateMachines/";
 
-#define LIBRARY_PATH              "Library/"
-#define ANIMATIONS_PATH           "Library/Animations/"
-#define AUDIO_PATH                "Library/Audio/"
-#define MODELS_LIB_PATH           "Library/Models/"
-#define MESHES_PATH               "Library/Meshes/"
-#define SCENES_PLAY_PATH          "Library/Scenes/"
-#define TEXTURES_PATH             "Library/Textures/"
-#define MATERIALS_PATH            "Library/Materials/"
-#define STATEMACHINES_LIB_PATH    "Library/StateMachines/"
-#define STATEMACHINES_ASSETS_PATH "Assets/StateMachines/"
-#define PREFABS_LIB_PATH          "Library/Prefabs/"
+constexpr const char* LIBRARY_PATH                   = "Library/";
+constexpr const char* ANIMATIONS_PATH                = "Library/Animations/";
+constexpr const char* AUDIO_PATH                     = "Library/Audio/";
+constexpr const char* MODELS_LIB_PATH                = "Library/Models/";
+constexpr const char* MESHES_PATH                    = "Library/Meshes/";
+constexpr const char* SCENES_PLAY_PATH               = "Library/Scenes/";
+constexpr const char* TEXTURES_PATH                  = "Library/Textures/";
+constexpr const char* MATERIALS_PATH                 = "Library/Materials/";
+constexpr const char* STATEMACHINES_LIB_PATH         = "Library/StateMachines/";
+constexpr const char* PREFABS_LIB_PATH               = "Library/Prefabs/";
 
-#define ASSET_EXTENSION        ".gltf"
-#define MESH_EXTENSION         ".sobrassada"
-#define TEXTURE_EXTENSION      ".dds"
-#define MATERIAL_EXTENSION     ".mat"
-#define SCENE_EXTENSION        ".scene"
-#define PREFAB_EXTENSION       ".prefab"
-#define MODEL_EXTENSION        ".model"
-#define META_EXTENSION         ".smeta"
-#define STATEMACHINE_EXTENSION ".smachine"
+constexpr const char* ASSET_EXTENSION                = ".gltf";
+constexpr const char* MESH_EXTENSION                 = ".sobrassada";
+constexpr const char* TEXTURE_EXTENSION              = ".dds";
+constexpr const char* MATERIAL_EXTENSION             = ".mat";
+constexpr const char* SCENE_EXTENSION                = ".scene";
+constexpr const char* PREFAB_EXTENSION               = ".prefab";
+constexpr const char* MODEL_EXTENSION                = ".model";
+constexpr const char* META_EXTENSION                 = ".smeta";
+constexpr const char* STATEMACHINE_EXTENSION         = ".smachine";
 
-#define MAX_COMPONENT_NAME_LENGTH 64;
+constexpr int MAX_COMPONENT_NAME_LENGTH              = 64;
 
 // SHADER PATHS
-constexpr const char* LIGHTS_VERTEX_SHADER_PATH     = "./EngineDefaults/Shader/Vertex/VertexShader.glsl";
-constexpr const char* SKYBOX_VERTEX_SHADER_PATH     = "./EngineDefaults/Shader/Vertex/SkyboxVertex.glsl";
+constexpr const char* LIGHTS_VERTEX_SHADER_PATH      = "./EngineDefaults/Shader/Vertex/VertexShader.glsl";
+constexpr const char* SKYBOX_VERTEX_SHADER_PATH      = "./EngineDefaults/Shader/Vertex/SkyboxVertex.glsl";
 
-constexpr const char* UNLIT_FRAGMENT_SHADER_PATH    = "./EngineDefaults/Shader/Fragment/UnlitFragmentShader.glsl";
-constexpr const char* SKYBOX_FRAGMENT_SHADER_PATH   = "./EngineDefaults/Shader/Fragment/SkyboxFragment.glsl";
-constexpr const char* SPECULAR_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader/Fragment/BRDFPhongFragmentShader.glsl";
-constexpr const char* METALLIC_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader/Fragment/BRDFCookTorranceShader.glsl";
+constexpr const char* UNLIT_FRAGMENT_SHADER_PATH     = "./EngineDefaults/Shader/Fragment/UnlitFragmentShader.glsl";
+constexpr const char* SKYBOX_FRAGMENT_SHADER_PATH    = "./EngineDefaults/Shader/Fragment/SkyboxFragment.glsl";
+constexpr const char* SPECULAR_FRAGMENT_SHADER_PATH  = "./EngineDefaults/Shader/Fragment/BRDFPhongFragmentShader.glsl";
+constexpr const char* METALLIC_FRAGMENT_SHADER_PATH  = "./EngineDefaults/Shader/Fragment/BRDFCookTorranceShader.glsl";
 
-#define UID uint64_t
+using UID                                            = uint64_t;
 
-constexpr UID INVALID_UID                               = 0;
-constexpr UID UID_PREFIX_DIVISOR                        = 100000000000000;
-constexpr UID FALLBACK_TEXTURE_UID                      = 1200000000000000;
+constexpr UID INVALID_UID                            = 0;
+constexpr UID UID_PREFIX_DIVISOR                     = 100000000000000;
+constexpr UID FALLBACK_TEXTURE_UID                   = 1200000000000000;
 
-constexpr const char* CONSTANT_MESH_SELECT_DIALOG_ID    = "mesh-select";
+constexpr const char* CONSTANT_MESH_SELECT_DIALOG_ID = "mesh-select";
 constexpr const char* CONSTANT_TEXTURE_SELECT_DIALOG_ID = "texture-select";
 constexpr const char* CONSTANT_PREFAB_SELECT_DIALOG_ID  = "prefab-select";
 constexpr const char* CONSTANT_MODEL_SELECT_DIALOG_ID   = "model-select";
