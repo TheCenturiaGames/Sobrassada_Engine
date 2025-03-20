@@ -244,7 +244,7 @@ void GameObject::RenderEditorInspector()
 
         ImGui::Spacing();
 
-        if (App->GetEditorUIModule()->RenderTransformWidget(localTransform, globalTransform, parentTransform))
+        if (App->GetEditorUIModule()->RenderTransformWidget(localTransform, globalTransform, parentTransform, position, rotation, scale))
         {
             UpdateTransformForGOBranch();
         }
@@ -321,7 +321,7 @@ void GameObject::RenderEditorInspector()
 
         if (!App->GetSceneModule()->GetInPlayMode())
         {
-            if (App->GetEditorUIModule()->RenderImGuizmo(localTransform, globalTransform, parentTransform))
+            if (App->GetEditorUIModule()->RenderImGuizmo(localTransform, globalTransform, parentTransform, position, rotation, scale))
             {
                 UpdateTransformForGOBranch();
             }

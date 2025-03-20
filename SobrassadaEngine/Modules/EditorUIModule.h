@@ -62,8 +62,14 @@ class EditorUIModule : public Module
     update_status PostUpdate(float deltaTime) override;
     bool ShutDown() override;
 
-    bool RenderTransformWidget(float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform);
-    bool RenderImGuizmo(float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform) const;
+    bool RenderTransformWidget(
+        float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform, float3& pos, float3& rot,
+        float3& scale
+    );
+    bool RenderImGuizmo(
+        float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform, float3& pos, float3& rot,
+        float3& scale
+    ) const;
 
     template <typename T>
     T RenderResourceSelectDialog(
@@ -155,7 +161,6 @@ class EditorUIModule : public Module
     std::unordered_map<UID, EngineEditorBase*> openEditors;
 
     bool lockScaleAxis        = false;
-    bool bUseRad              = true;
 
     // load dialog
     std::string inputFileLoad = "";

@@ -768,7 +768,8 @@ void EditorUIModule::Console(bool& consoleMenu) const
 }
 
 bool EditorUIModule::RenderTransformWidget(
-    float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform
+    float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform, float3& pos, float3& rot,
+    float3& scale
 )
 {
     float4x4 outputTransform = float4x4(transformType == GizmoTransform::LOCAL ? localTransform : globalTransform);
@@ -787,7 +788,7 @@ bool EditorUIModule::RenderTransformWidget(
     ImGui::SeparatorText(transformName.c_str());
 
     RenderBasicTransformModifiers(
-        outputPosition, outputRotation, outputScale, lockScaleAxis, positionValueChanged, rotationValueChanged,
+        pos, rot, scale, lockScaleAxis, positionValueChanged, rotationValueChanged,
         scaleValueChanged
     );
 
@@ -812,12 +813,7 @@ bool EditorUIModule::RenderTransformWidget(
             outputScale    = originalScale;
         }
 
-        outputTransform = float4x4::identity;
-        outputTransform.SetTranslatePart(outputPosition);
-        outputTransform.SetRotatePart(Quat::FromEulerXYZ(outputRotation.x, outputRotation.y, outputRotation.z));
-        outputTransform.ScaleCol3(0, outputScale.x);
-        outputTransform.ScaleCol3(1, outputScale.y);
-        outputTransform.ScaleCol3(2, outputScale.z);
+        outputTransform = float4x4::FromTRS(pos, Quat::FromEulerXYZ(rot.x, rot.y, rot.z), scale);
 
         if (transformType == GizmoTransform::WORLD)
         {
@@ -833,7 +829,8 @@ bool EditorUIModule::RenderTransformWidget(
 }
 
 bool EditorUIModule::RenderImGuizmo(
-    float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform
+    float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform, float3& pos, float3& rot,
+    float3& scale
 ) const
 {
     float4x4 view = float4x4(App->GetCameraModule()->GetViewMatrix());
@@ -857,7 +854,10 @@ bool EditorUIModule::RenderImGuizmo(
         nullptr, nullptr
     );
 
+
     if (!ImGuizmo::IsUsing()) return false;
+
+    ImGuizmo::DecomposeMatrixToComponents(transform.ptr(), &pos[0], &rot[0], &scale[0]);
 
     if (App->GetSceneModule()->GetDoInputsScene())
     {
@@ -888,17 +888,14 @@ void EditorUIModule::RenderBasicTransformModifiers(
 {
     positionValueChanged |= ImGui::InputFloat3("Position", &outputPosition[0]);
 
-    if (!bUseRad)
-    {
-        outputRotation *= RAD_DEGREE_CONV;
-    }
+
+    outputRotation *= RAD_DEGREE_CONV;
+
     rotationValueChanged |= ImGui::InputFloat3("Rotation", &outputRotation[0]);
-    if (!bUseRad)
-    {
-        outputRotation /= RAD_DEGREE_CONV;
-    }
-    ImGui::SameLine();
-    ImGui::Checkbox("Radians", &bUseRad);
+
+    outputRotation /= RAD_DEGREE_CONV;
+    
+
     scaleValueChanged |= ImGui::InputFloat3("Scale", &outputScale[0]);
     ImGui::SameLine();
     ImGui::Checkbox("Lock axis", &lockScaleAxis);

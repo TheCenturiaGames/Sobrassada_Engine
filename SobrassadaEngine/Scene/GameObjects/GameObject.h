@@ -121,6 +121,10 @@ class GameObject
     UID prefabUID = INVALID_UID;
     bool drawNodes                       = false;
 
+    float3 position                      = float3::zero;
+    float3 rotation                      = float3::zero;
+    float3 scale                         = float3::one;
+
     float4x4 localTransform              = float4x4::identity;
     float4x4 globalTransform             = float4x4::identity;
 
