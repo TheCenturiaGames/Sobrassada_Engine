@@ -850,7 +850,10 @@ bool EditorUIModule::RenderImGuizmo(
 
     float maxDistance  = App->GetCameraModule()->GetFarPlaneDistance() * 0.9f;
 
-    float4x4 transform = float4x4(globalTransform);
+    //float4x4 transform = float4x4(globalTransform);
+    float4x4 transform;
+    float3 tmpRot = rot * RAD_DEGREE_CONV;
+    ImGuizmo::RecomposeMatrixFromComponents(&pos[0], &tmpRot[0], &scale[0], transform.ptr());
     transform.Transpose();
 
     ImGuizmo::OPERATION operation = GetImGuizmoOperation();
@@ -865,8 +868,6 @@ bool EditorUIModule::RenderImGuizmo(
 
     if (!ImGuizmo::IsUsing()) return false;
 
-    ImGuizmo::DecomposeMatrixToComponents(transform.ptr(), &pos[0], &rot[0], &scale[0]);
-
     if (App->GetSceneModule()->GetDoInputsScene())
     {
         transform.Transpose();
@@ -875,6 +876,8 @@ bool EditorUIModule::RenderImGuizmo(
             ImGuizmo::Enable(false);
             return false;
         }
+        ImGuizmo::DecomposeMatrixToComponents(transform.ptr(), &pos[0], &rot[0], &scale[0]);
+        rot            *= DEGREE_RAD_CONV;
         localTransform = parentTransform.Inverted() * transform;
     }
 
