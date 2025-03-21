@@ -27,6 +27,7 @@ void MetaFile::Save(const std::string& name, const std::string& assetPath) const
     pathValue.SetString(assetPath.c_str(), static_cast<rapidjson::SizeType>(assetPath.length()), allocator);
 
     // Common metadata fields
+    doc.AddMember("version", META_VERSION, allocator);
     doc.AddMember("UID", assetUID, allocator);
     doc.AddMember("name", nameValue, allocator);
     doc.AddMember("assetPath", pathValue, allocator);

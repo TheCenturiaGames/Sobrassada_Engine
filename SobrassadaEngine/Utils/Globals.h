@@ -50,7 +50,8 @@ constexpr bool VSYNC                    = true;
 constexpr const char* TITLE             = "Sobrassada Engine";
 constexpr const char* ENGINE_NAME       = "Sobrassada";
 constexpr const char* ORGANIZATION_NAME = "Hound of Ulster";
-constexpr const char* ENGINE_VERSION    = "0.1.0";
+constexpr const char* ENGINE_VERSION    = "0.2.0";
+constexpr int META_VERSION              = 1;
 constexpr int HFOV                      = 90;
 
 #ifdef _WIN32
