@@ -371,10 +371,8 @@ void EditorUIModule::LoadDialog(bool& loadMenu)
 
     if (ImGui::Button("Ok", ImVec2(0, 0)))
     {
-        if (!inputFileLoad.empty())
-        {
-            App->GetLibraryModule()->LoadScene(inputFileLoad.c_str());
-        }
+        if (!inputFileLoad.empty()) App->GetLibraryModule()->LoadScene(inputFileLoad.c_str());
+
         loadMenu = false;
     }
 
@@ -792,35 +790,26 @@ bool EditorUIModule::RenderTransformWidget(
             if (originalScale.IsZero())
             {
                 float scaleFactor = 1;
-                if (scale.x != originalScale.x)
-                {
-                    scaleFactor = scale.x;
-                }
-                else if (scale.y != originalScale.y)
-                {
-                    scaleFactor = scale.y;
-                }
-                else if (scale.z != originalScale.z)
-                {
-                    scaleFactor = scale.z;
-                }
+                if (scale.x != originalScale.x) scaleFactor = scale.x;
+
+                else if (scale.y != originalScale.y) scaleFactor = scale.y;
+
+                else if (scale.z != originalScale.z) scaleFactor = scale.z;
+
                 scale = float3(scaleFactor, scaleFactor, scaleFactor);
             }
             else
             {
                 float scaleFactor = 1;
                 if (scale.x != originalScale.x && scale.x != 0)
-                {
                     scaleFactor = originalScale.x == 0 ? 1 : scale.x / originalScale.x;
-                }
+
                 else if (scale.y != originalScale.y && scale.y != 0)
-                {
                     scaleFactor = originalScale.y == 0 ? 1 : scale.y / originalScale.y;
-                }
+
                 else if (scale.z != originalScale.z && scale.z != 0)
-                {
                     scaleFactor = originalScale.z == 0 ? 1 : scale.z / originalScale.z;
-                }
+
                 originalScale *= scaleFactor;
                 scale          = originalScale;
             }
@@ -828,14 +817,9 @@ bool EditorUIModule::RenderTransformWidget(
 
         float4x4 outputTransform = float4x4::FromTRS(pos, Quat::FromEulerXYZ(rot.x, rot.y, rot.z), scale);
 
-        if (transformType == GizmoTransform::WORLD)
-        {
-            localTransform = parentTransform.Inverted() * outputTransform;
-        }
-        else
-        {
-            localTransform = outputTransform;
-        }
+        if (transformType == GizmoTransform::WORLD) localTransform = parentTransform.Inverted() * outputTransform;
+
+        else localTransform = outputTransform;
     }
 
     return positionValueChanged || rotationValueChanged || scaleValueChanged;

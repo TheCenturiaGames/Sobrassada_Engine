@@ -80,6 +80,10 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
             initLocalTransform[12].GetFloat(), initLocalTransform[13].GetFloat(), initLocalTransform[14].GetFloat(),
             initLocalTransform[15].GetFloat()
         );
+
+        position = localTransform.TranslatePart();
+        rotation   = localTransform.RotatePart().ToEulerXYZ();
+        scale = localTransform.GetScale();
     }
 
     // Deserialize Components
