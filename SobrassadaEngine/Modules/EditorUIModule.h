@@ -1,32 +1,30 @@
 #pragma once
-#include "EngineEditors/Editor/NodeEditor.h"
-#include "EngineEditors/EngineEditorBase.h"
+
 #include "Module.h"
-#include "ResourceManagement/Resources/Resource.h"
+#include <ComponentUtils.h>
+#include <Globals.h>
+#include <NodeEditor.h>
 
-#include "SDL.h"
-
-#include "imgui_internal.h"
 #include <Math/float3.h>
 #include <Math/float4x4.h>
 #include <deque>
 #include <string>
 #include <unordered_map>
-// imguizmo include after imgui
-#include "ComponentUtils.h"
-#include "./Libs/ImGuizmo/ImGuizmo.h"
+#include <vector>
+
+class EngineEditorBase;
+
+namespace ImGuizmo
+{
+    enum OPERATION;
+    enum MODE;
+} // namespace ImGuizmo
 
 enum EditorType
 {
     BASE,
     ANIMATION,
     NODE
-};
-
-struct CPUFeature
-{
-    SDL_bool (*check)();
-    const char* name;
 };
 
 enum class GizmoOperation
@@ -62,8 +60,14 @@ class EditorUIModule : public Module
     update_status PostUpdate(float deltaTime) override;
     bool ShutDown() override;
 
-    bool RenderTransformWidget(float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform);
-    bool RenderImGuizmo(float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform) const;
+    bool RenderTransformWidget(
+        float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform, float3& pos, float3& rot,
+        float3& scale
+    );
+    bool RenderImGuizmo(
+        float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform, float3& pos, float3& rot,
+        float3& scale
+    ) const;
 
     template <typename T>
     T RenderResourceSelectDialog(
@@ -139,7 +143,6 @@ class EditorUIModule : public Module
     bool loadPrefab         = false;
     bool aboutMenu          = false;
     bool editorSettingsMenu = false;
-    bool closeScene         = false;
     bool closeApplication   = false;
 
     int maximumPlotData     = 50;
@@ -156,7 +159,6 @@ class EditorUIModule : public Module
     std::unordered_map<UID, EngineEditorBase*> openEditors;
 
     bool lockScaleAxis        = false;
-    bool bUseRad              = true;
 
     // load dialog
     std::string inputFileLoad = "";

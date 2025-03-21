@@ -1,15 +1,15 @@
 #pragma once
 
-#include "Math/float3.h"
-#include "Math/float4.h"
+#include <Math/float3.h>
+#include <Math/float4.h>
 #include <string>
 #include <vector>
 
 class Material
 {
   public:
-    Material() = default;
-    ~Material()   = default;
+    Material()  = default;
+    ~Material() = default;
 
     // Getters (const refs or pointers to avoid copies)
     const float4& GetDiffuseFactor() const { return diffuseFactor; }

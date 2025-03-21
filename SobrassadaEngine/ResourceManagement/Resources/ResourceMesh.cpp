@@ -1,6 +1,7 @@
 #include "ResourceMesh.h"
 
 #include "Application.h"
+#include "CameraComponent.h"
 #include "CameraModule.h"
 #include "FileSystem/Mesh.h"
 #include "GameObject.h"
@@ -15,11 +16,34 @@
 #include <glew.h>
 #include <tiny_gltf.h>
 
-ResourceMesh::ResourceMesh(UID uid, const std::string& name, const float3& maxPos, const float3& minPos)
+ResourceMesh::ResourceMesh(
+    UID uid, const std::string& name, const float3& maxPos, const float3& minPos, const rapidjson::Value& importOptions
+)
     : Resource(uid, name, ResourceType::Mesh)
 {
     aabb.maxPoint = maxPos;
     aabb.minPoint = minPos;
+
+    if (importOptions.HasMember("generateTangents") && importOptions["generateTangents"].IsBool())
+        generateTangents = importOptions["generateTangents"].GetBool();
+
+    if (importOptions.HasMember("transform") && importOptions["transform"].IsArray() &&
+        importOptions["transform"].Size() == 16)
+    {
+        const rapidjson::Value& transformValue = importOptions["transform"];
+
+        defaultTransform                       = float4x4(
+            transformValue[0].GetFloat(), transformValue[1].GetFloat(), transformValue[2].GetFloat(),
+            transformValue[3].GetFloat(), transformValue[4].GetFloat(), transformValue[5].GetFloat(),
+            transformValue[6].GetFloat(), transformValue[7].GetFloat(), transformValue[8].GetFloat(),
+            transformValue[9].GetFloat(), transformValue[10].GetFloat(), transformValue[11].GetFloat(),
+            transformValue[12].GetFloat(), transformValue[13].GetFloat(), transformValue[14].GetFloat(),
+            transformValue[15].GetFloat()
+        );
+
+        aabb.maxPoint = defaultTransform.MulPos(maxPos);
+        aabb.minPoint = defaultTransform.MulPos(minPos);
+    }
 }
 
 ResourceMesh::~ResourceMesh()
@@ -94,8 +118,8 @@ void ResourceMesh::Render(
 
     glUniformMatrix4fv(3, 1, GL_TRUE, modelMatrix.ptr());
     float3 cameraPos;
-    if (App->GetSceneModule()->GetMainCamera() != nullptr && App->GetSceneModule()->GetInPlayMode())
-        cameraPos = App->GetSceneModule()->GetMainCamera()->GetCameraPosition();
+    if (App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr && App->GetSceneModule()->GetInPlayMode())
+        cameraPos = App->GetSceneModule()->GetScene()->GetMainCamera()->GetCameraPosition();
     else cameraPos = App->GetCameraModule()->GetCameraPosition();
 
     glUniform3fv(glGetUniformLocation(program, "cameraPos"), 1, &cameraPos[0]);

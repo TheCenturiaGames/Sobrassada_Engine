@@ -1,15 +1,13 @@
 #include "ResourcesModule.h"
 
-#include "FileSystem/Importer.h"
-#include "FileSystem/MeshImporter.h"
+#include "Importer.h"
 #include "LibraryModule.h"
+#include "MeshImporter.h"
 #include "ResourceManagement/Resources/ResourceMaterial.h"
 #include "ResourceManagement/Resources/ResourceMesh.h"
 #include "ResourceManagement/Resources/ResourceTexture.h"
 #include "SceneModule.h"
 #include "ShaderModule.h"
-//test
-#include "Globals.h"
 
 #include <Algorithm/Random/LCG.h> // TODO: LCG remove includes
 
@@ -19,7 +17,6 @@ ResourcesModule::ResourcesModule()
 
 ResourcesModule::~ResourcesModule()
 {
-    
 }
 
 bool ResourcesModule::Init()

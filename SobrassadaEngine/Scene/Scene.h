@@ -33,7 +33,9 @@ class Scene
     void LoadComponents() const;
     void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
     void LoadModel(const UID modelUID);
-    void LoadPrefab(const UID prefabUid, const ResourcePrefab* prefab = nullptr, const float4x4& transform = float4x4::identity);
+    void LoadPrefab(
+        const UID prefabUid, const ResourcePrefab* prefab = nullptr, const float4x4& transform = float4x4::identity
+    );
     void OverridePrefabs(UID prefabUID);
 
     update_status Update(float deltaTime);
@@ -70,6 +72,7 @@ class Scene
     CameraComponent* GetMainCamera() { return mainCamera; }
 
     bool GetDoInputs() const { return doInputs; }
+    bool GetDoMouseInputs() const { return doMouseInputs; }
     bool GetStopPlaying() const { return stopPlaying; }
 
     const std::tuple<float, float>& GetWindowPosition() const { return sceneWindowPosition; };
@@ -81,7 +84,7 @@ class Scene
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
 
     void SetStopPlaying(bool stop) { stopPlaying = stop; }
-    
+
     void SetStaticModified() { staticModified = true; }
     void SetDynamicModified() { dynamicModified = true; }
 
@@ -96,8 +99,9 @@ class Scene
     UID gameObjectRootUID;
     UID selectedGameObjectUID;
     CameraComponent* mainCamera;
-    bool stopPlaying = false;
-    bool doInputs    = false;
+    bool stopPlaying   = false;
+    bool doInputs      = false;
+    bool doMouseInputs = false;
 
     std::unordered_map<UID, GameObject*> gameObjectsContainer;
 

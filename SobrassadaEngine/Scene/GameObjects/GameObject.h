@@ -29,6 +29,8 @@ class GameObject
 
     ~GameObject();
 
+    void Init() const;
+
     const float4x4& GetParentGlobalTransform() const;
 
     bool IsStatic() const { return mobilitySettings == ComponentMobilitySettings::STATIC; };
@@ -96,6 +98,7 @@ class GameObject
     void UpdateLocalTransform(const float4x4& parentGlobalTransform);
     void DrawNodes() const;
     void OnDrawConnectionsToggle();
+    void UpdateMobilityHeriarchy(ComponentMobilitySettings type);
 
   public:
     inline static UID currentRenamingUID = INVALID_UID;
@@ -116,8 +119,12 @@ class GameObject
     bool isRenaming = false;
     char renameBuffer[128];
 
-    UID prefabUID = INVALID_UID;
+    UID prefabUID                        = INVALID_UID;
     bool drawNodes                       = false;
+
+    float3 position                      = float3::zero;
+    float3 rotation                      = float3::zero;
+    float3 scale                         = float3::one;
 
     float4x4 localTransform              = float4x4::identity;
     float4x4 globalTransform             = float4x4::identity;

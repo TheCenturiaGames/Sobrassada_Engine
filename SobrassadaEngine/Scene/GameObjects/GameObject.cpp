@@ -10,6 +10,7 @@
 
 #include "imgui.h"
 
+#include <set>
 #include <stack>
 
 GameObject::GameObject(std::string name) : name(name)
@@ -79,6 +80,10 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
             initLocalTransform[12].GetFloat(), initLocalTransform[13].GetFloat(), initLocalTransform[14].GetFloat(),
             initLocalTransform[15].GetFloat()
         );
+
+        position = localTransform.TranslatePart();
+        rotation   = localTransform.RotatePart().ToEulerXYZ();
+        scale = localTransform.GetScale();
     }
 
     // Deserialize Components
@@ -90,7 +95,7 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
         {
             const rapidjson::Value& jsonComponent = jsonComponents[i];
 
-            Component* newComponent               = ComponentUtils::CreateExistingComponent(jsonComponent);
+            Component* newComponent               = ComponentUtils::CreateExistingComponent(jsonComponent, this);
 
             if (newComponent != nullptr)
             {
@@ -98,8 +103,6 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
             }
         }
     }
-
-    OnAABBUpdated();
 
     if (initialState.HasMember("Children") && initialState["Children"].IsArray())
     {
@@ -119,6 +122,14 @@ GameObject::~GameObject()
         delete component.second;
     }
     components.clear();
+}
+
+void GameObject::Init() const
+{
+    for (auto& component : components)
+    {
+        component.second->Init();
+    }
 }
 
 bool GameObject::AddGameObject(UID gameObjectUID)
@@ -208,7 +219,7 @@ void GameObject::RenderEditorInspector()
 
     ImGui::Text(name.c_str());
 
-    if (uid != App->GetSceneModule()->GetGameObjectRootUID())
+    if (uid != App->GetSceneModule()->GetScene()->GetGameObjectRootUID())
     {
         ImGui::SameLine();
         if (ImGui::Checkbox("Draw nodes", &drawNodes)) OnDrawConnectionsToggle();
@@ -238,7 +249,9 @@ void GameObject::RenderEditorInspector()
 
         ImGui::Spacing();
 
-        if (App->GetEditorUIModule()->RenderTransformWidget(localTransform, globalTransform, parentTransform))
+        if (App->GetEditorUIModule()->RenderTransformWidget(
+                localTransform, globalTransform, parentTransform, position, rotation, scale
+            ))
         {
             UpdateTransformForGOBranch();
         }
@@ -250,8 +263,9 @@ void GameObject::RenderEditorInspector()
         {
             if (previousMobility != mobilitySettings)
             {
-                App->GetSceneModule()->SetStaticObjectUpdated();
-                App->GetSceneModule()->SetDynamicObjectUpdated();
+                App->GetSceneModule()->GetScene()->SetStaticModified();
+                App->GetSceneModule()->GetScene()->SetDynamicModified();
+                UpdateMobilityHeriarchy(STATIC);
             }
         }
         ImGui::SameLine();
@@ -259,8 +273,9 @@ void GameObject::RenderEditorInspector()
         {
             if (previousMobility != mobilitySettings)
             {
-                App->GetSceneModule()->SetStaticObjectUpdated();
-                App->GetSceneModule()->SetDynamicObjectUpdated();
+                App->GetSceneModule()->GetScene()->SetStaticModified();
+                App->GetSceneModule()->GetScene()->SetDynamicModified();
+                UpdateMobilityHeriarchy(DYNAMIC);
             }
         }
 
@@ -315,7 +330,9 @@ void GameObject::RenderEditorInspector()
 
         if (!App->GetSceneModule()->GetInPlayMode())
         {
-            if (App->GetEditorUIModule()->RenderImGuizmo(localTransform, globalTransform, parentTransform))
+            if (App->GetEditorUIModule()->RenderImGuizmo(
+                    localTransform, globalTransform, parentTransform, position, rotation, scale
+                ))
             {
                 UpdateTransformForGOBranch();
             }
@@ -334,11 +351,11 @@ void GameObject::UpdateTransformForGOBranch() const
 
     while (!childrenBuffer.empty())
     {
-        GameObject* gameObject = App->GetSceneModule()->GetGameObjectByUID(childrenBuffer.top());
+        GameObject* gameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(childrenBuffer.top());
         childrenBuffer.pop();
         if (gameObject != nullptr)
         {
-            gameObject->OnTransformUpdated();
+            gameObject->OnAABBUpdated();
             for (UID child : gameObject->GetChildren())
                 childrenBuffer.push(child);
         }
@@ -365,12 +382,17 @@ MeshComponent* GameObject::GetMeshComponent() const
 
 void GameObject::OnTransformUpdated()
 {
-    globalTransform = GetParentGlobalTransform() * localTransform;
-    globalOBB       = localAABB.Transform(globalTransform);
-    globalAABB      = AABB(globalOBB);
+    globalTransform              = GetParentGlobalTransform() * localTransform;
+    globalOBB                    = globalTransform * OBB(localAABB);
+    globalAABB                   = AABB(globalOBB);
 
-    if (mobilitySettings == STATIC) App->GetSceneModule()->SetStaticObjectUpdated();
-    else App->GetSceneModule()->SetDynamicObjectUpdated();
+    MeshComponent* meshComponent = GetMeshComponent();
+    if (meshComponent != nullptr)
+    {
+        meshComponent->OnTransformUpdated();
+    }
+    if (mobilitySettings == STATIC) App->GetSceneModule()->GetScene()->SetStaticModified();
+    else App->GetSceneModule()->GetScene()->SetDynamicModified();
 }
 
 void GameObject::UpdateLocalTransform(const float4x4& parentGlobalTransform)
@@ -413,7 +435,7 @@ void GameObject::RenderHierarchyNode(UID& selectedGameObjectUUID)
     {
         for (UID childUID : children)
         {
-            GameObject* childGameObject = App->GetSceneModule()->GetGameObjectByUID(childUID);
+            GameObject* childGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(childUID);
             if (childGameObject && childUID != uid)
             {
                 childGameObject->RenderHierarchyNode(selectedGameObjectUUID);
@@ -441,7 +463,7 @@ void GameObject::HandleNodeClick(UID& selectedGameObjectUUID)
 
     // Drag and Drop
 
-    if (uid != App->GetSceneModule()->GetGameObjectRootUID() && ImGui::BeginDragDropSource())
+    if (uid != App->GetSceneModule()->GetScene()->GetGameObjectRootUID() && ImGui::BeginDragDropSource())
     {
         ImGui::SetDragDropPayload("DRAG_DROP_GAMEOBJECT", &uid, sizeof(UID));
         ImGui::Text("Dragging %s", name.c_str());
@@ -453,7 +475,7 @@ void GameObject::HandleNodeClick(UID& selectedGameObjectUUID)
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DRAG_DROP_GAMEOBJECT"))
         {
             UID draggedUID        = *static_cast<const UID*>(payload->Data);
-            GameObject* draggedGO = App->GetSceneModule()->GetGameObjectByUID(draggedUID);
+            GameObject* draggedGO = App->GetSceneModule()->GetScene()->GetGameObjectByUID(draggedUID);
 
             if (draggedGO != nullptr && !draggedGO->TargetIsChildren(uid))
             {
@@ -475,17 +497,17 @@ void GameObject::RenderContextMenu()
         if (ImGui::MenuItem("New GameObject"))
         {
             auto newGameObject = new GameObject(uid, "new Game Object");
-            App->GetSceneModule()->AddGameObject(newGameObject->GetUID(), newGameObject);
+            App->GetSceneModule()->GetScene()->AddGameObject(newGameObject->GetUID(), newGameObject);
 
-            if (newGameObject->IsStatic()) App->GetSceneModule()->SetStaticObjectUpdated();
-            else App->GetSceneModule()->SetDynamicObjectUpdated();
+            if (newGameObject->IsStatic()) App->GetSceneModule()->GetScene()->SetStaticModified();
+            else App->GetSceneModule()->GetScene()->SetDynamicModified();
         }
 
         if (ImGui::MenuItem("Rename"))
         {
             if (currentRenamingUID != INVALID_UID && currentRenamingUID != uid)
             {
-                GameObject* oldGameObject = App->GetSceneModule()->GetGameObjectByUID(currentRenamingUID);
+                GameObject* oldGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentRenamingUID);
 
                 if (oldGameObject)
                 {
@@ -503,9 +525,9 @@ void GameObject::RenderContextMenu()
         const char* label = prefabUID == INVALID_UID ? "Create Prefab" : "Update Prefab";
         if (ImGui::MenuItem(label)) CreatePrefab();
 
-        if (uid != App->GetSceneModule()->GetGameObjectRootUID() && ImGui::MenuItem("Delete"))
+        if (uid != App->GetSceneModule()->GetScene()->GetGameObjectRootUID() && ImGui::MenuItem("Delete"))
         {
-            App->GetSceneModule()->RemoveGameObjectHierarchy(uid);
+            App->GetSceneModule()->GetScene()->RemoveGameObjectHierarchy(uid);
         }
 
         ImGui::EndPopup();
@@ -556,7 +578,7 @@ bool GameObject::TargetIsChildren(UID uidTarget)
 
         if (currentUID == uidTarget) return true;
 
-        GameObject* currentGO = App->GetSceneModule()->GetGameObjectByUID(currentUID);
+        GameObject* currentGO = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentUID);
 
         if (currentGO != nullptr)
         {
@@ -571,14 +593,14 @@ bool GameObject::TargetIsChildren(UID uidTarget)
 
 void GameObject::UpdateGameObjectHierarchy(UID sourceUID)
 {
-    GameObject* sourceGameObject = App->GetSceneModule()->GetGameObjectByUID(sourceUID);
+    GameObject* sourceGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(sourceUID);
 
     if (sourceGameObject != nullptr)
     {
         UID oldParentUID = sourceGameObject->GetParent();
         sourceGameObject->SetParent(uid);
 
-        GameObject* oldParentGameObject = App->GetSceneModule()->GetGameObjectByUID(oldParentUID);
+        GameObject* oldParentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(oldParentUID);
 
         if (oldParentGameObject)
         {
@@ -594,7 +616,7 @@ void GameObject::UpdateGameObjectHierarchy(UID sourceUID)
 
 void GameObject::OnAABBUpdated()
 {
-    localAABB = AABB();
+    localAABB = localAABB;
     localAABB.SetNegativeInfinity();
 
     for (auto& component : components)
@@ -620,7 +642,7 @@ void GameObject::RenderEditor()
     }
     if (App->GetEditorUIModule()->hierarchyMenu)
     {
-        App->GetSceneModule()->RenderHierarchyUI(App->GetEditorUIModule()->hierarchyMenu);
+        App->GetSceneModule()->GetScene()->RenderHierarchyUI(App->GetEditorUIModule()->hierarchyMenu);
     }
 }
 
@@ -631,7 +653,7 @@ void GameObject::DrawGizmos() const
 
 const float4x4& GameObject::GetParentGlobalTransform() const
 {
-    GameObject* parent = App->GetSceneModule()->GetGameObjectByUID(parentUID);
+    GameObject* parent = App->GetSceneModule()->GetScene()->GetGameObjectByUID(parentUID);
     if (parent != nullptr)
     {
         return parent->GetGlobalTransform();
@@ -657,9 +679,61 @@ void GameObject::OnDrawConnectionsToggle()
 {
     for (const UID childUID : children)
     {
-        GameObject* childObject = App->GetSceneModule()->GetGameObjectByUID(childUID);
+        GameObject* childObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(childUID);
         childObject->drawNodes  = drawNodes;
         childObject->OnDrawConnectionsToggle();
+    }
+}
+
+void GameObject::UpdateMobilityHeriarchy(ComponentMobilitySettings type)
+{
+    std::set<UID> visitedGameObjects;
+    std::stack<UID> toVisitGameObjects;
+    UID sceneRootUID = App->GetSceneModule()->GetScene()->GetGameObjectRootUID();
+    // ADD "THIS" GAME OBJECT SO WHEN ASCENDING HERIARCHY WE DON'T REVISIT OUR CHILDREN
+    visitedGameObjects.insert(uid);
+
+    // FIRST UPDATE DOWN THE HERIARCHY
+    for (UID gameObjectID : children)
+        toVisitGameObjects.push(gameObjectID);
+
+    while (!toVisitGameObjects.empty())
+    {
+        UID currentUID = toVisitGameObjects.top();
+        toVisitGameObjects.pop();
+
+        if (visitedGameObjects.find(currentUID) == visitedGameObjects.end())
+        {
+            visitedGameObjects.insert(currentUID);
+            GameObject* currentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentUID);
+
+            currentGameObject->SetMobility(type);
+
+            for (UID childID : currentGameObject->GetChildren())
+                toVisitGameObjects.push(childID);
+        }
+    }
+
+    // UPDATE UP THE HERIARCHY
+    if (parentUID != sceneRootUID) toVisitGameObjects.push(parentUID);
+
+    while (!toVisitGameObjects.empty())
+    {
+        UID currentUID = toVisitGameObjects.top();
+        toVisitGameObjects.pop();
+
+        if (visitedGameObjects.find(currentUID) == visitedGameObjects.end())
+        {
+            visitedGameObjects.insert(currentUID);
+            GameObject* currentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentUID);
+
+            currentGameObject->SetMobility(type);
+
+            for (UID childID : currentGameObject->GetChildren())
+                toVisitGameObjects.push(childID);
+
+            if (currentGameObject->GetParent() != sceneRootUID) toVisitGameObjects.push(currentGameObject->GetParent());
+        }
     }
 }
 
@@ -668,8 +742,7 @@ bool GameObject::CreateComponent(const ComponentType componentType)
     if (components.find(componentType) == components.end())
     // TODO Allow override of components after displaying an info box
     {
-        Component* createdComponent =
-            ComponentUtils::CreateEmptyComponent(componentType, LCG().IntFast(), uid); // TODO: CHANGE LCG for UID
+        Component* createdComponent = ComponentUtils::CreateEmptyComponent(componentType, GetUID(), this);
         if (createdComponent != nullptr)
         {
             components.insert({componentType, createdComponent});
@@ -696,12 +769,12 @@ bool GameObject::RemoveComponent(ComponentType componentType)
 
 void GameObject::CreatePrefab()
 {
-    bool override = this->prefabUID == INVALID_UID ? false : true;
+    bool override = this->prefabUID != INVALID_UID;
     prefabUID     = PrefabManager::SavePrefab(this, override);
 
     if (override)
     {
         // Update all prefabs
-        App->GetSceneModule()->OverridePrefabs(prefabUID);
+        App->GetSceneModule()->GetScene()->OverridePrefabs(prefabUID);
     }
 }

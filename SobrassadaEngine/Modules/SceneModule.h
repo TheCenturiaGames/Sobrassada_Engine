@@ -1,23 +1,9 @@
 #pragma once
 
-#include "Globals.h"
-#include "LightsConfig.h"
 #include "Module.h"
-// TMP
-#include "Scene/Components/CameraComponent.h"
-#include "CameraModule.h"
 #include "Scene.h"
 
-#include <map>
-#include <string>
-#include <tuple>
-#include <unordered_map>
-
-class GameObject;
-class Component;
-class RootComponent;
-class Octree;
-class Quadtree;
+#include <document.h>
 
 class SceneModule : public Module
 {
@@ -35,88 +21,24 @@ class SceneModule : public Module
 
     void CreateScene();
     void LoadScene(const rapidjson::Value& initialState, bool forceReload = false);
-    void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
-    void LoadComponents(const std::map<UID, Component*>& loadedGameComponents);
     void CloseScene();
-
-    void LoadModel(const UID modelUID) { loadedScene != nullptr ? loadedScene->LoadModel(modelUID) : void(); }
-    void LoadPrefab(const UID prefabUid) const { loadedScene != nullptr ? loadedScene->LoadPrefab(prefabUid) : void(); }
 
     void SwitchPlayMode(bool play);
 
-    void AddGameObject(UID uid, GameObject* newGameObject) const
-    {
-        loadedScene != nullptr ? loadedScene->AddGameObject(uid, newGameObject) : void();
-    }
+    void ReenerateStaticTree() const { loadedScene->UpdateStaticSpatialStructure(); }
+    void ReenerateDynamicTree() const { loadedScene->UpdateDynamicSpatialStructure(); }
 
-    void RegenerateStaticTree() const { loadedScene->UpdateStaticSpatialStructure(); }
-    void RegenerateDynamicTree() const { loadedScene->UpdateDynamicSpatialStructure(); }
-
-    void RenderHierarchyUI(bool& hierarchyMenu) const
-    {
-        loadedScene != nullptr ? loadedScene->RenderHierarchyUI(hierarchyMenu) : void();
-    }
-
-    void RemoveGameObjectHierarchy(UID gameObjectUID) const
-    {
-        loadedScene != nullptr ? loadedScene->RemoveGameObjectHierarchy(gameObjectUID) : void();
-    }
-
-    GameObject* GetGameObjectByUID(UID gameObjectUID) const
-    {
-        return loadedScene != nullptr ? loadedScene->GetGameObjectByUID(gameObjectUID) : nullptr;
-    }
-
-    GameObject* GetSelectedGameObject() const
-    {
-        return loadedScene != nullptr ? loadedScene->GetSelectedGameObject() : nullptr;
-    }
-
-    const std::unordered_map<UID, GameObject*>* GetAllGameObjects() const
-    {
-        return loadedScene != nullptr ? &loadedScene->GetAllGameObjects() : nullptr;
-    }
-
-    UID GetGameObjectRootUID() const
-    {
-        return loadedScene != nullptr ? loadedScene->GetGameObjectRootUID() : INVALID_UID;
-    }
+    bool GetDoInputsScene() const { return loadedScene->GetDoInputs() && !inPlayMode; }
+    bool GetDoMouseInputsScene() const { return loadedScene->GetDoMouseInputs() && !inPlayMode; }
+    bool GetDoInputsGame() const { return loadedScene->GetDoInputs() && inPlayMode; }
 
     bool IsSceneLoaded() const { return loadedScene != nullptr; }
 
     Scene* GetScene() const { return loadedScene; }
-    UID GetSceneUID() const { return loadedScene != nullptr ? loadedScene->GetSceneUID() : INVALID_UID; }
-    const std::string& GetSceneName() const
-    {
-        return loadedScene != nullptr ? loadedScene->GetSceneName() : unloadedSceneName;
-    }
-    LightsConfig* GetLightsConfig() { return loadedScene != nullptr ? loadedScene->GetLightsConfig() : nullptr; }
+
     bool GetInPlayMode() const { return inPlayMode; }
-    CameraComponent* GetMainCamera() { return loadedScene->GetMainCamera(); }
-    const std::tuple<float, float>& GetWindowPosition() const { return loadedScene->GetWindowPosition(); };
-    const std::tuple<float, float>& GetWindowSize() const { return loadedScene->GetWindowSize(); };
-    const std::tuple<float, float>& GetMousePosition() const { return loadedScene->GetMousePosition(); };
-
-    bool GetDoInputs() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() : false; }
-    bool GetDoInputsScene() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() && !inPlayMode : false; }
-    bool GetDoInputsGame() const { return loadedScene != nullptr ? loadedScene->GetDoInputs() && inPlayMode : false; }
-    void OverridePrefabs(UID prefabUID) const { loadedScene != nullptr ? loadedScene->OverridePrefabs(prefabUID) : void(); }
-    
-    Octree* GetSceneOctree() const { return loadedScene != nullptr ? loadedScene->GetOctree() : nullptr; }
-    Quadtree* GetSceneDynamicTree() const { return loadedScene != nullptr ? loadedScene->GetDynamicTree() : nullptr; }
-
-    void SetMainCamera(CameraComponent* camera) { loadedScene->SetMainCamera(camera); }
-    void SetStaticObjectUpdated() const
-    {
-        if (loadedScene != nullptr) loadedScene->SetStaticModified();
-    }
-    void SetDynamicObjectUpdated() const
-    {
-        if (loadedScene != nullptr) loadedScene->SetDynamicModified();
-    }
 
   private:
-    Scene* loadedScene                  = nullptr;
-    bool inPlayMode                     = false;
-    const std::string unloadedSceneName = "UnloadedScene";
+    Scene* loadedScene = nullptr;
+    bool inPlayMode    = false;
 };

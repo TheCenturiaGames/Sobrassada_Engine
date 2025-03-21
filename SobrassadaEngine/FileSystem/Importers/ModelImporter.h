@@ -1,18 +1,18 @@
 #pragma once
 
-#include "Globals.h"
+#include <Globals.h>
 
 #include <string>
 #include <vector>
+
+class ResourceModel;
+struct NodeData;
 
 namespace tinygltf
 {
     class Model;
     class Node;
 } // namespace tinygltf
-
-class ResourceModel;
-struct NodeData;
 
 namespace ModelImporter
 {

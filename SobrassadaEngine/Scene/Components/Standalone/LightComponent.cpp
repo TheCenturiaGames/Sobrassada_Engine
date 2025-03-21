@@ -4,15 +4,16 @@
 
 #include "ImGui.h"
 
-LightComponent::LightComponent(const UID uid, const UID uidParent, const char* uiName, const ComponentType lightType)
-    : Component(uid, uidParent, uiName, lightType)
+LightComponent::LightComponent(const UID uid, GameObject* parent, const char* uiName, const ComponentType lightType)
+    : Component(uid, parent, uiName, lightType)
 {
     intensity  = 1;
     color      = float3(1.0f, 1.0f, 1.0f);
     drawGizmos = true;
 }
 
-LightComponent::LightComponent(const rapidjson::Value& initialState) : Component(initialState)
+LightComponent::LightComponent(const rapidjson::Value& initialState, GameObject* parent)
+    : Component(initialState, parent)
 {
     if (initialState.HasMember("Intensity"))
     {

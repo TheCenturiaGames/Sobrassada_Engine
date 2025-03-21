@@ -1,38 +1,50 @@
 ﻿#include "ComponentUtils.h"
 
+#include "CameraComponent.h"
 #include "Component.h"
+#include "Standalone/CharacterControllerComponent.h"
 #include "Standalone/Lights/DirectionalLightComponent.h"
 #include "Standalone/Lights/PointLightComponent.h"
 #include "Standalone/Lights/SpotLightComponent.h"
 #include "Standalone/MeshComponent.h"
-#include "Standalone/CharacterControllerComponent.h"
-#include "CameraComponent.h"
 
 #include <cstdint>
 
-Component* ComponentUtils::CreateEmptyComponent(ComponentType type, UID uid, UID uidParent)
+Component* ComponentUtils::CreateEmptyComponent(const ComponentType type, const UID uid, GameObject* parent)
 {
+    Component* generatedComponent;
     switch (type)
     {
     case COMPONENT_NONE:
         return nullptr;
     case COMPONENT_MESH:
-        return new MeshComponent(uid, uidParent);
+        generatedComponent = new MeshComponent(uid, parent);
+        break;
     case COMPONENT_POINT_LIGHT:
-        return new PointLightComponent(uid, uidParent);
+        generatedComponent = new PointLightComponent(uid, parent);
+        break;
     case COMPONENT_SPOT_LIGHT:
-        return new SpotLightComponent(uid, uidParent);
+        generatedComponent = new SpotLightComponent(uid, parent);
+        break;
     case COMPONENT_DIRECTIONAL_LIGHT:
-        return new DirectionalLightComponent(uid, uidParent);
+        generatedComponent = new DirectionalLightComponent(uid, parent);
+        break;
     case COMPONENT_CHARACTER_CONTROLLER:
-        return new CharacterControllerComponent(uid, uidParent);
+        generatedComponent = new CharacterControllerComponent(uid, parent);
+        break;
     case COMPONENT_CAMERA:
-        return new CameraComponent(uid, uidParent);
+        generatedComponent = new CameraComponent(uid, parent);
+        break;
+    default:
+        return nullptr;
     }
-    return nullptr;
+
+    generatedComponent->Init();
+
+    return generatedComponent;
 }
 
-Component* ComponentUtils::CreateExistingComponent(const rapidjson::Value& initialState)
+Component* ComponentUtils::CreateExistingComponent(const rapidjson::Value& initialState, GameObject* parent)
 {
     if (initialState.HasMember("Type"))
     {
@@ -41,17 +53,17 @@ Component* ComponentUtils::CreateExistingComponent(const rapidjson::Value& initi
         case COMPONENT_NONE:
             return nullptr;
         case COMPONENT_MESH:
-            return new MeshComponent(initialState);
+            return new MeshComponent(initialState, parent);
         case COMPONENT_POINT_LIGHT:
-            return new PointLightComponent(initialState);
+            return new PointLightComponent(initialState, parent);
         case COMPONENT_SPOT_LIGHT:
-            return new SpotLightComponent(initialState);
+            return new SpotLightComponent(initialState, parent);
         case COMPONENT_DIRECTIONAL_LIGHT:
-            return new DirectionalLightComponent(initialState);
+            return new DirectionalLightComponent(initialState, parent);
         case COMPONENT_CHARACTER_CONTROLLER:
-            return new CharacterControllerComponent(initialState);
+            return new CharacterControllerComponent(initialState, parent);
         case COMPONENT_CAMERA:
-            return new CameraComponent(initialState);
+            return new CameraComponent(initialState, parent);
         default:
             return nullptr;
         }

@@ -1,7 +1,7 @@
 #include "ResourceStateMachine.h"
+#include "Application.h"
 #include "FileSystem.h"
 #include "LibraryModule.h"
-#include "Application.h"
 #include "MetaModel.h"
 
 ResourceStateMachine::ResourceStateMachine(UID uid, const std::string& name)
@@ -70,9 +70,7 @@ bool ResourceStateMachine::EditClipInfo(
                 }
             }
             clip.clipName = HashString(newName);
-            
         }
-        
     }
 
     return true;
@@ -190,7 +188,6 @@ void ResourceStateMachine::AddTransition(
     newTransition.interpolationTime = interpolationTime;
 
     transitions.push_back(newTransition);
-
 }
 
 bool ResourceStateMachine::RemoveTransition(const std::string& fromState, const std::string& toState)
@@ -210,7 +207,8 @@ bool ResourceStateMachine::RemoveTransition(const std::string& fromState, const 
 }
 
 bool ResourceStateMachine::EditTransition(
-    const std::string& fromState, const std::string& toState, const std::string& newTrigger, unsigned newInterpolationTime
+    const std::string& fromState, const std::string& toState, const std::string& newTrigger,
+    unsigned newInterpolationTime
 )
 {
     HashString hashFrom(fromState);
@@ -227,8 +225,6 @@ bool ResourceStateMachine::EditTransition(
     }
     return false;
 }
-
-
 
 const Clip* ResourceStateMachine::GetClip(const std::string& name) const
 {
@@ -264,7 +260,6 @@ const Transition* ResourceStateMachine::GetTransition(const std::string& fromSta
     return nullptr;
 }
 
-
 bool ResourceStateMachine::ClipExists(const std::string& clipName) const
 {
     HashString hashClip(clipName);
@@ -274,4 +269,3 @@ bool ResourceStateMachine::ClipExists(const std::string& clipName) const
     }
     return false;
 }
-

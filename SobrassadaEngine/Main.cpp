@@ -17,7 +17,6 @@ extern "C"
     _declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }
 
-
 enum MainState
 {
     MAIN_CREATION,
@@ -25,11 +24,10 @@ enum MainState
     MAIN_UPDATE,
     MAIN_FINISH,
     MAIN_EXIT
-
 };
 
-Application* App                               = NULL;
-std::vector<char*>* Logs                       = NULL;
+Application* App         = NULL;
+std::vector<char*>* Logs = NULL;
 
 int main(int argc, char** argv)
 {

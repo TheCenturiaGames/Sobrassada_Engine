@@ -25,7 +25,7 @@ bool ProjectModule::Init()
             loadedProjectName = loadedProjectAbsolutePath;
             FileSystem::RemoveDelimiterIfPresent(loadedProjectName);
             loadedProjectName = FileSystem::GetFileNameWithoutExtension(loadedProjectName);
-            projectConfig = new ProjectConfig();
+            projectConfig     = new ProjectConfig();
             projectLoaded     = true;
         }
         else
@@ -148,7 +148,7 @@ update_status ProjectModule::RenderEditor(float deltaTime)
                 memcpy(newProjectPath, resultingPath.c_str(), resultingPath.size());
             }
         }
-        return UPDATE_CONTINUE;
+        return projectReloadRequested ? UPDATE_RESTART : UPDATE_CONTINUE;
     }
 
     return projectReloadRequested ? UPDATE_RESTART : UPDATE_CONTINUE;
