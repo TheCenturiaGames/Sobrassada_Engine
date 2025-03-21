@@ -1,19 +1,20 @@
 #include "MeshComponent.h"
 
-#include "Application.h"
 #include "CameraComponent.h"
-#include "CameraModule.h"
-#include "EditorUIModule.h"
-#include "LibraryModule.h"
-#include "MeshImporter.h"
-#include "ResourceManagement/Resources/ResourceModel.h"
-#include "ResourcesModule.h"
-#include "SceneModule.h"
-#include "ShaderModule.h"
-// #include "Scene/GameObjects/GameObject.h"
+#include <Application.h>
+#include <CameraModule.h>
+#include <EditorUIModule.h>
+#include <LibraryModule.h>
+#include <MeshImporter.h>
+#include <ResourceMaterial.h>
+#include <ResourceMesh.h>
+#include <ResourceModel.h>
+#include <ResourcesModule.h>
+#include <SceneModule.h>
+#include <ShaderModule.h>
 
-#include "imgui.h"
 #include <Math/Quat.h>
+#include <imgui.h>
 
 MeshComponent::MeshComponent(const UID uid, GameObject* parent) : Component(uid, parent, "Mesh", COMPONENT_MESH)
 {
@@ -186,6 +187,8 @@ void MeshComponent::AddMesh(UID resource, bool updateParent)
         currentMesh        = newMesh;
         localComponentAABB = AABB(currentMesh->GetAABB());
         if (updateParent) parent->OnAABBUpdated();
+
+        App->GetResourcesModule()->RequestBatch(newMesh);
     }
 }
 

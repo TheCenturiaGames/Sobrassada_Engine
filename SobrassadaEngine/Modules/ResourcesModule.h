@@ -1,9 +1,13 @@
 #pragma once
 
 #include "Module.h"
-#include "ResourceManagement/Resources/Resource.h"
 
 #include <map>
+
+class BatchManager;
+class GeometryBatch;
+class ResourceMesh;
+class Resource;
 
 class ResourcesModule : public Module
 {
@@ -19,6 +23,8 @@ class ResourcesModule : public Module
 
     void UnloadAllResources();
 
+    GeometryBatch* RequestBatch(const ResourceMesh* mesh);
+
   private:
     Resource* CreateNewResource(UID uid);
 
@@ -27,4 +33,5 @@ class ResourcesModule : public Module
     int specularGlossinessProgram = -1;
     int metallicRoughnessProgram  = -1;
     std::map<UID, Resource*> resources;
+    BatchManager* batchManager = nullptr;
 };

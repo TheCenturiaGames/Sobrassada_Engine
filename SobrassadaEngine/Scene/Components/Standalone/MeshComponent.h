@@ -1,13 +1,15 @@
 ﻿#pragma once
 
+#include "Component.h"
 #include "Globals.h"
-#include "ResourceManagement/Resources/ResourceMaterial.h"
-#include "ResourceManagement/Resources/ResourceMesh.h"
-#include "Scene/Components/Component.h"
 
-#include "Math/float4x4.h"
+#include <Math/float4x4.h>
 #include <Libs/rapidjson/document.h>
 #include <cstdint>
+
+class ResourceMesh;
+class ResourceMaterial;
+class GeometryBatch;
 
 class MeshComponent : public Component
 {
@@ -64,4 +66,6 @@ class MeshComponent : public Component
     int skinIndex           = -1;
 
     float4x4 combinedMatrix = float4x4::identity;
+
+    GeometryBatch* batch    = nullptr;
 };

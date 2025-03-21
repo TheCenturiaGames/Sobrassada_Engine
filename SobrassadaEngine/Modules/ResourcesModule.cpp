@@ -1,22 +1,26 @@
 #include "ResourcesModule.h"
 
-#include "Importer.h"
 #include "LibraryModule.h"
-#include "MeshImporter.h"
-#include "ResourceManagement/Resources/ResourceMaterial.h"
-#include "ResourceManagement/Resources/ResourceMesh.h"
-#include "ResourceManagement/Resources/ResourceTexture.h"
 #include "SceneModule.h"
 #include "ShaderModule.h"
+#include <BatchManager.h>
+#include <Importer.h>
+#include <MeshImporter.h>
+#include <Resource.h>
+#include <ResourceMaterial.h>
+#include <ResourceMesh.h>
+#include <ResourceTexture.h>
 
 #include <Algorithm/Random/LCG.h> // TODO: LCG remove includes
 
 ResourcesModule::ResourcesModule()
 {
+    batchManager = new BatchManager();
 }
 
 ResourcesModule::~ResourcesModule()
 {
+    delete batchManager;
 }
 
 bool ResourcesModule::Init()
@@ -86,4 +90,9 @@ void ResourcesModule::UnloadAllResources()
         delete resource.second;
     }
     resources.clear();
+}
+
+GeometryBatch* ResourcesModule::RequestBatch(const ResourceMesh* mesh)
+{
+    return batchManager->RequestBatch(mesh);
 }

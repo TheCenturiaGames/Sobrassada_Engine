@@ -39,6 +39,8 @@ class ResourceMesh : public Resource
     const std::vector<Vertex>& GetLocalVertices() const { return vertices; }
     const std::vector<unsigned int>& GetIndices() const { return indices; }
     const float4x4& GetDefaultTransform() const { return defaultTransform; }
+    const unsigned int GetMode() const { return mode; }
+    const bool GetHasIndices() const { return hasIndices; }
 
   private:
     const float4x4 TestSkinning(

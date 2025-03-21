@@ -1,13 +1,14 @@
 #include "ResourceMesh.h"
 
-#include "Application.h"
-#include "CameraComponent.h"
-#include "CameraModule.h"
-#include "FileSystem/Mesh.h"
-#include "GameObject.h"
-#include "OpenGLModule.h"
 #include "ResourceMaterial.h"
-#include "SceneModule.h"
+#include <Application.h>
+#include <BatchManager.h>
+#include <CameraComponent.h>
+#include <CameraModule.h>
+#include <GameObject.h>
+#include <Mesh.h>
+#include <OpenGLModule.h>
+#include <SceneModule.h>
 
 #include <Math/float2.h>
 #include <Math/float4x4.h>
