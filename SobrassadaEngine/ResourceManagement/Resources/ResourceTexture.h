@@ -23,6 +23,7 @@ class ResourceTexture : public Resource
     unsigned int GetTextureID() const { return textureID; }
     int GetTextureWidth() { return (int)metadata.width; }
     int GetTextureHeight() { return (int)metadata.height; }
+    int GetMipMapLevels() const { return static_cast<int>(metadata.mipLevels); }
 
     void SetTextureID(unsigned int id) { textureID = id; }
 
