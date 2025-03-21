@@ -10,34 +10,32 @@
 class Component
 {
   public:
-    Component(UID uid, UID parentUID, const char* initName, ComponentType type);
-    Component(const rapidjson::Value& initialState);
+    Component(UID uid, GameObject* parent, const char* initName, ComponentType type);
+    Component(const rapidjson::Value& initialState, GameObject* parent);
     virtual ~Component() = default;
 
-    virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
-    virtual void Clone(const Component* other)  = 0;
+    virtual void Init() {}
 
-    virtual void Update(float deltaTime) = 0;
-    virtual void Render(float deltaTime) = 0;
+    virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
+    virtual void Clone(const Component* other) = 0;
+
+    virtual void Update(float deltaTime)       = 0;
+    virtual void Render(float deltaTime)       = 0;
     virtual void RenderEditorInspector();
 
     UID GetUID() const { return uid; }
-    UID GetParentUID() const { return parentUID; }
+    UID GetParentUID() const { return parent->GetUID(); }
 
     const AABB& GetLocalAABB() const { return localComponentAABB; }
 
     ComponentType GetType() const { return type; }
     const char* GetName() const { return name; }
 
-    const float4x4& GetGlobalTransform();
-
-
-  protected:
-    GameObject* GetParent();
+    const float4x4& GetGlobalTransform() const;
 
   protected:
     const UID uid;
-    const UID parentUID;
+    GameObject* parent = nullptr;
 
     char name[64];
     bool enabled;
@@ -45,7 +43,4 @@ class Component
     AABB localComponentAABB;
 
     const ComponentType type = COMPONENT_NONE;
-
-  private:
-    GameObject* parent = nullptr;
 };

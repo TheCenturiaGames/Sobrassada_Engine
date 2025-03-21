@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "FileSystem.h"
 #include "LibraryModule.h"
+#include "MeshImporter.h"
 #include "MetaModel.h"
 #include "Model.h"
 #include "ProjectModule.h"
@@ -350,10 +351,13 @@ namespace ModelImporter
     {
         // Fill node data
         const tinygltf::Node& nodeData = nodesList[nodeId];
-        NodeData newNode;
-        newNode.name        = nodeData.name;
 
-        newNode.transform   = GetNodeTransform(nodeData);
+        NodeData newNode;
+        newNode.name = nodeData.name;
+
+        if (nodeData.mesh != -1) newNode.transform = float4x4::identity;
+        else newNode.transform = MeshImporter::GetNodeTransform(nodeData);
+
         newNode.parentIndex = parentId;
 
         // Get reference to Mesh and Material UIDs
@@ -368,38 +372,5 @@ namespace ModelImporter
         {
             FillNodes(nodesList, id, nodeId, meshesUIDs, outNodes);
         }
-    }
-
-    const float4x4 GetNodeTransform(const tinygltf::Node& node)
-    {
-        if (!node.matrix.empty())
-        {
-            // glTF stores matrices in COLUMN-MAJOR order, same as MathGeoLib
-            float4x4 matrix = float4x4(
-                (float)node.matrix[0], (float)node.matrix[1], (float)node.matrix[2], (float)node.matrix[3],
-                (float)node.matrix[4], (float)node.matrix[5], (float)node.matrix[6], (float)node.matrix[7],
-                (float)node.matrix[8], (float)node.matrix[9], (float)node.matrix[10], (float)node.matrix[11],
-                (float)node.matrix[12], (float)node.matrix[13], (float)node.matrix[14], (float)node.matrix[15]
-            );
-            return matrix.Transposed(); // Probably need the Transposed(), but has not been tested
-        }
-
-        // Default values
-        float3 translation = float3::zero;
-        Quat rotation      = Quat::identity;
-        float3 scale       = float3::one;
-
-        if (!node.translation.empty())
-            translation = float3((float)node.translation[0], (float)node.translation[1], (float)node.translation[2]);
-
-        if (!node.rotation.empty())
-            rotation = Quat(
-                (float)node.rotation[0], (float)node.rotation[1], (float)node.rotation[2], (float)node.rotation[3]
-            ); // glTF stores as [x, y, z, w]
-
-        if (!node.scale.empty()) scale = float3((float)node.scale[0], (float)node.scale[1], (float)node.scale[2]);
-
-        float4x4 matrix = float4x4::FromTRS(translation, rotation, scale);
-        return matrix;
     }
 } // namespace ModelImporter

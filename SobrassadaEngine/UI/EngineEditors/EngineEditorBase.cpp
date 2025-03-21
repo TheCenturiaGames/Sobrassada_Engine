@@ -6,14 +6,12 @@ EngineEditorBase::EngineEditorBase(const std::string& editorName, const UID uid)
 }
 EngineEditorBase::~EngineEditorBase()
 {
-
 }
 
 bool EngineEditorBase::RenderEditor()
 {
     bool stillOpen = true;
 
-   
     if (!ImGui::Begin(name.c_str(), &stillOpen))
     {
         ImGui::End();
@@ -25,6 +23,6 @@ bool EngineEditorBase::RenderEditor()
         ImGui::SetWindowSize(ImVec2(150, 150), ImGuiCond_Always);
     }
 
-     ImGui::End();
-     return stillOpen;
+    ImGui::End();
+    return stillOpen;
 }

@@ -7,9 +7,11 @@
 class PointLightComponent : public LightComponent
 {
   public:
-    PointLightComponent(UID uid, UID uidParent);
-    PointLightComponent(const rapidjson::Value& initialState);
+    PointLightComponent(UID uid, GameObject* parent);
+    PointLightComponent(const rapidjson::Value& initialState, GameObject* parent);
     ~PointLightComponent() override;
+
+    void Init() override;
 
     void Render(float deltaTime = 0) override;
     void RenderEditorInspector() override;

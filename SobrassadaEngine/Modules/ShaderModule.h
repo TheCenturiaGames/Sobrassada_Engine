@@ -23,9 +23,9 @@ class ShaderModule : public Module
     unsigned int CreateProgram(unsigned int vertexShader, unsigned fragmentShader);
 
   private:
-    int specularGlossinessProgram = -1;
+    int specularGlossinessProgram      = -1;
     int specularGlossinessProgramUnlit = -1;
 
-    int metallicRoughnessProgram  = -1;
+    int metallicRoughnessProgram       = -1;
     int metallicRoughnessProgramUnlit  = -1;
 };

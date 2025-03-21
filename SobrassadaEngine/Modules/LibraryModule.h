@@ -3,6 +3,7 @@
 #include "Globals.h"
 #include "Module.h"
 
+#include <Libs/rapidjson/document.h>
 #include <string>
 #include <unordered_map>
 
@@ -37,13 +38,17 @@ class LibraryModule : public Module
     bool LoadScene(const char* fileName, bool reload = false) const;
 
     bool LoadLibraryMaps(const std::string& projectPath);
+    void GetImportOptions(UID uid, rapidjson::Document& doc, rapidjson::Value& importOptions) const;
+    void SearchImportOptionsFromUID(
+        UID uid, const std::string& path, rapidjson::Document& doc, rapidjson::Value& importOptions
+    ) const;
     UID AssignFiletypeUID(UID originalUID, FileType fileType);
 
     void AddTexture(UID textureUID, const std::string& ddsPath);
     void AddMesh(UID meshUID, const std::string& matPath);
     void AddMaterial(UID materialUID, const std::string& sobPath);
     void AddPrefab(UID prefabUID, const std::string& prefabPath);
-    void AddModel(UID modelUID, const std::string &modelPath);
+    void AddModel(UID modelUID, const std::string& modelPath);
     void AddStateMachine(UID stateMachineUID, const std::string& stMachPath);
     void AddName(const std::string& resourceName, UID resourceUID);
     void AddResource(const std::string& resourcePath, UID resourceUID);
@@ -51,7 +56,7 @@ class LibraryModule : public Module
     UID GetTextureUID(const std::string& texturePath) const;
     UID GetMeshUID(const std::string& meshPath) const;
     UID GetMaterialUID(const std::string& materialPath) const;
-    UID GetModelUID(const std::string &modelPath) const;
+    UID GetModelUID(const std::string& modelPath) const;
     UID GetStateMachinelUID(const std::string& stMachPath) const;
 
     const std::string& GetResourceName(UID resourceID) const;
@@ -69,9 +74,9 @@ class LibraryModule : public Module
     // maps for user visuals | name -> UID
     std::unordered_map<std::string, UID> textureMap;
     std::unordered_map<std::string, UID> materialMap;
-    std::unordered_map<std::string, UID> meshMap;  
-    std::unordered_map<std::string, UID> prefabMap; 
-    std::unordered_map<std::string, UID> modelMap;  
+    std::unordered_map<std::string, UID> meshMap;
+    std::unordered_map<std::string, UID> prefabMap;
+    std::unordered_map<std::string, UID> modelMap;
     std::unordered_map<std::string, UID> stateMachineMap;
     // inversed map          | UID -> name
     std::unordered_map<UID, std::string> namesMap;

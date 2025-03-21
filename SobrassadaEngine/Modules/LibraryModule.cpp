@@ -30,7 +30,7 @@ bool LibraryModule::Init()
 {
     if (App->GetProjectModule()->IsProjectLoaded())
     {
-        const std::string engineDefaultPath = ENGINE_DEFAULT_ASSETS;
+        const std::string& engineDefaultPath = ENGINE_DEFAULT_ASSETS;
         SceneImporter::CreateLibraryDirectories(App->GetProjectModule()->GetLoadedProjectPath());
         SceneImporter::CreateLibraryDirectories(engineDefaultPath);
         LoadLibraryMaps(App->GetProjectModule()->GetLoadedProjectPath());
@@ -188,6 +188,39 @@ bool LibraryModule::LoadLibraryMaps(const std::string& projectPath)
     GLOG("MODELS MAP SIZE: %d", modelMap.size());
 
     return true;
+}
+
+void LibraryModule::GetImportOptions(UID uid, rapidjson::Document& doc, rapidjson::Value& outImportOptions) const
+{
+    const std::string& projectPath = App->GetProjectModule()->GetLoadedProjectPath();
+    SearchImportOptionsFromUID(uid, projectPath, doc, outImportOptions);
+    if (outImportOptions.IsNull())
+    {
+        const std::string& engineDefaultPath = ENGINE_DEFAULT_ASSETS;
+        SearchImportOptionsFromUID(uid, engineDefaultPath, doc, outImportOptions);
+    }
+}
+
+void LibraryModule::SearchImportOptionsFromUID(
+    UID uid, const std::string& path, rapidjson::Document& doc, rapidjson::Value& outImportOptions
+) const
+{
+    for (const auto& entry : std::filesystem::recursive_directory_iterator(path + METADATA_PATH))
+    {
+        if (entry.is_regular_file() && (FileSystem::GetFileExtension(entry.path().string()) == META_EXTENSION))
+        {
+            std::string filePath = entry.path().string();
+            if (!FileSystem::LoadJSON(filePath.c_str(), doc)) continue;
+
+            UID assetUID = doc["UID"].GetUint64();
+
+            if (uid == assetUID && doc.HasMember("importOptions") && doc["importOptions"].IsObject())
+            {
+                outImportOptions = doc["importOptions"];
+                return;
+            }
+        }
+    }
 }
 
 UID LibraryModule::AssignFiletypeUID(UID originalUID, FileType fileType)

@@ -2,7 +2,7 @@
 
 #include "Module.h"
 
-#include "Math/float4x4.h"
+#include <Math/float4x4.h>
 #include <bitset>
 #include <list>
 
@@ -20,8 +20,8 @@ enum class DebugOptions : uint8_t
     RENDER_CAMERA_RAY
 };
 
-static const char* DebugStrings[] = {"Render Lights", "Render Wireframe", "AABB",      "OBB",
-                                     "Octree",        "Dynamic Tree",     "Camera Ray"};
+constexpr const char* DebugStrings[] = {"Render Lights", "Render Wireframe", "AABB",      "OBB",
+                                        "Octree",        "Dynamic Tree",     "Camera Ray"};
 
 class DebugDrawModule : public Module
 {

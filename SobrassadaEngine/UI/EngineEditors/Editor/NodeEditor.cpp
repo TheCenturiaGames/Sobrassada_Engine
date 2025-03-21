@@ -52,8 +52,8 @@ bool NodeEditor::RenderEditor()
         }
     );
     ImVec2 currentSize = ImGui::GetWindowSize();
-    if (currentSize.x < 150 || currentSize.y < 150)  ImGui::SetWindowSize(ImVec2(150, 150), ImGuiCond_Always);
-    
+    if (currentSize.x < 150 || currentSize.y < 150) ImGui::SetWindowSize(ImVec2(150, 150), ImGuiCond_Always);
+
     ImGui::End();
     return true;
 }

@@ -141,9 +141,9 @@ vec3 RenderLight(vec3 L, vec3 N, vec3 texColor, vec3 Li, float NdotL, float alph
 vec3 RenderPointLight(const int index, const vec3 N, const vec3 texColor, const float alpha, float roughness, float metalness)
 {
 	float attenuation = PointLightAttenuation(index);
-	vec3 L = normalize(pos - pointLights[index].position.xyz);
+	vec3 L = -normalize(pos - pointLights[index].position.xyz);
 	vec3 Li = pointLights[index].color.rgb * pointLights[index].color.a * attenuation;
-	float NdotL = dot(N, -L);
+	float NdotL = dot(N, L);
 
 	if (NdotL > 0 && attenuation > 0) return RenderLight(L, N, texColor, Li, NdotL, alpha, roughness, metalness);
 	else return vec3(0);	
@@ -152,9 +152,9 @@ vec3 RenderPointLight(const int index, const vec3 N, const vec3 texColor, const 
 vec3 RenderSpotLight(const int index, const vec3 N, const vec3 texColor, const float alpha, float roughness, float metalness)
 {
 	float attenuation = SpotLightAttenuation(index);
-	vec3 L = normalize(pos - spotLights[index].position.xyz);
+	vec3 L = -normalize(pos - spotLights[index].position.xyz);
 	vec3 Li = spotLights[index].color.rgb * spotLights[index].color.a * attenuation;
-	float NdotL = dot(N, -L);
+	float NdotL = dot(N, L);
 
 	if (NdotL > 0 && attenuation > 0) return RenderLight(L, N, texColor, Li, NdotL, alpha, roughness, metalness);
 	else return vec3(0);
@@ -171,7 +171,7 @@ vec3 RenderSpotLight(const int index, const vec3 N, const vec3 texColor, const f
 void main()
 {
     vec3 texColor = pow(texture(sampler2D(diffuseTex), uv0).rgb, vec3(2.2f));
-    vec4 metallicRoughnessTexColor = texture(sampler2D(metallicTex), uv0);
+    vec4 metallicRoughnessTexColor = pow(texture(sampler2D(metallicTex), uv0), vec4(2.2));
     float alpha = metallicRoughnessTexColor.a;
 
 
@@ -189,7 +189,7 @@ void main()
     }
 
     float roughness = roughnessFactor * metallicRoughnessTexColor.y;
-    roughness = roughness * roughness;
+    //roughness = roughness * roughness;
     float metallic = metallicFactor * metallicRoughnessTexColor.z;
 
     // Point Lights
@@ -206,8 +206,8 @@ void main()
 
     // Directional light
     vec3 lightColor = directional_color.rgb * directional_color.a;
-    vec3 L = normalize(directional_dir.xyz);
-    float NdotL = max(dot(N, -L), 0.001f);
+    vec3 L = -normalize(directional_dir.xyz);
+    float NdotL = max(dot(N, L), 0.001f);
     if (NdotL > 0)
     {
 		hdr += RenderLight(L, N, texColor, lightColor, NdotL, alpha, roughness, metallic);

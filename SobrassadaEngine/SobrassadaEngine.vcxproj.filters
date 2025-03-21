@@ -210,9 +210,6 @@
     <ClCompile Include="Scene\Components\ComponentUtils.cpp">
       <Filter>Scene\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Utils\Scene.cpp">
-      <Filter>Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Utils\FrustumPlanes.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
@@ -297,25 +294,25 @@
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp">
       <Filter>External\ImGuizmo</Filter>
     </ClCompile>
-    <ClCompile Include="FileSystem\MetaFile.cpp">
+    <ClCompile Include="FileSystem\Meta\MetaFile.cpp">
       <Filter>FileSystem\Meta</Filter>
     </ClCompile>
-    <ClCompile Include="FileSystem\MetaMaterial.cpp">
+    <ClCompile Include="FileSystem\Meta\MetaMaterial.cpp">
       <Filter>FileSystem\Meta</Filter>
     </ClCompile>
-    <ClCompile Include="FileSystem\MetaMesh.cpp">
+    <ClCompile Include="FileSystem\Meta\MetaMesh.cpp">
       <Filter>FileSystem\Meta</Filter>
     </ClCompile>
-    <ClCompile Include="FileSystem\MetaTexture.cpp">
+    <ClCompile Include="FileSystem\Meta\MetaTexture.cpp">
       <Filter>FileSystem\Meta</Filter>
     </ClCompile>
-    <ClCompile Include="FileSystem\MetaPrefab.cpp">
+    <ClCompile Include="FileSystem\Meta\MetaPrefab.cpp">
       <Filter>FileSystem\Meta</Filter>
     </ClCompile>
     <ClCompile Include="Scene\Components\Standalone\CharacterControllerComponent.cpp">
       <Filter>Scene\Components</Filter>
     </ClCompile>
-    <ClCompile Include="FileSystem\MetaModel.cpp">
+    <ClCompile Include="FileSystem\Meta\MetaModel.cpp">
       <Filter>FileSystem\Meta</Filter>
     </ClCompile>
     <ClCompile Include="Scene\Components\CameraComponent.cpp">
@@ -366,22 +363,22 @@
     <ClCompile Include="UI\EngineEditors\Editor\TextureLibraryEditor.cpp">
       <Filter>UI\EngineEditors</Filter>
     </ClCompile>
-    <ClCompile Include="FileSystem\Importer.cpp">
+    <ClCompile Include="FileSystem\Importers\Importer.cpp">
       <Filter>FileSystem\Importers</Filter>
     </ClCompile>
-    <ClCompile Include="FileSystem\MaterialImporter.cpp">
+    <ClCompile Include="FileSystem\Importers\MaterialImporter.cpp">
       <Filter>FileSystem\Importers</Filter>
     </ClCompile>
-    <ClCompile Include="FileSystem\MeshImporter.cpp">
+    <ClCompile Include="FileSystem\Importers\MeshImporter.cpp">
       <Filter>FileSystem\Importers</Filter>
     </ClCompile>
-    <ClCompile Include="FileSystem\ModelImporter.cpp">
+    <ClCompile Include="FileSystem\Importers\ModelImporter.cpp">
       <Filter>FileSystem\Importers</Filter>
     </ClCompile>
-    <ClCompile Include="FileSystem\SceneImporter.cpp">
+    <ClCompile Include="FileSystem\Importers\SceneImporter.cpp">
       <Filter>FileSystem\Importers</Filter>
     </ClCompile>
-    <ClCompile Include="FileSystem\TextureImporter.cpp">
+    <ClCompile Include="FileSystem\Importers\TextureImporter.cpp">
       <Filter>FileSystem\Importers</Filter>
     </ClCompile>
     <ClCompile Include="ResourceManagement\Resources\ResourceStateMachine.cpp">
@@ -614,25 +611,25 @@
     <ClInclude Include="UI\EngineEditors\EngineEditorBase.h">
       <Filter>UI\EngineEditors</Filter>
     </ClInclude>
-    <ClInclude Include="FileSystem\MetaFile.h">
+    <ClInclude Include="FileSystem\Meta\MetaFile.h">
       <Filter>FileSystem\Meta</Filter>
     </ClInclude>
-    <ClInclude Include="FileSystem\MetaMaterial.h">
+    <ClInclude Include="FileSystem\Meta\MetaMaterial.h">
       <Filter>FileSystem\Meta</Filter>
     </ClInclude>
-    <ClInclude Include="FileSystem\MetaMesh.h">
+    <ClInclude Include="FileSystem\Meta\MetaMesh.h">
       <Filter>FileSystem\Meta</Filter>
     </ClInclude>
-    <ClInclude Include="FileSystem\MetaTexture.h">
+    <ClInclude Include="FileSystem\Meta\MetaTexture.h">
       <Filter>FileSystem\Meta</Filter>
     </ClInclude>
     <ClInclude Include="Utils\RaycastController.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="FileSystem\MetaModel.h">
+    <ClInclude Include="FileSystem\Meta\MetaModel.h">
       <Filter>FileSystem\Meta</Filter>
     </ClInclude>
-    <ClInclude Include="FileSystem\MetaPrefab.h">
+    <ClInclude Include="FileSystem\Meta\MetaPrefab.h">
       <Filter>FileSystem\Meta</Filter>
     </ClInclude>
     <ClInclude Include="Scene\Components\Standalone\CharacterControllerComponent.h">
@@ -698,22 +695,22 @@
     <ClInclude Include="UI\EngineEditors\Editor\TextureLibraryEditor.h">
       <Filter>UI\EngineEditors</Filter>
     </ClInclude>
-    <ClInclude Include="FileSystem\Importer.h">
+    <ClInclude Include="FileSystem\Importers\Importer.h">
       <Filter>FileSystem\Importers</Filter>
     </ClInclude>
-    <ClInclude Include="FileSystem\MaterialImporter.h">
+    <ClInclude Include="FileSystem\Importers\MaterialImporter.h">
       <Filter>FileSystem\Importers</Filter>
     </ClInclude>
-    <ClInclude Include="FileSystem\MeshImporter.h">
+    <ClInclude Include="FileSystem\Importers\MeshImporter.h">
       <Filter>FileSystem\Importers</Filter>
     </ClInclude>
-    <ClInclude Include="FileSystem\ModelImporter.h">
+    <ClInclude Include="FileSystem\Importers\ModelImporter.h">
       <Filter>FileSystem\Importers</Filter>
     </ClInclude>
-    <ClInclude Include="FileSystem\SceneImporter.h">
+    <ClInclude Include="FileSystem\Importers\SceneImporter.h">
       <Filter>FileSystem\Importers</Filter>
     </ClInclude>
-    <ClInclude Include="FileSystem\TextureImporter.h">
+    <ClInclude Include="FileSystem\Importers\TextureImporter.h">
       <Filter>FileSystem\Importers</Filter>
     </ClInclude>
     <ClInclude Include="FileSystem\Config\ProjectConfig.h">

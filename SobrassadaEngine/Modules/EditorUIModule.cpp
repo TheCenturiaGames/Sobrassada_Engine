@@ -1,39 +1,43 @@
 #include "EditorUIModule.h"
 
-#include "Application.h"
 #include "CameraModule.h"
-#include "Component.h"
-#include "FileSystem.h"
-#include "GameTimer.h"
 #include "InputModule.h"
 #include "LibraryModule.h"
 #include "OpenGLModule.h"
 #include "ProjectModule.h"
-#include "SceneImporter.h"
 #include "SceneModule.h"
 #include "WindowModule.h"
-#include "TextureLibraryEditor.h"
+#include <Application.h>
+#include <Component.h>
+#include <EngineEditorBase.h>
+#include <FileSystem.h>
+#include <GameTimer.h>
+#include <SceneImporter.h>
 #include <TextureImporter.h>
+#include <TextureLibraryEditor.h>
 
-
+#include "SDL.h"
 #include "glew.h"
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl2.h"
+#include "imgui_internal.h"
+#include <Math/Quat.h>
 #include <cstring>
 #include <filesystem>
 #include <string>
-
+// imguizmo include after imgui
+#include <ImGuizmo.h>
 
 EditorUIModule::EditorUIModule() : width(0), height(0)
 {
     standaloneComponents = {
-        {"Mesh",              COMPONENT_MESH             },
-        {"Point Light",       COMPONENT_POINT_LIGHT      },
-        {"Spot Light",        COMPONENT_SPOT_LIGHT       },
-        {"Directional Light", COMPONENT_DIRECTIONAL_LIGHT},
+        {"Mesh",                 COMPONENT_MESH                },
+        {"Point Light",          COMPONENT_POINT_LIGHT         },
+        {"Spot Light",           COMPONENT_SPOT_LIGHT          },
+        {"Directional Light",    COMPONENT_DIRECTIONAL_LIGHT   },
         {"Character Controller", COMPONENT_CHARACTER_CONTROLLER},
-        {"Camera",            COMPONENT_CAMERA           }
+        {"Camera",               COMPONENT_CAMERA              }
     };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;
@@ -76,7 +80,7 @@ bool EditorUIModule::Init()
 
 update_status EditorUIModule::PreUpdate(float deltaTime)
 {
-    #ifndef GAME
+#ifndef GAME
 
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame();
@@ -85,30 +89,33 @@ update_status EditorUIModule::PreUpdate(float deltaTime)
     // ImGuizmo::SetOrthographic(false);
     // ImGuizmo::AllowAxisFlip(false);
     // ImGuizmo::SetPlaneLimit(0);
-    
+
     ImGui::DockSpaceOverViewport();
 
-    #endif
+#endif
 
     return UPDATE_CONTINUE;
 }
 
 update_status EditorUIModule::Update(float deltaTime)
 {
-    #ifndef GAME
+#ifndef GAME
 
-    UpdateGizmoTransformMode();
-    AddFramePlotData(deltaTime);
-    UpdateGizmoDragState();
+    if (App->GetProjectModule()->IsProjectLoaded())
+    {
+        UpdateGizmoTransformMode();
+        AddFramePlotData(deltaTime);
+        UpdateGizmoDragState();
+    }
 
-    #endif
+#endif
 
     return UPDATE_CONTINUE;
 }
 
 update_status EditorUIModule::RenderEditor(float deltaTime)
 {
-    #ifndef GAME
+#ifndef GAME
     if (App->GetProjectModule()->IsProjectLoaded())
     {
         Draw();
@@ -130,23 +137,17 @@ update_status EditorUIModule::RenderEditor(float deltaTime)
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-    #endif
+#endif
     return UPDATE_CONTINUE;
 }
 
 update_status EditorUIModule::PostUpdate(float deltaTime)
 {
-    #ifndef GAME
+#ifndef GAME
 
     if (closeApplication) return UPDATE_STOP;
 
-    if (closeScene)
-    {
-        App->GetSceneModule()->CloseScene();
-        closeScene = false;
-    }
-
-    #endif
+#endif
 
     return UPDATE_CONTINUE;
 }
@@ -268,10 +269,6 @@ void EditorUIModule::MainMenu()
         if (ImGui::MenuItem("Save as", "", saveMenu)) saveMenu = !saveMenu;
         ImGui::EndDisabled();
 
-        ImGui::BeginDisabled(!sceneLoaded);
-        if (ImGui ::MenuItem("Close")) closeScene = true;
-        ImGui::EndDisabled();
-
         if (ImGui::MenuItem("Quit")) closeApplication = true;
 
         ImGui::EndMenu();
@@ -313,18 +310,17 @@ void EditorUIModule::MainMenu()
             ImGui::EndMenu();
         }
 
-       if (ImGui::BeginMenu("Engine Editor Window"))
+        if (ImGui::BeginMenu("Engine Editor Window"))
         {
             if (ImGui::MenuItem("Mockup Base Engine Editor", "")) OpenEditor(CreateEditor(EditorType::BASE));
 
             if (ImGui::MenuItem("Node Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::NODE));
 
-            if (ImGui::MenuItem("Texture Library"))               OpenEditor(new TextureLibraryEditor("Texture Library", GenerateUID()));
+            if (ImGui::MenuItem("Texture Library"))
+                OpenEditor(new TextureLibraryEditor("Texture Library", GenerateUID()));
 
             ImGui::EndMenu();
         }
-
-
 
         if (ImGui::MenuItem("Editor settings", "", editorSettingsMenu)) editorSettingsMenu = !editorSettingsMenu;
 
@@ -375,10 +371,8 @@ void EditorUIModule::LoadDialog(bool& loadMenu)
 
     if (ImGui::Button("Ok", ImVec2(0, 0)))
     {
-        if (!inputFileLoad.empty())
-        {
-            App->GetLibraryModule()->LoadScene(inputFileLoad.c_str());
-        }
+        if (!inputFileLoad.empty()) App->GetLibraryModule()->LoadScene(inputFileLoad.c_str());
+
         loadMenu = false;
     }
 
@@ -430,7 +424,7 @@ void EditorUIModule::LoadPrefabDialog(bool& loadPrefab)
 
     ImGui::Dummy(ImVec2(0, 3));
 
-    if (ImGui::Button("Ok", ImVec2(0, 0))) App->GetSceneModule()->LoadPrefab(prefabUID);
+    if (ImGui::Button("Ok", ImVec2(0, 0))) App->GetSceneModule()->GetScene()->LoadPrefab(prefabUID);
 
     ImGui::SameLine();
 
@@ -474,7 +468,7 @@ void EditorUIModule::LoadModelDialog(bool& loadModel)
 
     ImGui::Dummy(ImVec2(0, 3));
 
-    if (ImGui::Button("Ok", ImVec2(0, 0))) App->GetSceneModule()->LoadModel(modelUID);
+    if (ImGui::Button("Ok", ImVec2(0, 0))) App->GetSceneModule()->GetScene()->LoadModel(modelUID);
 
     ImGui::SameLine();
 
@@ -775,72 +769,65 @@ void EditorUIModule::Console(bool& consoleMenu) const
 }
 
 bool EditorUIModule::RenderTransformWidget(
-    float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform
+    float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform, float3& pos, float3& rot,
+    float3& scale
 )
 {
-    float4x4 outputTransform = float4x4(transformType == GizmoTransform::LOCAL ? localTransform : globalTransform);
-
-    float3 outputScale       = outputTransform.GetScale();
-    outputTransform.ScaleCol3(0, outputScale.x != 0 ? 1 / outputScale.x : 1);
-    outputTransform.ScaleCol3(1, outputScale.y != 0 ? 1 / outputScale.y : 1);
-    outputTransform.ScaleCol3(2, outputScale.z != 0 ? 1 / outputScale.z : 1);
-    float3 outputPosition     = outputTransform.TranslatePart();
-    float3 outputRotation     = Quat(outputTransform.RotatePart()).ToEulerXYZ();
-
     bool positionValueChanged = false, rotationValueChanged = false, scaleValueChanged = false;
-    float3 originalScale      = float3(outputScale);
+    float3 originalScale      = float3(scale);
 
     std::string transformName = std::string(transformType == GizmoTransform::LOCAL ? "Local " : "World ") + "Transform";
     ImGui::SeparatorText(transformName.c_str());
 
     RenderBasicTransformModifiers(
-        outputPosition, outputRotation, outputScale, lockScaleAxis, positionValueChanged, rotationValueChanged,
-        scaleValueChanged
+        pos, rot, scale, lockScaleAxis, positionValueChanged, rotationValueChanged, scaleValueChanged
     );
 
     if (positionValueChanged || rotationValueChanged || scaleValueChanged)
     {
         if (scaleValueChanged && lockScaleAxis)
         {
-            float scaleFactor = 1;
-            if (outputScale.x != originalScale.x)
+            if (originalScale.IsZero())
             {
-                scaleFactor = originalScale.x == 0 ? 1 : outputScale.x / originalScale.x;
+                float scaleFactor = 1;
+                if (scale.x != originalScale.x) scaleFactor = scale.x;
+
+                else if (scale.y != originalScale.y) scaleFactor = scale.y;
+
+                else if (scale.z != originalScale.z) scaleFactor = scale.z;
+
+                scale = float3(scaleFactor, scaleFactor, scaleFactor);
             }
-            else if (outputScale.y != originalScale.y)
+            else
             {
-                scaleFactor = originalScale.y == 0 ? 1 : outputScale.y / originalScale.y;
+                float scaleFactor = 1;
+                if (scale.x != originalScale.x && scale.x != 0)
+                    scaleFactor = originalScale.x == 0 ? 1 : scale.x / originalScale.x;
+
+                else if (scale.y != originalScale.y && scale.y != 0)
+                    scaleFactor = originalScale.y == 0 ? 1 : scale.y / originalScale.y;
+
+                else if (scale.z != originalScale.z && scale.z != 0)
+                    scaleFactor = originalScale.z == 0 ? 1 : scale.z / originalScale.z;
+
+                originalScale *= scaleFactor;
+                scale          = originalScale;
             }
-            else if (outputScale.z != originalScale.z)
-            {
-                scaleFactor = originalScale.z == 0 ? 1 : outputScale.z / originalScale.z;
-            }
-            originalScale *= scaleFactor;
-            outputScale    = originalScale;
         }
 
-        outputTransform = float4x4::identity;
-        outputTransform.SetTranslatePart(outputPosition);
-        outputTransform.SetRotatePart(Quat::FromEulerXYZ(outputRotation.x, outputRotation.y, outputRotation.z));
-        outputTransform.ScaleCol3(0, outputScale.x);
-        outputTransform.ScaleCol3(1, outputScale.y);
-        outputTransform.ScaleCol3(2, outputScale.z);
+        float4x4 outputTransform = float4x4::FromTRS(pos, Quat::FromEulerXYZ(rot.x, rot.y, rot.z), scale);
 
-        if (transformType == GizmoTransform::WORLD)
-        {
-            localTransform = parentTransform.Inverted() * outputTransform;
-        }
-        else
-        {
-            localTransform = outputTransform;
-        }
+        if (transformType == GizmoTransform::WORLD) localTransform = parentTransform.Inverted() * outputTransform;
+
+        else localTransform = outputTransform;
     }
 
     return positionValueChanged || rotationValueChanged || scaleValueChanged;
 }
 
 bool EditorUIModule::RenderImGuizmo(
-    float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform
+    float4x4& localTransform, float4x4& globalTransform, const float4x4& parentTransform, float3& pos, float3& rot,
+    float3& scale
 ) const
 {
     float4x4 view = float4x4(App->GetCameraModule()->GetViewMatrix());
@@ -874,6 +861,9 @@ bool EditorUIModule::RenderImGuizmo(
             ImGuizmo::Enable(false);
             return false;
         }
+        pos            = transform.TranslatePart();
+        rot            = transform.RotatePart().ToEulerXYZ();
+        scale          = transform.GetScale();
         localTransform = parentTransform.Inverted() * transform;
     }
 
@@ -895,18 +885,13 @@ void EditorUIModule::RenderBasicTransformModifiers(
 {
     positionValueChanged |= ImGui::InputFloat3("Position", &outputPosition[0]);
 
-    if (!bUseRad)
-    {
-        outputRotation *= RAD_DEGREE_CONV;
-    }
+    outputRotation       *= RAD_DEGREE_CONV;
+
     rotationValueChanged |= ImGui::InputFloat3("Rotation", &outputRotation[0]);
-    if (!bUseRad)
-    {
-        outputRotation /= RAD_DEGREE_CONV;
-    }
-    ImGui::SameLine();
-    ImGui::Checkbox("Radians", &bUseRad);
-    scaleValueChanged |= ImGui::InputFloat3("Scale", &outputScale[0]);
+
+    outputRotation       /= RAD_DEGREE_CONV;
+
+    scaleValueChanged    |= ImGui::InputFloat3("Scale", &outputScale[0]);
     ImGui::SameLine();
     ImGui::Checkbox("Lock axis", &lockScaleAxis);
 }
@@ -1494,6 +1479,12 @@ void EditorUIModule::HardwareConfig() const
 
 void EditorUIModule::ShowCaps() const
 {
+    struct CPUFeature
+    {
+        SDL_bool (*check)();
+        const char* name;
+    };
+
     const CPUFeature features[] = {
         {SDL_HasRDTSC,   "RDTSC"  },
         {SDL_HasAltiVec, "AltiVec"},

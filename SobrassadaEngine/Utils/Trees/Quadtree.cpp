@@ -29,7 +29,9 @@ bool Quadtree::InsertElement(GameObject* gameObject)
     std::stack<QuadtreeNode*> nodesToVisit;
     nodesToVisit.push(rootNode);
 
-    const AABB elementBoundingBox   = gameObject->GetGlobalAABB();
+    AABB elementBoundingBox   = AABB(gameObject->GetGlobalAABB());
+    elementBoundingBox.minPoint.y   = -1;
+    elementBoundingBox.maxPoint.y   = 1;
     QuadtreeElement quadtreeElement = QuadtreeElement(elementBoundingBox, gameObject, totalElements);
 
     while (!nodesToVisit.empty())

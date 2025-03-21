@@ -1,9 +1,6 @@
 #pragma once
 
 #include "Geometry/AABB.h"
-#include "Geometry/LineSegment.h"
-#include "Math/float3.h"
-#include "Math/float4.h"
 
 #include <stack>
 #include <vector>

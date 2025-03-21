@@ -28,6 +28,7 @@
 #include "imgui_internal.h"
 // guizmo after imgui include
 #include "./Libs/ImGuizmo/ImGuizmo.h"
+#include "CameraComponent.h"
 
 Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 {
@@ -91,11 +92,12 @@ Scene::~Scene()
 
 void Scene::Init()
 {
-    GameObject* root = GetGameObjectByUID(gameObjectRootUID);
-    if (root != nullptr)
+    for (auto& gameObject : gameObjectsContainer)
     {
-        root->UpdateTransformForGOBranch();
+        gameObject.second->Init();
     }
+
+    GetGameObjectByUID(gameObjectRootUID)->UpdateTransformForGOBranch();
 
     // When loading a scene, overrides all gameObjects that have a prefabUID. That is because if the prefab has been
     // modified, the scene file may have not, so the prefabs need to be updated when loading the scene again
@@ -164,7 +166,7 @@ void Scene::Save(
     targetState.AddMember("GameObjects", gameObjectsJSON, allocator);
 
     // Serialize Lights Config
-    LightsConfig* lightConfig = App->GetSceneModule()->GetLightsConfig();
+    LightsConfig* lightConfig = App->GetSceneModule()->GetScene()->GetLightsConfig();
 
     if (lightConfig != nullptr)
     {
@@ -403,10 +405,16 @@ void Scene::RenderScene()
         ImGui::SetWindowFocus();
 
     // do inputs only if window is focused
-    if (ImGui::IsWindowFocused(ImGuiFocusedFlags_DockHierarchy) &&
-        ImGui::IsWindowHovered(ImGuiFocusedFlags_DockHierarchy))
-        doInputs = true;
-    else doInputs = false;
+    if (ImGui::IsWindowHovered(ImGuiFocusedFlags_DockHierarchy))
+    {
+        doMouseInputs = true;
+        if (ImGui::IsWindowFocused(ImGuiFocusedFlags_DockHierarchy)) doInputs = true;
+    }
+    else
+    {
+        doInputs      = false;
+        doMouseInputs = false;
+    }
 
     const auto& framebuffer = App->GetOpenGLModule()->GetFramebuffer();
 
@@ -429,9 +437,9 @@ void Scene::RenderScene()
     if (framebuffer->GetTextureWidth() != windowSize.x || framebuffer->GetTextureHeight() != windowSize.y)
     {
         float aspectRatio = windowSize.y / windowSize.x;
-        if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr)
+        if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
         {
-            App->GetSceneModule()->GetMainCamera()->SetAspectRatio(aspectRatio);
+            App->GetSceneModule()->GetScene()->GetMainCamera()->SetAspectRatio(aspectRatio);
         }
         else App->GetCameraModule()->SetAspectRatio(aspectRatio);
         framebuffer->Resize((int)windowSize.x, (int)windowSize.y);
@@ -598,7 +606,7 @@ void Scene::CreateDynamicSpatialDataStruct()
 
         if (objectIterator.second->IsStatic()) continue;
         if (objectIterator.second->GetUID() == gameObjectRootUID) continue;
-        if (objectBB.Size().x == 0 && objectBB.Size().y == 0 && objectBB.Size().z == 0) continue;
+        if (objectBB.IsDegenerate()) continue;
 
         dynamicTree->InsertElement(objectIterator.second);
     }
@@ -626,8 +634,8 @@ void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects)
 {
     std::vector<GameObject*> queriedObjects;
     FrustumPlanes frustumPlanes = App->GetCameraModule()->GetFrustrumPlanes();
-    if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetMainCamera() != nullptr)
-        frustumPlanes = App->GetSceneModule()->GetMainCamera()->GetFrustrumPlanes();
+    if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
+        frustumPlanes = App->GetSceneModule()->GetScene()->GetMainCamera()->GetFrustrumPlanes();
 
     sceneOctree->QueryElements<FrustumPlanes>(frustumPlanes, queriedObjects);
     dynamicTree->QueryElements<FrustumPlanes>(frustumPlanes, queriedObjects);

@@ -1,21 +1,19 @@
 ﻿#include "Component.h"
 
-#include "Application.h"
 #include "ComponentUtils.h"
-#include "SceneModule.h"
 
 #include "imgui.h"
 #include <Math/float4x4.h>
 #include <string>
 
-Component::Component(UID uid, UID parentUID, const char* initName, ComponentType type)
-    : uid(uid), parentUID(parentUID), type(type), enabled(true)
+Component::Component(UID uid, GameObject* parent, const char* initName, ComponentType type)
+    : uid(uid), parent(parent), type(type), enabled(true)
 {
     memcpy(name, initName, strlen(initName));
 }
 
-Component::Component(const rapidjson::Value& initialState)
-    : uid(initialState["UID"].GetUint64()), parentUID(initialState["ParentUID"].GetUint64()),
+Component::Component(const rapidjson::Value& initialState, GameObject* parent)
+    : uid(initialState["UID"].GetUint64()), parent(parent),
       type(static_cast<ComponentType>(initialState["Type"].GetInt()))
 {
     enabled              = initialState["Enabled"].GetBool();
@@ -27,7 +25,6 @@ Component::Component(const rapidjson::Value& initialState)
 void Component::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
 {
     targetState.AddMember("UID", uid, allocator);
-    targetState.AddMember("ParentUID", parentUID, allocator);
     targetState.AddMember("Type", type, allocator);
 
     targetState.AddMember("Enabled", enabled, allocator);
@@ -41,25 +38,7 @@ void Component::RenderEditorInspector()
     ImGui::Checkbox("Enabled", &enabled);
 }
 
-const float4x4& Component::GetGlobalTransform()
+const float4x4& Component::GetGlobalTransform() const
 {
-    GameObject* parent = GetParent();
-    if (parent != nullptr)
-    {
-        return parent->GetGlobalTransform();
-    }
-    return float4x4::identity;
-}
-
-GameObject* Component::GetParent()
-{
-    if (parent == nullptr)
-    {
-        parent = App->GetSceneModule()->GetGameObjectByUID(parentUID);
-        if (parent == nullptr)
-        {
-            // GLOG("Could not load parent with UID: %s - Object does not exist", uidParent)
-        }
-    }
-    return parent;
+    return parent->GetGlobalTransform();
 }

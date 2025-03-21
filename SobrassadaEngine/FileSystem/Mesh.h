@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Math/float2.h"
-#include "Math/float3.h"
-#include "Math/float4.h"
+#include <Math/float2.h>
+#include <Math/float3.h>
+#include <Math/float4.h>
 #include <vector>
 
 // ORDER MATTERS
@@ -36,16 +36,13 @@ struct Vertex
 class Mesh
 {
   public:
-    Mesh() = default;
+    Mesh()  = default;
     ~Mesh() = default;
 
     const std::vector<Vertex>& GetVertices() const { return vertices; }
     const std::vector<unsigned int>& GetIndices() const { return indices; }
     unsigned int GetMode() const { return mode; }
-    // unsigned int GetMaterialIndex() const { return materialIndex; }
 
-    // 4 bytes -> cheap, move not worth it
-    // void SetMaterialIndex(unsigned int newMaterialIndex) { materialIndex = newMaterialIndex; }
     void SetMode(unsigned int newMode) { mode = newMode; }
     // expensive -> move operators
     void SetVertices(std::vector<Vertex>&& newVertices) { vertices = std::move(newVertices); }
@@ -54,6 +51,5 @@ class Mesh
   private:
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
-    // unsigned int materialIndex = 0;
     unsigned int mode = 4; // Default: GL_TRIANGLES
 };

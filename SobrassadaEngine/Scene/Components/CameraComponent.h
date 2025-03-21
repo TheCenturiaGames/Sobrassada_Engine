@@ -9,8 +9,8 @@
 class CameraComponent : public Component
 {
   public:
-    CameraComponent(UID uid, UID uidParent);
-    CameraComponent(const rapidjson::Value& initialState);
+    CameraComponent(UID uid, GameObject* parent);
+    CameraComponent(const rapidjson::Value& initialState, GameObject* parent);
     ~CameraComponent() override;
 
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;

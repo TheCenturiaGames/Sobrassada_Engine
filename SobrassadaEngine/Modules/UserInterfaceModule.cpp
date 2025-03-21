@@ -3,7 +3,7 @@
 #include "Application.h"
 #include "ProjectModule.h"
 
-//Test to see if library is working
+// Test to see if library is working
 bool UserInterfaceModule::Init()
 {
     if (App->GetProjectModule()->IsProjectLoaded())
@@ -24,7 +24,7 @@ bool UserInterfaceModule::Init()
         GLOG("Font loaded successfully: %s %s", face->family_name, face->style_name);
 
         FT_Done_Face(face);
-        FT_Done_FreeType(library);   
+        FT_Done_FreeType(library);
     }
     return true;
 }

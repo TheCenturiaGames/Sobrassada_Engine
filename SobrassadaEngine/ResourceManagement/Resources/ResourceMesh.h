@@ -5,6 +5,7 @@
 #include "Math/float3.h"
 #include "Math/float4x4.h"
 #include <Geometry/AABB.h>
+#include <Libs/rapidjson/document.h>
 #include <vector>
 
 namespace tinygltf
@@ -21,7 +22,10 @@ struct Vertex;
 class ResourceMesh : public Resource
 {
   public:
-    ResourceMesh(UID uid, const std::string& name, const float3& maxPos, const float3& minPos);
+    ResourceMesh(
+        UID uid, const std::string& name, const float3& maxPos, const float3& minPos,
+        const rapidjson::Value& importOptions
+    );
     ~ResourceMesh() override;
 
     void Render(
@@ -34,6 +38,7 @@ class ResourceMesh : public Resource
     int GetIndexCount() const { return indexCount; }
     const std::vector<Vertex>& GetLocalVertices() const { return vertices; }
     const std::vector<unsigned int>& GetIndices() const { return indices; }
+    const float4x4& GetDefaultTransform() const { return defaultTransform; }
 
   private:
     const float4x4 TestSkinning(
@@ -54,4 +59,7 @@ class ResourceMesh : public Resource
     std::vector<Vertex> bindPoseVertices;
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
+
+    bool generateTangents     = false;
+    float4x4 defaultTransform = float4x4::identity;
 };

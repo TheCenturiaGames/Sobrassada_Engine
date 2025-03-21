@@ -5,8 +5,8 @@ class CharacterControllerComponent : public Component
 {
 
   public:
-    CharacterControllerComponent(UID uid, UID uidParent);
-    CharacterControllerComponent(const rapidjson::Value& initialState);
+    CharacterControllerComponent(UID uid, GameObject* parent);
+    CharacterControllerComponent(const rapidjson::Value& initialState, GameObject* parent);
 
     ~CharacterControllerComponent() override;
 
@@ -16,7 +16,7 @@ class CharacterControllerComponent : public Component
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
     void Clone(const Component* other) override;
 
-    void Move(const float3& direction, float deltaTime);
+    void Move(const float3& direction, float deltaTime) const;
     void Rotate(float rotationDirection, float deltaTime);
     void HandleInput(float deltaTime);
 

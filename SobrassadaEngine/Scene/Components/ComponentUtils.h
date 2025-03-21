@@ -5,11 +5,9 @@
 #include <Libs/rapidjson/document.h>
 #include <Math/float4x4.h>
 #include <cstdint>
-#include <map>
-#include <string>
-#include <unordered_map>
 
 class Component;
+class GameObject;
 
 enum ComponentType
 {
@@ -29,7 +27,7 @@ enum ComponentType
 class ComponentUtils
 {
   public:
-    static Component* CreateEmptyComponent(ComponentType type, UID uid, UID uidParent);
+    static Component* CreateEmptyComponent(ComponentType type, UID uid, GameObject* parent);
 
-    static Component* CreateExistingComponent(const rapidjson::Value& initialState);
+    static Component* CreateExistingComponent(const rapidjson::Value& initialState, GameObject* parent);
 };

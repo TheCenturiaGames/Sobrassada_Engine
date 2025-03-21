@@ -5,7 +5,6 @@
 #include "LibraryModule.h"
 #include "ResourceManagement/Resources/ResourceTexture.h"
 #include "TextureImporter.h"
-#include "FileSystem/Material.h"
 
 #include "imgui.h"
 #include <glew.h>
@@ -142,23 +141,6 @@ void ResourceMaterial::LoadMaterialData(Material mat)
         }
 
         delete specTexture;
-    }
-
-    if (specularTexture.textureID == 0 && metallicTexture.textureID == 0)
-    {
-        ResourceTexture* specTexture = TextureImporter::LoadTexture(FALLBACK_TEXTURE_UID);
-        if (specTexture != nullptr)
-        {
-            specularTexture.textureID = specTexture->GetTextureID();
-
-            material.specularTex      = glGetTextureHandleARB(specTexture->GetTextureID());
-            glMakeTextureHandleResidentARB(material.specularTex);
-
-            specularTexture.width     = specTexture->GetTextureWidth();
-            specularTexture.height    = specTexture->GetTextureHeight();
-
-            material.shininessInAlpha = true;
-        }
     }
 
     ResourceTexture* normTexture = TextureImporter::LoadTexture(mat.GetNormalTexture());

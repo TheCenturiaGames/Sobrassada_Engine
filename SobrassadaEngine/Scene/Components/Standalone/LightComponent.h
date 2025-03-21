@@ -8,8 +8,8 @@
 class LightComponent : public Component
 {
   public:
-    LightComponent(UID uid, UID uidParent, const char* uiName, ComponentType lightType);
-    LightComponent(const rapidjson::Value& initialState);
+    LightComponent(UID uid, GameObject* parent, const char* uiName, ComponentType lightType);
+    LightComponent(const rapidjson::Value& initialState, GameObject* parent);
 
     void Update(float deltaTime) override;
     virtual void Render(float deltaTime) override;

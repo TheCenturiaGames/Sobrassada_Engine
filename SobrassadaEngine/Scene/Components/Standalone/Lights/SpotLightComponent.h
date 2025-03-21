@@ -7,9 +7,11 @@
 class SpotLightComponent : public LightComponent
 {
   public:
-    SpotLightComponent(UID uid, UID uidParent);
-    SpotLightComponent(const rapidjson::Value& initialState);
+    SpotLightComponent(UID uid, GameObject* parent);
+    SpotLightComponent(const rapidjson::Value& initialState, GameObject* parent);
     ~SpotLightComponent() override;
+
+    void Init() override;
 
     void Render(float deltaTime = 0) override;
     void RenderEditorInspector() override;
