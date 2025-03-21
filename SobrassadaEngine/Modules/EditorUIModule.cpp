@@ -775,8 +775,6 @@ bool EditorUIModule::RenderTransformWidget(
     float3& scale
 )
 {
-    float4x4 outputTransform  = float4x4(transformType == GizmoTransform::LOCAL ? localTransform : globalTransform);
-
     bool positionValueChanged = false, rotationValueChanged = false, scaleValueChanged = false;
     float3 originalScale      = float3(scale);
 
@@ -815,7 +813,7 @@ bool EditorUIModule::RenderTransformWidget(
                 {
                     scaleFactor = originalScale.x == 0 ? 1 : scale.x / originalScale.x;
                 }
-                else if (scale.y != originalScale.y &&scale.y != 0)
+                else if (scale.y != originalScale.y && scale.y != 0)
                 {
                     scaleFactor = originalScale.y == 0 ? 1 : scale.y / originalScale.y;
                 }
@@ -828,7 +826,7 @@ bool EditorUIModule::RenderTransformWidget(
             }
         }
 
-        outputTransform = float4x4::FromTRS(pos, Quat::FromEulerXYZ(rot.x, rot.y, rot.z), scale);
+        float4x4 outputTransform = float4x4::FromTRS(pos, Quat::FromEulerXYZ(rot.x, rot.y, rot.z), scale);
 
         if (transformType == GizmoTransform::WORLD)
         {
@@ -879,8 +877,8 @@ bool EditorUIModule::RenderImGuizmo(
             ImGuizmo::Enable(false);
             return false;
         }
-        // ImGuizmo::DecomposeMatrixToComponents(transform.ptr(), &pos[0], &rot[0], &scale[0]);
         pos            = transform.TranslatePart();
+        rot            = transform.RotatePart().ToEulerXYZ();
         scale          = transform.GetScale();
         localTransform = parentTransform.Inverted() * transform;
     }
