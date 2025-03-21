@@ -606,7 +606,7 @@ void Scene::CreateDynamicSpatialDataStruct()
 
         if (objectIterator.second->IsStatic()) continue;
         if (objectIterator.second->GetUID() == gameObjectRootUID) continue;
-        if (objectBB.Size().x == 0 && objectBB.Size().y == 0 && objectBB.Size().z == 0) continue;
+        if (objectBB.IsDegenerate()) continue;
 
         dynamicTree->InsertElement(objectIterator.second);
     }

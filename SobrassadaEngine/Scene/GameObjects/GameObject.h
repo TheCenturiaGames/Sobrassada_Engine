@@ -98,6 +98,7 @@ class GameObject
     void UpdateLocalTransform(const float4x4& parentGlobalTransform);
     void DrawNodes() const;
     void OnDrawConnectionsToggle();
+    void UpdateMobilityHeriarchy(ComponentMobilitySettings type);
 
   public:
     inline static UID currentRenamingUID = INVALID_UID;

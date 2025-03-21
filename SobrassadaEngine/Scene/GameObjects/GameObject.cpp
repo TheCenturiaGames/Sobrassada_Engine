@@ -10,6 +10,7 @@
 
 #include "imgui.h"
 
+#include <set>
 #include <stack>
 
 GameObject::GameObject(std::string name) : name(name)
@@ -260,6 +261,7 @@ void GameObject::RenderEditorInspector()
             {
                 App->GetSceneModule()->GetScene()->SetStaticModified();
                 App->GetSceneModule()->GetScene()->SetDynamicModified();
+                UpdateMobilityHeriarchy(STATIC);
             }
         }
         ImGui::SameLine();
@@ -269,6 +271,7 @@ void GameObject::RenderEditorInspector()
             {
                 App->GetSceneModule()->GetScene()->SetStaticModified();
                 App->GetSceneModule()->GetScene()->SetDynamicModified();
+                UpdateMobilityHeriarchy(DYNAMIC);
             }
         }
 
@@ -675,6 +678,58 @@ void GameObject::OnDrawConnectionsToggle()
         GameObject* childObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(childUID);
         childObject->drawNodes  = drawNodes;
         childObject->OnDrawConnectionsToggle();
+    }
+}
+
+void GameObject::UpdateMobilityHeriarchy(ComponentMobilitySettings type)
+{
+    std::set<UID> visitedGameObjects;
+    std::stack<UID> toVisitGameObjects;
+    UID sceneRootUID = App->GetSceneModule()->GetScene()->GetGameObjectRootUID();
+    // ADD "THIS" GAME OBJECT SO WHEN ASCENDING HERIARCHY WE DON'T REVISIT OUR CHILDREN
+    visitedGameObjects.insert(uid);
+
+    // FIRST UPDATE DOWN THE HERIARCHY
+    for (UID gameObjectID : children)
+        toVisitGameObjects.push(gameObjectID);
+
+    while (!toVisitGameObjects.empty())
+    {
+        UID currentUID = toVisitGameObjects.top();
+        toVisitGameObjects.pop();
+
+        if (visitedGameObjects.find(currentUID) == visitedGameObjects.end())
+        {
+            visitedGameObjects.insert(currentUID);
+            GameObject* currentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentUID);
+
+            currentGameObject->SetMobility(type);
+
+            for (UID childID : currentGameObject->GetChildren())
+                toVisitGameObjects.push(childID);
+        }
+    }
+
+    // UPDATE UP THE HERIARCHY
+    if (parentUID != sceneRootUID) toVisitGameObjects.push(parentUID);
+
+    while (!toVisitGameObjects.empty())
+    {
+        UID currentUID = toVisitGameObjects.top();
+        toVisitGameObjects.pop();
+
+        if (visitedGameObjects.find(currentUID) == visitedGameObjects.end())
+        {
+            visitedGameObjects.insert(currentUID);
+            GameObject* currentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentUID);
+
+            currentGameObject->SetMobility(type);
+
+            for (UID childID : currentGameObject->GetChildren())
+                toVisitGameObjects.push(childID);
+
+            if (currentGameObject->GetParent() != sceneRootUID) toVisitGameObjects.push(currentGameObject->GetParent());
+        }
     }
 }
 
