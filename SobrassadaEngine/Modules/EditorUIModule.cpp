@@ -811,15 +811,15 @@ bool EditorUIModule::RenderTransformWidget(
             else
             {
                 float scaleFactor = 1;
-                if (scale.x != originalScale.x)
+                if (scale.x != originalScale.x && scale.x != 0)
                 {
                     scaleFactor = originalScale.x == 0 ? 1 : scale.x / originalScale.x;
                 }
-                else if (scale.y != originalScale.y)
+                else if (scale.y != originalScale.y &&scale.y != 0)
                 {
                     scaleFactor = originalScale.y == 0 ? 1 : scale.y / originalScale.y;
                 }
-                else if (scale.z != originalScale.z)
+                else if (scale.z != originalScale.z && scale.z != 0)
                 {
                     scaleFactor = originalScale.z == 0 ? 1 : scale.z / originalScale.z;
                 }
@@ -854,12 +854,9 @@ bool EditorUIModule::RenderImGuizmo(
     float4x4 proj = float4x4(App->GetCameraModule()->GetProjectionMatrix());
     proj.Transpose();
 
-    float maxDistance = App->GetCameraModule()->GetFarPlaneDistance() * 0.9f;
+    float maxDistance  = App->GetCameraModule()->GetFarPlaneDistance() * 0.9f;
 
-    // float4x4 transform = float4x4(globalTransform);
-    float4x4 transform;
-    float3 tmpRot = rot * RAD_DEGREE_CONV;
-    ImGuizmo::RecomposeMatrixFromComponents(&pos[0], &tmpRot[0], &scale[0], transform.ptr());
+    float4x4 transform = float4x4(globalTransform);
     transform.Transpose();
 
     ImGuizmo::OPERATION operation = GetImGuizmoOperation();
@@ -882,9 +879,10 @@ bool EditorUIModule::RenderImGuizmo(
             ImGuizmo::Enable(false);
             return false;
         }
-        ImGuizmo::DecomposeMatrixToComponents(transform.ptr(), &pos[0], &rot[0], &scale[0]);
-        rot            *= DEGREE_RAD_CONV;
-        localTransform  = parentTransform.Inverted() * transform;
+        // ImGuizmo::DecomposeMatrixToComponents(transform.ptr(), &pos[0], &rot[0], &scale[0]);
+        pos            = transform.TranslatePart();
+        scale          = transform.GetScale();
+        localTransform = parentTransform.Inverted() * transform;
     }
 
     return true;
