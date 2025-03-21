@@ -57,7 +57,7 @@ void DirectionalLightComponent::Render(float deltaTime)
     );
 }
 
-const float3& DirectionalLightComponent::GetDirection() const
+const float3 DirectionalLightComponent::GetDirection() const
 {
     return (parent->GetGlobalTransform().RotatePart() * -float3::unitY).Normalized();
 }
