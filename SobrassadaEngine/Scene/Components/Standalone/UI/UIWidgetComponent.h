@@ -12,12 +12,17 @@ struct UIStyle
     int fontSize;
 };
 
-class UIWidgetComponent : Component
+class UIWidgetComponent : public Component
 {
   public:
     UIWidgetComponent(UID uid, GameObject* parent, const char* uiName, ComponentType widgetType);
     ~UIWidgetComponent();
 
+    virtual void Update(float deltaTime) override {};
+    virtual void Render(float deltaTime) override {};
+    virtual void Clone(const Component* otherComponent) = 0;
+
+  private:
     bool isVisible;
     UIStyle style;
 };

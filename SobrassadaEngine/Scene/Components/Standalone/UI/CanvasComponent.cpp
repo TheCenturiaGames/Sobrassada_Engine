@@ -8,7 +8,14 @@ CanvasComponent::~CanvasComponent()
 {
 }
 
+void CanvasComponent::Update(float deltaTime)
+{
+}
+
 void CanvasComponent::Render(float deltaTime)
 {
+}
 
+void CanvasComponent::Clone(const Component* otherComponent)
+{
 }

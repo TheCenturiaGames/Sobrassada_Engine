@@ -8,5 +8,7 @@ class CanvasComponent : public Component
     CanvasComponent(UID uid, GameObject* parent);
     ~CanvasComponent();
 
+    void Update(float deltaTime) override;
     void Render(float deltaTime) override;
+    void Clone(const Component* otherComponent) override;
 };

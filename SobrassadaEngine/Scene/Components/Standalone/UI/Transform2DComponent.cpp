@@ -8,3 +8,15 @@ Transform2DComponent::Transform2DComponent(UID uid, GameObject* parent)
 Transform2DComponent::~Transform2DComponent()
 {
 }
+
+void Transform2DComponent::Update(float deltaTime)
+{
+}
+
+void Transform2DComponent::Render(float deltaTime)
+{
+}
+
+void Transform2DComponent::Clone(const Component* otherComponent)
+{
+}

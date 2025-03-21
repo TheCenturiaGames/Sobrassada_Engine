@@ -7,6 +7,9 @@
 #include "Standalone/Lights/PointLightComponent.h"
 #include "Standalone/Lights/SpotLightComponent.h"
 #include "Standalone/MeshComponent.h"
+#include "Standalone/UI/Transform2DComponent.h"
+#include "Standalone/UI/CanvasComponent.h"
+#include "Standalone/UI/UILabelComponent.h"
 
 #include <cstdint>
 
@@ -31,6 +34,15 @@ Component* ComponentUtils::CreateEmptyComponent(const ComponentType type, const 
         break;
     case COMPONENT_CHARACTER_CONTROLLER:
         generatedComponent = new CharacterControllerComponent(uid, parent);
+        break;
+    case COMPONENT_TRANSFORM_2D:
+        generatedComponent = new Transform2DComponent(uid, parent);
+        break;
+    case COMPONENT_CANVAS:
+        generatedComponent = new CanvasComponent(uid, parent);
+        break;
+    case COMPONENT_LABEL:
+        generatedComponent = new UILabelComponent(uid, parent);
         break;
     case COMPONENT_CAMERA:
         generatedComponent = new CameraComponent(uid, parent);
