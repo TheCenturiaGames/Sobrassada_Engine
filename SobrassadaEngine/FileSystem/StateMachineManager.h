@@ -2,10 +2,13 @@
 
 #include <Globals.h>
 
-#include <vector>
 #include <string>
+#include <vector>
 
 class ResourceStateMachine;
+struct Clip;
+struct State;
+struct Transition;
 
 namespace StateMachineManager
 {
