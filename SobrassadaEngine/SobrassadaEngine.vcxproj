@@ -274,8 +274,11 @@
     <ClCompile Include="FileSystem\Meta\MetaModel.cpp" />
     <ClCompile Include="Libs\ImNodeFlow-1.2.2\src\ImNodeFlow.cpp" />
     <ClCompile Include="FileSystem\StateMachineManager.cpp" />
+    <ClCompile Include="Modules\GameUIModule.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceStateMachine.cpp" />
     <ClCompile Include="Scene\Components\CameraComponent.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\UI\CanvasComponent.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\UI\UILabelComponent.cpp" />
     <ClCompile Include="UI\EngineEditors\Editor\NodeEditor.cpp" />
     <ClCompile Include="UI\EngineEditors\Editor\TextureLibraryEditor.cpp" />
     <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp" />
@@ -344,6 +347,8 @@
     <ClCompile Include="Modules\UserInterfaceModule.cpp" />
     <ClCompile Include="Scene\Components\Standalone\CharacterControllerComponent.cpp" />
     <ClCompile Include="UI\EngineEditors\Nodes\CustomNode.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\UI\Transform2DComponent.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\UI\UIWidgetComponent.cpp" />
     <ClCompile Include="Utils\EngineTimer.cpp" />
     <ClCompile Include="FileSystem\Importers\Importer.cpp" />
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp" />
@@ -432,8 +437,11 @@
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_bezier_math.h" />
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_extra_math.h" />
     <ClInclude Include="FileSystem\StateMachineManager.h" />
+    <ClInclude Include="Modules\GameUIModule.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceStateMachine.h" />
     <ClInclude Include="Scene\Components\CameraComponent.h" />
+    <ClInclude Include="Scene\Components\Standalone\UI\CanvasComponent.h" />
+    <ClInclude Include="Scene\Components\Standalone\UI\UILabelComponent.h" />
     <ClInclude Include="UI\EngineEditors\Editor\NodeEditor.h" />
     <ClInclude Include="UI\EngineEditors\Editor\TextureLibraryEditor.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -456,6 +464,8 @@
     <ClInclude Include="Modules\ResourcesModule.h" />
     <ClInclude Include="Modules\SceneModule.h" />
     <ClInclude Include="FileSystem\Importers\ModelImporter.h" />
+    <ClInclude Include="Scene\Components\Standalone\UI\Transform2DComponent.h" />
+    <ClInclude Include="Scene\Components\Standalone\UI\UIWidgetComponent.h" />
     <ClInclude Include="Utils\Delegate.h" />
     <ClInclude Include="Utils\EventDispatcher.h" />
     <ClInclude Include="Utils\Interpolation.h" />

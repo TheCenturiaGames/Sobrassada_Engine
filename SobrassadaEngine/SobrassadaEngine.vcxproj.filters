@@ -387,6 +387,11 @@
     <ClCompile Include="FileSystem\StateMachineManager.cpp">
       <Filter>FileSystem</Filter>
     </ClCompile>
+    <ClCompile Include="Modules\GameUIModule.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\UI\UIWidgetComponent.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\UI\Transform2DComponent.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\UI\UILabelComponent.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\UI\CanvasComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -716,6 +721,11 @@
     <ClInclude Include="FileSystem\Config\ProjectConfig.h">
       <Filter>FileSystem\Config</Filter>
     </ClInclude>
+    <ClInclude Include="Modules\GameUIModule.h" />
+    <ClInclude Include="Scene\Components\Standalone\UI\UIWidgetComponent.h" />
+    <ClInclude Include="Scene\Components\Standalone\UI\Transform2DComponent.h" />
+    <ClInclude Include="Scene\Components\Standalone\UI\UILabelComponent.h" />
+    <ClInclude Include="Scene\Components\Standalone\UI\CanvasComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl">
