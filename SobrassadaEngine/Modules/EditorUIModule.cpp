@@ -1166,13 +1166,14 @@ void EditorUIModule::EditorSettings(bool& editorSettingsMenu)
     if (ImGui::CollapsingHeader("Application"))
     {
         ImGui::SeparatorText("Information");
-        ImGui::InputText(
-            "App Name", const_cast<char*>(ENGINE_NAME), IM_ARRAYSIZE(ENGINE_NAME), ImGuiInputTextFlags_ReadOnly
-        );
-        ImGui::InputText(
-            "Organization", const_cast<char*>(ORGANIZATION_NAME), IM_ARRAYSIZE(ORGANIZATION_NAME),
-            ImGuiInputTextFlags_ReadOnly
-        );
+
+        std::string appName = ENGINE_NAME;
+        char* charAppName   = &appName[0];
+        ImGui::InputText("App Name", charAppName, strlen(charAppName), ImGuiInputTextFlags_ReadOnly);
+
+        std::string organizationName = ORGANIZATION_NAME;
+        char* charOrganizationName   = &organizationName[0];
+        ImGui::InputText("Organization", charOrganizationName, strlen(ORGANIZATION_NAME), ImGuiInputTextFlags_ReadOnly);
 
         ImGui::SeparatorText("Ms and Fps Graph");
         FramePlots(vsync);
