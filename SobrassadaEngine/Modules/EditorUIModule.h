@@ -1,31 +1,30 @@
 #pragma once
-#include "ComponentUtils.h"
-#include "EngineEditors/Editor/NodeEditor.h"
-#include "EngineEditors/EngineEditorBase.h"
-#include "Module.h"
-#include "ResourceManagement/Resources/Resource.h"
 
-#include "SDL.h"
-#include "imgui_internal.h"
+#include "Module.h"
+#include <ComponentUtils.h>
+#include <Globals.h>
+#include <NodeEditor.h>
+
 #include <Math/float3.h>
 #include <Math/float4x4.h>
 #include <deque>
 #include <string>
 #include <unordered_map>
-// imguizmo include after imgui
-#include "./Libs/ImGuizmo/ImGuizmo.h"
+#include <vector>
+
+class EngineEditorBase;
+
+namespace ImGuizmo
+{
+    enum OPERATION;
+    enum MODE;
+} // namespace ImGuizmo
 
 enum EditorType
 {
     BASE,
     ANIMATION,
     NODE
-};
-
-struct CPUFeature
-{
-    SDL_bool (*check)();
-    const char* name;
 };
 
 enum class GizmoOperation

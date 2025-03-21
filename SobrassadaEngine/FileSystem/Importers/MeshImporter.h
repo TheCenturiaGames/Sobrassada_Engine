@@ -1,9 +1,11 @@
 #pragma once
 
-#include "Globals.h"
+#include <Globals.h>
 
 #include <Math/float4x4.h>
 #include <string>
+
+class ResourceMesh;
 
 namespace tinygltf
 {
@@ -19,8 +21,6 @@ enum DataType
     UNSIGNED_SHORT,
     UNSIGNED_INT
 };
-
-class ResourceMesh;
 
 namespace MeshImporter
 {

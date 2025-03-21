@@ -1,13 +1,14 @@
 #pragma once
 
-#include "FileSystem.h"
-#include "ResourceManagement/Resources/ResourceStateMachine.h"
+#include <Globals.h>
 
-#include "Math/float4x4.h"
+#include <vector>
+#include <string>
+
+class ResourceStateMachine;
 
 namespace StateMachineManager
 {
-
     void Save(
         const std::vector<Clip>& clips, const std::vector<State>& states, const std::vector<Transition>& transitions,
         const std::string& path, const UID sourceUID

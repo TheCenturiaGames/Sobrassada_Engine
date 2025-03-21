@@ -1,16 +1,16 @@
 #pragma once
 
-#include "Globals.h"
+#include <Globals.h>
 
 #include <string>
+
+class ResourceTexture;
 
 namespace DirectX
 {
     class ScratchImage;
     struct TexMetadata;
 } // namespace DirectX
-
-class ResourceTexture;
 
 namespace TextureImporter
 {

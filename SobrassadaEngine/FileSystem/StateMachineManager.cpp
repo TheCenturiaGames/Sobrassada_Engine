@@ -1,14 +1,15 @@
 #include "StateMachineManager.h"
 
 #include "Application.h"
+#include "FileSystem.h"
 #include "LibraryModule.h"
 #include "MetaModel.h"
-#include "ResourceManagement/Resources/ResourceStateMachine.h"
+#include <ResourceStateMachine.h>
 
 #include "Math/Quat.h"
-#include "Math/float4x4.h"
 #include "prettywriter.h"
 #include "stringbuffer.h"
+#include <Math/float4x4.h>
 
 namespace StateMachineManager
 {

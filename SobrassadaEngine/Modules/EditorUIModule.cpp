@@ -1,27 +1,32 @@
 #include "EditorUIModule.h"
 
-#include "Application.h"
 #include "CameraModule.h"
-#include "Component.h"
-#include "FileSystem.h"
-#include "GameTimer.h"
 #include "InputModule.h"
 #include "LibraryModule.h"
 #include "OpenGLModule.h"
 #include "ProjectModule.h"
-#include "SceneImporter.h"
 #include "SceneModule.h"
-#include "TextureLibraryEditor.h"
 #include "WindowModule.h"
+#include <Application.h>
+#include <Component.h>
+#include <EngineEditorBase.h>
+#include <FileSystem.h>
+#include <GameTimer.h>
+#include <SceneImporter.h>
 #include <TextureImporter.h>
+#include <TextureLibraryEditor.h>
 
+#include "SDL.h"
 #include "glew.h"
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl2.h"
+#include "imgui_internal.h"
 #include <cstring>
 #include <filesystem>
 #include <string>
+// imguizmo include after imgui
+#include <ImGuizmo.h>
 
 EditorUIModule::EditorUIModule() : width(0), height(0)
 {
@@ -1493,6 +1498,12 @@ void EditorUIModule::HardwareConfig() const
 
 void EditorUIModule::ShowCaps() const
 {
+    struct CPUFeature
+    {
+        SDL_bool (*check)();
+        const char* name;
+    };
+
     const CPUFeature features[] = {
         {SDL_HasRDTSC,   "RDTSC"  },
         {SDL_HasAltiVec, "AltiVec"},

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "MetaFile.h"
 
 class MetaPrefab : public MetaFile

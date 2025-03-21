@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Globals.h"
+#include <Globals.h>
+
 #include <Libs/rapidjson/document.h>
 #include <ctime>
 #include <string>

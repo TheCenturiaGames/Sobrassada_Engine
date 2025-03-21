@@ -1,15 +1,15 @@
 #pragma once
 
-#include "Globals.h"
+#include <Globals.h>
 
 #include <string>
+
+class ResourceMaterial;
 
 namespace tinygltf
 {
     class Model;
 } // namespace tinygltf
-
-class ResourceMaterial;
 
 namespace MaterialImporter
 {
