@@ -10,6 +10,7 @@
 #include <ResourceMaterial.h>
 #include <ResourceMesh.h>
 #include <ResourceTexture.h>
+#include <MeshComponent.h>
 
 #include <Algorithm/Random/LCG.h> // TODO: LCG remove includes
 
@@ -92,7 +93,7 @@ void ResourcesModule::UnloadAllResources()
     resources.clear();
 }
 
-GeometryBatch* ResourcesModule::RequestBatch(const ResourceMesh* mesh)
+GeometryBatch* ResourcesModule::RequestBatch(const MeshComponent* mesh)
 {
     return batchManager->RequestBatch(mesh);
 }

@@ -188,7 +188,7 @@ void MeshComponent::AddMesh(UID resource, bool updateParent)
         localComponentAABB = AABB(currentMesh->GetAABB());
         if (updateParent) parent->OnAABBUpdated();
 
-        App->GetResourcesModule()->RequestBatch(newMesh);
+        batch = App->GetResourcesModule()->RequestBatch(this);
     }
 }
 

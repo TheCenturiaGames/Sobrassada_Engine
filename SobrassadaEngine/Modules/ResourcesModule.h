@@ -6,7 +6,7 @@
 
 class BatchManager;
 class GeometryBatch;
-class ResourceMesh;
+class MeshComponent;
 class Resource;
 
 class ResourcesModule : public Module
@@ -23,7 +23,7 @@ class ResourcesModule : public Module
 
     void UnloadAllResources();
 
-    GeometryBatch* RequestBatch(const ResourceMesh* mesh);
+    GeometryBatch* RequestBatch(const MeshComponent* mesh);
 
   private:
     Resource* CreateNewResource(UID uid);

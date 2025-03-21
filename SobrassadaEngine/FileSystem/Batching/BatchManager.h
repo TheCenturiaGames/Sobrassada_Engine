@@ -3,7 +3,7 @@
 #include <vector>
 
 class GeometryBatch;
-class ResourceMesh;
+class MeshComponent;
 
 class BatchManager
 {
@@ -11,10 +11,10 @@ class BatchManager
     BatchManager();
     ~BatchManager();
 
-    GeometryBatch* RequestBatch(const ResourceMesh* mesh);
+    GeometryBatch* RequestBatch(const MeshComponent* mesh);
 
   private:
-    GeometryBatch* CreateNewBatch(const ResourceMesh* mesh);
+    GeometryBatch* CreateNewBatch(const MeshComponent* mesh);
 
   private:
     std::vector<GeometryBatch*> batches;
