@@ -13,8 +13,8 @@
 #include <FileSystem.h>
 #include <GameTimer.h>
 #include <SceneImporter.h>
-#include <TextureImporter.h>
 #include <TextureEditor.h>
+#include <TextureImporter.h>
 
 #include "SDL.h"
 #include "glew.h"

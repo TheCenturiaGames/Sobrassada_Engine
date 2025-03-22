@@ -77,7 +77,7 @@ bool TextureEditor::RenderEditor()
 
     if (showViewPortWindow)
     {
-        ViewPort();
+        Viewport();
     }
 
     ImGui::Columns(1);
@@ -86,7 +86,7 @@ bool TextureEditor::RenderEditor()
     return true;
 }
 
-void TextureEditor::ViewPort()
+void TextureEditor::Viewport()
 {
     bool open = true;
     if (ImGui::Begin("Texture Detail", &open))

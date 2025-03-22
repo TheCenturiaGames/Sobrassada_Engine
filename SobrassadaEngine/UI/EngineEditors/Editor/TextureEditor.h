@@ -10,11 +10,11 @@ class TextureEditor : public EngineEditorBase
 
   private:
     bool RenderEditor() override;
-    void ViewPort();
+    void Viewport();
 
-    UID selectedTextureUID = 0;
+    UID selectedTextureUID  = 0;
     bool showViewPortWindow = false;
-    bool showR             = true;
-    bool showG             = true;
-    bool showB             = true;
+    bool showR              = true;
+    bool showG              = true;
+    bool showB              = true;
 };

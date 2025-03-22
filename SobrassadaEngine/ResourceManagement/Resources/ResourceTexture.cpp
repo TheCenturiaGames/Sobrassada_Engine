@@ -68,10 +68,16 @@ void ResourceTexture::ConvertMetadata(const DirectX::TexMetadata& metadata, Open
         outMetadata.format         = GL_BGR;
         outMetadata.type           = GL_UNSIGNED_BYTE;
         break;
+    case DXGI_FORMAT_D24_UNORM_S8_UINT:
+        outMetadata.internalFormat = GL_DEPTH24_STENCIL8;
+        outMetadata.format         = GL_DEPTH_STENCIL;
+        outMetadata.type           = GL_UNSIGNED_INT_24_8;
+        break;
     default:
         assert(false && "Unsupported format");
     }
 }
+
 
 unsigned int ResourceTexture::GetCubemapFaceID(int faceIndex) const
 {
