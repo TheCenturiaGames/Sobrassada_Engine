@@ -17,7 +17,7 @@ class ProjectModule;
 class SceneModule;
 class CameraModule;
 class DebugDrawModule;
-class UserInterfaceModule;
+class GameUIModule;
 
 class EngineTimer;
 class GameTimer;
@@ -44,7 +44,7 @@ class Application
     SceneModule* GetSceneModule() { return sceneModule; }
     CameraModule* GetCameraModule() { return cameraModule; }
     DebugDrawModule* GetDebugDrawModule() { return debugDraw; }
-    UserInterfaceModule* GetUserInterfaceModule() { return UIModule; }
+    GameUIModule* GetGameUIModule() { return gameUIModule; }
 
     EngineTimer* GetEngineTimer() { return engineTimer; }
     GameTimer* GetGameTimer() { return gameTimer; }
@@ -65,7 +65,7 @@ class Application
     SceneModule* sceneModule         = nullptr;
     CameraModule* cameraModule       = nullptr;
     DebugDrawModule* debugDraw       = nullptr;
-    UserInterfaceModule* UIModule    = nullptr;
+    GameUIModule* gameUIModule       = nullptr;
 
     EngineTimer* engineTimer         = nullptr;
     GameTimer* gameTimer             = nullptr;

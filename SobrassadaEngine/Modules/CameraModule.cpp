@@ -32,7 +32,7 @@ bool CameraModule::Init()
     camera.up                        = float3::unitY;
 
     camera.nearPlaneDistance         = 0.1f;
-    camera.farPlaneDistance          = 100.f;
+    camera.farPlaneDistance          = 2000.f;
 
     camera.horizontalFov             = (float)HFOV / RAD_DEGREE_CONV;
 

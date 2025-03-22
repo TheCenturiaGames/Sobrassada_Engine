@@ -2,6 +2,8 @@
 
 #include "Component.h"
 
+class Transform2DComponent;
+
 class CanvasComponent : public Component
 {
   public:
@@ -11,4 +13,7 @@ class CanvasComponent : public Component
     void Update(float deltaTime) override;
     void Render(float deltaTime) override;
     void Clone(const Component* otherComponent) override;
+
+  private:
+    Transform2DComponent* transform2D = nullptr;
 };

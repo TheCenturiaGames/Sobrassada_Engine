@@ -344,7 +344,6 @@
     <ClCompile Include="Modules\EditorUIModule.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourcePrefab.cpp" />
     <ClCompile Include="Modules\ProjectModule.cpp" />
-    <ClCompile Include="Modules\UserInterfaceModule.cpp" />
     <ClCompile Include="Scene\Components\Standalone\CharacterControllerComponent.cpp" />
     <ClCompile Include="UI\EngineEditors\Nodes\CustomNode.cpp" />
     <ClCompile Include="Scene\Components\Standalone\UI\Transform2DComponent.cpp" />
@@ -484,7 +483,6 @@
     <ClInclude Include="FileSystem\Importers\MeshImporter.h" />
     <ClInclude Include="FileSystem\Importers\SceneImporter.h" />
     <ClInclude Include="Scene\Components\Standalone\CharacterControllerComponent.h" />
-    <ClInclude Include="Modules\UserInterfaceModule.h" />
     <ClInclude Include="UI\EngineEditors\EngineEditorBase.h" />
     <ClInclude Include="Utils\EngineTimer.h" />
     <ClInclude Include="Scene\Components\Component.h" />

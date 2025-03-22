@@ -82,8 +82,8 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
         );
 
         position = localTransform.TranslatePart();
-        rotation   = localTransform.RotatePart().ToEulerXYZ();
-        scale = localTransform.GetScale();
+        rotation = localTransform.RotatePart().ToEulerXYZ();
+        scale    = localTransform.GetScale();
     }
 
     // Deserialize Components
@@ -238,7 +238,8 @@ void GameObject::RenderEditorInspector()
 
         const float4x4& parentTransform = GetParentGlobalTransform();
 
-        if (selectedComponentIndex != COMPONENT_NONE)
+        if (selectedComponentIndex != COMPONENT_NONE &&
+            !(GetComponentByType(COMPONENT_CANVAS) && selectedComponentIndex == COMPONENT_TRANSFORM_2D))
         {
             ImGui::SameLine();
             if (ImGui::Button("Remove Component"))
@@ -742,7 +743,7 @@ bool GameObject::CreateComponent(const ComponentType componentType)
     if (components.find(componentType) == components.end())
     // TODO Allow override of components after displaying an info box
     {
-        Component* createdComponent = ComponentUtils::CreateEmptyComponent(componentType, GetUID(), this);
+        Component* createdComponent = ComponentUtils::CreateEmptyComponent(componentType, GenerateUID(), this);
         if (createdComponent != nullptr)
         {
             components.insert({componentType, createdComponent});

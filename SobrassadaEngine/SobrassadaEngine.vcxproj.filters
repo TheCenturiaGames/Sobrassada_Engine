@@ -324,9 +324,6 @@
     <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
       <Filter>UI\EngineEditors</Filter>
     </ClCompile>
-    <ClCompile Include="Modules\UserInterfaceModule.cpp">
-      <Filter>Modules</Filter>
-    </ClCompile>
     <ClCompile Include="FileSystem\PrefabManager.cpp">
       <Filter>FileSystem</Filter>
     </ClCompile>
@@ -648,9 +645,6 @@
     </ClInclude>
     <ClInclude Include="Scene\Components\CameraComponent.h">
       <Filter>Scene\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Modules\UserInterfaceModule.h">
-      <Filter>Modules</Filter>
     </ClInclude>
     <ClInclude Include="Utils\Trees\Quadtree.h">
       <Filter>Utils\Tree</Filter>
