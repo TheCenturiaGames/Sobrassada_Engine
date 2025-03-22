@@ -60,22 +60,6 @@ readonly layout(std430, binding = 5) buffer SpotLights
 	SpotLight spotLights[];
 };
 
-
-// Material UBO
-// layout(std140, binding = 1) uniform Material
-// {
-//     vec4 diffColor;
-//     vec3 specColor;
-//     float shininess;   
-//     bool shininessInAlpha;  
-//     float metallicFactor;
-//     float roughnessFactor;
-//     uvec2 diffuseTex;
-//     uvec2 specularTex;
-//     uvec2 metallicTex;
-//     uvec2 normalTex;
-// };
-
 struct Material
 {
     vec4 diffColor;
@@ -123,7 +107,7 @@ float SpotLightAttenuation(const int index)
 vec3 RenderLight(vec3 L, vec3 N, vec4 specTexColor, vec3 texColor, vec3 Li, float NdotL, float alpha)
  {
     float shininessValue;
-	if(materials[gl_BaseInstance].shininessInAlpha) shininessValue = exp2(alpha * 7 + 1);
+	if(materials[instance_index].shininessInAlpha) shininessValue = exp2(alpha * 7 + 1);
 	else shininessValue = shininess;
 
     float normalization = (shininessValue + 2.0) / (2.0 * PI);
@@ -135,8 +119,8 @@ vec3 RenderLight(vec3 L, vec3 N, vec4 specTexColor, vec3 texColor, vec3 Li, floa
     float cosTheta = max(dot(N, V), 0.0);
     vec3 fresnel = RF0 + (1 - RF0) * pow(1 - cosTheta, 5);
 
-    vec3 diffuse = (1.0 - RF0) / PI * materials[gl_BaseInstance].diffColor.rgb * texColor * Li * NdotL;
-    vec3 specular = normalization * materials[gl_BaseInstance].specColor.rgb * specTexColor.rgb * VR * Li * fresnel;
+    vec3 diffuse = (1.0 - RF0) / PI * materials[instance_index].diffColor.rgb * texColor * Li * NdotL;
+    vec3 specular = normalization * materials[instance_index].specColor.rgb * specTexColor.rgb * VR * Li * fresnel;
     return diffuse + specular;
 }
 

@@ -60,22 +60,6 @@ readonly layout(std430, binding = 5) buffer SpotLights
 	SpotLight spotLights[];
 };
 
-
-// Material UBO
-// layout(std140, binding = 1) uniform Material
-// {
-//     vec4 diffColor;
-//     vec3 specColor;
-//     float shininess;
-//     bool shininessInAlpha;
-//     float metallicFactor;
-//     float roughnessFactor;
-//     uvec2 diffuseTex;
-//     uvec2 specularTex;
-//     uvec2 metallicTex;
-//     uvec2 normalTex;
-// };
-
 struct Material
 {
     vec4 diffColor;
@@ -143,7 +127,7 @@ vec3 RenderLight(vec3 L, vec3 N, vec3 texColor, vec3 Li, float NdotL, float alph
     float NdotV = max(dot(N, V), 0.0001);
     float NdotH = max(dot(N, H), 0.0001);
 
-    vec3 BaseColor = materials[gl_BaseInstance].diffColor.rgb * texColor;
+    vec3 BaseColor = materials[instance_index].diffColor.rgb * texColor;
     vec3 Cd = BaseColor * (1 - metalness);
     vec3 RF0 = mix(vec3(0.04), BaseColor, metalness);
     

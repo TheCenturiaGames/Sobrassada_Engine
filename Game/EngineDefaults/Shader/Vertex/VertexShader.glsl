@@ -31,12 +31,12 @@ out vec3 fragViewPos;
 
 void main()
 {
+    instance_index = gl_BaseInstance;
+    mat4 model = models[gl_BaseInstance];
+
     //Camera position in World Space
     fragViewPos = vec3(inverse(viewMatrix)[3]);
     uv0 = vertex_uv0;
-
-    //mat4 finalModel = model;
-    mat4 finalModel = models[gl_BaseInstance];
 
     mat3 normalMatrix = mat3(transpose(inverse(model)));
     normal = normalMatrix * vertex_normal;
