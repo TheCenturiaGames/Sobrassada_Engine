@@ -387,6 +387,12 @@
     <ClCompile Include="FileSystem\StateMachineManager.cpp">
       <Filter>FileSystem</Filter>
     </ClCompile>
+    <ClCompile Include="StateNode.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\EngineEditors\Editor\StateMachineEditor.cpp">
+      <Filter>UI\EngineEditors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -715,6 +721,12 @@
     </ClInclude>
     <ClInclude Include="FileSystem\Config\ProjectConfig.h">
       <Filter>FileSystem\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="StateNode.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\EngineEditors\Editor\StateMachineEditor.h">
+      <Filter>UI\EngineEditors</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
