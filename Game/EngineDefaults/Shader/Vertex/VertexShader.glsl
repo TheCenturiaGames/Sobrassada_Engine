@@ -6,7 +6,7 @@ layout(location=3) in vec2 vertex_uv0;
 layout(location=4) in ivec4 vertex_joint;
 layout(location=5) in vec4 vertex_weights;
 
-layout(location=3) uniform mat4 model;
+//layout(location=3) uniform mat4 model;
 layout(location=4) uniform bool hasBones;
 
 uniform mat4 palette[64];
@@ -16,6 +16,12 @@ layout(std140, row_major, binding = 0) uniform CameraMatrices
     mat4 projMatrix;
     mat4 viewMatrix;
 };
+
+readonly layout(std430, row_major, binding = 10) buffer Transforms {
+    mat4 models[];
+};
+
+out int flat instance_index;
 
 out vec3 pos;
 out vec3 normal;
@@ -29,7 +35,8 @@ void main()
     fragViewPos = vec3(inverse(viewMatrix)[3]);
     uv0 = vertex_uv0;
 
-    mat4 finalModel = model;
+    //mat4 finalModel = model;
+    mat4 finalModel = models[gl_BaseInstance];
 
     mat3 normalMatrix = mat3(transpose(inverse(model)));
     normal = normalMatrix * vertex_normal;

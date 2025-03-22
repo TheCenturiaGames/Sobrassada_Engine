@@ -33,6 +33,7 @@ class MeshComponent : public Component
     void InitSkin();
 
     const ResourceMesh* GetResourceMesh() const { return currentMesh; }
+    const ResourceMaterial* GetResourceMaterial() const { return currentMaterial; }
 
     void AddMesh(UID resource, bool updateParent = true);
     void AddMaterial(UID resource);

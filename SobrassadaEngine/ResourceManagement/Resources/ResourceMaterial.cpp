@@ -156,10 +156,10 @@ void ResourceMaterial::LoadMaterialData(Material mat)
         normalTexture.height = normTexture->GetTextureHeight();
     }
 
-    glGenBuffers(1, &ubo);
-    glBindBuffer(GL_UNIFORM_BUFFER, ubo);
-    glBufferData(GL_UNIFORM_BUFFER, sizeof(MaterialGPU), &material, GL_DYNAMIC_DRAW);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    //glGenBuffers(1, &ubo);
+    //glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+    //glBufferData(GL_UNIFORM_BUFFER, sizeof(MaterialGPU), &material, GL_DYNAMIC_DRAW);
+    //glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     delete diffTexture;
     delete metallicRoughnessTexture;
@@ -168,12 +168,12 @@ void ResourceMaterial::LoadMaterialData(Material mat)
 
 void ResourceMaterial::RenderMaterial(int program) const
 {
-    glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+    //glBindBuffer(GL_UNIFORM_BUFFER, ubo);
 
-    unsigned int blockIdx = glGetUniformBlockIndex(program, "Material");
-    glUniformBlockBinding(program, blockIdx, 1);
-    glBindBufferBase(GL_UNIFORM_BUFFER, 1, ubo);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    //unsigned int blockIdx = glGetUniformBlockIndex(program, "Material");
+    //glUniformBlockBinding(program, blockIdx, 1);
+    //glBindBufferBase(GL_UNIFORM_BUFFER, 1, ubo);
+    //glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 void ResourceMaterial::FreeMaterials() const

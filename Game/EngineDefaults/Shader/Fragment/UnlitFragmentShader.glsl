@@ -14,7 +14,21 @@ uniform vec3 cameraPos;
 #define PI 3.14159265359
 
 // Material UBO
-layout(std140, binding = 1) uniform Material
+// layout(std140, binding = 1) uniform Material
+// {
+//     vec4 diffColor;
+//     vec3 specColor;
+//     float shininess;
+//     bool shininessInAlpha;
+//     float metallicFactor;
+//     float roughnessFactor;
+//     uvec2 diffuseTex;
+//     uvec2 specularTex;
+//     uvec2 metallicTex;
+//     uvec2 normalTex;
+// };
+
+struct Material
 {
     vec4 diffColor;
     vec3 specColor;
@@ -28,7 +42,15 @@ layout(std140, binding = 1) uniform Material
     uvec2 normalTex;
 };
 
+readonly layout(std430, binding = 11) buffer Materials {
+    Material materials[];
+};
+
+in int flat instance_index;
+
+
 void main()
 {
-   outColor = texture(sampler2D(diffuseTex), uv0);
+    Material mat = materials[instance_index];
+    outColor = texture(sampler2D(mat.diffuseTex), uv0);
 }

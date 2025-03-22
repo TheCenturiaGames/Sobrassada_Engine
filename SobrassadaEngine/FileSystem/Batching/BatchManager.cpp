@@ -1,7 +1,14 @@
 #include "BatchManager.h"
 
 #include "GeometryBatch.h"
+#include <Application.h>
+#include <CameraComponent.h>
+#include <CameraModule.h>
+#include <ResourceMaterial.h>
 #include <ResourceMesh.h>
+#include <Scene.h>
+#include <SceneModule.h>
+#include <ShaderModule.h>
 #include <Standalone/MeshComponent.h>
 
 BatchManager::BatchManager()
@@ -26,8 +33,17 @@ void BatchManager::LoadData()
 
 void BatchManager::Render()
 {
+    unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
+
+    if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
+        cameraUBO = App->GetSceneModule()->GetScene()->GetMainCamera()->GetUbo();
+
     for (GeometryBatch* it : batches)
-        it->Render();
+    {
+        unsigned int program = it->GetIsMetallic() ? App->GetShaderModule()->GetMetallicRoughnessProgram()
+                                                   : App->GetShaderModule()->GetSpecularGlossinessProgram();
+        it->Render(program, cameraUBO);
+    }
 }
 
 void BatchManager::ClearObjectsToRender()
@@ -36,29 +52,30 @@ void BatchManager::ClearObjectsToRender()
         it->ClearObjectsToRender();
 }
 
-GeometryBatch* BatchManager::RequestBatch(const MeshComponent* mesh)
+GeometryBatch* BatchManager::RequestBatch(const MeshComponent* component)
 {
     if (batches.empty())
     {
-        return CreateNewBatch(mesh);
+        return CreateNewBatch(component);
     }
 
-    const ResourceMesh* resource = mesh->GetResourceMesh();
+    const ResourceMesh* mesh         = component->GetResourceMesh();
+    const ResourceMaterial* material = component->GetResourceMaterial();
 
     for (GeometryBatch* it : batches)
     {
-        if (it->GetMode() == resource->GetMode())
+        if (it->GetMode() == mesh->GetMode() && it->GetIsMetallic() == material->GetIsMetallicRoughness())
         {
             return it;
         }
     }
 
-    return CreateNewBatch(mesh);
+    return CreateNewBatch(component);
 }
 
-GeometryBatch* BatchManager::CreateNewBatch(const MeshComponent* mesh)
+GeometryBatch* BatchManager::CreateNewBatch(const MeshComponent* component)
 {
-    GeometryBatch* newBatch = new GeometryBatch(mesh, mesh->GetResourceMesh());
+    GeometryBatch* newBatch = new GeometryBatch(component);
     batches.push_back(newBatch);
     return newBatch;
 }

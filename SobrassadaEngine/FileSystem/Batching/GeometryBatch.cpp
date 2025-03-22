@@ -3,9 +3,12 @@
 #include <Application.h>
 #include <Mesh.h>
 #include <OpenGLModule.h>
+#include <ResourceMaterial.h>
 #include <ResourceMesh.h>
+#include <ShaderModule.h>
 #include <Standalone/MeshComponent.h>
 
+#include <Math/float4x4.h>
 #include <chrono>
 #include <glew.h>
 
@@ -18,12 +21,15 @@ struct Command
     unsigned int baseInstance;  // Instance Index
 };
 
-GeometryBatch::GeometryBatch(const MeshComponent* mesh, const ResourceMesh* resource) : mode(resource->GetMode())
+GeometryBatch::GeometryBatch(const MeshComponent* component) : mode(component->GetResourceMesh()->GetMode())
 {
+    isMetallic = component->GetResourceMaterial()->GetIsMetallicRoughness();
     glGenBuffers(1, &indirect);
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
     glGenBuffers(1, &ebo);
+    glGenBuffers(1, &models);
+    glGenBuffers(1, &materials);
 }
 
 GeometryBatch::~GeometryBatch()
@@ -34,12 +40,16 @@ GeometryBatch::~GeometryBatch()
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &vbo);
     glDeleteBuffers(1, &ebo);
+    glDeleteBuffers(1, &models);
+    glDeleteBuffers(1, &materials);
 }
 
 void GeometryBatch::LoadData()
 {
     std::vector<Vertex> totalVertices;
     std::vector<unsigned int> totalIndices;
+    std::vector<float4x4> totalModels;
+    std::vector<MaterialGPU> totalMaterials;
 
     for (const MeshComponent* component : components)
     {
@@ -71,6 +81,9 @@ void GeometryBatch::LoadData()
             commands.push_back(newCommand);
             uniqueMeshes.push_back(resource);
         }
+
+        totalModels.push_back(component->GetCombinedMatrix());
+        totalMaterials.push_back(component->GetResourceMaterial()->GetMaterial());
     }
 
     glBindVertexArray(vao);
@@ -97,20 +110,41 @@ void GeometryBatch::LoadData()
     glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, weights));
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(
-        GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(unsigned int), totalIndices.data(), GL_DYNAMIC_DRAW
-    );
-
-    glBindVertexArray(0);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(unsigned int), totalIndices.data(), GL_DYNAMIC_DRAW);
 
     glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirect);
     glBufferData(GL_DRAW_INDIRECT_BUFFER, commands.size() * sizeof(Command), commands.data(), GL_DYNAMIC_DRAW);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, models);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, totalModels.size() * sizeof(float4x4), totalModels.data(), GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, materials);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, totalMaterials.size() * sizeof(MaterialGPU), totalMaterials.data(), GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    glBindVertexArray(0);
 }
 
-void GeometryBatch::Render()
+void GeometryBatch::Render(unsigned int program, unsigned int cameraUBO)
 {
-    const int meshTriangles = vertexCount / 3;
     const auto start        = std::chrono::high_resolution_clock::now();
+
+    const int meshTriangles = vertexCount / 3;
+
+    glUseProgram(program);
+
+    glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
+    unsigned int blockIdx = glGetUniformBlockIndex(program, "CameraMatrices");
+    glUniformBlockBinding(program, blockIdx, 0);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 0, cameraUBO);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, models);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 10, models);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, materials);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 11, materials);
 
     glBindVertexArray(vao);
 

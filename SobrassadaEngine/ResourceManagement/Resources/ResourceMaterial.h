@@ -7,12 +7,6 @@
 
 class Material;
 
-namespace tinygltf
-{
-    class Model;
-    struct Material;
-} // namespace tinygltf
-
 struct TextureInfo
 {
     unsigned int textureID = 0;
@@ -28,13 +22,11 @@ struct MaterialGPU
     bool shininessInAlpha = false;
     float metallicFactor  = 1.0f;
     float roughnessFactor = 1.0f;
-    UID diffuseTex        = 0;
-    UID specularTex       = 0;
-    UID metallicTex       = 0;
-    UID normalTex         = 0;
+    uint64_t diffuseTex   = 0;
+    uint64_t specularTex  = 0;
+    uint64_t metallicTex  = 0;
+    uint64_t normalTex    = 0;
 };
-
-class Material;
 
 class ResourceMaterial : public Resource
 {
@@ -42,13 +34,14 @@ class ResourceMaterial : public Resource
     ResourceMaterial(UID uid, const std::string& name);
     ~ResourceMaterial() override;
 
-    const bool GetIsMetallicRoughness() const { return metallicTexture.textureID != 0 ? true : false; }
-
     void OnEditorUpdate();
     void LoadMaterialData(Material mat);
     void RenderMaterial(int program) const;
     void FreeMaterials() const;
     void UpdateUBO() const;
+
+    const bool GetIsMetallicRoughness() const { return metallicTexture.textureID != 0 ? true : false; }
+    const MaterialGPU GetMaterial() const { return material; }
 
   private:
     TextureInfo diffuseTexture;

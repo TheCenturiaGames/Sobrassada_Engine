@@ -62,7 +62,21 @@ readonly layout(std430, binding = 5) buffer SpotLights
 
 
 // Material UBO
-layout(std140, binding = 1) uniform Material
+// layout(std140, binding = 1) uniform Material
+// {
+//     vec4 diffColor;
+//     vec3 specColor;
+//     float shininess;   
+//     bool shininessInAlpha;  
+//     float metallicFactor;
+//     float roughnessFactor;
+//     uvec2 diffuseTex;
+//     uvec2 specularTex;
+//     uvec2 metallicTex;
+//     uvec2 normalTex;
+// };
+
+struct Material
 {
     vec4 diffColor;
     vec3 specColor;
@@ -76,6 +90,11 @@ layout(std140, binding = 1) uniform Material
     uvec2 normalTex;
 };
 
+readonly layout(std430, binding = 11) buffer Materials {
+    Material materials[];
+};
+
+in int flat instance_index;
 
 float PointLightAttenuation(const int index) 
 {
@@ -104,7 +123,7 @@ float SpotLightAttenuation(const int index)
 vec3 RenderLight(vec3 L, vec3 N, vec4 specTexColor, vec3 texColor, vec3 Li, float NdotL, float alpha)
  {
     float shininessValue;
-	if(shininessInAlpha) shininessValue = exp2(alpha * 7 + 1);
+	if(materials[gl_BaseInstance].shininessInAlpha) shininessValue = exp2(alpha * 7 + 1);
 	else shininessValue = shininess;
 
     float normalization = (shininessValue + 2.0) / (2.0 * PI);
@@ -116,8 +135,8 @@ vec3 RenderLight(vec3 L, vec3 N, vec4 specTexColor, vec3 texColor, vec3 Li, floa
     float cosTheta = max(dot(N, V), 0.0);
     vec3 fresnel = RF0 + (1 - RF0) * pow(1 - cosTheta, 5);
 
-    vec3 diffuse = (1.0 - RF0) / PI * diffColor.rgb * texColor * Li * NdotL;
-    vec3 specular = normalization * specColor.rgb * specTexColor.rgb * VR * Li * fresnel;
+    vec3 diffuse = (1.0 - RF0) / PI * materials[gl_BaseInstance].diffColor.rgb * texColor * Li * NdotL;
+    vec3 specular = normalization * materials[gl_BaseInstance].specColor.rgb * specTexColor.rgb * VR * Li * fresnel;
     return diffuse + specular;
 }
 
@@ -153,8 +172,9 @@ vec3 RenderSpotLight(const int index, const vec3 N, vec4 specTexColor, const vec
 
 void main()
 {
-    vec3 texColor = pow(texture(sampler2D(diffuseTex), uv0).rgb, vec3(2.2f));
-    vec4 specTexColor = texture(sampler2D(specularTex), uv0);
+    Material mat = materials[instance_index];
+    vec3 texColor = pow(texture(sampler2D(mat.diffuseTex), uv0).rgb, vec3(2.2f));
+    vec4 specTexColor = texture(sampler2D(mat.specularTex), uv0);
     float alpha = specTexColor.a;
 
     alpha = specTexColor.a;
@@ -165,9 +185,9 @@ void main()
 
     vec3 N = normalize(normal);
     // Retrive normal for normal map
-    if (normalTex.r != 0 || normalTex.g != 0) {
+    if (mat.normalTex.r != 0 || mat.normalTex.g != 0) {
         mat3 space = CreateTBN();
-        vec3 texNormal = (texture(sampler2D(normalTex), uv0).xyz*2.0-1.0);
+        vec3 texNormal = (texture(sampler2D(mat.normalTex), uv0).xyz*2.0-1.0);
         vec3 final_normal = space * texNormal;
         N = normalize(final_normal);
     }

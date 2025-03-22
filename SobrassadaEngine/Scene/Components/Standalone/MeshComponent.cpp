@@ -52,6 +52,7 @@ MeshComponent::MeshComponent(const rapidjson::Value& initialState, GameObject* p
             bindMatrices         = model->GetModelData().GetSkin(skinIndex).inverseBindMatrices;
         }
     }
+    batch = App->GetResourcesModule()->GetBatchManager()->RequestBatch(this);
 }
 
 MeshComponent::~MeshComponent()
@@ -145,24 +146,26 @@ void MeshComponent::RenderEditorInspector()
 
 void MeshComponent::Update(float deltaTime)
 {
+    if (batch == nullptr && currentMesh != nullptr && currentMaterial != nullptr)
+        batch = App->GetResourcesModule()->GetBatchManager()->RequestBatch(this);
 }
 
 void MeshComponent::Render(float deltaTime)
 {
     if (enabled && currentMesh != nullptr)
     {
-        unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
-        int program            = App->GetShaderModule()->GetMetallicRoughnessProgram();
+        //unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
+        //int program            = App->GetShaderModule()->GetMetallicRoughnessProgram();
 
-        if (currentMaterial != nullptr)
-        {
-            if (!currentMaterial->GetIsMetallicRoughness())
-                program = App->GetShaderModule()->GetSpecularGlossinessProgram();
-        }
-        if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
-            cameraUBO = App->GetSceneModule()->GetScene()->GetMainCamera()->GetUbo();
+        //if (currentMaterial != nullptr)
+        //{
+        //    if (!currentMaterial->GetIsMetallicRoughness())
+        //        program = App->GetShaderModule()->GetSpecularGlossinessProgram();
+        //}
+        //if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
+        //    cameraUBO = App->GetSceneModule()->GetScene()->GetMainCamera()->GetUbo();
 
-        currentMesh->Render(program, combinedMatrix, cameraUBO, currentMaterial, bones, bindMatrices);
+        //currentMesh->Render(program, combinedMatrix, cameraUBO, currentMaterial, bones, bindMatrices);
     }
 }
 
@@ -189,8 +192,6 @@ void MeshComponent::AddMesh(UID resource, bool updateParent)
         currentMesh        = newMesh;
         localComponentAABB = AABB(currentMesh->GetAABB());
         if (updateParent) parent->OnAABBUpdated();
-
-        batch = App->GetResourcesModule()->GetBatchManager()->RequestBatch(this);
     }
 }
 
