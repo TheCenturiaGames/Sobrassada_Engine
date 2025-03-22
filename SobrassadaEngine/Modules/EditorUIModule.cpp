@@ -15,6 +15,7 @@
 #include <SceneImporter.h>
 #include <TextureImporter.h>
 #include <TextureLibraryEditor.h>
+#include <PrefabEditor.h>
 
 #include "SDL.h"
 #include "glew.h"
@@ -318,6 +319,8 @@ void EditorUIModule::MainMenu()
 
             if (ImGui::MenuItem("Texture Library"))
                 OpenEditor(new TextureLibraryEditor("Texture Library", GenerateUID()));
+
+            if (ImGui::MenuItem("Prefab Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::PREFAB));
 
             ImGui::EndMenu();
         }
@@ -1142,6 +1145,9 @@ EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
         break;
     case EditorType::NODE:
         return new NodeEditor("NodeEditor" + std::to_string(uid), uid);
+
+    case EditorType::PREFAB:
+        return new PrefabEditor("PrefabEditor" + std::to_string(uid), uid);
 
     default:
         return nullptr;
