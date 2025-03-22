@@ -19,13 +19,12 @@ class GeometryBatch
     void ClearObjectsToRender();
 
     void AddComponent(const MeshComponent* component) { components.push_back(component); }
-    void AddResource(const ResourceMesh* resource) { uniqueMeshes.insert(resource); }
 
     const unsigned int GetMode() const { return mode; }
 
   private:
     std::vector<const MeshComponent*> components;
-    std::unordered_set<const ResourceMesh*> uniqueMeshes;
+    std::vector<const ResourceMesh*> uniqueMeshes;
     std::vector<Command> commands;
 
     unsigned int indirect    = 0;
@@ -35,4 +34,5 @@ class GeometryBatch
 
     unsigned int mode        = 0;
     unsigned int vertexCount = 0;
+    unsigned int indexCount  = 0;
 };
