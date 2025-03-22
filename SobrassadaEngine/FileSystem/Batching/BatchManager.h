@@ -11,6 +11,10 @@ class BatchManager
     BatchManager();
     ~BatchManager();
 
+    void LoadData();
+    void Render();
+    void ClearObjectsToRender();
+
     GeometryBatch* RequestBatch(const MeshComponent* mesh);
 
   private:

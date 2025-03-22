@@ -4,6 +4,7 @@
 #include <Application.h>
 #include <CameraModule.h>
 #include <EditorUIModule.h>
+#include <GeometryBatch.h>
 #include <LibraryModule.h>
 #include <MeshImporter.h>
 #include <ResourceMaterial.h>

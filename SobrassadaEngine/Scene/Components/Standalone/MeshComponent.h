@@ -3,8 +3,8 @@
 #include "Component.h"
 #include "Globals.h"
 
-#include <Math/float4x4.h>
 #include <Libs/rapidjson/document.h>
+#include <Math/float4x4.h>
 #include <cstdint>
 
 class ResourceMesh;
@@ -50,6 +50,8 @@ class MeshComponent : public Component
     void OnTransformUpdated();
 
     const float4x4& GetCombinedMatrix() const { return combinedMatrix; }
+
+    GeometryBatch* GetBatch() const { return batch; }
 
   private:
     std::string currentMeshName       = "Not selected";

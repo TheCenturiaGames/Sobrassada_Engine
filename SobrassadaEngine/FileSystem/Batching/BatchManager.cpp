@@ -8,10 +8,32 @@ BatchManager::BatchManager()
 {
 }
 
-BatchManager ::~BatchManager()
+BatchManager::~BatchManager()
 {
+    for (GeometryBatch* it : batches)
+    {
+        delete it;
+    }
     batches.clear();
     batches.shrink_to_fit();
+}
+
+void BatchManager::LoadData()
+{
+    for (GeometryBatch* it : batches)
+        it->LoadData();
+}
+
+void BatchManager::Render()
+{
+    for (GeometryBatch* it : batches)
+        it->Render();
+}
+
+void BatchManager::ClearObjectsToRender()
+{
+    for (GeometryBatch* it : batches)
+        it->ClearObjectsToRender();
 }
 
 GeometryBatch* BatchManager::RequestBatch(const MeshComponent* mesh)
@@ -21,7 +43,7 @@ GeometryBatch* BatchManager::RequestBatch(const MeshComponent* mesh)
         return CreateNewBatch(mesh);
     }
 
-    const ResourceMesh* resource = mesh->GetResourceMesh(); 
+    const ResourceMesh* resource = mesh->GetResourceMesh();
 
     for (GeometryBatch* it : batches)
     {

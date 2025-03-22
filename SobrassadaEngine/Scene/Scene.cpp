@@ -1,6 +1,7 @@
 ﻿#include "Scene.h"
 
 #include "Application.h"
+#include "CameraComponent.h"
 #include "CameraModule.h"
 #include "Component.h"
 #include "DebugDrawModule.h"
@@ -22,13 +23,13 @@
 #include "Scene/Components/ComponentUtils.h"
 #include "Scene/Components/Standalone/MeshComponent.h"
 #include "SceneModule.h"
+#include <GeometryBatch.h>
 
 #include "SDL_mouse.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 // guizmo after imgui include
 #include "./Libs/ImGuizmo/ImGuizmo.h"
-#include "CameraComponent.h"
 
 Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 {
@@ -231,7 +232,20 @@ update_status Scene::Render(float deltaTime) const
     std::vector<GameObject*> objectsToRender;
     CheckObjectsToRender(objectsToRender);
 
-    for (auto& gameObject : objectsToRender)
+    App->GetResourcesModule()->ClearObjectsToRender();
+
+    for (const auto& gameObject : objectsToRender)
+    {
+        MeshComponent* mesh = gameObject->GetMeshComponent();
+        if (mesh != nullptr)
+        {
+            GeometryBatch* batch = mesh->GetBatch();
+            batch->AddComponent(mesh);
+            batch->AddResource(mesh->GetResourceMesh());
+        }
+    }
+
+    for (const auto& gameObject : objectsToRender)
     {
         if (gameObject != nullptr)
         {

@@ -23,6 +23,7 @@ class ResourcesModule : public Module
 
     void UnloadAllResources();
 
+    void ClearObjectsToRender();
     GeometryBatch* RequestBatch(const MeshComponent* mesh);
 
   private:

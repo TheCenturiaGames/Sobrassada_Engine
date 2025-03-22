@@ -40,7 +40,6 @@ class ResourceMesh : public Resource
     const std::vector<unsigned int>& GetIndices() const { return indices; }
     const float4x4& GetDefaultTransform() const { return defaultTransform; }
     const unsigned int GetMode() const { return mode; }
-    const bool GetHasIndices() const { return hasIndices; }
 
   private:
     const float4x4 TestSkinning(
@@ -55,7 +54,6 @@ class ResourceMesh : public Resource
     unsigned int mode        = 0;
     unsigned int vertexCount = 0;
     unsigned int indexCount  = 0;
-    bool hasIndices          = false;
     AABB aabb;
 
     std::vector<Vertex> bindPoseVertices;
