@@ -5,7 +5,6 @@
 #include "ResourcesModule.h"
 #include "TextureEditor.h"
 #include "imgui.h"
-#include <TextureImporter.h>
 
 TextureEditor::TextureEditor(const std::string& editorName, UID uid) : EngineEditorBase(editorName, uid)
 {
