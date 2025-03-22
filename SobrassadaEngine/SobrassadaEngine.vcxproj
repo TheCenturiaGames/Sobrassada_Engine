@@ -199,14 +199,18 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;.\Scripting\SobrassadaScripts\SobrassadaScripts;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>.\Libs\glew-2.1.0\lib;.\DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration)\;.\Libs\freetype\lib;.\Libs\Optick_1.4.0\lib\LibDebug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>OptickCore.lib;DirectXTex.lib;glew32.lib;opengl32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>.\Libs\glew-2.1.0\lib;.\DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration)\;.\Libs\freetype\lib;.\$(Platform)\$(Configuration)\;.\Libs\Optick_1.4.0\lib\LibDebug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OptickCore.lib;DirectXTex.lib;glew32.lib;opengl32.lib;freetype.lib;SobrassadaScripts.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Game Debug|x64'">
     <ClCompile>
@@ -215,14 +219,18 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;GAME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;.\Scripting\SobrassadaScripts\SobrassadaScripts;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>.\Libs\glew-2.1.0\lib;.\DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration)\;.\Libs\freetype\lib;.\Libs\Optick_1.4.0\lib\LibDebug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>OptickCore.lib;DirectXTex.lib;glew32.lib;opengl32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>.\Libs\glew-2.1.0\lib;.\DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration)\;.\Libs\freetype\lib;.\$(Platform)\$(Configuration)\;.\Libs\Optick_1.4.0\lib\LibDebug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OptickCore.lib;DirectXTex.lib;glew32.lib;opengl32.lib;freetype.lib;SobrassadaScripts.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -233,7 +241,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;.\Scripting\SobrassadaScripts\SobrassadaScripts;..\Scripting\SobrassadaScripts\SobrassadaScripts;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -241,9 +249,13 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>.\Libs\glew-2.1.0\lib;.\DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration)\;.\Libs\freetype\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>DirectXTex.lib;glew32.lib;opengl32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>.\Libs\glew-2.1.0\lib;.\DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration)\;.\Libs\freetype\lib;.\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>DirectXTex.lib;glew32.lib;opengl32.lib;freetype.lib;SobrassadaScripts.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Game|x64'">
     <ClCompile>
@@ -254,7 +266,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;GAME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;.\Scripting\SobrassadaScripts\SobrassadaScripts;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -262,9 +274,13 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>.\Libs\glew-2.1.0\lib;.\DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration)\;.\Libs\freetype\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>DirectXTex.lib;glew32.lib;opengl32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>.\Libs\glew-2.1.0\lib;.\DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration)\;.\Libs\freetype\lib;.\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>DirectXTex.lib;glew32.lib;opengl32.lib;freetype.lib;SobrassadaScripts.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
