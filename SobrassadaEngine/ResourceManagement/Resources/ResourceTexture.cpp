@@ -15,6 +15,36 @@ void ResourceTexture::LoadData(const DirectX::TexMetadata& metadata, const Direc
     this->metadata = metadata;
     // this->scratchImage = scratchImage;
     ConvertMetadata(this->metadata, openGLMetadata);
+
+    if (IsCubemap())
+    {
+        assert(metadata.arraySize == 6);
+
+        for (int i = 0; i < 6; ++i)
+        {
+            glGenTextures(1, &m_CubemapFaceIDs[i]);
+            glBindTexture(GL_TEXTURE_2D, m_CubemapFaceIDs[i]);
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+            const DirectX::Image* faceImg = scratchImage.GetImage(0, i, 0);
+            if (faceImg)
+            {
+                glTexImage2D(
+                    GL_TEXTURE_2D, 0, openGLMetadata.internalFormat, static_cast<GLsizei>(faceImg->width),
+                    static_cast<GLsizei>(faceImg->height), 0, openGLMetadata.format, openGLMetadata.type,
+                    faceImg->pixels
+                );
+            }
+            else
+            {
+                GLOG("Error loading cubemap face %d", i);
+            }
+        }
+    }
 }
 
 void ResourceTexture::ConvertMetadata(const DirectX::TexMetadata& metadata, OpenGLMetadata& outMetadata)
@@ -41,4 +71,10 @@ void ResourceTexture::ConvertMetadata(const DirectX::TexMetadata& metadata, Open
     default:
         assert(false && "Unsupported format");
     }
+}
+
+unsigned int ResourceTexture::GetCubemapFaceID(int faceIndex) const
+{
+    assert(faceIndex >= 0 && faceIndex < 6);
+    return m_CubemapFaceIDs[faceIndex];
 }

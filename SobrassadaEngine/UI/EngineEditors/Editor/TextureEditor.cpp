@@ -62,7 +62,7 @@ bool TextureEditor::RenderEditor()
         if (ImGui::Selectable(name.c_str()))
         {
             selectedTextureUID = textureUID;
-            showDetailWindow   = true;
+            showViewPortWindow = true;
         }
         ImGui::NextColumn();
         ImGui::Text("%d", width);
@@ -75,7 +75,7 @@ bool TextureEditor::RenderEditor()
         ImGui::NextColumn();
     }
 
-    if (showDetailWindow)
+    if (showViewPortWindow)
     {
         ViewPort();
     }
@@ -88,33 +88,47 @@ bool TextureEditor::RenderEditor()
 
 void TextureEditor::ViewPort()
 {
-    if (selectedTextureUID == 0) return;
-
     bool open = true;
     if (ImGui::Begin("Texture Detail", &open))
     {
-        // Checkbox to activate R, G i B
-        ImGui::Text("Channel Toggles:");
-        ImGui::Checkbox("Red", &showR);
-        ImGui::SameLine();
-        ImGui::Checkbox("Green", &showG);
-        ImGui::SameLine();
-        ImGui::Checkbox("Blue", &showB);
-
         Resource* selectedResource = App->GetResourcesModule()->RequestResource(selectedTextureUID);
         if (selectedResource)
         {
             ResourceTexture* selectedTexture = dynamic_cast<ResourceTexture*>(selectedResource);
             if (selectedTexture)
             {
-                ImVec4 tint_color(showR ? 1.0f : 0.0f, showG ? 1.0f : 0.0f, showB ? 1.0f : 0.0f, 1.0f);
-                ImVec2 imageSize(128, 128);
+                if (selectedTexture->IsCubemap())
+                {
+                    ImGui::Text("Cubemap Texture Faces:");
+                    ImVec2 imageSize(128, 128);
+                    for (int i = 0; i < 6; i++)
+                    {
+                        ImGui::Text("Face %d", i);
+                        ImGui::SameLine();
+                        unsigned int faceTexID = selectedTexture->GetCubemapFaceID(i);
+                        ImGui::Image((ImTextureID)(intptr_t)faceTexID, imageSize);
+                        if ((i + 1) % 3 == 0) ImGui::NewLine();
+                        else ImGui::SameLine();
+                    }
+                }
+                else
+                {
+                    ImGui::Text("Channel Toggles:");
+                    ImGui::Checkbox("Red", &showR);
+                    ImGui::SameLine();
+                    ImGui::Checkbox("Green", &showG);
+                    ImGui::SameLine();
+                    ImGui::Checkbox("Blue", &showB);
 
-                ImGui::Text("Filtered Texture:");
-                ImGui::Image(
-                    (ImTextureID)(intptr_t)selectedTexture->GetTextureID(), imageSize, ImVec2(0, 0), ImVec2(1, 1),
-                    tint_color
-                );
+                    ImVec4 tint_color(showR ? 1.0f : 0.0f, showG ? 1.0f : 0.0f, showB ? 1.0f : 0.0f, 1.0f);
+                    ImVec2 imageSize(128, 128);
+
+                    ImGui::Text("Filtered Texture:");
+                    ImGui::Image(
+                        (ImTextureID)(intptr_t)selectedTexture->GetTextureID(), imageSize, ImVec2(0, 0), ImVec2(1, 1),
+                        tint_color
+                    );
+                }
             }
         }
     }
@@ -122,7 +136,7 @@ void TextureEditor::ViewPort()
 
     if (!open)
     {
-        showDetailWindow   = false;
+        showViewPortWindow = false;
         selectedTextureUID = 0;
     }
 }
