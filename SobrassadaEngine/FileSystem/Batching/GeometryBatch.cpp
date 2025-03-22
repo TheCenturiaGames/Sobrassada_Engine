@@ -54,7 +54,7 @@ void GeometryBatch::LoadData()
     for (const MeshComponent* component : components)
     {
         const ResourceMesh* resource = component->GetResourceMesh();
-        const auto& it               = std::find(uniqueMeshes.begin(), uniqueMeshes.end(), resource);
+        const auto& it               = uniqueMeshes.find(resource);
         if (it != uniqueMeshes.end())
         {
             int idx                         = static_cast<int>(std::distance(uniqueMeshes.begin(), it));
@@ -78,11 +78,18 @@ void GeometryBatch::LoadData()
             indexCount               += count;
             vertexCount              += static_cast<unsigned int>(vertices.size());
             commands.push_back(newCommand);
-            uniqueMeshes.push_back(resource);
+            uniqueMeshes.insert(resource);
         }
 
         totalModels.push_back(component->GetCombinedMatrix());
         totalMaterials.push_back(component->GetResourceMaterial()->GetMaterial());
+    }
+
+    int baseInstanceCount = 0;
+    for (Command& currentCommand : commands)
+    {
+        currentCommand.baseInstance  = baseInstanceCount;
+        baseInstanceCount           += currentCommand.instanceCount;
     }
 
     glBindVertexArray(vao);
@@ -112,6 +119,8 @@ void GeometryBatch::LoadData()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(unsigned int), totalIndices.data(), GL_DYNAMIC_DRAW);
 
+    glBindVertexArray(0);
+
     glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirect);
     glBufferData(GL_DRAW_INDIRECT_BUFFER, commands.size() * sizeof(Command), commands.data(), GL_DYNAMIC_DRAW);
 
@@ -122,8 +131,6 @@ void GeometryBatch::LoadData()
     glBufferData(
         GL_SHADER_STORAGE_BUFFER, totalMaterials.size() * sizeof(MaterialGPU), totalMaterials.data(), GL_DYNAMIC_DRAW
     );
-
-    glBindVertexArray(0);
 }
 
 void GeometryBatch::Render(unsigned int program, unsigned int cameraUBO, float3 cameraPos)
@@ -134,17 +141,6 @@ void GeometryBatch::Render(unsigned int program, unsigned int cameraUBO, float3 
 
     glUseProgram(program);
 
-    GLint status;
-    glGetProgramiv(program, GL_LINK_STATUS, &status);
-    if (status == GL_FALSE)
-    {
-        GLint logLength;
-        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
-        std::vector<GLchar> log(logLength);
-        glGetProgramInfoLog(program, logLength, nullptr, log.data());
-        return;
-    }
-
     glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
     unsigned int blockIdx = glGetUniformBlockIndex(program, "CameraMatrices");
     glUniformBlockBinding(program, blockIdx, 0);
@@ -153,7 +149,7 @@ void GeometryBatch::Render(unsigned int program, unsigned int cameraUBO, float3 
 
     glUniform3fv(glGetUniformLocation(program, "cameraPos"), 1, &cameraPos[0]);
 
-    glUniform1i(4, 0);
+    glUniform1i(4, 0); // hasBones
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, models);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 10, models);
@@ -164,15 +160,9 @@ void GeometryBatch::Render(unsigned int program, unsigned int cameraUBO, float3 
     glBindVertexArray(vao);
 
     glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirect);
-
     glMultiDrawElementsIndirect(
         static_cast<GLenum>(mode), GL_UNSIGNED_INT, (GLvoid*)0, static_cast<GLsizei>(commands.size()), 0
     );
-
-    if (glGetError() != GL_NO_ERROR)
-    {
-        return;
-    }
 
     glBindVertexArray(0);
 

@@ -82,14 +82,14 @@ readonly layout(std430, binding = 11) buffer Materials {
 float PointLightAttenuation(const int index) 
 {
 	float distance = length(pos - pointLights[index].position.xyz);
-	return pow(max(1 - pow((distance / pointLights[index].position.w), 4), 0), 2) / (pow(distance, 2) + 1);
+	return pow(max(1 - pow((distance / pointLights[index].position.w), 4.0), 0.0), 2.0) / (pow(distance, 2.0) + 1.0);
 }
 
 float SpotLightAttenuation(const int index)
 {
 	vec3 dirLight = normalize(spotLights[index].direction);
 	float distance = dot(pos - spotLights[index].position.xyz, dirLight);
-	float Fatt = pow(max(1 - pow((distance / spotLights[index].position.w), 4), 0), 2) / (pow(distance, 2) + 1);
+	float Fatt = pow(max(1 - pow((distance / spotLights[index].position.w), 4.0), 0.0), 2.0) / (pow(distance, 2.0) + 1.0);
 
 	vec3 D = normalize(pos - spotLights[index].position.xyz);
 	float C = dot(D, dirLight);
@@ -197,6 +197,6 @@ void main()
     }
 
     vec3 ldr = hdr.rgb / (hdr.rgb + vec3(1.0));
-    ldr = pow(hdr, vec3(1/2.2));
+    ldr = pow(hdr, vec3(1.0/2.2));
     outColor = vec4(ldr, alpha);
 }

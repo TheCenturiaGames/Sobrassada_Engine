@@ -26,7 +26,7 @@ class GeometryBatch
 
   private:
     std::vector<const MeshComponent*> components;
-    std::vector<const ResourceMesh*> uniqueMeshes;
+    std::unordered_set<const ResourceMesh*> uniqueMeshes;
     std::vector<Command> commands;
     unsigned int vertexCount = 0;
     unsigned int indexCount  = 0;

@@ -36,9 +36,7 @@ class ResourceMaterial : public Resource
 
     void OnEditorUpdate();
     void LoadMaterialData(Material mat);
-    void RenderMaterial(int program) const;
     void FreeMaterials() const;
-    void UpdateUBO() const;
 
     const bool GetIsMetallicRoughness() const { return metallicTexture.textureID != 0 ? true : false; }
     const MaterialGPU GetMaterial() const { return material; }
@@ -50,6 +48,4 @@ class ResourceMaterial : public Resource
     TextureInfo normalTexture;
 
     MaterialGPU material;
-
-    unsigned int ubo = 0;
 };
