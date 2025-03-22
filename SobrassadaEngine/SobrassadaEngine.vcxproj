@@ -276,7 +276,6 @@
     <ClCompile Include="FileSystem\StateMachineManager.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceStateMachine.cpp" />
     <ClCompile Include="Scene\Components\CameraComponent.cpp" />
-    <ClCompile Include="StateNode.cpp" />
     <ClCompile Include="UI\EngineEditors\Editor\NodeEditor.cpp" />
     <ClCompile Include="UI\EngineEditors\Editor\StateMachineEditor.cpp" />
     <ClCompile Include="UI\EngineEditors\Editor\TextureLibraryEditor.cpp" />
@@ -346,6 +345,7 @@
     <ClCompile Include="Modules\UserInterfaceModule.cpp" />
     <ClCompile Include="Scene\Components\Standalone\CharacterControllerComponent.cpp" />
     <ClCompile Include="UI\EngineEditors\Nodes\CustomNode.cpp" />
+    <ClCompile Include="UI\EngineEditors\Nodes\StateNode.cpp" />
     <ClCompile Include="Utils\EngineTimer.cpp" />
     <ClCompile Include="FileSystem\Importers\Importer.cpp" />
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp" />
@@ -436,7 +436,6 @@
     <ClInclude Include="FileSystem\StateMachineManager.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceStateMachine.h" />
     <ClInclude Include="Scene\Components\CameraComponent.h" />
-    <ClInclude Include="StateNode.h" />
     <ClInclude Include="UI\EngineEditors\Editor\NodeEditor.h" />
     <ClInclude Include="UI\EngineEditors\Editor\StateMachineEditor.h" />
     <ClInclude Include="UI\EngineEditors\Editor\TextureLibraryEditor.h">
@@ -460,6 +459,7 @@
     <ClInclude Include="Modules\ResourcesModule.h" />
     <ClInclude Include="Modules\SceneModule.h" />
     <ClInclude Include="FileSystem\Importers\ModelImporter.h" />
+    <ClInclude Include="UI\EngineEditors\Nodes\StateNode.h" />
     <ClInclude Include="Utils\Delegate.h" />
     <ClInclude Include="Utils\EventDispatcher.h" />
     <ClInclude Include="Utils\Interpolation.h" />
