@@ -11,6 +11,8 @@
 #include <ShaderModule.h>
 #include <Standalone/MeshComponent.h>
 
+#include <Math/float3.h>
+
 BatchManager::BatchManager()
 {
 }
@@ -38,11 +40,16 @@ void BatchManager::Render()
     if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
         cameraUBO = App->GetSceneModule()->GetScene()->GetMainCamera()->GetUbo();
 
+    float3 cameraPos;
+    if (App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr && App->GetSceneModule()->GetInPlayMode())
+        cameraPos = App->GetSceneModule()->GetScene()->GetMainCamera()->GetCameraPosition();
+    else cameraPos = App->GetCameraModule()->GetCameraPosition();
+
     for (GeometryBatch* it : batches)
     {
         unsigned int program = it->GetIsMetallic() ? App->GetShaderModule()->GetMetallicRoughnessProgram()
                                                    : App->GetShaderModule()->GetSpecularGlossinessProgram();
-        it->Render(program, cameraUBO);
+        it->Render(program, cameraUBO, cameraPos);
     }
 }
 

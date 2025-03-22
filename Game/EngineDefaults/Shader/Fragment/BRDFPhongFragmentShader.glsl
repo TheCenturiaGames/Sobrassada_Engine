@@ -2,18 +2,32 @@
 
 #extension GL_ARB_bindless_texture : require
 
+#define PI 3.14159265359
+
 in vec3 pos;
 in vec2 uv0;
 in vec3 normal;
 in vec4 tangent;
+flat in int instance_index;
 
 out vec4 outColor;
 
 uniform vec3 cameraPos;
 
-#define PI 3.14159265359
+struct Material
+{
+    vec4 diffColor;
+    vec3 specColor;
+    float shininess;
+    bool shininessInAlpha;
+    float metallicFactor;
+    float roughnessFactor;
+    uvec2 diffuseTex;
+    uvec2 specularTex;
+    uvec2 metallicTex;
+    uvec2 normalTex;
+};
 
-// Lights data structures
 struct DirectionalLight
 {
     vec3 direction;
@@ -36,7 +50,7 @@ struct SpotLight
 };
 
 
-// Lights SSBOs
+// UBOs
 layout(std140, binding = 2) uniform Ambient
 {
 	vec4 ambient_color;		// rbg = color & alpha = intensity
@@ -48,6 +62,7 @@ layout(std140, binding = 3) uniform Directional
     vec4 directional_color;
 };
 
+// SSBOs
 readonly layout(std430, binding = 4) buffer PointLights
 {
 	int pointLightsCount;
@@ -60,25 +75,9 @@ readonly layout(std430, binding = 5) buffer SpotLights
 	SpotLight spotLights[];
 };
 
-struct Material
-{
-    vec4 diffColor;
-    vec3 specColor;
-    float shininess;   
-    bool shininessInAlpha;  
-    float metallicFactor;
-    float roughnessFactor;
-    uvec2 diffuseTex;
-    uvec2 specularTex;
-    uvec2 metallicTex;
-    uvec2 normalTex;
-};
-
 readonly layout(std430, binding = 11) buffer Materials {
     Material materials[];
 };
-
-in int flat instance_index;
 
 float PointLightAttenuation(const int index) 
 {
@@ -108,7 +107,7 @@ vec3 RenderLight(vec3 L, vec3 N, vec4 specTexColor, vec3 texColor, vec3 Li, floa
  {
     float shininessValue;
 	if(materials[instance_index].shininessInAlpha) shininessValue = exp2(alpha * 7 + 1);
-	else shininessValue = shininess;
+	else shininessValue = materials[instance_index].shininess;
 
     float normalization = (shininessValue + 2.0) / (2.0 * PI);
     vec3 V = normalize(cameraPos - pos);

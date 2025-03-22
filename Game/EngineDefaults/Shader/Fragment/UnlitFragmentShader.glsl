@@ -2,31 +2,17 @@
 
 #extension GL_ARB_bindless_texture : require
 
+#define PI 3.14159265359
+
 in vec3 pos;
 in vec2 uv0;
 in vec3 normal;
 in vec4 tangent;
+flat in int instance_index;
 
 out vec4 outColor;
 
 uniform vec3 cameraPos;
-
-#define PI 3.14159265359
-
-// Material UBO
-// layout(std140, binding = 1) uniform Material
-// {
-//     vec4 diffColor;
-//     vec3 specColor;
-//     float shininess;
-//     bool shininessInAlpha;
-//     float metallicFactor;
-//     float roughnessFactor;
-//     uvec2 diffuseTex;
-//     uvec2 specularTex;
-//     uvec2 metallicTex;
-//     uvec2 normalTex;
-// };
 
 struct Material
 {
@@ -45,9 +31,6 @@ struct Material
 readonly layout(std430, binding = 11) buffer Materials {
     Material materials[];
 };
-
-in int flat instance_index;
-
 
 void main()
 {

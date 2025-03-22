@@ -2,6 +2,7 @@
 
 #include <unordered_set>
 #include <vector>
+#include <Math/float3.h>
 
 class MeshComponent;
 class ResourceMesh;
@@ -15,7 +16,7 @@ class GeometryBatch
     ~GeometryBatch();
 
     void LoadData();
-    void Render(unsigned int program, unsigned int cameraUBO);
+    void Render(unsigned int program, unsigned int cameraUBO, float3 cameraPos);
     void ClearObjectsToRender();
 
     void AddComponent(const MeshComponent* component) { components.push_back(component); }
@@ -37,6 +38,6 @@ class GeometryBatch
     unsigned int models      = 0;
     unsigned int materials   = 0;
 
-    bool isMetallic          = 0;
+    bool isMetallic          = false;
     unsigned int mode        = 0;
 };

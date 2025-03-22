@@ -24,8 +24,8 @@ struct Command
 GeometryBatch::GeometryBatch(const MeshComponent* component) : mode(component->GetResourceMesh()->GetMode())
 {
     isMetallic = component->GetResourceMaterial()->GetIsMetallicRoughness();
-    glGenBuffers(1, &indirect);
     glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &indirect);
     glGenBuffers(1, &vbo);
     glGenBuffers(1, &ebo);
     glGenBuffers(1, &models);
@@ -36,8 +36,8 @@ GeometryBatch::~GeometryBatch()
 {
     components.clear();
     uniqueMeshes.clear();
-    glDeleteBuffers(1, &indirect);
     glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &indirect);
     glDeleteBuffers(1, &vbo);
     glDeleteBuffers(1, &ebo);
     glDeleteBuffers(1, &models);
@@ -68,7 +68,6 @@ void GeometryBatch::LoadData()
             totalIndices.insert(totalIndices.end(), indices.begin(), indices.end());
 
             const unsigned int count = static_cast<unsigned int>(indices.size());
-
             Command newCommand;
             newCommand.count          = count;       // Number of indices in the mesh
             newCommand.instanceCount  = 1;           // Number of instances to render
@@ -87,8 +86,8 @@ void GeometryBatch::LoadData()
     }
 
     glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(Vertex), totalVertices.data(), GL_DYNAMIC_DRAW);
 
     glEnableVertexAttribArray(0); // Position
@@ -108,6 +107,7 @@ void GeometryBatch::LoadData()
 
     glEnableVertexAttribArray(5); // Weights
     glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, weights));
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(unsigned int), totalIndices.data(), GL_DYNAMIC_DRAW);
@@ -117,16 +117,16 @@ void GeometryBatch::LoadData()
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, models);
     glBufferData(GL_SHADER_STORAGE_BUFFER, totalModels.size() * sizeof(float4x4), totalModels.data(), GL_DYNAMIC_DRAW);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, materials);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, totalMaterials.size() * sizeof(MaterialGPU), totalMaterials.data(), GL_DYNAMIC_DRAW);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    glBufferData(
+        GL_SHADER_STORAGE_BUFFER, totalMaterials.size() * sizeof(MaterialGPU), totalMaterials.data(), GL_DYNAMIC_DRAW
+    );
 
     glBindVertexArray(0);
 }
 
-void GeometryBatch::Render(unsigned int program, unsigned int cameraUBO)
+void GeometryBatch::Render(unsigned int program, unsigned int cameraUBO, float3 cameraPos)
 {
     const auto start        = std::chrono::high_resolution_clock::now();
 
@@ -134,11 +134,26 @@ void GeometryBatch::Render(unsigned int program, unsigned int cameraUBO)
 
     glUseProgram(program);
 
+    GLint status;
+    glGetProgramiv(program, GL_LINK_STATUS, &status);
+    if (status == GL_FALSE)
+    {
+        GLint logLength;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
+        std::vector<GLchar> log(logLength);
+        glGetProgramInfoLog(program, logLength, nullptr, log.data());
+        return;
+    }
+
     glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
     unsigned int blockIdx = glGetUniformBlockIndex(program, "CameraMatrices");
     glUniformBlockBinding(program, blockIdx, 0);
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, cameraUBO);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    glUniform3fv(glGetUniformLocation(program, "cameraPos"), 1, &cameraPos[0]);
+
+    glUniform1i(4, 0);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, models);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 10, models);
@@ -149,9 +164,15 @@ void GeometryBatch::Render(unsigned int program, unsigned int cameraUBO)
     glBindVertexArray(vao);
 
     glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirect);
+
     glMultiDrawElementsIndirect(
-        static_cast<GLenum>(mode), GL_UNSIGNED_INT, nullptr, static_cast<GLsizei>(commands.size()), 0
+        static_cast<GLenum>(mode), GL_UNSIGNED_INT, (GLvoid*)0, static_cast<GLsizei>(commands.size()), 0
     );
+
+    if (glGetError() != GL_NO_ERROR)
+    {
+        return;
+    }
 
     glBindVertexArray(0);
 
