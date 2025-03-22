@@ -6,6 +6,7 @@
 class MeshComponent;
 class ResourceMesh;
 class MeshComponent;
+struct Command;
 
 class GeometryBatch
 {
@@ -25,11 +26,13 @@ class GeometryBatch
   private:
     std::vector<const MeshComponent*> components;
     std::unordered_set<const ResourceMesh*> uniqueMeshes;
+    std::vector<Command> commands;
 
-    unsigned int indirect = 0;
-    unsigned int vao      = 0;
-    unsigned int vbo      = 0;
-    unsigned int ebo      = 0;
+    unsigned int indirect    = 0;
+    unsigned int vao         = 0;
+    unsigned int vbo         = 0;
+    unsigned int ebo         = 0;
 
-    unsigned int mode     = 0;
+    unsigned int mode        = 0;
+    unsigned int vertexCount = 0;
 };

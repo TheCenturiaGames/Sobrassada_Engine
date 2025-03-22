@@ -1,9 +1,12 @@
 #include "GeometryBatch.h"
 
+#include <Application.h>
 #include <Mesh.h>
+#include <OpenGLModule.h>
 #include <ResourceMesh.h>
 #include <Standalone/MeshComponent.h>
 
+#include <chrono>
 #include <glew.h>
 
 struct Command
@@ -48,7 +51,8 @@ void GeometryBatch::LoadData()
         totalVertices.insert(totalVertices.end(), vertices.begin(), vertices.end());
         totalIndices.insert(totalIndices.end(), indices.begin(), indices.end());
     }
-    glBufferData(GL_ARRAY_BUFFER, totalVertices.size() * sizeof(Vertex), totalVertices.data(), GL_DYNAMIC_DRAW);
+    vertexCount = static_cast<unsigned int>(totalVertices.size());
+    glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(Vertex), totalVertices.data(), GL_DYNAMIC_DRAW);
 
     glEnableVertexAttribArray(0); // Position
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
@@ -76,13 +80,26 @@ void GeometryBatch::LoadData()
     glBindVertexArray(0);
 
     glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirect);
-    std::vector<Command> commands;
     glBufferData(GL_DRAW_INDIRECT_BUFFER, commands.size() * sizeof(Command), commands.data(), GL_DYNAMIC_DRAW);
 }
 
 void GeometryBatch::Render()
 {
-    // glMultiDrawElementsIndirect();
+    int meshTriangles = vertexCount / 3;
+    const auto start  = std::chrono::high_resolution_clock::now();
+
+    glBindVertexArray(vao);
+
+    glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirect);
+    glMultiDrawElementsIndirect(static_cast<GLenum>(mode), GL_UNSIGNED_INT, nullptr, static_cast<GLsizei>(commands.size()), 0);
+
+    glBindVertexArray(0);
+
+    auto end                             = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<float> elapsed = end - start;
+
+    App->GetOpenGLModule()->AddTrianglesPerSecond(meshTriangles / elapsed.count());
+    App->GetOpenGLModule()->AddVerticesCount(vertexCount);
 }
 
 void GeometryBatch::ClearObjectsToRender()

@@ -2,6 +2,7 @@
 
 #include "CameraComponent.h"
 #include <Application.h>
+#include <BatchManager.h>
 #include <CameraModule.h>
 #include <EditorUIModule.h>
 #include <GeometryBatch.h>
@@ -189,7 +190,7 @@ void MeshComponent::AddMesh(UID resource, bool updateParent)
         localComponentAABB = AABB(currentMesh->GetAABB());
         if (updateParent) parent->OnAABBUpdated();
 
-        batch = App->GetResourcesModule()->RequestBatch(this);
+        batch = App->GetResourcesModule()->GetBatchManager()->RequestBatch(this);
     }
 }
 

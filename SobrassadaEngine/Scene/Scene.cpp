@@ -23,6 +23,7 @@
 #include "Scene/Components/ComponentUtils.h"
 #include "Scene/Components/Standalone/MeshComponent.h"
 #include "SceneModule.h"
+#include <BatchManager.h>
 #include <GeometryBatch.h>
 
 #include "SDL_mouse.h"
@@ -232,7 +233,8 @@ update_status Scene::Render(float deltaTime) const
     std::vector<GameObject*> objectsToRender;
     CheckObjectsToRender(objectsToRender);
 
-    App->GetResourcesModule()->ClearObjectsToRender();
+    BatchManager* batchManager = App->GetResourcesModule()->GetBatchManager();
+    batchManager->ClearObjectsToRender();
 
     for (const auto& gameObject : objectsToRender)
     {
@@ -244,6 +246,9 @@ update_status Scene::Render(float deltaTime) const
             batch->AddResource(mesh->GetResourceMesh());
         }
     }
+
+    batchManager->LoadData();
+    batchManager->Render();
 
     for (const auto& gameObject : objectsToRender)
     {

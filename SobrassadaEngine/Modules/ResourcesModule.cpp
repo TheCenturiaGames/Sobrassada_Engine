@@ -92,13 +92,3 @@ void ResourcesModule::UnloadAllResources()
     }
     resources.clear();
 }
-
-GeometryBatch* ResourcesModule::RequestBatch(const MeshComponent* mesh)
-{
-    return batchManager->RequestBatch(mesh);
-}
-
-void ResourcesModule::ClearObjectsToRender()
-{
-    batchManager->ClearObjectsToRender();
-}

@@ -23,8 +23,7 @@ class ResourcesModule : public Module
 
     void UnloadAllResources();
 
-    void ClearObjectsToRender();
-    GeometryBatch* RequestBatch(const MeshComponent* mesh);
+    BatchManager* GetBatchManager() { return batchManager; }
 
   private:
     Resource* CreateNewResource(UID uid);
