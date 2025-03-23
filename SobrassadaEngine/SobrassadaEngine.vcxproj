@@ -275,6 +275,7 @@
     <ClCompile Include="Libs\ImNodeFlow-1.2.2\src\ImNodeFlow.cpp" />
     <ClCompile Include="FileSystem\StateMachineManager.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceStateMachine.cpp" />
+    <ClCompile Include="ResourceManagement\Resources\ResourceNavmesh.cpp" />
     <ClCompile Include="Scene\Components\CameraComponent.cpp" />
     <ClCompile Include="UI\EngineEditors\Editor\NodeEditor.cpp" />
     <ClCompile Include="UI\EngineEditors\Editor\TextureLibraryEditor.cpp" />
@@ -433,6 +434,7 @@
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_extra_math.h" />
     <ClInclude Include="FileSystem\StateMachineManager.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceStateMachine.h" />
+    <ClInclude Include="ResourceManagement\Resources\ResourceNavmesh.h" />
     <ClInclude Include="Scene\Components\CameraComponent.h" />
     <ClInclude Include="UI\EngineEditors\Editor\NodeEditor.h" />
     <ClInclude Include="UI\EngineEditors\Editor\TextureLibraryEditor.h">

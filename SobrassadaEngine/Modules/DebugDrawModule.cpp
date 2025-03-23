@@ -10,6 +10,7 @@
 #include "OpenGLModule.h"
 #include "Quadtree.h"
 #include "SceneModule.h"
+#include "ResourcesModule.h"
 
 #include "SDL_video.h"
 #define DEBUG_DRAW_IMPLEMENTATION
@@ -759,5 +760,84 @@ void DebugDrawModule::HandleDebugRenderOptions()
     if (debugOptionValues[(int)DebugOptions::RENDER_CAMERA_RAY])
     {
         DrawLineSegment(cameraModule->GetLastCastedRay(), float3(1.f, 1.f, 0.f));
+    }
+    if (debugOptionValues[(int)DebugOptions::RENDER_NAVMESH])
+    {
+        if (App->GetResourcesModule()->GetNavMesh())
+        {
+            DrawNavMesh(
+                App->GetResourcesModule()->GetNavMesh()->GetDetourNavMesh(),
+                App->GetResourcesModule()->GetNavMesh()->GetDetourNavMeshQuery(), DRAWNAVMESH_COLOR_TILES
+            );
+        }
+    }
+}
+
+unsigned int duIntToCol(int i, int a)
+{
+    int r = bit(i, 1) + bit(i, 3) * 2 + 1;
+    int g = bit(i, 2) + bit(i, 4) * 2 + 1;
+    int b = bit(i, 0) + bit(i, 5) * 2 + 1;
+    return duRGBA(r * 63, g * 63, b * 63, a);
+}
+
+unsigned int areaToCol(unsigned int area)
+{
+    if (area == 0)
+    {
+        // Treat zero area type as default.
+        return duRGBA(0, 192, 255, 255);
+    }
+    else
+    {
+        return duIntToCol(area, 255);
+    }
+}
+void DebugDrawModule::DrawNavMesh(const dtNavMesh* navMesh, const dtNavMeshQuery* navQuery, unsigned char flags)
+{
+    if (!navMesh) return;
+
+    for (int i = 0; i < navMesh->getMaxTiles(); ++i)
+    {
+        const dtMeshTile* tile = navMesh->getTile(i);
+        if (!tile || !tile->header) continue;
+
+        dtPolyRef base         = navMesh->getPolyRefBase(tile);
+        int tileNum            = navMesh->decodePolyIdTile(base);
+        unsigned int tileColor = duIntToCol(tileNum, 128);
+
+        // Iterate through each polygon in the tile
+        for (int j = 0; j < tile->header->polyCount; ++j)
+        {
+            const dtPoly* p = &tile->polys[j];
+            if (p->getType() == DT_POLYTYPE_OFFMESH_CONNECTION) continue;
+
+            const dtPolyDetail* pd = &tile->detailMeshes[j];
+
+            unsigned int col;
+            if (navQuery && navQuery->isInClosedList(base | (dtPolyRef)j)) col = duRGBA(255, 196, 0, 64);
+            else col = duTransCol(areaToCol(p->getArea()), 64);
+
+            std::vector<LineSegment> lines;
+
+            for (int k = 0; k < pd->triCount; ++k)
+            {
+                const unsigned char* t = &tile->detailTris[(pd->triBase + k) * 4];
+
+                float3 v[3];
+                for (int l = 0; l < 3; ++l)
+                {
+                    if (t[l] < p->vertCount) v[l] = float3(&tile->verts[p->verts[t[l]] * 3]);
+                    else v[l] = float3(&tile->detailVerts[(pd->vertBase + t[l] - p->vertCount) * 3]);
+                }
+
+                // Draw Triangle Edges
+                lines.push_back(LineSegment(v[0], v[1]));
+                lines.push_back(LineSegment(v[1], v[2]));
+                lines.push_back(LineSegment(v[2], v[0]));
+            }
+
+            RenderLines(lines, float3(0.0f, 1.0f, 0.0f)); // Green color
+        }
     }
 }

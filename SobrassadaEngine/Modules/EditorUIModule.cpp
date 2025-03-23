@@ -7,6 +7,7 @@
 #include "ProjectModule.h"
 #include "SceneModule.h"
 #include "WindowModule.h"
+#include "ResourcesModule.h"
 #include <Application.h>
 #include <Component.h>
 #include <EngineEditorBase.h>
@@ -241,6 +242,8 @@ void EditorUIModule::Draw()
 
     if (saveMenu) SaveDialog(saveMenu);
 
+    if (navmesh) Navmesh(navmesh);
+
     if (editorSettingsMenu) EditorSettings(editorSettingsMenu);
 }
 
@@ -268,6 +271,8 @@ void EditorUIModule::MainMenu()
 
         if (ImGui::MenuItem("Save as", "", saveMenu)) saveMenu = !saveMenu;
         ImGui::EndDisabled();
+
+        if (ImGui::MenuItem("Navmesh", "", navmesh)) navmesh = !navmesh;
 
         if (ImGui::MenuItem("Quit")) closeApplication = true;
 
@@ -389,6 +394,22 @@ void EditorUIModule::LoadDialog(bool& loadMenu)
         selectedLoad  = -1;
         inputFileLoad = "";
     }
+}
+
+void EditorUIModule::Navmesh(bool& navmesh)
+{
+
+    ImGui::Begin("NavMesh Creation");
+
+    if (ImGui::Button("Create NavMesh"))
+    {
+        App->GetResourcesModule()->CreateNavMesh();
+        ImGui::Text("NavMesh created!");
+    }
+
+    App->GetResourcesModule()->GetNavMesh()->RenderNavmeshEditor();
+
+    ImGui::End();
 }
 
 void EditorUIModule::LoadPrefabDialog(bool& loadPrefab)

@@ -387,6 +387,9 @@
     <ClCompile Include="FileSystem\StateMachineManager.cpp">
       <Filter>FileSystem</Filter>
     </ClCompile>
+    <ClCompile Include="ResourceManagement\Resources\ResourceNavmesh.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -715,6 +718,9 @@
     </ClInclude>
     <ClInclude Include="FileSystem\Config\ProjectConfig.h">
       <Filter>FileSystem\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManagement\Resources\ResourceNavmesh.h">
+      <Filter>Resources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

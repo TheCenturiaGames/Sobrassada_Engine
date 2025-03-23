@@ -1,17 +1,18 @@
 #include "ResourcesModule.h"
-
+#include "Application.h"
 #include "Importer.h"
 #include "LibraryModule.h"
 #include "MeshImporter.h"
 #include "ResourceManagement/Resources/ResourceMaterial.h"
 #include "ResourceManagement/Resources/ResourceMesh.h"
 #include "ResourceManagement/Resources/ResourceTexture.h"
+#include "Scene/Components/Standalone/MeshComponent.h"
 #include "SceneModule.h"
 #include "ShaderModule.h"
 
 #include <Algorithm/Random/LCG.h> // TODO: LCG remove includes
 
-ResourcesModule::ResourcesModule()
+ResourcesModule::ResourcesModule() : myNavmesh(15345456565, "defaultName")
 {
 }
 
@@ -86,4 +87,44 @@ void ResourcesModule::UnloadAllResources()
         delete resource.second;
     }
     resources.clear();
+}
+
+void ResourcesModule::CreateNavMesh()
+{
+
+    std::vector<std::pair<const ResourceMesh*, const float4x4&>> meshes;
+    float minPos[3]                                         = {0, 0, 0};
+    float maxPos[3]                                         = {0, 0, 0};
+
+    const std::unordered_map<UID, GameObject*>& gameObjects = App->GetSceneModule()->GetScene()->GetAllGameObjects();
+
+    if (!gameObjects.empty())
+    {
+        for (const auto& pair : gameObjects)
+        {
+            GameObject* gameObject = pair.second;
+            if (gameObject)
+            {
+                const MeshComponent* meshComponent = gameObject->GetMeshComponent();
+                const float4x4 globalMatrix        = gameObject->GetGlobalTransform();
+
+                if (meshComponent)
+                {
+                    const ResourceMesh* resourceMesh = meshComponent->GetResourceMesh();
+                    AABB aabb                        = gameObject->GetGlobalAABB();
+
+                    minPos[0]                        = std::min(minPos[0], aabb.minPoint.x);
+                    minPos[1]                        = std::min(minPos[1], aabb.minPoint.y);
+                    minPos[2]                        = std::min(minPos[2], aabb.minPoint.z);
+
+                    maxPos[0]                        = std::max(maxPos[0], aabb.maxPoint.x);
+                    maxPos[1]                        = std::max(maxPos[1], aabb.maxPoint.y);
+                    maxPos[2]                        = std::max(maxPos[2], aabb.maxPoint.z);
+
+                    meshes.push_back(std::pair(resourceMesh, globalMatrix));
+                }
+            }
+        }
+    }
+    myNavmesh.BuildNavMesh(meshes, minPos, maxPos);
 }
