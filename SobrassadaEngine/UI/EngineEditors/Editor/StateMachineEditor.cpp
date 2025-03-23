@@ -20,6 +20,16 @@ bool StateMachineEditor::RenderEditor()
 
     graph->update();
 
+    for (auto& pair : graph->getNodes())
+    {
+        auto& node = pair.second;
+        if (node->isSelected())
+        {
+            selectedNode = dynamic_cast<StateNode*>(node.get());
+        }
+    }
+   
+
     graph->rightClickPopUpContent(
         [this](ImFlow::BaseNode* node)
         {
@@ -27,9 +37,17 @@ bool StateMachineEditor::RenderEditor()
             {
                 ImVec2 pos = graph->screen2grid(ImGui::GetMousePos());
                 State newState;
-                newState.name     = HashString("NewState_" + std::to_string(resource->states.size()));
-                newState.clipName = HashString(""); 
+                std::string stateName = "NewState_" + std::to_string(resource->states.size());
+                std::string clipName  = "Clip_" + std::to_string(resource->clips.size());
 
+                newState.name         = HashString(stateName);
+                newState.clipName     = HashString(clipName);
+
+                //StateNode* stateNode  = dynamic_cast<StateNode*>(node);
+                //stateNode->SetStateName(stateName);
+                //stateNode->SetClipName(clipName);
+
+                resource->AddClip(0, clipName, false); 
                 resource->AddState(newState.name.GetString(), newState.clipName.GetString());
                 graph->placeNodeAt<StateNode>(pos);
             }
@@ -63,6 +81,74 @@ bool StateMachineEditor::RenderEditor()
     );
 
     ImGui::End();
+
+    if (selectedNode != nullptr)
+    {
+        ImGui::Begin("State Inspector");
+
+        std::string stateName = selectedNode->GetStateName();
+        char nameBuffer[128];
+        strncpy_s(nameBuffer, stateName.c_str(), sizeof(nameBuffer));
+        nameBuffer[sizeof(nameBuffer) - 1] = '\0';
+
+        if (ImGui::InputText("State Name", nameBuffer, sizeof(nameBuffer)))
+        {
+            std::string newName(nameBuffer);
+            if (newName != stateName)
+            {
+                resource->EditState(stateName, newName, selectedNode->GetClipName());
+                selectedNode->SetStateName(newName); 
+            }
+        }
+
+        char clipBuffer[128];
+        strncpy_s(clipBuffer, selectedNode->GetClipName().c_str(), sizeof(clipBuffer));
+        clipBuffer[sizeof(clipBuffer) - 1] = '\0';
+
+        if (ImGui::InputText("Clip Name", clipBuffer, sizeof(clipBuffer)))
+        {
+            std::string newClip(clipBuffer);
+            if (newClip != selectedNode->GetClipName())
+            {
+                resource->EditState(selectedNode->GetStateName(), selectedNode->GetStateName(), newClip);
+                selectedNode->SetClipName(newClip); 
+            }
+        }
+
+        const Clip* clip = resource->GetClip(selectedNode->GetClipName());
+        if (clip)
+        {
+            static UID clipUIDBuffer = clip->clipUID;
+            static bool loopBuffer   = clip->loop;
+
+            ImGui::InputScalar("Clip UID", ImGuiDataType_U64, &clipUIDBuffer);
+            ImGui::Checkbox("Loop", &loopBuffer);
+
+            char newClipNameBuffer[128];
+            strncpy_s(newClipNameBuffer, clip->clipName.GetString().c_str(), sizeof(newClipNameBuffer));
+            newClipNameBuffer[sizeof(newClipNameBuffer) - 1] = '\0';
+
+            if (ImGui::InputText("Rename Clip", newClipNameBuffer, sizeof(newClipNameBuffer)))
+            {
+                std::string newClipName(newClipNameBuffer);
+
+                if (newClipName != clip->clipName.GetString() || clipUIDBuffer != clip->clipUID ||
+                    loopBuffer != clip->loop)
+                {
+                    resource->EditClipInfo(clip->clipName.GetString(), clipUIDBuffer, newClipName, loopBuffer);
+                }
+            }
+        }
+        else
+        {
+            ImGui::TextColored(
+                ImVec4(1, 0.5f, 0.5f, 1.0f), "No Clip found with name: %s", selectedNode->GetClipName().c_str()
+            );
+        }
+
+        ImGui::End();
+    }
+
     return true;
 }
 

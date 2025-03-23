@@ -18,6 +18,13 @@ class StateNode : public ImFlow::BaseNode
     std::shared_ptr<ImFlow::InPin<int>> getInputPin() { return inputPin; }
     std::shared_ptr<ImFlow::OutPin<int>> getOutputPin() { return outputPin; }
     const std::string& GetStateName() { return getName(); }
+    void SetStateName(const std::string& newName)
+    {
+        state.name = HashString(newName);
+        setTitle(newName);
+    }
+    void SetClipName(const std::string& newClip) { state.clipName = HashString(newClip); }
+    std::string GetClipName() const { return state.clipName.GetString(); }
 
   private:
     State state;

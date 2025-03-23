@@ -4,6 +4,7 @@
 #include "UI/EngineEditors/EngineEditorBase.h"
 #include "ResourceManagement/Resources/ResourceStateMachine.h"
 #include "Libs/ImNodeFlow-1.2.2/include/ImNodeFlow.h"
+#include "UI/EngineEditors/Nodes/StateNode.h"
 
 class StateMachineEditor : public EngineEditorBase
 {
@@ -19,5 +20,6 @@ class StateMachineEditor : public EngineEditorBase
     UID uid;
     ResourceStateMachine* resource = nullptr;
     std::unique_ptr<ImFlow::ImNodeFlow> graph;
+    StateNode* selectedNode = nullptr;
 
 };
