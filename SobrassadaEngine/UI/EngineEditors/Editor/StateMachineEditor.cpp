@@ -31,7 +31,7 @@ bool StateMachineEditor::RenderEditor()
                 newState.clipName = HashString(""); 
 
                 resource->AddState(newState.name.GetString(), newState.clipName.GetString());
-                graph->placeNodeAt<StateNode>(pos, newState);
+                graph->placeNodeAt<StateNode>(pos);
             }
         }
     );
@@ -53,7 +53,8 @@ bool StateMachineEditor::RenderEditor()
                         resource->AddTransition(
                             sourceNode->GetStateName(), inputPinRaw->GetStateName(), "Trigger", 200
                         );
-                        auto newLink = std::make_shared<ImFlow::Link>(dragged, inputPinRaw, graph.get());
+                        auto newLink =
+                            std::make_shared<ImFlow::Link>(dragged, inputPinRaw->getInputPin().get(), graph.get());
                         graph->addLink(newLink);
                     }
                 }
@@ -63,4 +64,9 @@ bool StateMachineEditor::RenderEditor()
 
     ImGui::End();
     return true;
+}
+
+void StateMachineEditor::BuildGraph()
+{
+    
 }

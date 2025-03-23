@@ -5,10 +5,10 @@
 class StateNode : public ImFlow::BaseNode
 {
   public:
-    StateNode(const State& state)
+    StateNode() 
     {
-        this->state = state;
-        setTitle(state.name.GetString());
+        setTitle("New State");
+        setStyle(ImFlow::NodeStyle::cyan());
         inputPin  = addIN<int>("In", 0, ImFlow::ConnectionFilter::SameType());
         outputPin = addOUT<int>("Out");
     }
@@ -17,7 +17,7 @@ class StateNode : public ImFlow::BaseNode
 
     std::shared_ptr<ImFlow::InPin<int>> getInputPin() { return inputPin; }
     std::shared_ptr<ImFlow::OutPin<int>> getOutputPin() { return outputPin; }
-    const std::string& GetStateName() const { return state.name.GetString(); }
+    const std::string& GetStateName() { return getName(); }
 
   private:
     State state;
