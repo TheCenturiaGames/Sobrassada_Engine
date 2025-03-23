@@ -99,17 +99,21 @@ namespace TextManager
 
     void RenderText(FontData& fontData, const std::string& text, const unsigned vbo)
     {
+        glDisable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         int x = 0, y = 0;
+        glActiveTexture(GL_TEXTURE0);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
         for (char c : text)
         {
             Character character = fontData.characters[c];
 
-            float xPos          = x + character.bearing.x;
-            float yPos          = y - (character.size.y - character.bearing.y);
+            float xPos          = 0;
+            float yPos          = 0;
             float width         = character.size.x;
             float height        = character.size.y;
 
@@ -119,10 +123,27 @@ namespace TextManager
                                    xPos + width, yPos + height, 1.0f,         0.0f, xPos, yPos + height,
                                    0.0f,         0.0f,          xPos + width, yPos, 1.0f, 1.0f};
 
-            glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, character.textureID);
-            glBindBuffer(GL_ARRAY_BUFFER, vbo);
             glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+            //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+            GLenum err;
+            while ((err = glGetError()) != GL_NO_ERROR)
+            {
+                GLOG("Open GL Error: %d", err);
+            }
+            GLint attribEnabled;
+            glGetVertexAttribiv(0, GL_VERTEX_ATTRIB_ARRAY_ENABLED, &attribEnabled);
+            if (!attribEnabled)
+            {
+                GLOG("Error: Position attribute (0) is not enabled.");
+            }
+
+            glGetVertexAttribiv(1, GL_VERTEX_ATTRIB_ARRAY_ENABLED, &attribEnabled);
+            if (!attribEnabled)
+            {
+                GLOG("Error: UV attribute (1) is not enabled.");
+            }
             glDrawArrays(GL_TRIANGLES, 0, 6);
 
             x += (character.advance >> 6);
@@ -130,6 +151,7 @@ namespace TextManager
 
         glDisable(GL_BLEND);
         glEnable(GL_CULL_FACE);
+        glEnable(GL_DEPTH_TEST);
     }
 
 } // namespace TextManager

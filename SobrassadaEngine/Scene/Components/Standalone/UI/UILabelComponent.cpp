@@ -8,10 +8,11 @@
 #include "glew.h"
 
 UILabelComponent::UILabelComponent(UID uid, GameObject* parent)
-    : text("New text"), UIWidgetComponent(uid, parent, "Label", COMPONENT_LABEL)
+    : text("A"), UIWidgetComponent(uid, parent, "Label", COMPONENT_LABEL)
 {
     fontData = new TextManager::FontData();
     fontData->Init("./EngineDefaults/Shader/Font/Arial.ttf", fontSize);
+    InitBuffers();
 }
 
 UILabelComponent::~UILabelComponent()
@@ -29,8 +30,10 @@ void UILabelComponent::Render(float deltaTime)
     glUseProgram(uiProgram);
 
     glUniformMatrix4fv(0, 1, GL_TRUE, parent->GetGlobalTransform().ptr());
-    glUniformMatrix4fv(1, 1, GL_TRUE, App->GetCameraModule()->GetProjectionMatrix().ptr());
-    glUniformMatrix4fv(2, 1, GL_TRUE, App->GetCameraModule()->GetViewMatrix().ptr());
+    glUniformMatrix4fv(1, 1, GL_TRUE, App->GetCameraModule()->GetViewMatrix().ptr());
+    glUniformMatrix4fv(2, 1, GL_TRUE, App->GetCameraModule()->GetProjectionMatrix().ptr());
+    //glUniformMatrix4fv(1, 1, GL_TRUE, float4x4::identity.ptr());
+    //glUniformMatrix4fv(2, 1, GL_TRUE, float4x4::identity.ptr());
 
     glBindVertexArray(vao);
     TextManager::RenderText(*fontData, text, vbo);

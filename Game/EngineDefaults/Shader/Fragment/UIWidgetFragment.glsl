@@ -7,5 +7,5 @@ uniform sampler2D fontTexture;
 void main()
 {
     vec4 sampled = texture(fontTexture, TexCoords);
-    color = vec4(1.0, 1.0, 1.0, sampled.r);
+    color = vec4(1.0, 0.0, 0.0, sampled.r);
 }
