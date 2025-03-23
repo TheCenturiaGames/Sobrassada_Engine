@@ -4,6 +4,7 @@
 #include "Transform2DComponent.h"
 #include "WindowModule.h"
 #include "GameUIModule.h"
+#include "SceneModule.h"
 
 CanvasComponent::CanvasComponent(UID uid, GameObject* parent) : Component(uid, parent, "Canvas", COMPONENT_CANVAS)
 {
@@ -58,6 +59,11 @@ void CanvasComponent::Render(float deltaTime)
         ),
         -float3::unitY, transform2D->GetSize().y, float3(1, 1, 1)
     );
+
+    for (const auto& child : parent->GetChildren())
+    {
+        App->GetSceneModule()->GetScene()->GetGameObjectByUID(child)->Render(deltaTime);
+    }
 }
 
 void CanvasComponent::Clone(const Component* otherComponent)

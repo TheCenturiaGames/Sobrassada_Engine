@@ -2,6 +2,11 @@
 
 #include "UIWidgetComponent.h"
 
+namespace TextManager
+{
+    struct FontData;
+}
+
 class UILabelComponent : public UIWidgetComponent
 {
   public:
@@ -13,5 +18,14 @@ class UILabelComponent : public UIWidgetComponent
     void Clone(const Component* otherComponent) override;
 
   private:
+    void InitBuffers();
+    void ClearBuffers();
+
+  private:
+    TextManager::FontData* fontData;
     std::string text;
+
+    unsigned int fontSize = 48;
+    unsigned int vbo = 0;
+    unsigned int vao = 0;
 };

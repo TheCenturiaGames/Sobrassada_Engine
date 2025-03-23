@@ -16,6 +16,7 @@ class ShaderModule : public Module
 
     int GetSpecularGlossinessProgram() const;
     int GetMetallicRoughnessProgram() const;
+    int GetUIWidgetProgram() const { return uiWidgetProgram; }
 
   private:
     char* LoadShaderSource(const char* shaderPath);
@@ -28,4 +29,6 @@ class ShaderModule : public Module
 
     int metallicRoughnessProgram       = -1;
     int metallicRoughnessProgramUnlit  = -1;
+
+    int uiWidgetProgram                = -1;
 };

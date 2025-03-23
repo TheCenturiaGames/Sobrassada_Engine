@@ -25,10 +25,9 @@ class GameUIModule : public Module
 
     void AddCanvas(CanvasComponent* newCanvas) { canvas.push_back(newCanvas); }
     void ResetCanvas() { canvas.clear(); }
-    void RenderText(const std::string text, const float2& position) const;
 
   private:
     std::vector<CanvasComponent*> canvas;
 
-    TextManager::FontData* currentFont;
+    unsigned int uiWidgetProgram = 0;
 };
