@@ -423,6 +423,7 @@
     <ClCompile Include="Scene\Scene.cpp" />
     <ClCompile Include="Utils\GameTimer.cpp" />
     <ClCompile Include="Modules\WindowModule.cpp" />
+    <ClCompile Include="Utils\TextManager.cpp" />
     <ClCompile Include="Utils\Trees\Octree.cpp" />
     <ClCompile Include="Utils\Trees\Quadtree.cpp" />
   </ItemGroup>
@@ -441,6 +442,7 @@
     <ClInclude Include="Scene\Components\CameraComponent.h" />
     <ClInclude Include="Scene\Components\Standalone\UI\CanvasComponent.h" />
     <ClInclude Include="Scene\Components\Standalone\UI\UILabelComponent.h" />
+    <ClInclude Include="Utils\TextManager.h" />
     <ClInclude Include="UI\EngineEditors\Editor\NodeEditor.h" />
     <ClInclude Include="UI\EngineEditors\Editor\TextureLibraryEditor.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>

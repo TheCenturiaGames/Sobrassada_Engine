@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "ProjectModule.h"
+#include "TextManager.h"
 
 GameUIModule::GameUIModule()
 {
@@ -15,23 +16,7 @@ bool GameUIModule::Init()
 {
     if (App->GetProjectModule()->IsProjectLoaded())
     {
-        FT_Library library;
-        FT_Face face;
-
-        if (FT_Init_FreeType(&library))
-        {
-            GLOG("Error: Could not initialize FreeType");
-        }
-
-        if (FT_New_Face(library, "./EngineDefaults/Shader/Font/arial.ttf", 0, &face))
-        {
-            GLOG("Error: Could not load the font");
-        }
-
-        GLOG("Font loaded successfully: %s %s", face->family_name, face->style_name);
-
-        FT_Done_Face(face);
-        FT_Done_FreeType(library);
+        currentFont->Init("./Game/EngineDefaults/Shader/Font/Arial.ttf", 64);        
     }
     return true;
 }
@@ -47,10 +32,17 @@ update_status GameUIModule::Render(float deltaTime)
     {
         canvas->Render(deltaTime);
     }
+    DrawTxt("Hello World", float2(0, 0));
     return UPDATE_CONTINUE;
 }
 
 bool GameUIModule::ShutDown()
 {
+    currentFont->Clean();
     return true;
+}
+
+void GameUIModule::DrawTxt(const std::string text, const float2& position) const
+{
+    TextManager::RenderText(*currentFont, text, float3(position, 0), float3(1, 1, 1));
 }

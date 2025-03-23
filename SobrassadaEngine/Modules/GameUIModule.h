@@ -7,6 +7,11 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+namespace TextManager
+{
+    struct FontData;
+}
+
 class GameUIModule : public Module
 {
   public:
@@ -19,7 +24,10 @@ class GameUIModule : public Module
     bool ShutDown() override;
 
     void AddCanvas(CanvasComponent* newCanvas) { canvas.push_back(newCanvas); }
+    void DrawTxt(const std::string text, const float2& position) const;
 
   private:
     std::vector<CanvasComponent*> canvas;
+
+    TextManager::FontData* currentFont;
 };

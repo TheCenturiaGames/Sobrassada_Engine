@@ -389,6 +389,7 @@
     <ClCompile Include="Scene\Components\Standalone\UI\Transform2DComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\UI\UILabelComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\UI\CanvasComponent.cpp" />
+    <ClCompile Include="Utils\TextManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -720,6 +721,9 @@
     <ClInclude Include="Scene\Components\Standalone\UI\Transform2DComponent.h" />
     <ClInclude Include="Scene\Components\Standalone\UI\UILabelComponent.h" />
     <ClInclude Include="Scene\Components\Standalone\UI\CanvasComponent.h" />
+    <ClInclude Include="Utils\TextManager.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl">
