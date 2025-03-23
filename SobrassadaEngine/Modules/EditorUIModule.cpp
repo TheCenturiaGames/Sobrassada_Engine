@@ -316,6 +316,8 @@ void EditorUIModule::MainMenu()
 
             if (ImGui::MenuItem("Node Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::NODE));
 
+            if (ImGui::MenuItem("State Machine Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::ANIMATION));
+
             if (ImGui::MenuItem("Texture Library"))
                 OpenEditor(new TextureLibraryEditor("Texture Library", GenerateUID()));
 
@@ -1134,6 +1136,7 @@ void EditorUIModule::About(bool& aboutMenu)
 EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
 {
     UID uid = GenerateUID();
+    ResourceStateMachine* stateMachine = new ResourceStateMachine(uid, "State Machine " + std::to_string(uid));
     switch (type)
     {
     case EditorType::BASE:
@@ -1142,6 +1145,9 @@ EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
         break;
     case EditorType::NODE:
         return new NodeEditor("NodeEditor" + std::to_string(uid), uid);
+
+    case EditorType::ANIMATION:
+        return new StateMachineEditor("StateMachineEditor " + std::to_string(uid), uid, stateMachine);
 
     default:
         return nullptr;
