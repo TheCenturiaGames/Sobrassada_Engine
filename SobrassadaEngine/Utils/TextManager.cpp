@@ -89,7 +89,7 @@ namespace TextManager
 
     void GenerateFontAtlas(const FT_Face font, GLuint& fontTexture, std::map<char, float4>& charTexCoords)
     {
-        const int atlasWidth = 512, atlasHeight = 512;
+        const int atlasWidth = 4096, atlasHeight = 4096;
         GLubyte* atlasData = new GLubyte[atlasWidth * atlasHeight];
 
         int xOffset = 0, yOffset = 0, rowHeight = 0;
@@ -131,15 +131,14 @@ namespace TextManager
 
             xOffset   += bitmap.width + 2;
             rowHeight  = std::max(rowHeight, (int)bitmap.rows);
-
-            glGenTextures(1, &fontTexture);
-            glBindTexture(GL_TEXTURE_2D, fontTexture);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, atlasWidth, atlasHeight, 0, GL_RED, GL_UNSIGNED_BYTE, atlasData);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         }
+        glGenTextures(1, &fontTexture);
+        glBindTexture(GL_TEXTURE_2D, fontTexture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, atlasWidth, atlasHeight, 0, GL_RED, GL_UNSIGNED_BYTE, atlasData);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
 
     void FontData::Init(const char* filename, const unsigned int height)
@@ -234,6 +233,8 @@ namespace TextManager
 
     void RenderText(FontData& fontData, const std::string& text, const float3& position, const float3& scale)
     {
+        glUseProgram(0);
+
         glBindTexture(GL_TEXTURE_2D, fontData.textureId);
         glEnable(GL_TEXTURE_2D);
 
@@ -250,8 +251,8 @@ namespace TextManager
 
             const float4& texCoord = fontData.charTextureCoords[ch];
 
-            float w          = texCoord.z * 10.0f; // Scale width
-            float h          = texCoord.w * 10.0f; // Scale height
+            float w          = texCoord.z * 1.0f; // Scale width
+            float h          = texCoord.w * 1.0f; // Scale height
 
             glTexCoord2f(texCoord.x, texCoord.y);
             glVertex3f(xOffset, 0, 0);

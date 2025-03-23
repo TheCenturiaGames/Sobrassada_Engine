@@ -3,8 +3,8 @@
 #include "Module.h"
 #include "Scene/Components/Standalone/UI/CanvasComponent.h"
 
-#include <vector>
 #include <ft2build.h>
+#include <vector>
 #include FT_FREETYPE_H
 
 namespace TextManager
@@ -24,7 +24,8 @@ class GameUIModule : public Module
     bool ShutDown() override;
 
     void AddCanvas(CanvasComponent* newCanvas) { canvas.push_back(newCanvas); }
-    void DrawTxt(const std::string text, const float2& position) const;
+    void ResetCanvas() { canvas.clear(); }
+    void RenderText(const std::string text, const float2& position) const;
 
   private:
     std::vector<CanvasComponent*> canvas;

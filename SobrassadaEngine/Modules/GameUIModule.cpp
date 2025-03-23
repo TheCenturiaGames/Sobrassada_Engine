@@ -14,9 +14,10 @@ GameUIModule::~GameUIModule()
 
 bool GameUIModule::Init()
 {
+    currentFont = new TextManager::FontData();
     if (App->GetProjectModule()->IsProjectLoaded())
     {
-        currentFont->Init("./Game/EngineDefaults/Shader/Font/Arial.ttf", 64);        
+        currentFont->Init("./EngineDefaults/Shader/Font/Arial.ttf", 64);        
     }
     return true;
 }
@@ -32,7 +33,7 @@ update_status GameUIModule::Render(float deltaTime)
     {
         canvas->Render(deltaTime);
     }
-    DrawTxt("Hello World", float2(0, 0));
+    RenderText("Hello World", float2(1, 0));
     return UPDATE_CONTINUE;
 }
 
@@ -42,7 +43,7 @@ bool GameUIModule::ShutDown()
     return true;
 }
 
-void GameUIModule::DrawTxt(const std::string text, const float2& position) const
+void GameUIModule::RenderText(const std::string text, const float2& position) const
 {
     TextManager::RenderText(*currentFont, text, float3(position, 0), float3(1, 1, 1));
 }

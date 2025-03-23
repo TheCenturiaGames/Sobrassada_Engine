@@ -19,6 +19,7 @@ CanvasComponent::CanvasComponent(UID uid, GameObject* parent) : Component(uid, p
 
 CanvasComponent::~CanvasComponent()
 {
+    App->GetGameUIModule()->ResetCanvas();
 }
 
 void CanvasComponent::Update(float deltaTime)
