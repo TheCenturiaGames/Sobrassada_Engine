@@ -387,6 +387,7 @@
     <ClCompile Include="FileSystem\StateMachineManager.cpp">
       <Filter>FileSystem</Filter>
     </ClCompile>
+    <ClCompile Include="Scripting\ScriptModule.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -716,6 +717,7 @@
     <ClInclude Include="FileSystem\Config\ProjectConfig.h">
       <Filter>FileSystem\Config</Filter>
     </ClInclude>
+    <ClInclude Include="Scripting\ScriptModule.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl">

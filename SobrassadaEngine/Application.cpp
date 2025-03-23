@@ -17,6 +17,8 @@
 #include "ShaderModule.h"
 #include "UserInterfaceModule.h"
 #include "WindowModule.h"
+#include "Scripting/ScriptModule.h"
+
 
 #ifdef _DEBUG
 #include "optick.h"
@@ -38,6 +40,7 @@ Application::Application()
     modules.push_back(debugDraw = new DebugDrawModule());
     modules.push_back(editorUIModule = new EditorUIModule());
     modules.push_back(UIModule = new UserInterfaceModule());
+    modules.push_back(scriptModule = new ScriptModule());
 
     engineTimer = new EngineTimer();
     engineTimer->Start();
