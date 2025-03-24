@@ -1,14 +1,14 @@
 #include "UILabelComponent.h"
 
-#include "TextManager.h"
-#include "ShaderModule.h"
 #include "Application.h"
 #include "CameraModule.h"
+#include "ShaderModule.h"
+#include "TextManager.h"
 
 #include "glew.h"
 
 UILabelComponent::UILabelComponent(UID uid, GameObject* parent)
-    : text("A"), UIWidgetComponent(uid, parent, "Label", COMPONENT_LABEL)
+    : text("XD"), UIWidgetComponent(uid, parent, "Label", COMPONENT_LABEL)
 {
     fontData = new TextManager::FontData();
     fontData->Init("./EngineDefaults/Shader/Font/Arial.ttf", fontSize);
@@ -27,6 +27,11 @@ void UILabelComponent::Render(float deltaTime)
 {
     int uiProgram = App->GetShaderModule()->GetUIWidgetProgram();
     if (uiProgram == -1) GLOG("Error with UI Program");
+    GLenum err;
+    while ((err = glGetError()) != GL_NO_ERROR)
+    {
+        GLOG("Open GL Error: %d", err);
+    }
     glUseProgram(uiProgram);
 
     glUniformMatrix4fv(0, 1, GL_TRUE, parent->GetGlobalTransform().ptr());
@@ -52,8 +57,11 @@ void UILabelComponent::InitBuffers()
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 24, NULL, GL_DYNAMIC_DRAW);
 
-    glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);

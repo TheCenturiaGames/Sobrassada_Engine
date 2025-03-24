@@ -31,20 +31,21 @@ namespace TextManager
                 GLOG("ERROR: Failed to load character");
                 continue;
             }
-            // if (FT_Render_Glyph(font->glyph, FT_RENDER_MODE_NORMAL))
+            //if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL))
             //{
-            //     GLOG("ERROR: Failed to load character");
-            //     continue;
-            // }
+            //    GLOG("ERROR: Failed to load character");
+            //    continue;
+            //}
 
             GLuint texture;
             glGenTextures(1, &texture);
             glBindTexture(GL_TEXTURE_2D, texture);
+
+            unsigned char whitePixel[1] = {100};
             glTexImage2D(
-                GL_TEXTURE_2D, 0, GL_RED, face->glyph->bitmap.width, face->glyph->bitmap.rows, 0, GL_RED,
+                GL_TEXTURE_2D, 0, GL_R8, face->glyph->bitmap.width, face->glyph->bitmap.rows, 0, GL_RED,
                 GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer
             );
-
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -100,7 +101,6 @@ namespace TextManager
     void RenderText(FontData& fontData, const std::string& text, const unsigned vbo)
     {
         glDisable(GL_DEPTH_TEST);
-        glDisable(GL_CULL_FACE);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -112,11 +112,12 @@ namespace TextManager
         {
             Character character = fontData.characters[c];
 
-            float xPos          = 0;
-            float yPos          = 0;
+            float xPos          = x + character.bearing.x;
+            float yPos          = y - (character.size.y - character.bearing.y);
             float width         = character.size.x;
             float height        = character.size.y;
 
+            // Positions - Uvs interleaved
             float vertices[]    = {xPos,         yPos + height, 0.0f,         0.0f, xPos, yPos,
                                    0.0f,         1.0f,          xPos + width, yPos, 1.0f, 1.0f,
 
@@ -125,32 +126,12 @@ namespace TextManager
 
             glBindTexture(GL_TEXTURE_2D, character.textureID);
             glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-            //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-            GLenum err;
-            while ((err = glGetError()) != GL_NO_ERROR)
-            {
-                GLOG("Open GL Error: %d", err);
-            }
-            GLint attribEnabled;
-            glGetVertexAttribiv(0, GL_VERTEX_ATTRIB_ARRAY_ENABLED, &attribEnabled);
-            if (!attribEnabled)
-            {
-                GLOG("Error: Position attribute (0) is not enabled.");
-            }
-
-            glGetVertexAttribiv(1, GL_VERTEX_ATTRIB_ARRAY_ENABLED, &attribEnabled);
-            if (!attribEnabled)
-            {
-                GLOG("Error: UV attribute (1) is not enabled.");
-            }
             glDrawArrays(GL_TRIANGLES, 0, 6);
 
             x += (character.advance >> 6);
         }
 
         glDisable(GL_BLEND);
-        glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
     }
 

@@ -384,12 +384,24 @@
     <ClCompile Include="FileSystem\StateMachineManager.cpp">
       <Filter>FileSystem</Filter>
     </ClCompile>
-    <ClCompile Include="Modules\GameUIModule.cpp" />
-    <ClCompile Include="Scene\Components\Standalone\UI\UIWidgetComponent.cpp" />
-    <ClCompile Include="Scene\Components\Standalone\UI\Transform2DComponent.cpp" />
-    <ClCompile Include="Scene\Components\Standalone\UI\UILabelComponent.cpp" />
-    <ClCompile Include="Scene\Components\Standalone\UI\CanvasComponent.cpp" />
-    <ClCompile Include="Utils\TextManager.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\UI\CanvasComponent.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\UI\UIWidgetComponent.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\UI\UILabelComponent.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\UI\Transform2DComponent.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\TextManager.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\GameUIModule.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -716,13 +728,23 @@
     <ClInclude Include="FileSystem\Config\ProjectConfig.h">
       <Filter>FileSystem\Config</Filter>
     </ClInclude>
-    <ClInclude Include="Modules\GameUIModule.h" />
-    <ClInclude Include="Scene\Components\Standalone\UI\UIWidgetComponent.h" />
-    <ClInclude Include="Scene\Components\Standalone\UI\Transform2DComponent.h" />
-    <ClInclude Include="Scene\Components\Standalone\UI\UILabelComponent.h" />
-    <ClInclude Include="Scene\Components\Standalone\UI\CanvasComponent.h" />
     <ClInclude Include="Utils\TextManager.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\UI\CanvasComponent.h">
+      <Filter>Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\UI\UIWidgetComponent.h">
+      <Filter>Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\UI\UILabelComponent.h">
+      <Filter>Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\UI\Transform2DComponent.h">
+      <Filter>Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\GameUIModule.h">
+      <Filter>Modules</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

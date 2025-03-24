@@ -337,3 +337,15 @@ void CameraModule::FocusCamera()
 
     viewMatrix         = camera.ViewMatrix();
 }
+
+void CameraModule::SetOrthographic()
+{
+    camera.orthographicWidth = App->GetWindowModule()->GetWidth();
+    camera.orthographicHeight = App->GetWindowModule()->GetHeight();
+    camera.type               = FrustumType::OrthographicFrustum;
+}
+
+void CameraModule::SetPerspective()
+{
+    camera.type = FrustumType::PerspectiveFrustum;
+}

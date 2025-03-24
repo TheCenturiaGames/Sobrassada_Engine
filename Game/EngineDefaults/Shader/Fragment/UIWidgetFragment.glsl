@@ -1,11 +1,12 @@
 #version 460
-in vec2 TexCoords;
+in vec2 uv0;
 out vec4 color;
 
-uniform sampler2D fontTexture;
+layout(binding = 0) uniform sampler2D fontTexture;
+layout(binding = 1) uniform vec3 fontColor;
 
 void main()
 {
-    vec4 sampled = texture(fontTexture, TexCoords);
-    color = vec4(1.0, 0.0, 0.0, sampled.r);
+    vec4 sampled = texture(fontTexture, uv0);
+    color = vec4(sampled.r, 0, 0, sampled.r);
 }
