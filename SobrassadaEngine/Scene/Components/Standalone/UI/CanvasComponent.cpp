@@ -1,10 +1,15 @@
 #include "CanvasComponent.h"
+
 #include "Application.h"
+#include "CameraModule.h"
 #include "DebugDrawModule.h"
-#include "Transform2DComponent.h"
-#include "WindowModule.h"
 #include "GameUIModule.h"
 #include "SceneModule.h"
+#include "Transform2DComponent.h"
+#include "WindowModule.h"
+
+#include "imgui.h"
+#include <queue>
 
 CanvasComponent::CanvasComponent(UID uid, GameObject* parent) : Component(uid, parent, "Canvas", COMPONENT_CANVAS)
 {
@@ -21,6 +26,10 @@ CanvasComponent::CanvasComponent(UID uid, GameObject* parent) : Component(uid, p
 CanvasComponent::~CanvasComponent()
 {
     App->GetGameUIModule()->ResetCanvas();
+}
+
+void CanvasComponent::Clone(const Component* otherComponent)
+{
 }
 
 void CanvasComponent::Update(float deltaTime)
@@ -60,12 +69,37 @@ void CanvasComponent::Render(float deltaTime)
         -float3::unitY, transform2D->GetSize().y, float3(1, 1, 1)
     );
 
-    for (const auto& child : parent->GetChildren())
+    // Render all ui widgets
+
+    // Iteratively render all UI children
+    // TODO: Probably better to store them in an array of Transform2D when created and render those directly. Nope, becuase if changing hierarchy won't get updated. This way it gets updated always
+    // std::queue<UID> children;
+    //
+    // while (!children.empty())
+    //{
+    //    App->GetSceneModule()->GetScene()->GetGameObjectByUID(children.front())->Render(deltaTime);
+    //    children.pop();
+    //
+    //    for (const UID child : parent->GetChildren())
+    //    {
+    //        children.push(child);
+    //    }
+    //}
+
+    for (const UID child : parent->GetChildren())
     {
         App->GetSceneModule()->GetScene()->GetGameObjectByUID(child)->Render(deltaTime);
     }
 }
 
-void CanvasComponent::Clone(const Component* otherComponent)
+void CanvasComponent::RenderEditorInspector()
 {
+    Component::RenderEditorInspector();
+
+    if (enabled)
+    {
+        ImGui::Text("Canvas");
+
+        ImGui::Checkbox("Show in world space", &isInWorldSpaceEditor);
+    }
 }

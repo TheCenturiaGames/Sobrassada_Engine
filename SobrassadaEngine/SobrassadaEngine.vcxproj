@@ -347,7 +347,6 @@
     <ClCompile Include="Scene\Components\Standalone\CharacterControllerComponent.cpp" />
     <ClCompile Include="UI\EngineEditors\Nodes\CustomNode.cpp" />
     <ClCompile Include="Scene\Components\Standalone\UI\Transform2DComponent.cpp" />
-    <ClCompile Include="Scene\Components\Standalone\UI\UIWidgetComponent.cpp" />
     <ClCompile Include="Utils\EngineTimer.cpp" />
     <ClCompile Include="FileSystem\Importers\Importer.cpp" />
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp" />
@@ -466,7 +465,6 @@
     <ClInclude Include="Modules\SceneModule.h" />
     <ClInclude Include="FileSystem\Importers\ModelImporter.h" />
     <ClInclude Include="Scene\Components\Standalone\UI\Transform2DComponent.h" />
-    <ClInclude Include="Scene\Components\Standalone\UI\UIWidgetComponent.h" />
     <ClInclude Include="Utils\Delegate.h" />
     <ClInclude Include="Utils\EventDispatcher.h" />
     <ClInclude Include="Utils\Interpolation.h" />

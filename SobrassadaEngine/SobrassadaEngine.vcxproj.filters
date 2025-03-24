@@ -387,9 +387,6 @@
     <ClCompile Include="Scene\Components\Standalone\UI\CanvasComponent.cpp">
       <Filter>Scene\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Components\Standalone\UI\UIWidgetComponent.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\Components\Standalone\UI\UILabelComponent.cpp">
       <Filter>Scene\Components</Filter>
     </ClCompile>
@@ -732,9 +729,6 @@
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="Scene\Components\Standalone\UI\CanvasComponent.h">
-      <Filter>Scene\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene\Components\Standalone\UI\UIWidgetComponent.h">
       <Filter>Scene\Components</Filter>
     </ClInclude>
     <ClInclude Include="Scene\Components\Standalone\UI\UILabelComponent.h">

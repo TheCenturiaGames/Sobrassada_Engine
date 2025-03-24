@@ -343,9 +343,11 @@ void CameraModule::SetOrthographic()
     camera.type               = FrustumType::OrthographicFrustum;
     camera.orthographicWidth = App->GetWindowModule()->GetWidth();
     camera.orthographicHeight = App->GetWindowModule()->GetHeight();
+    projectionMatrix = camera.ProjectionMatrix();
 }
 
 void CameraModule::SetPerspective()
 {
     camera.type = FrustumType::PerspectiveFrustum;
+    projectionMatrix = camera.ProjectionMatrix();
 }

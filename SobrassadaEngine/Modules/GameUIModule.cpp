@@ -26,12 +26,10 @@ update_status GameUIModule::Update(float deltaTime)
 
 update_status GameUIModule::Render(float deltaTime)
 {
-    App->GetCameraModule()->SetOrthographic();
     for (CanvasComponent* canvas : canvas)
     {
         canvas->Render(deltaTime);
     }
-    App->GetCameraModule()->SetPerspective();
 
     return UPDATE_CONTINUE;
 }

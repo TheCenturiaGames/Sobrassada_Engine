@@ -8,16 +8,6 @@
 
 namespace TextManager
 {
-    int NextPower2(int numToSurpass)
-    {
-        int power = 1;
-        while (power < numToSurpass)
-        {
-            power *= 2;
-        }
-        return power; // Returns the first power of 2 bigger than the given number
-    }
-
     void GenerateFontTextures(const FT_Face face, std::map<char, Character>& outCharacters)
     {
         // Disable byte-alignment restriction.
