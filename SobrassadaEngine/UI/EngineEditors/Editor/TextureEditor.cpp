@@ -1,10 +1,12 @@
-#include "Application.h"
+#include "TextureEditor.h"
 
+#include "Application.h"
 #include "LibraryModule.h"
 #include "ResourceManagement/Resources/ResourceTexture.h"
 #include "ResourcesModule.h"
-#include "TextureEditor.h"
+
 #include "imgui.h"
+
 
 TextureEditor::TextureEditor(const std::string& editorName, UID uid) : EngineEditorBase(editorName, uid)
 {
