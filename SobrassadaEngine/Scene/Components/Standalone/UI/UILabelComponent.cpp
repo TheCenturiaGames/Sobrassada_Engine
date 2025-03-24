@@ -4,6 +4,7 @@
 #include "CameraModule.h"
 #include "ShaderModule.h"
 #include "TextManager.h"
+#include "WindowModule.h"
 
 #include "glew.h"
 
@@ -34,11 +35,18 @@ void UILabelComponent::Render(float deltaTime)
     }
     glUseProgram(uiProgram);
 
+    float4x4 proj = float4x4::D3DOrthoProjLH(
+        -1, 1, App->GetWindowModule()->GetWidth(), App->GetWindowModule()->GetHeight()
+    ); // near plane. far plane, screen width, screen height
+    float4x4 view = float4x4::identity;
+
+
     glUniformMatrix4fv(0, 1, GL_TRUE, parent->GetGlobalTransform().ptr());
-    glUniformMatrix4fv(1, 1, GL_TRUE, App->GetCameraModule()->GetViewMatrix().ptr());
-    glUniformMatrix4fv(2, 1, GL_TRUE, App->GetCameraModule()->GetProjectionMatrix().ptr());
-    //glUniformMatrix4fv(1, 1, GL_TRUE, float4x4::identity.ptr());
-    //glUniformMatrix4fv(2, 1, GL_TRUE, float4x4::identity.ptr());
+    //glUniformMatrix4fv(1, 1, GL_TRUE, App->GetCameraModule()->GetViewMatrix().ptr());
+    //glUniformMatrix4fv(2, 1, GL_TRUE, App->GetCameraModule()->GetProjectionMatrix().ptr());
+
+    glUniformMatrix4fv(1, 1, GL_TRUE, float4x4::identity.ptr());
+    glUniformMatrix4fv(2, 1, GL_TRUE, proj.ptr());
 
     glBindVertexArray(vao);
     TextManager::RenderText(*fontData, text, vbo);

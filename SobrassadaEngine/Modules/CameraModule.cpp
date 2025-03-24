@@ -340,9 +340,9 @@ void CameraModule::FocusCamera()
 
 void CameraModule::SetOrthographic()
 {
+    camera.type               = FrustumType::OrthographicFrustum;
     camera.orthographicWidth = App->GetWindowModule()->GetWidth();
     camera.orthographicHeight = App->GetWindowModule()->GetHeight();
-    camera.type               = FrustumType::OrthographicFrustum;
 }
 
 void CameraModule::SetPerspective()

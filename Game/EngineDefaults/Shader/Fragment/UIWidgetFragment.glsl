@@ -2,8 +2,8 @@
 in vec2 uv0;
 out vec4 color;
 
-layout(binding = 0) uniform sampler2D fontTexture;
-layout(binding = 1) uniform vec3 fontColor;
+uniform sampler2D fontTexture;
+layout(location=3) uniform vec3 fontColor;
 
 void main()
 {

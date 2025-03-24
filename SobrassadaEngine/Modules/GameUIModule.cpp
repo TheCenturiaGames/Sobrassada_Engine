@@ -1,9 +1,8 @@
 #include "GameUIModule.h"
 
 #include "Application.h"
-#include "ProjectModule.h"
-#include "ShaderModule.h"
 #include "TextManager.h"
+#include "CameraModule.h"
 
 #include "glew.h"
 
@@ -27,10 +26,12 @@ update_status GameUIModule::Update(float deltaTime)
 
 update_status GameUIModule::Render(float deltaTime)
 {
+    App->GetCameraModule()->SetOrthographic();
     for (CanvasComponent* canvas : canvas)
     {
         canvas->Render(deltaTime);
     }
+    App->GetCameraModule()->SetPerspective();
 
     return UPDATE_CONTINUE;
 }
