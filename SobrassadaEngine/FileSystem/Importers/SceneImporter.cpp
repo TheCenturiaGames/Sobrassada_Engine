@@ -8,6 +8,8 @@
 #include "PrefabManager.h"
 #include "ProjectModule.h"
 #include "TextureImporter.h"
+#include "PrefabImporter.h"
+
 
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #define TINYGLTF_NO_STB_IMAGE
@@ -25,9 +27,11 @@ namespace SceneImporter
         CreateLibraryDirectories(engineDefaultPath);
 
         std::string extension = FileSystem::GetFileExtension(filePath);
+        std::string targetPath = App->GetProjectModule()->GetLoadedProjectPath();
 
-        if (extension == ASSET_EXTENSION) ImportGLTF(filePath, App->GetProjectModule()->GetLoadedProjectPath());
-        else TextureImporter::Import(filePath, App->GetProjectModule()->GetLoadedProjectPath());
+        if(extension == ASSET_EXTENSION) ImportGLTF(filePath, targetPath);
+        else if (extension == PREFAB_EXTENSION) PrefabImporter::Import(filePath, targetPath, INVALID_UID);
+        else TextureImporter::Import(filePath, targetPath);
     }
 
     void ImportGLTF(const char* filePath, const std::string& targetFilePath)
