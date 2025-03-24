@@ -1,5 +1,6 @@
 #include "ScriptModule.h"
 #include "Fibonacci.h"
+#include <thread>
 
 bool ScriptModule::Init()
 {
@@ -15,12 +16,11 @@ void ScriptModule::LoadDLL()
         GLOG("Failed to load DLL\n");
         return;
     }
+
     fibonacci_initFunc    = (FibonacciInitFunc)GetProcAddress(dllHandle, "fibonacci_init");
     fibonacci_indexFunc   = (FibonacciIndexFunc)GetProcAddress(dllHandle, "fibonacci_index");
     fibonacci_currentFunc = (FibonacciCurrentFunc)GetProcAddress(dllHandle, "fibonacci_current");
     fibonacci_nextFunc    = (FibonacciNextFunc)GetProcAddress(dllHandle, "fibonacci_next");
-    fibonacci_version = (FibonacciVersion)GetProcAddress(dllHandle, "GetDLLVersion");
-    GLOG("%s", fibonacci_version());
 
     if (!fibonacci_initFunc || !fibonacci_nextFunc || !fibonacci_indexFunc || !fibonacci_currentFunc)
     {
@@ -38,12 +38,13 @@ void ScriptModule::UnloadDLL()
 {
     if (dllHandle)
     {
-        FreeLibrary(dllHandle);
-        dllHandle         = nullptr;
         fibonacci_initFunc    = nullptr;
         fibonacci_nextFunc    = nullptr;
         fibonacci_indexFunc   = nullptr;
         fibonacci_currentFunc = nullptr;
+
+        FreeLibrary(dllHandle);
+        dllHandle         = nullptr;
     }
 }
 
@@ -53,7 +54,6 @@ void ScriptModule::CallTestFunction()
     {
         int i = 0;
         fibonacci_initFunc(1, 1);
-        // Write out the sequence values until overflow.
         do {
             GLOG("%d: %d", fibonacci_indexFunc(), fibonacci_currentFunc());
             i++;
@@ -67,22 +67,22 @@ void ScriptModule::CallTestFunction()
 
 void ScriptModule::ReloadDLLIfUpdated()
 {
-    // Ruta del archivo DLL
-    const fs::path dllPath = "SobrassadaScripts.dll";
-    
-    // Verificar si el archivo existe
+    const fs::path dllPath = "..\\SobrassadaEngine\\x64\\Debug\\SobrassadaScripts.dll";
+    const fs::path copyPath = "..\\Game";
+
     if (fs::exists(dllPath))
     {
-        // Obtener el tiempo de última modificación
         fs::file_time_type currentWriteTime = fs::last_write_time(dllPath);
         
-        // Si el tiempo de modificación ha cambiado, recargar la DLL
         if (currentWriteTime != lastWriteTime)
         {
             GLOG("DLL has been updated, reloading...\n");
-            UnloadDLL();  // Descargar la DLL antigua
-            LoadDLL();    // Cargar la nueva DLL
-            lastWriteTime = currentWriteTime;  // Actualizar el último tiempo de modificación
+
+            UnloadDLL();
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            fs::copy(dllPath, copyPath, fs::copy_options::overwrite_existing);
+            LoadDLL();
+            lastWriteTime = currentWriteTime;
             CallTestFunction();
         }
     }

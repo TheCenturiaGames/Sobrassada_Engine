@@ -8,7 +8,6 @@ typedef void (*FibonacciInitFunc)(int, int);
 typedef bool (*FibonacciNextFunc)();
 typedef int (*FibonacciIndexFunc)();
 typedef int (*FibonacciCurrentFunc)();
-typedef const char* (*FibonacciVersion)();
 
 namespace fs = std::filesystem;
 
@@ -17,7 +16,6 @@ class ScriptModule : public Module
   public:
     ScriptModule()
         : dllHandle(nullptr), fibonacci_initFunc(nullptr), fibonacci_nextFunc(nullptr), fibonacci_indexFunc(nullptr),
-          fibonacci_version(nullptr),
           fibonacci_currentFunc(nullptr)
     {
     }
@@ -37,7 +35,6 @@ class ScriptModule : public Module
     FibonacciNextFunc fibonacci_nextFunc;
     FibonacciIndexFunc fibonacci_indexFunc;
     FibonacciCurrentFunc fibonacci_currentFunc;
-    FibonacciVersion fibonacci_version;
 
     fs::file_time_type lastWriteTime;
 };
