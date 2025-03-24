@@ -718,6 +718,7 @@
       <Filter>FileSystem\Config</Filter>
     </ClInclude>
     <ClInclude Include="Scripting\ScriptModule.h" />
+    <ClInclude Include="Script.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl">

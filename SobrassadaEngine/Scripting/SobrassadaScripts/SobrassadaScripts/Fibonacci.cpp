@@ -37,15 +37,10 @@ bool fibonacci_next()
 
 unsigned long long fibonacci_current()
 {
-    return 1;
+    return current_;
 }
 
 unsigned fibonacci_index()
 {
     return index_;
-}
-
-const char* GetDLLVersion()
-{
-    return "1.0.0";
 }

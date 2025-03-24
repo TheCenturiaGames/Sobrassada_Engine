@@ -451,6 +451,7 @@
     <ClInclude Include="FileSystem\StateMachineManager.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceStateMachine.h" />
     <ClInclude Include="Scene\Components\CameraComponent.h" />
+    <ClInclude Include="Script.h" />
     <ClInclude Include="Scripting\ScriptModule.h" />
     <ClInclude Include="UI\EngineEditors\Editor\NodeEditor.h" />
     <ClInclude Include="UI\EngineEditors\Editor\TextureLibraryEditor.h">

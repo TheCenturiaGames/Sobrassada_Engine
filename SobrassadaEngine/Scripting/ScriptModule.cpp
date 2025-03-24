@@ -1,10 +1,10 @@
 #include "ScriptModule.h"
-#include "Fibonacci.h"
 #include <thread>
 
+// Information: To make the dll works you need to recompile (not compile!)
 bool ScriptModule::Init()
 {
-    LoadDLL();
+    ReloadDLLIfUpdated();
     return true;
 }
 
@@ -16,21 +16,34 @@ void ScriptModule::LoadDLL()
         GLOG("Failed to load DLL\n");
         return;
     }
+    lastWriteTime     = fs::last_write_time("SobrassadaScripts.dll");
 
-    fibonacci_initFunc    = (FibonacciInitFunc)GetProcAddress(dllHandle, "fibonacci_init");
-    fibonacci_indexFunc   = (FibonacciIndexFunc)GetProcAddress(dllHandle, "fibonacci_index");
-    fibonacci_currentFunc = (FibonacciCurrentFunc)GetProcAddress(dllHandle, "fibonacci_current");
-    fibonacci_nextFunc    = (FibonacciNextFunc)GetProcAddress(dllHandle, "fibonacci_next");
-
-    if (!fibonacci_initFunc || !fibonacci_nextFunc || !fibonacci_indexFunc || !fibonacci_currentFunc)
+    createScriptFunc  = (CreateScriptFunc)GetProcAddress(dllHandle, "CreateScript");
+    destroyScriptFunc = (DestroyScriptFunc)GetProcAddress(dllHandle, "DestroyScript");
+    if (!createScriptFunc || !destroyScriptFunc)
     {
-        GLOG("Failed to load fibonacci functions\n");
+        GLOG("Failed to load CreateScript or DestroyScript functions\n");
+        return;
+    }
+
+    scriptInstance = createScriptFunc();
+    if (scriptInstance && !scriptInstance->Init())
+    {
+        GLOG("Failed to initialize script\n");
+        destroyScriptFunc(scriptInstance);
+        scriptInstance = nullptr;
     }
 }
 
 update_status ScriptModule::Update(float deltaTime)
 {
     ReloadDLLIfUpdated();
+
+    if (scriptInstance)
+    {
+        scriptInstance->Update(deltaTime);
+    }
+
     return UPDATE_CONTINUE;
 }
 
@@ -38,52 +51,40 @@ void ScriptModule::UnloadDLL()
 {
     if (dllHandle)
     {
-        fibonacci_initFunc    = nullptr;
-        fibonacci_nextFunc    = nullptr;
-        fibonacci_indexFunc   = nullptr;
-        fibonacci_currentFunc = nullptr;
+        if (scriptInstance)
+        {
+            destroyScriptFunc(scriptInstance);
+            scriptInstance = nullptr;
+        }
+
+        createScriptFunc  = nullptr;
+        destroyScriptFunc = nullptr;
 
         FreeLibrary(dllHandle);
-        dllHandle         = nullptr;
-    }
-}
-
-void ScriptModule::CallTestFunction()
-{
-    if (fibonacci_initFunc && fibonacci_nextFunc && fibonacci_indexFunc && fibonacci_currentFunc)
-    {
-        int i = 0;
-        fibonacci_initFunc(1, 1);
-        do {
-            GLOG("%d: %d", fibonacci_indexFunc(), fibonacci_currentFunc());
-            i++;
-        } while (fibonacci_nextFunc() && i < 10);
-    }
-    else
-    {
-        GLOG("Fibonacci functions are not loaded correctly\n");
+        dllHandle = nullptr;
     }
 }
 
 void ScriptModule::ReloadDLLIfUpdated()
 {
-    const fs::path dllPath = "..\\SobrassadaEngine\\x64\\Debug\\SobrassadaScripts.dll";
+    //This needs to be move into globals.h
+    const fs::path dllPath  = "..\\SobrassadaEngine\\x64\\Debug\\SobrassadaScripts.dll";
     const fs::path copyPath = "..\\Game";
 
     if (fs::exists(dllPath))
     {
         fs::file_time_type currentWriteTime = fs::last_write_time(dllPath);
-        
+
         if (currentWriteTime != lastWriteTime)
         {
-            GLOG("DLL has been updated, reloading...\n");
+            if (lastWriteTime != fs::file_time_type {}) GLOG("DLL has been updated, reloading...\n");
 
             UnloadDLL();
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            // We need to do a little sleep because windows doesnt release directly the program (probably I need to change that)
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
             fs::copy(dllPath, copyPath, fs::copy_options::overwrite_existing);
             LoadDLL();
             lastWriteTime = currentWriteTime;
-            CallTestFunction();
         }
     }
 }
