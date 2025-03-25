@@ -67,7 +67,7 @@ void ScriptModule::UnloadDLL()
 
 void ScriptModule::ReloadDLLIfUpdated()
 {
-    //This needs to be move into globals.h
+    // This needs to be move into globals.h
     const fs::path dllPath  = "..\\SobrassadaEngine\\x64\\Debug\\SobrassadaScripts.dll";
     const fs::path copyPath = "..\\Game";
 
@@ -80,9 +80,23 @@ void ScriptModule::ReloadDLLIfUpdated()
             if (lastWriteTime != fs::file_time_type {}) GLOG("DLL has been updated, reloading...\n");
 
             UnloadDLL();
-            // We need to do a little sleep because windows doesnt release directly the program (probably I need to change that)
-            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+            const int maxAttempts = 10;
+            int attempt = 0;
+            while (fs::exists(copyPath / "SobrassadaScripts.dll") && attempt < maxAttempts)
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                attempt++;
+            }
+
+            if (fs::exists(copyPath / "SobrassadaScripts.dll"))
+            {
+                GLOG("ERROR: Could not delete the DLL. It may still be in use.\n");
+                return;
+            }
+
             fs::copy(dllPath, copyPath, fs::copy_options::overwrite_existing);
+
             LoadDLL();
             lastWriteTime = currentWriteTime;
         }

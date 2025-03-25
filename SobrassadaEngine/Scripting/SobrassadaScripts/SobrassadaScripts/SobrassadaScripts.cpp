@@ -1,4 +1,4 @@
-// SobrassadaScripts.cpp : Define las funciones exportadas del archivo DLL.
+// SobrassadaScripts.cpp : Define the exported functions from the DLL.
 //
 
 #include "pch.h"
@@ -6,16 +6,16 @@
 #include "SobrassadaScripts.h"
 
 
-// Ejemplo de variable exportada
-SOBRASSADASCRIPTS_API int nSobrassadaScripts=0;
+// Example of exported variable
+SOBRASSADASCRIPTS_API int nSobrassadaScripts = 0;
 
-// Ejemplo de función exportada.
+// Example of exported function
 SOBRASSADASCRIPTS_API int fnSobrassadaScripts(void)
 {
     return 0;
 }
 
-// Constructor de clase exportada.
+// Constructor of exported class
 CSobrassadaScripts::CSobrassadaScripts()
 {
     return;

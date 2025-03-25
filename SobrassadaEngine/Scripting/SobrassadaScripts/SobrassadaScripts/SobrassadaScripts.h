@@ -1,20 +1,19 @@
-// El siguiente bloque ifdef muestra la forma estándar de crear macros que hacen la exportación
-// de un DLL más sencillo. Todos los archivos de este archivo DLL se compilan con SOBRASSADASCRIPTS_EXPORTS
-// símbolo definido en la línea de comandos. Este símbolo no debe definirse en ningún proyecto
-// que use este archivo DLL. De este modo, otros proyectos cuyos archivos de código fuente incluyan el archivo verán
-// interpretan que las funciones SOBRASSADASCRIPTS_API se importan de un archivo DLL, mientras que este archivo DLL interpreta los símbolos
-// definidos en esta macro como si fueran exportados.
+// The following ifdef block shows the standard way to create macros that make exporting a DLL easier. 
+// All files in this DLL are compiled with the SOBRASSADASCRIPTS_EXPORTS symbol defined on the command line.
+// This symbol should not be defined in any project that uses this DLL. 
+// This way, other projects whose source code files include the file will interpret the SOBRASSADASCRIPTS_API functions as imported from a DLL,
+// while this DLL interprets the symbols defined in this macro as exported.
 #ifdef SOBRASSADASCRIPTS_EXPORTS
 #define SOBRASSADASCRIPTS_API __declspec(dllexport)
 #else
 #define SOBRASSADASCRIPTS_API __declspec(dllimport)
 #endif
 
-// Clase exportada del DLL
+// Exported class from DLL
 class SOBRASSADASCRIPTS_API CSobrassadaScripts {
 public:
 	CSobrassadaScripts(void);
-	// TODO: agregar métodos aquí.
+	// You can add here more functions
 };
 
 extern SOBRASSADASCRIPTS_API int nSobrassadaScripts;
