@@ -8,7 +8,6 @@
 #include <ShaderModule.h>
 #include <Standalone/MeshComponent.h>
 
-#include <Math/float4x4.h>
 #include <chrono>
 #include <glew.h>
 
@@ -48,54 +47,29 @@ void GeometryBatch::LoadData()
 {
     std::vector<Vertex> totalVertices;
     std::vector<unsigned int> totalIndices;
-    std::vector<float4x4> totalModels;
-    std::vector<MaterialGPU> totalMaterials;
 
     for (const MeshComponent* component : components)
     {
         const ResourceMesh* resource = component->GetResourceMesh();
         const auto& it               = uniqueMeshes.find(resource);
-        if (it != uniqueMeshes.end())
-        {
-            int idx                         = static_cast<int>(std::distance(uniqueMeshes.begin(), it));
-            commands.at(idx).instanceCount += 1;
-        }
-        else
+        if (it == uniqueMeshes.end())
         {
             const std::vector<Vertex>& vertices      = resource->GetLocalVertices();
             const std::vector<unsigned int>& indices = resource->GetIndices();
             totalVertices.insert(totalVertices.end(), vertices.begin(), vertices.end());
             totalIndices.insert(totalIndices.end(), indices.begin(), indices.end());
-
-            const unsigned int count = static_cast<unsigned int>(indices.size());
-            Command newCommand;
-            newCommand.count          = count;       // Number of indices in the mesh
-            newCommand.instanceCount  = 1;           // Number of instances to render
-            newCommand.firstIndex     = indexCount;  // Index offset in the EBO
-            newCommand.baseVertex     = vertexCount; // Vertex offset in the VBO
-            newCommand.baseInstance   = 0;           // Instance Index
-
-            indexCount               += count;
-            vertexCount              += static_cast<unsigned int>(vertices.size());
-            commands.push_back(newCommand);
             uniqueMeshes.insert(resource);
+            MeshCount newMeshCount;
+            newMeshCount.vertexCount = resource->GetVertexCount();
+            newMeshCount.indexCount  = resource->GetIndexCount();
+            uniqueMeshesCount.push_back(newMeshCount);
         }
-
-        totalModels.push_back(component->GetCombinedMatrix());
-        totalMaterials.push_back(component->GetResourceMaterial()->GetMaterial());
-    }
-
-    int baseInstanceCount = 0;
-    for (Command& currentCommand : commands)
-    {
-        currentCommand.baseInstance  = baseInstanceCount;
-        baseInstanceCount           += currentCommand.instanceCount;
     }
 
     glBindVertexArray(vao);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(Vertex), totalVertices.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, totalVertices.size() * sizeof(Vertex), totalVertices.data(), GL_DYNAMIC_DRAW);
 
     glEnableVertexAttribArray(0); // Position
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
@@ -114,30 +88,28 @@ void GeometryBatch::LoadData()
 
     glEnableVertexAttribArray(5); // Weights
     glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, weights));
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(unsigned int), totalIndices.data(), GL_DYNAMIC_DRAW);
+    glBufferData(
+        GL_ELEMENT_ARRAY_BUFFER, totalIndices.size() * sizeof(unsigned int), totalIndices.data(), GL_DYNAMIC_DRAW
+    );
 
     glBindVertexArray(0);
-
-    glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirect);
-    glBufferData(GL_DRAW_INDIRECT_BUFFER, commands.size() * sizeof(Command), commands.data(), GL_DYNAMIC_DRAW);
-
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, models);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, totalModels.size() * sizeof(float4x4), totalModels.data(), GL_DYNAMIC_DRAW);
-
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, materials);
-    glBufferData(
-        GL_SHADER_STORAGE_BUFFER, totalMaterials.size() * sizeof(MaterialGPU), totalMaterials.data(), GL_DYNAMIC_DRAW
-    );
 }
 
-void GeometryBatch::Render(unsigned int program, unsigned int cameraUBO, float3 cameraPos)
+void GeometryBatch::Render(
+    unsigned int program, unsigned int cameraUBO, float3 cameraPos, const std::vector<MeshComponent*>& meshesToRender
+)
 {
-    const auto start        = std::chrono::high_resolution_clock::now();
+    const auto start = std::chrono::high_resolution_clock::now();
 
-    const int meshTriangles = vertexCount / 3;
+    std::vector<float4x4> totalModels;
+    std::vector<MaterialGPU> totalMaterials;
+    std::vector<Command> commands;
+
+    GenerateCommands(meshesToRender, commands, totalModels, totalMaterials);
+
+    const int meshTriangles = totalVertexCount / 3;
 
     glUseProgram(program);
 
@@ -151,10 +123,17 @@ void GeometryBatch::Render(unsigned int program, unsigned int cameraUBO, float3 
 
     glUniform1i(4, 0); // hasBones
 
+    glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirect);
+    glBufferData(GL_DRAW_INDIRECT_BUFFER, commands.size() * sizeof(Command), commands.data(), GL_DYNAMIC_DRAW);
+
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, models);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, totalModels.size() * sizeof(float4x4), totalModels.data(), GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 10, models);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, materials);
+    glBufferData(
+        GL_SHADER_STORAGE_BUFFER, totalMaterials.size() * sizeof(MaterialGPU), totalMaterials.data(), GL_DYNAMIC_DRAW
+    );
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 11, materials);
 
     glBindVertexArray(vao);
@@ -170,14 +149,49 @@ void GeometryBatch::Render(unsigned int program, unsigned int cameraUBO, float3 
     const std::chrono::duration<float> elapsed = end - start;
 
     App->GetOpenGLModule()->AddTrianglesPerSecond(meshTriangles / elapsed.count());
-    App->GetOpenGLModule()->AddVerticesCount(vertexCount);
+    App->GetOpenGLModule()->AddVerticesCount(totalVertexCount);
 }
 
-void GeometryBatch::ClearObjectsToRender()
+void GeometryBatch::GenerateCommands(
+    const std::vector<MeshComponent*>& meshes, std::vector<Command>& commands, std::vector<float4x4>& totalModels,
+    std::vector<MaterialGPU>& totalMaterials
+)
 {
-    components.clear();
-    uniqueMeshes.clear();
-    commands.clear();
-    vertexCount = 0;
-    indexCount  = 0;
+    totalVertexCount      = 0;
+    totalIndexCount       = 0;
+    int baseInstanceCount = 0;
+
+    for (const MeshComponent* component : meshes)
+    {
+        const ResourceMesh* resource = component->GetResourceMesh();
+
+        unsigned int vertexCount     = static_cast<unsigned int>(resource->GetVertexCount());
+        unsigned int indexCount      = static_cast<unsigned int>(resource->GetIndexCount());
+
+        const auto& it               = uniqueMeshes.find(resource);
+        int idx                      = static_cast<int>(std::distance(uniqueMeshes.begin(), it));
+
+        int accVertexCount           = 0;
+        int accIndexCount            = 0;
+        for (int i = 0; i < idx; i++)
+        {
+            accVertexCount += uniqueMeshesCount[i].vertexCount;
+            accIndexCount  += uniqueMeshesCount[i].indexCount;
+        }
+
+        Command newCommand;
+        newCommand.count          = indexCount;        // Number of indices in the mesh
+        newCommand.instanceCount  = 1;                 // Number of instances to render
+        newCommand.firstIndex     = accIndexCount;     // Index offset in the EBO
+        newCommand.baseVertex     = accVertexCount;    // Vertex offset in the VBO
+        newCommand.baseInstance   = baseInstanceCount; // Instance Index
+
+        baseInstanceCount        += 1;
+        totalVertexCount         += vertexCount;
+        totalIndexCount          += indexCount;
+
+        commands.push_back(newCommand);
+        totalModels.push_back(component->GetCombinedMatrix());
+        totalMaterials.push_back(component->GetResourceMaterial()->GetMaterial());
+    }
 }

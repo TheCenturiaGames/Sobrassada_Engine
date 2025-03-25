@@ -53,6 +53,7 @@ MeshComponent::MeshComponent(const rapidjson::Value& initialState, GameObject* p
         }
     }
     batch = App->GetResourcesModule()->GetBatchManager()->RequestBatch(this);
+    batch->AddComponent(this);
 }
 
 MeshComponent::~MeshComponent()
@@ -147,7 +148,11 @@ void MeshComponent::RenderEditorInspector()
 void MeshComponent::Update(float deltaTime)
 {
     if (batch == nullptr && currentMesh != nullptr && currentMaterial != nullptr)
+    {
         batch = App->GetResourcesModule()->GetBatchManager()->RequestBatch(this);
+        batch->AddComponent(this);
+    }
+        
 }
 
 void MeshComponent::Render(float deltaTime)

@@ -1,13 +1,21 @@
 #pragma once
 
+#include <Math/float3.h>
+#include <Math/float4x4.h>
 #include <unordered_set>
 #include <vector>
-#include <Math/float3.h>
 
 class MeshComponent;
 class ResourceMesh;
 class MeshComponent;
 struct Command;
+struct MaterialGPU;
+
+struct MeshCount
+{
+    unsigned int vertexCount;
+    unsigned int indexCount;
+};
 
 class GeometryBatch
 {
@@ -16,8 +24,15 @@ class GeometryBatch
     ~GeometryBatch();
 
     void LoadData();
-    void Render(unsigned int program, unsigned int cameraUBO, float3 cameraPos);
-    void ClearObjectsToRender();
+    void Render(
+        unsigned int program, unsigned int cameraUBO, float3 cameraPos,
+        const std::vector<MeshComponent*>& meshesToRender
+    );
+
+    void GenerateCommands(
+        const std::vector<MeshComponent*>& meshes, std::vector<Command>& commands, std::vector<float4x4>& totalModels,
+        std::vector<MaterialGPU>& totalMaterials
+    );
 
     void AddComponent(const MeshComponent* component) { components.push_back(component); }
 
@@ -27,9 +42,11 @@ class GeometryBatch
   private:
     std::vector<const MeshComponent*> components;
     std::unordered_set<const ResourceMesh*> uniqueMeshes;
-    std::vector<Command> commands;
-    unsigned int vertexCount = 0;
-    unsigned int indexCount  = 0;
+
+    std::vector<MeshCount> uniqueMeshesCount;
+
+    unsigned int totalVertexCount = 0;
+    unsigned int totalIndexCount  = 0;
 
     unsigned int indirect    = 0;
     unsigned int vao         = 0;

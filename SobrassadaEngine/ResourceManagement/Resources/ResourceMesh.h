@@ -36,6 +36,7 @@ class ResourceMesh : public Resource
 
     const AABB& GetAABB() const { return aabb; }
     int GetIndexCount() const { return indexCount; }
+    int GetVertexCount() const { return vertexCount; }
     const std::vector<Vertex>& GetLocalVertices() const { return vertices; }
     const std::vector<unsigned int>& GetIndices() const { return indices; }
     const float4x4& GetDefaultTransform() const { return defaultTransform; }

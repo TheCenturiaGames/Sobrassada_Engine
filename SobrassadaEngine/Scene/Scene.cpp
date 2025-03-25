@@ -71,6 +71,8 @@ Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUI
     }
 
     GLOG("%s scene loaded", sceneName.c_str());
+
+    App->GetResourcesModule()->GetBatchManager()->LoadData();
 }
 
 Scene::~Scene()
@@ -234,16 +236,15 @@ update_status Scene::Render(float deltaTime) const
     CheckObjectsToRender(objectsToRender);
 
     BatchManager* batchManager = App->GetResourcesModule()->GetBatchManager();
-    batchManager->ClearObjectsToRender();
+    std::vector<MeshComponent*> meshesToRender;
 
     for (const auto& gameObject : objectsToRender)
     {
         MeshComponent* mesh = gameObject->GetMeshComponent();
-        if (mesh != nullptr && mesh->GetBatch() != nullptr) mesh->GetBatch()->AddComponent(mesh);
+        if (mesh != nullptr && mesh->GetBatch() != nullptr) meshesToRender.push_back(mesh);
     }
 
-    batchManager->LoadData();
-    batchManager->Render();
+    batchManager->Render(meshesToRender);
 
     for (const auto& gameObject : objectsToRender)
     {

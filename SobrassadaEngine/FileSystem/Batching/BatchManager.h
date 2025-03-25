@@ -12,8 +12,7 @@ class BatchManager
     ~BatchManager();
 
     void LoadData();
-    void Render();
-    void ClearObjectsToRender();
+    void Render(const std::vector<MeshComponent*>& meshesToRender);
 
     GeometryBatch* RequestBatch(const MeshComponent* mesh);
 

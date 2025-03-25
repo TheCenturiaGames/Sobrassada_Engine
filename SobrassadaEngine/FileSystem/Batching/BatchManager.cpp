@@ -33,7 +33,7 @@ void BatchManager::LoadData()
         it->LoadData();
 }
 
-void BatchManager::Render()
+void BatchManager::Render(const std::vector<MeshComponent*>& meshesToRender)
 {
     unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
 
@@ -47,17 +47,19 @@ void BatchManager::Render()
 
     for (GeometryBatch* it : batches)
     {
+        std::vector<MeshComponent*> batchMeshes;
+        for (MeshComponent* mesh : meshesToRender)
+        {
+            if (mesh->GetBatch() == it) batchMeshes.push_back(mesh);
+        }
+
         unsigned int program = it->GetIsMetallic() ? App->GetShaderModule()->GetMetallicRoughnessProgram()
                                                    : App->GetShaderModule()->GetSpecularGlossinessProgram();
-        it->Render(program, cameraUBO, cameraPos);
+        it->Render(program, cameraUBO, cameraPos, batchMeshes);
     }
 }
 
-void BatchManager::ClearObjectsToRender()
-{
-    for (GeometryBatch* it : batches)
-        it->ClearObjectsToRender();
-}
+
 
 GeometryBatch* BatchManager::RequestBatch(const MeshComponent* component)
 {
