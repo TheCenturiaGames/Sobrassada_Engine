@@ -31,13 +31,19 @@ class Model
 
     const std::vector<NodeData>& GetNodes() const { return nodes; }
     const Skin& GetSkin(int skinIndex) const { return skins[skinIndex]; }
+    UID GetAnimationUID() const { return animUID; }
+    const std::vector<UID>& GetAllAnimationUIDs() const { return allAnimUIDs; }
 
     void SetUID(const UID uid) { this->uid = uid; }
     void SetNodes(const std::vector<NodeData>& nodes) { this->nodes = nodes; }
     void SetSkins(const std::vector<Skin>& skins) { this->skins = skins; }
+    void SetAnimationUID(UID animationUID) { animUID = animationUID; }
+    void SetAllAnimationUIDs(std::vector<UID> animUids) { allAnimUIDs = animUids; }
 
   private:
     UID uid;
     std::vector<NodeData> nodes;
     std::vector<Skin> skins;
+    UID animUID = INVALID_UID;
+    std::vector<UID> allAnimUIDs;
 };

@@ -21,6 +21,7 @@ enum class FileType
     Material,
     Scene,
     Model,
+    Animation,
     Prefab,
     StateMachine
 };
@@ -49,6 +50,7 @@ class LibraryModule : public Module
     void AddMaterial(UID materialUID, const std::string& sobPath);
     void AddPrefab(UID prefabUID, const std::string& prefabPath);
     void AddModel(UID modelUID, const std::string& modelPath);
+    void AddAnimation(UID animUID, const std::string& animPath);
     void AddStateMachine(UID stateMachineUID, const std::string& stMachPath);
     void AddName(const std::string& resourceName, UID resourceUID);
     void AddResource(const std::string& resourcePath, UID resourceUID);
@@ -57,6 +59,7 @@ class LibraryModule : public Module
     UID GetMeshUID(const std::string& meshPath) const;
     UID GetMaterialUID(const std::string& materialPath) const;
     UID GetModelUID(const std::string& modelPath) const;
+    UID GetAnimUID(const std::string& animPath) const;
     UID GetStateMachinelUID(const std::string& stMachPath) const;
 
     const std::string& GetResourceName(UID resourceID) const;
@@ -67,6 +70,7 @@ class LibraryModule : public Module
     const std::unordered_map<std::string, UID>& GetMaterialMap() const { return materialMap; }
     const std::unordered_map<std::string, UID>& GetMeshMap() const { return meshMap; }
     const std::unordered_map<std::string, UID>& GetModelMap() const { return modelMap; }
+    const std::unordered_map<std::string, UID>& GetAnimMap() const { return animMap; }
     const std::unordered_map<std::string, UID>& GetPrefabMap() const { return prefabMap; }
     const std::unordered_map<std::string, UID>& GetStateMachinePath() const { return stateMachineMap; }
 
@@ -78,6 +82,7 @@ class LibraryModule : public Module
     std::unordered_map<std::string, UID> prefabMap;
     std::unordered_map<std::string, UID> modelMap;
     std::unordered_map<std::string, UID> stateMachineMap;
+    std::unordered_map<std::string, UID> animMap;
     // inversed map          | UID -> name
     std::unordered_map<UID, std::string> namesMap;
 

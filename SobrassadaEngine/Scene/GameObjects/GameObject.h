@@ -11,7 +11,7 @@
 #include <vector>
 
 class MeshComponent;
-
+class AnimationComponent;
 enum ComponentMobilitySettings
 {
     DYNAMIC = 0,
@@ -84,6 +84,7 @@ class GameObject
     Component* GetComponentByType(ComponentType type) const;
 
     MeshComponent* GetMeshComponent() const;
+    AnimationComponent* GetAnimationComponent() const;
 
     void SetLocalTransform(const float4x4& newTransform) { localTransform = newTransform; }
     void DrawGizmos() const;

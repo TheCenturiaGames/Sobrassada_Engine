@@ -1,0 +1,27 @@
+{
+    "UID": 1183180907647542,
+    "name": "Zombunny0",
+    "assetPath": "Assets/Zombunny.gltf",
+    "lastModifiedDate": 0,
+    "importOptions": {
+        "generateTangents": true,
+        "transform": [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+        ]
+    }
+}

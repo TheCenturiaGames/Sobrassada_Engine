@@ -7,6 +7,7 @@
 #include "PrefabManager.h"
 #include "SceneModule.h"
 #include "Standalone/MeshComponent.h"
+#include "Standalone/AnimationComponent.h"
 
 #include "imgui.h"
 
@@ -376,6 +377,15 @@ MeshComponent* GameObject::GetMeshComponent() const
     if (components.find(COMPONENT_MESH) != components.end())
     {
         return dynamic_cast<MeshComponent*>(components.at(COMPONENT_MESH));
+    }
+    return nullptr;
+}
+
+AnimationComponent* GameObject::GetAnimationComponent() const
+{
+    if (components.find(COMPONENT_ANIMATION) != components.end())
+    {
+        return dynamic_cast<AnimationComponent*>(components.at(COMPONENT_ANIMATION));
     }
     return nullptr;
 }

@@ -1,0 +1,10 @@
+{
+    "UID": 1372600272736834,
+    "name": "SciFiHelmet",
+    "assetPath": "Assets/SciFiHelmet.gltf",
+    "lastModifiedDate": 1742043016,
+    "importOptions": {
+        "shader": "15046360837325576173",
+        "useOcclusion": true
+    }
+}

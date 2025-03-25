@@ -387,6 +387,24 @@
     <ClCompile Include="FileSystem\StateMachineManager.cpp">
       <Filter>FileSystem</Filter>
     </ClCompile>
+    <ClCompile Include="FileSystem\Importers\AnimationImporter.cpp">
+      <Filter>FileSystem\Importers</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\Meta\MetaAnimation.cpp">
+      <Filter>FileSystem\Meta</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\EngineEditors\Editor\AnimatorEditor.cpp">
+      <Filter>UI\EngineEditors</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\AnimationComponent.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\AnimController.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceManagement\Resources\ResourceAnimation.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -715,6 +733,24 @@
     </ClInclude>
     <ClInclude Include="FileSystem\Config\ProjectConfig.h">
       <Filter>FileSystem\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\Importers\AnimationImporter.h">
+      <Filter>FileSystem\Importers</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\Meta\MetaAnimation.h">
+      <Filter>FileSystem\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\EngineEditors\Editor\AnimatorEditor.h">
+      <Filter>UI\EngineEditors</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\AnimationComponent.h">
+      <Filter>Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\AnimController.h">
+      <Filter>Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManagement\Resources\ResourceAnimation.h">
+      <Filter>Resources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

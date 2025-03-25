@@ -21,6 +21,7 @@
 #include "ResourcesModule.h"
 #include "Scene/Components/ComponentUtils.h"
 #include "Scene/Components/Standalone/MeshComponent.h"
+#include "Scene/Components/Standalone/AnimationComponent.h"
 #include "SceneModule.h"
 
 #include "SDL_mouse.h"
@@ -666,11 +667,29 @@ void Scene::LoadModel(const UID modelUID)
         ResourceModel* newModel            = (ResourceModel*)App->GetResourcesModule()->RequestResource(modelUID);
         const Model& model                 = newModel->GetModelData();
         const std::vector<NodeData>& nodes = model.GetNodes();
-
+        
+        
+        
+        
         GameObject* rootObject =
             new GameObject(GetGameObjectRootUID(), App->GetLibraryModule()->GetResourceName(modelUID));
         rootObject->SetLocalTransform(nodes[0].transform);
-
+        if (newModel->GetAnimationUID() != 0)
+        {
+            rootObject->CreateComponent(COMPONENT_ANIMATION);
+            AnimationComponent* animComponent = rootObject->GetAnimationComponent();
+            const auto& animUIDs = newModel->GetAllAnimationUIDs();
+            GLOG("Model has %zu animations", animUIDs.size());
+            for (UID uid : animUIDs)
+            {
+                //ResourceAnimation* animation = (ResourceAnimation*)App->GetResourcesModule()->RequestResource(uid);
+                animComponent->SetAnimationResource(uid);
+                GLOG("Animation UID: %d", uid);
+            }
+          
+           
+         
+        }
         // Add the gameObject to the rootObject
         GetGameObjectByUID(GetGameObjectRootUID())->AddGameObject(rootObject->GetUID());
         AddGameObject(rootObject->GetUID(), rootObject);

@@ -8,6 +8,8 @@
 #include "Model.h"
 #include "ProjectModule.h"
 #include "ResourceManagement/Resources/ResourceModel.h"
+#include "AnimationImporter.h"
+#include "MetaAnimation.h"
 
 #include "Math/Quat.h"
 #include "Math/float4x4.h"
@@ -89,7 +91,31 @@ namespace ModelImporter
         assetPath = targetFilePath + assetPath;
 
         newModel.SetUID(finalModelUID);
-
+        const std::string animName = FileSystem::GetFileNameWithoutExtension(filePath);
+        std::string animAssetPath       = ANIMATIONS_ASSETS_PATH + animName + ANIMATION_EXTENSION;
+        
+        //Import Animations
+        if (model.animations.size() > 0)
+        {std::vector<UID> animationUIDs;
+        for (int i = 0; i < model.animations.size(); ++i)
+        {
+        const auto& anim = model.animations[i];
+        
+        UID animUID = AnimationImporter::ImportAnimation(model, anim, animName, filePath);
+        animationUIDs.push_back(animUID);
+        GLOG("Animation found and imported: %s", animName.c_str());
+        
+        
+        UID finalAnimUID = App->GetLibraryModule()->AssignFiletypeUID(animUID, FileType::Animation);
+        
+        
+        MetaAnimation metaAnim(finalAnimUID, animAssetPath);
+        metaAnim.Save(animName, animAssetPath);
+        }
+       
+        newModel.SetAnimationUID(animationUIDs[0]);
+        newModel.SetAllAnimationUIDs(animationUIDs);
+        }
         // Create structure
         modelJSON.AddMember("UID", finalModelUID, allocator);
 
