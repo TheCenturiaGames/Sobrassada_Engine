@@ -8,6 +8,8 @@ namespace TextManager
 {
     struct FontData;
 }
+class Transform2DComponent;
+class CanvasComponent;
 
 class UILabelComponent : public Component
 {
@@ -24,6 +26,7 @@ class UILabelComponent : public Component
     void InitBuffers();
 
   private:
+    Transform2DComponent* transform2D;
     TextManager::FontData* fontData;
 
     char text[512];
@@ -32,4 +35,6 @@ class UILabelComponent : public Component
 
     unsigned int vbo = 0;
     unsigned int vao = 0;
+
+    CanvasComponent* parentCanvas;
 };

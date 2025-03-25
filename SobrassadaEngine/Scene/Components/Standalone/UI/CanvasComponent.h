@@ -15,6 +15,9 @@ class CanvasComponent : public Component
     void RenderEditorInspector() override;
     void Clone(const Component* otherComponent) override;
 
+    bool IsInWorldSpaceEditor() const { return isInWorldSpaceEditor; }
+    bool IsInWorldSpaceGame() const { return isInWorldSpaceGame; }
+
   private:
     Transform2DComponent* transform2D = nullptr;
 

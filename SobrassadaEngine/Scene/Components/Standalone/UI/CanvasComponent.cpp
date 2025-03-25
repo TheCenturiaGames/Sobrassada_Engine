@@ -13,11 +13,17 @@
 
 CanvasComponent::CanvasComponent(UID uid, GameObject* parent) : Component(uid, parent, "Canvas", COMPONENT_CANVAS)
 {
-    if (parent->GetComponentByType(COMPONENT_TRANSFORM_2D) == nullptr)
+    Transform2DComponent* transform =
+        static_cast<Transform2DComponent*>(parent->GetComponentByType(COMPONENT_TRANSFORM_2D));
+    if (transform == nullptr)
     {
         parent->CreateComponent(COMPONENT_TRANSFORM_2D);
         transform2D = static_cast<Transform2DComponent*>(parent->GetComponentByType(COMPONENT_TRANSFORM_2D));
         transform2D->SetSize(App->GetWindowModule()->GetWidth(), App->GetWindowModule()->GetHeight());
+    }
+    else
+    {
+        transform2D = transform;
     }
 
     App->GetGameUIModule()->AddCanvas(this);
@@ -76,7 +82,7 @@ void CanvasComponent::Render(float deltaTime)
     for (const UID child : parent->GetChildren())
     {
         children.push(child);
-    } 
+    }
 
     while (!children.empty())
     {

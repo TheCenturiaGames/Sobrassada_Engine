@@ -2,25 +2,60 @@
 
 #include "Application.h"
 #include "CameraModule.h"
+#include "CanvasComponent.h"
+#include "Scene.h"
+#include "SceneModule.h"
 #include "ShaderModule.h"
 #include "TextManager.h"
+#include "Transform2DComponent.h"
 #include "WindowModule.h"
 
 #include "glew.h"
 #include "imgui.h"
+#include <queue>
 
 UILabelComponent::UILabelComponent(UID uid, GameObject* parent)
     : text("XD"), Component(uid, parent, "Label", COMPONENT_LABEL)
 {
+    Transform2DComponent* transform =
+        static_cast<Transform2DComponent*>(parent->GetComponentByType(COMPONENT_TRANSFORM_2D));
+    if (transform == nullptr)
+    {
+        parent->CreateComponent(COMPONENT_TRANSFORM_2D);
+        transform2D = static_cast<Transform2DComponent*>(parent->GetComponentByType(COMPONENT_TRANSFORM_2D));
+        transform2D->SetSize(App->GetWindowModule()->GetWidth(), App->GetWindowModule()->GetHeight());
+    }
+    else
+    {
+        transform2D = transform;
+    }
+
+    // Search for a parent canvas iteratively
+    std::queue<UID> parentQueue;
+    parentQueue.push(parent->GetParent());
+
+    Scene* scene =
+        App->GetSceneModule()->GetScene(); // Save the scene here to not call for it in each iteration of the loops
+    while (!parentQueue.empty())
+    {
+        const GameObject* currentParent = scene->GetGameObjectByUID(parentQueue.front());
+
+        if (currentParent == nullptr) break; // If parent null it has reached the scene root
+
+        CanvasComponent* canvas = static_cast<CanvasComponent*>(currentParent->GetComponentByType(COMPONENT_CANVAS));
+        if (canvas != nullptr)
+        {
+            parentCanvas = canvas;
+            break;
+        }
+
+        parentQueue.push(currentParent->GetParent());
+        parentQueue.pop();
+    }
+
     fontData = new TextManager::FontData();
     fontData->Init("./EngineDefaults/Shader/Font/Arial.ttf", fontSize);
     InitBuffers();
-
-    // TODO: Get a reference to the parent canvas. Al instanciar un ui widget afegirli una referencia del canvas pare.
-    // Si no té dona igual perque no es fara render Es mirarà el canvas pare per veure si es renderitza el text en world
-    // space o en screen space. Potser es pot cridar des del canvas una funció que no sigui render() als fills, i se li
-    // passi un bool de world o screen (de fet segurament es millor ja que a priori em sembla que també es soluciona el
-    // problema de la recursivitat)
 }
 
 UILabelComponent::~UILabelComponent()
@@ -45,9 +80,9 @@ void UILabelComponent::Render(float deltaTime)
 
     glUseProgram(uiProgram);
 
-    bool isWorldSpace   = true;
-    const float4x4 view = isWorldSpace ? App->GetCameraModule()->GetViewMatrix() : float4x4::identity;
-    const float4x4 proj = isWorldSpace
+    const float4x4 view =
+        parentCanvas->IsInWorldSpaceEditor() ? App->GetCameraModule()->GetViewMatrix() : float4x4::identity;
+    const float4x4 proj = parentCanvas->IsInWorldSpaceEditor()
                             ? App->GetCameraModule()->GetProjectionMatrix()
                             : float4x4::D3DOrthoProjLH(
                                   -1, 1, App->GetWindowModule()->GetWidth(), App->GetWindowModule()->GetHeight()
@@ -58,7 +93,7 @@ void UILabelComponent::Render(float deltaTime)
     glUniformMatrix4fv(2, 1, GL_TRUE, proj.ptr());
 
     GLOG("fONT COLOR: %f, %f, %f", fontColor.x, fontColor.y, fontColor.z);
-    glUniform3fv(3, 1, fontColor.ptr());    // Font color
+    glUniform3fv(3, 1, fontColor.ptr()); // Font color
 
     glBindVertexArray(vao);
     TextManager::RenderText(*fontData, text, vbo);
@@ -71,7 +106,7 @@ void UILabelComponent::RenderEditorInspector()
     if (enabled)
     {
         ImGui::Text("Label");
-        ImGui::InputText("Label Text", &text[0], sizeof(text));
+        ImGui::InputTextMultiline("Label Text", &text[0], sizeof(text));
 
         if (ImGui::InputInt("Font Size", &fontSize))
         {
