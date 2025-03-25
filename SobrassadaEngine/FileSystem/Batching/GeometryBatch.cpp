@@ -10,6 +10,7 @@
 
 #include <chrono>
 #include <glew.h>
+#include <numeric>
 
 struct Command
 {
@@ -107,7 +108,7 @@ void GeometryBatch::Render(
     std::vector<MaterialGPU> totalMaterials;
     std::vector<Command> commands;
 
-    GenerateCommands(meshesToRender, commands, totalModels, totalMaterials);
+    GenerateCommandsAndSSBO(meshesToRender, commands, totalModels, totalMaterials);
 
     const int meshTriangles = totalVertexCount / 3;
 
@@ -152,7 +153,7 @@ void GeometryBatch::Render(
     App->GetOpenGLModule()->AddVerticesCount(totalVertexCount);
 }
 
-void GeometryBatch::GenerateCommands(
+void GeometryBatch::GenerateCommandsAndSSBO(
     const std::vector<MeshComponent*>& meshes, std::vector<Command>& commands, std::vector<float4x4>& totalModels,
     std::vector<MaterialGPU>& totalMaterials
 )
@@ -168,16 +169,15 @@ void GeometryBatch::GenerateCommands(
         unsigned int vertexCount     = static_cast<unsigned int>(resource->GetVertexCount());
         unsigned int indexCount      = static_cast<unsigned int>(resource->GetIndexCount());
 
-        const auto& it               = uniqueMeshes.find(resource);
-        int idx                      = static_cast<int>(std::distance(uniqueMeshes.begin(), it));
-
-        int accVertexCount           = 0;
-        int accIndexCount            = 0;
-        for (int i = 0; i < idx; i++)
-        {
-            accVertexCount += uniqueMeshesCount[i].vertexCount;
-            accIndexCount  += uniqueMeshesCount[i].indexCount;
-        }
+        std::ptrdiff_t idx           = std::distance(uniqueMeshes.begin(), uniqueMeshes.find(resource));
+        int accVertexCount           = std::accumulate(
+            uniqueMeshesCount.begin(), uniqueMeshesCount.begin() + idx, 0,
+            [](int sum, const MeshCount& mesh) { return sum + mesh.vertexCount; }
+        );
+        int accIndexCount = std::accumulate(
+            uniqueMeshesCount.begin(), uniqueMeshesCount.begin() + idx, 0,
+            [](int sum, const MeshCount& mesh) { return sum + mesh.indexCount; }
+        );
 
         Command newCommand;
         newCommand.count          = indexCount;        // Number of indices in the mesh

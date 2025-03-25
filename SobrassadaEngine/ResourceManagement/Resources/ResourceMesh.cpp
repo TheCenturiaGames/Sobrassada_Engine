@@ -49,9 +49,6 @@ ResourceMesh::ResourceMesh(
 
 ResourceMesh::~ResourceMesh()
 {
-    //glDeleteVertexArrays(1, &vao);
-    //glDeleteBuffers(1, &vbo);
-    //glDeleteBuffers(1, &ebo);
 }
 
 void ResourceMesh::LoadData(
@@ -63,43 +60,11 @@ void ResourceMesh::LoadData(
     this->vertices    = vertices;
     bindPoseVertices  = vertices;
 
-    //glGenVertexArrays(1, &vao);
-    //glBindVertexArray(vao);
-
-    //glGenBuffers(1, &vbo);
-    //glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    //glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
-
-    //glEnableVertexAttribArray(0); // Position
-    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
-
-    //glEnableVertexAttribArray(1); // Tangent
-    //glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
-
-    //glEnableVertexAttribArray(2); // Normal
-    //glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-
-    //glEnableVertexAttribArray(3); // Texture Coordinates
-    //glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoord));
-
-    //glEnableVertexAttribArray(4); // Joint
-    //glVertexAttribIPointer(4, 4, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, joint));
-
-    //glEnableVertexAttribArray(5); // Weights
-    //glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, weights));
-
     if (!indices.empty())
     {
         this->indexCount = static_cast<unsigned int>(indices.size());
         this->indices    = indices;
-
-        //glGenBuffers(1, &ebo);
-        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        //glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
     }
-
-    //// Unbind VAO
-    //glBindVertexArray(0);
 }
 
 void ResourceMesh::Render(

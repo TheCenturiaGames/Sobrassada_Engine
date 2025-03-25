@@ -49,9 +49,7 @@ class ResourceMesh : public Resource
     );
 
   private:
-    unsigned int vbo         = 0;
-    unsigned int ebo         = 0;
-    unsigned int vao         = 0;
+    unsigned int vbo         = 0; // should be deleted
     unsigned int mode        = 0;
     unsigned int vertexCount = 0;
     unsigned int indexCount  = 0;

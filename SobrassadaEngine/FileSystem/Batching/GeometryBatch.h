@@ -29,7 +29,7 @@ class GeometryBatch
         const std::vector<MeshComponent*>& meshesToRender
     );
 
-    void GenerateCommands(
+    void GenerateCommandsAndSSBO(
         const std::vector<MeshComponent*>& meshes, std::vector<Command>& commands, std::vector<float4x4>& totalModels,
         std::vector<MaterialGPU>& totalMaterials
     );
@@ -48,13 +48,13 @@ class GeometryBatch
     unsigned int totalVertexCount = 0;
     unsigned int totalIndexCount  = 0;
 
-    unsigned int indirect    = 0;
-    unsigned int vao         = 0;
-    unsigned int vbo         = 0;
-    unsigned int ebo         = 0;
-    unsigned int models      = 0;
-    unsigned int materials   = 0;
+    unsigned int indirect         = 0;
+    unsigned int vao              = 0;
+    unsigned int vbo              = 0;
+    unsigned int ebo              = 0;
+    unsigned int models           = 0;
+    unsigned int materials        = 0;
 
-    bool isMetallic          = false;
-    unsigned int mode        = 0;
+    bool isMetallic               = false;
+    unsigned int mode             = 0;
 };
