@@ -37,22 +37,29 @@ bool StateMachineEditor::RenderEditor()
             {
                 ImVec2 pos = graph->screen2grid(ImGui::GetMousePos());
                 State newState;
-                std::string stateName = "NewState_" + std::to_string(resource->states.size());
-                std::string clipName  = "Clip_" + std::to_string(resource->clips.size());
+                std::string stateName  = "NewState_" + std::to_string(resource->states.size());
+                std::string clipName   = "Clip_" + std::to_string(resource->clips.size());
 
                 newState.name         = HashString(stateName);
                 newState.clipName     = HashString(clipName);
 
-                //StateNode* stateNode  = dynamic_cast<StateNode*>(node);
-                //stateNode->SetStateName(stateName);
-                //stateNode->SetClipName(clipName);
-
                 resource->AddClip(0, clipName, false); 
                 resource->AddState(newState.name.GetString(), newState.clipName.GetString());
-                graph->placeNodeAt<StateNode>(pos);
+                auto newNode = graph->placeNodeAt<StateNode>(pos);
+                if (newNode)
+                {
+                    auto newStateNode = std::dynamic_pointer_cast<StateNode>(newNode);
+                    if (newStateNode)
+                    {
+                        newStateNode->SetStateName(stateName);
+                        newStateNode->SetClipName(clipName);
+                    }
+                }
             }
         }
     );
+
+    DetectNewTransitions();
     
     graph->droppedLinkPopUpContent(
         [this](ImFlow::Pin* dragged)
@@ -65,6 +72,7 @@ bool StateMachineEditor::RenderEditor()
                 auto newNode = graph->placeNode<StateNode>();
                 if (newNode)
                 {
+                    
                     auto inputPinRaw = std::dynamic_pointer_cast<StateNode>(newNode);
                     if (inputPinRaw)
                     {
@@ -82,9 +90,14 @@ bool StateMachineEditor::RenderEditor()
 
     ImGui::End();
 
+    //INSPECTOR
+
     if (selectedNode != nullptr)
     {
         ImGui::Begin("State Inspector");
+
+        ImGui::Text("State");
+        ImGui::Separator();
 
         std::string stateName = selectedNode->GetStateName();
         char nameBuffer[128];
@@ -100,12 +113,11 @@ bool StateMachineEditor::RenderEditor()
                 selectedNode->SetStateName(newName); 
             }
         }
-
         char clipBuffer[128];
         strncpy_s(clipBuffer, selectedNode->GetClipName().c_str(), sizeof(clipBuffer));
         clipBuffer[sizeof(clipBuffer) - 1] = '\0';
 
-        if (ImGui::InputText("Clip Name", clipBuffer, sizeof(clipBuffer)))
+        if (ImGui::InputText("Associated Clip", clipBuffer, sizeof(clipBuffer)))
         {
             std::string newClip(clipBuffer);
             if (newClip != selectedNode->GetClipName())
@@ -115,27 +127,26 @@ bool StateMachineEditor::RenderEditor()
             }
         }
 
+        
+        ImGui::Spacing();
+        ImGui::Text("Clip Information");
+        ImGui::Separator();
         const Clip* clip = resource->GetClip(selectedNode->GetClipName());
         if (clip)
         {
-            static UID clipUIDBuffer = clip->clipUID;
-            static bool loopBuffer   = clip->loop;
+            static bool loopBuffer = clip->loop;
 
-            ImGui::InputScalar("Clip UID", ImGuiDataType_U64, &clipUIDBuffer);
-            ImGui::Checkbox("Loop", &loopBuffer);
+            ImGui::Text("Clip UID: %llu", clip->clipUID);
 
-            char newClipNameBuffer[128];
-            strncpy_s(newClipNameBuffer, clip->clipName.GetString().c_str(), sizeof(newClipNameBuffer));
-            newClipNameBuffer[sizeof(newClipNameBuffer) - 1] = '\0';
+            ImGui::Text("Clip Name: %s", clip->clipName.GetString().c_str());
 
-            if (ImGui::InputText("Rename Clip", newClipNameBuffer, sizeof(newClipNameBuffer)))
+            if (ImGui::Checkbox("Loop", &loopBuffer))
             {
-                std::string newClipName(newClipNameBuffer);
-
-                if (newClipName != clip->clipName.GetString() || clipUIDBuffer != clip->clipUID ||
-                    loopBuffer != clip->loop)
+                if (loopBuffer != clip->loop)
                 {
-                    resource->EditClipInfo(clip->clipName.GetString(), clipUIDBuffer, newClipName, loopBuffer);
+                    resource->EditClipInfo(
+                        clip->clipName.GetString(), clip->clipUID, clip->clipName.GetString(), loopBuffer
+                    );
                 }
             }
         }
@@ -144,6 +155,31 @@ bool StateMachineEditor::RenderEditor()
             ImGui::TextColored(
                 ImVec4(1, 0.5f, 0.5f, 1.0f), "No Clip found with name: %s", selectedNode->GetClipName().c_str()
             );
+        }
+
+
+        ImGui::Spacing();
+        ImGui::Text("Connected Transitions");
+        ImGui::Separator();
+        int cont = 0;
+        for (const auto& transition : resource->transitions)
+        {
+            cont++;
+            GLOG("Transition: %d", cont);
+            if (transition.fromState.GetString() == selectedNode->GetStateName())
+            {
+                ImGui::Text(
+                    "-> %s (Trigger: %s, Blend: %u ms)", transition.toState.GetString().c_str(),
+                    transition.triggerName.GetString().c_str(), transition.interpolationTime
+                );
+            }
+            else if (transition.toState.GetString() == selectedNode->GetStateName())
+            {
+                ImGui::Text(
+                    "<- %s (Trigger: %s, Blend: %u ms)", transition.fromState.GetString().c_str(),
+                    transition.triggerName.GetString().c_str(), transition.interpolationTime
+                );
+            }
         }
 
         ImGui::End();
@@ -155,4 +191,33 @@ bool StateMachineEditor::RenderEditor()
 void StateMachineEditor::BuildGraph()
 {
     
+}
+
+void StateMachineEditor::DetectNewTransitions()
+{
+    for (const auto& linkWeak : graph->getLinks())
+    {
+        if (auto link = linkWeak.lock())
+        {
+            ImFlow::Pin* startPin = link->left(); 
+            ImFlow::Pin* endPin   = link->right();
+
+            if (!startPin || !endPin) continue;
+
+            auto startNode = dynamic_cast<StateNode*>(startPin->getParent());
+            auto endNode   = dynamic_cast<StateNode*>(endPin->getParent());
+
+            if (startNode && endNode)
+            {
+                std::string fromState = startNode->GetStateName();
+                std::string toState   = endNode->GetStateName();
+
+                if (!resource->GetTransition(fromState, toState))
+                {
+                    GLOG("Creating transition from %s to %s", fromState.c_str(), toState.c_str());
+                    resource->AddTransition(fromState, toState, "Trigger", 200);
+                }
+            }
+        }
+    }
 }

@@ -15,11 +15,11 @@ class StateMachineEditor : public EngineEditorBase
   private:
     bool RenderEditor() override;
     void BuildGraph();
+    void DetectNewTransitions();
 
   private:
     UID uid;
     ResourceStateMachine* resource = nullptr;
     std::unique_ptr<ImFlow::ImNodeFlow> graph;
     StateNode* selectedNode = nullptr;
-
 };
