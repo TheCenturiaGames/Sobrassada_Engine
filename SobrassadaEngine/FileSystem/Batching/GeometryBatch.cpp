@@ -57,14 +57,14 @@ void GeometryBatch::LoadData()
     {
         const ResourceMesh* resource = component->GetResourceMesh();
 
-        bool exists = (std::find(uniqueMeshes.begin(), uniqueMeshes.end(), resource) != uniqueMeshes.end());
-        if (!exists)
+        if (uniqueMeshesMap.find(resource) == uniqueMeshesMap.end())
         {
             const std::vector<Vertex>& vertices      = resource->GetLocalVertices();
             const std::vector<unsigned int>& indices = resource->GetIndices();
             totalVertices.insert(totalVertices.end(), vertices.begin(), vertices.end());
             totalIndices.insert(totalIndices.end(), indices.begin(), indices.end());
             uniqueMeshes.push_back(resource);
+            uniqueMeshesMap[resource] = uniqueMeshes.size() - 1;
 
             AccMeshCount newMeshCount;
             newMeshCount.accVertexCount = accVertexCount;
@@ -178,8 +178,7 @@ void GeometryBatch::GenerateCommandsAndSSBO(
         unsigned int vertexCount     = static_cast<unsigned int>(resource->GetVertexCount());
         unsigned int indexCount      = static_cast<unsigned int>(resource->GetIndexCount());
 
-        const auto& it               = std::find(uniqueMeshes.begin(), uniqueMeshes.end(), resource);
-        std::ptrdiff_t idx           = std::distance(uniqueMeshes.begin(), it);
+        std::size_t idx              = uniqueMeshesMap[resource];
 
         Command newCommand;
         newCommand.count          = indexCount;                            // Number of indices in the mesh
