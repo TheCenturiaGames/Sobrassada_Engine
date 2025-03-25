@@ -71,24 +71,23 @@ void CanvasComponent::Render(float deltaTime)
 
     // Render all ui widgets
 
-    // Iteratively render all UI children
-    // TODO: Probably better to store them in an array of Transform2D when created and render those directly. Nope, becuase if changing hierarchy won't get updated. This way it gets updated always
-    // std::queue<UID> children;
-    //
-    // while (!children.empty())
-    //{
-    //    App->GetSceneModule()->GetScene()->GetGameObjectByUID(children.front())->Render(deltaTime);
-    //    children.pop();
-    //
-    //    for (const UID child : parent->GetChildren())
-    //    {
-    //        children.push(child);
-    //    }
-    //}
+    std::queue<UID> children;
 
     for (const UID child : parent->GetChildren())
     {
-        App->GetSceneModule()->GetScene()->GetGameObjectByUID(child)->Render(deltaTime);
+        children.push(child);
+    } 
+
+    while (!children.empty())
+    {
+        const GameObject* currentObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(children.front());
+        currentObject->Render(isInWorldSpaceEditor);
+        children.pop();
+
+        for (const UID child : currentObject->GetChildren())
+        {
+            children.push(child);
+        }
     }
 }
 

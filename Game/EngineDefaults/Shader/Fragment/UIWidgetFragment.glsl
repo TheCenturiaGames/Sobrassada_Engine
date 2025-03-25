@@ -8,5 +8,5 @@ layout(location=3) uniform vec3 fontColor;
 void main()
 {
     vec4 sampled = texture(fontTexture, uv0);
-    color = vec4(sampled.r, 0, 0, sampled.r);
+    color = vec4(fontColor.r, fontColor.g, fontColor.b, sampled.r);
 }

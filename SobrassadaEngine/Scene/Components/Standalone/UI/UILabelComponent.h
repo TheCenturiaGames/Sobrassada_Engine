@@ -26,7 +26,7 @@ class UILabelComponent : public Component
   private:
     TextManager::FontData* fontData;
 
-    std::string text;
+    char text[512];
     int fontSize = 48;
     float3 fontColor;
 

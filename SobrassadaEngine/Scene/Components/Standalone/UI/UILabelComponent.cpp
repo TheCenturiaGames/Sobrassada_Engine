@@ -16,16 +16,18 @@ UILabelComponent::UILabelComponent(UID uid, GameObject* parent)
     fontData->Init("./EngineDefaults/Shader/Font/Arial.ttf", fontSize);
     InitBuffers();
 
-    // TODO: Get a reference to the parent canvas. Al instanciar un ui widget afegirli una referencia del canvas pare. Si no té dona igual perque no es fara render
-    // Es mirarà el canvas pare per veure si es renderitza el text en world space o en screen space. Potser es pot cridar des del canvas una funció que no sigui render() 
-    // als fills, i se li passi un bool de world o screen (de fet segurament es millor ja que a priori em sembla que també es soluciona el problema de la recursivitat)
+    // TODO: Get a reference to the parent canvas. Al instanciar un ui widget afegirli una referencia del canvas pare.
+    // Si no té dona igual perque no es fara render Es mirarà el canvas pare per veure si es renderitza el text en world
+    // space o en screen space. Potser es pot cridar des del canvas una funció que no sigui render() als fills, i se li
+    // passi un bool de world o screen (de fet segurament es millor ja que a priori em sembla que també es soluciona el
+    // problema de la recursivitat)
 }
 
 UILabelComponent::~UILabelComponent()
 {
     fontData->Clean();
     if (vbo != 0) glDeleteBuffers(1, &vbo);
-    if (vao != 0) glDeleteBuffers(1, &vao);
+    if (vao != 0) glDeleteVertexArrays(1, &vao);
 }
 
 void UILabelComponent::Clone(const Component* otherComponent)
@@ -43,16 +45,20 @@ void UILabelComponent::Render(float deltaTime)
 
     glUseProgram(uiProgram);
 
-    float4x4 proj = float4x4::D3DOrthoProjLH(
-        -1, 1, App->GetWindowModule()->GetWidth(), App->GetWindowModule()->GetHeight()
-    ); // near plane. far plane, screen width, screen height
+    bool isWorldSpace   = true;
+    const float4x4 view = isWorldSpace ? App->GetCameraModule()->GetViewMatrix() : float4x4::identity;
+    const float4x4 proj = isWorldSpace
+                            ? App->GetCameraModule()->GetProjectionMatrix()
+                            : float4x4::D3DOrthoProjLH(
+                                  -1, 1, App->GetWindowModule()->GetWidth(), App->GetWindowModule()->GetHeight()
+                              ); // near plane. far plane, screen width, screen height
 
     glUniformMatrix4fv(0, 1, GL_TRUE, parent->GetGlobalTransform().ptr());
-    //glUniformMatrix4fv(1, 1, GL_TRUE, App->GetCameraModule()->GetViewMatrix().ptr());
-    //glUniformMatrix4fv(2, 1, GL_TRUE, App->GetCameraModule()->GetProjectionMatrix().ptr());
-
-    glUniformMatrix4fv(1, 1, GL_TRUE, float4x4::identity.ptr());
+    glUniformMatrix4fv(1, 1, GL_TRUE, view.ptr());
     glUniformMatrix4fv(2, 1, GL_TRUE, proj.ptr());
+
+    GLOG("fONT COLOR: %f, %f, %f", fontColor.x, fontColor.y, fontColor.z);
+    glUniform3fv(3, 1, fontColor.ptr());    // Font color
 
     glBindVertexArray(vao);
     TextManager::RenderText(*fontData, text, vbo);
@@ -65,13 +71,13 @@ void UILabelComponent::RenderEditorInspector()
     if (enabled)
     {
         ImGui::Text("Label");
-        ImGui::InputText("Label Text", &text[0], text.size(), ImGuiInputTextFlags_ReadOnly);
+        ImGui::InputText("Label Text", &text[0], sizeof(text));
 
         if (ImGui::InputInt("Font Size", &fontSize))
         {
             if (fontSize < 0) fontSize = 0;
         }
-        ImGui::ColorPicker3("Font Color", &fontColor[0]);
+        ImGui::ColorPicker3("Font Color", fontColor.ptr());
     }
 }
 

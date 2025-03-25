@@ -98,6 +98,7 @@ namespace TextManager
         glActiveTexture(GL_TEXTURE0);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
+        GLOG("Text size: %d", text.length());
         for (char c : text)
         {
             Character character = fontData.characters[c];
