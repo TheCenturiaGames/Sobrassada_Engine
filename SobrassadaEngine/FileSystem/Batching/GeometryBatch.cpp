@@ -10,7 +10,6 @@
 
 #include <chrono>
 #include <glew.h>
-#include <numeric>
 
 struct Command
 {
@@ -36,6 +35,7 @@ GeometryBatch::~GeometryBatch()
 {
     components.clear();
     uniqueMeshes.clear();
+    uniqueMeshesCount.clear();
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &indirect);
     glDeleteBuffers(1, &vbo);
@@ -46,9 +46,13 @@ GeometryBatch::~GeometryBatch()
 
 void GeometryBatch::LoadData()
 {
+    uniqueMeshesCount.clear();
+
     std::vector<Vertex> totalVertices;
     std::vector<unsigned int> totalIndices;
 
+    unsigned int accVertexCount = 0;
+    unsigned int accIndexCount  = 0;
     for (const MeshComponent* component : components)
     {
         const ResourceMesh* resource = component->GetResourceMesh();
@@ -61,10 +65,14 @@ void GeometryBatch::LoadData()
             totalVertices.insert(totalVertices.end(), vertices.begin(), vertices.end());
             totalIndices.insert(totalIndices.end(), indices.begin(), indices.end());
             uniqueMeshes.push_back(resource);
-            MeshCount newMeshCount;
-            newMeshCount.vertexCount = resource->GetVertexCount();
-            newMeshCount.indexCount  = resource->GetIndexCount();
+
+            AccMeshCount newMeshCount;
+            newMeshCount.accVertexCount = accVertexCount;
+            newMeshCount.accIndexCount  = accIndexCount;
             uniqueMeshesCount.push_back(newMeshCount);
+
+            accVertexCount += resource->GetVertexCount();
+            accIndexCount  += resource->GetIndexCount();
         }
     }
 
@@ -172,21 +180,13 @@ void GeometryBatch::GenerateCommandsAndSSBO(
 
         const auto& it               = std::find(uniqueMeshes.begin(), uniqueMeshes.end(), resource);
         std::ptrdiff_t idx           = std::distance(uniqueMeshes.begin(), it);
-        int accVertexCount           = std::accumulate(
-            uniqueMeshesCount.begin(), uniqueMeshesCount.begin() + idx, 0,
-            [](int sum, const MeshCount& mesh) { return sum + mesh.vertexCount; }
-        );
-        int accIndexCount = std::accumulate(
-            uniqueMeshesCount.begin(), uniqueMeshesCount.begin() + idx, 0,
-            [](int sum, const MeshCount& mesh) { return sum + mesh.indexCount; }
-        );
 
         Command newCommand;
-        newCommand.count          = indexCount;        // Number of indices in the mesh
-        newCommand.instanceCount  = 1;                 // Number of instances to render
-        newCommand.firstIndex     = accIndexCount;     // Index offset in the EBO
-        newCommand.baseVertex     = accVertexCount;    // Vertex offset in the VBO
-        newCommand.baseInstance   = baseInstanceCount; // Instance Index
+        newCommand.count          = indexCount;                            // Number of indices in the mesh
+        newCommand.instanceCount  = 1;                                     // Number of instances to render
+        newCommand.firstIndex     = uniqueMeshesCount[idx].accIndexCount;  // Index offset in the EBO
+        newCommand.baseVertex     = uniqueMeshesCount[idx].accVertexCount; // Vertex offset in the VBO
+        newCommand.baseInstance   = baseInstanceCount;                     // Instance Index
 
         baseInstanceCount        += 1;
         totalVertexCount         += vertexCount;

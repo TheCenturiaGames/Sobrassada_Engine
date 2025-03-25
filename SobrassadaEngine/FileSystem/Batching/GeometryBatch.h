@@ -10,10 +10,10 @@ class MeshComponent;
 struct Command;
 struct MaterialGPU;
 
-struct MeshCount
+struct AccMeshCount
 {
-    unsigned int vertexCount;
-    unsigned int indexCount;
+    unsigned int accVertexCount;
+    unsigned int accIndexCount;
 };
 
 class GeometryBatch
@@ -41,8 +41,7 @@ class GeometryBatch
   private:
     std::vector<const MeshComponent*> components;
     std::vector<const ResourceMesh*> uniqueMeshes;
-
-    std::vector<MeshCount> uniqueMeshesCount;
+    std::vector<AccMeshCount> uniqueMeshesCount;
 
     unsigned int totalVertexCount = 0;
     unsigned int totalIndexCount  = 0;
