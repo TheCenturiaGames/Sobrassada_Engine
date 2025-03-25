@@ -21,11 +21,11 @@ namespace TextManager
                 GLOG("ERROR: Failed to load character");
                 continue;
             }
-            //if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL))
+            // if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL))
             //{
-            //    GLOG("ERROR: Failed to load character");
-            //    continue;
-            //}
+            //     GLOG("ERROR: Failed to load character");
+            //     continue;
+            // }
 
             GLuint texture;
             glGenTextures(1, &texture);
@@ -90,7 +90,9 @@ namespace TextManager
 
     void RenderText(FontData& fontData, const std::string& text, const unsigned vbo)
     {
+        // When deferred lightning works, this won't be needed as transparency will be properly handled
         glDisable(GL_DEPTH_TEST);
+
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

@@ -13,6 +13,8 @@
 
 CanvasComponent::CanvasComponent(UID uid, GameObject* parent) : Component(uid, parent, "Canvas", COMPONENT_CANVAS)
 {
+
+    // Probably better create the transform in another function
     Transform2DComponent* transform =
         static_cast<Transform2DComponent*>(parent->GetComponentByType(COMPONENT_TRANSFORM_2D));
     if (transform == nullptr)

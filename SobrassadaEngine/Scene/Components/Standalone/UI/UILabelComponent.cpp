@@ -67,6 +67,7 @@ UILabelComponent::~UILabelComponent()
 
 void UILabelComponent::Clone(const Component* otherComponent)
 {
+    // It will have to look for the canvas here probably, seems better to do that in a separate function
 }
 
 void UILabelComponent::Update(float deltaTime)
@@ -92,7 +93,6 @@ void UILabelComponent::Render(float deltaTime)
     glUniformMatrix4fv(1, 1, GL_TRUE, view.ptr());
     glUniformMatrix4fv(2, 1, GL_TRUE, proj.ptr());
 
-    GLOG("fONT COLOR: %f, %f, %f", fontColor.x, fontColor.y, fontColor.z);
     glUniform3fv(3, 1, fontColor.ptr()); // Font color
 
     glBindVertexArray(vao);
