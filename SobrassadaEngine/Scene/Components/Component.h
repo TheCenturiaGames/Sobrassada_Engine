@@ -30,6 +30,7 @@ class Component
 
     ComponentType GetType() const { return type; }
     const char* GetName() const { return name; }
+    const bool GetEnabled() const { return enabled; }
 
     const float4x4& GetGlobalTransform() const;
 

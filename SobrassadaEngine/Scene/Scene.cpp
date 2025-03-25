@@ -241,7 +241,7 @@ update_status Scene::Render(float deltaTime) const
     for (const auto& gameObject : objectsToRender)
     {
         MeshComponent* mesh = gameObject->GetMeshComponent();
-        if (mesh != nullptr && mesh->GetBatch() != nullptr) meshesToRender.push_back(mesh);
+        if (mesh != nullptr && mesh->GetEnabled() && mesh->GetBatch() != nullptr) meshesToRender.push_back(mesh);
     }
 
     batchManager->Render(meshesToRender);

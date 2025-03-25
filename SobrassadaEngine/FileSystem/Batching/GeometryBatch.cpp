@@ -52,14 +52,15 @@ void GeometryBatch::LoadData()
     for (const MeshComponent* component : components)
     {
         const ResourceMesh* resource = component->GetResourceMesh();
-        const auto& it               = uniqueMeshes.find(resource);
-        if (it == uniqueMeshes.end())
+
+        bool exists = (std::find(uniqueMeshes.begin(), uniqueMeshes.end(), resource) != uniqueMeshes.end());
+        if (!exists)
         {
             const std::vector<Vertex>& vertices      = resource->GetLocalVertices();
             const std::vector<unsigned int>& indices = resource->GetIndices();
             totalVertices.insert(totalVertices.end(), vertices.begin(), vertices.end());
             totalIndices.insert(totalIndices.end(), indices.begin(), indices.end());
-            uniqueMeshes.insert(resource);
+            uniqueMeshes.push_back(resource);
             MeshCount newMeshCount;
             newMeshCount.vertexCount = resource->GetVertexCount();
             newMeshCount.indexCount  = resource->GetIndexCount();
@@ -169,7 +170,8 @@ void GeometryBatch::GenerateCommandsAndSSBO(
         unsigned int vertexCount     = static_cast<unsigned int>(resource->GetVertexCount());
         unsigned int indexCount      = static_cast<unsigned int>(resource->GetIndexCount());
 
-        std::ptrdiff_t idx           = std::distance(uniqueMeshes.begin(), uniqueMeshes.find(resource));
+        const auto& it               = std::find(uniqueMeshes.begin(), uniqueMeshes.end(), resource);
+        std::ptrdiff_t idx           = std::distance(uniqueMeshes.begin(), it);
         int accVertexCount           = std::accumulate(
             uniqueMeshesCount.begin(), uniqueMeshesCount.begin() + idx, 0,
             [](int sum, const MeshCount& mesh) { return sum + mesh.vertexCount; }

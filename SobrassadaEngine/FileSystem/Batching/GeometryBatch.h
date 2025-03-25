@@ -2,7 +2,6 @@
 
 #include <Math/float3.h>
 #include <Math/float4x4.h>
-#include <unordered_set>
 #include <vector>
 
 class MeshComponent;
@@ -41,7 +40,7 @@ class GeometryBatch
 
   private:
     std::vector<const MeshComponent*> components;
-    std::unordered_set<const ResourceMesh*> uniqueMeshes;
+    std::vector<const ResourceMesh*> uniqueMeshes;
 
     std::vector<MeshCount> uniqueMeshesCount;
 
