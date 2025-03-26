@@ -13,7 +13,7 @@ class TextureEditor : public EngineEditorBase
     void Viewport();
 
     UID selectedTextureUID  = 0;
-    bool showViewPortWindow = false;
+    bool showViewportWindow = false;
     bool showR              = true;
     bool showG              = true;
     bool showB              = true;

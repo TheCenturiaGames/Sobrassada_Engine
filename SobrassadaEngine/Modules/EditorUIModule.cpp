@@ -1140,10 +1140,10 @@ EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
         return new EngineEditorBase("Base Editor " + std::to_string(uid), uid);
         break;
     case EditorType::NODE:
-        return new NodeEditor("NodeEditor" + std::to_string(uid), uid);
+        return new NodeEditor("NodeEditor_" + std::to_string(uid), uid);
 
     case EditorType::TEXTURE:
-        return new TextureEditor("TextureEditor" + std::to_string(uid), uid);
+        return new TextureEditor("TextureEditor_" + std::to_string(uid), uid);
         break;
     default:
         return nullptr;

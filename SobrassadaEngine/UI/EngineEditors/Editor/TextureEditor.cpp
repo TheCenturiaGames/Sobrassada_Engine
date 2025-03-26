@@ -54,16 +54,16 @@ bool TextureEditor::RenderEditor()
         ResourceTexture* texture = dynamic_cast<ResourceTexture*>(resource);
         if (!texture) continue;
 
-        int width        = texture->GetTextureWidth();
-        int height       = texture->GetTextureHeight();
-        int mipmapLevels = texture->GetMipMapLevels();
-        int sizeKB       = (width * height * 4) / 1024; //(4 bytes for pixel -> RGBA)
+        const int width        = texture->GetTextureWidth();
+        const int height       = texture->GetTextureHeight();
+        const int mipmapLevels = texture->GetMipMapLevels();
+        const int sizeKB       = (width * height * 4) / 1024; //(4 bytes for pixel -> RGBA)
 
         // Save the UID of selected texture
         if (ImGui::Selectable(name.c_str()))
         {
             selectedTextureUID = textureUID;
-            showViewPortWindow = true;
+            showViewportWindow = true;
         }
         ImGui::NextColumn();
         ImGui::Text("%d", width);
@@ -76,7 +76,7 @@ bool TextureEditor::RenderEditor()
         ImGui::NextColumn();
     }
 
-    if (showViewPortWindow)
+    if (showViewportWindow)
     {
         Viewport();
     }
@@ -95,18 +95,18 @@ void TextureEditor::Viewport()
         Resource* selectedResource = App->GetResourcesModule()->RequestResource(selectedTextureUID);
         if (selectedResource)
         {
-            ResourceTexture* selectedTexture = dynamic_cast<ResourceTexture*>(selectedResource);
+            const ResourceTexture* selectedTexture = dynamic_cast<ResourceTexture*>(selectedResource);
             if (selectedTexture)
             {
                 if (selectedTexture->IsCubemap())
                 {
                     ImGui::Text("Cubemap Texture Faces:");
-                    ImVec2 imageSize(128, 128);
+                    const ImVec2 imageSize(128, 128);
                     for (int i = 0; i < 6; i++)
                     {
                         ImGui::Text("Face %d", i);
                         ImGui::SameLine();
-                        unsigned int faceTexID = selectedTexture->GetCubemapFaceID(i);
+                        const unsigned int faceTexID = selectedTexture->GetCubemapFaceID(i);
                         ImGui::Image((ImTextureID)(intptr_t)faceTexID, imageSize);
                         if ((i + 1) % 3 == 0) ImGui::NewLine();
                         else ImGui::SameLine();
@@ -121,8 +121,8 @@ void TextureEditor::Viewport()
                     ImGui::SameLine();
                     ImGui::Checkbox("Blue", &showB);
 
-                    ImVec4 tint_color(showR ? 1.0f : 0.0f, showG ? 1.0f : 0.0f, showB ? 1.0f : 0.0f, 1.0f);
-                    ImVec2 imageSize(128, 128);
+                    const ImVec4 tint_color(showR ? 1.0f : 0.0f, showG ? 1.0f : 0.0f, showB ? 1.0f : 0.0f, 1.0f);
+                    const ImVec2 imageSize(128, 128);
 
                     ImGui::Text("Filtered Texture:");
                     ImGui::Image(
@@ -137,7 +137,7 @@ void TextureEditor::Viewport()
 
     if (!open)
     {
-        showViewPortWindow = false;
+        showViewportWindow = false;
         selectedTextureUID = 0;
     }
 }
