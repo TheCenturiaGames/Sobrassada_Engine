@@ -1,5 +1,6 @@
 #include "UI/EngineEditors/Editor/StateMachineEditor.h"
 #include "UI/EngineEditors/Nodes/StateNode.h"
+#include "FileSystem/StateMachineManager.h"
 
 StateMachineEditor::StateMachineEditor(const std::string& editorName, UID uid, ResourceStateMachine* stateMachine)
     : EngineEditorBase(editorName, uid), uid(uid), resource(stateMachine)
@@ -17,6 +18,16 @@ bool StateMachineEditor::RenderEditor()
     if (!EngineEditorBase::RenderEditor()) return false;
 
     ImGui::Begin(name.c_str());
+
+     if (ImGui::Button("Save"))
+    {
+        SaveMachine();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Load"))
+    {
+        LoadMachine();
+    }
 
     graph->update();
 
@@ -36,23 +47,14 @@ bool StateMachineEditor::RenderEditor()
             if (node == nullptr && ImGui::MenuItem("Add State"))
             {
                 ImVec2 pos = graph->screen2grid(ImGui::GetMousePos());
-                State newState;
-                std::string stateName  = "NewState_" + std::to_string(resource->states.size());
-                std::string clipName   = "Clip_" + std::to_string(resource->clips.size());
-
-                newState.name         = HashString(stateName);
-                newState.clipName     = HashString(clipName);
-
-                resource->AddClip(0, clipName, false); 
-                resource->AddState(newState.name.GetString(), newState.clipName.GetString());
+            
                 auto newNode = graph->placeNodeAt<StateNode>(pos);
                 if (newNode)
                 {
                     auto newStateNode = std::dynamic_pointer_cast<StateNode>(newNode);
                     if (newStateNode)
                     {
-                        newStateNode->SetStateName(stateName);
-                        newStateNode->SetClipName(clipName);
+                        CreateBaseState(*newStateNode.get());
                     }
                 }
             }
@@ -72,10 +74,10 @@ bool StateMachineEditor::RenderEditor()
                 auto newNode = graph->placeNode<StateNode>();
                 if (newNode)
                 {
-                    
                     auto inputPinRaw = std::dynamic_pointer_cast<StateNode>(newNode);
                     if (inputPinRaw)
                     {
+                        CreateBaseState(*inputPinRaw.get());
                         resource->AddTransition(
                             sourceNode->GetStateName(), inputPinRaw->GetStateName(), "Trigger", 200
                         );
@@ -220,4 +222,30 @@ void StateMachineEditor::DetectNewTransitions()
             }
         }
     }
+}
+
+void StateMachineEditor::CreateBaseState(StateNode& node)
+{
+    State newState;
+    std::string stateName = "NewState_" + std::to_string(resource->states.size());
+    std::string clipName  = "Clip_" + std::to_string(resource->clips.size());
+
+    newState.name         = HashString(stateName);
+    newState.clipName     = HashString(clipName);
+
+    resource->AddClip(0, clipName, false);
+    resource->AddState(newState.name.GetString(), newState.clipName.GetString());
+    node.SetStateName(stateName);
+    node.SetClipName(clipName);
+
+}
+
+void StateMachineEditor::SaveMachine()
+{
+   // StateMachineManager::Save();
+}
+
+void StateMachineEditor::LoadMachine()
+{
+    //StateMachineManager::Load();
 }

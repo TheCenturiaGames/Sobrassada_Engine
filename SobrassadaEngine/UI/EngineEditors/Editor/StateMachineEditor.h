@@ -6,6 +6,7 @@
 #include "Libs/ImNodeFlow-1.2.2/include/ImNodeFlow.h"
 #include "UI/EngineEditors/Nodes/StateNode.h"
 
+
 class StateMachineEditor : public EngineEditorBase
 {
   public:
@@ -16,6 +17,9 @@ class StateMachineEditor : public EngineEditorBase
     bool RenderEditor() override;
     void BuildGraph();
     void DetectNewTransitions();
+    void CreateBaseState(StateNode& node);
+    void SaveMachine();
+    void LoadMachine();
 
   private:
     UID uid;
