@@ -2,13 +2,14 @@
 
 #include "Module.h"
 
-#include "DetourNavMesh.h"
-#include "DetourNavMeshQuery.h"
+
 #include <Math/float4x4.h>
 #include <bitset>
 #include <list>
 
 class DDRenderInterfaceCoreGL;
+class DetourNavMeshQuery;
+class DetourNavMesh;
 class Camera;
 
 enum class DebugOptions : uint8_t
@@ -23,20 +24,6 @@ enum class DebugOptions : uint8_t
     RENDER_NAVMESH
 };
 
-inline unsigned int duTransCol(unsigned int c, unsigned int a)
-{
-    return (a << 24) | (c & 0x00ffffff);
-}
-
-inline int bit(int a, int b)
-{
-    return (a & (1 << b)) >> b;
-}
-
-inline unsigned int duRGBA(int r, int g, int b, int a)
-{
-    return ((unsigned int)r) | ((unsigned int)g << 8) | ((unsigned int)b << 16) | ((unsigned int)a << 24);
-}
 
 enum DrawNavMeshFlags
 {

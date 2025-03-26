@@ -772,13 +772,28 @@ void DebugDrawModule::HandleDebugRenderOptions()
         }
     }
 }
-
-unsigned int duIntToCol(int i, int a)
+static unsigned int DetourTransCol(unsigned int c, unsigned int a)
 {
-    int r = bit(i, 1) + bit(i, 3) * 2 + 1;
-    int g = bit(i, 2) + bit(i, 4) * 2 + 1;
-    int b = bit(i, 0) + bit(i, 5) * 2 + 1;
-    return duRGBA(r * 63, g * 63, b * 63, a);
+    return (a << 24) | (c & 0x00ffffff);
+}
+
+static int DetourBit(int a, int b)
+{
+    return (a & (1 << b)) >> b;
+}
+
+static unsigned int DetourRGBA(int r, int g, int b, int a)
+{
+    return ((unsigned int)r) | ((unsigned int)g << 8) | ((unsigned int)b << 16) | ((unsigned int)a << 24);
+}
+
+
+unsigned int DetourIntToCol(int i, int a)
+{
+    int r = DetourBit(i, 1) + DetourBit(i, 3) * 2 + 1;
+    int g = DetourBit(i, 2) + DetourBit(i, 4) * 2 + 1;
+    int b = DetourBit(i, 0) + DetourBit(i, 5) * 2 + 1;
+    return DetourRGBA(r * 63, g * 63, b * 63, a);
 }
 
 unsigned int areaToCol(unsigned int area)
@@ -786,11 +801,11 @@ unsigned int areaToCol(unsigned int area)
     if (area == 0)
     {
         // Treat zero area type as default.
-        return duRGBA(0, 192, 255, 255);
+        return DetourRGBA(0, 192, 255, 255);
     }
     else
     {
-        return duIntToCol(area, 255);
+        return DetourIntToCol(area, 255);
     }
 }
 void DebugDrawModule::DrawNavMesh(const dtNavMesh* navMesh, const dtNavMeshQuery* navQuery, unsigned char flags)
@@ -804,7 +819,7 @@ void DebugDrawModule::DrawNavMesh(const dtNavMesh* navMesh, const dtNavMeshQuery
 
         dtPolyRef base         = navMesh->getPolyRefBase(tile);
         int tileNum            = navMesh->decodePolyIdTile(base);
-        unsigned int tileColor = duIntToCol(tileNum, 128);
+        unsigned int tileColor = DetourIntToCol(tileNum, 128);
 
         // Iterate through each polygon in the tile
         for (int j = 0; j < tile->header->polyCount; ++j)
@@ -816,7 +831,7 @@ void DebugDrawModule::DrawNavMesh(const dtNavMesh* navMesh, const dtNavMeshQuery
 
             unsigned int col;
             if (navQuery && navQuery->isInClosedList(base | (dtPolyRef)j)) col = duRGBA(255, 196, 0, 64);
-            else col = duTransCol(areaToCol(p->getArea()), 64);
+            else col = DetourTransCol(areaToCol(p->getArea()), 64);
 
             std::vector<LineSegment> lines;
 
