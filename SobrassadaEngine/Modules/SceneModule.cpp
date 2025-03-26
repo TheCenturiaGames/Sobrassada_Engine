@@ -163,7 +163,7 @@ void SceneModule::CloseScene()
     // TODO Warning dialog before closing scene without saving
     delete loadedScene;
     loadedScene = nullptr;
-    if (App->GetResourcesModule() != nullptr) App->GetResourcesModule()->UnloadAllResources();
+    if (App->GetResourcesModule() != nullptr) App->GetResourcesModule()->ShutDown();
 }
 
 void SceneModule::SwitchPlayMode(bool play)

@@ -31,11 +31,8 @@ bool ResourcesModule::Init()
 
 bool ResourcesModule::ShutDown()
 {
-    for (auto resource : resources)
-    {
-        delete resource.second;
-    }
-    resources.clear();
+    UnloadAllResources();
+    batchManager->UnloadAllBatches();
     return true;
 }
 

@@ -11,6 +11,8 @@ class BatchManager
     BatchManager();
     ~BatchManager();
 
+    void UnloadAllBatches();
+
     void LoadData();
     void Render(const std::vector<MeshComponent*>& meshesToRender);
 

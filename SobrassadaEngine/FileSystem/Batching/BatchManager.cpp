@@ -19,6 +19,11 @@ BatchManager::BatchManager()
 
 BatchManager::~BatchManager()
 {
+    UnloadAllBatches();
+}
+
+void BatchManager::UnloadAllBatches()
+{
     for (GeometryBatch* it : batches)
     {
         delete it;
@@ -58,8 +63,6 @@ void BatchManager::Render(const std::vector<MeshComponent*>& meshesToRender)
         it->Render(program, cameraUBO, cameraPos, batchMeshes);
     }
 }
-
-
 
 GeometryBatch* BatchManager::RequestBatch(const MeshComponent* component)
 {
