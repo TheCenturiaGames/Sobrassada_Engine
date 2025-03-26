@@ -196,13 +196,24 @@ void CharacterControllerComponent::HandleInput(float deltaTime)
 
     float3 direction(0.0f, 0.0f, 0.0f);
 
+    if (keyboard[SDL_SCANCODE_A] == KEY_REPEAT || keyboard[SDL_SCANCODE_D] == KEY_REPEAT)
+    {
+        targetDirection.Set(1.0f, 0.0f, 0.0f);
+    }
+    else
+    {
+        targetDirection.Set(0.0f, 0.0f, 1.0f);
+    }
+
     if (keyboard[SDL_SCANCODE_W] == KEY_REPEAT) direction -= targetDirection;
     if (keyboard[SDL_SCANCODE_S] == KEY_REPEAT) direction += targetDirection;
+    if (keyboard[SDL_SCANCODE_A] == KEY_REPEAT) direction -= targetDirection;
+    if (keyboard[SDL_SCANCODE_D] == KEY_REPEAT) direction += targetDirection;
 
     float rotationDir = 0.0f;
 
-    if (keyboard[SDL_SCANCODE_A] == KEY_REPEAT) rotationDir += 1.0f;
-    if (keyboard[SDL_SCANCODE_D] == KEY_REPEAT) rotationDir -= 1.0f;
+    if (keyboard[SDL_SCANCODE_Q] == KEY_REPEAT) rotationDir += 1.0f;
+    if (keyboard[SDL_SCANCODE_E] == KEY_REPEAT) rotationDir -= 1.0f;
 
     if (direction.LengthSq() > 0.0001f)
     {
