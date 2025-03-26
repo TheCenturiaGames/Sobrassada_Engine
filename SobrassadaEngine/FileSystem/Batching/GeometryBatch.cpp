@@ -82,7 +82,7 @@ void GeometryBatch::LoadData()
     glBindVertexArray(vao);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, totalVertices.size() * sizeof(Vertex), totalVertices.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, totalVertices.size() * sizeof(Vertex), totalVertices.data(), GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0); // Position
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
@@ -104,17 +104,19 @@ void GeometryBatch::LoadData()
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(
-        GL_ELEMENT_ARRAY_BUFFER, totalIndices.size() * sizeof(unsigned int), totalIndices.data(), GL_DYNAMIC_DRAW
+        GL_ELEMENT_ARRAY_BUFFER, totalIndices.size() * sizeof(unsigned int), totalIndices.data(), GL_STATIC_DRAW
     );
 
     glBindVertexArray(0);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, models);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, totalModels.size() * sizeof(float4x4), totalModels.data(), GL_DYNAMIC_DRAW);
+    GLbitfield flags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT;
+    glBufferStorage(GL_SHADER_STORAGE_BUFFER, totalModels.size() * sizeof(float4x4), nullptr, flags);
+    ptrModels = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, materials);
     glBufferData(
-        GL_SHADER_STORAGE_BUFFER, totalMaterials.size() * sizeof(MaterialGPU), totalMaterials.data(), GL_DYNAMIC_DRAW
+        GL_SHADER_STORAGE_BUFFER, totalMaterials.size() * sizeof(MaterialGPU), totalMaterials.data(), GL_STATIC_DRAW
     );
 }
 
@@ -145,7 +147,10 @@ void GeometryBatch::Render(
     glBufferData(GL_DRAW_INDIRECT_BUFFER, commands.size() * sizeof(Command), commands.data(), GL_DYNAMIC_DRAW);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, models);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, totalModels.size() * sizeof(float4x4), totalModels.data(), GL_DYNAMIC_DRAW);
+    if (ptrModels)
+    {
+        memcpy(ptrModels, totalModels.data(), totalModels.size() * sizeof(float4x4));
+    }
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 10, models);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, materials);

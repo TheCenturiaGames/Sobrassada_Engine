@@ -43,6 +43,7 @@ class GeometryBatch
     std::unordered_map<const ResourceMesh*, std::size_t> uniqueMeshesMap;
     std::vector<AccMeshCount> uniqueMeshesCount;
 
+    void* ptrModels;
     std::vector<float4x4> totalModels;
     std::vector<MaterialGPU> totalMaterials;
 
