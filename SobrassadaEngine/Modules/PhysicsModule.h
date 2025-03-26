@@ -2,6 +2,9 @@
 
 #include "Module.h"
 
+// TODO REMOVE, JUST FOR TESTING
+#include <vector>
+
 class btDefaultCollisionConfiguration;
 class btCollisionDispatcher;
 class btBroadphaseInterface;
@@ -9,6 +12,9 @@ class btSequentialImpulseConstraintSolver;
 class btDiscreteDynamicsWorld;
 
 constexpr float DEFAULT_GRAVITY = -9.81f;
+
+// TODO REMOVE, JUST FOR TESTING
+class btCollisionShape;
 
 class PhysicsModule : public Module
 {
@@ -42,4 +48,7 @@ class PhysicsModule : public Module
     btBroadphaseInterface* broadPhase                       = nullptr;
     btSequentialImpulseConstraintSolver* solver             = nullptr;
     btDiscreteDynamicsWorld* dynamicsWorld                  = nullptr;
+
+    // TODO REMOVE, JUST FOR TESTING
+    std::vector<btCollisionShape*> collisionShapes;
 };
