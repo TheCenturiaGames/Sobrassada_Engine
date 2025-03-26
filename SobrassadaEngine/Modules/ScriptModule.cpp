@@ -65,6 +65,19 @@ void ScriptModule::UnloadDLL()
     }
 }
 
+bool ScriptModule::IsFileLocked(const std::filesystem::path& filePath)
+{
+    HANDLE hFile = CreateFileW(filePath.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+    
+    if (hFile == INVALID_HANDLE_VALUE)
+    {
+        return true;
+    }
+
+    CloseHandle(hFile);
+    return false;
+}
+
 void ScriptModule::ReloadDLLIfUpdated()
 {
     // This needs to be move into globals.h
@@ -77,24 +90,13 @@ void ScriptModule::ReloadDLLIfUpdated()
 
         if (currentWriteTime != lastWriteTime)
         {
-            if (lastWriteTime != fs::file_time_type {}) GLOG("DLL has been updated, reloading...\n");
-
             UnloadDLL();
 
-            const int maxAttempts = 10;
-            int attempt = 0;
-            while (fs::exists(copyPath / "SobrassadaScripts.dll") && attempt < maxAttempts)
+            while (IsFileLocked(dllPath))
             {
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
-                attempt++;
-            }
-
-            if (fs::exists(copyPath / "SobrassadaScripts.dll"))
-            {
-                GLOG("ERROR: Could not delete the DLL. It may still be in use.\n");
                 return;
             }
-
+            if (lastWriteTime != fs::file_time_type {}) GLOG("DLL has been updated, reloading...\n");
             fs::copy(dllPath, copyPath, fs::copy_options::overwrite_existing);
 
             LoadDLL();

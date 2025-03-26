@@ -17,7 +17,7 @@
 #include "ShaderModule.h"
 #include "UserInterfaceModule.h"
 #include "WindowModule.h"
-#include "Scripting/ScriptModule.h"
+#include "ScriptModule.h"
 
 
 #ifdef _DEBUG

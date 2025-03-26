@@ -290,9 +290,9 @@
     <ClCompile Include="FileSystem\Meta\MetaModel.cpp" />
     <ClCompile Include="Libs\ImNodeFlow-1.2.2\src\ImNodeFlow.cpp" />
     <ClCompile Include="FileSystem\StateMachineManager.cpp" />
+    <ClCompile Include="Modules\ScriptModule.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceStateMachine.cpp" />
     <ClCompile Include="Scene\Components\CameraComponent.cpp" />
-    <ClCompile Include="Scripting\ScriptModule.cpp" />
     <ClCompile Include="UI\EngineEditors\Editor\NodeEditor.cpp" />
     <ClCompile Include="UI\EngineEditors\Editor\TextureLibraryEditor.cpp" />
     <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp" />
@@ -449,10 +449,9 @@
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_bezier_math.h" />
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_extra_math.h" />
     <ClInclude Include="FileSystem\StateMachineManager.h" />
+    <ClInclude Include="Modules\ScriptModule.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceStateMachine.h" />
     <ClInclude Include="Scene\Components\CameraComponent.h" />
-    <ClInclude Include="Script.h" />
-    <ClInclude Include="Scripting\ScriptModule.h" />
     <ClInclude Include="UI\EngineEditors\Editor\NodeEditor.h" />
     <ClInclude Include="UI\EngineEditors\Editor\TextureLibraryEditor.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -528,6 +527,7 @@
     <ClInclude Include="Utils\LightsConfig.h" />
     <ClInclude Include="Utils\GameTimer.h" />
     <ClInclude Include="Modules\WindowModule.h" />
+    <ClInclude Include="Utils\Script.h" />
     <ClInclude Include="Utils\Trees\Octree.h" />
     <ClInclude Include="Utils\Trees\Quadtree.h" />
   </ItemGroup>

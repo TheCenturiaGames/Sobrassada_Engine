@@ -23,6 +23,7 @@ class ScriptModule : public Module
     void LoadDLL();
     void UnloadDLL();
     void ReloadDLLIfUpdated();
+    bool IsFileLocked(const std::filesystem::path& filePath);
 
   private:
     HMODULE dllHandle                   = nullptr;
