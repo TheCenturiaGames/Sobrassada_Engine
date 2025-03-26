@@ -14,8 +14,7 @@
 namespace StateMachineManager
 {
     void Save(
-        const std::vector<Clip>& clips, const std::vector<State>& states, const std::vector<Transition>& transitions,
-        const std::string& path, const UID sourceUID
+        ResourceStateMachine* resource
     )
     {
         std::vector<char> buffer;

@@ -242,7 +242,7 @@ void StateMachineEditor::CreateBaseState(StateNode& node)
 
 void StateMachineEditor::SaveMachine()
 {
-   // StateMachineManager::Save();
+    StateMachineManager::Save(resource);
 }
 
 void StateMachineEditor::LoadMachine()
