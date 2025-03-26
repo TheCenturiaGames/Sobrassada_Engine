@@ -433,7 +433,7 @@ namespace MeshImporter
         unsigned int vertexCount  = header[1];
         unsigned int mode         = header[2];
         unsigned int indexMode    = header[3];
-        GLOG("The mode for the mesh is %d", mode);
+        //GLOG("The mode for the mesh is %d", mode);
 
         // Create Mesh
         std::vector<Vertex> tmpVertices;

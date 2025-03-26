@@ -87,7 +87,7 @@ GeometryBatch* BatchManager::RequestBatch(const MeshComponent* component)
 
 GeometryBatch* BatchManager::CreateNewBatch(const MeshComponent* component)
 {
-    GeometryBatch* newBatch = new GeometryBatch(component);
+    GeometryBatch* newBatch = new GeometryBatch(component, static_cast<int>(batches.size()));
     batches.push_back(newBatch);
     return newBatch;
 }

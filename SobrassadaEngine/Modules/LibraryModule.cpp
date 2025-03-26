@@ -352,8 +352,8 @@ const std::string& LibraryModule::GetResourcePath(UID resourceID) const
     auto it = resourcePathsMap.find(resourceID);
     if (it != resourcePathsMap.end())
     {
-        GLOG("requested uid: %llu", resourceID);
-        GLOG("obtained path: %s", it->second.c_str());
+        //GLOG("requested uid: %llu", resourceID);
+        //GLOG("obtained path: %s", it->second.c_str());
         return it->second;
     }
     static const std::string emptyString = "";
@@ -365,8 +365,8 @@ const std::string& LibraryModule::GetResourceName(UID resourceID) const
     auto it = namesMap.find(resourceID);
     if (it != namesMap.end())
     {
-        GLOG("requested uid: %llu", resourceID);
-        GLOG("obtained name: %s", it->second.c_str());
+        //GLOG("requested uid: %llu", resourceID);
+        //GLOG("obtained name: %s", it->second.c_str());
         return it->second;
     }
     static const std::string emptyString = "";
