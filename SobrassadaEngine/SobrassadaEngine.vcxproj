@@ -235,7 +235,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs\rapidjson;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;.\Libs\bullet\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -276,6 +276,7 @@
     <ClCompile Include="FileSystem\Meta\MetaModel.cpp" />
     <ClCompile Include="Libs\ImNodeFlow-1.2.2\src\ImNodeFlow.cpp" />
     <ClCompile Include="FileSystem\StateMachineManager.cpp" />
+    <ClCompile Include="Modules\PhysicsModule.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceStateMachine.cpp" />
     <ClCompile Include="Scene\Components\CameraComponent.cpp" />
     <ClCompile Include="UI\EngineEditors\Editor\NodeEditor.cpp" />
@@ -434,6 +435,7 @@
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_bezier_math.h" />
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_extra_math.h" />
     <ClInclude Include="FileSystem\StateMachineManager.h" />
+    <ClInclude Include="Modules\PhysicsModule.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceStateMachine.h" />
     <ClInclude Include="Scene\Components\CameraComponent.h" />
     <ClInclude Include="UI\EngineEditors\Editor\NodeEditor.h" />

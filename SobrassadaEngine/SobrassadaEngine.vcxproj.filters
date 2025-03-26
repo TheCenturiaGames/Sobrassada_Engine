@@ -387,6 +387,9 @@
     <ClCompile Include="FileSystem\StateMachineManager.cpp">
       <Filter>FileSystem</Filter>
     </ClCompile>
+    <ClCompile Include="Modules\PhysicsModule.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -715,6 +718,9 @@
     </ClInclude>
     <ClInclude Include="FileSystem\Config\ProjectConfig.h">
       <Filter>FileSystem\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\PhysicsModule.h">
+      <Filter>Modules</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
