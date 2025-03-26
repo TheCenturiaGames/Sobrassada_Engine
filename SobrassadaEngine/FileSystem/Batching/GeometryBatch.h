@@ -10,6 +10,7 @@ class ResourceMesh;
 class MeshComponent;
 struct Command;
 struct MaterialGPU;
+typedef struct __GLsync* GLsync;
 
 struct AccMeshCount
 {
@@ -29,6 +30,9 @@ class GeometryBatch
         const std::vector<MeshComponent*>& meshesToRender
     );
 
+    void LockBuffer();
+    void WaitBuffer();
+
     void GenerateCommandsAndSSBO(const std::vector<MeshComponent*>& meshes, std::vector<Command>& commands);
 
     void AddComponent(const MeshComponent* component) { components.push_back(component); }
@@ -44,6 +48,8 @@ class GeometryBatch
     std::vector<AccMeshCount> uniqueMeshesCount;
 
     void* ptrModels;
+    GLsync gSync;
+
     std::vector<float4x4> totalModels;
     std::vector<MaterialGPU> totalMaterials;
 

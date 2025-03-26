@@ -39,10 +39,13 @@ GeometryBatch::~GeometryBatch()
     uniqueMeshesCount.clear();
     totalModels.clear();
     totalMaterials.clear();
+
+    glUseProgram(0);
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &indirect);
     glDeleteBuffers(1, &vbo);
     glDeleteBuffers(1, &ebo);
+    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
     glDeleteBuffers(1, &models);
     glDeleteBuffers(1, &materials);
 }
@@ -111,7 +114,7 @@ void GeometryBatch::LoadData()
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, models);
     GLbitfield flags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT;
-    glBufferStorage(GL_SHADER_STORAGE_BUFFER, totalModels.size() * sizeof(float4x4), nullptr, flags);
+    glBufferStorage(GL_SHADER_STORAGE_BUFFER, totalModels.size() * sizeof(float4x4), 0, flags);
     ptrModels = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, materials);
@@ -125,6 +128,8 @@ void GeometryBatch::Render(
 )
 {
     const auto start = std::chrono::high_resolution_clock::now();
+
+    WaitBuffer();
 
     std::vector<Command> commands;
     GenerateCommandsAndSSBO(meshesToRender, commands);
@@ -150,6 +155,7 @@ void GeometryBatch::Render(
     if (ptrModels)
     {
         memcpy(ptrModels, totalModels.data(), totalModels.size() * sizeof(float4x4));
+        glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
     }
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 10, models);
 
@@ -164,6 +170,8 @@ void GeometryBatch::Render(
     );
 
     glBindVertexArray(0);
+
+    LockBuffer();
 
     const auto end                             = std::chrono::high_resolution_clock::now();
     const std::chrono::duration<float> elapsed = end - start;
@@ -199,5 +207,26 @@ void GeometryBatch::GenerateCommandsAndSSBO(const std::vector<MeshComponent*>& m
         commands.push_back(newCommand);
 
         totalModels[componentsMap[component]] = component->GetCombinedMatrix();
+    }
+}
+
+void GeometryBatch::LockBuffer()
+{
+    if (gSync)
+    {
+        glDeleteSync(gSync);
+    }
+    gSync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+}
+
+void GeometryBatch::WaitBuffer()
+{
+    if (gSync)
+    {
+        while (1)
+        {
+            GLenum waitReturn = glClientWaitSync(gSync, GL_SYNC_FLUSH_COMMANDS_BIT, 1);
+            if (waitReturn == GL_ALREADY_SIGNALED || waitReturn == GL_CONDITION_SATISFIED) return;
+        }
     }
 }
