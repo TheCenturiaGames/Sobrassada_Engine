@@ -7,8 +7,10 @@ class Transform2DComponent : public Component
 {
   public:
     Transform2DComponent(UID uid, GameObject* parent);
+    Transform2DComponent(const rapidjson::Value& initialState, GameObject* parent);
     ~Transform2DComponent();
 
+    void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
     void Update(float deltaTime) override;
     void Render(float deltaTime) override;
     void RenderEditorInspector() override;

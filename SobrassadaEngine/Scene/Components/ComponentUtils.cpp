@@ -7,8 +7,8 @@
 #include "Standalone/Lights/PointLightComponent.h"
 #include "Standalone/Lights/SpotLightComponent.h"
 #include "Standalone/MeshComponent.h"
-#include "Standalone/UI/Transform2DComponent.h"
 #include "Standalone/UI/CanvasComponent.h"
+#include "Standalone/UI/Transform2DComponent.h"
 #include "Standalone/UI/UILabelComponent.h"
 
 #include <cstdint>
@@ -74,6 +74,12 @@ Component* ComponentUtils::CreateExistingComponent(const rapidjson::Value& initi
             return new DirectionalLightComponent(initialState, parent);
         case COMPONENT_CHARACTER_CONTROLLER:
             return new CharacterControllerComponent(initialState, parent);
+        case COMPONENT_TRANSFORM_2D:
+            return new Transform2DComponent(initialState, parent);
+        case COMPONENT_CANVAS:
+            return new CanvasComponent(initialState, parent);
+        case COMPONENT_LABEL:
+            return new UILabelComponent(initialState, parent);
         case COMPONENT_CAMERA:
             return new CameraComponent(initialState, parent);
         default:

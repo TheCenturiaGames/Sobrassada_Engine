@@ -11,6 +11,7 @@ class CanvasComponent : public Component
     CanvasComponent(const rapidjson::Value& initialState, GameObject* parent);
     ~CanvasComponent();
 
+    void Init() override;
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
     void Clone(const Component* otherComponent) override;
     void Update(float deltaTime) override;
@@ -21,8 +22,8 @@ class CanvasComponent : public Component
     bool IsInWorldSpaceGame() const { return isInWorldSpaceGame; }
 
   private:
-    Transform2DComponent* transform2D = nullptr;
-
+    float width               = SCREEN_WIDTH;
+    float height              = SCREEN_HEIGHT;
     bool isInWorldSpaceEditor = false;
-    bool isInWorldSpaceGame = true;
+    bool isInWorldSpaceGame   = true;
 };

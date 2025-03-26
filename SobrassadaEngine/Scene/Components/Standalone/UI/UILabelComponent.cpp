@@ -15,7 +15,34 @@
 #include <queue>
 
 UILabelComponent::UILabelComponent(UID uid, GameObject* parent)
-    : text("XD"), Component(uid, parent, "Label", COMPONENT_LABEL)
+    : text("Le Sobrassada"), Component(uid, parent, "Label", COMPONENT_LABEL)
+{
+}
+
+UILabelComponent::UILabelComponent(const rapidjson::Value& initialState, GameObject* parent)
+    : Component(initialState, parent)
+{
+    const char* textPtr = initialState["Text"].GetString();
+    strcpy_s(text, sizeof(text), textPtr);
+    fontSize = initialState["FontSize"].GetInt();
+
+    if (initialState.HasMember("FontColor") && initialState["FontColor"].IsArray())
+    {
+        const rapidjson::Value& initFontColor = initialState["FontColor"];
+        fontColor.x                           = initFontColor[0].GetFloat();
+        fontColor.y                           = initFontColor[1].GetFloat();
+        fontColor.z                           = initFontColor[2].GetFloat();
+    }
+}
+
+UILabelComponent::~UILabelComponent()
+{
+    fontData->Clean();
+    if (vbo != 0) glDeleteBuffers(1, &vbo);
+    if (vao != 0) glDeleteVertexArrays(1, &vao);
+}
+
+void UILabelComponent::Init()
 {
     Transform2DComponent* transform =
         static_cast<Transform2DComponent*>(parent->GetComponentByType(COMPONENT_TRANSFORM_2D));
@@ -58,11 +85,19 @@ UILabelComponent::UILabelComponent(UID uid, GameObject* parent)
     InitBuffers();
 }
 
-UILabelComponent::~UILabelComponent()
+void UILabelComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
 {
-    fontData->Clean();
-    if (vbo != 0) glDeleteBuffers(1, &vbo);
-    if (vao != 0) glDeleteVertexArrays(1, &vao);
+    Component::Save(targetState, allocator);
+
+    std::string textString(text);
+    targetState.AddMember("Text", rapidjson::Value(textString.c_str(), allocator), allocator);
+    targetState.AddMember("FontSize", fontSize, allocator);
+
+    rapidjson::Value valFontColor(rapidjson::kArrayType);
+    valFontColor.PushBack(fontColor.x, allocator);
+    valFontColor.PushBack(fontColor.y, allocator);
+    valFontColor.PushBack(fontColor.z, allocator);
+    targetState.AddMember("FontColor", valFontColor, allocator);
 }
 
 void UILabelComponent::Clone(const Component* otherComponent)

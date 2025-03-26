@@ -15,12 +15,15 @@ class UILabelComponent : public Component
 {
   public:
     UILabelComponent(UID uid, GameObject* parent);
+    UILabelComponent(const rapidjson::Value& initialState, GameObject* parent);
     ~UILabelComponent();
 
+    void Init() override;
+    void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
+    void Clone(const Component* otherComponent) override;
     void Update(float deltaTime) override;
     void Render(float deltaTime) override;
     void RenderEditorInspector() override;
-    void Clone(const Component* otherComponent) override;
 
   private:
     void InitBuffers();
