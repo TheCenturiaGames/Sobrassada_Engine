@@ -29,11 +29,32 @@ CanvasComponent::CanvasComponent(UID uid, GameObject* parent) : Component(uid, p
     }
 
     App->GetGameUIModule()->AddCanvas(this);
+    localComponentAABB = AABB(
+        float3(
+            transform2D->GetPosition().x - (transform2D->GetSize().x / 2),
+            transform2D->GetPosition().y - (transform2D->GetSize().y / 2), 0
+        ),
+        float3(
+            transform2D->GetPosition().x + (transform2D->GetSize().x / 2),
+            transform2D->GetPosition().y + (transform2D->GetSize().y / 2), 0
+        )
+    );
+}
+
+CanvasComponent::CanvasComponent(const rapidjson::Value& initialState, GameObject* parent)
+    : Component(initialState, parent)
+{
 }
 
 CanvasComponent::~CanvasComponent()
 {
     App->GetGameUIModule()->ResetCanvas();
+}
+
+void CanvasComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
+{
+    targetState.AddMember("IsInWorldSpaceEditor", isInWorldSpaceEditor, allocator);
+    targetState.AddMember("IsInWorldSpaceGame", isInWorldSpaceGame, allocator);
 }
 
 void CanvasComponent::Clone(const Component* otherComponent)
