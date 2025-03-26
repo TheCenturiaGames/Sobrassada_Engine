@@ -18,6 +18,7 @@
 #include "Geometry/OBB.h"
 #include "glew.h"
 #include "imgui.h"
+#include "btVector3.h"
 #include <unordered_map>
 
 class DDRenderInterfaceCoreGL final : public dd::RenderInterface
@@ -686,6 +687,14 @@ void DebugDrawModule::DrawLine(
 {
     float3 dir = direction.Normalized() * distance;
     dd::line(origin, dir + origin, color, 0, enableDepth);
+}
+
+// TODO, CHECK IF PROPER WAY OF IMPLEMENTATION
+void DebugDrawModule::DrawLine(const btVector3& from, const btVector3& to, const btVector3& color)
+{
+    dd::line(
+        float3(from.x(), from.y(), from.z()), float3(to.x(), to.y(), to.z()), float3(color.x(), color.y(), color.z())
+    );
 }
 
 void DebugDrawModule::DrawCircle(const float3& center, const float3& upVector, const float3& color, const float radius)

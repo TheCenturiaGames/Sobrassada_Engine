@@ -10,6 +10,7 @@ class btCollisionDispatcher;
 class btBroadphaseInterface;
 class btSequentialImpulseConstraintSolver;
 class btDiscreteDynamicsWorld;
+class BulletDebugDraw;
 
 constexpr float DEFAULT_GRAVITY = -9.81f;
 
@@ -41,13 +42,15 @@ class PhysicsModule : public Module
 
   private:
     float gravity                                           = DEFAULT_GRAVITY;
-    bool updateGravity                                      = false;
+    bool updateGravity                                      = true;
 
     btDefaultCollisionConfiguration* collisionConfiguration = nullptr;
     btCollisionDispatcher* dispatcher                       = nullptr;
     btBroadphaseInterface* broadPhase                       = nullptr;
     btSequentialImpulseConstraintSolver* solver             = nullptr;
     btDiscreteDynamicsWorld* dynamicsWorld                  = nullptr;
+
+    BulletDebugDraw* debugDraw                              = nullptr;
 
     // TODO REMOVE, JUST FOR TESTING
     std::vector<btCollisionShape*> collisionShapes;

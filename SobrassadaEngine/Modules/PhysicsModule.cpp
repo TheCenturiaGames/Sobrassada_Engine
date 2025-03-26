@@ -1,5 +1,8 @@
 #include "PhysicsModule.h"
 
+#include "BulletDebugDraw.h"
+
+#include "Algorithm/Random/LCG.h"
 #include "btBulletDynamicsCommon.h"
 
 bool PhysicsModule::Init()
@@ -10,9 +13,14 @@ bool PhysicsModule::Init()
     solver                 = new btSequentialImpulseConstraintSolver;
     dynamicsWorld          = new btDiscreteDynamicsWorld(dispatcher, broadPhase, solver, collisionConfiguration);
 
-    dynamicsWorld->setGravity(btVector3(0, gravity, 0));
+    debugDraw              = new BulletDebugDraw();
 
-    // TODO REMOVE, JUST FOR TESTING 
+    debugDraw->setDebugMode(2);
+
+    dynamicsWorld->setGravity(btVector3(0, gravity, 0));
+    dynamicsWorld->setDebugDrawer(debugDraw);
+
+    // TODO REMOVE, JUST FOR TESTING
 
     // the ground is a cube of side 100 at position y = -56.
     // the sphere will hit it at y = -6, with center at -5
@@ -42,16 +50,24 @@ bool PhysicsModule::Init()
         dynamicsWorld->addRigidBody(body);
     }
 
+    LCG randomGen;
+
+    for (int i = 0; i < 100; i++)
     {
         // create a dynamic rigidbody
-
-        // btCollisionShape* colShape = new btBoxShape(btVector3(1,1,1));
-        btCollisionShape* colShape = new btSphereShape(btScalar(1.));
+        btCollisionShape* colShape = new btBoxShape(btVector3(1,1,1));
+        //btCollisionShape* colShape = new btSphereShape(btScalar(1.));
         collisionShapes.push_back(colShape);
 
         /// Create Dynamic Objects
         btTransform startTransform;
         startTransform.setIdentity();
+
+        float x = randomGen.Float(-100, 100);
+        float y = randomGen.Float(1, 100);
+        float z = randomGen.Float(-100, 100);
+
+        startTransform.setOrigin(btVector3(x, y, z));
 
         btScalar mass(1.f);
 
@@ -107,6 +123,8 @@ update_status PhysicsModule::PreUpdate(float deltaTime)
 
 update_status PhysicsModule::Render(float deltaTime)
 {
+    if (debugDraw->getDebugMode()) dynamicsWorld->debugDrawWorld();
+
     return UPDATE_CONTINUE;
 }
 
@@ -130,7 +148,7 @@ bool PhysicsModule::ShutDown()
 
 void PhysicsModule::DeleteWorld()
 {
-    // TODO REMOVE, JUST FOR TESTING 
+    // TODO REMOVE, JUST FOR TESTING
     for (int j = 0; j < collisionShapes.size(); j++)
     {
         btCollisionShape* shape = collisionShapes[j];

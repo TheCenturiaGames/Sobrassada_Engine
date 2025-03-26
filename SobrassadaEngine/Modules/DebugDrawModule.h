@@ -8,6 +8,7 @@
 
 class DDRenderInterfaceCoreGL;
 class Camera;
+class btVector3;
 
 enum class DebugOptions : uint8_t
 {
@@ -42,6 +43,10 @@ class DebugDrawModule : public Module
         const float3& origin, const float3& direction, const float distance, const float3& color,
         bool enableDepth = true
     );
+
+    // TODO, CHECK IF PROPER WAY OF IMPLEMENTATION
+    void DrawLine(const btVector3& from, const btVector3& to, const btVector3& color);
+   
     void DrawFrustrum(float4x4 frustumProj, float4x4 frustumView);
     void DrawCircle(const float3& center, const float3& upVector, const float3& color, const float radius);
     void DrawSphere(const float3& center, const float3& color, const float radius);

@@ -390,6 +390,9 @@
     <ClCompile Include="Modules\PhysicsModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
+    <ClCompile Include="DebugDraw\BulletDebugDraw.cpp">
+      <Filter>External\Debug</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -721,6 +724,9 @@
     </ClInclude>
     <ClInclude Include="Modules\PhysicsModule.h">
       <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugDraw\BulletDebugDraw.h">
+      <Filter>External\Debug</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
