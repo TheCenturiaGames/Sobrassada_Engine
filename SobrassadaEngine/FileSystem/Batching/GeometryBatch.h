@@ -29,10 +29,7 @@ class GeometryBatch
         const std::vector<MeshComponent*>& meshesToRender
     );
 
-    void GenerateCommandsAndSSBO(
-        const std::vector<MeshComponent*>& meshes, std::vector<Command>& commands, std::vector<float4x4>& totalModels,
-        std::vector<MaterialGPU>& totalMaterials
-    );
+    void GenerateCommandsAndSSBO(const std::vector<MeshComponent*>& meshes, std::vector<Command>& commands);
 
     void AddComponent(const MeshComponent* component) { components.push_back(component); }
 
@@ -41,9 +38,13 @@ class GeometryBatch
 
   private:
     std::vector<const MeshComponent*> components;
-    std::vector<const ResourceMesh*> uniqueMeshes;
+    std::unordered_map<const MeshComponent*, std::size_t> componentsMap; // index of position added
+
     std::unordered_map<const ResourceMesh*, std::size_t> uniqueMeshesMap;
     std::vector<AccMeshCount> uniqueMeshesCount;
+
+    std::vector<float4x4> totalModels;
+    std::vector<MaterialGPU> totalMaterials;
 
     unsigned int totalVertexCount = 0;
     unsigned int totalIndexCount  = 0;
