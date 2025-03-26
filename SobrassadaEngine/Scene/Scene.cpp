@@ -13,6 +13,7 @@
 #include "LibraryModule.h"
 #include "Octree.h"
 #include "OpenGLModule.h"
+#include "PhysicsModule.h"
 #include "ProjectModule.h"
 #include "Quadtree.h"
 #include "ResourceManagement/Resources/Resource.h"
@@ -127,6 +128,8 @@ void Scene::Init()
 
     UpdateStaticSpatialStructure();
     UpdateDynamicSpatialStructure();
+
+    App->GetPhysicsModule()->CreateWorld();
 }
 
 void Scene::Save(

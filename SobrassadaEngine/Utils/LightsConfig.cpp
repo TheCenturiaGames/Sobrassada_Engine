@@ -33,6 +33,7 @@ LightsConfig::~LightsConfig()
     glDeleteVertexArrays(1, &skyboxVao);
     glDeleteBuffers(1, &skyboxVbo);
     glDeleteProgram(skyboxProgram);
+    glDeleteTextures(1, &skyboxTexture);
 }
 
 void LightsConfig::InitSkybox()

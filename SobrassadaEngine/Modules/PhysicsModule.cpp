@@ -1,11 +1,13 @@
 #include "PhysicsModule.h"
 
+#include "Application.h"
 #include "BulletDebugDraw.h"
+#include "SceneModule.h"
 
 #include "Algorithm/Random/LCG.h"
 #include "btBulletDynamicsCommon.h"
 
-bool PhysicsModule::Init()
+PhysicsModule::PhysicsModule()
 {
     collisionConfiguration = new btDefaultCollisionConfiguration();
     dispatcher             = new btCollisionDispatcher(collisionConfiguration);
@@ -19,8 +21,73 @@ bool PhysicsModule::Init()
 
     dynamicsWorld->setGravity(btVector3(0, gravity, 0));
     dynamicsWorld->setDebugDrawer(debugDraw);
+}
 
-    // TODO REMOVE, JUST FOR TESTING
+bool PhysicsModule::Init()
+{
+    return true;
+}
+
+update_status PhysicsModule::PreUpdate(float deltaTime)
+{
+    if (!App->GetSceneModule()->GetInPlayMode()) return UPDATE_CONTINUE;
+    
+    dynamicsWorld->stepSimulation(deltaTime, 10);
+
+    // print positions of all objects
+    for (int j = dynamicsWorld->getNumCollisionObjects() - 1; j >= 0; j--)
+    {
+        btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[j];
+        btRigidBody* body      = btRigidBody::upcast(obj);
+        btTransform trans;
+        if (body && body->getMotionState())
+        {
+            body->getMotionState()->getWorldTransform(trans);
+        }
+        else
+        {
+            trans = obj->getWorldTransform();
+        }
+    }
+    return UPDATE_CONTINUE;
+}
+
+update_status PhysicsModule::Render(float deltaTime)
+{
+    if (debugDraw->getDebugMode()) dynamicsWorld->debugDrawWorld();
+
+    return UPDATE_CONTINUE;
+}
+
+update_status PhysicsModule::PostUpdate(float deltaTime)
+{
+    if (updateGravity)
+    {
+        updateGravity = false;
+        dynamicsWorld->setGravity(btVector3(0, gravity, 0));
+    }
+
+    return UPDATE_CONTINUE;
+}
+
+bool PhysicsModule::ShutDown()
+{
+    DeleteWorld();
+
+    delete dynamicsWorld;
+    delete solver;
+    delete broadPhase;
+    delete dispatcher;
+    delete collisionConfiguration;
+
+    return true;
+}
+
+void PhysicsModule::CreateWorld()
+{
+    DeleteWorld();
+
+    // TODO, REPLACE WITH CURRENT SCENE LOADED DYNAMIC OBJECTS
 
     // the ground is a cube of side 100 at position y = -56.
     // the sphere will hit it at y = -6, with center at -5
@@ -52,20 +119,20 @@ bool PhysicsModule::Init()
 
     LCG randomGen;
 
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 1000; i++)
     {
         // create a dynamic rigidbody
-        btCollisionShape* colShape = new btBoxShape(btVector3(1,1,1));
-        //btCollisionShape* colShape = new btSphereShape(btScalar(1.));
+        btCollisionShape* colShape = new btBoxShape(btVector3(1, 1, 1));
+        // btCollisionShape* colShape = new btSphereShape(btScalar(1.));
         collisionShapes.push_back(colShape);
 
         /// Create Dynamic Objects
         btTransform startTransform;
         startTransform.setIdentity();
 
-        float x = randomGen.Float(-100, 100);
+        float x = randomGen.Float(-75, 75);
         float y = randomGen.Float(1, 100);
-        float z = randomGen.Float(-100, 100);
+        float z = randomGen.Float(-75, 75);
 
         startTransform.setOrigin(btVector3(x, y, z));
 
@@ -77,8 +144,6 @@ bool PhysicsModule::Init()
         btVector3 localInertia(0, 0, 0);
         if (isDynamic) colShape->calculateLocalInertia(mass, localInertia);
 
-        startTransform.setOrigin(btVector3(2, 10, 0));
-
         // using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active'
         // objects
         btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
@@ -87,63 +152,6 @@ bool PhysicsModule::Init()
 
         dynamicsWorld->addRigidBody(body);
     }
-
-    for (int i = 0; i < 150; i++)
-    {
-        dynamicsWorld->stepSimulation(1.f / 60.f, 10);
-
-        // print positions of all objects
-        for (int j = dynamicsWorld->getNumCollisionObjects() - 1; j >= 0; j--)
-        {
-            btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[j];
-            btRigidBody* body      = btRigidBody::upcast(obj);
-            btTransform trans;
-            if (body && body->getMotionState())
-            {
-                body->getMotionState()->getWorldTransform(trans);
-            }
-            else
-            {
-                trans = obj->getWorldTransform();
-            }
-            GLOG(
-                "world pos object %d = %f,%f,%f\n", j, float(trans.getOrigin().getX()), float(trans.getOrigin().getY()),
-                float(trans.getOrigin().getZ())
-            );
-        }
-    }
-
-    return true;
-}
-
-update_status PhysicsModule::PreUpdate(float deltaTime)
-{
-    return UPDATE_CONTINUE;
-}
-
-update_status PhysicsModule::Render(float deltaTime)
-{
-    if (debugDraw->getDebugMode()) dynamicsWorld->debugDrawWorld();
-
-    return UPDATE_CONTINUE;
-}
-
-update_status PhysicsModule::PostUpdate(float deltaTime)
-{
-    if (updateGravity)
-    {
-        updateGravity = false;
-        dynamicsWorld->setGravity(btVector3(0, gravity, 0));
-    }
-
-    return UPDATE_CONTINUE;
-}
-
-bool PhysicsModule::ShutDown()
-{
-    DeleteWorld();
-
-    return true;
 }
 
 void PhysicsModule::DeleteWorld()
@@ -157,6 +165,9 @@ void PhysicsModule::DeleteWorld()
     }
     // -------
 
+    collisionShapes.clear();
+
+    // EMPTY CURRENT WORLD
     for (int i = dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i--)
     {
         btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[i];
@@ -168,10 +179,4 @@ void PhysicsModule::DeleteWorld()
         dynamicsWorld->removeCollisionObject(obj);
         delete obj;
     }
-
-    delete dynamicsWorld;
-    delete solver;
-    delete broadPhase;
-    delete dispatcher;
-    delete collisionConfiguration;
 }

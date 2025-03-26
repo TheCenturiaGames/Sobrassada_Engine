@@ -20,7 +20,7 @@ class btCollisionShape;
 class PhysicsModule : public Module
 {
   public:
-    PhysicsModule()  = default;
+    PhysicsModule();
     ~PhysicsModule() = default;
 
     bool Init() override;
@@ -37,8 +37,10 @@ class PhysicsModule : public Module
         updateGravity = true;
     };
 
-  private:
+
+    void CreateWorld();
     void DeleteWorld();
+  private:
 
   private:
     float gravity                                           = DEFAULT_GRAVITY;

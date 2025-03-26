@@ -9,6 +9,7 @@
 #include "ImGuizmo.h"
 #include "InputModule.h"
 #include "LibraryModule.h"
+#include "PhysicsModule.h"
 #include "ProjectModule.h"
 #include "RaycastController.h"
 #include "ResourcesModule.h"
@@ -164,6 +165,7 @@ void SceneModule::CloseScene()
     delete loadedScene;
     loadedScene = nullptr;
     if (App->GetResourcesModule() != nullptr) App->GetResourcesModule()->UnloadAllResources();
+    App->GetPhysicsModule()->DeleteWorld();
 }
 
 void SceneModule::SwitchPlayMode(bool play)
