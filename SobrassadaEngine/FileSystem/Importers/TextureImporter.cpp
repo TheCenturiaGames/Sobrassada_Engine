@@ -5,7 +5,7 @@
 #include "LibraryModule.h"
 #include "MetaTexture.h"
 #include "ProjectModule.h"
-#include "ResourceManagement/Resources/ResourceTexture.h"
+#include "ResourceTexture.h"
 
 #include "DirectXTex/DirectXTex.h"
 #include "glew.h"

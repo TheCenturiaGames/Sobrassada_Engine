@@ -1,8 +1,8 @@
 #pragma once
 
-#include <Globals.h>
+#include "Globals.h"
 
-#include <Math/float4x4.h>
+#include "Math/float4x4.h"
 #include <vector>
 
 struct NodeData

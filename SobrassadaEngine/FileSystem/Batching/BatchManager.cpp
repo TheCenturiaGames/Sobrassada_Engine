@@ -1,17 +1,17 @@
 #include "BatchManager.h"
 
 #include "GeometryBatch.h"
-#include <Application.h>
-#include <CameraComponent.h>
-#include <CameraModule.h>
-#include <ResourceMaterial.h>
-#include <ResourceMesh.h>
-#include <Scene.h>
-#include <SceneModule.h>
-#include <ShaderModule.h>
-#include <Standalone/MeshComponent.h>
+#include "Application.h"
+#include "CameraComponent.h"
+#include "CameraModule.h"
+#include "ResourceMaterial.h"
+#include "ResourceMesh.h"
+#include "Scene.h"
+#include "SceneModule.h"
+#include "ShaderModule.h"
+#include "Standalone/MeshComponent.h"
 
-#include <Math/float3.h>
+#include "Math/float3.h"
 
 BatchManager::BatchManager()
 {

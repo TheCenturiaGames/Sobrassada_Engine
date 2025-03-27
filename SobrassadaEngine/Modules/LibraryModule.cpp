@@ -12,9 +12,9 @@
 
 #include "Libs/rapidjson/stringbuffer.h"
 #include "Libs/rapidjson/writer.h"
-#include "document.h"
-#include "prettywriter.h"
-#include "stringbuffer.h"
+#include "rapidjson/document.h"
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
 #include <filesystem>
 #include <fstream>
 

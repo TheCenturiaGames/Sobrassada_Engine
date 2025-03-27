@@ -1,16 +1,16 @@
 #include "GeometryBatch.h"
 
-#include <Application.h>
-#include <Globals.h>
-#include <Mesh.h>
-#include <OpenGLModule.h>
-#include <ResourceMaterial.h>
-#include <ResourceMesh.h>
-#include <ShaderModule.h>
-#include <Standalone/MeshComponent.h>
+#include "Application.h"
+#include "Globals.h"
+#include "Mesh.h"
+#include "OpenGLModule.h"
+#include "ResourceMaterial.h"
+#include "ResourceMesh.h"
+#include "ShaderModule.h"
+#include "Standalone/MeshComponent.h"
 
+#include "glew.h"
 #include <chrono>
-#include <glew.h>
 
 struct Command
 {

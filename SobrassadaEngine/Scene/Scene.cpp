@@ -23,8 +23,8 @@
 #include "Scene/Components/ComponentUtils.h"
 #include "Scene/Components/Standalone/MeshComponent.h"
 #include "SceneModule.h"
-#include <BatchManager.h>
-#include <GeometryBatch.h>
+#include "BatchManager.h"
+#include "GeometryBatch.h"
 
 #include "SDL_mouse.h"
 #include "imgui.h"

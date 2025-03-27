@@ -7,13 +7,13 @@
 #include "MetaModel.h"
 #include "Model.h"
 #include "ProjectModule.h"
-#include "ResourceManagement/Resources/ResourceModel.h"
+#include "ResourceModel.h"
 
 #include "Math/Quat.h"
 #include "Math/float4x4.h"
-#include "prettywriter.h"
-#include "stringbuffer.h"
-#include <tiny_gltf.h>
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+#include "tiny_gltf.h"
 
 namespace ModelImporter
 {
