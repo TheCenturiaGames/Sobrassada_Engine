@@ -1,7 +1,7 @@
 #include "MetaMesh.h"
 
-MetaMesh::MetaMesh(UID uid, const std::string& assetPath, bool generateTangents, const float4x4& transform)
-    : MetaFile(uid, assetPath), generateTangents(generateTangents), transform(transform)
+MetaMesh::MetaMesh(UID uid, const std::string& assetPath, bool generateTangents, const float4x4& transform, UID defaultMaterialUID)
+    : MetaFile(uid, assetPath), generateTangents(generateTangents), transform(transform),defaulMaterialUID(defaulMaterialUID)
 {
 }
 
@@ -28,5 +28,10 @@ void MetaMesh::AddImportOptions(rapidjson::Document& doc, rapidjson::Document::A
         .PushBack(transform.ptr()[15], allocator);
 
     importOptions.AddMember("transform", transformArray, allocator);
+
+    // TODO: Add default material
+    importOptions.AddMember("defaultMaterialUID", defaulMaterialUID, allocator);
+
     doc.AddMember("importOptions", importOptions, allocator);
+    
 }
