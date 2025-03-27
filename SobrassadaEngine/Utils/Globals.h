@@ -140,3 +140,9 @@ inline UID GenerateUID()
     UID uid = static_cast<UID>(rng.IntFast()) << 32 | rng.IntFast(); // Combine two 32-bit values
     return uid;
 }
+
+#if defined(SOBRASADA_ENGINE_API)
+/* do nothing. */
+#elif defined(_MSC_VER)
+#define SOBRASADA_ENGINE_API __declspec(dllexport)
+#endif

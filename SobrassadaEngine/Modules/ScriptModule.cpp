@@ -27,7 +27,7 @@ void ScriptModule::LoadDLL()
     }
 
     scriptInstance = createScriptFunc();
-    if (scriptInstance && !scriptInstance->Init())
+    if (!scriptInstance || !scriptInstance->Init())
     {
         GLOG("Failed to initialize script\n");
         destroyScriptFunc(scriptInstance);
@@ -67,8 +67,10 @@ void ScriptModule::UnloadDLL()
 
 bool ScriptModule::IsFileLocked(const std::filesystem::path& filePath)
 {
-    HANDLE hFile = CreateFileW(filePath.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
-    
+    HANDLE hFile = CreateFileW(
+        filePath.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr
+    );
+
     if (hFile == INVALID_HANDLE_VALUE)
     {
         return true;

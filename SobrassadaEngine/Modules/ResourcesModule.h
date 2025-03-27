@@ -18,6 +18,7 @@ class ResourcesModule : public Module
     void ReleaseResource(const Resource* resource);
 
     void UnloadAllResources();
+    SOBRASADA_ENGINE_API int GetspecularGlossinessProgram() const { return specularGlossinessProgram; }
 
   private:
     Resource* CreateNewResource(UID uid);

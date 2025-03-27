@@ -76,4 +76,4 @@ class Application
     EngineConfig* engineConfig       = nullptr;
 };
 
-extern Application* App;
+extern SOBRASADA_ENGINE_API Application* App;
