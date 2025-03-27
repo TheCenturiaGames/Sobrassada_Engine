@@ -6,7 +6,10 @@
 #include "FileSystem/Mesh.h"
 #include "ResourceMesh.h"
 #include "ResourcesModule.h"
+#include "DetourNavMeshBuilder.h"
+#include "DetourNavMeshQuery.h"
 #include "algorithm"
+#include "Recast.h"
 
 ResourceNavMesh::~ResourceNavMesh()
 {
@@ -32,37 +35,40 @@ ResourceNavMesh::~ResourceNavMesh()
         dtFreeNavMeshQuery(navQuery);
         navQuery = nullptr;
     }
+
+    delete config;
 }
 
 ResourceNavMesh::ResourceNavMesh(UID uid, const std::string& name) : Resource(uid, name, ResourceType::Navmesh)
 {
+    config         = new rcConfig();
     // Default Heightfield Options
-    config.bmin[0] = config.bmin[1] = config.bmin[2] = 0.0f;
-    config.bmax[0] = config.bmax[1] = config.bmax[2] = 0.0f;
-    config.cs                                        = 0.3f; // Default cell size
-    config.ch                                        = 0.2f; // Default cell height
-    config.width                                     = 1000; // Arbitrary default width
-    config.height                                    = 1000; // Arbitrary default height
+    config->bmin[0] = config->bmin[1] = config->bmin[2] = 0.0f;
+    config->bmax[0] = config->bmax[1] = config->bmax[2] = 0.0f;
+    config->cs                                        = 0.3f; // Default cell size
+    config->ch                                        = 0.2f; // Default cell height
+    config->width                                     = 1000; // Arbitrary default width
+    config->height                                    = 1000; // Arbitrary default height
 
     // Default Walkable Options
-    config.walkableSlopeAngle                        = 45.0f; // Max slope an agent can walk on
-    config.walkableClimb                             = 1;     // Max step height agent can climb
-    config.walkableHeight                            = 2;     // Min height required to pass
-    config.walkableRadius                            = 1;     // Agent radius
+    config->walkableSlopeAngle                          = 45.0f; // Max slope an agent can walk on
+    config->walkableClimb                               = 1;     // Max step height agent can climb
+    config->walkableHeight                              = 2;     // Min height required to pass
+    config->walkableRadius                              = 1;     // Agent radius
 
     // Default Partition Options
     partitionType                                    = SAMPLE_PARTITION_MONOTONE;
-    config.minRegionArea                             = 4;  // Min region area (small regions will be removed)
-    config.mergeRegionArea                           = 10; // Merge regions smaller than this size
+    config->minRegionArea                               = 4;  // Min region area (small regions will be removed)
+    config->mergeRegionArea                             = 10; // Merge regions smaller than this size
 
     // Default Contour Options
-    config.maxSimplificationError                    = 2.0f;
-    config.maxEdgeLen                                = 15;
-    config.maxVertsPerPoly                           = 6;
+    config->maxSimplificationError                      = 2.0f;
+    config->maxEdgeLen                                  = 15;
+    config->maxVertsPerPoly                             = 6;
 
     // Default PolyMesh Options
-    config.detailSampleDist                          = 0.5f; // Higher = more accurate, lower = faster
-    config.detailSampleMaxError                      = 0.5f; // Higher = more smooth, lower = accurate
+    config->detailSampleDist                            = 0.5f; // Higher = more accurate, lower = faster
+    config->detailSampleMaxError                        = 0.5f; // Higher = more smooth, lower = accurate
 
     // Default Filters
     m_filterLowHangingObstacles                      = true;
@@ -101,13 +107,13 @@ bool ResourceNavMesh::BuildNavMesh(
         allTriangleCount += (mesh.first->GetIndexCount() / 3);
     }
 
-    config.bmin[0] = minPoint[0];
-    config.bmin[1] = minPoint[1];
-    config.bmin[2] = minPoint[2];
+    config->bmin[0] = minPoint[0];
+    config->bmin[1] = minPoint[1];
+    config->bmin[2] = minPoint[2];
 
-    config.bmax[0] = maxPoint[0];
-    config.bmax[1] = maxPoint[0];
-    config.bmax[2] = maxPoint[0];
+    config->bmax[0] = maxPoint[0];
+    config->bmax[1] = maxPoint[0];
+    config->bmax[2] = maxPoint[0];
 
     std::vector<float> navmeshVertices;
     std::vector<int> navmeshTriangles;
@@ -157,7 +163,7 @@ bool ResourceNavMesh::BuildNavMesh(
     }
 
     if (!rcCreateHeightfield(
-            context, *heightfield, config.width, config.height, config.bmin, config.bmax, config.cs, config.ch
+            context, *heightfield, config->width, config->height, config->bmin, config->bmax, config->cs, config->ch
         ))
     {
         GLOG("Failed to create heightfield");
@@ -168,13 +174,13 @@ bool ResourceNavMesh::BuildNavMesh(
     triAreas = new unsigned char[allTriangleCount]();
 
     rcMarkWalkableTriangles(
-        context, config.walkableSlopeAngle, navmeshVertices.data(), allVertexCount, navmeshTriangles.data(),
+        context, config->walkableSlopeAngle, navmeshVertices.data(), allVertexCount, navmeshTriangles.data(),
         allTriangleCount, triAreas
     );
 
     if (!rcRasterizeTriangles(
             context, navmeshVertices.data(), allVertexCount, navmeshTriangles.data(), triAreas, allTriangleCount,
-            *heightfield, config.walkableClimb
+            *heightfield, config->walkableClimb
         ))
     {
         GLOG("Failed to rasterize triangles for navmesh!");
@@ -187,9 +193,9 @@ bool ResourceNavMesh::BuildNavMesh(
     delete[] triAreas;
     triAreas = 0;
 
-    if (m_filterLowHangingObstacles) rcFilterLowHangingWalkableObstacles(context, config.walkableClimb, *heightfield);
-    if (m_filterLedgeSpans) rcFilterLedgeSpans(context, config.walkableHeight, config.walkableClimb, *heightfield);
-    if (m_filterWalkableLowHeightSpans) rcFilterWalkableLowHeightSpans(context, config.walkableHeight, *heightfield);
+    if (m_filterLowHangingObstacles) rcFilterLowHangingWalkableObstacles(context, config->walkableClimb, *heightfield);
+    if (m_filterLedgeSpans) rcFilterLedgeSpans(context, config->walkableHeight, config->walkableClimb, *heightfield);
+    if (m_filterWalkableLowHeightSpans) rcFilterWalkableLowHeightSpans(context, config->walkableHeight, *heightfield);
 
     // make a compact heightfield from the heightfield
     compactHeightfield = rcAllocCompactHeightfield();
@@ -202,7 +208,7 @@ bool ResourceNavMesh::BuildNavMesh(
         return false;
     }
     if (!rcBuildCompactHeightfield(
-            context, config.walkableHeight, config.walkableClimb, *heightfield, *compactHeightfield
+            context, config->walkableHeight, config->walkableClimb, *heightfield, *compactHeightfield
         ))
     {
         GLOG("buildNavigation: Could not build compact data.");
@@ -215,7 +221,7 @@ bool ResourceNavMesh::BuildNavMesh(
     heightfield = 0;
 
     // Erode the walkable area by agent radius.
-    if (!rcErodeWalkableArea(context, config.walkableRadius, *compactHeightfield))
+    if (!rcErodeWalkableArea(context, config->walkableRadius, *compactHeightfield))
     {
         GLOG("buildNavigation: Could not erode compact heightfield .");
         rcFreeCompactHeightfield(compactHeightfield);
@@ -235,7 +241,7 @@ bool ResourceNavMesh::BuildNavMesh(
         }
 
         // Partition the walkable surface into simple regions without holes.
-        if (!rcBuildRegions(context, *compactHeightfield, 0, config.minRegionArea, config.mergeRegionArea))
+        if (!rcBuildRegions(context, *compactHeightfield, 0, config->minRegionArea, config->mergeRegionArea))
         {
             GLOG("buildNavigation: Could not build watershed regions.");
             rcFreeCompactHeightfield(compactHeightfield);
@@ -247,7 +253,7 @@ bool ResourceNavMesh::BuildNavMesh(
     {
         // Partition the walkable surface into simple regions without holes.
         // Monotone partitioning does not need distancefield.
-        if (!rcBuildRegionsMonotone(context, *compactHeightfield, 0, config.minRegionArea, config.mergeRegionArea))
+        if (!rcBuildRegionsMonotone(context, *compactHeightfield, 0, config->minRegionArea, config->mergeRegionArea))
         {
             GLOG("buildNavigation: Could not build monotone regions.");
             rcFreeCompactHeightfield(compactHeightfield);
@@ -258,7 +264,7 @@ bool ResourceNavMesh::BuildNavMesh(
     else // SAMPLE_PARTITION_LAYERS
     {
         // Partition the walkable surface into simple regions without holes.
-        if (!rcBuildLayerRegions(context, *compactHeightfield, 0, config.minRegionArea))
+        if (!rcBuildLayerRegions(context, *compactHeightfield, 0, config->minRegionArea))
         {
             GLOG("buildNavigation: Could not build layer regions.");
             rcFreeCompactHeightfield(compactHeightfield);
@@ -276,7 +282,7 @@ bool ResourceNavMesh::BuildNavMesh(
         delete context;
         return false;
     }
-    if (!rcBuildContours(context, *compactHeightfield, config.maxSimplificationError, config.maxEdgeLen, *contourSet))
+    if (!rcBuildContours(context, *compactHeightfield, config->maxSimplificationError, config->maxEdgeLen, *contourSet))
     {
         GLOG("buildNavigation: Could not create contours.");
         delete context;
@@ -295,7 +301,7 @@ bool ResourceNavMesh::BuildNavMesh(
         rcFreeContourSet(contourSet);
         return false;
     }
-    if (!rcBuildPolyMesh(context, *contourSet, config.maxVertsPerPoly, *polymesh))
+    if (!rcBuildPolyMesh(context, *contourSet, config->maxVertsPerPoly, *polymesh))
     {
         GLOG("buildNavigation: Could not triangulate contours.");
         delete context;
@@ -315,7 +321,7 @@ bool ResourceNavMesh::BuildNavMesh(
     }
 
     if (!rcBuildPolyMeshDetail(
-            context, *polymesh, *compactHeightfield, config.detailSampleDist, config.detailSampleMaxError,
+            context, *polymesh, *compactHeightfield, config->detailSampleDist, config->detailSampleMaxError,
             *polymeshDetail
         ))
     {
@@ -329,7 +335,7 @@ bool ResourceNavMesh::BuildNavMesh(
     rcFreeCompactHeightfield(compactHeightfield);
     rcFreeContourSet(contourSet);
 
-    if (config.maxVertsPerPoly <= DT_VERTS_PER_POLYGON)
+    if (config->maxVertsPerPoly <= DT_VERTS_PER_POLYGON)
     {
         unsigned char* navData = 0;
         int navDataSize        = 0;
@@ -382,8 +388,8 @@ bool ResourceNavMesh::BuildNavMesh(
         params.walkableClimb    = m_agentMaxClimb;
         rcVcopy(params.bmin, polymesh->bmin);
         rcVcopy(params.bmax, polymesh->bmax);
-        params.cs          = config.cs;
-        params.ch          = config.ch;
+        params.cs          = config->cs;
+        params.ch          = config->ch;
         params.buildBvTree = true;
 
         if (!dtCreateNavMeshData(&params, &navData, &navDataSize))
@@ -436,16 +442,16 @@ void ResourceNavMesh::Render()
 void ResourceNavMesh::RenderNavmeshEditor()
 {
 
-    ImGui::DragFloat("Cell Size", &config.cs, 0.1f, 0.1f, 2);
-    ImGui::DragFloat("Cell Height", &config.ch, 0.1f, 0.1f, 2);
+    ImGui::DragFloat("Cell Size", &config->cs, 0.1f, 0.1f, 2);
+    ImGui::DragFloat("Cell Height", &config->ch, 0.1f, 0.1f, 2);
 
-    ImGui::DragInt("Max Navmesh Width", &config.width, 1, 10, 10000);
-    ImGui::DragInt("Max Navmesh Height", &config.height, 1, 10, 10000);
+    ImGui::DragInt("Max Navmesh Width", &config->width, 1, 10, 10000);
+    ImGui::DragInt("Max Navmesh Height", &config->height, 1, 10, 10000);
 
-    ImGui::DragFloat("Max Walkable Slope Angle", &config.walkableSlopeAngle, 0.1f, 0.f, 90.f);
-    ImGui::DragInt("Max Walkable Climb", &config.walkableClimb, 1, 1, 100);
-    ImGui::DragInt("Max Walkable Height", &config.walkableHeight, 1, 1, 100);
-    ImGui::DragInt("Agent raidus", &config.walkableRadius, 1, 1, 100);
+    ImGui::DragFloat("Max Walkable Slope Angle", &config->walkableSlopeAngle, 0.1f, 0.f, 90.f);
+    ImGui::DragInt("Max Walkable Climb", &config->walkableClimb, 1, 1, 100);
+    ImGui::DragInt("Max Walkable Height", &config->walkableHeight, 1, 1, 100);
+    ImGui::DragInt("Agent raidus", &config->walkableRadius, 1, 1, 100);
 
     static SamplePartitionType currentSelection = SamplePartitionType ::SAMPLE_PARTITION_MONOTONE;
     int currentIndex                            = static_cast<int>(currentSelection);
@@ -459,18 +465,18 @@ void ResourceNavMesh::RenderNavmeshEditor()
         partitionType    = currentSelection;                               
     }
 
-    ImGui::DragInt("Minimum Region Area", &config.minRegionArea, 1, 1, 100);
-    ImGui::DragInt("Merge Region Area", &config.mergeRegionArea, 10, 10, 100);
+    ImGui::DragInt("Minimum Region Area", &config->minRegionArea, 1, 1, 100);
+    ImGui::DragInt("Merge Region Area", &config->mergeRegionArea, 10, 10, 100);
 
-    ImGui::DragFloat("Max Simplification Error", &config.maxSimplificationError, 0.1f, 0.1f, 5);
-    ImGui::DragInt("Max Edges Length", &config.maxEdgeLen, 1, 1, 100);
-    ImGui::DragInt("Max Vertices Per Polygon", &config.maxVertsPerPoly, 1, 1, 100);
+    ImGui::DragFloat("Max Simplification Error", &config->maxSimplificationError, 0.1f, 0.1f, 5);
+    ImGui::DragInt("Max Edges Length", &config->maxEdgeLen, 1, 1, 100);
+    ImGui::DragInt("Max Vertices Per Polygon", &config->maxVertsPerPoly, 1, 1, 100);
 
     ImGui::DragFloat(
-        "Detail Sample Distance (hiher - more accurate but slower)", &config.detailSampleDist, 0.1f, 0.1f, 5
+        "Detail Sample Distance (hiher - more accurate but slower)", &config->detailSampleDist, 0.1f, 0.1f, 5
     );
     ImGui::DragFloat(
-        "Detail Sample Max Error (higher - smoother but less accurate)", &config.detailSampleMaxError, 0.1f, 0.1f, 5
+        "Detail Sample Max Error (higher - smoother but less accurate)", &config->detailSampleMaxError, 0.1f, 0.1f, 5
     );
 
     ImGui::Checkbox("Filter Low hanging Obstacles", &m_filterLowHangingObstacles);

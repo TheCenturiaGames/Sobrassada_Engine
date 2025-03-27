@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Module.h"
-#include "ResourceManagement/Resources/Resource.h"
-#include "ResourceManagement/Resources/ResourceNavmesh.h"
+#include "Resource.h"
+#include "ResourceNavmesh.h"
 
 #include <map>
 
@@ -26,9 +26,6 @@ class ResourcesModule : public Module
     Resource* CreateNewResource(UID uid);
 
   private:
-    // We will need to do a resourceProgram
-    int specularGlossinessProgram = -1;
-    int metallicRoughnessProgram  = -1;
     std::map<UID, Resource*> resources;
     ResourceNavMesh myNavmesh;
 };

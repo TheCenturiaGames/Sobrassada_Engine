@@ -11,6 +11,8 @@
 #include "Quadtree.h"
 #include "SceneModule.h"
 #include "ResourcesModule.h"
+#include "DetourNavMesh.h"
+#include "DetourNavMeshQuery.h"
 
 #include "SDL_video.h"
 #define DEBUG_DRAW_IMPLEMENTATION

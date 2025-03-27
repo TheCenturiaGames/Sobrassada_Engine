@@ -1,11 +1,19 @@
 #pragma once
 
-#include "Libs/RecastDetour/Detour/Include/DetourNavMeshBuilder.h"
-#include "Libs/RecastDetour/Detour/Include/DetourNavMeshQuery.h"
-#include "Libs/RecastDetour/Recast/Include/Recast.h"
 #include "Resource.h"
 
 class ResourceMesh;
+class dtNavMesh;
+class dtNavMeshQuery;
+class rcConfig;
+class rcContext;
+class rcHeightfield;
+class rcCompactHeightfield;
+class rcContourSet;
+class rcPolyMesh;
+class rcPolyMeshDetail;
+class ResourceMesh;
+
 struct Vertex;
 
 enum SamplePartitionType
@@ -53,8 +61,7 @@ class ResourceNavMesh : public Resource
     dtNavMeshQuery* GetDetourNavMeshQuery() { return navQuery; }
 
   private:
-    rcConfig config;
-
+    rcConfig* config;
     rcContext* context;
     rcHeightfield* heightfield;
     rcCompactHeightfield* compactHeightfield;
