@@ -13,8 +13,8 @@
 #include <FileSystem.h>
 #include <GameTimer.h>
 #include <SceneImporter.h>
+#include <TextureEditor.h>
 #include <TextureImporter.h>
-#include <TextureLibraryEditor.h>
 
 #include "SDL.h"
 #include "glew.h"
@@ -316,8 +316,7 @@ void EditorUIModule::MainMenu()
 
             if (ImGui::MenuItem("Node Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::NODE));
 
-            if (ImGui::MenuItem("Texture Library"))
-                OpenEditor(new TextureLibraryEditor("Texture Library", GenerateUID()));
+            if (ImGui::MenuItem("Texture Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::TEXTURE));
 
             ImGui::EndMenu();
         }
@@ -1142,8 +1141,11 @@ EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
         return new EngineEditorBase("Base Editor " + std::to_string(uid), uid);
         break;
     case EditorType::NODE:
-        return new NodeEditor("NodeEditor" + std::to_string(uid), uid);
+        return new NodeEditor("NodeEditor_" + std::to_string(uid), uid);
 
+    case EditorType::TEXTURE:
+        return new TextureEditor("TextureEditor_" + std::to_string(uid), uid);
+        break;
     default:
         return nullptr;
     }

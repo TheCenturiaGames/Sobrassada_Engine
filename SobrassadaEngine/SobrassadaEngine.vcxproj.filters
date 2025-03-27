@@ -360,7 +360,7 @@
     <ClCompile Include="FileSystem\Config\ProjectConfig.cpp">
       <Filter>FileSystem\Config</Filter>
     </ClCompile>
-    <ClCompile Include="UI\EngineEditors\Editor\TextureLibraryEditor.cpp">
+    <ClCompile Include="UI\EngineEditors\Editor\TextureEditor.cpp">
       <Filter>UI\EngineEditors</Filter>
     </ClCompile>
     <ClCompile Include="FileSystem\Importers\Importer.cpp">
@@ -692,7 +692,7 @@
     <ClInclude Include="FileSystem\StateMachineManager.h">
       <Filter>FileSystem</Filter>
     </ClInclude>
-    <ClInclude Include="UI\EngineEditors\Editor\TextureLibraryEditor.h">
+    <ClInclude Include="UI\EngineEditors\Editor\TextureEditor.h">
       <Filter>UI\EngineEditors</Filter>
     </ClInclude>
     <ClInclude Include="FileSystem\Importers\Importer.h">
