@@ -166,8 +166,6 @@ bool StateMachineEditor::RenderEditor()
         int cont = 0;
         for (const auto& transition : resource->transitions)
         {
-            cont++;
-            GLOG("Transition: %d", cont);
             if (transition.fromState.GetString() == selectedNode->GetStateName())
             {
                 ImGui::Text(
@@ -242,7 +240,7 @@ void StateMachineEditor::CreateBaseState(StateNode& node)
 
 void StateMachineEditor::SaveMachine()
 {
-    StateMachineManager::Save(resource);
+    StateMachineManager::Save(resource, false);
 }
 
 void StateMachineEditor::LoadMachine()

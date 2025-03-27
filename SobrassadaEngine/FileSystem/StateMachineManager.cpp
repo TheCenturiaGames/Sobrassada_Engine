@@ -4,131 +4,106 @@
 #include "FileSystem.h"
 #include "LibraryModule.h"
 #include "MetaModel.h"
+#include "ProjectModule.h"
 #include <ResourceStateMachine.h>
 
 #include "Math/Quat.h"
 #include "prettywriter.h"
 #include "stringbuffer.h"
 #include <Math/float4x4.h>
+#include <filesystem>
+#include <queue>
+
 
 namespace StateMachineManager
 {
-    void Save(
-        ResourceStateMachine* resource
+    UID Save(ResourceStateMachine* resource, bool override
     )
     {
-        std::vector<char> buffer;
+        // Create doc Json
+        rapidjson::Document doc;
+        doc.SetObject();
+        rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
 
-        // --- Save Clips ---
-        uint32_t numClips = static_cast<uint32_t>(clips.size());
-        buffer.insert(
-            buffer.end(), reinterpret_cast<const char*>(&numClips),
-            reinterpret_cast<const char*>(&numClips) + sizeof(uint32_t)
-        );
+        rapidjson::Value stateMachineJSON(rapidjson::kObjectType);
 
-        for (const auto& clip : clips)
+        UID uid              = GenerateUID();
+        std::string savePath = STATEMACHINES_LIB_PATH + std::string("StateMachine") + STATEMACHINE_EXTENSION;
+        UID stateMachineUID =
+            override ? resource->GetUID() : App->GetLibraryModule()->AssignFiletypeUID(uid, FileType::StateMachine);
+        savePath = App->GetProjectModule()->GetLoadedProjectPath() + STATEMACHINES_LIB_PATH +
+                   std::to_string(stateMachineUID) + STATEMACHINE_EXTENSION;
+        std::string stateName = resource->GetName();
+
+        stateMachineJSON.AddMember("UID", stateMachineUID, allocator);
+        stateMachineJSON.AddMember("Name", rapidjson::Value(stateName.c_str(), allocator), allocator);
+
+         //Clips
+        rapidjson::Value clipsArray(rapidjson::kArrayType);
+        for (const auto& clip : resource->clips)
         {
-            buffer.insert(
-                buffer.end(), reinterpret_cast<const char*>(&clip.clipUID),
-                reinterpret_cast<const char*>(&clip.clipUID) + sizeof(UID)
-            );
-            buffer.insert(
-                buffer.end(), reinterpret_cast<const char*>(&clip.loop),
-                reinterpret_cast<const char*>(&clip.loop) + sizeof(bool)
-            );
+            rapidjson::Value clipJSON(rapidjson::kObjectType);
+            clipJSON.AddMember("ClipUID", clip.clipUID, allocator);
+            clipJSON.AddMember("ClipName", rapidjson::Value(clip.clipName.GetString().c_str(), allocator), allocator);
+            clipJSON.AddMember("Loop", clip.loop, allocator);
 
-            uint32_t nameSize = static_cast<uint32_t>(clip.clipName.GetString().size());
-            buffer.insert(
-                buffer.end(), reinterpret_cast<const char*>(&nameSize),
-                reinterpret_cast<const char*>(&nameSize) + sizeof(uint32_t)
+            clipsArray.PushBack(clipJSON, allocator);
+        }
+        stateMachineJSON.AddMember("Clips", clipsArray, allocator);
+
+        //States
+        rapidjson::Value statesArray(rapidjson::kArrayType);
+        for (const auto& state : resource->states)
+        {
+            rapidjson::Value stateJSON(rapidjson::kObjectType);
+            stateJSON.AddMember("StateName", rapidjson::Value(state.name.GetString().c_str(), allocator), allocator);
+            stateJSON.AddMember("ClipName", rapidjson::Value(state.clipName.GetString().c_str(), allocator), allocator);
+
+            statesArray.PushBack(stateJSON, allocator);
+        }
+        stateMachineJSON.AddMember("States", statesArray, allocator);
+
+        //Transitions
+        rapidjson::Value transitionsArray(rapidjson::kArrayType);
+        for (const auto& transition : resource->transitions)
+        {
+            rapidjson::Value transitionJSON(rapidjson::kObjectType);
+            transitionJSON.AddMember(
+                "FromState", rapidjson::Value(transition.fromState.GetString().c_str(), allocator), allocator
             );
-            buffer.insert(buffer.end(), clip.clipName.GetString().begin(), clip.clipName.GetString().end());
+            transitionJSON.AddMember(
+                "ToState", rapidjson::Value(transition.toState.GetString().c_str(), allocator), allocator
+            );
+            transitionJSON.AddMember(
+                "Trigger", rapidjson::Value(transition.triggerName.GetString().c_str(), allocator), allocator
+            );
+            transitionJSON.AddMember("InterpolationTime", transition.interpolationTime, allocator);
+
+            transitionsArray.PushBack(transitionJSON, allocator);
+        }
+        stateMachineJSON.AddMember("Transitions", transitionsArray, allocator);
+
+        doc.AddMember("StateMachine", stateMachineJSON, allocator);
+        rapidjson::StringBuffer buffer;
+        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+        doc.Accept(writer);
+
+        std::string machinePath = STATEMACHINES_LIB_PATH + std::to_string(stateMachineUID) + STATEMACHINE_EXTENSION;
+        unsigned int bytesWritten = (unsigned int
+        )FileSystem::Save(machinePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
+   
+        if (bytesWritten == 0)
+        {
+            GLOG("Failed to save state machine file: %s", machinePath.c_str());
+            return INVALID_UID;
         }
 
-        // --- Save States ---
-        uint32_t numStates = static_cast<uint32_t>(states.size());
-        buffer.insert(
-            buffer.end(), reinterpret_cast<const char*>(&numStates),
-            reinterpret_cast<const char*>(&numStates) + sizeof(uint32_t)
-        );
+        App->GetLibraryModule()->AddStateMachine(stateMachineUID, stateName);
+        App->GetLibraryModule()->AddName(stateName, stateMachineUID);
+        App->GetLibraryModule()->AddResource(machinePath, stateMachineUID);
 
-        for (const auto& state : states)
-        {
-            uint32_t nameSize = static_cast<uint32_t>(state.name.GetString().size());
-            buffer.insert(
-                buffer.end(), reinterpret_cast<const char*>(&nameSize),
-                reinterpret_cast<const char*>(&nameSize) + sizeof(uint32_t)
-            );
-            buffer.insert(buffer.end(), state.name.GetString().begin(), state.name.GetString().end());
+        return stateMachineUID;
 
-            uint32_t clipNameSize = static_cast<uint32_t>(state.clipName.GetString().size());
-            buffer.insert(
-                buffer.end(), reinterpret_cast<const char*>(&clipNameSize),
-                reinterpret_cast<const char*>(&clipNameSize) + sizeof(uint32_t)
-            );
-            buffer.insert(buffer.end(), state.clipName.GetString().begin(), state.clipName.GetString().end());
-        }
-
-        // --- Save Transitions ---
-        uint32_t numTransitions = static_cast<uint32_t>(transitions.size());
-        buffer.insert(
-            buffer.end(), reinterpret_cast<const char*>(&numTransitions),
-            reinterpret_cast<const char*>(&numTransitions) + sizeof(uint32_t)
-        );
-
-        for (const auto& t : transitions)
-        {
-            uint32_t fromSize = static_cast<uint32_t>(t.fromState.GetString().size());
-            buffer.insert(
-                buffer.end(), reinterpret_cast<const char*>(&fromSize),
-                reinterpret_cast<const char*>(&fromSize) + sizeof(uint32_t)
-            );
-            buffer.insert(buffer.end(), t.fromState.GetString().begin(), t.fromState.GetString().end());
-
-            uint32_t toSize = static_cast<uint32_t>(t.toState.GetString().size());
-            buffer.insert(
-                buffer.end(), reinterpret_cast<const char*>(&toSize),
-                reinterpret_cast<const char*>(&toSize) + sizeof(uint32_t)
-            );
-            buffer.insert(buffer.end(), t.toState.GetString().begin(), t.toState.GetString().end());
-
-            uint32_t triggerSize = static_cast<uint32_t>(t.triggerName.GetString().size());
-            buffer.insert(
-                buffer.end(), reinterpret_cast<const char*>(&triggerSize),
-                reinterpret_cast<const char*>(&triggerSize) + sizeof(uint32_t)
-            );
-            buffer.insert(buffer.end(), t.triggerName.GetString().begin(), t.triggerName.GetString().end());
-
-            buffer.insert(
-                buffer.end(), reinterpret_cast<const char*>(&t.interpolationTime),
-                reinterpret_cast<const char*>(&t.interpolationTime) + sizeof(uint32_t)
-            );
-        }
-
-        const std::string stateMachineName = FileSystem::GetFileNameWithoutExtension(path);
-
-        UID finalStateMachineUID;
-
-        if (sourceUID == INVALID_UID)
-        {
-            UID stateMachineUID   = GenerateUID();
-            finalStateMachineUID  = App->GetLibraryModule()->AssignFiletypeUID(stateMachineUID, FileType::StateMachine);
-
-            std::string assetPath = STATEMACHINES_ASSETS_PATH + stateMachineName + MODEL_EXTENSION;
-            MetaModel meta(finalStateMachineUID, assetPath);
-            meta.Save(stateMachineName, assetPath);
-        }
-        else
-        {
-            finalStateMachineUID = sourceUID;
-        }
-        std::string saveFilePath =
-            STATEMACHINES_LIB_PATH + std::to_string(finalStateMachineUID) + STATEMACHINE_EXTENSION;
-        FileSystem::Save(saveFilePath.c_str(), buffer.data(), static_cast<unsigned int>(buffer.size()), true);
-
-        App->GetLibraryModule()->AddStateMachine(finalStateMachineUID, stateMachineName);
-        App->GetLibraryModule()->AddName(stateMachineName, finalStateMachineUID);
-        App->GetLibraryModule()->AddResource(saveFilePath, finalStateMachineUID);
     }
 
     void CopyMachine(const std::string& filePath, const std::string& name, const UID sourceUID)
