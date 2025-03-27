@@ -1,34 +1,24 @@
-#include "Globals.h"
-
 #include "AnimationImporter.h"
-#include "ResourceAnimation.h"
-#include "MetaAnimation.h"
-#include "LibraryModule.h"
+
 #include "Application.h"
 #include "FileSystem.h"
-#include "tiny_gltf.h"
+#include "LibraryModule.h"
+#include "MetaAnimation.h"
+#include "ProjectModule.h"
+#include "ResourceAnimation.h"
 
-
-namespace tinygltf
-{
-    class Model;
-    class Animation;
-    class AnimationSampler;
-    struct Accessor;
-    struct BufferView;
-    struct Buffer;
-}
-
-
+#include <Libs/rapidjson/document.h>
+#include <memory>
+#include <tiny_gltf.h>
+#include <vector>
 
 namespace AnimationImporter
 {
     UID ImportAnimation(
-        const tinygltf::Model& model, const tinygltf::Animation& animation, const std::string& name,
-        const char* filePath
+        const tinygltf::Model& model, const tinygltf::Animation& animation, const char* sourceFilePath,
+        const std::string& targetFilePath, UID sourceUID
     )
     {
-
         std::vector<char> buffer;
 
         uint32_t channelCount = static_cast<uint32_t>(animation.channels.size());
@@ -59,8 +49,6 @@ namespace AnimationImporter
 
             const std::string& nodeName = model.nodes[channel.target_node].name;
             const uint32_t nameSize     = static_cast<uint32_t>(nodeName.size());
-
-            GLOG("Writing node name: %s, size = %u", nodeName.c_str(), nameSize);
 
             buffer.insert(
                 buffer.end(), reinterpret_cast<const char*>(&nameSize),
@@ -105,59 +93,80 @@ namespace AnimationImporter
                 );
             }
         }
-       
-        const std::string animName = FileSystem::GetFileNameWithoutExtension(filePath);
-        const UID animationUID = GenerateUID();
-        std::string savePath       = ANIMATIONS_PATH + std::to_string(animationUID) + ANIMATION_EXTENSION;
-        UID finalAnimUID           = App->GetLibraryModule()->AssignFiletypeUID(animationUID, FileType::Animation);
 
-        MetaAnimation metaAnim(finalAnimUID, savePath);
-        metaAnim.Save(animName, savePath);
-       
+        // Handle UID
+        UID finalAnimUID;
+        if (sourceUID == INVALID_UID)
+        {
+            UID animationUID      = GenerateUID();
+            finalAnimUID          = App->GetLibraryModule()->AssignFiletypeUID(animationUID, FileType::Animation);
 
-        FileSystem::Save(savePath.c_str(), buffer.data(), buffer.size(), true);
+            std::string assetPath = ANIMATIONS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
+            MetaAnimation meta(finalAnimUID, assetPath);
 
-        App->GetLibraryModule()->AddAnimation(animationUID, name); //name of model and uid
-        App->GetLibraryModule()->AddName(animName, animationUID);
-        App->GetLibraryModule()->AddResource(savePath, animationUID);
+            
+            std::string animName = FileSystem::GetFileNameWithoutExtension(sourceFilePath);
+            meta.Save(animName, assetPath);
+        }
+        else
+        {
+            finalAnimUID = sourceUID;
+        }
 
-        
-        GLOG("%s saved as binary", animName.c_str());
+        // Construct save paths 
+        std::string saveFilePath =
+            targetFilePath + ANIMATIONS_PATH + std::to_string(finalAnimUID) + ANIMATION_EXTENSION;
 
-        return animationUID;
+      
+        unsigned int bytesWritten =
+            (unsigned int)FileSystem::Save(saveFilePath.c_str(), buffer.data(), buffer.size(), true);
+
+        if (bytesWritten == 0)
+        {
+            GLOG("Failed to save animation file: %s", saveFilePath.c_str());
+            return 0;
+        }
+
+      
+        App->GetLibraryModule()->AddAnimation(finalAnimUID, FileSystem::GetFileNameWithoutExtension(sourceFilePath));
+        App->GetLibraryModule()->AddName(FileSystem::GetFileNameWithoutExtension(sourceFilePath), finalAnimUID);
+        App->GetLibraryModule()->AddResource(saveFilePath, finalAnimUID);
+
+        GLOG("%s saved as binary", FileSystem::GetFileNameWithoutExtension(sourceFilePath).c_str());
+
+        return finalAnimUID;
     }
 
     ResourceAnimation* LoadAnimation(UID animationUID)
     {
-       
-        const std::string path      = App->GetLibraryModule()->GetResourcePath(animationUID);
+        rapidjson::Document doc;
+        rapidjson::Value importOptions;
+        App->GetLibraryModule()->GetImportOptions(animationUID, doc, importOptions);
 
-        char* buffer                = nullptr;
-        const unsigned int fileSize = FileSystem::Load(path.c_str(), &buffer);
+        const std::string path = App->GetLibraryModule()->GetResourcePath(animationUID);
+        const std::string name = App->GetLibraryModule()->GetResourceName(animationUID);
 
-      
+        char* buffer           = nullptr;
+        unsigned int fileSize  = FileSystem::Load(path.c_str(), &buffer);
+
         if (fileSize == 0 || buffer == nullptr)
         {
             GLOG("Failed to load animation file: %s", path.c_str());
             return nullptr;
         }
 
-       
         char* cursor = buffer;
 
-  
         uint32_t channelCount;
         memcpy(&channelCount, cursor, sizeof(uint32_t));
-        cursor += sizeof(uint32_t);
+        cursor                       += sizeof(uint32_t);
 
-        // Create animation resource
-        ResourceAnimation* animation =
-            new ResourceAnimation(animationUID, FileSystem::GetFileNameWithoutExtension(path));
+        // Create animation resource with UID and name
+        ResourceAnimation* animation  = new ResourceAnimation(animationUID, name);
 
         // Parse channels
         for (uint32_t i = 0; i < channelCount; ++i)
         {
-           
             uint32_t nameSize;
             memcpy(&nameSize, cursor, sizeof(uint32_t));
             cursor += sizeof(uint32_t);
@@ -165,12 +174,10 @@ namespace AnimationImporter
             std::string nodeName(cursor, nameSize);
             cursor += nameSize;
 
-            
             AnimationType animType;
             memcpy(&animType, cursor, sizeof(AnimationType));
             cursor += sizeof(AnimationType);
 
-          
             uint32_t keyframeCount;
             memcpy(&keyframeCount, cursor, sizeof(uint32_t));
             cursor               += sizeof(uint32_t);
@@ -181,7 +188,6 @@ namespace AnimationImporter
             // Parse based on animation type
             if (animType == AnimationType::TRANSLATION)
             {
-
                 animChannel.posTimeStamps.resize(keyframeCount);
                 memcpy(animChannel.posTimeStamps.data(), cursor, keyframeCount * sizeof(float));
                 cursor += keyframeCount * sizeof(float);

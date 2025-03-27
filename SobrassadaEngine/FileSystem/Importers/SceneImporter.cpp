@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "FileSystem.h"
 #include "MaterialImporter.h"
+#include "AnimationImporter.h"
 #include "MeshImporter.h"
 #include "ModelImporter.h"
 #include "PrefabManager.h"
@@ -167,6 +168,8 @@ namespace SceneImporter
     {
         ModelImporter::CopyModel(filePath, targetFilePath, name, sourceUID);
     }
+
+ 
 
     void CreateLibraryDirectories(const std::string& projectFilePath)
     {

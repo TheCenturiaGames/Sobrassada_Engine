@@ -93,28 +93,49 @@ namespace ModelImporter
         newModel.SetUID(finalModelUID);
         const std::string animName = FileSystem::GetFileNameWithoutExtension(filePath);
         std::string animAssetPath       = ANIMATIONS_ASSETS_PATH + animName + ANIMATION_EXTENSION;
-        
+        std::vector<UID> animationUIDs;
         //Import Animations
         if (model.animations.size() > 0)
-        {std::vector<UID> animationUIDs;
-        for (int i = 0; i < model.animations.size(); ++i)
         {
-        const auto& anim = model.animations[i];
-        
-        UID animUID = AnimationImporter::ImportAnimation(model, anim, animName, filePath);
-        animationUIDs.push_back(animUID);
-        GLOG("Animation found and imported: %s", animName.c_str());
-        
-        
-        UID finalAnimUID = App->GetLibraryModule()->AssignFiletypeUID(animUID, FileType::Animation);
-        
-        
-        MetaAnimation metaAnim(finalAnimUID, animAssetPath);
-        metaAnim.Save(animName, animAssetPath);
-        }
-       
-        newModel.SetAnimationUID(animationUIDs[0]);
-        newModel.SetAllAnimationUIDs(animationUIDs);
+          
+            GLOG("Number of animations in model: %zu", model.animations.size());
+
+            for (int i = 0; i < model.animations.size(); ++i)
+            {
+                const auto& anim = model.animations[i];
+
+                GLOG("Importing animation %d", i);
+                GLOG("Animation channels: %zu", anim.channels.size());
+
+                UID animUID = AnimationImporter::ImportAnimation(model, anim,filePath, targetFilePath, sourceUID);
+                
+                GLOG("Imported animation UID: %llu", animUID);
+
+                if (animUID != INVALID_UID)
+                {
+                    animationUIDs.push_back(animUID);
+
+                    GLOG("Final animation UID: %llu", animUID);
+                }
+                  
+                else
+                {
+                    GLOG("Failed to import animation %d", i);
+                }
+            }
+
+            if (!animationUIDs.empty())
+            {
+                newModel.SetAnimationUID(animationUIDs[0]);
+                newModel.SetAllAnimationUIDs(animationUIDs);
+
+                GLOG("Set first animation UID: %llu", animationUIDs[0]);
+                GLOG("Total animation UIDs: %zu", animationUIDs.size());
+            }
+            else
+            {
+                GLOG("No valid animation UIDs found");
+            }
         }
         // Create structure
         modelJSON.AddMember("UID", finalModelUID, allocator);
@@ -156,6 +177,14 @@ namespace ModelImporter
             nodesJSON.PushBack(nodeDataJSON, allocator);
         }
         modelJSON.AddMember("Nodes", nodesJSON, allocator);
+
+        //Serialize anims
+        rapidjson::Value animationsJSON(rapidjson::kArrayType);
+        for (UID animUID : animationUIDs)
+        {
+            animationsJSON.PushBack(animUID, allocator);
+        }
+        modelJSON.AddMember("Animations", animationsJSON, allocator);
 
         // Serialize skins
         rapidjson::Value skinsJSON(rapidjson::kArrayType);
@@ -311,6 +340,19 @@ namespace ModelImporter
                 loadedNodes.push_back(newNode);
             }
         }
+        
+         std::vector<UID> loadedAnimations;
+        //Deserialize Animations
+        if (modelJSON.HasMember("Animations") && modelJSON["Animations"].IsArray())
+        {
+           
+            const rapidjson::Value& animUIDs = modelJSON["Animations"];
+
+            for (rapidjson::SizeType i = 0; i < animUIDs.Size(); ++i)
+            {
+                loadedAnimations.push_back(animUIDs[i].GetUint64());
+            }
+        }
 
         // Deserialize Skins
         std::vector<Skin> loadedSkins;
@@ -366,6 +408,8 @@ namespace ModelImporter
 
         ResourceModel* resourceModel = new ResourceModel(uid, FileSystem::GetFileNameWithoutExtension(filePath));
         resourceModel->SetModelData(Model(uid, loadedNodes, loadedSkins));
+        resourceModel->SetAllAnimationUIDs(loadedAnimations);
+        resourceModel->SetAnimationUID(loadedAnimations[0]);
 
         return resourceModel;
     }

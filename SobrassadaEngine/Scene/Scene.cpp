@@ -20,8 +20,8 @@
 #include "ResourceManagement/Resources/ResourcePrefab.h"
 #include "ResourcesModule.h"
 #include "Scene/Components/ComponentUtils.h"
-#include "Scene/Components/Standalone/MeshComponent.h"
 #include "Scene/Components/Standalone/AnimationComponent.h"
+#include "Scene/Components/Standalone/MeshComponent.h"
 #include "SceneModule.h"
 
 #include "SDL_mouse.h"
@@ -667,28 +667,38 @@ void Scene::LoadModel(const UID modelUID)
         ResourceModel* newModel            = (ResourceModel*)App->GetResourcesModule()->RequestResource(modelUID);
         const Model& model                 = newModel->GetModelData();
         const std::vector<NodeData>& nodes = model.GetNodes();
-        
-        
-        
-        
+
+        GLOG("Model Animation UID: %llu", newModel->GetAnimationUID());
+
+        const auto& animUIDs = newModel->GetAllAnimationUIDs();
+        GLOG("Total Animation UIDs %zu ", animUIDs.size());
+
+        for (UID uid : animUIDs)
+        {
+            GLOG("Animation UID in list: %llu ", uid);
+        }
+
         GameObject* rootObject =
             new GameObject(GetGameObjectRootUID(), App->GetLibraryModule()->GetResourceName(modelUID));
+
         rootObject->SetLocalTransform(nodes[0].transform);
-        if (newModel->GetAnimationUID() != 0)
+        if (!animUIDs.empty())
         {
             rootObject->CreateComponent(COMPONENT_ANIMATION);
             AnimationComponent* animComponent = rootObject->GetAnimationComponent();
-            const auto& animUIDs = newModel->GetAllAnimationUIDs();
+
             GLOG("Model has %zu animations", animUIDs.size());
             for (UID uid : animUIDs)
             {
-                //ResourceAnimation* animation = (ResourceAnimation*)App->GetResourcesModule()->RequestResource(uid);
+                GLOG("Setting aimation resource with UID %llu ", uid);
+                ResourceAnimation* animation = (ResourceAnimation*)App->GetResourcesModule()->RequestResource(uid);
                 animComponent->SetAnimationResource(uid);
                 GLOG("Animation UID: %d", uid);
             }
-          
-           
-         
+        }
+        else
+        {
+            GLOG("No animations found for this model");
         }
         // Add the gameObject to the rootObject
         GetGameObjectByUID(GetGameObjectRootUID())->AddGameObject(rootObject->GetUID());
