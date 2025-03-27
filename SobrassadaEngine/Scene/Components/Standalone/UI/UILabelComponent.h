@@ -28,6 +28,7 @@ class UILabelComponent : public Component
   private:
     void InitBuffers();
     void GetParentCanvas();
+    void OnFontChange();
 
   private:
     Transform2DComponent* transform2D;

@@ -80,12 +80,13 @@ namespace TextManager
         FT_Done_FreeType(library);
     }
 
-    void FontData::Clean() const
+    void FontData::Clean()
     {
         for (const auto& c : characters)
         {
             if (c.second.textureID != 0) glDeleteTextures(1, &c.second.textureID);
         }
+        characters.clear();
     }
 
     void RenderText(FontData& fontData, const std::string& text, const unsigned vbo)
@@ -100,7 +101,7 @@ namespace TextManager
         glActiveTexture(GL_TEXTURE0);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-        GLOG("Text size: %d", text.length());
+        //GLOG("Text size: %d", text.length());
         for (char c : text)
         {
             Character character = fontData.characters[c];

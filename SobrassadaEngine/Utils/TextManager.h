@@ -21,7 +21,7 @@ namespace TextManager
         std::map<char, Character> characters;
 
         void Init(const char* filename, const unsigned int fontSize);
-        void Clean() const;
+        void Clean();
     };
 
     void RenderText(FontData& fontData, const std::string& text, const unsigned vbo);

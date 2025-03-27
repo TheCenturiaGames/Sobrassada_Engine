@@ -85,10 +85,12 @@ void UILabelComponent::Clone(const Component* other)
     // It will have to look for the canvas here probably, seems better to do that in a separate function
     if (other->GetType() == ComponentType::COMPONENT_LABEL)
     {
-        const UILabelComponent* otherLabel    = static_cast<const UILabelComponent*>(other);
+        const UILabelComponent* otherLabel = static_cast<const UILabelComponent*>(other);
         strcpy_s(text, sizeof(text), otherLabel->text);
-        fontSize = otherLabel->fontSize;
+        fontSize  = otherLabel->fontSize;
         fontColor = otherLabel->fontColor;
+
+        fontData->Init("./EngineDefaults/Shader/Font/Arial.ttf", fontSize);
     }
     else
     {
@@ -136,8 +138,10 @@ void UILabelComponent::RenderEditorInspector()
 
         if (ImGui::InputInt("Font Size", &fontSize))
         {
-            if (fontSize < 0) fontSize = 0;
+            if (fontSize < 1) fontSize = 1;
+            OnFontChange();
         }
+
         ImGui::ColorPicker3("Font Color", fontColor.ptr());
     }
 }
@@ -185,4 +189,10 @@ void UILabelComponent::GetParentCanvas()
         parentQueue.push(currentParent->GetParent());
         parentQueue.pop();
     }
+}
+
+void UILabelComponent::OnFontChange()
+{
+    fontData->Clean();
+    fontData->Init("./EngineDefaults/Shader/Font/Arial.ttf", fontSize);
 }
