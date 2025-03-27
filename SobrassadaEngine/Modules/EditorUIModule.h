@@ -26,6 +26,7 @@ enum EditorType
     ANIMATION,
     NODE,
     PREFAB
+    TEXTURE
 };
 
 enum class GizmoOperation
