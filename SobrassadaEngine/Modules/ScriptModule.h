@@ -1,12 +1,15 @@
 #pragma once
 #include "Globals.h"
 #include "Module.h"
-#include "Script.h"
 #include <filesystem>
 #include <windows.h>
 
-typedef Script* (*CreateScriptFunc)();
+class Application;
+class Script;
+
+typedef Script* (*CreateScriptFunc)(const std::string&);
 typedef void (*DestroyScriptFunc)(Script*);
+typedef void (*SetApplicationFunc)(Application*);
 
 namespace fs = std::filesystem;
 
@@ -19,6 +22,8 @@ class ScriptModule : public Module
     bool Init() override;
     update_status Update(float deltaTime) override;
 
+    HMODULE getHandle() const { return dllHandle; }
+
   private:
     void LoadDLL();
     void UnloadDLL();
@@ -29,6 +34,7 @@ class ScriptModule : public Module
     HMODULE dllHandle                   = nullptr;
     CreateScriptFunc createScriptFunc   = nullptr;
     DestroyScriptFunc destroyScriptFunc = nullptr;
+    SetApplicationFunc setAppFunc       = nullptr;
 
     Script* scriptInstance              = nullptr;
 

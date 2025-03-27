@@ -4,18 +4,19 @@
 // This way, other projects whose source code files include the file will interpret the SOBRASSADASCRIPTS_API functions as imported from a DLL,
 // while this DLL interprets the symbols defined in this macro as exported.
 #ifdef SOBRASSADASCRIPTS_EXPORTS
-#define SOBRASSADASCRIPTS_API __declspec(dllexport)
+#define SOBRASSADA_API __declspec(dllexport)
 #else
-#define SOBRASSADASCRIPTS_API __declspec(dllimport)
+#define SOBRASSADA_API __declspec(dllimport)
 #endif
 
 // Exported class from DLL
-class SOBRASSADASCRIPTS_API CSobrassadaScripts {
-public:
+class SOBRASSADA_API CSobrassadaScripts
+{
+  public:
 	CSobrassadaScripts(void);
 	// You can add here more functions
 };
 
-extern SOBRASSADASCRIPTS_API int nSobrassadaScripts;
+extern SOBRASSADA_API int nSobrassadaScripts;
 
-SOBRASSADASCRIPTS_API int fnSobrassadaScripts(void);
+SOBRASSADA_API int fnSobrassadaScripts(void);

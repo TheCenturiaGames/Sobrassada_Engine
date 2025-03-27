@@ -7,10 +7,10 @@
 
 
 // Example of exported variable
-SOBRASSADASCRIPTS_API int nSobrassadaScripts = 0;
+SOBRASSADA_API int nSobrassadaScripts = 0;
 
 // Example of exported function
-SOBRASSADASCRIPTS_API int fnSobrassadaScripts(void)
+SOBRASSADA_API int fnSobrassadaScripts(void)
 {
     return 0;
 }

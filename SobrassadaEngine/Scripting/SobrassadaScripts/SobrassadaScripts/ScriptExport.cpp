@@ -1,15 +1,11 @@
 #include "pch.h"
 #include "MyScript.h"
+#include <string>
 
-#ifdef SOBRASSADASCRIPTS_EXPORTS
-#define SOBRASSADA_API __declspec(dllexport)
-#else
-#define SOBRASSADA_API __declspec(dllimport)
-#endif
-
-extern "C" SOBRASSADA_API Script* CreateScript()
+extern "C" SOBRASSADA_API Script* CreateScript(const std::string& scriptType)
 {
-    return new MyScript();
+    if (scriptType == "MyScript") return new MyScript();
+    return nullptr;
 }
 
 extern "C" SOBRASSADA_API void DestroyScript(Script* script)

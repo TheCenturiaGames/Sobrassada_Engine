@@ -33,20 +33,21 @@ class Application
     update_status Update();
     bool ShutDown();
 
-    WindowModule* GetWindowModule() { return windowModule; }
-    OpenGLModule* GetOpenGLModule() { return openGLModule; }
-    ResourcesModule* GetResourcesModule() { return resourcesModule; }
+    //I added the SOBRASADA_ENGINE_API to the modules so we can use any info inside the game from the modules
+    SOBRASADA_ENGINE_API WindowModule* GetWindowModule() { return windowModule; }
+    SOBRASADA_ENGINE_API OpenGLModule* GetOpenGLModule() { return openGLModule; }
+    SOBRASADA_ENGINE_API ResourcesModule* GetResourcesModule() { return resourcesModule; }
 
-    InputModule* GetInputModule() { return inputModule; }
-    ShaderModule* GetShaderModule() { return shaderModule; }
-    LibraryModule* GetLibraryModule() { return libraryModule; }
-    EditorUIModule* GetEditorUIModule() { return editorUIModule; };
-    ProjectModule* GetProjectModule() { return projectModule; };
-    SceneModule* GetSceneModule() { return sceneModule; }
-    CameraModule* GetCameraModule() { return cameraModule; }
-    DebugDrawModule* GetDebugDrawModule() { return debugDraw; }
-    UserInterfaceModule* GetUserInterfaceModule() { return UIModule; }
-    ScriptModule* GetScriptModule() { return scriptModule; }
+    SOBRASADA_ENGINE_API InputModule* GetInputModule() { return inputModule; }
+    SOBRASADA_ENGINE_API ShaderModule* GetShaderModule() { return shaderModule; }
+    SOBRASADA_ENGINE_API LibraryModule* GetLibraryModule() { return libraryModule; }
+    SOBRASADA_ENGINE_API EditorUIModule* GetEditorUIModule() { return editorUIModule; };
+    SOBRASADA_ENGINE_API ProjectModule* GetProjectModule() { return projectModule; };
+    SOBRASADA_ENGINE_API SceneModule* GetSceneModule() { return sceneModule; }
+    SOBRASADA_ENGINE_API CameraModule* GetCameraModule() { return cameraModule; }
+    SOBRASADA_ENGINE_API DebugDrawModule* GetDebugDrawModule() { return debugDraw; }
+    SOBRASADA_ENGINE_API UserInterfaceModule* GetUserInterfaceModule() { return UIModule; }
+    SOBRASADA_ENGINE_API ScriptModule* GetScriptModule() { return scriptModule; }
 
     EngineTimer* GetEngineTimer() { return engineTimer; }
     GameTimer* GetGameTimer() { return gameTimer; }
@@ -76,4 +77,4 @@ class Application
     EngineConfig* engineConfig       = nullptr;
 };
 
-extern SOBRASADA_ENGINE_API Application* App;
+extern Application* App;

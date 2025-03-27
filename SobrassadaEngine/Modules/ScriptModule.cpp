@@ -1,4 +1,6 @@
 #include "ScriptModule.h"
+#include "Application.h"
+#include "Script.h"
 #include <thread>
 
 // Information: To make the dll works you need to recompile (not compile!)
@@ -20,18 +22,27 @@ void ScriptModule::LoadDLL()
 
     createScriptFunc  = (CreateScriptFunc)GetProcAddress(dllHandle, "CreateScript");
     destroyScriptFunc = (DestroyScriptFunc)GetProcAddress(dllHandle, "DestroyScript");
-    if (!createScriptFunc || !destroyScriptFunc)
+
+    setAppFunc        = (SetApplicationFunc)GetProcAddress(dllHandle, "setApplication");
+
+    if (!createScriptFunc || !destroyScriptFunc || !setAppFunc)
     {
         GLOG("Failed to load CreateScript or DestroyScript functions\n");
         return;
     }
 
-    scriptInstance = createScriptFunc();
-    if (!scriptInstance || !scriptInstance->Init())
+    setAppFunc(App);
+
+    scriptInstance = createScriptFunc("MyScript");
+    if (!scriptInstance)
     {
-        GLOG("Failed to initialize script\n");
-        destroyScriptFunc(scriptInstance);
+        GLOG("Failed to instantiate script\n");
         scriptInstance = nullptr;
+        return;
+    }
+    if (!scriptInstance->Init())
+    {
+        destroyScriptFunc(scriptInstance);
     }
 }
 
