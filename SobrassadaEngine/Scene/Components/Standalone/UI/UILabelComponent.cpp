@@ -38,6 +38,7 @@ UILabelComponent::UILabelComponent(const rapidjson::Value& initialState, GameObj
 UILabelComponent::~UILabelComponent()
 {
     fontData->Clean();
+    delete fontData;
     if (vbo != 0) glDeleteBuffers(1, &vbo);
     if (vao != 0) glDeleteVertexArrays(1, &vao);
 }
@@ -57,28 +58,7 @@ void UILabelComponent::Init()
         transform2D = transform;
     }
 
-    // Search for a parent canvas iteratively
-    std::queue<UID> parentQueue;
-    parentQueue.push(parent->GetParent());
-
-    Scene* scene =
-        App->GetSceneModule()->GetScene(); // Save the scene here to not call for it in each iteration of the loops
-    while (!parentQueue.empty())
-    {
-        const GameObject* currentParent = scene->GetGameObjectByUID(parentQueue.front());
-
-        if (currentParent == nullptr) break; // If parent null it has reached the scene root
-
-        CanvasComponent* canvas = static_cast<CanvasComponent*>(currentParent->GetComponentByType(COMPONENT_CANVAS));
-        if (canvas != nullptr)
-        {
-            parentCanvas = canvas;
-            break;
-        }
-
-        parentQueue.push(currentParent->GetParent());
-        parentQueue.pop();
-    }
+    GetParentCanvas();
 
     fontData = new TextManager::FontData();
     fontData->Init("./EngineDefaults/Shader/Font/Arial.ttf", fontSize);
@@ -100,9 +80,20 @@ void UILabelComponent::Save(rapidjson::Value& targetState, rapidjson::Document::
     targetState.AddMember("FontColor", valFontColor, allocator);
 }
 
-void UILabelComponent::Clone(const Component* otherComponent)
+void UILabelComponent::Clone(const Component* other)
 {
     // It will have to look for the canvas here probably, seems better to do that in a separate function
+    if (other->GetType() == ComponentType::COMPONENT_LABEL)
+    {
+        const UILabelComponent* otherLabel    = static_cast<const UILabelComponent*>(other);
+        strcpy_s(text, sizeof(text), otherLabel->text);
+        fontSize = otherLabel->fontSize;
+        fontColor = otherLabel->fontColor;
+    }
+    else
+    {
+        GLOG("It is not possible to clone a component of a different type!");
+    }
 }
 
 void UILabelComponent::Update(float deltaTime)
@@ -168,4 +159,30 @@ void UILabelComponent::InitBuffers()
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+}
+
+void UILabelComponent::GetParentCanvas()
+{
+    // Search for a parent canvas iteratively
+    std::queue<UID> parentQueue;
+    parentQueue.push(parent->GetParent());
+
+    Scene* scene =
+        App->GetSceneModule()->GetScene(); // Save the scene here to not call for it in each iteration of the loops
+    while (!parentQueue.empty())
+    {
+        const GameObject* currentParent = scene->GetGameObjectByUID(parentQueue.front());
+
+        if (currentParent == nullptr) break; // If parent null it has reached the scene root
+
+        CanvasComponent* canvas = static_cast<CanvasComponent*>(currentParent->GetComponentByType(COMPONENT_CANVAS));
+        if (canvas != nullptr)
+        {
+            parentCanvas = canvas;
+            break;
+        }
+
+        parentQueue.push(currentParent->GetParent());
+        parentQueue.pop();
+    }
 }

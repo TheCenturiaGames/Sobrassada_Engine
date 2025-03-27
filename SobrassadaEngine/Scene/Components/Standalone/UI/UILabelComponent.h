@@ -20,13 +20,14 @@ class UILabelComponent : public Component
 
     void Init() override;
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
-    void Clone(const Component* otherComponent) override;
+    void Clone(const Component* other) override;
     void Update(float deltaTime) override;
     void Render(float deltaTime) override;
     void RenderEditorInspector() override;
 
   private:
     void InitBuffers();
+    void GetParentCanvas();
 
   private:
     Transform2DComponent* transform2D;

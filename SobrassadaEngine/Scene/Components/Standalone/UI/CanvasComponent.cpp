@@ -14,14 +14,14 @@
 CanvasComponent::CanvasComponent(UID uid, GameObject* parent) : Component(uid, parent, "Canvas", COMPONENT_CANVAS)
 {
     width  = App->GetWindowModule()->GetWidth();
-    height = App->GetWindowModule()->GetHeight();  
+    height = App->GetWindowModule()->GetHeight();
 }
 
 CanvasComponent::CanvasComponent(const rapidjson::Value& initialState, GameObject* parent)
     : Component(initialState, parent)
 {
-    width = initialState["Width"].GetFloat();
-    height = initialState["Height"].GetFloat();
+    width                = initialState["Width"].GetFloat();
+    height               = initialState["Height"].GetFloat();
     isInWorldSpaceEditor = initialState["IsInWorldSpaceEditor"].GetBool();
     isInWorldSpaceGame   = initialState["IsInWorldSpaceGame"].GetBool();
 }
@@ -33,7 +33,7 @@ CanvasComponent::~CanvasComponent()
 
 void CanvasComponent::Init()
 {
-    App->GetGameUIModule()->AddCanvas(this);
+    App->GetGameUIModule()->AddCanvas(this); // TODO: Change this fora GetCanvasesInScene(), so the Canvas of a prefab is not added
 
     localComponentAABB = AABB(
         float3(
@@ -57,9 +57,21 @@ void CanvasComponent::Save(rapidjson::Value& targetState, rapidjson::Document::A
     targetState.AddMember("IsInWorldSpaceGame", isInWorldSpaceGame, allocator);
 }
 
-void CanvasComponent::Clone(const Component* otherComponent)
+void CanvasComponent::Clone(const Component* other)
 {
+    if (other->GetType() == ComponentType::COMPONENT_CANVAS)
+    {
+        const CanvasComponent* otherCanvas = static_cast<const CanvasComponent*>(other);
+        width                              = otherCanvas->width;
+        height                             = otherCanvas->height;
 
+        isInWorldSpaceEditor               = otherCanvas->isInWorldSpaceEditor;
+        isInWorldSpaceGame                 = otherCanvas->isInWorldSpaceGame;
+    }
+    else
+    {
+        GLOG("It is not possible to clone a component of a different type!");
+    }
 }
 
 void CanvasComponent::Update(float deltaTime)

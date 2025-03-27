@@ -43,6 +43,20 @@ void Transform2DComponent::Save(rapidjson::Value& targetState, rapidjson::Docume
     targetState.AddMember("Size", valSize, allocator);
 }
 
+void Transform2DComponent::Clone(const Component* other)
+{
+    if (other->GetType() == ComponentType::COMPONENT_TRANSFORM_2D)
+    {
+        const Transform2DComponent* otherTransform = static_cast<const Transform2DComponent*>(other);
+        position                                   = otherTransform->position;
+        size                                       = otherTransform->size;
+    }
+    else
+    {
+        GLOG("It is not possible to clone a component of a different type!");
+    }
+}
+
 void Transform2DComponent::Update(float deltaTime)
 {
 }
@@ -68,8 +82,4 @@ void Transform2DComponent::RenderEditorInspector()
             // Update size
         }
     }
-}
-
-void Transform2DComponent::Clone(const Component* otherComponent)
-{
 }

@@ -11,10 +11,11 @@ class Transform2DComponent : public Component
     ~Transform2DComponent();
 
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
+    void Clone(const Component* other) override;
+
     void Update(float deltaTime) override;
     void Render(float deltaTime) override;
     void RenderEditorInspector() override;
-    void Clone(const Component* otherComponent) override;
 
     const float2& GetPosition() const { return position; }
     const float2& GetSize() const { return size; }
