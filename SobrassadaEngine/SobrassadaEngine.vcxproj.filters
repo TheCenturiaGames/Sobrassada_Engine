@@ -396,6 +396,9 @@
     <ClCompile Include="Scene\Components\Standalone\Physics\CubeColliderComponent.cpp">
       <Filter>Scene\Components\Physics</Filter>
     </ClCompile>
+    <ClCompile Include="Utils\Physics\BulletMotionState.cpp">
+      <Filter>Utils\Physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -466,6 +469,9 @@
     </Filter>
     <Filter Include="Scene\Components\Physics">
       <UniqueIdentifier>{66257dd0-b9f6-4430-8450-125aa647a078}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils\Physics">
+      <UniqueIdentifier>{d73de18e-a52c-4b41-bc53-d6b11a25b7f4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -736,6 +742,9 @@
     </ClInclude>
     <ClInclude Include="Scene\Components\Standalone\Physics\CubeColliderComponent.h">
       <Filter>Scene\Components\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Physics\BulletMotionState.h">
+      <Filter>Utils\Physics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

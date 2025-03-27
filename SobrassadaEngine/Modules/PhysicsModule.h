@@ -12,6 +12,8 @@ class btSequentialImpulseConstraintSolver;
 class btDiscreteDynamicsWorld;
 class BulletDebugDraw;
 
+class CubeColliderComponent;
+
 constexpr float DEFAULT_GRAVITY = -9.81f;
 
 // TODO REMOVE, JUST FOR TESTING
@@ -37,9 +39,9 @@ class PhysicsModule : public Module
         updateGravity = true;
     };
 
-
     void CreateWorld();
     void DeleteWorld();
+
   private:
 
   private:

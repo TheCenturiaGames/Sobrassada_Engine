@@ -24,4 +24,9 @@ class CubeColliderComponent : public Component
 
   private:
     btRigidBody* rigidBody = nullptr;
+
+    bool freezeRotation    = false;
+    float mass             = 0.f;
+    float3 size            = float3::one;
+    float3 centrerOffset   = float3::zero;
 };
