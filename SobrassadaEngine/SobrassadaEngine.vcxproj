@@ -296,7 +296,7 @@
     <ClCompile Include="ResourceManagement\Resources\ResourceStateMachine.cpp" />
     <ClCompile Include="Scene\Components\CameraComponent.cpp" />
     <ClCompile Include="UI\EngineEditors\Editor\NodeEditor.cpp" />
-    <ClCompile Include="UI\EngineEditors\Editor\TextureLibraryEditor.cpp" />
+    <ClCompile Include="UI\EngineEditors\Editor\TextureEditor.cpp" />
     <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp" />
     <ClCompile Include="FileSystem\Importers\ModelImporter.cpp" />
     <ClCompile Include="FileSystem\Meta\MetaPrefab.cpp" />
@@ -455,7 +455,7 @@
     <ClInclude Include="ResourceManagement\Resources\ResourceStateMachine.h" />
     <ClInclude Include="Scene\Components\CameraComponent.h" />
     <ClInclude Include="UI\EngineEditors\Editor\NodeEditor.h" />
-    <ClInclude Include="UI\EngineEditors\Editor\TextureLibraryEditor.h">
+    <ClInclude Include="UI\EngineEditors\Editor\TextureEditor.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
