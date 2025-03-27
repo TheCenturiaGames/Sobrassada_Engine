@@ -70,12 +70,6 @@ int main(int argc, char** argv)
         {
             int update_return = App->Update();
 
-            for (auto log : *Logs)
-            {
-                free(log);
-            }
-            Logs->clear();
-
             if (update_return == UPDATE_ERROR)
             {
                 GLOG("----- Application Update exits with error -----");

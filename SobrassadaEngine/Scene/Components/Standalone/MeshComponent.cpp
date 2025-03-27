@@ -4,13 +4,13 @@
 #include "CameraComponent.h"
 #include "CameraModule.h"
 #include "EditorUIModule.h"
+#include "GameObject.h"
 #include "LibraryModule.h"
 #include "MeshImporter.h"
 #include "ResourceManagement/Resources/ResourceModel.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
 #include "ShaderModule.h"
-// #include "Scene/GameObjects/GameObject.h"
 
 #include "imgui.h"
 #include <Math/Quat.h>

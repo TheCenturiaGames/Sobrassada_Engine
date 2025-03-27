@@ -1,9 +1,9 @@
 ﻿#include "Component.h"
 
-#include "ComponentUtils.h"
+#include "GameObject.h"
 
 #include "imgui.h"
-#include <Math/float4x4.h>
+#include "Math/float4x4.h"
 #include <string>
 
 Component::Component(UID uid, GameObject* parent, const char* initName, ComponentType type)
@@ -36,6 +36,11 @@ void Component::RenderEditorInspector()
     ImGui::InputText("Name", name, sizeof(name));
     ImGui::SameLine();
     ImGui::Checkbox("Enabled", &enabled);
+}
+
+UID Component::GetParentUID() const
+{
+    return parent->GetUID();
 }
 
 const float4x4& Component::GetGlobalTransform() const

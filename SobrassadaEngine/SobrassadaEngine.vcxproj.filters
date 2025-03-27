@@ -393,6 +393,9 @@
     <ClCompile Include="DebugDraw\BulletDebugDraw.cpp">
       <Filter>External\Debug</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\Physics\CubeColliderComponent.cpp">
+      <Filter>Scene\Components\Physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -460,6 +463,9 @@
     </Filter>
     <Filter Include="FileSystem\Importers">
       <UniqueIdentifier>{16f8a1d8-a659-4cc6-8af0-fff819224bf0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Components\Physics">
+      <UniqueIdentifier>{66257dd0-b9f6-4430-8450-125aa647a078}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -727,6 +733,9 @@
     </ClInclude>
     <ClInclude Include="DebugDraw\BulletDebugDraw.h">
       <Filter>External\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\Physics\CubeColliderComponent.h">
+      <Filter>Scene\Components\Physics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

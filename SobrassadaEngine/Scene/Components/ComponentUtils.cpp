@@ -7,6 +7,7 @@
 #include "Standalone/Lights/PointLightComponent.h"
 #include "Standalone/Lights/SpotLightComponent.h"
 #include "Standalone/MeshComponent.h"
+#include "Standalone/Physics/CubeColliderComponent.h"
 
 #include <cstdint>
 
@@ -34,6 +35,9 @@ Component* ComponentUtils::CreateEmptyComponent(const ComponentType type, const 
         break;
     case COMPONENT_CAMERA:
         generatedComponent = new CameraComponent(uid, parent);
+        break;
+    case COMPONENT_CUBE_COLLIDER:
+        generatedComponent = new CubeColliderComponent(uid, parent);
         break;
     default:
         return nullptr;
