@@ -5,9 +5,9 @@
 #include "LibraryModule.h"
 #include "OpenGLModule.h"
 #include "ProjectModule.h"
+#include "ResourcesModule.h"
 #include "SceneModule.h"
 #include "WindowModule.h"
-#include "ResourcesModule.h"
 #include <Application.h>
 #include <Component.h>
 #include <EngineEditorBase.h>
@@ -272,8 +272,6 @@ void EditorUIModule::MainMenu()
         if (ImGui::MenuItem("Save as", "", saveMenu)) saveMenu = !saveMenu;
         ImGui::EndDisabled();
 
-        if (ImGui::MenuItem("Navmesh", "", navmesh)) navmesh = !navmesh;
-
         if (ImGui::MenuItem("Quit")) closeApplication = true;
 
         ImGui::EndMenu();
@@ -310,6 +308,7 @@ void EditorUIModule::MainMenu()
             if (ImGui::MenuItem("Hierarchy", "", hierarchyMenu)) hierarchyMenu = !hierarchyMenu;
             if (ImGui::MenuItem("Inspector", "", inspectorMenu)) inspectorMenu = !inspectorMenu;
             if (ImGui::MenuItem("Lights Config", "", lightConfig)) lightConfig = !lightConfig;
+            if (ImGui::MenuItem("Navmesh", "", navmesh)) navmesh = !navmesh;
             ImGui::EndDisabled();
 
             ImGui::EndMenu();
@@ -398,8 +397,9 @@ void EditorUIModule::LoadDialog(bool& loadMenu)
 
 void EditorUIModule::Navmesh(bool& navmesh)
 {
+    if (!navmesh) return;
 
-    ImGui::Begin("NavMesh Creation");
+    ImGui::Begin("NavMesh Creation", &navmesh, ImGuiWindowFlags_None);
 
     if (ImGui::Button("Create NavMesh"))
     {

@@ -2,14 +2,13 @@
 
 #include "Module.h"
 
-
 #include <Math/float4x4.h>
 #include <bitset>
 #include <list>
 
 class DDRenderInterfaceCoreGL;
-class DetourNavMeshQuery;
-class DetourNavMesh;
+class dtNavMeshQuery;
+class dtNavMesh;
 class Camera;
 
 enum class DebugOptions : uint8_t
@@ -24,7 +23,6 @@ enum class DebugOptions : uint8_t
     RENDER_NAVMESH
 };
 
-
 enum DrawNavMeshFlags
 {
     DRAWNAVMESH_OFFMESHCONS = 0x01,
@@ -32,7 +30,7 @@ enum DrawNavMeshFlags
     DRAWNAVMESH_COLOR_TILES = 0x04
 };
 
-constexpr const char* DebugStrings[] = {"Render Lights", "Render Wireframe", "AABB",      "OBB",
+constexpr const char* DebugStrings[] = {"Render Lights", "Render Wireframe", "AABB",       "OBB",
                                         "Octree",        "Dynamic Tree",     "Camera Ray", "Navmesh"};
 
 class DebugDrawModule : public Module

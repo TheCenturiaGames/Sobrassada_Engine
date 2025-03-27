@@ -788,7 +788,7 @@ static unsigned int DetourRGBA(int r, int g, int b, int a)
 }
 
 
-unsigned int DetourIntToCol(int i, int a)
+static unsigned int DetourIntToCol(int i, int a)
 {
     int r = DetourBit(i, 1) + DetourBit(i, 3) * 2 + 1;
     int g = DetourBit(i, 2) + DetourBit(i, 4) * 2 + 1;
@@ -796,7 +796,7 @@ unsigned int DetourIntToCol(int i, int a)
     return DetourRGBA(r * 63, g * 63, b * 63, a);
 }
 
-unsigned int areaToCol(unsigned int area)
+static unsigned int areaToCol(unsigned int area)
 {
     if (area == 0)
     {
@@ -830,7 +830,7 @@ void DebugDrawModule::DrawNavMesh(const dtNavMesh* navMesh, const dtNavMeshQuery
             const dtPolyDetail* pd = &tile->detailMeshes[j];
 
             unsigned int col;
-            if (navQuery && navQuery->isInClosedList(base | (dtPolyRef)j)) col = duRGBA(255, 196, 0, 64);
+            if (navQuery && navQuery->isInClosedList(base | (dtPolyRef)j)) col = DetourRGBA(255, 196, 0, 64);
             else col = DetourTransCol(areaToCol(p->getArea()), 64);
 
             std::vector<LineSegment> lines;
