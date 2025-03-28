@@ -8,6 +8,9 @@
 
 #include <stack>
 #include <vector>
+#ifdef _DEBUG
+#include "optick.h"
+#endif
 
 class GameObject;
 
@@ -77,12 +80,16 @@ inline void Quadtree::QueryElements(const AreaType& queryObject, std::vector<Gam
 
     std::stack<const QuadtreeNode*> nodesToVisit;
     nodesToVisit.push(rootNode);
-
+#ifdef _DEBUG
+    OPTICK_CATEGORY("Quadtree::Bucle", Optick::Category::GameLogic)
+#endif
     while (!nodesToVisit.empty())
     {
         const QuadtreeNode* currentNode = nodesToVisit.top();
         nodesToVisit.pop();
-
+#ifdef _DEBUG
+        OPTICK_CATEGORY("Quadtree::Intersects", Optick::Category::GameLogic)
+#endif
         if (queryObject.Intersects(currentNode->currentArea))
         {
             if (currentNode->IsLeaf())

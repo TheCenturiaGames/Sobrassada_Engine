@@ -132,7 +132,7 @@ constexpr float PI                                      = 3.14159265359f;
 constexpr float RAD_DEGREE_CONV                         = 180.f / PI;
 constexpr float DEGREE_RAD_CONV                         = PI / 180.f;
 
-constexpr float MINIMUM_TREE_LEAF_SIZE                  = 1.f;
+constexpr float MINIMUM_TREE_LEAF_SIZE                  = 5.f;
 
 inline UID GenerateUID()
 {

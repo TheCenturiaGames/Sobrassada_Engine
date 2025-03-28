@@ -1,6 +1,7 @@
 ﻿#include "Scene.h"
 
 #include "Application.h"
+#include "BatchManager.h"
 #include "CameraComponent.h"
 #include "CameraModule.h"
 #include "Component.h"
@@ -9,6 +10,7 @@
 #include "Framebuffer.h"
 #include "GameObject.h"
 #include "GameTimer.h"
+#include "GeometryBatch.h"
 #include "Importer.h"
 #include "InputModule.h"
 #include "LibraryModule.h"
@@ -23,14 +25,15 @@
 #include "Scene/Components/ComponentUtils.h"
 #include "Scene/Components/Standalone/MeshComponent.h"
 #include "SceneModule.h"
-#include "BatchManager.h"
-#include "GeometryBatch.h"
 
 #include "SDL_mouse.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 // guizmo after imgui include
 #include "./Libs/ImGuizmo/ImGuizmo.h"
+#ifdef _DEBUG
+#include "optick.h"
+#endif
 
 Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 {
@@ -215,6 +218,9 @@ void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGa
 
 update_status Scene::Update(float deltaTime)
 {
+#ifdef _DEBUG
+    OPTICK_CATEGORY("Scene::Update", Optick::Category::GameLogic)
+#endif
     for (auto& gameObject : gameObjectsContainer)
     {
         std::unordered_map<ComponentType, Component*> componentList = gameObject.second->GetComponents();
@@ -232,20 +238,30 @@ update_status Scene::Render(float deltaTime) const
         lightsConfig->RenderSkybox();
     lightsConfig->SetLightsShaderData();
 
+#ifdef _DEBUG
+    OPTICK_CATEGORY("Scene::CheckObjectsToRender", Optick::Category::GameLogic)
+#endif
     std::vector<GameObject*> objectsToRender;
     CheckObjectsToRender(objectsToRender);
 
     BatchManager* batchManager = App->GetResourcesModule()->GetBatchManager();
     std::vector<MeshComponent*> meshesToRender;
-
+#ifdef _DEBUG
+    OPTICK_CATEGORY("Scene::BatchManager::MeshesToRender", Optick::Category::GameLogic)
+#endif
     for (const auto& gameObject : objectsToRender)
     {
         MeshComponent* mesh = gameObject->GetMeshComponent();
         if (mesh != nullptr && mesh->GetEnabled() && mesh->GetBatch() != nullptr) meshesToRender.push_back(mesh);
     }
-
+#ifdef _DEBUG
+    OPTICK_CATEGORY("Scene::BatchManager::Render", Optick::Category::Rendering)
+#endif
     batchManager->Render(meshesToRender);
 
+#ifdef _DEBUG
+    OPTICK_CATEGORY("Scene::GameObject::Render", Optick::Category::Rendering)
+#endif
     for (const auto& gameObject : objectsToRender)
     {
         if (gameObject != nullptr)
@@ -254,6 +270,9 @@ update_status Scene::Render(float deltaTime) const
         }
     }
 
+#ifdef _DEBUG
+    OPTICK_CATEGORY("Scene::GameObject::DrawGizmos", Optick::Category::Rendering)
+#endif
     for (const auto& gameObject : gameObjectsContainer)
     {
         gameObject.second->DrawGizmos();
@@ -592,7 +611,7 @@ void Scene::CreateStaticSpatialDataStruct()
     // PARAMETRIZED IN FUTURE
     float3 octreeCenter = float3::zero;
     float octreeLength  = 200;
-    int nodeCapacity    = 5;
+    int nodeCapacity    = 10;
     sceneOctree         = new Octree(octreeCenter, octreeLength, nodeCapacity);
 
     for (const auto& objectIterator : gameObjectsContainer)
@@ -647,12 +666,18 @@ void Scene::UpdateDynamicSpatialStructure()
 
 void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects) const
 {
+
     std::vector<GameObject*> queriedObjects;
     FrustumPlanes frustumPlanes = App->GetCameraModule()->GetFrustrumPlanes();
     if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
         frustumPlanes = App->GetSceneModule()->GetScene()->GetMainCamera()->GetFrustrumPlanes();
-
+#ifdef _DEBUG
+    OPTICK_CATEGORY("Scene::CheckObjectsToRender::Quadtrees::Static", Optick::Category::GameLogic)
+#endif
     sceneOctree->QueryElements<FrustumPlanes>(frustumPlanes, queriedObjects);
+#ifdef _DEBUG
+    OPTICK_CATEGORY("Scene::CheckObjectsToRender::Quadtrees::Dynamic", Optick::Category::GameLogic)
+#endif
     dynamicTree->QueryElements<FrustumPlanes>(frustumPlanes, queriedObjects);
 
     for (auto gameObject : queriedObjects)
