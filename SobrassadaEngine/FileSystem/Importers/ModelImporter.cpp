@@ -28,12 +28,10 @@ namespace ModelImporter
 
         GLOG("Start filling nodes")
         const auto& scene = model.scenes[0]; // consider only one scene element in aray
-        int parentID      = -1;
         for (const auto& nodeID : scene.nodes)
         {
             if (model.nodes[nodeID].name == "Camera" || model.nodes[nodeID].camera != -1) continue;
-            FillNodes(model.nodes, nodeID, parentID, meshesUIDs, orderedNodes); // -1 parentId for root
-            parentID = nodeID;
+            FillNodes(model.nodes, nodeID, -1, meshesUIDs, orderedNodes); // -1 parentId for root
         }
         GLOG("Nodes filled");
 
@@ -363,12 +361,13 @@ namespace ModelImporter
 
         NodeData newNode;
         if (!nodeData.name.empty()) newNode.name = nodeData.name;
-        else newNode.name = DEFAULT_NODE_NAME; 
+        else newNode.name = DEFAULT_NODE_NAME;
 
         if (nodeData.mesh != -1) newNode.transform = float4x4::identity;
         else newNode.transform = MeshImporter::GetNodeTransform(nodeData);
 
-        newNode.parentIndex = parentId;
+        if (outNodes.empty()) newNode.parentIndex = parentId;
+        else newNode.parentIndex = static_cast<int>(outNodes.size() - 1);
 
         // Get reference to Mesh and Material UIDs
         if (nodeData.mesh > -1) newNode.meshes = meshesUIDs[nodeData.mesh];
