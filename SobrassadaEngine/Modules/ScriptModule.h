@@ -46,4 +46,10 @@ class ScriptModule : public Module
     fs::file_time_type lastWriteTime;
     std::atomic<bool> running = true;
     std::thread dllMonitorThread;
+    const fs::path copyPath = GAME_PATH;
+    #ifdef _DEBUG
+    const fs::path dllPath  = DEBUG_DLL_PATH;
+    #else
+    const fs::path dllPath  = RELEASE_DLL_PATH;
+    #endif
 };

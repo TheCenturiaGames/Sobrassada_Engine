@@ -70,15 +70,11 @@ bool ScriptModule::IsFileLocked(const std::filesystem::path& filePath)
 
 void ScriptModule::ReloadDLLIfUpdated()
 {
-    // This needs to be move into globals.h and do it for debug and release
-    const fs::path dllPath  = "..\\SobrassadaEngine\\x64\\Debug\\SobrassadaScripts.dll";
-    const fs::path copyPath = "..\\Game";
-
     while (running)
     {
         if (fs::exists(dllPath))
         {
-            fs::file_time_type currentWriteTime = fs::last_write_time(dllPath);
+            const fs::file_time_type currentWriteTime = fs::last_write_time(dllPath);
 
             if (currentWriteTime != lastWriteTime)
             {
