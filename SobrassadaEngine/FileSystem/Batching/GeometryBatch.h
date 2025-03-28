@@ -52,11 +52,11 @@ class GeometryBatch
     std::unordered_map<const ResourceMesh*, std::size_t> uniqueMeshesMap;
     std::vector<AccMeshCount> uniqueMeshesCount;
 
-    float4x4* ptrModels[2]     = {nullptr, nullptr};
-    GLsync gSync[2]        = {nullptr, nullptr};
-    GLuint models[2]       = {0, 0};
-    int currentBufferIndex = 0;
-    std::size_t modelsSize = 0;
+    float4x4* ptrModels[2]        = {nullptr, nullptr};
+    GLsync gSync[2]               = {nullptr, nullptr};
+    GLuint models[2]              = {0, 0};
+    int currentBufferIndex        = 0;
+    std::size_t modelsSize        = 0;
 
     unsigned int totalVertexCount = 0;
     unsigned int totalIndexCount  = 0;
@@ -67,6 +67,7 @@ class GeometryBatch
     unsigned int ebo              = 0;
     unsigned int materials        = 0;
 
+    bool hasBones                 = false;
     bool isMetallic               = false;
     unsigned int mode             = 0;
 };

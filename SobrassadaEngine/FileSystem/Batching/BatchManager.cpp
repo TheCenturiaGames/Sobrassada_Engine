@@ -80,6 +80,8 @@ void BatchManager::Render(const std::vector<MeshComponent*>& meshesToRender)
             if (mesh->GetBatch() == it) batchMeshes.push_back(mesh);
         }
 
+        if (batchMeshes.empty()) continue;
+
         unsigned int program = it->GetIsMetallic() ? App->GetShaderModule()->GetMetallicRoughnessProgram()
                                                    : App->GetShaderModule()->GetSpecularGlossinessProgram();
 
