@@ -100,6 +100,7 @@ void BatchManager::Render(const std::vector<MeshComponent*>& meshesToRender)
         const int meshTriangles                    = vertexCount / 3;
         App->GetOpenGLModule()->AddTrianglesPerSecond(meshTriangles / elapsed.count());
         App->GetOpenGLModule()->AddVerticesCount(vertexCount);
+        App->GetOpenGLModule()->AddDrawCallsCount();
     }
 }
 

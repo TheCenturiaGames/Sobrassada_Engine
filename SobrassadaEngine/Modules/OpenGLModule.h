@@ -24,6 +24,7 @@ class OpenGLModule : public Module
 
     void AddTrianglesPerSecond(float meshTrianglesPerSecond) { trianglesPerSecond += meshTrianglesPerSecond; }
     void AddVerticesCount(int meshVertices) { verticesCount += meshVertices; }
+    void AddDrawCallsCount() { drawCallsCount += 1; }
 
     void* GetContext() const { return context; }
     float GetClearRed() const { return clearColorRed; }

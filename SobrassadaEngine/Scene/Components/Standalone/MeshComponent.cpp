@@ -54,8 +54,15 @@ MeshComponent::MeshComponent(const rapidjson::Value& initialState, GameObject* p
     }
     if (currentMesh != nullptr && currentMaterial != nullptr)
     {
+#ifndef GAME
+        batch = App->GetResourcesModule()->GetBatchManager()->CreateNewBatch(this);
+        batch->AddComponent(this);
+        //batch = App->GetResourcesModule()->GetBatchManager()->RequestBatch(this);
+        //batch->AddComponent(this);
+#else
         batch = App->GetResourcesModule()->GetBatchManager()->RequestBatch(this);
         batch->AddComponent(this);
+#endif
     }
 }
 
@@ -63,7 +70,9 @@ MeshComponent::~MeshComponent()
 {
     App->GetResourcesModule()->ReleaseResource(currentMaterial);
     App->GetResourcesModule()->ReleaseResource(currentMesh);
-    // batch delete
+#ifndef GAME
+    App->GetResourcesModule()->GetBatchManager()->RemoveBatch(batch);
+#endif
 }
 
 void MeshComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
@@ -155,27 +164,13 @@ void MeshComponent::Update(float deltaTime)
     {
         batch = App->GetResourcesModule()->GetBatchManager()->CreateNewBatch(this); // Editor Mode, single component for batch
         batch->AddComponent(this);
+        batch->LoadData();
     }
         
 }
 
 void MeshComponent::Render(float deltaTime)
 {
-    if (enabled && currentMesh != nullptr)
-    {
-        //unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
-        //int program            = App->GetShaderModule()->GetMetallicRoughnessProgram();
-
-        //if (currentMaterial != nullptr)
-        //{
-        //    if (!currentMaterial->GetIsMetallicRoughness())
-        //        program = App->GetShaderModule()->GetSpecularGlossinessProgram();
-        //}
-        //if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
-        //    cameraUBO = App->GetSceneModule()->GetScene()->GetMainCamera()->GetUbo();
-
-        //currentMesh->Render(program, combinedMatrix, cameraUBO, currentMaterial, bones, bindMatrices);
-    }
 }
 
 void MeshComponent::InitSkin()
