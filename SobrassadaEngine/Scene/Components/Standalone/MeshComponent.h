@@ -71,4 +71,5 @@ class MeshComponent : public Component
     float4x4 combinedMatrix = float4x4::identity;
 
     GeometryBatch* batch    = nullptr;
+    bool editorMesh         = false;
 };

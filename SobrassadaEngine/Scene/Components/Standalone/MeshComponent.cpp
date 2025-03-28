@@ -63,9 +63,8 @@ MeshComponent::~MeshComponent()
 {
     App->GetResourcesModule()->ReleaseResource(currentMaterial);
     App->GetResourcesModule()->ReleaseResource(currentMesh);
-#ifndef GAME
-    App->GetResourcesModule()->GetBatchManager()->RemoveBatch(batch);
-#endif
+
+    if (editorMesh) App->GetResourcesModule()->GetBatchManager()->RemoveBatch(batch);
 }
 
 void MeshComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
@@ -159,6 +158,7 @@ void MeshComponent::Update(float deltaTime)
         ); // Editor Mode, single component for batch
         batch->AddComponent(this);
         batch->LoadData();
+        editorMesh = true;
     }
 }
 

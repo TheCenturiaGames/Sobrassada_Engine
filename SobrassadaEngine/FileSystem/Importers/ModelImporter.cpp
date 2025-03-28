@@ -27,7 +27,14 @@ namespace ModelImporter
         std::vector<NodeData> orderedNodes;
 
         GLOG("Start filling nodes")
-        FillNodes(model.nodes, 0, -1, meshesUIDs, orderedNodes); // -1 parentId for root
+        const auto& scene = model.scenes[0]; // consider only one scene element in aray
+        int parentID      = -1;
+        for (const auto& nodeID : scene.nodes)
+        {
+            if (model.nodes[nodeID].name == "Camera" || model.nodes[nodeID].camera != -1) continue;
+            FillNodes(model.nodes, nodeID, parentID, meshesUIDs, orderedNodes); // -1 parentId for root
+            parentID = nodeID;
+        }
         GLOG("Nodes filled");
 
         newModel.SetNodes(orderedNodes);
@@ -352,8 +359,11 @@ namespace ModelImporter
         // Fill node data
         const tinygltf::Node& nodeData = nodesList[nodeId];
 
+        if (nodeData.camera != -1) return;
+
         NodeData newNode;
-        newNode.name = nodeData.name;
+        if (!nodeData.name.empty()) newNode.name = nodeData.name;
+        else newNode.name = DEFAULT_NODE_NAME; 
 
         if (nodeData.mesh != -1) newNode.transform = float4x4::identity;
         else newNode.transform = MeshImporter::GetNodeTransform(nodeData);
