@@ -1,16 +1,11 @@
 #include "GeometryBatch.h"
 
-#include "Application.h"
-#include "Globals.h"
 #include "Mesh.h"
-#include "OpenGLModule.h"
 #include "ResourceMaterial.h"
 #include "ResourceMesh.h"
-#include "ShaderModule.h"
 #include "Standalone/MeshComponent.h"
 
 #include "glew.h"
-#include <chrono>
 
 struct Command
 {
@@ -46,8 +41,6 @@ GeometryBatch::~GeometryBatch()
     componentsMap.clear();
     uniqueMeshesMap.clear();
     uniqueMeshesCount.clear();
-    totalModels.clear();
-    totalMaterials.clear();
 
     CleanUp();
     glUseProgram(0);
@@ -73,6 +66,8 @@ void GeometryBatch::LoadData()
 {
     std::vector<Vertex> totalVertices;
     std::vector<unsigned int> totalIndices;
+    std::vector<float4x4> totalModels;
+    std::vector<MaterialGPU> totalMaterials;
 
     unsigned int accVertexCount = 0;
     unsigned int accIndexCount  = 0;
@@ -155,27 +150,9 @@ void GeometryBatch::LoadData()
     GLOG("Batch %d loaded succesfully", id);
 }
 
-void GeometryBatch::Render(
-    unsigned int program, unsigned int cameraUBO, float3 cameraPos, const std::vector<MeshComponent*>& meshesToRender
-)
+void GeometryBatch::Render(const std::vector<MeshComponent*>& meshesToRender)
 {
-    const auto start = std::chrono::high_resolution_clock::now();
-
     WaitBuffer();
-
-    const int meshTriangles = totalVertexCount / 3;
-
-    glUseProgram(program);
-
-    glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
-    unsigned int blockIdx = glGetUniformBlockIndex(program, "CameraMatrices");
-    glUniformBlockBinding(program, blockIdx, 0);
-    glBindBufferBase(GL_UNIFORM_BUFFER, 0, cameraUBO);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-    glUniform3fv(glGetUniformLocation(program, "cameraPos"), 1, &cameraPos[0]);
-
-    glUniform1i(4, 0); // hasBones
 
     std::vector<Command> commands;
     GenerateCommandsAndSSBO(meshesToRender, commands);
@@ -183,7 +160,7 @@ void GeometryBatch::Render(
     glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirect);
     glBufferData(GL_DRAW_INDIRECT_BUFFER, commands.size() * sizeof(Command), commands.data(), GL_DYNAMIC_DRAW);
 
-    UpdateBuffer();
+    UpdateBuffer(meshesToRender);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, materials);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 11, materials);
@@ -198,12 +175,6 @@ void GeometryBatch::Render(
     glBindVertexArray(0);
 
     LockBuffer();
-
-    const auto end                             = std::chrono::high_resolution_clock::now();
-    const std::chrono::duration<float> elapsed = end - start;
-
-    App->GetOpenGLModule()->AddTrianglesPerSecond(meshTriangles / elapsed.count());
-    App->GetOpenGLModule()->AddVerticesCount(totalVertexCount);
 }
 
 void GeometryBatch::GenerateCommandsAndSSBO(const std::vector<MeshComponent*>& meshes, std::vector<Command>& commands)
@@ -231,8 +202,6 @@ void GeometryBatch::GenerateCommandsAndSSBO(const std::vector<MeshComponent*>& m
         totalIndexCount          += indexCount;
 
         commands.push_back(newCommand);
-
-        totalModels[componentsMap[component]] = component->GetCombinedMatrix();
     }
 }
 
@@ -249,14 +218,19 @@ void GeometryBatch::WaitBuffer()
     }
 }
 
-void GeometryBatch::UpdateBuffer()
+void GeometryBatch::UpdateBuffer(const std::vector<MeshComponent*>& meshesToRender)
 {
     int nextBufferIndex  = (currentBufferIndex + 1) % 2;
     GLuint nextBuffer    = models[nextBufferIndex];
     GLuint currentBuffer = models[currentBufferIndex];
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, nextBuffer);
-    memcpy(ptrModels[nextBufferIndex], totalModels.data(), modelsSize);
+
+    for (const MeshComponent* component : meshesToRender)
+    {
+        std::size_t index                 = componentsMap[component];
+        ptrModels[nextBufferIndex][index] = component->GetCombinedMatrix();
+    }
     glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, currentBuffer);

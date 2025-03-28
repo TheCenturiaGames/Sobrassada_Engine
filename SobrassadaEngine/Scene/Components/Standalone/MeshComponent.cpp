@@ -63,6 +63,7 @@ MeshComponent::~MeshComponent()
 {
     App->GetResourcesModule()->ReleaseResource(currentMaterial);
     App->GetResourcesModule()->ReleaseResource(currentMesh);
+    // batch delete
 }
 
 void MeshComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
@@ -152,7 +153,7 @@ void MeshComponent::Update(float deltaTime)
 {
     if (batch == nullptr && currentMesh != nullptr && currentMaterial != nullptr)
     {
-        batch = App->GetResourcesModule()->GetBatchManager()->RequestBatch(this);
+        batch = App->GetResourcesModule()->GetBatchManager()->CreateNewBatch(this); // Editor Mode, single component for batch
         batch->AddComponent(this);
     }
         

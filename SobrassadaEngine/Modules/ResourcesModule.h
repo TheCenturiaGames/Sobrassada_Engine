@@ -16,6 +16,7 @@ class ResourcesModule : public Module
     ~ResourcesModule() override;
 
     bool Init() override;
+    //update_status PostUpdate(float deltaTime) override;
     bool ShutDown() override;
 
     Resource* RequestResource(UID uid);

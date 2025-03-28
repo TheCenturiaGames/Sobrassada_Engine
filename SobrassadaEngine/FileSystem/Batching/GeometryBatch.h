@@ -26,19 +26,18 @@ class GeometryBatch
     ~GeometryBatch();
 
     void LoadData();
-    void Render(
-        unsigned int program, unsigned int cameraUBO, float3 cameraPos,
-        const std::vector<MeshComponent*>& meshesToRender
-    );
+    void Render(const std::vector<MeshComponent*>& meshesToRender);
 
     void AddComponent(const MeshComponent* component) { components.push_back(component); }
 
     const unsigned int GetMode() const { return mode; }
     const bool GetIsMetallic() const { return isMetallic; }
+    const unsigned int GetVertexCount() const { return totalVertexCount; }
+    const unsigned int GetIndexCount() const { return totalIndexCount; }
 
   private:
     void LockBuffer();
-    void UpdateBuffer();
+    void UpdateBuffer(const std::vector<MeshComponent*>& meshesToRender);
     void WaitBuffer();
 
     void GenerateCommandsAndSSBO(const std::vector<MeshComponent*>& meshes, std::vector<Command>& commands);
@@ -53,14 +52,11 @@ class GeometryBatch
     std::unordered_map<const ResourceMesh*, std::size_t> uniqueMeshesMap;
     std::vector<AccMeshCount> uniqueMeshesCount;
 
-    void* ptrModels[2]     = {nullptr, nullptr};
+    float4x4* ptrModels[2]     = {nullptr, nullptr};
     GLsync gSync[2]        = {nullptr, nullptr};
     GLuint models[2]       = {0, 0};
     int currentBufferIndex = 0;
     std::size_t modelsSize = 0;
-
-    std::vector<float4x4> totalModels;
-    std::vector<MaterialGPU> totalMaterials;
 
     unsigned int totalVertexCount = 0;
     unsigned int totalIndexCount  = 0;

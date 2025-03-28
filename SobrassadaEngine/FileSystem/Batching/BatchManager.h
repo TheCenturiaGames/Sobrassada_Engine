@@ -12,13 +12,13 @@ class BatchManager
     ~BatchManager();
 
     void UnloadAllBatches();
+    void RemoveBatch(GeometryBatch* batch);
 
     void LoadData();
     void Render(const std::vector<MeshComponent*>& meshesToRender);
 
     GeometryBatch* RequestBatch(const MeshComponent* mesh);
 
-  private:
     GeometryBatch* CreateNewBatch(const MeshComponent* mesh);
 
   private:

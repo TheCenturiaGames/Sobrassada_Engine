@@ -1,9 +1,10 @@
 #include "BatchManager.h"
 
-#include "GeometryBatch.h"
 #include "Application.h"
 #include "CameraComponent.h"
 #include "CameraModule.h"
+#include "GeometryBatch.h"
+#include "OpenGLModule.h"
 #include "ResourceMaterial.h"
 #include "ResourceMesh.h"
 #include "Scene.h"
@@ -12,6 +13,8 @@
 #include "Standalone/MeshComponent.h"
 
 #include "Math/float3.h"
+#include "glew.h"
+#include <chrono>
 
 BatchManager::BatchManager()
 {
@@ -30,6 +33,19 @@ void BatchManager::UnloadAllBatches()
     }
     batches.clear();
     batches.shrink_to_fit();
+}
+
+void BatchManager::RemoveBatch(GeometryBatch* removeBatch)
+{
+    for (int i = 0; i < batches.size(); i++)
+    {
+        if (batches[i] == removeBatch)
+        {
+            delete batches[i];
+            batches.erase(batches.begin() + i);
+            break;
+        }
+    }
 }
 
 void BatchManager::LoadData()
@@ -60,7 +76,30 @@ void BatchManager::Render(const std::vector<MeshComponent*>& meshesToRender)
 
         unsigned int program = it->GetIsMetallic() ? App->GetShaderModule()->GetMetallicRoughnessProgram()
                                                    : App->GetShaderModule()->GetSpecularGlossinessProgram();
-        it->Render(program, cameraUBO, cameraPos, batchMeshes);
+
+        const auto start     = std::chrono::high_resolution_clock::now();
+
+        glUseProgram(program);
+
+        glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
+        unsigned int blockIdx = glGetUniformBlockIndex(program, "CameraMatrices");
+        glUniformBlockBinding(program, blockIdx, 0);
+        glBindBufferBase(GL_UNIFORM_BUFFER, 0, cameraUBO);
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+        glUniform3fv(glGetUniformLocation(program, "cameraPos"), 1, &cameraPos[0]);
+
+        glUniform1i(4, 0); // hasBones
+
+        it->Render(batchMeshes);
+
+        const auto end                             = std::chrono::high_resolution_clock::now();
+        const std::chrono::duration<float> elapsed = end - start;
+
+        const unsigned int vertexCount             = it->GetVertexCount();
+        const int meshTriangles                    = vertexCount / 3;
+        App->GetOpenGLModule()->AddTrianglesPerSecond(meshTriangles / elapsed.count());
+        App->GetOpenGLModule()->AddVerticesCount(vertexCount);
     }
 }
 
