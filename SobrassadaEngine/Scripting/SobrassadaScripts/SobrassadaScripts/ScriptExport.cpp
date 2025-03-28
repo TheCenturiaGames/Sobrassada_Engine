@@ -16,7 +16,14 @@ extern "C" SOBRASSADA_API void DestroyScript(Script* script)
 extern "C" SOBRASSADA_API void DestroyExterns()
 {
     App = nullptr;
-    logsDLL = nullptr;
+    // Free memory from log*
+    for (auto log : *logsDLL)
+    {
+        free(log.message);
+    }
+    logsDLL->clear();
+    delete logsDLL;
+
 }
 
 extern "C" SOBRASSADA_API void setApplication(Application* application)
@@ -24,7 +31,7 @@ extern "C" SOBRASSADA_API void setApplication(Application* application)
     App = application;
 }
 
-extern "C" SOBRASSADA_API void setLogs(std::vector<char*>* log)
+extern "C" SOBRASSADA_API std::vector<LogEntry>* DLLConsoleLogs()
 {
-    logsDLL = log;
+    return logsDLL;
 }

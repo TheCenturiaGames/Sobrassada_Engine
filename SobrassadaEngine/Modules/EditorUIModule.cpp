@@ -6,6 +6,7 @@
 #include "OpenGLModule.h"
 #include "ProjectModule.h"
 #include "SceneModule.h"
+#include "ScriptModule.h"
 #include "WindowModule.h"
 #include <Application.h>
 #include <Component.h>
@@ -754,9 +755,20 @@ void EditorUIModule::Console(bool& consoleMenu) const
         return;
     }
 
-    for (const char* log : *Logs)
+    std::vector<LogEntry> allLogs  = *Logs;
+    std::vector<LogEntry>* dllLogs = App->GetScriptModule()->GetDLLConsoleLogs();
+    if (dllLogs != nullptr)
     {
-        ImGui::TextUnformatted(log);
+        allLogs.insert(allLogs.end(), dllLogs->begin(), dllLogs->end());
+    }
+
+    std::sort(
+        allLogs.begin(), allLogs.end(), [](const LogEntry& a, const LogEntry& b) { return a.timestamp < b.timestamp; }
+    );
+
+    for (const LogEntry& log : allLogs)
+    {
+        ImGui::TextUnformatted(log.message);
     }
 
     // Autoscroll only if the scroll is in the bottom position

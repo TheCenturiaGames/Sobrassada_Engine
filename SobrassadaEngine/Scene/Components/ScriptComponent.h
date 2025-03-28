@@ -19,7 +19,7 @@ class ScriptComponent : public Component
     void RenderEditorInspector() override;
 
   private:
-    std::string scriptName;
-    Script* scriptInstance = nullptr;
+    std::string scriptName           = "Not selected";
+    Script* scriptInstance           = nullptr;
     std::vector<std::string> scripts = {"MyScript"};
 };

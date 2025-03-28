@@ -4,6 +4,7 @@
 
 bool ScriptModule::Init()
 {
+    LoadDLL();
     running          = true;
     dllMonitorThread = std::thread(&ScriptModule::ReloadDLLIfUpdated, this);
     return true;
@@ -11,6 +12,7 @@ bool ScriptModule::Init()
 
 bool ScriptModule::ShutDown()
 {
+    UnloadDLL();
     running = false;
     if (dllMonitorThread.joinable()) dllMonitorThread.join();
     return true;
@@ -24,22 +26,21 @@ void ScriptModule::LoadDLL()
         GLOG("Failed to load DLL\n");
         return;
     }
-    lastWriteTime      = fs::last_write_time("SobrassadaScripts.dll");
+    lastWriteTime         = fs::last_write_time("SobrassadaScripts.dll");
 
-    createScriptFunc   = (CreateScriptFunc)GetProcAddress(dllHandle, "CreateScript");
-    destroyScriptFunc  = (DestroyScriptFunc)GetProcAddress(dllHandle, "DestroyScript");
-    destroyExternsFunc = (DestroyExterns)GetProcAddress(dllHandle, "DestroyExterns");
-    setAppFunc         = (SetApplicationFunc)GetProcAddress(dllHandle, "setApplication");
-    setLogsFunc        = (SetLogsFunc)GetProcAddress(dllHandle, "setLogs");
+    createScriptFunc      = (CreateScriptFunc)GetProcAddress(dllHandle, "CreateScript");
+    destroyScriptFunc     = (DestroyScriptFunc)GetProcAddress(dllHandle, "DestroyScript");
+    destroyExternsFunc    = (DestroyExterns)GetProcAddress(dllHandle, "DestroyExterns");
+    setAppFunc            = (SetApplicationFunc)GetProcAddress(dllHandle, "setApplication");
+    setDLLConsoleLogsFunc = (DLLConsoleLogs)GetProcAddress(dllHandle, "DLLConsoleLogs");
 
-    if (!createScriptFunc || !destroyScriptFunc || !setAppFunc || !setLogsFunc || !destroyExternsFunc)
+    if (!createScriptFunc || !destroyScriptFunc || !setAppFunc || !setDLLConsoleLogsFunc || !destroyExternsFunc)
     {
         GLOG("Failed to load CreateScript or DestroyScript functions\n");
         return;
     }
 
     setAppFunc(App);
-    setLogsFunc(Logs);
 }
 
 update_status ScriptModule::Update(float deltaTime)
@@ -53,11 +54,11 @@ void ScriptModule::UnloadDLL()
     {
         destroyExternsFunc();
 
-        createScriptFunc   = nullptr;
-        destroyScriptFunc  = nullptr;
-        destroyExternsFunc = nullptr;
-        setAppFunc         = nullptr;
-        setLogsFunc        = nullptr;
+        createScriptFunc      = nullptr;
+        destroyScriptFunc     = nullptr;
+        destroyExternsFunc    = nullptr;
+        setAppFunc            = nullptr;
+        setDLLConsoleLogsFunc = nullptr;
 
         FreeLibrary(dllHandle);
         dllHandle = nullptr;

@@ -4,7 +4,6 @@
 #include "Script.h"
 #include "ScriptModule.h"
 
-// GLOG in DLL (I need to free the memory correctly I suppose¿?)
 // When unload the DLL, I need to destroy and recreate the script
 // Do script of object rotating
 
@@ -85,6 +84,8 @@ void ScriptComponent::RenderEditorInspector()
                         App->GetScriptModule()->DestroyScript(scriptInstance);
                         scriptInstance = nullptr;
                     }
+
+                    scriptName     = scriptType;
 
                     scriptInstance = App->GetScriptModule()->CreateScript(scriptType);
                     scriptInstance->Init();

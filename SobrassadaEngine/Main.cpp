@@ -27,14 +27,14 @@ enum MainState
 };
 
 Application* App         = NULL;
-std::vector<char*>* Logs = NULL;
+std::vector<LogEntry>* Logs = NULL;
 
 int main(int argc, char** argv)
 {
     int mainReturn      = EXIT_SUCCESS;
     MainState mainState = MAIN_CREATION;
 
-    Logs                = new std::vector<char*>();
+    Logs                = new std::vector<LogEntry>();
 
     while (mainState != MAIN_EXIT)
     {
@@ -84,7 +84,7 @@ int main(int argc, char** argv)
                 // Free memory from log*
                 for (auto log : *Logs)
                 {
-                    free(log);
+                    free(log.message);
                 }
                 Logs->clear();
             }
@@ -113,7 +113,7 @@ int main(int argc, char** argv)
     // Free memory from log*
     for (auto log : *Logs)
     {
-        free(log);
+        free(log.message);
     }
     Logs->clear();
     delete Logs;

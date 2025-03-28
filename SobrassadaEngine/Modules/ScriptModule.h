@@ -1,15 +1,15 @@
 #pragma once
 #include "Globals.h"
 #include "Module.h"
-#include <filesystem>
-#include <windows.h>
-#include <thread>
 #include <atomic>
+#include <filesystem>
+#include <thread>
+#include <windows.h>
 
 class Application;
 class Script;
 
-namespace fs              = std::filesystem;
+namespace fs = std::filesystem;
 
 class ScriptModule : public Module
 {
@@ -24,6 +24,7 @@ class ScriptModule : public Module
     Script* CreateScript(const std::string name) const { return createScriptFunc(name); }
     void DestroyScript(Script* script) const { destroyScriptFunc(script); }
 
+    std::vector<LogEntry>* GetDLLConsoleLogs() { return setDLLConsoleLogsFunc(); }
 
   private:
     void LoadDLL();
@@ -38,23 +39,23 @@ class ScriptModule : public Module
     typedef void (*DestroyScriptFunc)(Script*);
     typedef void (*DestroyExterns)();
     typedef void (*SetApplicationFunc)(Application*);
-    typedef void (*SetLogsFunc)(std::vector<char*>*);
+    typedef std::vector<LogEntry>* (*DLLConsoleLogs)();
 
-    CreateScriptFunc createScriptFunc   = nullptr;
-    DestroyScriptFunc destroyScriptFunc = nullptr;
-    DestroyExterns destroyExternsFunc   = nullptr;
-    SetApplicationFunc setAppFunc       = nullptr;
-    SetLogsFunc setLogsFunc             = nullptr;
+    CreateScriptFunc createScriptFunc    = nullptr;
+    DestroyScriptFunc destroyScriptFunc  = nullptr;
+    DestroyExterns destroyExternsFunc    = nullptr;
+    SetApplicationFunc setAppFunc        = nullptr;
+    DLLConsoleLogs setDLLConsoleLogsFunc = nullptr;
 
-    Script* scriptInstance              = nullptr;
+    Script* scriptInstance               = nullptr;
 
     fs::file_time_type lastWriteTime;
     std::atomic<bool> running = true;
     std::thread dllMonitorThread;
     const fs::path copyPath = GAME_PATH;
-    #ifdef _DEBUG
-    const fs::path dllPath  = DEBUG_DLL_PATH;
-    #else
-    const fs::path dllPath  = RELEASE_DLL_PATH;
-    #endif
+#ifdef _DEBUG
+    const fs::path dllPath = DEBUG_DLL_PATH;
+#else
+    const fs::path dllPath = RELEASE_DLL_PATH;
+#endif
 };

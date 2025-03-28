@@ -10,8 +10,13 @@
 
 class Application;
 extern Application* App;
-extern std::vector<char*>* logsDLL;
 
+struct LogEntry
+{
+    char* message;
+    float timestamp;
+};
+
+extern std::vector<LogEntry>* logsDLL;
 void glogDLL(const char file[], int line, const char* format, ...);
-
 #define GLOG(format, ...) glogDLL(__FILE__, __LINE__, format, __VA_ARGS__);

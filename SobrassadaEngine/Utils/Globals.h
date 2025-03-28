@@ -7,7 +7,13 @@
 #include <windows.h>
 #include <vector>
 
-extern std::vector<char*>* Logs;
+struct LogEntry
+{
+    char* message;
+    float timestamp;
+};
+
+extern std::vector<LogEntry>* Logs;
 
 void glog(const char file[], int line, const char* format, ...);
 

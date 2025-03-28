@@ -4,12 +4,13 @@
 
 bool MyScript::Init()
 {
+
+    GLOG("HOLA");
     std::cout << "MyScript initialized!" << std::endl;
     return true;
 }
 
 void MyScript::Update(float deltaTime)
 {
-    GLOG("HOLA");
     std::cout << "Updating MyScript. Delta Time: " << deltaTime << std::endl;
 }
