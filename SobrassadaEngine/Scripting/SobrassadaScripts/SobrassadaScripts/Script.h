@@ -1,10 +1,5 @@
 #pragma once
-
-#ifdef SOBRASSADASCRIPTS_EXPORTS
-#define SOBRASSADA_API __declspec(dllexport)
-#else
-#define SOBRASSADA_API __declspec(dllimport)
-#endif
+#include "GlobalsDLL.h"
 
 class Script
 {

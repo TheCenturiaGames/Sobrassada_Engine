@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "MyScript.h"
 #include <iostream>
-#include "GlobalsDLL.h"
-#include "Application.h"
 
 bool MyScript::Init()
 {
@@ -12,5 +10,6 @@ bool MyScript::Init()
 
 void MyScript::Update(float deltaTime)
 {
+    GLOG("HOLA");
     std::cout << "Updating MyScript. Delta Time: " << deltaTime << std::endl;
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #ifdef SOBRASSADASCRIPTS_EXPORTS
 #define SOBRASSADA_API __declspec(dllexport)
 #else
@@ -7,10 +9,9 @@
 #endif
 
 class Application;
+extern Application* App;
+extern std::vector<char*>* logsDLL;
 
-//We need to declare the application to be used in the game dll
-Application* App = nullptr;
-extern "C" SOBRASSADA_API void setApplication(Application* application)
-{
-    App = application;
-}
+void glogDLL(const char file[], int line, const char* format, ...);
+
+#define GLOG(format, ...) glogDLL(__FILE__, __LINE__, format, __VA_ARGS__);

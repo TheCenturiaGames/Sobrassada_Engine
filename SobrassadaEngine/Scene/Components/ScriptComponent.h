@@ -21,4 +21,5 @@ class ScriptComponent : public Component
   private:
     std::string scriptName;
     Script* scriptInstance = nullptr;
+    std::vector<std::string> scripts = {"MyScript"};
 };

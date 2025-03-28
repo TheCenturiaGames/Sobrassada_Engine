@@ -24,6 +24,7 @@ class ScriptModule : public Module
     Script* CreateScript(const std::string name) const { return createScriptFunc(name); }
     void DestroyScript(Script* script) const { destroyScriptFunc(script); }
 
+
   private:
     void LoadDLL();
     void UnloadDLL();
@@ -35,11 +36,15 @@ class ScriptModule : public Module
 
     typedef Script* (*CreateScriptFunc)(const std::string&);
     typedef void (*DestroyScriptFunc)(Script*);
+    typedef void (*DestroyExterns)();
     typedef void (*SetApplicationFunc)(Application*);
+    typedef void (*SetLogsFunc)(std::vector<char*>*);
 
     CreateScriptFunc createScriptFunc   = nullptr;
     DestroyScriptFunc destroyScriptFunc = nullptr;
+    DestroyExterns destroyExternsFunc   = nullptr;
     SetApplicationFunc setAppFunc       = nullptr;
+    SetLogsFunc setLogsFunc             = nullptr;
 
     Script* scriptInstance              = nullptr;
 

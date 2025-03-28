@@ -4,8 +4,9 @@
 #include "Script.h"
 #include "ScriptModule.h"
 
-// GLOG in DLL (I need to free the memory correctly I suppose¿?)
+// GLOG in DLL
 // When unload the DLL, I need to destroy and recreate the script
+// Change the std::string in the createScriptFunc to an enum to make it easier (Done?)
 // Do script of object rotating
 
 ScriptComponent::ScriptComponent(UID uid, GameObject* parent) : Component(uid, parent, "Script", COMPONENT_SCRIPT)

@@ -4,14 +4,14 @@
 #include "Algorithm/Random/LCG.h"
 #include <Geometry/AABB.h>
 #include <stdio.h>
-#include <vector>
 #include <windows.h>
+#include <vector>
 
 extern std::vector<char*>* Logs;
 
-#define GLOG(format, ...) glog(__FILE__, __LINE__, format, __VA_ARGS__);
-
 void glog(const char file[], int line, const char* format, ...);
+
+#define GLOG(format, ...) glog(__FILE__, __LINE__, format, __VA_ARGS__);
 
 enum update_status
 {
@@ -144,9 +144,3 @@ inline UID GenerateUID()
     UID uid = static_cast<UID>(rng.IntFast()) << 32 | rng.IntFast(); // Combine two 32-bit values
     return uid;
 }
-
-#if defined(SOBRASADA_ENGINE_API)
-/* do nothing. */
-#elif defined(_MSC_VER)
-#define SOBRASADA_ENGINE_API __declspec(dllexport)
-#endif

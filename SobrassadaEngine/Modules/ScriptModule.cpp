@@ -24,19 +24,22 @@ void ScriptModule::LoadDLL()
         GLOG("Failed to load DLL\n");
         return;
     }
-    lastWriteTime     = fs::last_write_time("SobrassadaScripts.dll");
+    lastWriteTime      = fs::last_write_time("SobrassadaScripts.dll");
 
-    createScriptFunc  = (CreateScriptFunc)GetProcAddress(dllHandle, "CreateScript");
-    destroyScriptFunc = (DestroyScriptFunc)GetProcAddress(dllHandle, "DestroyScript");
-    setAppFunc        = (SetApplicationFunc)GetProcAddress(dllHandle, "setApplication");
+    createScriptFunc   = (CreateScriptFunc)GetProcAddress(dllHandle, "CreateScript");
+    destroyScriptFunc  = (DestroyScriptFunc)GetProcAddress(dllHandle, "DestroyScript");
+    destroyExternsFunc = (DestroyExterns)GetProcAddress(dllHandle, "DestroyExterns");
+    setAppFunc         = (SetApplicationFunc)GetProcAddress(dllHandle, "setApplication");
+    setLogsFunc        = (SetLogsFunc)GetProcAddress(dllHandle, "setLogs");
 
-    if (!createScriptFunc || !destroyScriptFunc || !setAppFunc)
+    if (!createScriptFunc || !destroyScriptFunc || !setAppFunc || !setLogsFunc || !destroyExternsFunc)
     {
         GLOG("Failed to load CreateScript or DestroyScript functions\n");
         return;
     }
 
     setAppFunc(App);
+    setLogsFunc(Logs);
 }
 
 update_status ScriptModule::Update(float deltaTime)
@@ -48,8 +51,13 @@ void ScriptModule::UnloadDLL()
 {
     if (dllHandle)
     {
-        createScriptFunc  = nullptr;
-        destroyScriptFunc = nullptr;
+        destroyExternsFunc();
+
+        createScriptFunc   = nullptr;
+        destroyScriptFunc  = nullptr;
+        destroyExternsFunc = nullptr;
+        setAppFunc         = nullptr;
+        setLogsFunc        = nullptr;
 
         FreeLibrary(dllHandle);
         dllHandle = nullptr;
@@ -81,7 +89,8 @@ void ScriptModule::ReloadDLLIfUpdated()
                 lastWriteTime = currentWriteTime;
                 UnloadDLL();
 
-                while (IsFileLocked(dllPath) && running) std::this_thread::sleep_for(std::chrono::milliseconds(500));
+                while (IsFileLocked(dllPath) && running)
+                    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
                 if (!running) return;
                 if (lastWriteTime != fs::file_time_type {}) GLOG("DLL has been updated, reloading...\n");
