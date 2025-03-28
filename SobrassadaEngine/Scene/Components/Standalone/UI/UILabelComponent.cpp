@@ -51,7 +51,6 @@ void UILabelComponent::Init()
     {
         parent->CreateComponent(COMPONENT_TRANSFORM_2D);
         transform2D = static_cast<Transform2DComponent*>(parent->GetComponentByType(COMPONENT_TRANSFORM_2D));
-        transform2D->SetSize(App->GetWindowModule()->GetWidth(), App->GetWindowModule()->GetHeight());
     }
     else
     {
@@ -90,6 +89,7 @@ void UILabelComponent::Clone(const Component* other)
         fontSize  = otherLabel->fontSize;
         fontColor = otherLabel->fontColor;
 
+        fontData->Clean();
         fontData->Init("./EngineDefaults/Shader/Font/Arial.ttf", fontSize);
     }
     else
@@ -114,10 +114,20 @@ void UILabelComponent::Render(float deltaTime)
     const float4x4 proj = parentCanvas->IsInWorldSpaceEditor()
                             ? App->GetCameraModule()->GetProjectionMatrix()
                             : float4x4::D3DOrthoProjLH(
-                                  -1, 1, App->GetWindowModule()->GetWidth(), App->GetWindowModule()->GetHeight()
+                                  -1, 1, (float)App->GetWindowModule()->GetWidth(), (float)App->GetWindowModule()->GetHeight()
                               ); // near plane. far plane, screen width, screen height
 
-    glUniformMatrix4fv(0, 1, GL_TRUE, parent->GetGlobalTransform().ptr());
+    if (transform2D != nullptr)
+    {
+        float4x4 transform = parent->GetGlobalTransform();
+        transform.SetTranslatePart(float3(transform2D->position.x, transform2D->position.y, 0));
+        glUniformMatrix4fv(0, 1, GL_TRUE, transform.ptr());
+    }
+    else
+    {
+        // If the transform2D component is deleted, get the common global transform
+        glUniformMatrix4fv(0, 1, GL_TRUE, parent->GetGlobalTransform().ptr());
+    }
     glUniformMatrix4fv(1, 1, GL_TRUE, view.ptr());
     glUniformMatrix4fv(2, 1, GL_TRUE, proj.ptr());
 
@@ -140,6 +150,22 @@ void UILabelComponent::RenderEditorInspector()
         {
             if (fontSize < 1) fontSize = 1;
             OnFontChange();
+        }
+
+        const char* preview = "Arial";
+        if (ImGui::BeginCombo("combo 1", preview))
+        {
+            // TODO: Fonts could be a resource, so users can use the fonts they want and get loaded here
+
+            // for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+            //{
+            //     const bool is_selected = (item_selected_idx == n);
+            //     if (ImGui::Selectable(items[n], is_selected)) item_selected_idx = n;
+            //
+            //     // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+            //     if (is_selected) ImGui::SetItemDefaultFocus();
+            // }
+            ImGui::EndCombo();
         }
 
         ImGui::ColorPicker3("Font Color", fontColor.ptr());

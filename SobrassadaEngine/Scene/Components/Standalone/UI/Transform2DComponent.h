@@ -17,12 +17,10 @@ class Transform2DComponent : public Component
     void Render(float deltaTime) override;
     void RenderEditorInspector() override;
 
-    const float2& GetPosition() const { return position; }
-    const float2& GetSize() const { return size; }
-    void SetPosition(const float x, const float y) { position = float2(x, y); }
-    void SetSize(const float width, const float height) { size = float2(width, height); }
+    void UpdateParentTransform();
+    void OnTransform3DUpdated(const float4x4& transform3D);
 
-  private: 
+  public: 
     float2 position;
     float2 size;
 };

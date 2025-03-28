@@ -1,8 +1,8 @@
 #include "Transform2DComponent.h"
 #include "imgui.h"
 
-Transform2DComponent::Transform2DComponent(UID uid, GameObject* parent)
-    : Component(uid, parent, "Transform 2D", COMPONENT_TRANSFORM_2D)
+Transform2DComponent::Transform2DComponent(UID uid, GameObject* parent) 
+    : size(float2(50, 50)), Component(uid, parent, "Transform 2D", COMPONENT_TRANSFORM_2D)
 {
 }
 
@@ -75,11 +75,24 @@ void Transform2DComponent::RenderEditorInspector()
 
         if (ImGui::InputFloat2("Position", &position[0]))
         {
-            // Update transform
+            UpdateParentTransform();
         }
         if (ImGui::InputFloat2("Size", &size[0]))
         {
             // Update size
         }
     }
+}
+
+void Transform2DComponent::UpdateParentTransform()
+{
+    float4x4 transform = parent->GetGlobalTransform();
+    transform.SetTranslatePart(position.x, position.y, 0);
+    parent->SetLocalTransform(transform);
+}
+
+void Transform2DComponent::OnTransform3DUpdated(const float4x4& transform3D)
+{
+    position.x = transform3D.TranslatePart().x;
+    position.y = transform3D.TranslatePart().y;
 }

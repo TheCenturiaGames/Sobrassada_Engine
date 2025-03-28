@@ -13,8 +13,8 @@
 
 CanvasComponent::CanvasComponent(UID uid, GameObject* parent) : Component(uid, parent, "Canvas", COMPONENT_CANVAS)
 {
-    width  = App->GetWindowModule()->GetWidth();
-    height = App->GetWindowModule()->GetHeight();
+    width  = (float)App->GetWindowModule()->GetWidth();
+    height = (float)App->GetWindowModule()->GetHeight();
 }
 
 CanvasComponent::CanvasComponent(const rapidjson::Value& initialState, GameObject* parent)
