@@ -28,7 +28,6 @@ void ScriptModule::LoadDLL()
 
     createScriptFunc  = (CreateScriptFunc)GetProcAddress(dllHandle, "CreateScript");
     destroyScriptFunc = (DestroyScriptFunc)GetProcAddress(dllHandle, "DestroyScript");
-
     setAppFunc        = (SetApplicationFunc)GetProcAddress(dllHandle, "setApplication");
 
     if (!createScriptFunc || !destroyScriptFunc || !setAppFunc)
@@ -38,27 +37,10 @@ void ScriptModule::LoadDLL()
     }
 
     setAppFunc(App);
-
-    scriptInstance = createScriptFunc("MyScript");
-    if (!scriptInstance)
-    {
-        GLOG("Failed to instantiate script\n");
-        scriptInstance = nullptr;
-        return;
-    }
-    if (!scriptInstance->Init())
-    {
-        destroyScriptFunc(scriptInstance);
-    }
 }
 
 update_status ScriptModule::Update(float deltaTime)
 {
-    if (scriptInstance)
-    {
-        scriptInstance->Update(deltaTime);
-    }
-
     return UPDATE_CONTINUE;
 }
 
@@ -66,12 +48,6 @@ void ScriptModule::UnloadDLL()
 {
     if (dllHandle)
     {
-        if (scriptInstance)
-        {
-            destroyScriptFunc(scriptInstance);
-            scriptInstance = nullptr;
-        }
-
         createScriptFunc  = nullptr;
         destroyScriptFunc = nullptr;
 
@@ -94,7 +70,7 @@ bool ScriptModule::IsFileLocked(const std::filesystem::path& filePath)
 
 void ScriptModule::ReloadDLLIfUpdated()
 {
-    // This needs to be move into globals.h
+    // This needs to be move into globals.h and do it for debug and release
     const fs::path dllPath  = "..\\SobrassadaEngine\\x64\\Debug\\SobrassadaScripts.dll";
     const fs::path copyPath = "..\\Game";
 

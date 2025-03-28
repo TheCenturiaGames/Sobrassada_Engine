@@ -390,6 +390,9 @@
     <ClCompile Include="Modules\ScriptModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\Components\ScriptComponent.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -724,6 +727,9 @@
     </ClInclude>
     <ClInclude Include="Modules\ScriptModule.h">
       <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\ScriptComponent.h">
+      <Filter>Scene\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -21,7 +21,8 @@ class ScriptModule : public Module
     update_status Update(float deltaTime) override;
     bool ShutDown() override;
 
-    HMODULE getHandle() const { return dllHandle; }
+    Script* CreateScript(const std::string name) const { return createScriptFunc(name); }
+    void DestroyScript(Script* script) const { destroyScriptFunc(script); }
 
   private:
     void LoadDLL();
