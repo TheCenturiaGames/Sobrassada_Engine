@@ -656,6 +656,15 @@ void GameObject::RenderEditor()
     }
 }
 
+void GameObject::SetLocalTransform(const float4x4& newTransform)
+{
+    localTransform = newTransform;
+    position       = localTransform.TranslatePart();
+    rotation       = localTransform.RotatePart().ToEulerXYZ();
+    scale          = localTransform.GetScale();
+    UpdateTransformForGOBranch();
+}
+
 void GameObject::DrawGizmos() const
 {
     if (drawNodes) DrawNodes();
