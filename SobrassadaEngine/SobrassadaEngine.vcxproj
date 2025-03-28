@@ -205,8 +205,8 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>.\Libs\glew-2.1.0\lib;.\DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration)\;.\Libs\freetype\lib;.\Libs\Optick_1.4.0\lib\LibDebug;.\Libs\bullet\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>LinearMath_debug.lib;BulletCollision_debug.lib;BulletDynamics_debug.lib;OptickCore.lib;DirectXTex.lib;glew32.lib;opengl32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>.\Libs\glew-2.1.0\lib;.\DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration)\;.\Libs\freetype\lib;.\Libs\Optick_1.4.0\lib\LibDebug;.\Libs\bullet\lib;%(AdditionalLibraryDirectories);DirectXTex.lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>LinearMath_debug.lib;BulletCollision_debug.lib;BulletDynamics_debug.lib;OptickCore.lib;DirectXTex.lib;glew32.lib;opengl32.lib;freetype.lib;%(AdditionalDependencies);DirectXTex.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Game Debug|x64'">
@@ -440,11 +440,8 @@
     <ClInclude Include="ResourceManagement\Resources\ResourceStateMachine.h" />
     <ClInclude Include="Scene\Components\CameraComponent.h" />
     <ClInclude Include="UI\EngineEditors\Editor\NodeEditor.h" />
-    <ClInclude Include="UI\EngineEditors\Editor\TextureEditor.h">
+    <ClInclude Include="UI\EngineEditors\Editor\TextureEditor.h" />
     <ClInclude Include="UI\EngineEditors\Editor\PrefabEditor.h" />
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="UI\EngineEditors\Nodes\CustomNode.h" />
     <ClInclude Include="FileSystem\Importers\Importer.h" />
     <ClInclude Include="FileSystem\PrefabManager.h" />

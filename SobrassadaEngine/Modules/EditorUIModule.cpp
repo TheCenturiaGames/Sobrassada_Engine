@@ -15,7 +15,6 @@
 #include <SceneImporter.h>
 #include <TextureEditor.h>
 #include <TextureImporter.h>
-#include <TextureLibraryEditor.h>
 #include <PrefabEditor.h>
 
 #include "SDL.h"
@@ -1151,7 +1150,7 @@ EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
         return new TextureEditor("TextureEditor_" + std::to_string(uid), uid);
         break;
     case EditorType::PREFAB:
-        return new PrefabEditor("PrefabEditor" + std::to_string(uid), uid);
+        return new PrefabEditor("PrefabEditor_" + std::to_string(uid), uid);
 
     default:
         return nullptr;

@@ -25,7 +25,7 @@ enum EditorType
     BASE,
     ANIMATION,
     NODE,
-    PREFAB
+    PREFAB,
     TEXTURE
 };
 

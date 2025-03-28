@@ -2,6 +2,8 @@
 
 #include "EngineEditors/EngineEditorBase.h"
 
+class ResourcePrefab;
+
 class PrefabEditor : public EngineEditorBase
 {
   public:
@@ -10,4 +12,7 @@ class PrefabEditor : public EngineEditorBase
 
   private:
     bool RenderEditor() override;
+    ResourcePrefab* selectedPrefab = nullptr;
+
+
 };
