@@ -84,6 +84,7 @@ class GameObject
     Component* GetComponentByType(ComponentType type) const;
 
     MeshComponent* GetMeshComponent() const;
+    const float3& GetScale() const { return scale; } 
 
     void SetLocalTransform(const float4x4& newTransform) { localTransform = newTransform; }
     void DrawGizmos() const;
@@ -93,8 +94,8 @@ class GameObject
     void SetPrefabUID(const UID uid) { prefabUID = uid; }
     void SetMobility(ComponentMobilitySettings newMobility) { mobilitySettings = newMobility; };
 
-  private:
     void OnTransformUpdated();
+  private:
     void UpdateLocalTransform(const float4x4& parentGlobalTransform);
     void DrawNodes() const;
     void OnDrawConnectionsToggle();

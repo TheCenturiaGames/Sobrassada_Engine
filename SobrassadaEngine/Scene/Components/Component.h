@@ -25,6 +25,7 @@ class Component
 
     UID GetUID() const { return uid; }
     UID GetParentUID() const;
+    GameObject* GetParent() const { return parent; }
 
     const AABB& GetLocalAABB() const { return localComponentAABB; }
 
