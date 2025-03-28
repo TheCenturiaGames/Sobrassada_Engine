@@ -155,11 +155,11 @@ void MeshComponent::Update(float deltaTime)
 {
     if (batch == nullptr && currentMesh != nullptr && currentMaterial != nullptr)
     {
-        batch = App->GetResourcesModule()->GetBatchManager()->CreateNewBatch(this); // Editor Mode, single component for batch
+        batch = App->GetResourcesModule()->GetBatchManager()->CreateNewBatch(this
+        ); // Editor Mode, single component for batch
         batch->AddComponent(this);
         batch->LoadData();
     }
-        
 }
 
 void MeshComponent::Render(float deltaTime)

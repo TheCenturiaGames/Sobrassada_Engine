@@ -14,6 +14,9 @@
 #include "ResourcesModule.h"
 
 #include <SDL_mouse.h>
+#ifdef _DEBUG
+#include "optick.h"
+#endif
 
 SceneModule::SceneModule()
 {
@@ -61,6 +64,9 @@ update_status SceneModule::Render(float deltaTime)
 {
     if (loadedScene != nullptr)
     {
+#ifdef _DEBUG
+        OPTICK_CATEGORY("SceneModule::Render", Optick::Category::Rendering)
+#endif
         return loadedScene->Render(deltaTime);
     }
 

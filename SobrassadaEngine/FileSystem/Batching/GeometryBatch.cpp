@@ -155,10 +155,12 @@ void GeometryBatch::LoadData()
 
 void GeometryBatch::Render(const std::vector<MeshComponent*>& meshesToRender)
 {
+    {
 #ifdef _DEBUG
-    OPTICK_CATEGORY("GeometryBatch::WaitBuffer", Optick::Category::Wait)
+        OPTICK_CATEGORY("GeometryBatch::WaitBuffer", Optick::Category::Wait)
 #endif
-    WaitBuffer();
+        WaitBuffer();
+    }
 
 #ifdef _DEBUG
     OPTICK_CATEGORY("GeometryBatch::Render", Optick::Category::Rendering)

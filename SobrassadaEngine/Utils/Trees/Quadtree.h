@@ -76,20 +76,19 @@ class Quadtree
 template <typename AreaType>
 inline void Quadtree::QueryElements(const AreaType& queryObject, std::vector<GameObject*>& foundElements) const
 {
+#ifdef _DEBUG
+    OPTICK_CATEGORY("Quadtree::QueryElements", Optick::Category::GameLogic)
+#endif
     std::vector<bool> insertedElements = std::vector<bool>(totalElements, false);
 
     std::stack<const QuadtreeNode*> nodesToVisit;
     nodesToVisit.push(rootNode);
-#ifdef _DEBUG
-    OPTICK_CATEGORY("Quadtree::Bucle", Optick::Category::GameLogic)
-#endif
+
     while (!nodesToVisit.empty())
     {
         const QuadtreeNode* currentNode = nodesToVisit.top();
         nodesToVisit.pop();
-#ifdef _DEBUG
-        OPTICK_CATEGORY("Quadtree::Intersects", Optick::Category::GameLogic)
-#endif
+
         if (queryObject.Intersects(currentNode->currentArea))
         {
             if (currentNode->IsLeaf())

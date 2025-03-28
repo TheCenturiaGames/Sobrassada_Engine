@@ -4,6 +4,9 @@
 
 #include <stack>
 #include <vector>
+#ifdef _DEBUG
+#include "optick.h"
+#endif
 
 class GameObject;
 
@@ -72,6 +75,9 @@ class Octree
 template <typename AreaType>
 inline void Octree::QueryElements(const AreaType& queryObject, std::vector<GameObject*>& foundElements) const
 {
+#ifdef _DEBUG
+    OPTICK_CATEGORY("Octree::QueryElements", Optick::Category::GameLogic)
+#endif
     std::vector<bool> insertedElements = std::vector<bool>(totalElements, false);
 
     std::stack<OctreeNode*> nodesToVisit;

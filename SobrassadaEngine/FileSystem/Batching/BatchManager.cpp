@@ -15,6 +15,9 @@
 #include "Math/float3.h"
 #include "glew.h"
 #include <chrono>
+#ifdef _DEBUG
+#include "optick.h"
+#endif
 
 BatchManager::BatchManager()
 {
@@ -56,6 +59,9 @@ void BatchManager::LoadData()
 
 void BatchManager::Render(const std::vector<MeshComponent*>& meshesToRender)
 {
+#ifdef _DEBUG
+    OPTICK_CATEGORY("BatchManager::Render", Optick::Category::Rendering)
+#endif
     unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
 
     if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
