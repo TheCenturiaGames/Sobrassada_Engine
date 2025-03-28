@@ -2,21 +2,25 @@
 #include "Application.h"
 #include "DebugDrawModule.h"
 #include "DetourNavMeshBuilder.h"
+#include "DetourNavMeshQuery.h"
 #include "EditorUIModule.h"
 #include "FileSystem/Mesh.h"
+#include "Recast.h"
 #include "ResourceMesh.h"
 #include "ResourcesModule.h"
-#include "DetourNavMeshBuilder.h"
-#include "DetourNavMeshQuery.h"
 #include "algorithm"
-#include "Recast.h"
 
 ResourceNavMesh::~ResourceNavMesh()
 {
+    if (navQuery)
+    {
+        dtFreeNavMeshQuery(navQuery);
+        navQuery = nullptr;
+    }
     if (navMesh)
     {
-        dtFree(navMesh);   // Free the navMesh memory
-        navMesh = nullptr; // Set the pointer to null for safety
+        dtFreeNavMesh(navMesh); // Free the navMesh memory
+        navMesh = nullptr;      // Set the pointer to null for safety
     }
 
     if (polymesh)
@@ -30,25 +34,22 @@ ResourceNavMesh::~ResourceNavMesh()
         rcFreePolyMeshDetail(polymeshDetail); // Free the detail polymesh memory
         polymeshDetail = nullptr;
     }
-    if (navQuery)
+    if (config)
     {
-        dtFreeNavMeshQuery(navQuery);
-        navQuery = nullptr;
+        delete config;
     }
-
-    delete config;
 }
 
 ResourceNavMesh::ResourceNavMesh(UID uid, const std::string& name) : Resource(uid, name, ResourceType::Navmesh)
 {
-    config         = new rcConfig();
+    config          = new rcConfig();
     // Default Heightfield Options
     config->bmin[0] = config->bmin[1] = config->bmin[2] = 0.0f;
     config->bmax[0] = config->bmax[1] = config->bmax[2] = 0.0f;
-    config->cs                                        = 0.3f; // Default cell size
-    config->ch                                        = 0.2f; // Default cell height
-    config->width                                     = 1000; // Arbitrary default width
-    config->height                                    = 1000; // Arbitrary default height
+    config->cs                                          = 0.3f; // Default cell size
+    config->ch                                          = 0.2f; // Default cell height
+    config->width                                       = 1000; // Arbitrary default width
+    config->height                                      = 1000; // Arbitrary default height
 
     // Default Walkable Options
     config->walkableSlopeAngle                          = 45.0f; // Max slope an agent can walk on
@@ -57,7 +58,7 @@ ResourceNavMesh::ResourceNavMesh(UID uid, const std::string& name) : Resource(ui
     config->walkableRadius                              = 1;     // Agent radius
 
     // Default Partition Options
-    partitionType                                    = SAMPLE_PARTITION_MONOTONE;
+    partitionType                                       = SAMPLE_PARTITION_MONOTONE;
     config->minRegionArea                               = 4;  // Min region area (small regions will be removed)
     config->mergeRegionArea                             = 10; // Merge regions smaller than this size
 
@@ -71,23 +72,23 @@ ResourceNavMesh::ResourceNavMesh(UID uid, const std::string& name) : Resource(ui
     config->detailSampleMaxError                        = 0.5f; // Higher = more smooth, lower = accurate
 
     // Default Filters
-    m_filterLowHangingObstacles                      = true;
-    m_filterLedgeSpans                               = true;
-    m_filterWalkableLowHeightSpans                   = true;
+    m_filterLowHangingObstacles                         = true;
+    m_filterLedgeSpans                                  = true;
+    m_filterWalkableLowHeightSpans                      = true;
 
-    m_agentHeight                                    = 2.0f;
-    m_agentMaxClimb                                  = 0.5f;
-    m_agentRadius                                    = 0.5f;
+    m_agentHeight                                       = 2.0f;
+    m_agentMaxClimb                                     = 0.5f;
+    m_agentRadius                                       = 0.5f;
 
-    context                                          = nullptr;
-    heightfield                                      = nullptr;
-    compactHeightfield                               = nullptr;
-    triAreas                                         = nullptr;
-    contourSet                                       = nullptr;
-    polymesh                                         = nullptr;
-    polymeshDetail                                   = nullptr;
-    navMesh                                          = nullptr;
-    navQuery                                         = dtAllocNavMeshQuery();
+    context                                             = nullptr;
+    heightfield                                         = nullptr;
+    compactHeightfield                                  = nullptr;
+    triAreas                                            = nullptr;
+    contourSet                                          = nullptr;
+    polymesh                                            = nullptr;
+    polymeshDetail                                      = nullptr;
+    navMesh                                             = nullptr;
+    navQuery                                            = dtAllocNavMeshQuery();
 }
 // add together all meshes to create navmesh - needs the direction to a vector of resourcemesh pointers
 bool ResourceNavMesh::BuildNavMesh(
@@ -461,8 +462,8 @@ void ResourceNavMesh::RenderNavmeshEditor()
     };
     if (ImGui::ListBox("Partition Type", &currentIndex, partitionLabels, IM_ARRAYSIZE(partitionLabels)))
     {
-        currentSelection = static_cast<SamplePartitionType>(currentIndex); 
-        partitionType    = currentSelection;                               
+        currentSelection = static_cast<SamplePartitionType>(currentIndex);
+        partitionType    = currentSelection;
     }
 
     ImGui::DragInt("Minimum Region Area", &config->minRegionArea, 1, 1, 100);
