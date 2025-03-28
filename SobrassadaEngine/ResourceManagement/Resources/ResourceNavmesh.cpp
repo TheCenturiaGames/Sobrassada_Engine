@@ -112,8 +112,8 @@ bool ResourceNavMesh::BuildNavMesh(
     config->bmin[2] = minPoint[2];
 
     config->bmax[0] = maxPoint[0];
-    config->bmax[1] = maxPoint[0];
-    config->bmax[2] = maxPoint[0];
+    config->bmax[1] = maxPoint[1];
+    config->bmax[2] = maxPoint[2];
 
     std::vector<float> navmeshVertices;
     std::vector<int> navmeshTriangles;
