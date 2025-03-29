@@ -393,6 +393,9 @@
     <ClCompile Include="UI\EngineEditors\Nodes\StateNode.cpp">
       <Filter>UI\EngineEditors</Filter>
     </ClCompile>
+    <ClCompile Include="FileSystem\Meta\MetaStateMachine.cpp">
+      <Filter>FileSystem\Meta</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -727,6 +730,9 @@
     </ClInclude>
     <ClInclude Include="UI\EngineEditors\Nodes\StateNode.h">
       <Filter>UI\EngineEditors</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\Meta\MetaStateMachine.h">
+      <Filter>FileSystem\Meta</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

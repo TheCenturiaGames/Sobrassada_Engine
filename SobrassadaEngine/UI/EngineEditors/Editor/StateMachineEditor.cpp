@@ -247,6 +247,6 @@ void StateMachineEditor::SaveMachine()
 
 void StateMachineEditor::LoadMachine()
 {
-    UID stateMachineUid = 1782151504258605;
+    UID stateMachineUid = 1789842735177183;
     const ResourceStateMachine* stateMachine = (const ResourceStateMachine*)App->GetResourcesModule()->RequestResource(stateMachineUid);
 }

@@ -270,6 +270,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="FileSystem\Meta\MetaStateMachine.cpp" />
     <ClCompile Include="FileSystem\PrefabManager.cpp" />
     <ClCompile Include="FileSystem\Config\EngineConfig.cpp" />
     <ClCompile Include="FileSystem\Config\ProjectConfig.cpp" />
@@ -431,6 +432,7 @@
     <ClInclude Include="FileSystem\Config\ConfigFile.h" />
     <ClInclude Include="FileSystem\Config\EngineConfig.h" />
     <ClInclude Include="FileSystem\Config\ProjectConfig.h" />
+    <ClInclude Include="FileSystem\Meta\MetaStateMachine.h" />
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\include\ImNodeFlow.h" />
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\context_wrapper.h" />
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_bezier_math.h" />

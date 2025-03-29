@@ -3,7 +3,7 @@
 #include "Application.h"
 #include "FileSystem.h"
 #include "LibraryModule.h"
-#include "MetaModel.h"
+#include "MetaStateMachine.h"
 #include "ProjectModule.h"
 #include <ResourceStateMachine.h>
 
@@ -88,8 +88,23 @@ namespace StateMachineManager
         rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
         doc.Accept(writer);
 
-        std::string machinePath = STATEMACHINES_LIB_PATH + std::to_string(stateMachineUID) + STATEMACHINE_EXTENSION;
+         // Create meta file
+        std::string assetPath = STATEMACHINES_LIB_PATH + stateName + STATEMACHINE_EXTENSION;
+        MetaStateMachine meta(stateMachineUID, assetPath);
+        meta.Save(stateName, assetPath);
+        assetPath = App->GetProjectModule()->GetLoadedProjectPath() + STATEMACHINES_LIB_PATH + stateName +
+                    STATEMACHINE_EXTENSION;
+        // Save in assets
         unsigned int bytesWritten = (unsigned int
+        )FileSystem::Save(assetPath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
+        if (bytesWritten == 0)
+        {
+            GLOG("Failed to save stateMachine file: %s", assetPath.c_str());
+            return INVALID_UID;
+        }
+
+        std::string machinePath = STATEMACHINES_LIB_PATH + std::to_string(stateMachineUID) + STATEMACHINE_EXTENSION;
+        bytesWritten = (unsigned int
         )FileSystem::Save(machinePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
    
         if (bytesWritten == 0)
@@ -102,7 +117,7 @@ namespace StateMachineManager
         App->GetLibraryModule()->AddName(stateName, stateMachineUID);
         App->GetLibraryModule()->AddResource(machinePath, stateMachineUID);
 
-        Load(stateMachineUID);
+       // Load(stateMachineUID);
 
         return stateMachineUID;
 
