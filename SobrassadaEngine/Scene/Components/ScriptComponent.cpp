@@ -17,7 +17,6 @@ ScriptComponent::ScriptComponent(const rapidjson::Value& initialState, GameObjec
     if (initialState.HasMember("Script Name"))
     {
         CreateScript(initialState["Script Name"].GetString());
-        scriptInstance->Init();
     }
 }
 
@@ -40,7 +39,6 @@ void ScriptComponent::Clone(const Component* other)
         enabled                            = otherScript->enabled;
 
         CreateScript(otherScript->scriptName);
-        scriptInstance->Init();
     }
     else
     {
@@ -50,6 +48,7 @@ void ScriptComponent::Clone(const Component* other)
 
 void ScriptComponent::Update(float deltaTime)
 {
+    //scriptInstance->Init();
     if (scriptInstance != nullptr && App->GetSceneModule()->GetInPlayMode()) scriptInstance->Update(deltaTime);
 }
 
@@ -76,9 +75,7 @@ void ScriptComponent::RenderEditorInspector()
                 if (ImGui::Selectable(scriptType.c_str()))
                 {
                     if (scriptInstance != nullptr) DeleteScript();
-
                     CreateScript(scriptType);
-                    scriptInstance->Init();
                 }
             }
             ImGui::EndPopup();

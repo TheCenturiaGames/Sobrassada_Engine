@@ -24,7 +24,10 @@ class ScriptModule : public Module
     Script* CreateScript(const std::string name) const { return createScriptFunc(name); }
     void DestroyScript(Script* script) const { destroyScriptFunc(script); }
 
-    std::vector<LogEntry>* GetDLLConsoleLogs() { return setDLLConsoleLogsFunc(); }
+    std::vector<LogEntry>* GetDLLConsoleLogs() { 
+        if(setDLLConsoleLogsFunc != nullptr ) return setDLLConsoleLogsFunc();
+        return nullptr;
+    }
 
   private:
     void LoadDLL();
