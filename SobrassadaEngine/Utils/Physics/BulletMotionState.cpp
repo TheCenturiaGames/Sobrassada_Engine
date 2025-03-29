@@ -54,9 +54,17 @@ void BulletMotionState::setWorldTransform(const btTransform& physicsWorldTransfo
     finalOffsetTransform.setOrigin(centerOffset.getOrigin());
 
     btTransform gameObjectTransform = finalPhysicsTransform * finalOffsetTransform;
+    btMatrix3x3 rotationBasis       = gameObjectTransform.getBasis();
 
     float3x3 rotationMat;
-    gameObjectTransform.getOpenGLMatrix(rotationMat.ptr());
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int j = 0; j < 3; ++ j)
+        {
+            rotationMat[i][j] = rotationBasis[i][j];
+        }
+    }
+
 
     float3 newPosition = float3(
         gameObjectTransform.getOrigin().x(), gameObjectTransform.getOrigin().y(), gameObjectTransform.getOrigin().z()

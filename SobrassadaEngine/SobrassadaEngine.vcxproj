@@ -430,6 +430,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="Collider.h" />
     <ClInclude Include="Utils\Physics\BulletMotionState.h" />
     <ClInclude Include="Scene\Components\Standalone\Physics\CubeColliderComponent.h" />
     <ClInclude Include="DebugDraw\BulletDebugDraw.h" />

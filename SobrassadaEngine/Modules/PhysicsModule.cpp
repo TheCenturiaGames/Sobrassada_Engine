@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "BulletDebugDraw.h"
 #include "SceneModule.h"
+#include "Standalone/Physics/CubeColliderComponent.h"
 
 #include "Algorithm/Random/LCG.h"
 #include "btBulletDynamicsCommon.h"
@@ -31,7 +32,7 @@ bool PhysicsModule::Init()
 update_status PhysicsModule::PreUpdate(float deltaTime)
 {
     if (!App->GetSceneModule()->GetInPlayMode()) return UPDATE_CONTINUE;
-    
+
     dynamicsWorld->stepSimulation(deltaTime, 10);
 
     // print positions of all objects
@@ -43,10 +44,7 @@ update_status PhysicsModule::PreUpdate(float deltaTime)
         if (body && body->getMotionState())
         {
             body->getMotionState()->getWorldTransform(trans);
-        }
-        else
-        {
-            trans = obj->getWorldTransform();
+            body->getMotionState()->setWorldTransform(trans);
         }
     }
     return UPDATE_CONTINUE;
@@ -67,12 +65,22 @@ update_status PhysicsModule::PostUpdate(float deltaTime)
         dynamicsWorld->setGravity(btVector3(0, gravity, 0));
     }
 
+    // REMOVE RIGID BODIES
+    for (btRigidBody* rigidBody : bodiesToRemove)
+    {
+        dynamicsWorld->removeRigidBody(rigidBody);
+        btCollisionShape* shape = rigidBody->getCollisionShape();
+        delete shape;
+        delete rigidBody;
+    }
+    bodiesToRemove.clear();
+
     return UPDATE_CONTINUE;
 }
 
 bool PhysicsModule::ShutDown()
 {
-    DeleteWorld();
+    EmptyWorld();
 
     delete dynamicsWorld;
     delete solver;
@@ -83,99 +91,74 @@ bool PhysicsModule::ShutDown()
     return true;
 }
 
-void PhysicsModule::CreateWorld()
+void PhysicsModule::CreateCubeRigidBody(CubeColliderComponent* colliderComponent)
 {
-    DeleteWorld();
+    // Collision shape
+    btCollisionShape* collisionShape = new btBoxShape(btVector3(
+        btScalar(colliderComponent->size.x), btScalar(colliderComponent->size.y), btScalar(colliderComponent->size.z)
+    ));
 
-    // TODO, REPLACE WITH CURRENT SCENE LOADED DYNAMIC OBJECTS
+    // DYNAMIC -> THIS WILL COME FROM ENUM INSIDE COMPONENT
+    bool isDynamic                   = (colliderComponent->mass != 0.f);
 
-    // the ground is a cube of side 100 at position y = -56.
-    // the sphere will hit it at y = -6, with center at -5
-    {
-        btCollisionShape* groundShape = new btBoxShape(btVector3(btScalar(50.), btScalar(50.), btScalar(50.)));
+    // Inertia
+    btVector3 localInertia(0, 0, 0);
+    if (isDynamic) collisionShape->calculateLocalInertia(colliderComponent->mass, localInertia);
 
-        collisionShapes.push_back(groundShape);
+    // MotionState
+    colliderComponent->motionState = BulletMotionState(
+        colliderComponent, colliderComponent->centrerOffset, colliderComponent->centrerRotation,
+        colliderComponent->freezeRotation
+    );
 
-        btTransform groundTransform;
-        groundTransform.setIdentity();
-        groundTransform.setOrigin(btVector3(0, -56, 0));
+    // Creating final RigidBody
+    btRigidBody::btRigidBodyConstructionInfo rbInfo(
+        btScalar(colliderComponent->mass), &colliderComponent->motionState, collisionShape, localInertia
+    );
+    btRigidBody* newRigidBody = new btRigidBody(rbInfo);
 
-        btScalar mass(0.);
+    newRigidBody->setUserPointer(&colliderComponent->collider);
 
-        // rigidbody is dynamic if and only if mass is non zero, otherwise static
-        bool isDynamic = (mass != 0.f);
+    colliderComponent->rigidBody = newRigidBody;
 
-        btVector3 localInertia(0, 0, 0);
-        if (isDynamic) groundShape->calculateLocalInertia(mass, localInertia);
-
-        // using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
-        btDefaultMotionState* myMotionState = new btDefaultMotionState(groundTransform);
-        btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, groundShape, localInertia);
-        btRigidBody* body = new btRigidBody(rbInfo);
-
-        // add the body to the dynamics world
-        dynamicsWorld->addRigidBody(body);
-    }
-
-    LCG randomGen;
-
-    for (int i = 0; i < 1000; i++)
-    {
-        // create a dynamic rigidbody
-        btCollisionShape* colShape = new btBoxShape(btVector3(1, 1, 1));
-        // btCollisionShape* colShape = new btSphereShape(btScalar(1.));
-        collisionShapes.push_back(colShape);
-
-        /// Create Dynamic Objects
-        btTransform startTransform;
-        startTransform.setIdentity();
-
-        float x = randomGen.Float(-75, 75);
-        float y = randomGen.Float(1, 100);
-        float z = randomGen.Float(-75, 75);
-
-        startTransform.setOrigin(btVector3(x, y, z));
-
-        btScalar mass(1.f);
-
-        // rigidbody is dynamic if and only if mass is non zero, otherwise static
-        bool isDynamic = (mass != 0.f);
-
-        btVector3 localInertia(0, 0, 0);
-        if (isDynamic) colShape->calculateLocalInertia(mass, localInertia);
-
-        // using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active'
-        // objects
-        btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
-        btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, colShape, localInertia);
-        btRigidBody* body = new btRigidBody(rbInfo);
-
-        dynamicsWorld->addRigidBody(body);
-    }
+    // TODO UPDATE WITH CHANNELS
+    AddRigidBody(newRigidBody);
 }
 
-void PhysicsModule::DeleteWorld()
+void PhysicsModule::UpdateCubeRigidBody(CubeColliderComponent* colliderComponent)
 {
-    // TODO REMOVE, JUST FOR TESTING
-    for (int j = 0; j < collisionShapes.size(); j++)
+    DeleteCubeRigidBody(colliderComponent);
+    CreateCubeRigidBody(colliderComponent);
+}
+
+void PhysicsModule::DeleteCubeRigidBody(CubeColliderComponent* colliderComponent)
+{
+    bodiesToRemove.push_back(colliderComponent->rigidBody);
+    colliderComponent->rigidBody = nullptr;
+}
+
+// TODO UPDATE WITH CHANNELS
+void PhysicsModule::AddRigidBody(btRigidBody* rigidBody)
+{
+    dynamicsWorld->addRigidBody(rigidBody);
+}
+
+void PhysicsModule::EmptyWorld()
+{
+    // REMOVE RIGID BODIES
+    for (btRigidBody* rigidBody : bodiesToRemove)
     {
-        btCollisionShape* shape = collisionShapes[j];
-        collisionShapes[j]      = 0;
+        dynamicsWorld->removeRigidBody(rigidBody);
+        btCollisionShape* shape = rigidBody->getCollisionShape();
         delete shape;
+        delete rigidBody;
     }
-    // -------
 
-    collisionShapes.clear();
+    bodiesToRemove.clear();
 
-    // EMPTY CURRENT WORLD
     for (int i = dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i--)
     {
         btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[i];
-        btRigidBody* body      = btRigidBody::upcast(obj);
-        if (body && body->getMotionState())
-        {
-            delete body->getMotionState();
-        }
         dynamicsWorld->removeCollisionObject(obj);
         delete obj;
     }

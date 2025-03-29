@@ -2,6 +2,7 @@
 
 #include "BulletMotionState.h"
 #include "Component.h"
+#include "Collider.h"
 
 #include "Math/float3.h"
 
@@ -22,14 +23,16 @@ class CubeColliderComponent : public Component
     void Update(float deltaTime) override;
     void Render(float deltaTime) override;
 
-  private:
+
+  public:
     btRigidBody* rigidBody        = nullptr;
 
     bool freezeRotation           = false;
-    float mass                    = 0.f;
+    float mass                    = 1.f;
     float3 centrerOffset          = float3::zero;
     float3 centrerRotation        = float3::zero;
     float3 size                   = float3::one;
 
     BulletMotionState motionState = BulletMotionState(nullptr, float3::zero, float3::zero, false);
+    Collider collider             = Collider(this, ComponentType::COMPONENT_CUBE_COLLIDER);
 };

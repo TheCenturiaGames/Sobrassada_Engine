@@ -84,6 +84,8 @@ class GameObject
     Component* GetComponentByType(ComponentType type) const;
 
     MeshComponent* GetMeshComponent() const;
+    const float3& GetPosition() const { return position; } 
+    const float3& GetRotation() const { return rotation; } 
     const float3& GetScale() const { return scale; } 
 
     void SetLocalTransform(const float4x4& newTransform) { localTransform = newTransform; }

@@ -11,6 +11,7 @@ class btBroadphaseInterface;
 class btSequentialImpulseConstraintSolver;
 class btDiscreteDynamicsWorld;
 class BulletDebugDraw;
+class btRigidBody;
 
 class CubeColliderComponent;
 
@@ -38,11 +39,15 @@ class PhysicsModule : public Module
         gravity       = newGravity;
         updateGravity = true;
     };
+  
+    void CreateCubeRigidBody(CubeColliderComponent* colliderComponent);
+    void UpdateCubeRigidBody(CubeColliderComponent* colliderComponent);
+    void DeleteCubeRigidBody(CubeColliderComponent* colliderComponent);
 
-    void CreateWorld();
-    void DeleteWorld();
-
+    void EmptyWorld();
   private:
+    // TODO UPDATE WITH CHANNELS
+    void AddRigidBody(btRigidBody* colliderComponent);
 
   private:
     float gravity                                           = DEFAULT_GRAVITY;
@@ -54,8 +59,11 @@ class PhysicsModule : public Module
     btSequentialImpulseConstraintSolver* solver             = nullptr;
     btDiscreteDynamicsWorld* dynamicsWorld                  = nullptr;
 
+    std::vector<btRigidBody*> bodiesToRemove;
+
     BulletDebugDraw* debugDraw                              = nullptr;
 
     // TODO REMOVE, JUST FOR TESTING
     std::vector<btCollisionShape*> collisionShapes;
+
 };

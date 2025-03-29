@@ -165,7 +165,6 @@ void SceneModule::CloseScene()
     delete loadedScene;
     loadedScene = nullptr;
     if (App->GetResourcesModule() != nullptr) App->GetResourcesModule()->UnloadAllResources();
-    App->GetPhysicsModule()->DeleteWorld();
 }
 
 void SceneModule::SwitchPlayMode(bool play)

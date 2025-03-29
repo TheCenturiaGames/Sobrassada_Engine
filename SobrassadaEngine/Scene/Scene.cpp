@@ -88,6 +88,8 @@ Scene::~Scene()
     sceneOctree  = nullptr;
     dynamicTree  = nullptr;
 
+    App->GetPhysicsModule()->EmptyWorld();
+
     GLOG("%s scene closed", sceneName.c_str());
 }
 
@@ -128,8 +130,6 @@ void Scene::Init()
 
     UpdateStaticSpatialStructure();
     UpdateDynamicSpatialStructure();
-
-    App->GetPhysicsModule()->CreateWorld();
 }
 
 void Scene::Save(
