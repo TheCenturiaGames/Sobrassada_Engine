@@ -82,10 +82,10 @@ void BatchManager::Render(const std::vector<MeshComponent*>& meshesToRender)
 
         if (batchMeshes.empty()) continue;
 
-        unsigned int program = it->GetIsMetallic() ? App->GetShaderModule()->GetMetallicRoughnessProgram()
-                                                   : App->GetShaderModule()->GetSpecularGlossinessProgram();
+        const unsigned int program = it->GetIsMetallic() ? App->GetShaderModule()->GetMetallicRoughnessProgram()
+                                                         : App->GetShaderModule()->GetSpecularGlossinessProgram();
 
-        const auto start     = std::chrono::high_resolution_clock::now();
+        const auto start           = std::chrono::high_resolution_clock::now();
 
         glUseProgram(program);
 

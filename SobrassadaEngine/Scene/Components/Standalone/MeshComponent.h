@@ -49,7 +49,11 @@ class MeshComponent : public Component
     }
     void SetBindMatrices(const std::vector<float4x4>& bindTransforms) { this->bindMatrices = bindTransforms; }
     void SetModelUID(const UID newModelUID) { this->modelUID = newModelUID; }
-    void SetSkinIndex(const int newIndex) { this->skinIndex = newIndex; }
+    void SetSkinIndex(const int newIndex)
+    {
+        this->skinIndex = newIndex;
+        hasBones        = true;
+    }
 
     void OnTransformUpdated();
 
@@ -75,5 +79,5 @@ class MeshComponent : public Component
     float4x4 combinedMatrix = float4x4::identity;
 
     GeometryBatch* batch    = nullptr;
-    bool editorMesh         = false;
+    bool uniqueBatch        = false;
 };

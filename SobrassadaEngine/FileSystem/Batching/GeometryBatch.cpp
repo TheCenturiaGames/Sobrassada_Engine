@@ -32,7 +32,11 @@ GeometryBatch::GeometryBatch(const MeshComponent* component)
     glGenBuffers(1, &vbo);
     glGenBuffers(1, &ebo);
     glGenBuffers(2, models);
-    if (hasBones) glGenBuffers(2, bones);
+    if (hasBones)
+    {
+        glGenBuffers(2, bones);
+        glGenBuffers(1, &bonesIndex);
+    }
     glGenBuffers(1, &materials);
     gSync[0]     = nullptr;
     gSync[1]     = nullptr;
@@ -48,8 +52,6 @@ GeometryBatch::~GeometryBatch()
     componentsMap.clear();
     uniqueMeshesMap.clear();
     uniqueMeshesCount.clear();
-    bonesGameObject.clear();
-    bindMatrices.clear();
 
     CleanUp();
     glUseProgram(0);
@@ -59,6 +61,7 @@ GeometryBatch::~GeometryBatch()
     glDeleteBuffers(1, &ebo);
     glDeleteBuffers(2, models);
     glDeleteBuffers(2, bones);
+    glDeleteBuffers(1, &bonesIndex);
     glDeleteBuffers(1, &materials);
 }
 
@@ -80,9 +83,12 @@ void GeometryBatch::LoadData()
     std::vector<unsigned int> totalIndices;
     std::vector<float4x4> totalModels;
     std::vector<MaterialGPU> totalMaterials;
+    std::vector<std::vector<GameObject*>> bonesGameObject;
+    std::vector<std::vector<float4x4>> bindMatrices;
 
     unsigned int accVertexCount = 0;
     unsigned int accIndexCount  = 0;
+    unsigned int accBonesCount  = 0;
     for (const auto& component : components)
     {
         const ResourceMesh* resource = component->GetResourceMesh();
@@ -111,6 +117,9 @@ void GeometryBatch::LoadData()
         {
             bonesGameObject.push_back(component->GetBonesGO());
             bindMatrices.push_back(component->GetBindMatrices());
+            bonesCount.push_back(accBonesCount);
+
+            accBonesCount += static_cast<unsigned int>(component->GetBonesGO().size());
         }
     }
 
@@ -144,8 +153,8 @@ void GeometryBatch::LoadData()
 
     glBindVertexArray(0);
 
-    modelsSize       = totalModels.size() * sizeof(float4x4);
-    GLbitfield flags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT;
+    modelsSize             = totalModels.size() * sizeof(float4x4);
+    const GLbitfield flags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT;
     for (int i = 0; i < 2; i++)
     {
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, models[i]);
@@ -161,7 +170,7 @@ void GeometryBatch::LoadData()
 
         if (!hasBones) continue;
 
-        bonesSize = bindMatrices.size() * sizeof(float4x4) * PALETTE_SIZE;
+        bonesSize = accBonesCount * sizeof(float4x4);
 
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, bones[i]);
 
@@ -173,6 +182,10 @@ void GeometryBatch::LoadData()
             GLOG("Error mapping ssbo bones %d", i);
             return;
         }
+
+        bonesIndexSize = bonesCount.size() * sizeof(unsigned int);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, bonesIndex);
+        glBufferData(GL_SHADER_STORAGE_BUFFER, bonesIndexSize, bonesCount.data(), GL_STATIC_DRAW);
     }
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, materials);
@@ -194,10 +207,7 @@ void GeometryBatch::Render(const std::vector<MeshComponent*>& meshesToRender)
     OPTICK_CATEGORY("GeometryBatch::Render", Optick::Category::Rendering)
 #endif
     std::vector<Command> commands;
-    GenerateCommandsAndSSBO(meshesToRender, commands);
-
-    glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirect);
-    glBufferData(GL_DRAW_INDIRECT_BUFFER, commands.size() * sizeof(Command), commands.data(), GL_DYNAMIC_DRAW);
+    GenerateCommands(meshesToRender, commands);
 
     UpdateBones(meshesToRender);
 
@@ -205,6 +215,9 @@ void GeometryBatch::Render(const std::vector<MeshComponent*>& meshesToRender)
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, materials);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 11, materials);
+
+    glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirect);
+    glBufferData(GL_DRAW_INDIRECT_BUFFER, commands.size() * sizeof(Command), commands.data(), GL_DYNAMIC_DRAW);
 
     glBindVertexArray(vao);
 
@@ -218,19 +231,19 @@ void GeometryBatch::Render(const std::vector<MeshComponent*>& meshesToRender)
     LockBuffer();
 }
 
-void GeometryBatch::GenerateCommandsAndSSBO(const std::vector<MeshComponent*>& meshes, std::vector<Command>& commands)
+void GeometryBatch::GenerateCommands(const std::vector<MeshComponent*>& meshes, std::vector<Command>& commands)
 {
     totalVertexCount = 0;
     totalIndexCount  = 0;
 
     for (const MeshComponent* component : meshes)
     {
-        const ResourceMesh* resource = component->GetResourceMesh();
+        const ResourceMesh* resource   = component->GetResourceMesh();
 
-        unsigned int vertexCount     = static_cast<unsigned int>(resource->GetVertexCount());
-        unsigned int indexCount      = static_cast<unsigned int>(resource->GetIndexCount());
+        const unsigned int vertexCount = static_cast<unsigned int>(resource->GetVertexCount());
+        const unsigned int indexCount  = static_cast<unsigned int>(resource->GetIndexCount());
 
-        std::size_t idx              = uniqueMeshesMap[resource];
+        const std::size_t idx          = uniqueMeshesMap[resource];
 
         Command newCommand;
         newCommand.count          = indexCount;                            // Number of indices in the mesh
@@ -263,26 +276,30 @@ void GeometryBatch::UpdateBones(const std::vector<MeshComponent*>& meshesToRende
 {
     if (hasBones)
     {
-        int nextBufferIndex  = (currentBufferIndex + 1) % 2;
-        GLuint nextBuffer    = bones[nextBufferIndex];
-        GLuint currentBuffer = bones[currentBufferIndex];
+        const int nextBufferIndex  = (currentBufferIndex + 1) % 2;
+        const GLuint nextBuffer    = bones[nextBufferIndex];
+        const GLuint currentBuffer = bones[currentBufferIndex];
 
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, nextBuffer);
 
         for (const MeshComponent* component : meshesToRender)
         {
-            std::size_t index        = componentsMap[component];
-            std::size_t indexPalette = index * PALETTE_SIZE;
-            for (size_t i = 0; i < PALETTE_SIZE; ++i)
+            const std::size_t index                         = componentsMap[component];
+            const std::size_t accBones                      = bonesCount[index];
+            const std::vector<GameObject*>& bonesGameObject = component->GetBonesGO();
+            const std::vector<float4x4>& bindMatrices       = component->GetBindMatrices();
+            for (size_t i = 0; i < bonesGameObject.size(); ++i)
             {
-                ptrBones[nextBufferIndex][indexPalette + i] =
-                    bonesGameObject[index][i]->GetGlobalTransform() * bindMatrices[index][i];
+                ptrBones[nextBufferIndex][accBones + i] = bonesGameObject[i]->GetGlobalTransform() * bindMatrices[i];
             }
         }
         glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
 
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, currentBuffer);
         glBindBufferRange(GL_SHADER_STORAGE_BUFFER, 12, currentBuffer, 0, bonesSize);
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, bonesIndex);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 13, bonesIndex);
 
         glUniform1i(4, 1); // mesh has bones
     }
@@ -291,15 +308,15 @@ void GeometryBatch::UpdateBones(const std::vector<MeshComponent*>& meshesToRende
 
 void GeometryBatch::UpdateModels(const std::vector<MeshComponent*>& meshesToRender)
 {
-    int nextBufferIndex  = (currentBufferIndex + 1) % 2;
-    GLuint nextBuffer    = models[nextBufferIndex];
-    GLuint currentBuffer = models[currentBufferIndex];
+    const int nextBufferIndex  = (currentBufferIndex + 1) % 2;
+    const GLuint nextBuffer    = models[nextBufferIndex];
+    const GLuint currentBuffer = models[currentBufferIndex];
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, nextBuffer);
 
     for (const MeshComponent* component : meshesToRender)
     {
-        std::size_t index                 = componentsMap[component];
+        const std::size_t index           = componentsMap[component];
         ptrModels[nextBufferIndex][index] = component->GetCombinedMatrix();
     }
     glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);

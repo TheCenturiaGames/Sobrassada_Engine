@@ -8,7 +8,6 @@
 class MeshComponent;
 class ResourceMesh;
 class MeshComponent;
-class GameObject;
 struct Command;
 struct MaterialGPU;
 typedef struct __GLsync* GLsync;
@@ -43,7 +42,7 @@ class GeometryBatch
     void UpdateBones(const std::vector<MeshComponent*>& meshesToRender);
     void WaitBuffer();
 
-    void GenerateCommandsAndSSBO(const std::vector<MeshComponent*>& meshes, std::vector<Command>& commands);
+    void GenerateCommands(const std::vector<MeshComponent*>& meshes, std::vector<Command>& commands);
 
     void CleanUp();
 
@@ -62,10 +61,11 @@ class GeometryBatch
     std::size_t modelsSize = 0;
 
     GLuint bones[2]        = {0, 0};
+    GLuint bonesIndex      = 0;
     float4x4* ptrBones[2]  = {nullptr, nullptr};
-    std::vector<std::vector<GameObject*>> bonesGameObject;
-    std::vector<std::vector<float4x4>> bindMatrices;
-    std::size_t bonesSize         = 0;
+    std::size_t bonesSize  = 0;
+    std::size_t bonesIndexSize  = 0;
+    std::vector<unsigned int> bonesCount;
 
     unsigned int totalVertexCount = 0;
     unsigned int totalIndexCount  = 0;
