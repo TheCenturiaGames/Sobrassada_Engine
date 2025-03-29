@@ -31,7 +31,6 @@ namespace TextManager
             glGenTextures(1, &texture);
             glBindTexture(GL_TEXTURE_2D, texture);
 
-            unsigned char whitePixel[1] = {100};
             glTexImage2D(
                 GL_TEXTURE_2D, 0, GL_R8, face->glyph->bitmap.width, face->glyph->bitmap.rows, 0, GL_RED,
                 GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer
@@ -41,7 +40,7 @@ namespace TextManager
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-            // Store the daa of the character texture
+            // Store the data of the character texture
             Character character = {
                 texture,
                 float2(static_cast<float>(face->glyph->bitmap.width), static_cast<float>(face->glyph->bitmap.rows)),
@@ -118,15 +117,15 @@ namespace TextManager
                 y -= fontData.fontSize;
             }
 
-            Character character = fontData.characters[c];
+            const Character character  = fontData.characters[c];
 
-            float xPos          = x + character.bearing.x;
-            float yPos          = y - (character.size.y - character.bearing.y);
-            float width         = character.size.x;
-            float height        = character.size.y;
+            const float xPos          = x + character.bearing.x;
+            const float yPos          = y - (character.size.y - character.bearing.y);
+            const float width         = character.size.x;
+            const float height        = character.size.y;
 
             // Positions - Uvs interleaved
-            float vertices[]    = {xPos,         yPos + height, 0.0f,         0.0f, xPos, yPos,
+            const float vertices[]    = {xPos,         yPos + height, 0.0f,         0.0f, xPos, yPos,
                                    0.0f,         1.0f,          xPos + width, yPos, 1.0f, 1.0f,
 
                                    xPos + width, yPos + height, 1.0f,         0.0f, xPos, yPos + height,

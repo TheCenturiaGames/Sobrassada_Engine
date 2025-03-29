@@ -24,11 +24,11 @@ class GameUIModule : public Module
     bool ShutDown() override;
 
     void OnWindowResize(const unsigned int width, const unsigned int height);
-    void AddCanvas(CanvasComponent* newCanvas) { canvas.push_back(newCanvas); }
+    void AddCanvas(CanvasComponent* newCanvas) { canvases.push_back(newCanvas); }
     void RemoveCanvas(CanvasComponent* canvasToRemove);
 
   private:
-    std::vector<CanvasComponent*> canvas;
+    std::vector<CanvasComponent*> canvases;
 
     unsigned int uiWidgetProgram = 0;
 };

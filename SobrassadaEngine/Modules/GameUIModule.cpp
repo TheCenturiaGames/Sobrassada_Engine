@@ -26,7 +26,7 @@ update_status GameUIModule::Update(float deltaTime)
 
 update_status GameUIModule::Render(float deltaTime)
 {
-    for (CanvasComponent* canvas : canvas)
+    for (CanvasComponent* canvas : canvases)
     {
         canvas->Render(deltaTime);
     }
@@ -41,7 +41,7 @@ bool GameUIModule::ShutDown()
 
 void GameUIModule::OnWindowResize(const unsigned int width, const unsigned int height)
 {
-    for (CanvasComponent* canvas : canvas)
+    for (CanvasComponent* canvas : canvases)
     {
         canvas->OnWindowResize(width, height);
     }
@@ -49,9 +49,9 @@ void GameUIModule::OnWindowResize(const unsigned int width, const unsigned int h
 
 void GameUIModule::RemoveCanvas(CanvasComponent* canvasToRemove)
 {
-    const auto& iterator = std::find(canvas.begin(), canvas.end(), canvasToRemove);
-    if (iterator != canvas.end())
+    const auto& iterator = std::find(canvases.begin(), canvases.end(), canvasToRemove);
+    if (iterator != canvases.end())
     {
-        canvas.erase(iterator);
+        canvases.erase(iterator);
     }
 }

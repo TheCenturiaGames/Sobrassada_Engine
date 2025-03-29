@@ -16,7 +16,7 @@ class UILabelComponent : public Component
   public:
     UILabelComponent(UID uid, GameObject* parent);
     UILabelComponent(const rapidjson::Value& initialState, GameObject* parent);
-    ~UILabelComponent();
+    ~UILabelComponent() override;
 
     void Init() override;
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;

@@ -9,7 +9,7 @@ class CanvasComponent : public Component
   public:
     CanvasComponent(UID uid, GameObject* parent);
     CanvasComponent(const rapidjson::Value& initialState, GameObject* parent);
-    ~CanvasComponent();
+    ~CanvasComponent() override;
 
     void Init() override;
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;

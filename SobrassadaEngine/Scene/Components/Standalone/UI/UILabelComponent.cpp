@@ -60,6 +60,8 @@ void UILabelComponent::Init()
         transform2D = transform;
     }
 
+    transform2D->size.x = 400;  // Custom size to fit the sample text
+
     GetParentCanvas();
 
     fontData->Init("./EngineDefaults/Shader/Font/Arial.ttf", fontSize);
@@ -106,7 +108,7 @@ void UILabelComponent::Update(float deltaTime)
 
 void UILabelComponent::Render(float deltaTime)
 {
-    int uiProgram = App->GetShaderModule()->GetUIWidgetProgram();
+    const int uiProgram = App->GetShaderModule()->GetUIWidgetProgram();
     if (uiProgram == -1) GLOG("Error with UI Program");
 
     glUseProgram(uiProgram);
