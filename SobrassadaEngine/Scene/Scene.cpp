@@ -74,8 +74,6 @@ Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUI
     }
 
     GLOG("%s scene loaded", sceneName.c_str());
-
-    App->GetResourcesModule()->GetBatchManager()->LoadData();
 }
 
 Scene::~Scene()
@@ -128,6 +126,8 @@ void Scene::Init()
         MeshComponent* mesh = gameObject.second->GetMeshComponent();
         if (mesh != nullptr) mesh->InitSkin();
     }
+
+    App->GetResourcesModule()->GetBatchManager()->LoadData();
 
     lightsConfig->InitSkybox();
     lightsConfig->InitLightBuffers();

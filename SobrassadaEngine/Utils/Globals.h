@@ -134,6 +134,7 @@ constexpr float RAD_DEGREE_CONV                         = 180.f / PI;
 constexpr float DEGREE_RAD_CONV                         = PI / 180.f;
 
 constexpr float MINIMUM_TREE_LEAF_SIZE                  = 5.f;
+constexpr int PALETTE_SIZE                              = 64;
 
 inline UID GenerateUID()
 {

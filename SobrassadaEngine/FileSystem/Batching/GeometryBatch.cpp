@@ -1,5 +1,7 @@
 #include "GeometryBatch.h"
 
+#include "GameObject.h"
+#include "Globals.h"
 #include "Mesh.h"
 #include "ResourceMaterial.h"
 #include "ResourceMesh.h"
@@ -19,23 +21,25 @@ struct Command
     unsigned int baseInstance;  // Instance Index
 };
 
-GeometryBatch::GeometryBatch(const MeshComponent* component, int id)
-    : id(id), mode(component->GetResourceMesh()->GetMode()), totalVertexCount(0), totalIndexCount(0),
-      currentBufferIndex(0)
+GeometryBatch::GeometryBatch(const MeshComponent* component)
+    : totalVertexCount(0), totalIndexCount(0), currentBufferIndex(0)
 {
+    mode       = component->GetResourceMesh()->GetMode();
     isMetallic = component->GetResourceMaterial()->GetIsMetallicRoughness();
+    hasBones   = component->GetHasBones();
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &indirect);
     glGenBuffers(1, &vbo);
     glGenBuffers(1, &ebo);
     glGenBuffers(2, models);
+    if (hasBones) glGenBuffers(2, bones);
     glGenBuffers(1, &materials);
     gSync[0]     = nullptr;
     gSync[1]     = nullptr;
     ptrModels[0] = nullptr;
     ptrModels[1] = nullptr;
-
-    GLOG("Batch %d created", id);
+    ptrBones[0]  = nullptr;
+    ptrBones[1]  = nullptr;
 }
 
 GeometryBatch::~GeometryBatch()
@@ -44,6 +48,8 @@ GeometryBatch::~GeometryBatch()
     componentsMap.clear();
     uniqueMeshesMap.clear();
     uniqueMeshesCount.clear();
+    bonesGameObject.clear();
+    bindMatrices.clear();
 
     CleanUp();
     glUseProgram(0);
@@ -52,6 +58,7 @@ GeometryBatch::~GeometryBatch()
     glDeleteBuffers(1, &vbo);
     glDeleteBuffers(1, &ebo);
     glDeleteBuffers(2, models);
+    glDeleteBuffers(2, bones);
     glDeleteBuffers(1, &materials);
 }
 
@@ -62,6 +69,8 @@ void GeometryBatch::CleanUp()
         if (gSync[i]) glDeleteSync(gSync[i]);
 
         if (ptrModels[i]) glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
+        if (ptrBones[i]) glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
     }
 }
 
@@ -97,6 +106,12 @@ void GeometryBatch::LoadData()
         componentsMap[component] = componentsMap.size();
         totalModels.push_back(component->GetCombinedMatrix());
         totalMaterials.push_back(component->GetResourceMaterial()->GetMaterial());
+
+        if (hasBones)
+        {
+            bonesGameObject.push_back(component->GetBonesGO());
+            bindMatrices.push_back(component->GetBindMatrices());
+        }
     }
 
     glBindVertexArray(vao);
@@ -143,14 +158,27 @@ void GeometryBatch::LoadData()
             GLOG("Error mapping ssbo model %d", i);
             return;
         }
+
+        if (!hasBones) continue;
+
+        bonesSize = bindMatrices.size() * sizeof(float4x4) * PALETTE_SIZE;
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, bones[i]);
+
+        glBufferStorage(GL_SHADER_STORAGE_BUFFER, bonesSize, bindMatrices.data(), flags);
+        ptrBones[i] = (float4x4*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, bonesSize, flags);
+
+        if (ptrBones[i] == nullptr)
+        {
+            GLOG("Error mapping ssbo bones %d", i);
+            return;
+        }
     }
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, materials);
     glBufferData(
         GL_SHADER_STORAGE_BUFFER, totalMaterials.size() * sizeof(MaterialGPU), totalMaterials.data(), GL_STATIC_DRAW
     );
-
-    GLOG("Batch %d loaded succesfully", id);
 }
 
 void GeometryBatch::Render(const std::vector<MeshComponent*>& meshesToRender)
@@ -171,7 +199,9 @@ void GeometryBatch::Render(const std::vector<MeshComponent*>& meshesToRender)
     glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirect);
     glBufferData(GL_DRAW_INDIRECT_BUFFER, commands.size() * sizeof(Command), commands.data(), GL_DYNAMIC_DRAW);
 
-    UpdateBuffer(meshesToRender);
+    UpdateBones(meshesToRender);
+
+    UpdateModels(meshesToRender);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, materials);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 11, materials);
@@ -229,7 +259,37 @@ void GeometryBatch::WaitBuffer()
     }
 }
 
-void GeometryBatch::UpdateBuffer(const std::vector<MeshComponent*>& meshesToRender)
+void GeometryBatch::UpdateBones(const std::vector<MeshComponent*>& meshesToRender)
+{
+    if (hasBones)
+    {
+        int nextBufferIndex  = (currentBufferIndex + 1) % 2;
+        GLuint nextBuffer    = bones[nextBufferIndex];
+        GLuint currentBuffer = bones[currentBufferIndex];
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, nextBuffer);
+
+        for (const MeshComponent* component : meshesToRender)
+        {
+            std::size_t index        = componentsMap[component];
+            std::size_t indexPalette = index * PALETTE_SIZE;
+            for (size_t i = 0; i < PALETTE_SIZE; ++i)
+            {
+                ptrBones[nextBufferIndex][indexPalette + i] =
+                    bonesGameObject[index][i]->GetGlobalTransform() * bindMatrices[index][i];
+            }
+        }
+        glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, currentBuffer);
+        glBindBufferRange(GL_SHADER_STORAGE_BUFFER, 12, currentBuffer, 0, bonesSize);
+
+        glUniform1i(4, 1); // mesh has bones
+    }
+    else glUniform1i(4, 0); // meshes has no bones
+}
+
+void GeometryBatch::UpdateModels(const std::vector<MeshComponent*>& meshesToRender)
 {
     int nextBufferIndex  = (currentBufferIndex + 1) % 2;
     GLuint nextBuffer    = models[nextBufferIndex];

@@ -8,6 +8,7 @@
 class MeshComponent;
 class ResourceMesh;
 class MeshComponent;
+class GameObject;
 struct Command;
 struct MaterialGPU;
 typedef struct __GLsync* GLsync;
@@ -22,7 +23,7 @@ struct AccMeshCount
 class GeometryBatch
 {
   public:
-    GeometryBatch(const MeshComponent* component, int id);
+    GeometryBatch(const MeshComponent* component);
     ~GeometryBatch();
 
     void LoadData();
@@ -32,12 +33,14 @@ class GeometryBatch
 
     const unsigned int GetMode() const { return mode; }
     const bool GetIsMetallic() const { return isMetallic; }
+    const bool GetHasBones() const { return hasBones; }
     const unsigned int GetVertexCount() const { return totalVertexCount; }
     const unsigned int GetIndexCount() const { return totalIndexCount; }
 
   private:
     void LockBuffer();
-    void UpdateBuffer(const std::vector<MeshComponent*>& meshesToRender);
+    void UpdateModels(const std::vector<MeshComponent*>& meshesToRender);
+    void UpdateBones(const std::vector<MeshComponent*>& meshesToRender);
     void WaitBuffer();
 
     void GenerateCommandsAndSSBO(const std::vector<MeshComponent*>& meshes, std::vector<Command>& commands);
@@ -45,18 +48,24 @@ class GeometryBatch
     void CleanUp();
 
   private:
-    int id = 0;
     std::vector<const MeshComponent*> components;
     std::unordered_map<const MeshComponent*, std::size_t> componentsMap; // index of position added
 
     std::unordered_map<const ResourceMesh*, std::size_t> uniqueMeshesMap;
     std::vector<AccMeshCount> uniqueMeshesCount;
 
-    float4x4* ptrModels[2]        = {nullptr, nullptr};
-    GLsync gSync[2]               = {nullptr, nullptr};
-    GLuint models[2]              = {0, 0};
-    int currentBufferIndex        = 0;
-    std::size_t modelsSize        = 0;
+    GLsync gSync[2]        = {nullptr, nullptr};
+    int currentBufferIndex = 0;
+
+    GLuint models[2]       = {0, 0};
+    float4x4* ptrModels[2] = {nullptr, nullptr};
+    std::size_t modelsSize = 0;
+
+    GLuint bones[2]        = {0, 0};
+    float4x4* ptrBones[2]  = {nullptr, nullptr};
+    std::vector<std::vector<GameObject*>> bonesGameObject;
+    std::vector<std::vector<float4x4>> bindMatrices;
+    std::size_t bonesSize         = 0;
 
     unsigned int totalVertexCount = 0;
     unsigned int totalIndexCount  = 0;

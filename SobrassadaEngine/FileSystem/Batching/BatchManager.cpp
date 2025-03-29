@@ -97,8 +97,6 @@ void BatchManager::Render(const std::vector<MeshComponent*>& meshesToRender)
 
         glUniform3fv(glGetUniformLocation(program, "cameraPos"), 1, &cameraPos[0]);
 
-        glUniform1i(4, 0); // hasBones
-
         it->Render(batchMeshes);
 
         const auto end                             = std::chrono::high_resolution_clock::now();
@@ -124,7 +122,8 @@ GeometryBatch* BatchManager::RequestBatch(const MeshComponent* component)
 
     for (GeometryBatch* it : batches)
     {
-        if (it->GetMode() == mesh->GetMode() && it->GetIsMetallic() == material->GetIsMetallicRoughness())
+        if (it->GetMode() == mesh->GetMode() && it->GetIsMetallic() == material->GetIsMetallicRoughness() &&
+            it->GetHasBones() == component->GetHasBones())
         {
             return it;
         }
@@ -135,7 +134,7 @@ GeometryBatch* BatchManager::RequestBatch(const MeshComponent* component)
 
 GeometryBatch* BatchManager::CreateNewBatch(const MeshComponent* component)
 {
-    GeometryBatch* newBatch = new GeometryBatch(component, static_cast<int>(batches.size()));
+    GeometryBatch* newBatch = new GeometryBatch(component);
     batches.push_back(newBatch);
     return newBatch;
 }

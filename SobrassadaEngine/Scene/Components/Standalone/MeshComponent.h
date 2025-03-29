@@ -38,7 +38,10 @@ class MeshComponent : public Component
     void AddMesh(UID resource, bool updateParent = true);
     void AddMaterial(UID resource);
 
+    const bool GetHasBones() const { return hasBones; }
+    const std::vector<GameObject*>& GetBonesGO() const { return bones; }
     const std::vector<UID>& GetBones() const { return bonesUIDs; }
+    const std::vector<float4x4>& GetBindMatrices() const { return bindMatrices; }
     void SetBones(const std::vector<GameObject*>& bones, const std::vector<UID> bonesIds)
     {
         this->bones     = bones;
@@ -64,6 +67,7 @@ class MeshComponent : public Component
     std::vector<UID> bonesUIDs;
     std::vector<GameObject*> bones;
     std::vector<float4x4> bindMatrices;
+    bool hasBones           = false;
 
     UID modelUID            = INVALID_UID;
     int skinIndex           = -1;

@@ -9,7 +9,7 @@ layout(location=5) in vec4 vertex_weights;
 
 layout(location=4) uniform bool hasBones;
 
-uniform mat4 palette[64];
+//uniform mat4 palette[64];
 
 layout(std140, row_major, binding = 0) uniform CameraMatrices
 {
@@ -19,6 +19,10 @@ layout(std140, row_major, binding = 0) uniform CameraMatrices
 
 readonly layout(std430, row_major, binding = 10) buffer Transforms {
     mat4 models[];
+};
+
+readonly layout(std430, row_major, binding = 12) buffer Bones {
+    mat4 palettes[];
 };
 
 out vec3 pos;
@@ -44,8 +48,8 @@ void main()
     // Indexing with a float is crashing
     if (hasBones) 
     {
-        mat4 skin    = palette[vertex_joint[0]] * vertex_weights[0] + palette[vertex_joint[1]] * vertex_weights[1] +             
-                       palette[vertex_joint[2]] * vertex_weights[2] + palette[vertex_joint[3]] * vertex_weights[3];
+        mat4 skin    = palettes[instance_index * 64 + vertex_joint[0]] * vertex_weights[0] + palettes[instance_index * 64 + vertex_joint[1]] * vertex_weights[1] +             
+                       palettes[instance_index * 64 + vertex_joint[2]] * vertex_weights[2] + palettes[instance_index * 64 + vertex_joint[3]] * vertex_weights[3];
         pos          = (skin * vec4(vertex_position, 1.0)).xyz;
 
         mat3 skinRot = mat3(skin); // Skin matrix with rotation only

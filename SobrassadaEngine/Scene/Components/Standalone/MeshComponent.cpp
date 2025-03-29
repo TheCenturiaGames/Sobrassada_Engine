@@ -52,6 +52,9 @@ MeshComponent::MeshComponent(const rapidjson::Value& initialState, GameObject* p
             bindMatrices         = model->GetModelData().GetSkin(skinIndex).inverseBindMatrices;
         }
     }
+
+    if (!bonesUIDs.empty() && !bindMatrices.empty()) hasBones = true;
+
     if (currentMesh != nullptr && currentMaterial != nullptr)
     {
         batch = App->GetResourcesModule()->GetBatchManager()->RequestBatch(this);
