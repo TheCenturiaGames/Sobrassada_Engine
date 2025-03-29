@@ -16,7 +16,7 @@ namespace TextureImporter
 {
     UID Import(const char* filePath, const std::string& targetFilePath, UID sourceUID = INVALID_UID);
     ResourceTexture* LoadTexture(UID textureUID);
-    unsigned int LoadCubemap(const char* texturePath);
+    ResourceTexture* LoadCubemap(UID textureUID);
     bool
     LoadTextureFile(const wchar_t* texturePath, DirectX::TexMetadata& outMetadata, DirectX::ScratchImage& outImage);
 }; // namespace TextureImporter

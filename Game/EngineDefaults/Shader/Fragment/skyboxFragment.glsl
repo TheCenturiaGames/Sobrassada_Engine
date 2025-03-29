@@ -4,7 +4,7 @@
 
 in vec3 texCoords;
 
-layout(binding = 1) uniform samplerCube skybox;
+uniform samplerCube skybox;
 
 out vec4 fragColor;
 
