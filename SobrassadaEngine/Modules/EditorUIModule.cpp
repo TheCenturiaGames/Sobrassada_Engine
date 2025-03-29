@@ -13,8 +13,8 @@
 #include <FileSystem.h>
 #include <GameTimer.h>
 #include <SceneImporter.h>
+#include <TextureEditor.h>
 #include <TextureImporter.h>
-#include <TextureLibraryEditor.h>
 
 #include "SDL.h"
 #include "glew.h"
@@ -319,8 +319,7 @@ void EditorUIModule::MainMenu()
 
             if (ImGui::MenuItem("Node Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::NODE));
 
-            if (ImGui::MenuItem("Texture Library"))
-                OpenEditor(new TextureLibraryEditor("Texture Library", GenerateUID()));
+            if (ImGui::MenuItem("Texture Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::TEXTURE));
 
             ImGui::EndMenu();
         }
@@ -974,6 +973,7 @@ void EditorUIModule::About(bool& aboutMenu)
     ImGui::Text(" - UI: FreeType: v2.13.3");
     ImGui::Text(" - RecastNavigation: v1.6.0");
     ImGui::Text(" - ImNodeFlow: v1.2.2");
+    ImGui::Text(" - Bullet: v3.25");
     ImGui::Text("%s is licensed under the MIT License, see LICENSE for more information.", ENGINE_NAME);
 
     ImGui::Checkbox("Config/Build Information", &showConfigInfo);
@@ -1144,8 +1144,11 @@ EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
         return new EngineEditorBase("Base Editor " + std::to_string(uid), uid);
         break;
     case EditorType::NODE:
-        return new NodeEditor("NodeEditor" + std::to_string(uid), uid);
+        return new NodeEditor("NodeEditor_" + std::to_string(uid), uid);
 
+    case EditorType::TEXTURE:
+        return new TextureEditor("TextureEditor_" + std::to_string(uid), uid);
+        break;
     default:
         return nullptr;
     }
