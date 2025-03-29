@@ -12,7 +12,6 @@
 
 #include "glew.h"
 #include "imgui.h"
-#include <queue>
 
 UILabelComponent::UILabelComponent(UID uid, GameObject* parent)
     : text("Le Sobrassada"), Component(uid, parent, "Label", COMPONENT_LABEL)
@@ -60,9 +59,8 @@ void UILabelComponent::Init()
         transform2D = transform;
     }
 
+    parentCanvas        = transform2D->GetParentCanvas();
     transform2D->size.x = 400;  // Custom size to fit the sample text
-
-    GetParentCanvas();
 
     fontData->Init("./EngineDefaults/Shader/Font/Arial.ttf", fontSize);
     InitBuffers();
@@ -195,32 +193,6 @@ void UILabelComponent::InitBuffers()
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-}
-
-void UILabelComponent::GetParentCanvas()
-{
-    // Search for a parent canvas iteratively
-    std::queue<UID> parentQueue;
-    parentQueue.push(parent->GetParent());
-
-    Scene* scene =
-        App->GetSceneModule()->GetScene(); // Save the scene here to not call for it in each iteration of the loops
-    while (!parentQueue.empty())
-    {
-        const GameObject* currentParent = scene->GetGameObjectByUID(parentQueue.front());
-
-        if (currentParent == nullptr) break; // If parent null it has reached the scene root
-
-        CanvasComponent* canvas = static_cast<CanvasComponent*>(currentParent->GetComponentByType(COMPONENT_CANVAS));
-        if (canvas != nullptr)
-        {
-            parentCanvas = canvas;
-            break;
-        }
-
-        parentQueue.push(currentParent->GetParent());
-        parentQueue.pop();
-    }
 }
 
 void UILabelComponent::OnFontChange()

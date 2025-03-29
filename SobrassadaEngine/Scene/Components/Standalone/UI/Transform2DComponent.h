@@ -3,6 +3,8 @@
 #include "Component.h"
 #include "Math/float2.h"
 
+class CanvasComponent;
+
 class Transform2DComponent : public Component
 {
   public:
@@ -10,6 +12,7 @@ class Transform2DComponent : public Component
     Transform2DComponent(const rapidjson::Value& initialState, GameObject* parent);
     ~Transform2DComponent();
 
+    void Init() override;
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
     void Clone(const Component* other) override;
 
@@ -21,11 +24,17 @@ class Transform2DComponent : public Component
     void OnTransform3DUpdated(const float4x4& transform3D);
 
     float2 GetGlobalPosition() const;
-    float2 GetStartPos() const;
 
-  public: 
+    CanvasComponent* GetParentCanvas() const { return parentCanvas; }
+
+  private:
+    void GetCanvas();
+
+  public:
     float2 position;
     float2 size;
-
     float2 pivot;
+
+  private:
+    CanvasComponent* parentCanvas;
 };

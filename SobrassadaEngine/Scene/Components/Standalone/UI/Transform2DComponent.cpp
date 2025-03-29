@@ -1,9 +1,13 @@
 #include "Transform2DComponent.h"
 
 #include "Application.h"
+#include "CanvasComponent.h"
 #include "DebugDrawModule.h"
+#include "Scene.h"
+#include "SceneModule.h"
 
 #include "imgui.h"
+#include <queue>
 
 Transform2DComponent::Transform2DComponent(UID uid, GameObject* parent)
     : size(float2(50, 50)), pivot(float2(0.5f, 0.5f)), Component(uid, parent, "Transform 2D", COMPONENT_TRANSFORM_2D)
@@ -37,6 +41,11 @@ Transform2DComponent::Transform2DComponent(const rapidjson::Value& initialState,
 
 Transform2DComponent::~Transform2DComponent()
 {
+}
+
+void Transform2DComponent::Init()
+{
+    GetCanvas();
 }
 
 void Transform2DComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
@@ -133,8 +142,35 @@ float2 Transform2DComponent::GetGlobalPosition() const
 {
     // TODO: Probably anchors will do something here
 
-    return float2(
-        parent->GetParentGlobalTransform().TranslatePart().x + position.x - (size.x * pivot.x),
-        parent->GetParentGlobalTransform().TranslatePart().y + position.y + (size.y * (1 - pivot.y))
+    float2 parentPos = float2(
+        parent->GetParentGlobalTransform().TranslatePart().x, parent->GetParentGlobalTransform().TranslatePart().y
     );
+
+    return float2(parentPos.x + position.x - (size.x * pivot.x), parentPos.y + position.y + (size.y * (1 - pivot.y)));
+}
+
+void Transform2DComponent::GetCanvas()
+{
+    // Search for a parent canvas iteratively
+    std::queue<UID> parentQueue;
+    parentQueue.push(parent->GetParent());
+
+    Scene* scene =
+        App->GetSceneModule()->GetScene(); // Save the scene here to not call for it in each iteration of the loops
+    while (!parentQueue.empty())
+    {
+        const GameObject* currentParent = scene->GetGameObjectByUID(parentQueue.front());
+
+        if (currentParent == nullptr) break; // If parent null it has reached the scene root
+
+        CanvasComponent* canvas = static_cast<CanvasComponent*>(currentParent->GetComponentByType(COMPONENT_CANVAS));
+        if (canvas != nullptr)
+        {
+            parentCanvas = canvas;
+            break;
+        }
+
+        parentQueue.push(currentParent->GetParent());
+        parentQueue.pop();
+    }
 }
