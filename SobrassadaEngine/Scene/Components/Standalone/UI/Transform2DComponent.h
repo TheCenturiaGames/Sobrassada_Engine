@@ -21,8 +21,11 @@ class Transform2DComponent : public Component
     void OnTransform3DUpdated(const float4x4& transform3D);
 
     float2 GetGlobalPosition() const;
+    float2 GetStartPos() const;
 
   public: 
     float2 position;
     float2 size;
+
+    float2 pivot;
 };

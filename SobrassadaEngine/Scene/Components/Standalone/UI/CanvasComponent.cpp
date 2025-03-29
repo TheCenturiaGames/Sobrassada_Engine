@@ -123,7 +123,9 @@ void CanvasComponent::Render(float deltaTime)
     while (!children.empty())
     {
         const GameObject* currentObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(children.front());
-        currentObject->Render(isInWorldSpaceEditor);
+
+        // Only render 2d objects (defined by having the transform 2D component)
+        if (currentObject->GetComponentByType(COMPONENT_TRANSFORM_2D) != nullptr) currentObject->Render(deltaTime);
         children.pop();
 
         for (const UID child : currentObject->GetChildren())

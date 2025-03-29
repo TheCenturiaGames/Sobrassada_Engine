@@ -18,12 +18,13 @@ namespace TextManager
 
     struct FontData
     {
+        unsigned int fontSize;
         std::map<char, Character> characters;
 
         void Init(const char* filename, const unsigned int fontSize);
         void Clean();
     };
 
-    void RenderText(FontData& fontData, const std::string& text, const unsigned vbo);
+    void RenderText(FontData& fontData, const std::string& text, const unsigned vbo, unsigned int maxWidth);
 
 } // namespace TextManager

@@ -117,11 +117,13 @@ void UILabelComponent::Render(float deltaTime)
                                   -1, 1, (float)App->GetWindowModule()->GetWidth(), (float)App->GetWindowModule()->GetHeight()
                               ); // near plane. far plane, screen width, screen height
 
+    unsigned int width = 0;
     if (transform2D != nullptr)
     {
         float4x4 transform = parent->GetGlobalTransform();
         transform.SetTranslatePart(float3(transform2D->GetGlobalPosition(), 0));
         glUniformMatrix4fv(0, 1, GL_TRUE, transform.ptr());
+        width = transform2D->size.x;
     }
     else
     {
@@ -134,7 +136,7 @@ void UILabelComponent::Render(float deltaTime)
     glUniform3fv(3, 1, fontColor.ptr()); // Font color
 
     glBindVertexArray(vao);
-    TextManager::RenderText(*fontData, text, vbo);
+    TextManager::RenderText(*fontData, text, vbo, width);
 }
 
 void UILabelComponent::RenderEditorInspector()

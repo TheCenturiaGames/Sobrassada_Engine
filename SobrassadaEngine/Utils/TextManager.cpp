@@ -75,6 +75,7 @@ namespace TextManager
 
         // Generate a texture per character
         GenerateFontTextures(face, characters);
+        this->fontSize = fontSize;
 
         FT_Done_Face(face);
         FT_Done_FreeType(library);
@@ -89,7 +90,7 @@ namespace TextManager
         characters.clear();
     }
 
-    void RenderText(FontData& fontData, const std::string& text, const unsigned vbo)
+    void RenderText(FontData& fontData, const std::string& text, const unsigned vbo, unsigned int maxWidth)
     {
         // When deferred lightning works, this won't be needed as transparency will be properly handled
         glDisable(GL_DEPTH_TEST);
@@ -97,13 +98,26 @@ namespace TextManager
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        int x = 0, y = 0;
+        int x = 0;
+        int y = -1 * fontData.fontSize;
         glActiveTexture(GL_TEXTURE0);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-        //GLOG("Text size: %d", text.length());
+        // GLOG("Text size: %d", text.length());
         for (char c : text)
         {
+            if (c == '\n')
+            {
+                x  = 0;
+                y -= fontData.fontSize;
+                continue;
+            }
+            else if (x > maxWidth)
+            {
+                x  = 0;
+                y -= fontData.fontSize;
+            }
+
             Character character = fontData.characters[c];
 
             float xPos          = x + character.bearing.x;

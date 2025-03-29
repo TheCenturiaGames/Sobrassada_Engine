@@ -1,8 +1,12 @@
 #include "Transform2DComponent.h"
+
+#include "Application.h"
+#include "DebugDrawModule.h"
+
 #include "imgui.h"
 
-Transform2DComponent::Transform2DComponent(UID uid, GameObject* parent) 
-    : size(float2(50, 50)), Component(uid, parent, "Transform 2D", COMPONENT_TRANSFORM_2D)
+Transform2DComponent::Transform2DComponent(UID uid, GameObject* parent)
+    : size(float2(50, 50)), pivot(float2(0.5f, 0.5f)), Component(uid, parent, "Transform 2D", COMPONENT_TRANSFORM_2D)
 {
 }
 
@@ -15,12 +19,19 @@ Transform2DComponent::Transform2DComponent(const rapidjson::Value& initialState,
         position.x                           = initPosition[0].GetFloat();
         position.y                           = initPosition[1].GetFloat();
     }
-    
+
     if (initialState.HasMember("Size") && initialState["Size"].IsArray())
     {
         const rapidjson::Value& initSize = initialState["Size"];
         size.x                           = initSize[0].GetFloat();
         size.y                           = initSize[1].GetFloat();
+    }
+
+    if (initialState.HasMember("Pivot") && initialState["Pivot"].IsArray())
+    {
+        const rapidjson::Value& initSize = initialState["Pivot"];
+        pivot.x                          = initSize[0].GetFloat();
+        pivot.y                          = initSize[1].GetFloat();
     }
 }
 
@@ -35,12 +46,17 @@ void Transform2DComponent::Save(rapidjson::Value& targetState, rapidjson::Docume
     rapidjson::Value valPosition(rapidjson::kArrayType);
     valPosition.PushBack(position.x, allocator);
     valPosition.PushBack(position.y, allocator);
-    targetState.AddMember("Position", valPosition, allocator); 
-    
+    targetState.AddMember("Position", valPosition, allocator);
+
     rapidjson::Value valSize(rapidjson::kArrayType);
     valSize.PushBack(size.x, allocator);
     valSize.PushBack(size.y, allocator);
     targetState.AddMember("Size", valSize, allocator);
+
+    rapidjson::Value valPivot(rapidjson::kArrayType);
+    valSize.PushBack(pivot.x, allocator);
+    valSize.PushBack(pivot.y, allocator);
+    targetState.AddMember("Pivot", valSize, allocator);
 }
 
 void Transform2DComponent::Clone(const Component* other)
@@ -50,6 +66,7 @@ void Transform2DComponent::Clone(const Component* other)
         const Transform2DComponent* otherTransform = static_cast<const Transform2DComponent*>(other);
         position                                   = otherTransform->position;
         size                                       = otherTransform->size;
+        pivot                                      = otherTransform->pivot;
     }
     else
     {
@@ -63,6 +80,23 @@ void Transform2DComponent::Update(float deltaTime)
 
 void Transform2DComponent::Render(float deltaTime)
 {
+    // Draw a square to show the width and height
+    DebugDrawModule* debugDraw = App->GetDebugDrawModule();
+    debugDraw->DrawLine(
+        float3(GetGlobalPosition().x, GetGlobalPosition().y, 0), float3::unitX, size.x, float3(1, 1, 1)
+    );
+
+    debugDraw->DrawLine(
+        float3(GetGlobalPosition().x + size.x, GetGlobalPosition().y, 0), -float3::unitY, size.y, float3(1, 1, 1)
+    );
+
+    debugDraw->DrawLine(
+        float3(GetGlobalPosition().x, GetGlobalPosition().y - size.y, 0), float3::unitX, size.x, float3(1, 1, 1)
+    );
+
+    debugDraw->DrawLine(
+        float3(GetGlobalPosition().x, GetGlobalPosition().y, 0), -float3::unitY, size.y, float3(1, 1, 1)
+    );
 }
 
 void Transform2DComponent::RenderEditorInspector()
@@ -77,10 +111,8 @@ void Transform2DComponent::RenderEditorInspector()
         {
             UpdateParentTransform();
         }
-        if (ImGui::InputFloat2("Size", &size[0]))
-        {
-            // Update size
-        }
+        ImGui::InputFloat2("Size", &size[0]);
+        ImGui::SliderFloat2("Pivot", &pivot[0], 0.0f, 1.0f);
     }
 }
 
@@ -99,10 +131,10 @@ void Transform2DComponent::OnTransform3DUpdated(const float4x4& transform3D)
 
 float2 Transform2DComponent::GetGlobalPosition() const
 {
-    // TODO: Probably anchors and pivots will do something here
+    // TODO: Probably anchors will do something here
 
-   return float2(
-        parent->GetParentGlobalTransform().TranslatePart().x + position.x,
-        parent->GetParentGlobalTransform().TranslatePart().y + position.y
+    return float2(
+        parent->GetParentGlobalTransform().TranslatePart().x + position.x - (size.x * pivot.x),
+        parent->GetParentGlobalTransform().TranslatePart().y + position.y + (size.y * (1 - pivot.y))
     );
 }
