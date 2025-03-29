@@ -107,7 +107,7 @@ void PhysicsModule::CreateCubeRigidBody(CubeColliderComponent* colliderComponent
 
     // MotionState
     colliderComponent->motionState = BulletMotionState(
-        colliderComponent, colliderComponent->centrerOffset, colliderComponent->centrerRotation,
+        colliderComponent, colliderComponent->centerOffset, colliderComponent->centerRotation,
         colliderComponent->freezeRotation
     );
 

@@ -1,17 +1,47 @@
 #include "CubeColliderComponent.h"
 
 #include "Application.h"
-#include "PhysicsModule.h"
 #include "GameObject.h"
+#include "PhysicsModule.h"
+
+#include "Libs/rapidjson/document.h"
 
 CubeColliderComponent::CubeColliderComponent(UID uid, GameObject* parent)
     : Component(uid, parent, "Cube Collider", COMPONENT_CUBE_COLLIDER)
 {
+    centerOffset   = parent->GetPosition();
+    centerRotation = parent->GetRotation();
+
     App->GetPhysicsModule()->CreateCubeRigidBody(this);
-    centrerOffset = parent->GetPosition();
-    centrerRotation = parent->GetRotation();
 }
 
+CubeColliderComponent::CubeColliderComponent(const rapidjson::Value& initialState, GameObject* parent)
+    : Component(initialState, parent)
+{
+    if (initialState.HasMember("FreezeRotation")) freezeRotation = initialState["FreezeRotation"].GetBool();
+
+    if (initialState.HasMember("Mass")) mass = initialState["Mass"].GetFloat();
+
+    if (initialState.HasMember("CenterOffset"))
+    {
+        const rapidjson::Value& dataArray = initialState["CenterOffset"];
+        centerOffset                      = {dataArray[0].GetFloat(), dataArray[1].GetFloat(), dataArray[2].GetFloat()};
+    }
+
+    if (initialState.HasMember("CenterRotation"))
+    {
+        const rapidjson::Value& dataArray = initialState["CenterRotation"];
+        centerRotation                    = {dataArray[0].GetFloat(), dataArray[1].GetFloat(), dataArray[2].GetFloat()};
+    }
+
+    if (initialState.HasMember("Size"))
+    {
+        const rapidjson::Value& dataArray = initialState["Size"];
+        size                              = {dataArray[0].GetFloat(), dataArray[1].GetFloat(), dataArray[2].GetFloat()};
+    }
+
+    App->GetPhysicsModule()->CreateCubeRigidBody(this);
+}
 
 CubeColliderComponent::~CubeColliderComponent()
 {
@@ -20,6 +50,29 @@ CubeColliderComponent::~CubeColliderComponent()
 
 void CubeColliderComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
 {
+    Component::Save(targetState, allocator);
+
+    targetState.AddMember("FreezeRotation", freezeRotation, allocator);
+    targetState.AddMember("Mass", mass, allocator);
+
+    // CENTER OFFSET
+    rapidjson::Value centerOffsetSave(rapidjson::kArrayType);
+    centerOffsetSave.PushBack(centerOffset.x, allocator)
+        .PushBack(centerOffset.y, allocator)
+        .PushBack(centerOffset.z, allocator);
+    targetState.AddMember("CenterOffset", centerOffsetSave, allocator);
+
+    // CENTER ROTATION
+    rapidjson::Value centerRotationSave(rapidjson::kArrayType);
+    centerRotationSave.PushBack(centerRotation.x, allocator)
+        .PushBack(centerRotation.y, allocator)
+        .PushBack(centerRotation.z, allocator);
+    targetState.AddMember("CenterRotation", centerRotationSave, allocator);
+
+    // BOX SIZE
+    rapidjson::Value sizeSave(rapidjson::kArrayType);
+    sizeSave.PushBack(size.x, allocator).PushBack(size.y, allocator).PushBack(size.z, allocator);
+    targetState.AddMember("Size", sizeSave, allocator);
 }
 
 void CubeColliderComponent::Clone(const Component* other)

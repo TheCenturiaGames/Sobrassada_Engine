@@ -1,8 +1,8 @@
 #pragma once
 
 #include "BulletMotionState.h"
-#include "Component.h"
 #include "Collider.h"
+#include "Component.h"
 
 #include "Math/float3.h"
 
@@ -13,6 +13,7 @@ class CubeColliderComponent : public Component
 {
   public:
     CubeColliderComponent(UID uid, GameObject* parent);
+    CubeColliderComponent(const rapidjson::Value& initialState, GameObject* parent);
     ~CubeColliderComponent() override;
 
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
@@ -23,16 +24,14 @@ class CubeColliderComponent : public Component
     void Update(float deltaTime) override;
     void Render(float deltaTime) override;
 
-
   public:
-    btRigidBody* rigidBody        = nullptr;
-
     bool freezeRotation           = false;
     float mass                    = 1.f;
-    float3 centrerOffset          = float3::zero;
-    float3 centrerRotation        = float3::zero;
+    float3 centerOffset           = float3::zero;
+    float3 centerRotation         = float3::zero;
     float3 size                   = float3::one;
 
+    btRigidBody* rigidBody        = nullptr;
     BulletMotionState motionState = BulletMotionState(nullptr, float3::zero, float3::zero, false);
     Collider collider             = Collider(this, ComponentType::COMPONENT_CUBE_COLLIDER);
 };

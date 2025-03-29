@@ -68,6 +68,9 @@ Component* ComponentUtils::CreateExistingComponent(const rapidjson::Value& initi
             return new CharacterControllerComponent(initialState, parent);
         case COMPONENT_CAMERA:
             return new CameraComponent(initialState, parent);
+        case COMPONENT_CUBE_COLLIDER:
+            return new CubeColliderComponent(initialState, parent);
+            break;
         default:
             return nullptr;
         }
