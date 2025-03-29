@@ -20,6 +20,8 @@ class Transform2DComponent : public Component
     void UpdateParentTransform();
     void OnTransform3DUpdated(const float4x4& transform3D);
 
+    float2 GetGlobalPosition() const;
+
   public: 
     float2 position;
     float2 size;

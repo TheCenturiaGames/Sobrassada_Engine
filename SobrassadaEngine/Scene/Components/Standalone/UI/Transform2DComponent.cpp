@@ -96,3 +96,13 @@ void Transform2DComponent::OnTransform3DUpdated(const float4x4& transform3D)
     position.x = transform3D.TranslatePart().x;
     position.y = transform3D.TranslatePart().y;
 }
+
+float2 Transform2DComponent::GetGlobalPosition() const
+{
+    // TODO: Probably anchors and pivots will do something here
+
+   return float2(
+        parent->GetParentGlobalTransform().TranslatePart().x + position.x,
+        parent->GetParentGlobalTransform().TranslatePart().y + position.y
+    );
+}

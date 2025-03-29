@@ -120,7 +120,7 @@ void UILabelComponent::Render(float deltaTime)
     if (transform2D != nullptr)
     {
         float4x4 transform = parent->GetGlobalTransform();
-        transform.SetTranslatePart(float3(transform2D->position.x, transform2D->position.y, 0));
+        transform.SetTranslatePart(float3(transform2D->GetGlobalPosition(), 0));
         glUniformMatrix4fv(0, 1, GL_TRUE, transform.ptr());
     }
     else
