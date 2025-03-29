@@ -60,6 +60,9 @@ void UILabelComponent::Init()
     }
 
     parentCanvas        = transform2D->GetParentCanvas();
+
+    if (parentCanvas == nullptr) GLOG("[WARNING] Label has no parent canvas, it won't be rendered");
+
     transform2D->size.x = 400;  // Custom size to fit the sample text
 
     fontData->Init("./EngineDefaults/Shader/Font/Arial.ttf", fontSize);
@@ -106,11 +109,13 @@ void UILabelComponent::Update(float deltaTime)
 
 void UILabelComponent::Render(float deltaTime)
 {
+    if (parentCanvas == nullptr) return;
+
     const int uiProgram = App->GetShaderModule()->GetUIWidgetProgram();
     if (uiProgram == -1) GLOG("Error with UI Program");
 
     glUseProgram(uiProgram);
-
+    
     const float4x4 view =
         parentCanvas->IsInWorldSpaceEditor() ? App->GetCameraModule()->GetViewMatrix() : float4x4::identity;
     const float4x4 proj = parentCanvas->IsInWorldSpaceEditor()
