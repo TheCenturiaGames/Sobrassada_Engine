@@ -146,3 +146,22 @@ void CanvasComponent::RenderEditorInspector()
         ImGui::Checkbox("Show in world space", &isInWorldSpaceEditor);
     }
 }
+
+void CanvasComponent::OnWindowResize(const unsigned int width, const unsigned int height)
+{
+    this->width        = width;
+    this->height       = height;
+
+    localComponentAABB = AABB(
+        float3(
+            parent->GetGlobalTransform().TranslatePart().x - (width / 2.0f),
+            parent->GetGlobalTransform().TranslatePart().y - (height / 2.0f), 0
+        ),
+        float3(
+            parent->GetGlobalTransform().TranslatePart().x + (width / 2.0f),
+            parent->GetGlobalTransform().TranslatePart().y + (height / 2.0f), 0
+        )
+    );
+
+    parent->UpdateTransformForGOBranch();
+}

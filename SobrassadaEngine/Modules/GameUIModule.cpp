@@ -39,6 +39,14 @@ bool GameUIModule::ShutDown()
     return true;
 }
 
+void GameUIModule::OnWindowResize(const unsigned int width, const unsigned int height)
+{
+    for (CanvasComponent* canvas : canvas)
+    {
+        canvas->OnWindowResize(width, height);
+    }
+}
+
 void GameUIModule::RemoveCanvas(CanvasComponent* canvasToRemove)
 {
     const auto& iterator = std::find(canvas.begin(), canvas.end(), canvasToRemove);

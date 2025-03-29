@@ -23,6 +23,7 @@ class GameUIModule : public Module
     update_status Render(float deltaTime) override;
     bool ShutDown() override;
 
+    void OnWindowResize(const unsigned int width, const unsigned int height);
     void AddCanvas(CanvasComponent* newCanvas) { canvas.push_back(newCanvas); }
     void RemoveCanvas(CanvasComponent* canvasToRemove);
 
