@@ -1,9 +1,9 @@
 ﻿#include "ResourceMaterial.h"
 
 #include "Application.h"
-#include "FileSystem/Material.h"
+#include "Material.h"
 #include "LibraryModule.h"
-#include "ResourceManagement/Resources/ResourceTexture.h"
+#include "ResourceTexture.h"
 #include "TextureImporter.h"
 
 #include "imgui.h"

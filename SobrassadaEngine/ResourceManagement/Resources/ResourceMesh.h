@@ -2,10 +2,10 @@
 
 #include "Resource.h"
 
+#include "Geometry/AABB.h"
 #include "Math/float3.h"
 #include "Math/float4x4.h"
-#include <Geometry/AABB.h>
-#include <Libs/rapidjson/document.h>
+#include "rapidjson/document.h"
 #include <vector>
 
 namespace tinygltf

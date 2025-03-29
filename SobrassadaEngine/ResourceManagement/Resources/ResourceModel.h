@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FileSystem/Model.h"
+#include "Model.h"
 #include "Resource.h"
 
 class Model;
