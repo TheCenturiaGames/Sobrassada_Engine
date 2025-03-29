@@ -29,9 +29,9 @@ Transform2DComponent::Transform2DComponent(const rapidjson::Value& initialState,
 
     if (initialState.HasMember("Pivot") && initialState["Pivot"].IsArray())
     {
-        const rapidjson::Value& initSize = initialState["Pivot"];
-        pivot.x                          = initSize[0].GetFloat();
-        pivot.y                          = initSize[1].GetFloat();
+        const rapidjson::Value& initPivot = initialState["Pivot"];
+        pivot.x                           = initPivot[0].GetFloat();
+        pivot.y                           = initPivot[1].GetFloat();
     }
 }
 
@@ -54,9 +54,9 @@ void Transform2DComponent::Save(rapidjson::Value& targetState, rapidjson::Docume
     targetState.AddMember("Size", valSize, allocator);
 
     rapidjson::Value valPivot(rapidjson::kArrayType);
-    valSize.PushBack(pivot.x, allocator);
-    valSize.PushBack(pivot.y, allocator);
-    targetState.AddMember("Pivot", valSize, allocator);
+    valPivot.PushBack(pivot.x, allocator);
+    valPivot.PushBack(pivot.y, allocator);
+    targetState.AddMember("Pivot", valPivot, allocator);
 }
 
 void Transform2DComponent::Clone(const Component* other)
