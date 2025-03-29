@@ -25,6 +25,6 @@ namespace TextManager
         void Clean();
     };
 
-    void RenderText(FontData& fontData, const std::string& text, const unsigned vbo, unsigned int maxWidth);
+    void RenderText(FontData& fontData, const std::string& text, const unsigned vbo, const float maxWidth);
 
 } // namespace TextManager

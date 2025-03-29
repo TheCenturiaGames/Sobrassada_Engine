@@ -59,11 +59,9 @@ void UILabelComponent::Init()
         transform2D = transform;
     }
 
-    parentCanvas        = transform2D->GetParentCanvas();
+    parentCanvas = transform2D->GetParentCanvas();
 
     if (parentCanvas == nullptr) GLOG("[WARNING] Label has no parent canvas, it won't be rendered");
-
-    transform2D->size.x = 400;  // Custom size to fit the sample text
 
     fontData->Init("./EngineDefaults/Shader/Font/Arial.ttf", fontSize);
     InitBuffers();
@@ -115,16 +113,17 @@ void UILabelComponent::Render(float deltaTime)
     if (uiProgram == -1) GLOG("Error with UI Program");
 
     glUseProgram(uiProgram);
-    
+
     const float4x4 view =
         parentCanvas->IsInWorldSpaceEditor() ? App->GetCameraModule()->GetViewMatrix() : float4x4::identity;
-    const float4x4 proj = parentCanvas->IsInWorldSpaceEditor()
-                            ? App->GetCameraModule()->GetProjectionMatrix()
-                            : float4x4::D3DOrthoProjLH(
-                                  -1, 1, (float)App->GetWindowModule()->GetWidth(), (float)App->GetWindowModule()->GetHeight()
-                              ); // near plane. far plane, screen width, screen height
+    const float4x4 proj =
+        parentCanvas->IsInWorldSpaceEditor()
+            ? App->GetCameraModule()->GetProjectionMatrix()
+            : float4x4::D3DOrthoProjLH(
+                  -1, 1, (float)App->GetWindowModule()->GetWidth(), (float)App->GetWindowModule()->GetHeight()
+              ); // near plane. far plane, screen width, screen height
 
-    unsigned int width = 0;
+    float width = 0;
     if (transform2D != nullptr)
     {
         float4x4 transform = parent->GetGlobalTransform();

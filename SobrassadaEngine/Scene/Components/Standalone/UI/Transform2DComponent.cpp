@@ -10,7 +10,7 @@
 #include <queue>
 
 Transform2DComponent::Transform2DComponent(UID uid, GameObject* parent)
-    : size(float2(50, 50)), pivot(float2(0.5f, 0.5f)), Component(uid, parent, "Transform 2D", COMPONENT_TRANSFORM_2D)
+    : size(float2(400, 200)), pivot(float2(0.5f, 0.5f)), Component(uid, parent, "Transform 2D", COMPONENT_TRANSFORM_2D)
 {
 }
 

@@ -89,7 +89,7 @@ namespace TextManager
         characters.clear();
     }
 
-    void RenderText(FontData& fontData, const std::string& text, const unsigned vbo, unsigned int maxWidth)
+    void RenderText(FontData& fontData, const std::string& text, const unsigned vbo, const float maxWidth)
     {
         // When deferred lightning works, this won't be needed as transparency will be properly handled
         glDisable(GL_DEPTH_TEST);
