@@ -13,7 +13,7 @@ struct Transition;
 namespace StateMachineManager
 {
     UID Save(ResourceStateMachine* stateMachine, bool override);
-    void CopyMachine(const std::string& filePath, const std::string& name, const UID sourceUID);
+    void CopyMachine(const std::string& filePath, const std::string& targetFilePath, const std::string& name, const UID sourceUID);
     ResourceStateMachine* Load(UID stateMachineUID);
 
 }; // namespace StateMachineManager

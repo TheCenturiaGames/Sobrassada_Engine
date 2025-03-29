@@ -9,6 +9,7 @@
 #include "SceneImporter.h"
 #include "SceneModule.h"
 #include "TextureImporter.h"
+#include "FileSystem/StateMachineManager.h"
 
 #include "Libs/rapidjson/stringbuffer.h"
 #include "Libs/rapidjson/writer.h"
@@ -178,6 +179,13 @@ bool LibraryModule::LoadLibraryMaps(const std::string& projectPath)
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 else SceneImporter::CopyPrefab(assetPath, projectPath, assetName, assetUID);
                 break;
+            case 17:
+                AddStateMachine(assetUID, assetName);
+                AddName(assetName, assetUID);
+                libraryPath = projectPath + STATEMACHINES_LIB_PATH + std::to_string(assetUID) + STATEMACHINE_EXTENSION;
+                if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
+                else StateMachineManager::CopyMachine(assetPath, projectPath, assetName, assetUID);
+                break;
             default:
                 GLOG("Unknown UID prefix (%s) for: %s", std::to_string(prefix).c_str(), assetName.c_str());
                 continue;
@@ -336,7 +344,7 @@ UID LibraryModule::GetModelUID(const std::string& modelPath) const
     return INVALID_UID;
 }
 
-UID LibraryModule::GetStateMachinelUID(const std::string& stMachPath) const
+UID LibraryModule::GetStateMachineUID(const std::string& stMachPath) const
 {
     auto it = stateMachineMap.find(stMachPath);
     if (it != stateMachineMap.end())

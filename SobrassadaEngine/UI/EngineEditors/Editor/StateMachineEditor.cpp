@@ -1,6 +1,8 @@
 #include "UI/EngineEditors/Editor/StateMachineEditor.h"
 #include "UI/EngineEditors/Nodes/StateNode.h"
 #include "FileSystem/StateMachineManager.h"
+#include "Application.h"
+#include "ResourcesModule.h"
 
 StateMachineEditor::StateMachineEditor(const std::string& editorName, UID uid, ResourceStateMachine* stateMachine)
     : EngineEditorBase(editorName, uid), uid(uid), resource(stateMachine)
@@ -245,5 +247,6 @@ void StateMachineEditor::SaveMachine()
 
 void StateMachineEditor::LoadMachine()
 {
-    //StateMachineManager::Load();
+    UID stateMachineUid = 1782151504258605;
+    const ResourceStateMachine* stateMachine = (const ResourceStateMachine*)App->GetResourcesModule()->RequestResource(stateMachineUid);
 }

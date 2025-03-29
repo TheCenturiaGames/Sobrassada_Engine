@@ -102,11 +102,13 @@ namespace StateMachineManager
         App->GetLibraryModule()->AddName(stateName, stateMachineUID);
         App->GetLibraryModule()->AddResource(machinePath, stateMachineUID);
 
+        Load(stateMachineUID);
+
         return stateMachineUID;
 
     }
 
-    void CopyMachine(const std::string& filePath, const std::string& name, const UID sourceUID)
+    void CopyMachine(const std::string& filePath, const std::string& targetFilePath, const std::string& name, const UID sourceUID)
     {
         std::string destination = STATEMACHINES_LIB_PATH + std::to_string(sourceUID) + STATEMACHINE_EXTENSION;
         FileSystem::Copy(filePath.c_str(), destination.c_str());
@@ -125,108 +127,67 @@ namespace StateMachineManager
             return nullptr;
         }
 
-        char* buffer  = nullptr;
-        uint32_t size = FileSystem::Load(path.c_str(), &buffer);
-        if (!buffer || size == 0)
+        rapidjson::Document doc;
+        bool loaded = FileSystem::LoadJSON(path.c_str(), doc);
+        if (!loaded || !doc.HasMember("StateMachine"))
         {
-            GLOG("Failed to load StateMachine file: %s", path.c_str());
+            GLOG("Failed to parse StateMachine JSON: %s", path.c_str());
             return nullptr;
         }
 
-        char* cursor = buffer;
+        const rapidjson::Value& stateMachineJSON = doc["StateMachine"];
 
-        ResourceStateMachine* stateMachine =
-            new ResourceStateMachine(stateMachineUID, FileSystem::GetFileNameWithoutExtension(path));
+        UID uid                                  = stateMachineJSON["UID"].GetUint64();
+        std::string name                         = stateMachineJSON["Name"].GetString();
 
-        // --- Load Clips ---
-        uint32_t numClips = 0;
-        memcpy(&numClips, cursor, sizeof(uint32_t));
-        cursor += sizeof(uint32_t);
 
-        for (uint32_t i = 0; i < numClips; ++i)
+        ResourceStateMachine* stateMachine = new ResourceStateMachine(uid, name);
+
+        //Clips
+        if (stateMachineJSON.HasMember("Clips") && stateMachineJSON["Clips"].IsArray())
         {
-            Clip clip;
-            memcpy(&clip.clipUID, cursor, sizeof(UID));
-            cursor += sizeof(UID);
-            memcpy(&clip.loop, cursor, sizeof(bool));
-            cursor += sizeof(bool);
+            for (const auto& clipJSON : stateMachineJSON["Clips"].GetArray())
+            {
+                Clip clip;
+                clip.clipUID  = clipJSON["ClipUID"].GetUint64();
+                clip.clipName = HashString(clipJSON["ClipName"].GetString());
+                clip.loop     = clipJSON["Loop"].GetBool();
 
-            uint32_t nameSize;
-            memcpy(&nameSize, cursor, sizeof(uint32_t));
-            cursor += sizeof(uint32_t);
-            std::string name(cursor, nameSize);
-            cursor        += nameSize;
-            clip.clipName  = HashString(name);
-
-            stateMachine->clips.push_back(clip);
+                stateMachine->clips.push_back(clip);
+            }
         }
 
-        // --- Load States ---
-        uint32_t numStates = 0;
-        memcpy(&numStates, cursor, sizeof(uint32_t));
-        cursor += sizeof(uint32_t);
-
-        for (uint32_t i = 0; i < numStates; ++i)
+        //States
+        if (stateMachineJSON.HasMember("States") && stateMachineJSON["States"].IsArray())
         {
-            State state;
+            for (const auto& stateJSON : stateMachineJSON["States"].GetArray())
+            {
+                State state;
+                state.name     = HashString(stateJSON["StateName"].GetString());
+                state.clipName = HashString(stateJSON["ClipName"].GetString());
 
-            uint32_t nameSize;
-            memcpy(&nameSize, cursor, sizeof(uint32_t));
-            cursor += sizeof(uint32_t);
-            std::string stateName(cursor, nameSize);
-            cursor     += nameSize;
-            state.name  = HashString(stateName);
-
-            uint32_t clipNameSize;
-            memcpy(&clipNameSize, cursor, sizeof(uint32_t));
-            cursor += sizeof(uint32_t);
-            std::string clipName(cursor, clipNameSize);
-            cursor         += clipNameSize;
-            state.clipName  = HashString(clipName);
-
-            stateMachine->states.push_back(state);
+                stateMachine->states.push_back(state);
+            }
         }
 
-        // --- Load Transitions ---
-        uint32_t numTransitions = 0;
-        memcpy(&numTransitions, cursor, sizeof(uint32_t));
-        cursor += sizeof(uint32_t);
-
-        for (uint32_t i = 0; i < numTransitions; ++i)
+        //Transitions
+        if (stateMachineJSON.HasMember("Transitions") && stateMachineJSON["Transitions"].IsArray())
         {
-            Transition t;
+            for (const auto& transitionJSON : stateMachineJSON["Transitions"].GetArray())
+            {
+                Transition t;
+                t.fromState         = HashString(transitionJSON["FromState"].GetString());
+                t.toState           = HashString(transitionJSON["ToState"].GetString());
+                t.triggerName       = HashString(transitionJSON["Trigger"].GetString());
+                t.interpolationTime = transitionJSON["InterpolationTime"].GetFloat();
 
-            uint32_t fromSize;
-            memcpy(&fromSize, cursor, sizeof(uint32_t));
-            cursor += sizeof(uint32_t);
-            std::string from(cursor, fromSize);
-            cursor      += fromSize;
-            t.fromState  = HashString(from);
-
-            uint32_t toSize;
-            memcpy(&toSize, cursor, sizeof(uint32_t));
-            cursor += sizeof(uint32_t);
-            std::string to(cursor, toSize);
-            cursor    += toSize;
-            t.toState  = HashString(to);
-
-            uint32_t triggerSize;
-            memcpy(&triggerSize, cursor, sizeof(uint32_t));
-            cursor += sizeof(uint32_t);
-            std::string trigger(cursor, triggerSize);
-            cursor        += triggerSize;
-            t.triggerName  = HashString(trigger);
-
-            memcpy(&t.interpolationTime, cursor, sizeof(uint32_t));
-            cursor += sizeof(uint32_t);
-
-            stateMachine->transitions.push_back(t);
+                stateMachine->transitions.push_back(t);
+            }
         }
-
-        delete[] buffer;
 
         GLOG("StateMachine %llu loaded successfully from: %s", stateMachineUID, path.c_str());
 
         return stateMachine;
     }
+
 } // namespace StateMachineManager
