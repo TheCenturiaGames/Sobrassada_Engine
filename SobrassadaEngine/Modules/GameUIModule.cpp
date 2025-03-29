@@ -38,3 +38,12 @@ bool GameUIModule::ShutDown()
 {
     return true;
 }
+
+void GameUIModule::RemoveCanvas(CanvasComponent* canvasToRemove)
+{
+    const auto& iterator = std::find(canvas.begin(), canvas.end(), canvasToRemove);
+    if (iterator != canvas.end())
+    {
+        canvas.erase(iterator);
+    }
+}

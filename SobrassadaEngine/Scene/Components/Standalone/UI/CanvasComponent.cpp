@@ -28,12 +28,12 @@ CanvasComponent::CanvasComponent(const rapidjson::Value& initialState, GameObjec
 
 CanvasComponent::~CanvasComponent()
 {
-    App->GetGameUIModule()->ResetCanvas();
+    App->GetGameUIModule()->RemoveCanvas(this);
 }
 
 void CanvasComponent::Init()
 {
-    App->GetGameUIModule()->AddCanvas(this); // TODO: Change this fora GetCanvasesInScene(), so the Canvas of a prefab is not added
+    App->GetGameUIModule()->AddCanvas(this);
 
     localComponentAABB = AABB(
         float3(

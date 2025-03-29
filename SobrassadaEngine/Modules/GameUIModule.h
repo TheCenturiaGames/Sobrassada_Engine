@@ -24,7 +24,7 @@ class GameUIModule : public Module
     bool ShutDown() override;
 
     void AddCanvas(CanvasComponent* newCanvas) { canvas.push_back(newCanvas); }
-    void ResetCanvas() { canvas.clear(); }
+    void RemoveCanvas(CanvasComponent* canvasToRemove);
 
   private:
     std::vector<CanvasComponent*> canvas;
