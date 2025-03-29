@@ -17,11 +17,14 @@
 UILabelComponent::UILabelComponent(UID uid, GameObject* parent)
     : text("Le Sobrassada"), Component(uid, parent, "Label", COMPONENT_LABEL)
 {
+    fontData = new TextManager::FontData();
 }
 
 UILabelComponent::UILabelComponent(const rapidjson::Value& initialState, GameObject* parent)
     : Component(initialState, parent)
 {
+    fontData            = new TextManager::FontData();
+
     const char* textPtr = initialState["Text"].GetString();
     strcpy_s(text, sizeof(text), textPtr);
     fontSize = initialState["FontSize"].GetInt();
@@ -59,7 +62,6 @@ void UILabelComponent::Init()
 
     GetParentCanvas();
 
-    fontData = new TextManager::FontData();
     fontData->Init("./EngineDefaults/Shader/Font/Arial.ttf", fontSize);
     InitBuffers();
 }
