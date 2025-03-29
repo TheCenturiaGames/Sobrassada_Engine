@@ -1,6 +1,9 @@
 #include "ScriptModule.h"
 #include "Application.h"
+#include "SceneModule.h"
+#include "Component.h"
 #include "Script.h"
+#include <ScriptComponent.h>
 
 bool ScriptModule::Init()
 {
@@ -77,6 +80,36 @@ bool ScriptModule::IsFileLocked(const std::filesystem::path& filePath)
     return false;
 }
 
+void ScriptModule::DeleteAllScripts()
+{
+    if (App->GetSceneModule()->GetScene())
+    {
+        for (auto* component : App->GetSceneModule()->GetScene()->GetAllComponents())
+        {
+            if (component->GetType() == ComponentType::COMPONENT_SCRIPT)
+            {
+                ScriptComponent* scriptComponent = static_cast<ScriptComponent*>(component);
+                scriptComponent->DeleteScript();
+            }
+        }
+    }
+}
+
+void ScriptModule::RecreateAllScripts()
+{
+    if (App->GetSceneModule()->GetScene())
+    {
+        for (auto* component : App->GetSceneModule()->GetScene()->GetAllComponents())
+        {
+            if (component->GetType() == ComponentType::COMPONENT_SCRIPT)
+            {
+                ScriptComponent* scriptComponent = static_cast<ScriptComponent*>(component);
+                scriptComponent->CreateScript(scriptComponent->GetScriptName());
+            }
+        }
+    }
+}
+
 void ScriptModule::ReloadDLLIfUpdated()
 {
     while (running)
@@ -88,6 +121,8 @@ void ScriptModule::ReloadDLLIfUpdated()
             if (currentWriteTime != lastWriteTime)
             {
                 lastWriteTime = currentWriteTime;
+                DeleteAllScripts();
+
                 UnloadDLL();
 
                 while (IsFileLocked(dllPath) && running)
@@ -98,6 +133,8 @@ void ScriptModule::ReloadDLLIfUpdated()
                 fs::copy(dllPath, copyPath, fs::copy_options::overwrite_existing);
 
                 LoadDLL();
+
+                RecreateAllScripts();
             }
         }
 

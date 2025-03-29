@@ -30,6 +30,8 @@ class ScriptModule : public Module
     void LoadDLL();
     void UnloadDLL();
     void ReloadDLLIfUpdated();
+    void DeleteAllScripts();
+    void RecreateAllScripts();
     bool IsFileLocked(const std::filesystem::path& filePath);
 
   private:
@@ -46,8 +48,6 @@ class ScriptModule : public Module
     DestroyExterns destroyExternsFunc    = nullptr;
     SetApplicationFunc setAppFunc        = nullptr;
     DLLConsoleLogs setDLLConsoleLogsFunc = nullptr;
-
-    Script* scriptInstance               = nullptr;
 
     fs::file_time_type lastWriteTime;
     std::atomic<bool> running = true;
