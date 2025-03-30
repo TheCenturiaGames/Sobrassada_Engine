@@ -89,5 +89,5 @@ void BulletMotionState::setWorldTransform(const btTransform& physicsWorldTransfo
     float4x4 newLocalMatrix = float4x4::FromTRS(newPosition, rotationMat, collider->GetParent()->GetScale());
 
     collider->GetParent()->SetLocalTransform(newLocalMatrix);
-    collider->GetParent()->OnTransformUpdated();
+    collider->GetParent()->UpdateTransformForGOBranch();
 }

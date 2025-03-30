@@ -43,7 +43,8 @@ update_status PhysicsModule::PreUpdate(float deltaTime)
         btTransform trans;
         if (body && body->getMotionState())
         {
-            body->getMotionState()->getWorldTransform(trans);
+            //body->getMotionState()->getWorldTransform(trans);
+            trans = body->getWorldTransform();
             body->getMotionState()->setWorldTransform(trans);
         }
     }
