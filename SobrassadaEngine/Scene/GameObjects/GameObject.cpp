@@ -4,7 +4,7 @@
 #include "Component.h"
 #include "DebugDrawModule.h"
 #include "EditorUIModule.h"
-#include "PrefabManager.h"
+#include "PrefabImporter.h"
 #include "SceneModule.h"
 #include "Standalone/MeshComponent.h"
 
@@ -770,7 +770,7 @@ bool GameObject::RemoveComponent(ComponentType componentType)
 void GameObject::CreatePrefab()
 {
     bool override = this->prefabUID != INVALID_UID;
-    prefabUID     = PrefabManager::SavePrefab(this, override);
+    prefabUID     = PrefabImporter::SavePrefab(this, override);
 
     if (override)
     {

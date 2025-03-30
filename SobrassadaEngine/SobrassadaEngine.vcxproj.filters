@@ -327,9 +327,6 @@
     <ClCompile Include="Modules\UserInterfaceModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
-    <ClCompile Include="FileSystem\PrefabManager.cpp">
-      <Filter>FileSystem</Filter>
-    </ClCompile>
     <ClCompile Include="Utils\Trees\Octree.cpp">
       <Filter>Utils\Tree</Filter>
     </ClCompile>
@@ -610,9 +607,6 @@
     </ClInclude>
     <ClInclude Include="ResourceManagement\Resources\ResourcePrefab.h">
       <Filter>Resources</Filter>
-    </ClInclude>
-    <ClInclude Include="FileSystem\PrefabManager.h">
-      <Filter>FileSystem</Filter>
     </ClInclude>
     <ClInclude Include="UI\EngineEditors\EngineEditorBase.h">
       <Filter>UI\EngineEditors</Filter>

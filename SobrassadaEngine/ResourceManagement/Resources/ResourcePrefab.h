@@ -17,6 +17,8 @@ class ResourcePrefab : public Resource
     GameObject* GetRootObject() const { return gameObjects[0]; }
     const std::vector<GameObject*>& GetGameObjectsVector() const { return gameObjects; }
     const std::vector<int>& GetParentIndices() const { return parentIndices; }
+    GameObject* FindGameObject(UID uid) const;
+
 
   private:
     std::vector<GameObject*> gameObjects;

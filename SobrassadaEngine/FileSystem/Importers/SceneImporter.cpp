@@ -5,7 +5,7 @@
 #include "MaterialImporter.h"
 #include "MeshImporter.h"
 #include "ModelImporter.h"
-#include "PrefabManager.h"
+#include "PrefabImporter.h"
 #include "ProjectModule.h"
 #include "TextureImporter.h"
 #include "PrefabImporter.h"
@@ -163,7 +163,7 @@ namespace SceneImporter
     void
     CopyPrefab(const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID)
     {
-        PrefabManager::CopyPrefab(filePath, targetFilePath, name, sourceUID);
+        PrefabImporter::CopyPrefab(filePath, targetFilePath, name, sourceUID);
     }
 
     void

@@ -5,7 +5,7 @@
 #include "MaterialImporter.h"
 #include "MeshImporter.h"
 #include "ModelImporter.h"
-#include "PrefabManager.h"
+#include "PrefabImporter.h"
 #include "ResourceManagement/Resources/Resource.h"
 #include "ResourceManagement/Resources/ResourceMaterial.h"
 #include "ResourceManagement/Resources/ResourceMesh.h"
@@ -31,7 +31,7 @@ Resource* Importer::Load(UID uid)
     case ResourceType::Model:
         return ModelImporter::LoadModel(uid);
     case ResourceType::Prefab:
-        return PrefabManager::LoadPrefab(uid);
+        return PrefabImporter::LoadPrefab(uid);
 
     default:
         GLOG("Unknown resource type: %d", type)

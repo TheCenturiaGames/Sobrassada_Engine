@@ -3,6 +3,7 @@
 #include "EngineEditors/EngineEditorBase.h"
 
 class ResourcePrefab;
+class GameObject;
 
 class PrefabEditor : public EngineEditorBase
 {
@@ -13,6 +14,8 @@ class PrefabEditor : public EngineEditorBase
   private:
     bool RenderEditor() override;
     ResourcePrefab* selectedPrefab = nullptr;
+    void treeHierarchyView();
+    void DrawHierarchyRecursive(GameObject* go);
 
 
 };

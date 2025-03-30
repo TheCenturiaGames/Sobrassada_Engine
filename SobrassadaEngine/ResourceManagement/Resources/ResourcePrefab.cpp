@@ -1,5 +1,8 @@
 #include "ResourcePrefab.h"
 
+#include "GameObject.h"
+
+
 ResourcePrefab::ResourcePrefab(UID uid, const std::string& name) : Resource(uid, name, ResourceType::Prefab)
 {
 }
@@ -15,4 +18,13 @@ void ResourcePrefab::LoadData(const std::vector<GameObject*>& objects, const std
         gameObjects.emplace_back(objects[i]);
         parentIndices.push_back(indices[i]);
     }
+}
+
+GameObject* ResourcePrefab::FindGameObject(UID uid) const
+{
+    for (GameObject* gameobject : gameObjects)
+    {
+        if (gameobject->GetUID() == uid) return gameobject;
+    }
+    return nullptr;
 }

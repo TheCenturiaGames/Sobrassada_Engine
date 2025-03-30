@@ -4,6 +4,8 @@
 #include "ResourcesModule.h"
 #include "imgui.h"
 #include "ResourcePrefab.h"
+#include "GameObject.h"
+
 
 PrefabEditor::PrefabEditor(const std::string& editorName, UID uid) : EngineEditorBase(editorName, uid)
 {
@@ -71,7 +73,7 @@ bool PrefabEditor::RenderEditor()
                     ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), IM_COL32(255, 255, 255, 255) // white line
                 );
                 ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10);
-                ImGui::Text("No preview disponible.");
+                ImGui::Text("No preview available.");
 
             }
             ImGui::EndChild();
@@ -85,14 +87,15 @@ bool PrefabEditor::RenderEditor()
 
                 ImGui::BeginChild("Hierarchy", ImVec2(rightWidth, hierarchyHeight), true);
                 {
-                    ImGui::Text("Jerarquia");
+                    ImGui::Text("Hierarchy");
+                    treeHierarchyView();
                     // Tree gameobjects
                 }
                 ImGui::EndChild();
 
                 ImGui::BeginChild("Properties", ImVec2(rightWidth, propsHeight), true);
                 {
-                    ImGui::Text("Propietats");
+                    ImGui::Text("Properties");
                     // Position, Rotation, ...
                 }
                 ImGui::EndChild();
@@ -107,4 +110,48 @@ bool PrefabEditor::RenderEditor()
 
     ImGui::End();
     return true;
+}
+
+void PrefabEditor::treeHierarchyView()
+{
+    if (!selectedPrefab) return;
+
+    for (GameObject* go : selectedPrefab->GetGameObjectsVector())
+    {
+        //ImGui::Text("GO: %s - ParentUID: %llu", go->GetName().c_str(), go->GetParent());
+
+        bool isRoot = true;
+        for (GameObject* possibleParent : selectedPrefab->GetGameObjectsVector())
+        {
+            if (go->GetParent() == possibleParent->GetUID())
+            {
+                isRoot = false;
+                break;
+            }
+        }
+
+        if (isRoot)
+        {
+            DrawHierarchyRecursive(go);
+        }
+
+    }
+}
+
+void PrefabEditor::DrawHierarchyRecursive(GameObject* go)
+{
+    std::string label = go->GetName() + "##" + std::to_string(go->GetUID());
+
+    if (ImGui::TreeNode(label.c_str()))
+    {
+        for (UID childUID : go->GetChildren())
+        {
+            GameObject* child = selectedPrefab->FindGameObject(childUID);
+            if (child)
+            {
+                DrawHierarchyRecursive(child);
+            }
+        }
+        ImGui::TreePop();
+    }
 }
