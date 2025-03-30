@@ -7,6 +7,7 @@
 #include <windows.h>
 #include <vector>
 
+#ifndef SOBRASSADA_API
 struct LogEntry
 {
     char* message;
@@ -18,6 +19,8 @@ extern std::vector<LogEntry>* Logs;
 void glog(const char file[], int line, const char* format, ...);
 
 #define GLOG(format, ...) glog(__FILE__, __LINE__, format, __VA_ARGS__);
+
+#endif
 
 enum update_status
 {

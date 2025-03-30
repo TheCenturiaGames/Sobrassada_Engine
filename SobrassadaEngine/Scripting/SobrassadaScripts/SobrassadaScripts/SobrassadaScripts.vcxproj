@@ -126,14 +126,14 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)DirectXTex;$(SolutionDir)Libs\rapidjson;$(SolutionDir)Libs\SDL\include;$(SolutionDir)Libs\glew-2.1.0\include;$(SolutionDir)Libs\MathGeoLib\include;$(SolutionDir)Libs\ImGui;$(SolutionDir)Libs\ImGuizmo;$(SolutionDir)Libs\Tinygltf;$(SolutionDir)Libs\freetype\include;$(SolutionDir)Libs\Optick_1.4.0\include;$(SolutionDir)Libs\RecastDetour\Detour\Include;$(SolutionDir)Libs\RecastDetour\Recast\Include;$(SolutionDir)Modules;$(SolutionDir)ResourceManagement\Resources;$(SolutionDir)UI;$(SolutionDir)UI\EngineEditors\;$(SolutionDir)UI\EngineEditors\Editor;$(SolutionDir)UI\EngineEditors\Nodes;$(SolutionDir)Utils;$(SolutionDir)Utils\Trees;$(SolutionDir)FileSystem;$(SolutionDir)FileSystem\Config;$(SolutionDir)FileSystem\Importers;$(SolutionDir)FileSystem\Meta;$(SolutionDir)DebugDraw;$(SolutionDir)Scene;$(SolutionDir)Scene\GameObjects;$(SolutionDir)Scene\Components;$(SolutionDir)Libs\bullet\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>
-      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>LinearMath_debug.lib;BulletCollision_debug.lib;BulletDynamics_debug.lib;OptickCore.lib;DirectXTex.lib;glew32.lib;opengl32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Libs\glew-2.1.0\lib;$(SolutionDir)Libs\freetype\lib;$(SolutionDir)Libs\bullet\lib;$(SolutionDir)DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration)\;$(SolutionDir)Libs\Optick_1.4.0\lib\LibDebug</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -148,6 +148,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)DirectXTex;$(SolutionDir)Libs\rapidjson;$(SolutionDir)Libs\SDL\include;$(SolutionDir)Libs\glew-2.1.0\include;$(SolutionDir)Libs\MathGeoLib\include;$(SolutionDir)Libs\ImGui;$(SolutionDir)Libs\ImGuizmo;$(SolutionDir)Libs\Tinygltf;$(SolutionDir)Libs\freetype\include;$(SolutionDir)Libs\Optick_1.4.0\include;$(SolutionDir)Libs\RecastDetour\Detour\Include;$(SolutionDir)Libs\RecastDetour\Recast\Include;$(SolutionDir)Modules;$(SolutionDir)ResourceManagement\Resources;$(SolutionDir)UI;$(SolutionDir)UI\EngineEditors\;$(SolutionDir)UI\EngineEditors\Editor;$(SolutionDir)UI\EngineEditors\Nodes;$(SolutionDir)Utils;$(SolutionDir)Utils\Trees;$(SolutionDir)FileSystem;$(SolutionDir)FileSystem\Config;$(SolutionDir)FileSystem\Importers;$(SolutionDir)FileSystem\Meta;$(SolutionDir)DebugDraw;$(SolutionDir)Scene;$(SolutionDir)Scene\GameObjects;$(SolutionDir)Scene\Components;$(SolutionDir)Libs\bullet\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -155,8 +156,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>LinearMath_debug.lib;BulletCollision_debug.lib;BulletDynamics_debug.lib;OptickCore.lib;DirectXTex.lib;glew32.lib;opengl32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Libs\glew-2.1.0\lib;$(SolutionDir)Libs\freetype\lib;$(SolutionDir)Libs\bullet\lib;$(SolutionDir)DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

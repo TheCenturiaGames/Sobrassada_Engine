@@ -10,7 +10,7 @@ float GetTimestamp() {
     using namespace std::chrono;
     auto now = high_resolution_clock::now();
     auto duration = duration_cast<seconds>(now.time_since_epoch());
-    return duration.count();
+    return static_cast<float>(duration.count());
 }
 
 void glogDLL(const char file[], int line, const char* format, ...)

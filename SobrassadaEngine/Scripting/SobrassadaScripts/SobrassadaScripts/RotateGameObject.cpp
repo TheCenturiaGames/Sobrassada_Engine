@@ -1,14 +1,16 @@
 #include "pch.h"
 #include "RotateGameObject.h"
+#include "GameObject.h"
+#include "Math/float4x4.h"
 
 bool RotateGameObject::Init()
 {
-    GLOG("Estoy aqui");
-    //std::cout << "MyScript initialized!" << std::endl;
+    GLOG("Initiating RotationGameObject");
     return true;
 }
 
 void RotateGameObject::Update(float deltaTime)
 {
-    //std::cout << "Updating MyScript. Delta Time: " << deltaTime << std::endl;
+    float4x4 matrix = parent->GetGlobalTransform();
+    //matrix = matrix.RotateX(0.01f);
 }

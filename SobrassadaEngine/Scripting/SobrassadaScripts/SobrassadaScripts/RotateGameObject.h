@@ -1,6 +1,8 @@
 #pragma once
 #include "Script.h"
 
+class GameObject;
+
 class RotateGameObject : public Script
 {
   public:
