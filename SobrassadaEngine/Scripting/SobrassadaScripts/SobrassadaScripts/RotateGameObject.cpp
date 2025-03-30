@@ -11,6 +11,8 @@ bool RotateGameObject::Init()
 
 void RotateGameObject::Update(float deltaTime)
 {
-    float4x4 matrix = parent->GetGlobalTransform();
-    //matrix = matrix.RotateX(0.01f);
+    GLOG("I HATE MY LIFE");
+    //parent->GetLocalTransform().RotateX(1.f);
+    //float4x4 matrix = parent->GetGlobalTransform();
+    //matrix = matrix.RotateX(1.f);
 }

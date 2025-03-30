@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="External">
+      <UniqueIdentifier>{21386770-963b-4862-a4df-9c3230b0137f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
@@ -61,6 +64,102 @@
     </ClCompile>
     <ClCompile Include="RotateGameObject.cpp">
       <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Time\Clock.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\BitOps.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\float2.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\float3.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\float3x3.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\float3x4.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\float4.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\float4x4.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\MathFunc.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\MathLog.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\MathOps.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\Polynomial.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\Quat.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\SSEMath.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\TransformOps.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\AABB.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\Capsule.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\Circle.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\Cone.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\Cylinder.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\Frustum.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\Line.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\LineSegment.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\OBB.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\Plane.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\Polygon.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\Polyhedron.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\Ray.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\Sphere.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\Triangle.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\TriangleMesh.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Algorithm\Random\LCG.cpp">
+      <Filter>External</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
