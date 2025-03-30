@@ -3,12 +3,15 @@
 #include "Application.h"
 #include "CameraModule.h"
 #include "CanvasComponent.h"
+#include "LibraryModule.h"
 #include "Scene.h"
 #include "SceneModule.h"
 #include "ShaderModule.h"
 #include "TextManager.h"
 #include "Transform2DComponent.h"
 #include "WindowModule.h"
+#include "ResourcesModule.h"
+#include "ResourceManagement/Resources/ResourceFont.h"
 
 #include "glew.h"
 #include "imgui.h"
@@ -161,18 +164,26 @@ void UILabelComponent::RenderEditorInspector()
         }
 
         const char* preview = "Arial";
-        if (ImGui::BeginCombo("combo 1", preview))
+        if (ImGui::BeginCombo("Font Type", fontData->fontName.c_str()))
         {
-            // TODO: Fonts could be a resource, so users can use the fonts they want and get loaded here
+            int selectedItemIndex = -1;
+            unsigned int i        = 0;
+            for (const auto& font : App->GetLibraryModule()->GetFontMap())
+            {
+                const bool is_selected = (selectedItemIndex == i);
+                if (ImGui::Selectable(font.first.c_str(), is_selected))
+                {
+                    selectedItemIndex = i;
+                    
+                    ResourceFont* resFont = static_cast<ResourceFont*>(App->GetResourcesModule()->RequestResource(font.second));
+                    fontData->Clean();
+                    fontData->Init(resFont->GetFilepath().c_str(), fontSize);
+                }
 
-            // for (int n = 0; n < IM_ARRAYSIZE(items); n++)
-            //{
-            //     const bool is_selected = (item_selected_idx == n);
-            //     if (ImGui::Selectable(items[n], is_selected)) item_selected_idx = n;
-            //
-            //     // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-            //     if (is_selected) ImGui::SetItemDefaultFocus();
-            // }
+                // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+                if (is_selected) ImGui::SetItemDefaultFocus();
+                ++i;
+            }
             ImGui::EndCombo();
         }
 

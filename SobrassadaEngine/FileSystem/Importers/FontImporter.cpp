@@ -4,6 +4,7 @@
 #include "FileSystem.h"
 #include "LibraryModule.h"
 #include "MetaFont.h"
+#include "ResourceManagement/Resources/ResourceFont.h"
 
 namespace FontImporter
 {
@@ -46,6 +47,10 @@ namespace FontImporter
 
     ResourceFont* LoadFont(UID fontUID)
     {
-        return nullptr;
+        const std::string filePath   = App->GetLibraryModule()->GetResourcePath(fontUID);
+        ResourceFont* resourceFont = new ResourceFont(fontUID, FileSystem::GetFileNameWithoutExtension(filePath));
+        resourceFont->SetFilepath(filePath);
+
+        return resourceFont;
     }
 } // namespace FontImporter
