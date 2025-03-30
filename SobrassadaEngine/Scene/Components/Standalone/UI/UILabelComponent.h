@@ -10,6 +10,7 @@ namespace TextManager
 }
 class Transform2DComponent;
 class CanvasComponent;
+class ResourceFont;
 
 class UILabelComponent : public Component
 {
@@ -36,6 +37,7 @@ class UILabelComponent : public Component
     char text[512];
     int fontSize = 48;
     float3 fontColor;
+    ResourceFont* fontType;
 
     unsigned int vbo = 0;
     unsigned int vao = 0;

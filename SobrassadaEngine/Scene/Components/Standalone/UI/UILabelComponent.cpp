@@ -4,14 +4,14 @@
 #include "CameraModule.h"
 #include "CanvasComponent.h"
 #include "LibraryModule.h"
+#include "ResourceManagement/Resources/ResourceFont.h"
+#include "ResourcesModule.h"
 #include "Scene.h"
 #include "SceneModule.h"
 #include "ShaderModule.h"
 #include "TextManager.h"
 #include "Transform2DComponent.h"
 #include "WindowModule.h"
-#include "ResourcesModule.h"
-#include "ResourceManagement/Resources/ResourceFont.h"
 
 #include "glew.h"
 #include "imgui.h"
@@ -20,6 +20,11 @@ UILabelComponent::UILabelComponent(UID uid, GameObject* parent)
     : text("Le Sobrassada"), Component(uid, parent, "Label", COMPONENT_LABEL)
 {
     fontData = new TextManager::FontData();
+
+    // Set the default font resource
+    fontType = static_cast<ResourceFont*>(
+        App->GetResourcesModule()->RequestResource(App->GetLibraryModule()->GetFontMap().at("Roboto-Regular"))
+    );
 }
 
 UILabelComponent::UILabelComponent(const rapidjson::Value& initialState, GameObject* parent)
@@ -30,6 +35,12 @@ UILabelComponent::UILabelComponent(const rapidjson::Value& initialState, GameObj
     const char* textPtr = initialState["Text"].GetString();
     strcpy_s(text, sizeof(text), textPtr);
     fontSize = initialState["FontSize"].GetInt();
+
+    if (initialState.HasMember("FontUID"))
+    {
+        fontType =
+            static_cast<ResourceFont*>(App->GetResourcesModule()->RequestResource(initialState["FontUID"].GetUint64()));
+    }
 
     if (initialState.HasMember("FontColor") && initialState["FontColor"].IsArray())
     {
@@ -44,6 +55,9 @@ UILabelComponent::~UILabelComponent()
 {
     fontData->Clean();
     delete fontData;
+
+    App->GetResourcesModule()->ReleaseResource(fontType);
+
     if (vbo != 0) glDeleteBuffers(1, &vbo);
     if (vao != 0) glDeleteVertexArrays(1, &vao);
 }
@@ -66,7 +80,8 @@ void UILabelComponent::Init()
 
     if (parentCanvas == nullptr) GLOG("[WARNING] Label has no parent canvas, it won't be rendered");
 
-    fontData->Init("./EngineDefaults/Shader/Font/Arial.ttf", fontSize);
+    fontData->Clean();
+    fontData->Init(fontType->GetFilepath().c_str(), fontSize);
     InitBuffers();
 }
 
@@ -77,6 +92,8 @@ void UILabelComponent::Save(rapidjson::Value& targetState, rapidjson::Document::
     std::string textString(text);
     targetState.AddMember("Text", rapidjson::Value(textString.c_str(), allocator), allocator);
     targetState.AddMember("FontSize", fontSize, allocator);
+
+    targetState.AddMember("FontUID", fontType->GetUID(), allocator);
 
     rapidjson::Value valFontColor(rapidjson::kArrayType);
     valFontColor.PushBack(fontColor.x, allocator);
@@ -95,8 +112,11 @@ void UILabelComponent::Clone(const Component* other)
         fontSize  = otherLabel->fontSize;
         fontColor = otherLabel->fontColor;
 
+        fontType  = otherLabel->fontType;
+        fontType->AddReference();
+
         fontData->Clean();
-        fontData->Init("./EngineDefaults/Shader/Font/Arial.ttf", fontSize);
+        fontData->Init(fontType->GetFilepath().c_str(), fontSize);
     }
     else
     {
@@ -174,10 +194,10 @@ void UILabelComponent::RenderEditorInspector()
                 if (ImGui::Selectable(font.first.c_str(), is_selected))
                 {
                     selectedItemIndex = i;
-                    
-                    ResourceFont* resFont = static_cast<ResourceFont*>(App->GetResourcesModule()->RequestResource(font.second));
+
+                    fontType = static_cast<ResourceFont*>(App->GetResourcesModule()->RequestResource(font.second));
                     fontData->Clean();
-                    fontData->Init(resFont->GetFilepath().c_str(), fontSize);
+                    fontData->Init(fontType->GetFilepath().c_str(), fontSize);
                 }
 
                 // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
@@ -213,5 +233,5 @@ void UILabelComponent::InitBuffers()
 void UILabelComponent::OnFontChange()
 {
     fontData->Clean();
-    fontData->Init("./EngineDefaults/Shader/Font/Arial.ttf", fontSize);
+    fontData->Init(fontType->GetFilepath().c_str(), fontSize);
 }
