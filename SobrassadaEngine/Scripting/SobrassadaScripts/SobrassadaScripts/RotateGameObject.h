@@ -1,10 +1,10 @@
 #pragma once
 #include "Script.h"
 
-class MyScript : public Script
+class RotateGameObject : public Script
 {
   public:
-    MyScript(GameObject* parent) : Script(parent) {}
+    RotateGameObject(GameObject* parent) : Script(parent) {}
     bool Init() override;
     void Update(float deltaTime) override;
 };

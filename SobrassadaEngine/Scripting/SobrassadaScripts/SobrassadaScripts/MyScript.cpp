@@ -4,7 +4,6 @@
 
 bool MyScript::Init()
 {
-
     GLOG("HOLA");
     std::cout << "MyScript initialized!" << std::endl;
     return true;

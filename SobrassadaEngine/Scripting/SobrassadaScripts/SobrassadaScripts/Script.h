@@ -1,12 +1,17 @@
 #pragma once
 #include "GlobalsDLL.h"
 
+class GameObject;
+
 class Script
 {
   public:
-    Script() {}
-    virtual ~Script() {}
+    Script(GameObject* gameObject) : parent(gameObject) {}
+    virtual ~Script() { parent = nullptr; }
 
     virtual bool Init()                  = 0;
     virtual void Update(float deltaTime) = 0;
+
+  private:
+    GameObject* parent;
 };

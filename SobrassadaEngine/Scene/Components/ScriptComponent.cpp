@@ -48,8 +48,19 @@ void ScriptComponent::Clone(const Component* other)
 
 void ScriptComponent::Update(float deltaTime)
 {
-    //scriptInstance->Init();
-    if (scriptInstance != nullptr && App->GetSceneModule()->GetInPlayMode()) scriptInstance->Update(deltaTime);
+    if (App->GetSceneModule()->GetInPlayMode())
+    {
+        if (scriptInstance != nullptr)
+        {
+            if (!startScript)
+            {
+                scriptInstance->Init();
+                startScript = true;
+            }
+            scriptInstance->Update(deltaTime);
+        }
+    }
+    else startScript = false;
 }
 
 void ScriptComponent::Render(float deltaTime)
@@ -86,7 +97,7 @@ void ScriptComponent::RenderEditorInspector()
 void ScriptComponent::CreateScript(std::string scriptType)
 {
     scriptName     = scriptType;
-    scriptInstance = App->GetScriptModule()->CreateScript(scriptType);
+    scriptInstance = App->GetScriptModule()->CreateScript(scriptType, parent);
     if (scriptInstance == nullptr) scriptName = "Not selected";
 }
 

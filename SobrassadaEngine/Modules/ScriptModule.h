@@ -8,6 +8,7 @@
 
 class Application;
 class Script;
+class GameObject;
 
 namespace fs = std::filesystem;
 
@@ -21,7 +22,7 @@ class ScriptModule : public Module
     update_status Update(float deltaTime) override;
     bool ShutDown() override;
 
-    Script* CreateScript(const std::string name) const { return createScriptFunc(name); }
+    Script* CreateScript(const std::string name, GameObject* parent) const { return createScriptFunc(name, parent); }
     void DestroyScript(Script* script) const { destroyScriptFunc(script); }
 
     std::vector<LogEntry>* GetDLLConsoleLogs() { 
@@ -40,7 +41,7 @@ class ScriptModule : public Module
   private:
     HMODULE dllHandle = nullptr;
 
-    typedef Script* (*CreateScriptFunc)(const std::string&);
+    typedef Script* (*CreateScriptFunc)(const std::string&, GameObject*);
     typedef void (*DestroyScriptFunc)(Script*);
     typedef void (*DestroyExterns)();
     typedef void (*SetApplicationFunc)(Application*);

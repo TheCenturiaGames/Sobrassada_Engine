@@ -1,5 +1,5 @@
 // SobrassadaScripts.cpp : Define the exported functions from the DLL.
-//
+// That file comes by default in the project, but it is not necessary to use it. We can delete it I think, but Im not sure.
 
 #include "pch.h"
 #include "framework.h"
