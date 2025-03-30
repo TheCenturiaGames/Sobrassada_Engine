@@ -399,6 +399,13 @@
     <ClCompile Include="Modules\GameUIModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
+    <ClCompile Include="ResourceManagement\Resources\ResourceFont.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\Importers\FontImporter.cpp">
+      <Filter>FileSystem\Importers</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\Meta\MetaFont.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -740,6 +747,13 @@
     <ClInclude Include="Modules\GameUIModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
+    <ClInclude Include="ResourceManagement\Resources\ResourceFont.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\Importers\FontImporter.h">
+      <Filter>FileSystem\Importers</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\Meta\MetaFont.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl">

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -270,6 +270,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="FileSystem\Importers\FontImporter.cpp" />
+    <ClCompile Include="FileSystem\Meta\MetaFont.cpp" />
     <ClCompile Include="FileSystem\PrefabManager.cpp" />
     <ClCompile Include="FileSystem\Config\EngineConfig.cpp" />
     <ClCompile Include="FileSystem\Config\ProjectConfig.cpp" />
@@ -277,6 +279,7 @@
     <ClCompile Include="Libs\ImNodeFlow-1.2.2\src\ImNodeFlow.cpp" />
     <ClCompile Include="FileSystem\StateMachineManager.cpp" />
     <ClCompile Include="Modules\GameUIModule.cpp" />
+    <ClCompile Include="ResourceManagement\Resources\ResourceFont.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceStateMachine.cpp" />
     <ClCompile Include="Scene\Components\CameraComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\UI\CanvasComponent.cpp" />
@@ -433,12 +436,15 @@
     <ClInclude Include="FileSystem\Config\ConfigFile.h" />
     <ClInclude Include="FileSystem\Config\EngineConfig.h" />
     <ClInclude Include="FileSystem\Config\ProjectConfig.h" />
+    <ClInclude Include="FileSystem\Importers\FontImporter.h" />
+    <ClInclude Include="FileSystem\Meta\MetaFont.h" />
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\include\ImNodeFlow.h" />
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\context_wrapper.h" />
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_bezier_math.h" />
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_extra_math.h" />
     <ClInclude Include="FileSystem\StateMachineManager.h" />
     <ClInclude Include="Modules\GameUIModule.h" />
+    <ClInclude Include="ResourceManagement\Resources\ResourceFont.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceStateMachine.h" />
     <ClInclude Include="Scene\Components\CameraComponent.h" />
     <ClInclude Include="Scene\Components\Standalone\UI\CanvasComponent.h" />

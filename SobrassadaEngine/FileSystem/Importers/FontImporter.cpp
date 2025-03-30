@@ -1,0 +1,51 @@
+#include "FontImporter.h"
+
+#include "Application.h"
+#include "FileSystem.h"
+#include "LibraryModule.h"
+#include "MetaFont.h"
+
+namespace FontImporter
+{
+    UID ImportFont(const char* filePath, const std::string& targetFilePath)
+    {
+        // Copy font to assets folder
+        const std::string relativePath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(filePath);
+        std::string copyPath           = targetFilePath + relativePath;
+        if (!FileSystem::Exists(copyPath.c_str()))
+        {
+            FileSystem::Copy(filePath, copyPath.c_str());
+        }
+
+        std::string name      = FileSystem::GetFileNameWithoutExtension(filePath);
+
+        UID fontUID          = GenerateUID();
+        fontUID               = App->GetLibraryModule()->AssignFiletypeUID(fontUID, FileType::Font);
+
+        std::string assetPath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(filePath);
+
+        MetaFont meta(fontUID, assetPath);
+        meta.Save(name, assetPath);
+
+        CopyFont(filePath, targetFilePath, name, fontUID);
+
+        return fontUID;
+    }
+
+    void CopyFont(
+        const std::string& filePath, const std::string& targetFilePath, const std::string& name, const UID sourceUID
+    )
+    {
+        std::string destination = targetFilePath + FONTS_PATH + std::to_string(sourceUID) + FONT_EXTENSION;
+        FileSystem::Copy(filePath.c_str(), destination.c_str());
+
+        App->GetLibraryModule()->AddFont(sourceUID, name);
+        App->GetLibraryModule()->AddName(name, sourceUID);
+        App->GetLibraryModule()->AddResource(destination, sourceUID);
+    }
+
+    ResourceFont* LoadFont(UID fontUID)
+    {
+        return nullptr;
+    }
+} // namespace FontImporter
