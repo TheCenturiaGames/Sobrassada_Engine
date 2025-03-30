@@ -22,6 +22,12 @@ void glog(const char file[], int line, const char* format, ...);
 
 #endif
 
+#ifdef SOBRASADA_ENGINE_API
+#define SOBRASADA_API_ENGINE __declspec(dllexport)
+#else
+#define SOBRASADA_API_ENGINE __declspec(dllimport)
+#endif
+
 enum update_status
 {
     UPDATE_CONTINUE = 1,

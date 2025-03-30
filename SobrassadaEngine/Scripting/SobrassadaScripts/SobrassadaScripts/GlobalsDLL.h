@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#ifdef SOBRASSADASCRIPTS_EXPORTS
+#ifndef SOBRASSADASCRIPTS_EXPORTS
 #define SOBRASSADA_API __declspec(dllexport)
 #else
 #define SOBRASSADA_API __declspec(dllimport)
