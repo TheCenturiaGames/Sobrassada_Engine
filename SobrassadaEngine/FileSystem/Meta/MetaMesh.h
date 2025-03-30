@@ -14,5 +14,5 @@ class MetaMesh : public MetaFile
     bool generateTangents;
     float4x4 transform;
 
-    UID defaulMaterialUID = INVALID_UID;
+    UID defaultMaterialUID = INVALID_UID;
 };

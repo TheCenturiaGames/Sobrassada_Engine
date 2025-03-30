@@ -35,7 +35,7 @@ namespace SceneImporter
         tinygltf::Model model = LoadModelGLTF(filePath, targetFilePath);
 
         std::vector<std::vector<std::pair<UID, UID>>> gltfMeshes;
-        std::vector<int> matIndices;
+        std::vector<std::pair<int,UID>> matIndices;
         for (const auto& srcMesh : model.meshes)
         {
             int n        = 0;
@@ -46,12 +46,19 @@ namespace SceneImporter
             {
                 UID matUID = INVALID_UID;
                 matIndex   = primitive.material;
-                if (matIndex == -1) GLOG("Material index invalid")
-                else if (std::find(matIndices.begin(), matIndices.end(), matIndex) == matIndices.end())
+
+                auto it    = std::find_if(
+                    matIndices.begin(), matIndices.end(),
+                    [matIndex](const std::pair<int, UID>& elem) { return elem.first == matIndex; }
+                );
+
+                if (it == matIndices.end() && matIndex != -1)
                 {
                     matUID = MaterialImporter::ImportMaterial(model, matIndex, filePath, targetFilePath);
-                    matIndices.push_back(matIndex);
+                    matIndices.emplace_back(matIndex, matUID);
                 }
+                else if (it != matIndices.end()) matUID = it->second;
+                else GLOG("Material index invalid")
                 
                 std::string name = srcMesh.name + std::to_string(n);
                 UID meshUID      = MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath, targetFilePath, INVALID_UID, matUID);
