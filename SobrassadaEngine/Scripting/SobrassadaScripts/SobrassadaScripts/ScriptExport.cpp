@@ -6,7 +6,7 @@
 extern "C" SOBRASSADA_API Script* CreateScript(const std::string& scriptType, GameObject* parent)
 {
     if (scriptType == "MyScript") return new MyScript(parent);
-    if (scriptType == "RotateGameObject") return new MyScript(parent);
+    if (scriptType == "RotateGameObject") return new RotateGameObject(parent);
     return nullptr;
 }
 
