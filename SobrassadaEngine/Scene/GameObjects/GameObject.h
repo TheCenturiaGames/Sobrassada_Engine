@@ -97,6 +97,7 @@ class GameObject
     void SetMobility(ComponentMobilitySettings newMobility) { mobilitySettings = newMobility; };
 
     void OnTransformUpdated();
+    void UpdateComponents();
   private:
     void UpdateLocalTransform(const float4x4& parentGlobalTransform);
     void DrawNodes() const;

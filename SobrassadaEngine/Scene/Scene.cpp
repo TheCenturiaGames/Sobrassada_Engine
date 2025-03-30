@@ -559,6 +559,15 @@ void Scene::RemoveGameObjectHierarchy(UID gameObjectUID)
     }
 }
 
+void Scene::UpdateGameObjects()
+{
+    for (GameObject* gameObject : gameObjectsToUpdate)
+    {
+        if (gameObject) gameObject->UpdateComponents();
+    }
+    gameObjectsToUpdate.clear();
+}
+
 const std::vector<Component*> Scene::GetAllComponents() const
 {
     std::vector<Component*> collectedComponents;

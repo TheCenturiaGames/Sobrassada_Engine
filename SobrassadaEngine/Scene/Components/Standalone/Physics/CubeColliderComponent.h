@@ -24,6 +24,8 @@ class CubeColliderComponent : public Component
     void Update(float deltaTime) override;
     void Render(float deltaTime) override;
 
+    void ParentUpdated() override;
+
   public:
     bool freezeRotation           = false;
     float mass                    = 1.f;

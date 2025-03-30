@@ -5,6 +5,7 @@
 #include "Math/float4x4.h"
 
 #include <map>
+#include <vector>
 #include <tuple>
 #include <unordered_map>
 
@@ -55,6 +56,9 @@ class Scene
 
     void AddGameObject(UID uid, GameObject* newGameObject) { gameObjectsContainer.insert({uid, newGameObject}); }
     void RemoveGameObjectHierarchy(UID gameObjectUUID);
+
+    void AddGameObjectToUpdate(GameObject* gameObject) { gameObjectsToUpdate.push_back(gameObject); }
+    void UpdateGameObjects();
 
     const std::string& GetSceneName() const { return sceneName; }
     UID GetSceneUID() const { return sceneUID; }
@@ -116,4 +120,6 @@ class Scene
 
     bool staticModified                          = false;
     bool dynamicModified                         = false;
+
+    std::vector<GameObject*> gameObjectsToUpdate;
 };

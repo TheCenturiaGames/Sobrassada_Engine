@@ -82,8 +82,8 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
         );
 
         position = localTransform.TranslatePart();
-        rotation   = localTransform.RotatePart().ToEulerXYZ();
-        scale = localTransform.GetScale();
+        rotation = localTransform.RotatePart().ToEulerXYZ();
+        scale    = localTransform.GetScale();
     }
 
     // Deserialize Components
@@ -254,6 +254,7 @@ void GameObject::RenderEditorInspector()
             ))
         {
             UpdateTransformForGOBranch();
+            App->GetSceneModule()->AddGameObjectToUpdate(this);
         }
 
         // Casting to use ImGui to set values and at the same type keep the enum type for the variable
@@ -335,6 +336,7 @@ void GameObject::RenderEditorInspector()
                 ))
             {
                 UpdateTransformForGOBranch();
+                App->GetSceneModule()->AddGameObjectToUpdate(this);
             }
         }
     }
@@ -393,6 +395,14 @@ void GameObject::OnTransformUpdated()
     }
     if (mobilitySettings == STATIC) App->GetSceneModule()->GetScene()->SetStaticModified();
     else App->GetSceneModule()->GetScene()->SetDynamicModified();
+}
+
+void GameObject::UpdateComponents()
+{
+    for (const auto& component : components)
+    {
+        if (component.second) component.second->ParentUpdated();
+    }
 }
 
 void GameObject::UpdateLocalTransform(const float4x4& parentGlobalTransform)

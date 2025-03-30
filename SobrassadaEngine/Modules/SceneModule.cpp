@@ -113,6 +113,8 @@ update_status SceneModule::PostUpdate(float deltaTime)
             {
                 loadedScene->UpdateDynamicSpatialStructure();
             }
+
+            loadedScene->UpdateGameObjects();
         }
 
         if (loadedScene->GetStopPlaying()) SwitchPlayMode(false);

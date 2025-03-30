@@ -9,9 +9,6 @@
 CubeColliderComponent::CubeColliderComponent(UID uid, GameObject* parent)
     : Component(uid, parent, "Cube Collider", COMPONENT_CUBE_COLLIDER)
 {
-    centerOffset   = parent->GetPosition();
-    centerRotation = parent->GetRotation();
-
     App->GetPhysicsModule()->CreateCubeRigidBody(this);
 }
 
@@ -89,4 +86,9 @@ void CubeColliderComponent::Update(float deltaTime)
 
 void CubeColliderComponent::Render(float deltaTime)
 {
+}
+
+void CubeColliderComponent::ParentUpdated()
+{
+    App->GetPhysicsModule()->UpdateCubeRigidBody(this);
 }

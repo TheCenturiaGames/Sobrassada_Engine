@@ -22,6 +22,7 @@ class Component
     virtual void Update(float deltaTime)       = 0;
     virtual void Render(float deltaTime)       = 0;
     virtual void RenderEditorInspector();
+    virtual void ParentUpdated() { return; };
 
     UID GetUID() const { return uid; }
     UID GetParentUID() const;

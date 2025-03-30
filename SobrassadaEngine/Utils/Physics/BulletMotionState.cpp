@@ -2,12 +2,13 @@
 
 #include "Application.h"
 #include "Component.h"
+#include "Standalone/Physics/CubeColliderComponent.h"
 #include "GameObject.h"
 #include "SceneModule.h"
 
+#include "Math/Quat.h"
 #include "Math/float3.h"
 #include "Math/float4x4.h"
-#include "Math/Quat.h"
 
 BulletMotionState::BulletMotionState(
     Component* newCollider, const math::float3& newCenterOffset, const math::float3& newCenterRotation,
@@ -29,7 +30,23 @@ void BulletMotionState::getWorldTransform(btTransform& outPhysicsWorldTransform)
     GameObject* parent = collider->GetParent();
 
     btTransform gameObjectWorldTransform;
-    gameObjectWorldTransform.setFromOpenGLMatrix(parent->GetGlobalTransform().ptr());
+
+    float3x3 rotationMat =
+        float3x3::FromEulerXYZ(parent->GetRotation().x, parent->GetRotation().y, parent->GetRotation().z);
+    btMatrix3x3 bulletRotation;
+
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int j = 0; j < 3; ++j)
+        {
+            bulletRotation[i][j] = rotationMat[i][j];
+        }
+    }
+
+    gameObjectWorldTransform.setBasis(bulletRotation);
+    gameObjectWorldTransform.setOrigin(btVector3(
+        btScalar(parent->GetPosition().x), btScalar(parent->GetPosition().y), btScalar(parent->GetPosition().z)
+    ));
 
     outPhysicsWorldTransform = gameObjectWorldTransform * centerOffset.inverse();
 }
@@ -59,12 +76,11 @@ void BulletMotionState::setWorldTransform(const btTransform& physicsWorldTransfo
     float3x3 rotationMat;
     for (int i = 0; i < 3; ++i)
     {
-        for (int j = 0; j < 3; ++ j)
+        for (int j = 0; j < 3; ++j)
         {
             rotationMat[i][j] = rotationBasis[i][j];
         }
     }
-
 
     float3 newPosition = float3(
         gameObjectTransform.getOrigin().x(), gameObjectTransform.getOrigin().y(), gameObjectTransform.getOrigin().z()
