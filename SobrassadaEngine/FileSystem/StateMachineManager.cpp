@@ -205,4 +205,30 @@ namespace StateMachineManager
         return stateMachine;
     }
 
+} 
+
+std::vector<std::string> StateMachineManager::GetAllStateMachineNames()
+{
+    std::vector<std::string> names;
+    const auto& stateMachineMap = App->GetLibraryModule()->GetStateMachinePath();
+
+    for (const auto& pair : stateMachineMap)
+    {
+        names.push_back(pair.first); 
+    }
+
+    return names;
+}
+
+UID StateMachineManager::GetStateMachineUID(const std::string& stateMachineName)
+{
+    const auto& stateMachineMap = App->GetLibraryModule()->GetStateMachinePath();
+
+    auto it                     = stateMachineMap.find(stateMachineName);
+    if (it != stateMachineMap.end())
+    {
+        return it->second; 
+    }
+
+    return INVALID_UID; 
 } // namespace StateMachineManager

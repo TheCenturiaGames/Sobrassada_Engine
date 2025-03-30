@@ -25,12 +25,13 @@ bool StateMachineEditor::RenderEditor()
     {
         SaveMachine();
     }
+    ShowSavePopup();
     ImGui::SameLine();
     if (ImGui::Button("Load"))
     {
         LoadMachine();
     }
-
+    ShowLoadPopup();
     graph->update();
 
     for (auto& pair : graph->getNodes())
@@ -187,12 +188,12 @@ bool StateMachineEditor::RenderEditor()
         ImGui::End();
     }
 
+
     return true;
 }
 
 void StateMachineEditor::BuildGraph()
 {
-    
 }
 
 void StateMachineEditor::DetectNewTransitions()
@@ -242,11 +243,100 @@ void StateMachineEditor::CreateBaseState(StateNode& node)
 
 void StateMachineEditor::SaveMachine()
 {
-    StateMachineManager::Save(resource, false);
+    ImGui::OpenPopup("Save State Machine");
+}
+
+void StateMachineEditor::ShowSavePopup()
+{
+    static char stateMachineName[128] = "";
+
+    if (ImGui::BeginPopupModal("Save State Machine", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ImGui::Text("Enter the name for the State Machine:");
+        ImGui::InputText("##StateMachineName", stateMachineName, IM_ARRAYSIZE(stateMachineName));
+
+        if (ImGui::Button("Save"))
+        {
+            if (strlen(stateMachineName) > 0)
+            {
+                resource->SetName(std::string(stateMachineName));
+                StateMachineManager::Save(resource, false);
+                ImGui::CloseCurrentPopup();
+            }
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
 }
 
 void StateMachineEditor::LoadMachine()
 {
-    UID stateMachineUid = 1789842735177183;
-    const ResourceStateMachine* stateMachine = (const ResourceStateMachine*)App->GetResourcesModule()->RequestResource(stateMachineUid);
+
+    ImGui::OpenPopup("Load State Machine");
+}
+
+void StateMachineEditor::ShowLoadPopup()
+{
+    static std::vector<std::string> stateMachineNames;
+    static int selectedIndex = -1;
+
+    if (ImGui::BeginPopupModal("Load State Machine", NULL, ImGuiWindowFlags_AlwaysAutoResize)){
+        if (stateMachineNames.empty())
+        {
+            stateMachineNames = StateMachineManager::GetAllStateMachineNames();
+        }
+        ImGui::Text("Select a State Machine to Load:");
+        ImGui::Separator();
+
+        if (ImGui::BeginListBox("##StateMachineList", ImVec2(-FLT_MIN, 10 * ImGui::GetTextLineHeightWithSpacing())))
+        {
+            for (size_t i = 0; i < stateMachineNames.size(); i++)
+            {
+                if (ImGui::Selectable(stateMachineNames[i].c_str(), selectedIndex == (int)i))
+                {
+                    selectedIndex = (int)i;
+                }
+            }
+            ImGui::EndListBox();
+        }
+
+        if (ImGui::Button("Load") && selectedIndex >= 0)
+        {
+            std::string selectedName = stateMachineNames[selectedIndex];
+            UID selectedUID          = StateMachineManager::GetStateMachineUID(selectedName);
+
+            if (selectedUID != 0)
+            {
+                GLOG("Loading State Machine: %s", selectedName.c_str());
+
+                const ResourceStateMachine* stateMachine = (const ResourceStateMachine*)App->GetResourcesModule()->RequestResource(selectedUID);
+                if (stateMachine)
+                {
+                    GLOG("Successfully loaded State Machine: %s", selectedName.c_str());
+                    resource = const_cast<ResourceStateMachine*>(stateMachine);
+                    BuildGraph();
+                    ImGui::CloseCurrentPopup();
+                }
+                else
+                {
+                    GLOG("Failed to load State Machine: %s", selectedName.c_str());
+                }
+            }
+        
+        }
+        ImGui::SameLine();
+
+        if (ImGui::Button("Cancel"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
+
 }

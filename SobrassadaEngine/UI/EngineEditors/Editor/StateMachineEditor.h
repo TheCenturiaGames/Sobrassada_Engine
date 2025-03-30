@@ -19,7 +19,9 @@ class StateMachineEditor : public EngineEditorBase
     void DetectNewTransitions();
     void CreateBaseState(StateNode& node);
     void SaveMachine();
+    void ShowSavePopup();
     void LoadMachine();
+    void ShowLoadPopup();
 
   private:
     UID uid;
