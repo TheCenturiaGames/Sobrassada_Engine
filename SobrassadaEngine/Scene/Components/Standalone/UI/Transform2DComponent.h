@@ -23,17 +23,20 @@ class Transform2DComponent : public Component
     void UpdateParentTransform();
     void OnTransform3DUpdated(const float4x4& transform3D);
 
-    float2 GetGlobalPosition() const;
+    float2 GetRenderingPosition() const;
 
     CanvasComponent* GetParentCanvas() const { return parentCanvas; }
 
   private:
     void GetCanvas();
+    bool IsRootTransform2D() const;
 
   public:
     float2 position;
     float2 size;
     float2 pivot;
+    float2 anchorsX;
+    float2 anchorsY;
 
   private:
     CanvasComponent* parentCanvas;

@@ -92,20 +92,63 @@ void Transform2DComponent::Render(float deltaTime)
     // Draw a square to show the width and height
     DebugDrawModule* debugDraw = App->GetDebugDrawModule();
     debugDraw->DrawLine(
-        float3(GetGlobalPosition().x, GetGlobalPosition().y, 0), float3::unitX, size.x, float3(1, 1, 1)
+        float3(GetRenderingPosition().x, GetRenderingPosition().y, 0), float3::unitX, size.x, float3(1, 1, 1)
     );
 
     debugDraw->DrawLine(
-        float3(GetGlobalPosition().x + size.x, GetGlobalPosition().y, 0), -float3::unitY, size.y, float3(1, 1, 1)
+        float3(GetRenderingPosition().x + size.x, GetRenderingPosition().y, 0), -float3::unitY, size.y, float3(1, 1, 1)
     );
 
     debugDraw->DrawLine(
-        float3(GetGlobalPosition().x, GetGlobalPosition().y - size.y, 0), float3::unitX, size.x, float3(1, 1, 1)
+        float3(GetRenderingPosition().x, GetRenderingPosition().y - size.y, 0), float3::unitX, size.x, float3(1, 1, 1)
     );
 
     debugDraw->DrawLine(
-        float3(GetGlobalPosition().x, GetGlobalPosition().y, 0), -float3::unitY, size.y, float3(1, 1, 1)
+        float3(GetRenderingPosition().x, GetRenderingPosition().y, 0), -float3::unitY, size.y, float3(1, 1, 1)
     );
+
+    // Draw anchor points when selected
+    if (App->GetSceneModule()->GetScene()->GetSelectedGameObject()->GetUID() == parent->GetUID())
+    {
+        // To get the anchors position, the parent width / height must be multiplied by the anchor, and the anchor
+        // value depends on the parent pivot
+
+        float2 parentPivot = float2(0, 0);
+        if (!IsRootTransform2D())
+        {
+            Transform2DComponent* parentTransform =
+                static_cast<Transform2DComponent*>(App->GetSceneModule()
+                                                       ->GetScene()
+                                                       ->GetGameObjectByUID(parent->GetParent())
+                                                       ->GetComponentByType(COMPONENT_TRANSFORM_2D));
+
+            parentPivot = parentTransform->pivot;
+
+            float3 x1   = float3(
+                parentTransform->position.x + (parentTransform->size.x * (anchorsX.x - parentTransform->pivot.x)),
+                parentTransform->position.y, 0
+            );
+            debugDraw->DrawPoint(x1, 5.0f);
+
+            float3 x2 = float3(
+                parentTransform->position.x + (parentTransform->size.x * (anchorsX.y - parentTransform->pivot.x)),
+                parentTransform->position.y, 0
+            );
+            debugDraw->DrawPoint(x2, 5.0f);
+
+            float3 y1 = float3(
+                parentTransform->position.x,
+                parentTransform->position.y + (parentTransform->size.y * (anchorsY.x - parentTransform->pivot.y)), 0
+            );
+            debugDraw->DrawPoint(y1, 5.0f);
+
+             float3 y2 = float3(
+                parentTransform->position.x,
+                parentTransform->position.y + (parentTransform->size.y * (anchorsY.y - parentTransform->pivot.y)), 0
+            );
+            debugDraw->DrawPoint(y2, 5.0f);
+        }
+    }
 }
 
 void Transform2DComponent::RenderEditorInspector()
@@ -122,6 +165,10 @@ void Transform2DComponent::RenderEditorInspector()
         }
         ImGui::InputFloat2("Size", &size[0]);
         ImGui::SliderFloat2("Pivot", &pivot[0], 0.0f, 1.0f);
+        ImGui::Separator();
+        ImGui::Text("Anchors");
+        ImGui::DragFloat2("X-axis bounds", &anchorsX.x, 0.001f, 0.0f, 1.0f);
+        ImGui::DragFloat2("Y-axis bounds", &anchorsY.x, 0.001f, 0.0f, 1.0f);
     }
 }
 
@@ -138,10 +185,11 @@ void Transform2DComponent::OnTransform3DUpdated(const float4x4& transform3D)
     position.y = transform3D.TranslatePart().y;
 }
 
-float2 Transform2DComponent::GetGlobalPosition() const
+float2 Transform2DComponent::GetRenderingPosition() const
 {
     // TODO: Probably anchors will do something here
 
+    // Gets the position to use for rendering the widget (at the top-left corner of the widget space)
     float2 parentPos = float2(
         parent->GetParentGlobalTransform().TranslatePart().x, parent->GetParentGlobalTransform().TranslatePart().y
     );
@@ -173,4 +221,10 @@ void Transform2DComponent::GetCanvas()
         parentQueue.push(currentParent->GetParent());
         parentQueue.pop();
     }
+}
+
+bool Transform2DComponent::IsRootTransform2D() const
+{
+    // Returns if the parent is the canvas component, which means this gameObject is the root of the UI
+    return parentCanvas->GetParentUID() == parent->GetParent();
 }

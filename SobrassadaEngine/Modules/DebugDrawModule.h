@@ -46,6 +46,8 @@ class DebugDrawModule : public Module
     void DrawCircle(const float3& center, const float3& upVector, const float3& color, const float radius);
     void DrawSphere(const float3& center, const float3& color, const float radius);
     void DrawAxisTriad(const float4x4& transform, bool depthEnabled = true);
+    void DrawCross(const float3& center, const float length);
+    void DrawPoint(const float3& center, const float size);
 
     void FlipDebugOptionValue(int position) { debugOptionValues.flip(position); }
 

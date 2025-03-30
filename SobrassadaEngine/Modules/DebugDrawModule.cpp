@@ -719,6 +719,16 @@ void DebugDrawModule::DrawAxisTriad(const float4x4& transform, bool depthEnabled
     dd::axisTriad(transform, 0.005f, 0.05f, 0, depthEnabled);
 }
 
+void DebugDrawModule::DrawCross(const float3& position, const float length)
+{
+    dd::cross(position, length);
+}
+
+void DebugDrawModule::DrawPoint(const float3& position, const float size)
+{
+    dd::point(position, float3(1, 1, 1), size);
+}
+
 void DebugDrawModule::HandleDebugRenderOptions()
 {
     SceneModule* sceneModule   = App->GetSceneModule();
