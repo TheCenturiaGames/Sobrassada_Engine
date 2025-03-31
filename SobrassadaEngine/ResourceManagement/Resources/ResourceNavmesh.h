@@ -5,13 +5,13 @@
 class ResourceMesh;
 class dtNavMesh;
 class dtNavMeshQuery;
-class rcConfig;
+struct rcConfig;
 class rcContext;
-class rcHeightfield;
-class rcCompactHeightfield;
-class rcContourSet;
-class rcPolyMesh;
-class rcPolyMeshDetail;
+struct rcHeightfield;
+struct rcCompactHeightfield;
+struct rcContourSet;
+struct rcPolyMesh;
+struct rcPolyMeshDetail;
 class ResourceMesh;
 
 struct Vertex;
