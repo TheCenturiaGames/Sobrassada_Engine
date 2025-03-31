@@ -93,10 +93,18 @@ bool PrefabEditor::RenderEditor()
                 }
                 ImGui::EndChild();
 
-                ImGui::BeginChild("Properties", ImVec2(rightWidth, propsHeight), true);
+               ImGui::BeginChild("Properties", ImVec2(rightWidth, propsHeight), true);
                 {
-                    ImGui::Text("Properties");
-                    // Position, Rotation, ...
+                    if (selectedGameObject)
+                    {
+                        ImGui::Text("Selected: %s", selectedGameObject->GetName().c_str());
+                        ImGui::Separator();
+                        selectedGameObject->RenderTransformInspector();
+                    }
+                    else
+                    {
+                        ImGui::Text("No GameObject selected.");
+                    }
                 }
                 ImGui::EndChild();
             }
@@ -142,7 +150,14 @@ void PrefabEditor::DrawHierarchyRecursive(GameObject* go)
 {
     std::string label = go->GetName() + "##" + std::to_string(go->GetUID());
 
-    if (ImGui::TreeNode(label.c_str()))
+    bool nodeOpen     = ImGui::TreeNodeEx(label.c_str(), selectedGameObject == go ? ImGuiTreeNodeFlags_Selected : 0);
+
+    if (ImGui::IsItemClicked())
+    {
+        selectedGameObject = go;
+    }
+
+    if (nodeOpen)
     {
         for (UID childUID : go->GetChildren())
         {

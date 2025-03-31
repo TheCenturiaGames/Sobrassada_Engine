@@ -17,5 +17,5 @@ class PrefabEditor : public EngineEditorBase
     void treeHierarchyView();
     void DrawHierarchyRecursive(GameObject* go);
 
-
+    GameObject* selectedGameObject = nullptr;
 };

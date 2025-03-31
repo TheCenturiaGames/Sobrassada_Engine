@@ -778,3 +778,15 @@ void GameObject::CreatePrefab()
         App->GetSceneModule()->GetScene()->OverridePrefabs(prefabUID);
     }
 }
+
+void GameObject::RenderTransformInspector()
+{
+    const float4x4& parentTransform = GetParentGlobalTransform();
+
+    if (App->GetEditorUIModule()->RenderTransformWidget(
+            localTransform, globalTransform, parentTransform, position, rotation, scale
+        ))
+    {
+        UpdateTransformForGOBranch();
+    }
+}
