@@ -46,6 +46,14 @@ Transform2DComponent::~Transform2DComponent()
 void Transform2DComponent::Init()
 {
     GetCanvas();
+
+    if (!IsRootTransform2D())
+    {
+        parentTransform = static_cast<Transform2DComponent*>(App->GetSceneModule()
+                                                                 ->GetScene()
+                                                                 ->GetGameObjectByUID(parent->GetParent())
+                                                                 ->GetComponentByType(COMPONENT_TRANSFORM_2D));
+    }
 }
 
 void Transform2DComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
@@ -110,44 +118,21 @@ void Transform2DComponent::Render(float deltaTime)
     // Draw anchor points when selected
     if (App->GetSceneModule()->GetScene()->GetSelectedGameObject()->GetUID() == parent->GetUID())
     {
-        // To get the anchors position, the parent width / height must be multiplied by the anchor, and the anchor
-        // value depends on the parent pivot
+        // Top-left
+        float3 x1 = float3(GetAnchorXPos(anchorsX.x), GetAnchorYPos(anchorsY.y), 0);
+        debugDraw->DrawCone(x1, float3(-20, 20, 0), 10, 1);
 
-        float2 parentPivot = float2(0, 0);
-        if (!IsRootTransform2D())
-        {
-            Transform2DComponent* parentTransform =
-                static_cast<Transform2DComponent*>(App->GetSceneModule()
-                                                       ->GetScene()
-                                                       ->GetGameObjectByUID(parent->GetParent())
-                                                       ->GetComponentByType(COMPONENT_TRANSFORM_2D));
+        // Top-right
+        float3 x2 = float3(GetAnchorXPos(anchorsX.y), GetAnchorYPos(anchorsY.y), 0);
+        debugDraw->DrawCone(x2, float3(20, 20, 0), 10, 1);
 
-            parentPivot = parentTransform->pivot;
+        // Bottom-left
+        float3 y1 = float3(GetAnchorXPos(anchorsX.x), GetAnchorYPos(anchorsY.x), 0);
+        debugDraw->DrawCone(y1, float3(-20, -20, 0), 10, 1);
 
-            float3 x1   = float3(
-                parentTransform->position.x + (parentTransform->size.x * (anchorsX.x - parentTransform->pivot.x)),
-                parentTransform->position.y, 0
-            );
-            debugDraw->DrawPoint(x1, 5.0f);
-
-            float3 x2 = float3(
-                parentTransform->position.x + (parentTransform->size.x * (anchorsX.y - parentTransform->pivot.x)),
-                parentTransform->position.y, 0
-            );
-            debugDraw->DrawPoint(x2, 5.0f);
-
-            float3 y1 = float3(
-                parentTransform->position.x,
-                parentTransform->position.y + (parentTransform->size.y * (anchorsY.x - parentTransform->pivot.y)), 0
-            );
-            debugDraw->DrawPoint(y1, 5.0f);
-
-             float3 y2 = float3(
-                parentTransform->position.x,
-                parentTransform->position.y + (parentTransform->size.y * (anchorsY.y - parentTransform->pivot.y)), 0
-            );
-            debugDraw->DrawPoint(y2, 5.0f);
-        }
+        // Bottom-right
+        float3 y2 = float3(GetAnchorXPos(anchorsX.y), GetAnchorYPos(anchorsY.x), 0);
+        debugDraw->DrawCone(y2, float3(20, -20, 0), 10, 1);
     }
 }
 
@@ -227,4 +212,26 @@ bool Transform2DComponent::IsRootTransform2D() const
 {
     // Returns if the parent is the canvas component, which means this gameObject is the root of the UI
     return parentCanvas->GetParentUID() == parent->GetParent();
+}
+
+float Transform2DComponent::GetAnchorXPos(const float anchor) const
+{
+    float anchorPos = 0;
+    if (IsRootTransform2D())
+        anchorPos = parent->GetParentGlobalTransform().TranslatePart().x +
+                    (parentCanvas->GetWidth() * (anchor - 0.5f)); // 0.5f because canvas pivot is always in the middle
+    else anchorPos = parentTransform->position.x + (parentTransform->size.x * (anchor - parentTransform->pivot.x));
+
+    return anchorPos;
+}
+
+float Transform2DComponent::GetAnchorYPos(const float anchor) const
+{
+    float anchorPos = 0;
+    if (IsRootTransform2D())
+        anchorPos = parent->GetParentGlobalTransform().TranslatePart().y +
+                    (parentCanvas->GetHeight() * (anchor - 0.5f)); // 0.5f because canvas pivot is always in the middle
+    else anchorPos = parentTransform->position.y + (parentTransform->size.y * (anchor - parentTransform->pivot.y));
+
+    return anchorPos;
 }

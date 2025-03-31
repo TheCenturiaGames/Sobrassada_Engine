@@ -48,6 +48,7 @@ class DebugDrawModule : public Module
     void DrawAxisTriad(const float4x4& transform, bool depthEnabled = true);
     void DrawCross(const float3& center, const float length);
     void DrawPoint(const float3& center, const float size);
+    void DrawCone(const float3& center, const float3& dir, const float baseRadius, const float apexRadius);
 
     void FlipDebugOptionValue(int position) { debugOptionValues.flip(position); }
 

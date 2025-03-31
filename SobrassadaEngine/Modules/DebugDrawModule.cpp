@@ -729,6 +729,11 @@ void DebugDrawModule::DrawPoint(const float3& position, const float size)
     dd::point(position, float3(1, 1, 1), size);
 }
 
+void DebugDrawModule::DrawCone(const float3& center, const float3& dir, const float baseRadius, const float apexRadius)
+{
+    dd::cone(center, dir, float3(1, 1, 1), baseRadius, apexRadius);
+}
+
 void DebugDrawModule::HandleDebugRenderOptions()
 {
     SceneModule* sceneModule   = App->GetSceneModule();

@@ -31,7 +31,12 @@ class Transform2DComponent : public Component
     void GetCanvas();
     bool IsRootTransform2D() const;
 
+    float GetAnchorXPos(const float anchor) const;
+    float GetAnchorYPos(const float anchor) const;
+
   public:
+    Transform2DComponent* parentTransform;
+
     float2 position;
     float2 size;
     float2 pivot;
