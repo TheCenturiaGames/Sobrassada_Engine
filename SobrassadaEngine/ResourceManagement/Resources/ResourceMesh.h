@@ -40,6 +40,8 @@ class ResourceMesh : public Resource
     const std::vector<unsigned int>& GetIndices() const { return indices; }
     const float4x4& GetDefaultTransform() const { return defaultTransform; }
 
+    UID GetDefaultMaterialUID() const { return defaultMaterialUID; }
+
   private:
     const float4x4 TestSkinning(
         int vertexIndex, const Vertex& vertex, const std::vector<GameObject*>& bones,
@@ -62,4 +64,6 @@ class ResourceMesh : public Resource
 
     bool generateTangents     = false;
     float4x4 defaultTransform = float4x4::identity;
+    
+    UID defaultMaterialUID    = INVALID_UID;
 };
