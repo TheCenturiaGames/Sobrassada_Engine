@@ -5,7 +5,7 @@
 #pragma comment(lib, "Libs/SDL/lib/SDL2.lib")
 #pragma comment(lib, "Libs/SDL/lib/SDL2main.lib")
 
-#ifdef USE_OPTICK
+#ifdef OPTICK
 #include "optick.h"
 #endif
 
@@ -38,7 +38,7 @@ int main(int argc, char** argv)
 
     while (mainState != MAIN_EXIT)
     {
-#ifdef USE_OPTICK
+#ifdef OPTICK
         OPTICK_FRAME("Main application update");
 #endif
         switch (mainState)

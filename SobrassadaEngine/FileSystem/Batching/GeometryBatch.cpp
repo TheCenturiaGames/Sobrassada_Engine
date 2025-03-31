@@ -8,7 +8,7 @@
 #include "Standalone/MeshComponent.h"
 
 #include "glew.h"
-#ifdef USE_OPTICK
+#ifdef OPTICK
 #include "optick.h"
 #endif
 
@@ -197,13 +197,13 @@ void GeometryBatch::LoadData()
 void GeometryBatch::Render(const std::vector<MeshComponent*>& meshesToRender)
 {
     {
-#ifdef USE_OPTICK
+#ifdef OPTICK
         OPTICK_CATEGORY("GeometryBatch::WaitBuffer", Optick::Category::Wait)
 #endif
         WaitBuffer();
     }
 
-#ifdef USE_OPTICK
+#ifdef OPTICK
     OPTICK_CATEGORY("GeometryBatch::Render", Optick::Category::Rendering)
 #endif
     std::vector<Command> commands;

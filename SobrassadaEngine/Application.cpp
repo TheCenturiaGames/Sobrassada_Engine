@@ -18,7 +18,7 @@
 #include "UserInterfaceModule.h"
 #include "WindowModule.h"
 
-#ifdef USE_OPTICK
+#ifdef OPTICK
 #include "optick.h"
 #endif
 
@@ -71,7 +71,7 @@ update_status Application::Update()
 
     update_status returnStatus = UPDATE_CONTINUE;
     {
-#ifdef USE_OPTICK
+#ifdef OPTICK
         OPTICK_CATEGORY("Application::PreUpdate", Optick::Category::GameLogic)
 #endif
         for (std::list<Module*>::iterator it = modules.begin(); it != modules.end() && returnStatus == UPDATE_CONTINUE;
@@ -79,7 +79,7 @@ update_status Application::Update()
             returnStatus = (*it)->PreUpdate(deltaTime);
     }
     {
-#ifdef USE_OPTICK
+#ifdef OPTICK
         OPTICK_CATEGORY("Application::Update", Optick::Category::GameLogic)
 #endif
         for (std::list<Module*>::iterator it = modules.begin(); it != modules.end() && returnStatus == UPDATE_CONTINUE;
@@ -87,7 +87,7 @@ update_status Application::Update()
             returnStatus = (*it)->Update(deltaTime);
     }
     {
-#ifdef USE_OPTICK
+#ifdef OPTICK
         OPTICK_CATEGORY("Application::Render", Optick::Category::Rendering)
 #endif
         for (std::list<Module*>::iterator it = modules.begin(); it != modules.end() && returnStatus == UPDATE_CONTINUE;
@@ -96,7 +96,7 @@ update_status Application::Update()
     }
 
     {
-#ifdef USE_OPTICK
+#ifdef OPTICK
         OPTICK_CATEGORY("Application::RenderEditor", Optick::Category::Rendering)
 #endif
 #ifndef GAME
@@ -109,7 +109,7 @@ update_status Application::Update()
     }
 
     {
-#ifdef USE_OPTICK
+#ifdef OPTICK
         OPTICK_CATEGORY("Application::PostUpdate", Optick::Category::GameLogic)
 #endif
         for (std::list<Module*>::iterator it = modules.begin(); it != modules.end() && returnStatus == UPDATE_CONTINUE;

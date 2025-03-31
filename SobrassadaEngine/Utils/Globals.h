@@ -31,10 +31,6 @@ enum update_status
         }                                                                                                              \
     }
 
-#if defined(NDEBUG) && !defined(GAME) // release but not game
-#define USE_OPTICK
-#endif
-
 // Configuration -----------
 constexpr int SCREEN_WIDTH  = 1280;
 constexpr int SCREEN_HEIGHT = 720;

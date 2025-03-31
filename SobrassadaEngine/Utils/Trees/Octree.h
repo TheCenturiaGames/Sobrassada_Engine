@@ -4,7 +4,7 @@
 
 #include <stack>
 #include <vector>
-#ifdef USE_OPTICK
+#ifdef OPTICK
 #include "optick.h"
 #endif
 
@@ -75,7 +75,7 @@ class Octree
 template <typename AreaType>
 inline void Octree::QueryElements(const AreaType& queryObject, std::vector<GameObject*>& foundElements) const
 {
-#ifdef USE_OPTICK
+#ifdef OPTICK
     OPTICK_CATEGORY("Octree::QueryElements", Optick::Category::GameLogic)
 #endif
     std::vector<bool> insertedElements = std::vector<bool>(totalElements, false);
