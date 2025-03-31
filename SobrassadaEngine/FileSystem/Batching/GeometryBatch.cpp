@@ -52,6 +52,7 @@ GeometryBatch::~GeometryBatch()
     componentsMap.clear();
     uniqueMeshesMap.clear();
     uniqueMeshesCount.clear();
+    bonesCount.clear();
 
     CleanUp();
     glUseProgram(0);
@@ -83,7 +84,6 @@ void GeometryBatch::LoadData()
     std::vector<unsigned int> totalIndices;
     std::vector<float4x4> totalModels;
     std::vector<MaterialGPU> totalMaterials;
-    std::vector<std::vector<GameObject*>> bonesGameObject;
     std::vector<std::vector<float4x4>> bindMatrices;
 
     unsigned int accVertexCount = 0;
@@ -115,11 +115,10 @@ void GeometryBatch::LoadData()
 
         if (hasBones)
         {
-            bonesGameObject.push_back(component->GetBonesGO());
             bindMatrices.push_back(component->GetBindMatrices());
             bonesCount.push_back(accBonesCount);
 
-            accBonesCount += static_cast<unsigned int>(component->GetBonesGO().size());
+            accBonesCount += static_cast<unsigned int>(component->GetBindMatrices().size());
         }
     }
 
@@ -128,22 +127,22 @@ void GeometryBatch::LoadData()
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, totalVertices.size() * sizeof(Vertex), totalVertices.data(), GL_STATIC_DRAW);
 
-    glEnableVertexAttribArray(0); // Position
+    glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
 
-    glEnableVertexAttribArray(1); // Tangent
+    glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
 
-    glEnableVertexAttribArray(2); // Normal
+    glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 
-    glEnableVertexAttribArray(3); // Texture Coordinates
+    glEnableVertexAttribArray(3);
     glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoord));
 
-    glEnableVertexAttribArray(4); // Joint
+    glEnableVertexAttribArray(4);
     glVertexAttribIPointer(4, 4, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, joint));
 
-    glEnableVertexAttribArray(5); // Weights
+    glEnableVertexAttribArray(5);
     glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, weights));
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
@@ -257,7 +256,6 @@ void GeometryBatch::GenerateCommands(const std::vector<MeshComponent*>& meshes, 
     }
 }
 
-// gpu not writting in display buffer (currentBuffer)
 void GeometryBatch::WaitBuffer()
 {
     if (gSync[currentBufferIndex])
@@ -323,7 +321,6 @@ void GeometryBatch::UpdateBuffers(const std::vector<MeshComponent*>& meshesToRen
     currentBufferIndex = nextBufferIndex;
 }
 
-// lock until gpu stops writting (nextBuffer)
 void GeometryBatch::LockBuffer()
 {
     if (gSync[currentBufferIndex])
