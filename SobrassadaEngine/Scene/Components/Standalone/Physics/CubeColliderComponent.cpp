@@ -4,6 +4,7 @@
 #include "GameObject.h"
 #include "PhysicsModule.h"
 
+#include "ImGui.h"
 #include "Libs/rapidjson/document.h"
 
 CubeColliderComponent::CubeColliderComponent(UID uid, GameObject* parent)
@@ -78,6 +79,35 @@ void CubeColliderComponent::Clone(const Component* other)
 
 void CubeColliderComponent::RenderEditorInspector()
 {
+
+    if (ImGui::BeginCombo("Collider type", ColliderTypeStrings[(int)colliderType]))
+    {
+        int colliderStringSize = sizeof(ColliderTypeStrings) / sizeof(char*);
+        for (int i = 0; i < colliderStringSize; ++i)
+        {
+            if (ImGui::Selectable(ColliderTypeStrings[i]))
+            {
+                colliderType = ColliderType(i);
+                if (colliderType == ColliderType::STATIC) mass = 0.f;
+                App->GetPhysicsModule()->UpdateCubeRigidBody(this);
+            }
+        }
+        ImGui::EndCombo();
+    }
+
+    ImGui::BeginDisabled(colliderType != ColliderType::DYNAMIC);
+    if (ImGui::InputFloat("Mass", &mass))
+    {
+        if(mass == 0.f)colliderType = ColliderType::STATIC;
+        App->GetPhysicsModule()->UpdateCubeRigidBody(this);
+    }
+    ImGui::EndDisabled();
+
+    if (ImGui::InputFloat3("Center offset", &centerOffset[0])) App->GetPhysicsModule()->UpdateCubeRigidBody(this);
+
+    if (ImGui::Checkbox("Freeze rotation", &freezeRotation)) App->GetPhysicsModule()->UpdateCubeRigidBody(this);
+
+    if (ImGui::InputFloat3("Center rotation", &centerRotation[0])) App->GetPhysicsModule()->UpdateCubeRigidBody(this);
 }
 
 void CubeColliderComponent::Update(float deltaTime)

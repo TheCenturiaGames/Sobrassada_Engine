@@ -1,4 +1,5 @@
 ﻿#include "ComponentUtils.h"
+#include "ComponentUtils.h"
 
 #include "CameraComponent.h"
 #include "Component.h"

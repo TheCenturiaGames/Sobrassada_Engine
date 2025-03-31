@@ -12,7 +12,7 @@
 
 class MeshComponent;
 
-enum ComponentMobilitySettings
+enum MobilitySettings
 {
     DYNAMIC = 0,
     STATIC  = 1,
@@ -33,7 +33,7 @@ class GameObject
 
     const float4x4& GetParentGlobalTransform() const;
 
-    bool IsStatic() const { return mobilitySettings == ComponentMobilitySettings::STATIC; };
+    bool IsStatic() const { return mobilitySettings == MobilitySettings::STATIC; };
 
     bool AddGameObject(UID gameObjectUID);
     bool RemoveGameObject(UID gameObjectUID);
@@ -94,7 +94,7 @@ class GameObject
     void CreatePrefab();
     UID GetPrefabUID() const { return prefabUID; }
     void SetPrefabUID(const UID uid) { prefabUID = uid; }
-    void SetMobility(ComponentMobilitySettings newMobility) { mobilitySettings = newMobility; };
+    void SetMobility(MobilitySettings newMobility) { mobilitySettings = newMobility; };
 
     void OnTransformUpdated();
     void UpdateComponents();
@@ -102,7 +102,7 @@ class GameObject
     void UpdateLocalTransform(const float4x4& parentGlobalTransform);
     void DrawNodes() const;
     void OnDrawConnectionsToggle();
-    void UpdateMobilityHeriarchy(ComponentMobilitySettings type);
+    void UpdateMobilityHeriarchy(MobilitySettings type);
 
   public:
     inline static UID currentRenamingUID = INVALID_UID;

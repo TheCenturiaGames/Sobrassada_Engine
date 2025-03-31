@@ -21,7 +21,7 @@ BulletMotionState::BulletMotionState(
 
     centerOffset = btTransform(
         rotationQuat, btVector3(btScalar(newCenterOffset.x), btScalar(newCenterOffset.y), btScalar(newCenterOffset.z))
-    );
+    ).inverse();
 }
 
 // Syncronize from render world to physics world

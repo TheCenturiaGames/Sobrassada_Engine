@@ -695,7 +695,7 @@ void GameObject::OnDrawConnectionsToggle()
     }
 }
 
-void GameObject::UpdateMobilityHeriarchy(ComponentMobilitySettings type)
+void GameObject::UpdateMobilityHeriarchy(MobilitySettings type)
 {
     std::set<UID> visitedGameObjects;
     std::stack<UID> toVisitGameObjects;

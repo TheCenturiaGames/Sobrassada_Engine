@@ -25,6 +25,16 @@ enum ComponentType
     LAST  = COMPONENT_CUBE_COLLIDER
 };
 
+enum class ColliderType
+{
+    STATIC = 0,
+    DYNAMIC,
+    KINEMATIC,
+    TRIGGER
+};
+
+constexpr const char* ColliderTypeStrings[] = {"Static", "Dynamic", "Kinematic", "Trigger"};
+
 class ComponentUtils
 {
   public:
