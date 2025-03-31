@@ -296,87 +296,38 @@ bool ResourceNavMesh::BuildNavMesh(
     // Build polygon navmesh from the contours.
 
     // temporal polymesh and detailpolymesh
-    rcPolyMesh* tempPolyMesh = rcAllocPolyMesh();
+    polymesh = rcAllocPolyMesh();
 
-    if (!tempPolyMesh)
+    if (!polymesh)
     {
         GLOG("buildNavigation: Out of memory 'tempPolyMesh'.");
         return false;
     }
-    if (!rcBuildPolyMesh(context, *contourSet, config->maxVertsPerPoly, *tempPolyMesh))
+    if (!rcBuildPolyMesh(context, *contourSet, config->maxVertsPerPoly, *polymesh))
     {
         GLOG("buildNavigation: Could not triangulate contours.");
         return false;
     }
-    rcPolyMeshDetail* tempPolyMeshDetail = rcAllocPolyMeshDetail();
-    if (!tempPolyMeshDetail)
+   polymeshDetail = rcAllocPolyMeshDetail();
+    if (!polymeshDetail)
     {
         GLOG("buildNavigation: Out of memory 'tempPolyMeshDetail'.");
         return false;
     }
 
     if (!rcBuildPolyMeshDetail(
-            context, *tempPolyMesh, *compactHeightfield, config->detailSampleDist, config->detailSampleMaxError,
-            *tempPolyMeshDetail
+            context, *polymesh, *compactHeightfield, config->detailSampleDist, config->detailSampleMaxError,
+            *polymeshDetail
         ))
     {
         GLOG("buildNavigation: Could not build detail mesh.");
         return false;
     }
-    // making polymeshes walkable for detour
-    if (tempPolyMesh->npolys > 0)
-    {
-        for (int i = 0; i < tempPolyMesh->npolys; ++i)
-        {
-            if (tempPolyMesh->areas[i] == RC_WALKABLE_AREA)
-            {
-                tempPolyMesh->flags[i] = 1;
-            }
-            else
-            {
-                tempPolyMesh->flags[i] = 0;
-            }
-
-            myPolyMeshDetails.push_back(tempPolyMeshDetail);
-            myPolyMeshes.push_back(tempPolyMesh);
-        }
-    }
-    else
-    {
-        rcFreePolyMesh(tempPolyMesh);
-        rcFreePolyMeshDetail(tempPolyMeshDetail);
-    }
+    
 
     rcFreeCompactHeightfield(compactHeightfield);
     rcFreeContourSet(contourSet);
 
-    polymesh = rcAllocPolyMesh();
-    if (!polymesh)
-    {
-        GLOG("buildNavigation: Out of memory for polymesh");
-        delete context;
-        return false;
-    }
-
-    polymeshDetail = rcAllocPolyMeshDetail();
-    if (!polymeshDetail)
-    {
-        GLOG("buildNavigation: Out of memory for detailed polymesh.");
-        delete context;
-        return false;
-    }
-
-    if (!rcMergePolyMeshes(context, &myPolyMeshes[0], myPolyMeshes.size(), *polymesh))
-    {
-        GLOG("mergePolymeshes: Failed to merge polymeshes.");
-        return false;
-    }
-
-    if (!rcMergePolyMeshDetails(context, &myPolyMeshDetails[0], myPolyMeshDetails.size(), *polymeshDetail))
-    {
-        GLOG("mergePolymeshdetails: Failed to merge polymeshdetails.");
-        return false;
-    }
 
     if (config->maxVertsPerPoly <= DT_VERTS_PER_POLYGON)
     {
