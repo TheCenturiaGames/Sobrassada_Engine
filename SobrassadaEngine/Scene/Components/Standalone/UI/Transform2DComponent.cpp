@@ -10,7 +10,8 @@
 #include <queue>
 
 Transform2DComponent::Transform2DComponent(UID uid, GameObject* parent)
-    : size(float2(400, 200)), pivot(float2(0.5f, 0.5f)), Component(uid, parent, "Transform 2D", COMPONENT_TRANSFORM_2D)
+    : size(float2(400, 200)), pivot(float2(0.5f, 0.5f)), anchorsX(float2(0.5f, 0.5f)), anchorsY(float2(0.5f, 0.5f)),
+      Component(uid, parent, "Transform 2D", COMPONENT_TRANSFORM_2D)
 {
 }
 
@@ -36,6 +37,15 @@ Transform2DComponent::Transform2DComponent(const rapidjson::Value& initialState,
         const rapidjson::Value& initPivot = initialState["Pivot"];
         pivot.x                           = initPivot[0].GetFloat();
         pivot.y                           = initPivot[1].GetFloat();
+    }
+
+    if (initialState.HasMember("Anchors") && initialState["Anchors"].IsArray())
+    {
+        const rapidjson::Value& initAnchors = initialState["Anchors"];
+        anchorsX.x                          = initAnchors[0].GetFloat();
+        anchorsX.y                          = initAnchors[1].GetFloat();
+        anchorsY.x                          = initAnchors[2].GetFloat();
+        anchorsY.y                          = initAnchors[3].GetFloat();
     }
 }
 
@@ -74,6 +84,13 @@ void Transform2DComponent::Save(rapidjson::Value& targetState, rapidjson::Docume
     valPivot.PushBack(pivot.x, allocator);
     valPivot.PushBack(pivot.y, allocator);
     targetState.AddMember("Pivot", valPivot, allocator);
+
+    rapidjson::Value valAnchors(rapidjson::kArrayType);
+    valAnchors.PushBack(anchorsX.x, allocator);
+    valAnchors.PushBack(anchorsX.y, allocator);
+    valAnchors.PushBack(anchorsY.y, allocator);
+    valAnchors.PushBack(anchorsY.y, allocator);
+    targetState.AddMember("Anchors", valAnchors, allocator);
 }
 
 void Transform2DComponent::Clone(const Component* other)
@@ -149,35 +166,39 @@ void Transform2DComponent::RenderEditorInspector()
             UpdateParentTransform();
         }
         ImGui::InputFloat2("Size", &size[0]);
-        ImGui::SliderFloat2("Pivot", &pivot[0], 0.0f, 1.0f);
+        ImGui::DragFloat2("Pivot", &pivot[0], 0.01f, 0.0f, 1.0f);
         ImGui::Separator();
         ImGui::Text("Anchors");
-        ImGui::DragFloat2("X-axis bounds", &anchorsX.x, 0.001f, 0.0f, 1.0f);
-        ImGui::DragFloat2("Y-axis bounds", &anchorsY.x, 0.001f, 0.0f, 1.0f);
+        if (ImGui::DragFloat2("X-axis bounds", &anchorsX.x, 0.001f, 0.0f, 1.0f)) OnAnchorsUpdated();
+        if (ImGui::DragFloat2("Y-axis bounds", &anchorsY.x, 0.001f, 0.0f, 1.0f)) OnAnchorsUpdated();
     }
 }
 
 void Transform2DComponent::UpdateParentTransform()
 {
-    float4x4 transform = parent->GetGlobalTransform();
-    transform.SetTranslatePart(position.x, position.y, 0);
-    parent->SetLocalTransform(transform);
+    // float4x4 transform = parent->GetGlobalTransform();
+    // transform.SetTranslatePart(GetAnchorXPos(anchorsX.x) + position.x, GetAnchorYPos(anchorsY.x) + position.y, 0);
+    // parent->SetLocalTransform(transform);
 }
 
 void Transform2DComponent::OnTransform3DUpdated(const float4x4& transform3D)
 {
-    position.x = transform3D.TranslatePart().x;
-    position.y = transform3D.TranslatePart().y;
+    // position.x = transform3D.TranslatePart().x - GetAnchorXPos(anchorsX.x);
+    // position.y = transform3D.TranslatePart().y - GetAnchorYPos(anchorsY.x);
+
+    // Like in Unity, when anchors are separated probably position will be calculated in a different way
 }
 
 float2 Transform2DComponent::GetRenderingPosition() const
 {
-    // TODO: Probably anchors will do something here
-
     // Gets the position to use for rendering the widget (at the top-left corner of the widget space)
-    float2 parentPos = float2(
-        parent->GetParentGlobalTransform().TranslatePart().x, parent->GetParentGlobalTransform().TranslatePart().y
-    );
+    float2 parentPos;
+
+    if (IsRootTransform2D())
+        parentPos = float2(
+            parent->GetParentGlobalTransform().TranslatePart().x, parent->GetParentGlobalTransform().TranslatePart().y
+        );
+    else parentPos = float2(parentTransform->position.x, parentTransform->position.y);
 
     return float2(parentPos.x + position.x - (size.x * pivot.x), parentPos.y + position.y + (size.y * (1 - pivot.y)));
 }
@@ -234,4 +255,9 @@ float Transform2DComponent::GetAnchorYPos(const float anchor) const
     else anchorPos = parentTransform->position.y + (parentTransform->size.y * (anchor - parentTransform->pivot.y));
 
     return anchorPos;
+}
+
+void Transform2DComponent::OnAnchorsUpdated()
+{
+    // TODO: Update position according to new anchor values
 }

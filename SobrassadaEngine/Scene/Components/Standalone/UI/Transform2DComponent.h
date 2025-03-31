@@ -34,6 +34,8 @@ class Transform2DComponent : public Component
     float GetAnchorXPos(const float anchor) const;
     float GetAnchorYPos(const float anchor) const;
 
+    void OnAnchorsUpdated();
+
   public:
     Transform2DComponent* parentTransform;
 
