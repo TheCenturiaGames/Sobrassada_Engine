@@ -8,7 +8,6 @@ StateMachineEditor::StateMachineEditor(const std::string& editorName, UID uid, R
     : EngineEditorBase(editorName, uid), uid(uid), resource(stateMachine)
 {
     graph = std::make_unique<ImFlow::ImNodeFlow>("StateMachineGraph_" + std::to_string(uid));
-    BuildGraph();
 }
 
 StateMachineEditor::~StateMachineEditor()
@@ -194,6 +193,58 @@ bool StateMachineEditor::RenderEditor()
 
 void StateMachineEditor::BuildGraph()
 {
+    selectedNode = nullptr;
+    graph = std::make_unique<ImFlow::ImNodeFlow>("StateMachineGraph_" + std::to_string(uid));
+
+    std::unordered_map<std::string, std::shared_ptr<StateNode>> stateNodes;
+    stateNodes.clear();
+
+    for (const auto& state : resource->states)
+    {
+        ImVec2 position = ImVec2(500, 200); 
+
+        auto newNode    = graph->placeNodeAt<StateNode>(position);
+        if (newNode)
+        {
+            auto stateNode = std::dynamic_pointer_cast<StateNode>(newNode);
+            if (stateNode)
+            {
+
+                stateNode->SetStateName(state.name.GetString());
+                stateNode->SetClipName(state.clipName.GetString());
+
+                stateNodes[state.name.GetString()] = stateNode;
+            }
+        }
+    }
+
+    for (const auto& transition : resource->transitions)
+    {
+        auto itFrom = stateNodes.find(transition.fromState.GetString());
+        auto itTo   = stateNodes.find(transition.toState.GetString());
+
+        if (itFrom != stateNodes.end() && itTo != stateNodes.end())
+        {
+            auto fromNode = itFrom->second;
+            auto toNode   = itTo->second;
+
+            if (fromNode && toNode)
+            {
+                auto outputPin = fromNode->getOutputPin();
+                auto inputPin  = toNode->getInputPin();
+
+                if (outputPin && inputPin)
+                {
+                    auto link = std::make_shared<ImFlow::Link>(outputPin.get(), inputPin.get(), graph.get());
+                    graph->addLink(link);
+                }
+                else
+                {
+                    GLOG("Error: Uno de los nodos no tiene pines válidos.");
+                }
+            }
+        }
+    }
 }
 
 void StateMachineEditor::DetectNewTransitions()
