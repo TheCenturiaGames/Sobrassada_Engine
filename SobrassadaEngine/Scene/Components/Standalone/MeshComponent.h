@@ -3,8 +3,8 @@
 #include "Component.h"
 #include "Globals.h"
 
-#include <Libs/rapidjson/document.h>
-#include <Math/float4x4.h>
+#include "Libs/rapidjson/document.h"
+#include "Math/float4x4.h"
 #include <cstdint>
 
 class ResourceMesh;

@@ -2,8 +2,8 @@
 
 #include "Globals.h"
 
-#include <Libs/rapidjson/document.h>
-#include <Math/float4x4.h>
+#include "Math/float4x4.h"
+#include "rapidjson/document.h"
 #include <cstdint>
 
 class Component;

@@ -1,11 +1,11 @@
 ﻿#pragma once
 
 #include "ComponentUtils.h"
+#include "GameObject.h"
 #include "Globals.h"
-#include "Scene/GameObjects/GameObject.h"
 
-#include <Geometry/AABB.h>
-#include <Libs/rapidjson/document.h>
+#include "Geometry/AABB.h"
+#include "rapidjson/document.h"
 
 class Component
 {

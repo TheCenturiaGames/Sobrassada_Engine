@@ -1,22 +1,22 @@
 #include "MeshComponent.h"
 
 #include "CameraComponent.h"
-#include <Application.h>
-#include <BatchManager.h>
-#include <CameraModule.h>
-#include <EditorUIModule.h>
-#include <GeometryBatch.h>
-#include <LibraryModule.h>
-#include <MeshImporter.h>
-#include <ResourceMaterial.h>
-#include <ResourceMesh.h>
-#include <ResourceModel.h>
-#include <ResourcesModule.h>
-#include <SceneModule.h>
-#include <ShaderModule.h>
+#include "Application.h"
+#include "BatchManager.h"
+#include "CameraModule.h"
+#include "EditorUIModule.h"
+#include "GeometryBatch.h"
+#include "LibraryModule.h"
+#include "MeshImporter.h"
+#include "ResourceMaterial.h"
+#include "ResourceMesh.h"
+#include "ResourceModel.h"
+#include "ResourcesModule.h"
+#include "SceneModule.h"
+#include "ShaderModule.h"
 
-#include <Math/Quat.h>
-#include <imgui.h>
+#include "Math/Quat.h"
+#include "imgui.h"
 
 MeshComponent::MeshComponent(const UID uid, GameObject* parent) : Component(uid, parent, "Mesh", COMPONENT_MESH)
 {
