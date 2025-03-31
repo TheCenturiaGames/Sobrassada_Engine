@@ -31,7 +31,7 @@
 #include "imgui_internal.h"
 // guizmo after imgui include
 #include "./Libs/ImGuizmo/ImGuizmo.h"
-#ifdef _DEBUG
+#ifdef USE_OPTICK
 #include "optick.h"
 #endif
 
@@ -218,7 +218,7 @@ void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGa
 
 update_status Scene::Update(float deltaTime)
 {
-#ifdef _DEBUG
+#ifdef USE_OPTICK
     OPTICK_CATEGORY("Scene::Update", Optick::Category::GameLogic)
 #endif
     for (auto& gameObject : gameObjectsContainer)
@@ -242,7 +242,7 @@ update_status Scene::Render(float deltaTime) const
     CheckObjectsToRender(objectsToRender);
 
     {
-#ifdef _DEBUG
+#ifdef USE_OPTICK
         OPTICK_CATEGORY("Scene::MeshesToRender", Optick::Category::GameLogic)
 #endif
         BatchManager* batchManager = App->GetResourcesModule()->GetBatchManager();
@@ -258,7 +258,7 @@ update_status Scene::Render(float deltaTime) const
     }
 
     {
-#ifdef _DEBUG
+#ifdef USE_OPTICK
         OPTICK_CATEGORY("Scene::GameObject::Render", Optick::Category::Rendering)
 #endif
         for (const auto& gameObject : objectsToRender)
@@ -271,7 +271,7 @@ update_status Scene::Render(float deltaTime) const
     }
 
     {
-#ifdef _DEBUG
+#ifdef USE_OPTICK
         OPTICK_CATEGORY("Scene::GameObject::DrawGizmos", Optick::Category::Rendering)
 #endif
         for (const auto& gameObject : gameObjectsContainer)
@@ -668,7 +668,7 @@ void Scene::UpdateDynamicSpatialStructure()
 
 void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects) const
 {
-#ifdef _DEBUG
+#ifdef USE_OPTICK
     OPTICK_CATEGORY("Scene::CheckObjectsToRender", Optick::Category::GameLogic)
 #endif
     std::vector<GameObject*> queriedObjects;

@@ -8,7 +8,7 @@
 #include "Standalone/MeshComponent.h"
 
 #include "glew.h"
-#ifdef _DEBUG
+#ifdef USE_OPTICK
 #include "optick.h"
 #endif
 
@@ -197,21 +197,19 @@ void GeometryBatch::LoadData()
 void GeometryBatch::Render(const std::vector<MeshComponent*>& meshesToRender)
 {
     {
-#ifdef _DEBUG
+#ifdef USE_OPTICK
         OPTICK_CATEGORY("GeometryBatch::WaitBuffer", Optick::Category::Wait)
 #endif
         WaitBuffer();
     }
 
-#ifdef _DEBUG
+#ifdef USE_OPTICK
     OPTICK_CATEGORY("GeometryBatch::Render", Optick::Category::Rendering)
 #endif
     std::vector<Command> commands;
     GenerateCommands(meshesToRender, commands);
 
-    UpdateBones(meshesToRender);
-
-    UpdateModels(meshesToRender);
+    if (!updatedOnce) UpdateBuffers(meshesToRender);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, materials);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 11, materials);
@@ -272,11 +270,13 @@ void GeometryBatch::WaitBuffer()
     }
 }
 
-void GeometryBatch::UpdateBones(const std::vector<MeshComponent*>& meshesToRender)
+void GeometryBatch::UpdateBuffers(const std::vector<MeshComponent*>& meshesToRender)
 {
+    updatedOnce               = true;
+    const int nextBufferIndex = (currentBufferIndex + 1) % 2;
+
     if (hasBones)
     {
-        const int nextBufferIndex  = (currentBufferIndex + 1) % 2;
         const GLuint nextBuffer    = bones[nextBufferIndex];
         const GLuint currentBuffer = bones[currentBufferIndex];
 
@@ -304,11 +304,7 @@ void GeometryBatch::UpdateBones(const std::vector<MeshComponent*>& meshesToRende
         glUniform1i(4, 1); // mesh has bones
     }
     else glUniform1i(4, 0); // meshes has no bones
-}
 
-void GeometryBatch::UpdateModels(const std::vector<MeshComponent*>& meshesToRender)
-{
-    const int nextBufferIndex  = (currentBufferIndex + 1) % 2;
     const GLuint nextBuffer    = models[nextBufferIndex];
     const GLuint currentBuffer = models[currentBufferIndex];
 

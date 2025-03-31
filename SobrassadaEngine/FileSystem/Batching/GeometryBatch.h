@@ -35,11 +35,11 @@ class GeometryBatch
     const bool GetHasBones() const { return hasBones; }
     const unsigned int GetVertexCount() const { return totalVertexCount; }
     const unsigned int GetIndexCount() const { return totalIndexCount; }
+    void ResetUpdatedOnce() { updatedOnce = false; }
 
   private:
     void LockBuffer();
-    void UpdateModels(const std::vector<MeshComponent*>& meshesToRender);
-    void UpdateBones(const std::vector<MeshComponent*>& meshesToRender);
+    void UpdateBuffers(const std::vector<MeshComponent*>& meshesToRender);
     void WaitBuffer();
 
     void GenerateCommands(const std::vector<MeshComponent*>& meshes, std::vector<Command>& commands);
@@ -53,18 +53,19 @@ class GeometryBatch
     std::unordered_map<const ResourceMesh*, std::size_t> uniqueMeshesMap;
     std::vector<AccMeshCount> uniqueMeshesCount;
 
-    GLsync gSync[2]        = {nullptr, nullptr};
-    int currentBufferIndex = 0;
+    bool updatedOnce           = false;
+    GLsync gSync[2]            = {nullptr, nullptr};
+    int currentBufferIndex     = 0;
 
-    GLuint models[2]       = {0, 0};
-    float4x4* ptrModels[2] = {nullptr, nullptr};
-    std::size_t modelsSize = 0;
+    GLuint models[2]           = {0, 0};
+    float4x4* ptrModels[2]     = {nullptr, nullptr};
+    std::size_t modelsSize     = 0;
 
-    GLuint bones[2]        = {0, 0};
-    GLuint bonesIndex      = 0;
-    float4x4* ptrBones[2]  = {nullptr, nullptr};
-    std::size_t bonesSize  = 0;
-    std::size_t bonesIndexSize  = 0;
+    GLuint bones[2]            = {0, 0};
+    GLuint bonesIndex          = 0;
+    float4x4* ptrBones[2]      = {nullptr, nullptr};
+    std::size_t bonesSize      = 0;
+    std::size_t bonesIndexSize = 0;
     std::vector<unsigned int> bonesCount;
 
     unsigned int totalVertexCount = 0;
@@ -76,7 +77,7 @@ class GeometryBatch
     unsigned int ebo              = 0;
     unsigned int materials        = 0;
 
-    bool hasBones                 = false;
-    bool isMetallic               = false;
     unsigned int mode             = 0;
+    bool isMetallic               = false;
+    bool hasBones                 = false;
 };

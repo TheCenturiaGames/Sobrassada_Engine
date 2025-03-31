@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "Config/EngineConfig.h"
+#include "Config/ProjectConfig.h"
 #include "EditorUIModule.h"
 #include "FileSystem.h"
 #include "ImGui.h"

@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "CameraModule.h"
 #include "Config/EngineConfig.h"
+#include "Config/ProjectConfig.h"
 #include "EditorUIModule.h"
 #include "FileSystem.h"
 #include "GameObject.h"
@@ -14,7 +15,7 @@
 #include "ResourcesModule.h"
 
 #include <SDL_mouse.h>
-#ifdef _DEBUG
+#ifdef USE_OPTICK
 #include "optick.h"
 #endif
 
@@ -64,7 +65,7 @@ update_status SceneModule::Render(float deltaTime)
 {
     if (loadedScene != nullptr)
     {
-#ifdef _DEBUG
+#ifdef USE_OPTICK
         OPTICK_CATEGORY("SceneModule::Render", Optick::Category::Rendering)
 #endif
         return loadedScene->Render(deltaTime);

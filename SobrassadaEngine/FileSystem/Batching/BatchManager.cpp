@@ -15,7 +15,7 @@
 #include "Math/float3.h"
 #include "glew.h"
 #include <chrono>
-#ifdef _DEBUG
+#ifdef USE_OPTICK
 #include "optick.h"
 #endif
 
@@ -59,7 +59,7 @@ void BatchManager::LoadData()
 
 void BatchManager::Render(const std::vector<MeshComponent*>& meshesToRender)
 {
-#ifdef _DEBUG
+#ifdef USE_OPTICK
     OPTICK_CATEGORY("BatchManager::Render", Optick::Category::Rendering)
 #endif
     unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
@@ -97,6 +97,7 @@ void BatchManager::Render(const std::vector<MeshComponent*>& meshesToRender)
 
         glUniform3fv(glGetUniformLocation(program, "cameraPos"), 1, &cameraPos[0]);
 
+        it->ResetUpdatedOnce();
         it->Render(batchMeshes);
 
         const auto end                             = std::chrono::high_resolution_clock::now();
