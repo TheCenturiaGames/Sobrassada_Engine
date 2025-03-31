@@ -12,6 +12,8 @@
 
 class MeshComponent;
 
+#pragma warning(disable: 4251)
+
 enum ComponentMobilitySettings
 {
     DYNAMIC = 0,

@@ -23,7 +23,7 @@ bool ScriptModule::ShutDown()
 
 void ScriptModule::LoadDLL()
 {
-    dllHandle = LoadLibrary("SobrassadaScripts.dll");
+    dllHandle = LoadLibrary(TEXT("SobrassadaScripts.dll"));
     if (!dllHandle)
     {
         GLOG("Failed to load DLL\n");
