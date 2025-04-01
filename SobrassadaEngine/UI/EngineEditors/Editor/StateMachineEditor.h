@@ -27,5 +27,7 @@ class StateMachineEditor : public EngineEditorBase
     UID uid;
     ResourceStateMachine* resource = nullptr;
     std::unique_ptr<ImFlow::ImNodeFlow> graph;
+    std::vector<std::string> availableClips;
+    std::vector<std::string> availableTriggers;
     StateNode* selectedNode = nullptr;
 };

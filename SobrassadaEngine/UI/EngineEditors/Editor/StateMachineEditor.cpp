@@ -83,6 +83,7 @@ bool StateMachineEditor::RenderEditor()
                         resource->AddTransition(
                             sourceNode->GetStateName(), inputPinRaw->GetStateName(), "Trigger", 200
                         );
+                        availableTriggers.push_back("Trigger");
                         auto newLink =
                             std::make_shared<ImFlow::Link>(dragged, inputPinRaw->getInputPin().get(), graph.get());
                         graph->addLink(newLink);
@@ -121,13 +122,33 @@ bool StateMachineEditor::RenderEditor()
         strncpy_s(clipBuffer, selectedNode->GetClipName().c_str(), sizeof(clipBuffer));
         clipBuffer[sizeof(clipBuffer) - 1] = '\0';
 
-        if (ImGui::InputText("Associated Clip", clipBuffer, sizeof(clipBuffer)))
+        int currentClipIndex               = -1;
+        for (size_t i = 0; i < availableClips.size(); ++i)
         {
-            std::string newClip(clipBuffer);
-            if (newClip != selectedNode->GetClipName())
+            if (availableClips[i] == selectedNode->GetClipName())
             {
-                resource->EditState(selectedNode->GetStateName(), selectedNode->GetStateName(), newClip);
-                selectedNode->SetClipName(newClip); 
+                currentClipIndex = static_cast<int>(i);
+                break;
+            }
+        }
+
+        if (ImGui::Combo(
+                "Associated Clip", &currentClipIndex,
+                [](void* data, int idx, const char** out_text)
+                {
+                    auto* clips = static_cast<std::vector<std::string>*>(data);
+                    if (out_text) *out_text = (*clips)[idx].c_str();
+                    return true;
+                },
+                &availableClips, availableClips.size()
+            ))
+        {
+            if (currentClipIndex >= 0 && availableClips[currentClipIndex] != selectedNode->GetClipName())
+            {
+                resource->EditState(
+                    selectedNode->GetStateName(), selectedNode->GetStateName(), availableClips[currentClipIndex]
+                );
+                selectedNode->SetClipName(availableClips[currentClipIndex]);
             }
         }
 
@@ -185,16 +206,50 @@ bool StateMachineEditor::RenderEditor()
                 if (ImGui::InputInt("##BlendTime", &tempInterpolationTime))
                 {
                     transition.interpolationTime =
-                        static_cast<uint32_t>(std::max(0, tempInterpolationTime)); // Evita negativos
+                        static_cast<uint32_t>(std::max(0, tempInterpolationTime)); // Evitar negativos
                     modified = true;
                 }
 
-                if (ImGui::InputText("##TriggerName", triggerBuffer, sizeof(triggerBuffer)))
+                //Trigger
+                int currentTriggerIndex = -1;
+                for (size_t i = 0; i < availableTriggers.size(); ++i)
                 {
-                    transition.triggerName = static_cast<std::string>(triggerBuffer);
-                    modified               = true;
+                    if (availableTriggers[i] ==
+                        transition.triggerName.GetString()) 
+                    {
+                        currentTriggerIndex = static_cast<int>(i);
+                        break;
+                    }
+                }
+
+                if (ImGui::Combo(
+                        "##TriggerName", &currentTriggerIndex,
+                        [](void* data, int idx, const char** out_text)
+                        {
+                            auto* triggers = static_cast<std::vector<std::string>*>(data);
+                            if (out_text) *out_text = (*triggers)[idx].c_str();
+                            return true;
+                        },
+                        &availableTriggers, availableTriggers.size()
+                    ))
+                {
+                    if (currentTriggerIndex >= 0 &&
+                        availableTriggers[currentTriggerIndex] != transition.triggerName.GetString())
+                    {
+                        transition.triggerName =
+                            availableTriggers[currentTriggerIndex]; 
+                        modified = true;
+                    }
                 }
                 ImGui::PopID();
+
+                if (modified)
+                {
+                    resource->EditTransition(
+                        transition.fromState.GetString(), transition.toState.GetString(),
+                        transition.triggerName.GetString(), transition.interpolationTime
+                    );
+                }
             }
             else if (transition.toState.GetString() == selectedNode->GetStateName())
             {
@@ -212,12 +267,44 @@ bool StateMachineEditor::RenderEditor()
                     modified = true;
                 }
 
-                if (ImGui::InputText("##TriggerName", triggerBuffer, sizeof(triggerBuffer)))
+                //Trigger
+                int currentTriggerIndex = -1;
+                for (size_t i = 0; i < availableTriggers.size(); ++i)
                 {
-                    transition.triggerName = static_cast<std::string>(triggerBuffer);
-                    modified               = true;
+                    if (availableTriggers[i] == transition.triggerName.GetString())
+                    {
+                        currentTriggerIndex = static_cast<int>(i);
+                        break;
+                    }
+                }
+
+                if (ImGui::Combo(
+                        "##TriggerName", &currentTriggerIndex,
+                        [](void* data, int idx, const char** out_text)
+                        {
+                            auto* triggers = static_cast<std::vector<std::string>*>(data);
+                            if (out_text) *out_text = (*triggers)[idx].c_str();
+                            return true;
+                        },
+                        &availableTriggers, availableTriggers.size()
+                    ))
+                {
+                    if (currentTriggerIndex >= 0 &&
+                        availableTriggers[currentTriggerIndex] != transition.triggerName.GetString())
+                    {
+                        transition.triggerName = availableTriggers[currentTriggerIndex];
+                        modified               = true;
+                    }
                 }
                 ImGui::PopID();
+                
+                if (modified)
+                {
+                    resource->EditTransition(
+                        transition.toState.GetString(), transition.fromState.GetString(), transition.triggerName.GetString(),
+                        transition.interpolationTime
+                    );
+                }
 
             }
 
@@ -250,7 +337,7 @@ void StateMachineEditor::BuildGraph()
             auto stateNode = std::dynamic_pointer_cast<StateNode>(newNode);
             if (stateNode)
             {
-
+                availableClips.push_back(state.clipName.GetString());
                 stateNode->SetStateName(state.name.GetString());
                 stateNode->SetClipName(state.clipName.GetString());
 
@@ -278,6 +365,7 @@ void StateMachineEditor::BuildGraph()
                 {
                     auto link = std::make_shared<ImFlow::Link>(outputPin.get(), inputPin.get(), graph.get());
                     graph->addLink(link);
+                    availableTriggers.push_back(transition.triggerName.GetString());
                 }
                 else
                 {
@@ -311,6 +399,7 @@ void StateMachineEditor::DetectNewTransitions()
                 {
                     GLOG("Creating transition from %s to %s", fromState.c_str(), toState.c_str());
                     resource->AddTransition(fromState, toState, "Trigger", 200);
+                    availableTriggers.push_back("Trigger");
                 }
             }
         }
@@ -327,6 +416,7 @@ void StateMachineEditor::CreateBaseState(StateNode& node)
     newState.clipName     = HashString(clipName);
 
     resource->AddClip(0, clipName, false);
+    availableClips.push_back(clipName);
     resource->AddState(newState.name.GetString(), newState.clipName.GetString());
     node.SetStateName(stateName);
     node.SetClipName(clipName);
