@@ -6,6 +6,7 @@
 #include "OpenGLModule.h"
 #include "ProjectModule.h"
 #include "SceneModule.h"
+#include "ScriptModule.h"
 #include "WindowModule.h"
 #include <Application.h>
 #include <Component.h>
@@ -37,7 +38,8 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"Spot Light",           COMPONENT_SPOT_LIGHT          },
         {"Directional Light",    COMPONENT_DIRECTIONAL_LIGHT   },
         {"Character Controller", COMPONENT_CHARACTER_CONTROLLER},
-        {"Camera",               COMPONENT_CAMERA              }
+        {"Camera",               COMPONENT_CAMERA              },
+        {"Script",               COMPONENT_SCRIPT              }
     };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;

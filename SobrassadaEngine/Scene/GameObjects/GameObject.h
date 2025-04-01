@@ -18,7 +18,7 @@ enum ComponentMobilitySettings
     STATIC  = 1,
 };
 
-class GameObject
+class SOBRASADA_API_ENGINE GameObject
 {
   public:
     GameObject(std::string name);

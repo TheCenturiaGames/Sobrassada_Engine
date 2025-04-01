@@ -14,6 +14,7 @@
 #include "ProjectModule.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
+#include "ScriptModule.h"
 #include "ShaderModule.h"
 #include "UserInterfaceModule.h"
 #include "WindowModule.h"
@@ -26,6 +27,7 @@ Application::Application()
 {
     engineConfig = new EngineConfig();
 
+    modules.push_back(scriptModule = new ScriptModule());
     modules.push_back(projectModule = new ProjectModule());
     modules.push_back(windowModule = new WindowModule());
     modules.push_back(openGLModule = new OpenGLModule());

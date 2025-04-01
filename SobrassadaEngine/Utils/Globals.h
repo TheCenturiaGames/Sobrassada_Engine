@@ -4,14 +4,22 @@
 #include "Algorithm/Random/LCG.h"
 #include <Geometry/AABB.h>
 #include <stdio.h>
-#include <vector>
 #include <windows.h>
+#include <vector>
 
-extern std::vector<char*>* Logs;
+#ifdef SOBRASADA_ENGINE_API
+#define SOBRASADA_API_ENGINE __declspec(dllexport)
+#else
+#define SOBRASADA_API_ENGINE __declspec(dllimport)
+#endif
+
+#pragma warning(disable: 4251)
+
+extern SOBRASADA_API_ENGINE std::vector<char*> *Logs;
+
+SOBRASADA_API_ENGINE void glog(const char file[], int line, const char* format, ...);
 
 #define GLOG(format, ...) glog(__FILE__, __LINE__, format, __VA_ARGS__);
-
-void glog(const char file[], int line, const char* format, ...);
 
 enum update_status
 {
@@ -73,6 +81,10 @@ constexpr float DEFAULT_CAMERA_ROTATE_SENSITIVITY    = 0.006f;
 constexpr float DEFAULT_CAMERA_DRAG_SENSITIVITY      = 0.05f;
 constexpr float DEFAULT_CAMERA_WHEEL_SENSITIVITY     = 2.f;
 constexpr float DEFAULT_CAMERA_ZOOM_SENSITIVITY      = 0.5f;
+
+constexpr const char* GAME_PATH  = "..\\Game";
+constexpr const char* DEBUG_DLL_PATH = "..\\SobrassadaEngine\\x64\\Debug\\SobrassadaScripts.dll";
+constexpr const char* RELEASE_DLL_PATH = "..\\SobrassadaEngine\\x64\\Release\\SobrassadaScripts.dll";
 
 constexpr const char* ENGINE_DEFAULT_ASSETS          = "EngineDefaults/";
 constexpr const char* ASSETS_PATH                    = "Assets/";
