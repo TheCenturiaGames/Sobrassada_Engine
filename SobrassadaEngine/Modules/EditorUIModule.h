@@ -24,7 +24,8 @@ enum EditorType
 {
     BASE,
     ANIMATION,
-    NODE
+    NODE,
+    TEXTURE
 };
 
 enum class GizmoOperation
