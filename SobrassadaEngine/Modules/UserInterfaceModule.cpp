@@ -21,7 +21,7 @@ bool UserInterfaceModule::Init()
             GLOG("Error: Could not load the font");
         }
 
-        GLOG("Font loaded successfully: %s %s", face->family_name, face->style_name);
+        GLOG("Font loaded successfully: %s %s\n", face->family_name, face->style_name);
 
         FT_Done_Face(face);
         FT_Done_FreeType(library);
