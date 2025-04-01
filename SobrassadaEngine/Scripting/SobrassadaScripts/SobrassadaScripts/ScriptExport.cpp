@@ -3,6 +3,12 @@
 #include "RotateGameObject.h"
 #include <string>
 
+#ifndef SOBRASSADASCRIPTS_EXPORTS
+#define SOBRASSADA_API __declspec(dllexport)
+#else
+#define SOBRASSADA_API __declspec(dllimport)
+#endif
+
 extern "C" SOBRASSADA_API Script* CreateScript(const std::string& scriptType, GameObject* parent)
 {
     if (scriptType == "MyScript") return new MyScript(parent);
@@ -13,27 +19,4 @@ extern "C" SOBRASSADA_API Script* CreateScript(const std::string& scriptType, Ga
 extern "C" SOBRASSADA_API void DestroyScript(Script* script)
 {
     delete script;
-}
-
-extern "C" SOBRASSADA_API void DestroyExterns()
-{
-    App = nullptr;
-    // Free memory from log*
-    for (auto log : *logsDLL)
-    {
-        free(log.message);
-    }
-    logsDLL->clear();
-    delete logsDLL;
-
-}
-
-extern "C" SOBRASSADA_API void setApplication(Application* application)
-{
-    App = application;
-}
-
-extern "C" SOBRASSADA_API std::vector<LogEntry>* DLLConsoleLogs()
-{
-    return logsDLL;
 }

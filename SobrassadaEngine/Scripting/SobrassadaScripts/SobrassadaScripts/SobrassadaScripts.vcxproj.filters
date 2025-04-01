@@ -33,9 +33,6 @@
     <ClInclude Include="MyScript.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="GlobalsDLL.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
     <ClInclude Include="RotateGameObject.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
@@ -51,9 +48,6 @@
       <Filter>Archivos de origen</Filter>
     </ClCompile>
     <ClCompile Include="ScriptExport.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
-    <ClCompile Include="GlobalsDLL.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
     <ClCompile Include="RotateGameObject.cpp">

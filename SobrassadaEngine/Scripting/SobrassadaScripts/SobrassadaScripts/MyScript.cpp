@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "MyScript.h"
 #include <iostream>
+#include <Globals.h>
 
 bool MyScript::Init()
 {

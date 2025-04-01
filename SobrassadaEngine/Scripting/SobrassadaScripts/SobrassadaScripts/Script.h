@@ -1,5 +1,4 @@
 #pragma once
-#include "GlobalsDLL.h"
 
 class GameObject;
 

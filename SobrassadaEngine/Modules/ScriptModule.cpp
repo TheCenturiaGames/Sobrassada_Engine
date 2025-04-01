@@ -33,17 +33,12 @@ void ScriptModule::LoadDLL()
 
     createScriptFunc      = (CreateScriptFunc)GetProcAddress(dllHandle, "CreateScript");
     destroyScriptFunc     = (DestroyScriptFunc)GetProcAddress(dllHandle, "DestroyScript");
-    destroyExternsFunc    = (DestroyExterns)GetProcAddress(dllHandle, "DestroyExterns");
-    setAppFunc            = (SetApplicationFunc)GetProcAddress(dllHandle, "setApplication");
-    setDLLConsoleLogsFunc = (DLLConsoleLogs)GetProcAddress(dllHandle, "DLLConsoleLogs");
 
-    if (!createScriptFunc || !destroyScriptFunc || !setAppFunc || !setDLLConsoleLogsFunc || !destroyExternsFunc)
+    if (!createScriptFunc || !destroyScriptFunc)
     {
         GLOG("Failed to load CreateScript or DestroyScript functions\n");
         return;
     }
-
-    setAppFunc(App);
 }
 
 update_status ScriptModule::Update(float deltaTime)
@@ -55,13 +50,8 @@ void ScriptModule::UnloadDLL()
 {
     if (dllHandle)
     {
-        destroyExternsFunc();
-
         createScriptFunc      = nullptr;
         destroyScriptFunc     = nullptr;
-        destroyExternsFunc    = nullptr;
-        setAppFunc            = nullptr;
-        setDLLConsoleLogsFunc = nullptr;
 
         FreeLibrary(dllHandle);
         dllHandle = nullptr;

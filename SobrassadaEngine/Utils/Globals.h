@@ -7,26 +7,19 @@
 #include <windows.h>
 #include <vector>
 
-#ifndef SOBRASSADA_API
-struct LogEntry
-{
-    char* message;
-    float timestamp;
-};
-
-extern std::vector<LogEntry>* Logs;
-
-void glog(const char file[], int line, const char* format, ...);
-
-#define GLOG(format, ...) glog(__FILE__, __LINE__, format, __VA_ARGS__);
-
-#endif
-
 #ifdef SOBRASADA_ENGINE_API
 #define SOBRASADA_API_ENGINE __declspec(dllexport)
 #else
 #define SOBRASADA_API_ENGINE __declspec(dllimport)
 #endif
+
+#pragma warning(disable: 4251)
+
+extern SOBRASADA_API_ENGINE std::vector<char*> *Logs;
+
+SOBRASADA_API_ENGINE void glog(const char file[], int line, const char* format, ...);
+
+#define GLOG(format, ...) glog(__FILE__, __LINE__, format, __VA_ARGS__);
 
 enum update_status
 {

@@ -755,20 +755,9 @@ void EditorUIModule::Console(bool& consoleMenu) const
         return;
     }
 
-    std::vector<LogEntry> allLogs  = *Logs;
-    std::vector<LogEntry>* dllLogs = App->GetScriptModule()->GetDLLConsoleLogs();
-    if (dllLogs != nullptr)
+    for (const char* log : *Logs)
     {
-        allLogs.insert(allLogs.end(), dllLogs->begin(), dllLogs->end());
-    }
-
-    std::sort(
-        allLogs.begin(), allLogs.end(), [](const LogEntry& a, const LogEntry& b) { return a.timestamp < b.timestamp; }
-    );
-
-    for (const LogEntry& log : allLogs)
-    {
-        ImGui::TextUnformatted(log.message);
+        ImGui::TextUnformatted(log);
     }
 
     // Autoscroll only if the scroll is in the bottom position

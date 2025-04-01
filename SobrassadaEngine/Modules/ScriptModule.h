@@ -25,11 +25,6 @@ class ScriptModule : public Module
     Script* CreateScript(const std::string name, GameObject* parent) const { return createScriptFunc(name, parent); }
     void DestroyScript(Script* script) const { destroyScriptFunc(script); }
 
-    std::vector<LogEntry>* GetDLLConsoleLogs() { 
-        if(setDLLConsoleLogsFunc != nullptr ) return setDLLConsoleLogsFunc();
-        return nullptr;
-    }
-
   private:
     void LoadDLL();
     void UnloadDLL();
@@ -43,15 +38,9 @@ class ScriptModule : public Module
 
     typedef Script* (*CreateScriptFunc)(const std::string&, GameObject*);
     typedef void (*DestroyScriptFunc)(Script*);
-    typedef void (*DestroyExterns)();
-    typedef void (*SetApplicationFunc)(Application*);
-    typedef std::vector<LogEntry>* (*DLLConsoleLogs)();
 
     CreateScriptFunc createScriptFunc    = nullptr;
     DestroyScriptFunc destroyScriptFunc  = nullptr;
-    DestroyExterns destroyExternsFunc    = nullptr;
-    SetApplicationFunc setAppFunc        = nullptr;
-    DLLConsoleLogs setDLLConsoleLogsFunc = nullptr;
 
     fs::file_time_type lastWriteTime;
     std::atomic<bool> running = true;

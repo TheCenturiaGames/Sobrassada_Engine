@@ -1,15 +1,7 @@
 #pragma once
 #include "Globals.h"
-#include <chrono>
 
-float GetTimestamp() {
-    using namespace std::chrono;
-    auto now = high_resolution_clock::now();
-    auto duration = duration_cast<seconds>(now.time_since_epoch());
-    return static_cast<float>(duration.count());
-}
-
-void glog(const char file[], int line, const char* format, ...)
+void glog(const char file[], int line, const char *format, ...)
 {
     static char tmp_string[4096];
     static char tmp_string2[4096];
@@ -25,16 +17,12 @@ void glog(const char file[], int line, const char* format, ...)
 #endif
 
     // Allocating memory to store logs
-    char* newString;
-    newString = (char*)malloc(4096);
+    char *newString;
+    newString = (char *)malloc(4096);
 
     if (newString == NULL) return;
 
     memcpy(newString, tmp_string, 4096 * sizeof(char));
 
-    LogEntry newLog;
-    newLog.message = newString;
-    newLog.timestamp = static_cast<float>(GetTimestamp());
-
-    Logs->push_back(newLog);
+    Logs->push_back(newString);
 }
