@@ -29,8 +29,6 @@ void MetaMesh::AddImportOptions(rapidjson::Document& doc, rapidjson::Document::A
         .PushBack(transform.ptr()[15], allocator);
 
     importOptions.AddMember("transform", transformArray, allocator);
-
-    // TODO: Add default material
     importOptions.AddMember("defaultMaterialUID", defaultMaterialUID, allocator);
 
     doc.AddMember("importOptions", importOptions, allocator);
