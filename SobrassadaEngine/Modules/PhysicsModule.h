@@ -1,8 +1,9 @@
 #pragma once
 
+#include "ComponentUtils.h"
 #include "Module.h"
 
-// TODO REMOVE, JUST FOR TESTING
+#include <bitset>
 #include <vector>
 
 class btDefaultCollisionConfiguration;
@@ -17,8 +18,7 @@ class CubeColliderComponent;
 
 constexpr float DEFAULT_GRAVITY = -9.81f;
 
-// TODO REMOVE, JUST FOR TESTING
-class btCollisionShape;
+typedef std::bitset<sizeof(ColliderLayerStrings) / sizeof(char*)> LayerBitset;
 
 class PhysicsModule : public Module
 {
@@ -32,6 +32,14 @@ class PhysicsModule : public Module
     update_status PostUpdate(float deltaTime) override;
     bool ShutDown() override;
 
+    //TODO READ FROM CONFIG FILE
+    void LoadLayerData();
+    void EmptyWorld();
+
+    void CreateCubeRigidBody(CubeColliderComponent* colliderComponent);
+    void UpdateCubeRigidBody(CubeColliderComponent* colliderComponent);
+    void DeleteCubeRigidBody(CubeColliderComponent* colliderComponent);
+
     float GetGravity() const { return gravity; }
 
     void SetGravity(float newGravity)
@@ -39,15 +47,11 @@ class PhysicsModule : public Module
         gravity       = newGravity;
         updateGravity = true;
     };
-  
-    void CreateCubeRigidBody(CubeColliderComponent* colliderComponent);
-    void UpdateCubeRigidBody(CubeColliderComponent* colliderComponent);
-    void DeleteCubeRigidBody(CubeColliderComponent* colliderComponent);
 
-    void EmptyWorld();
+
   private:
     // TODO UPDATE WITH CHANNELS
-    void AddRigidBody(btRigidBody* colliderComponent);
+    void AddRigidBody(btRigidBody* rigidBody, ColliderType colliderType, ColliderLayer layerType);
 
   private:
     float gravity                                           = DEFAULT_GRAVITY;
@@ -61,9 +65,6 @@ class PhysicsModule : public Module
 
     std::vector<btRigidBody*> bodiesToRemove;
 
-    BulletDebugDraw* debugDraw                              = nullptr;
-
-    // TODO REMOVE, JUST FOR TESTING
-    std::vector<btCollisionShape*> collisionShapes;
-
+    BulletDebugDraw* debugDraw = nullptr;
+    std::vector<LayerBitset> colliderLayerConfig;
 };

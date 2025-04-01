@@ -5,6 +5,7 @@
 #include "Component.h"
 
 #include "Math/float3.h"
+#include <bitset>
 
 class btRigidBody;
 class GameObject;
@@ -26,6 +27,9 @@ class CubeColliderComponent : public Component
 
     void ParentUpdated() override;
 
+    ColliderType GetColliderType() const { return colliderType; }
+    ColliderLayer GetLayer() const { return layer; }
+
   public:
     bool freezeRotation           = false;
     float mass                    = 1.f;
@@ -37,4 +41,5 @@ class CubeColliderComponent : public Component
     btRigidBody* rigidBody        = nullptr;
     BulletMotionState motionState = BulletMotionState(nullptr, float3::zero, float3::zero, false);
     Collider collider             = Collider(this, ComponentType::COMPONENT_CUBE_COLLIDER);
+    ColliderLayer layer           = ColliderLayer::WORLD_OBJECTS;
 };

@@ -5,7 +5,6 @@
 #include "SceneModule.h"
 #include "Standalone/Physics/CubeColliderComponent.h"
 
-#include "Algorithm/Random/LCG.h"
 #include "btBulletDynamicsCommon.h"
 
 PhysicsModule::PhysicsModule()
@@ -22,10 +21,13 @@ PhysicsModule::PhysicsModule()
 
     dynamicsWorld->setGravity(btVector3(0, gravity, 0));
     dynamicsWorld->setDebugDrawer(debugDraw);
+
+    colliderLayerConfig.assign(sizeof(ColliderLayerStrings) / sizeof(char*), LayerBitset().reset());
 }
 
 bool PhysicsModule::Init()
 {
+    LoadLayerData();
     return true;
 }
 
@@ -43,7 +45,7 @@ update_status PhysicsModule::PreUpdate(float deltaTime)
         btTransform trans;
         if (body && body->getMotionState())
         {
-            //body->getMotionState()->getWorldTransform(trans);
+            // body->getMotionState()->getWorldTransform(trans);
             trans = body->getWorldTransform();
             body->getMotionState()->setWorldTransform(trans);
         }
@@ -103,7 +105,7 @@ void PhysicsModule::CreateCubeRigidBody(CubeColliderComponent* colliderComponent
     bool isDynamic                   = (colliderComponent->mass != 0.f);
 
     // Inertia
-    btVector3 localInertia(0, 0, 0);
+    btVector3 localInertia(1, 0, 0);
     if (isDynamic) collisionShape->calculateLocalInertia(colliderComponent->mass, localInertia);
 
     // MotionState
@@ -123,7 +125,7 @@ void PhysicsModule::CreateCubeRigidBody(CubeColliderComponent* colliderComponent
     colliderComponent->rigidBody = newRigidBody;
 
     // TODO UPDATE WITH CHANNELS
-    AddRigidBody(newRigidBody);
+    AddRigidBody(newRigidBody, colliderComponent->GetColliderType(), colliderComponent->GetLayer());
 }
 
 void PhysicsModule::UpdateCubeRigidBody(CubeColliderComponent* colliderComponent)
@@ -139,9 +141,40 @@ void PhysicsModule::DeleteCubeRigidBody(CubeColliderComponent* colliderComponent
 }
 
 // TODO UPDATE WITH CHANNELS
-void PhysicsModule::AddRigidBody(btRigidBody* rigidBody)
+void PhysicsModule::AddRigidBody(btRigidBody* rigidBody, ColliderType colliderType, ColliderLayer layerType)
 {
-    dynamicsWorld->addRigidBody(rigidBody);
+    int group                     = 1 << (int)layerType;
+
+    int mask                      = 0;
+    const LayerBitset& maskBitset = colliderLayerConfig[(int)layerType];
+    for (int i = 0; i < maskBitset.size(); ++i)
+    {
+        if (maskBitset[i]) mask |= 1 << i;
+    }
+
+    dynamicsWorld->addRigidBody(rigidBody, group, mask);
+}
+
+// TODO READ FROM CONFIG FILE
+void PhysicsModule::LoadLayerData()
+{
+    // STATIC OBJECT
+    int config =
+        1 << (int)ColliderLayer::PLAYER | 1 << (int)ColliderLayer::ENEMY | 1 << (int)ColliderLayer::WORLD_OBJECTS;
+    colliderLayerConfig[0] |= config;
+
+    // TRIGGER
+    config                  = 1 << (int)ColliderLayer::PLAYER;
+    colliderLayerConfig[1] |= config;
+
+    // ENEMY
+    config                  = 1 << (int)ColliderLayer::PLAYER | 1 << (int)ColliderLayer::WORLD_OBJECTS;
+    colliderLayerConfig[2] |= config;
+
+    // PLAYER
+    config =
+        1 << (int)ColliderLayer::ENEMY | 1 << (int)ColliderLayer::WORLD_OBJECTS | 1 << (int)ColliderLayer::TRIGGERS;
+    colliderLayerConfig[3] |= config;
 }
 
 void PhysicsModule::EmptyWorld()

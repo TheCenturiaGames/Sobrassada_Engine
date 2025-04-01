@@ -20,6 +20,9 @@ CubeColliderComponent::CubeColliderComponent(const rapidjson::Value& initialStat
 
     if (initialState.HasMember("Mass")) mass = initialState["Mass"].GetFloat();
 
+    if (initialState.HasMember("ColliderType")) colliderType = ColliderType(initialState["ColliderType"].GetInt());
+    if (initialState.HasMember("ColliderLayer")) layer = ColliderLayer(initialState["ColliderLayer"].GetInt());
+
     if (initialState.HasMember("CenterOffset"))
     {
         const rapidjson::Value& dataArray = initialState["CenterOffset"];
@@ -52,6 +55,8 @@ void CubeColliderComponent::Save(rapidjson::Value& targetState, rapidjson::Docum
 
     targetState.AddMember("FreezeRotation", freezeRotation, allocator);
     targetState.AddMember("Mass", mass, allocator);
+    targetState.AddMember("ColliderType", (int)colliderType, allocator);
+    targetState.AddMember("ColliderLayer", (int)layer, allocator);
 
     // CENTER OFFSET
     rapidjson::Value centerOffsetSave(rapidjson::kArrayType);
@@ -98,7 +103,7 @@ void CubeColliderComponent::RenderEditorInspector()
     ImGui::BeginDisabled(colliderType != ColliderType::DYNAMIC);
     if (ImGui::InputFloat("Mass", &mass))
     {
-        if(mass == 0.f)colliderType = ColliderType::STATIC;
+        if (mass == 0.f) colliderType = ColliderType::STATIC;
         App->GetPhysicsModule()->UpdateCubeRigidBody(this);
     }
     ImGui::EndDisabled();
@@ -108,6 +113,21 @@ void CubeColliderComponent::RenderEditorInspector()
     if (ImGui::Checkbox("Freeze rotation", &freezeRotation)) App->GetPhysicsModule()->UpdateCubeRigidBody(this);
 
     if (ImGui::InputFloat3("Center rotation", &centerRotation[0])) App->GetPhysicsModule()->UpdateCubeRigidBody(this);
+
+    // COLLIDER LAYER SETTINGS
+    if (ImGui::BeginCombo("Layer options", ColliderLayerStrings[(int)layer]))
+    {
+        int colliderStringSize = sizeof(ColliderLayerStrings) / sizeof(char*);
+        for (int i = 0; i < colliderStringSize; ++i)
+        {
+            if (ImGui::Selectable(ColliderLayerStrings[i]))
+            {
+                layer = ColliderLayer(i);
+                App->GetPhysicsModule()->UpdateCubeRigidBody(this);
+            }
+        }
+        ImGui::EndCombo();
+    }
 }
 
 void CubeColliderComponent::Update(float deltaTime)

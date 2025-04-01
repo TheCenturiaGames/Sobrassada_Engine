@@ -25,7 +25,7 @@ enum ComponentType
     LAST  = COMPONENT_CUBE_COLLIDER
 };
 
-enum class ColliderType
+enum class ColliderType : uint8_t
 {
     STATIC = 0,
     DYNAMIC,
@@ -34,6 +34,18 @@ enum class ColliderType
 };
 
 constexpr const char* ColliderTypeStrings[] = {"Static", "Dynamic", "Kinematic", "Trigger"};
+
+// LAYERS IN THE PHYSICS WORLD ARE REPRESENTED AS AN INT, SO 32 LAYERS ARE THE MAXIMUM ALLOWED WITH CURRENT
+// IMPLEMENTATION
+enum class ColliderLayer : uint8_t
+{
+    WORLD_OBJECTS = 0,
+    TRIGGERS,
+    ENEMY,
+    PLAYER,
+};
+
+constexpr const char* ColliderLayerStrings[] = {"World Objects", "Triggers", "Enemies", "Player"};
 
 class ComponentUtils
 {
