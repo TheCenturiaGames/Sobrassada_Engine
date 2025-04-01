@@ -32,6 +32,8 @@ class MeshComponent : public Component
 
     void InitSkin();
 
+    void BatchEditorMode();
+
     const ResourceMesh* GetResourceMesh() const { return currentMesh; }
     const ResourceMaterial* GetResourceMaterial() const { return currentMaterial; }
 

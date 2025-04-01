@@ -1,8 +1,8 @@
 #include "MeshComponent.h"
 
-#include "CameraComponent.h"
 #include "Application.h"
 #include "BatchManager.h"
+#include "CameraComponent.h"
 #include "CameraModule.h"
 #include "EditorUIModule.h"
 #include "GeometryBatch.h"
@@ -157,11 +157,7 @@ void MeshComponent::Update(float deltaTime)
 {
     if (batch == nullptr && currentMesh != nullptr && currentMaterial != nullptr)
     {
-        batch = App->GetResourcesModule()->GetBatchManager()->CreateNewBatch(this
-        ); // Editor Mode, single component for batch
-        batch->AddComponent(this);
-        batch->LoadData();
-        uniqueBatch = true;
+        BatchEditorMode();
     }
 }
 
@@ -192,6 +188,8 @@ void MeshComponent::AddMesh(UID resource, bool updateParent)
         currentMesh        = newMesh;
         localComponentAABB = AABB(currentMesh->GetAABB());
         if (updateParent) parent->OnAABBUpdated();
+
+        if (batch) BatchEditorMode();
     }
 }
 
@@ -208,7 +206,18 @@ void MeshComponent::AddMaterial(UID resource)
         App->GetResourcesModule()->ReleaseResource(currentMaterial);
         currentMaterial     = newMaterial;
         currentMaterialName = currentMaterial->GetName();
+
+        if (batch) BatchEditorMode();
     }
+}
+
+void MeshComponent::BatchEditorMode()
+{
+    if (uniqueBatch) App->GetResourcesModule()->GetBatchManager()->RemoveBatch(batch);
+    batch = App->GetResourcesModule()->GetBatchManager()->CreateNewBatch(this);
+    batch->AddComponent(this);
+    batch->LoadData();
+    uniqueBatch = true;
 }
 
 void MeshComponent::OnTransformUpdated()
