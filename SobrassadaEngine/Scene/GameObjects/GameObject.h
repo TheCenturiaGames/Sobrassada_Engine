@@ -93,9 +93,10 @@ class GameObject
     UID GetPrefabUID() const { return prefabUID; }
     void SetPrefabUID(const UID uid) { prefabUID = uid; }
     void SetMobility(ComponentMobilitySettings newMobility) { mobilitySettings = newMobility; };
+    void OnTransformUpdated();
 
   private:
-    void OnTransformUpdated();
+    
     void UpdateLocalTransform(const float4x4& parentGlobalTransform);
     void DrawNodes() const;
     void OnDrawConnectionsToggle();

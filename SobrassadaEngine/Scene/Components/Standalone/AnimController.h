@@ -16,11 +16,16 @@ class AnimController
     update_status Update();  
     void Play(UID resource, bool loop);
     void Stop();
+    void Pause();
+    void Resume();
     
-   
+   ResourceAnimation* GetCurrentAnimation() { return animation; }
     void SetPlaybackSpeed(float speed) { playbackSpeed = speed; }
     void SetTime(float time) { currentTime = time; }
     float GetTime() const { return currentTime; }
+    bool IsPlaying() const { return playAnimation; }
+
+  
   private:
    
   private:
@@ -28,6 +33,6 @@ class AnimController
     float currentTime                    = 0; 
     bool loop                       = false;
     bool playAnimation                      = false;
-    float playbackSpeed                     = 1.0f;
+    float playbackSpeed                     = 0.5f;
     ResourceAnimation* animation            = nullptr;
 };

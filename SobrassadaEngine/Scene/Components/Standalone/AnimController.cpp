@@ -25,6 +25,16 @@ void AnimController::Stop()
     currentTime   = 0.0f;
 }
 
+void AnimController::Pause()
+{
+    playAnimation = false;
+}
+
+void AnimController::Resume()
+{
+    playAnimation = true;
+}
+
 
 update_status AnimController::Update()
 {

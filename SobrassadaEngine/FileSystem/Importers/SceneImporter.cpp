@@ -157,6 +157,23 @@ namespace SceneImporter
         }
     }
 
+    void ImportAnimationFromMetadata(
+        const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID
+    )
+    {
+        tinygltf::Model model = LoadModelGLTF(filePath.c_str(), targetFilePath);
+
+        // find material name that equals to name
+        for (int i = 0; i < model.animations.size(); i++)
+        {
+            if (model.animations[i].name == name)
+            {
+               AnimationImporter::ImportAnimation(model, model.animations[i], name, filePath.c_str(), targetFilePath, sourceUID);
+                return; // only one animation with the same name 
+            }
+        }
+    }
+
     void
     CopyPrefab(const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID)
     {

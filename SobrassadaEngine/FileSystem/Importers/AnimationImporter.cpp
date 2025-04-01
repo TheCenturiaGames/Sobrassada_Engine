@@ -15,7 +15,7 @@
 namespace AnimationImporter
 {
     UID ImportAnimation(
-        const tinygltf::Model& model, const tinygltf::Animation& animation, const char* sourceFilePath,
+        const tinygltf::Model& model, const tinygltf::Animation& animation, const std::string& name, const char* sourceFilePath,
         const std::string& targetFilePath, UID sourceUID
     )
     {
@@ -95,6 +95,7 @@ namespace AnimationImporter
         }
 
         // Handle UID
+        const std::string fileName = FileSystem::GetFileNameWithoutExtension(sourceFilePath);
         UID finalAnimUID;
         if (sourceUID == INVALID_UID)
         {
@@ -105,8 +106,8 @@ namespace AnimationImporter
             MetaAnimation meta(finalAnimUID, assetPath);
 
             
-            std::string animName = FileSystem::GetFileNameWithoutExtension(sourceFilePath);
-            meta.Save(animName, assetPath);
+            
+            meta.Save(fileName, assetPath);
         }
         else
         {
@@ -114,9 +115,9 @@ namespace AnimationImporter
         }
 
         // Construct save paths 
-        std::string saveFilePath =
-            targetFilePath + ANIMATIONS_PATH + std::to_string(finalAnimUID) + ANIMATION_EXTENSION;
 
+        std::string saveFilePath = App->GetProjectModule()->GetLoadedProjectPath() + ANIMATIONS_PATH +
+                                   std::to_string(finalAnimUID) + ANIMATION_EXTENSION;
       
         unsigned int bytesWritten =
             (unsigned int)FileSystem::Save(saveFilePath.c_str(), buffer.data(), buffer.size(), true);
@@ -128,8 +129,8 @@ namespace AnimationImporter
         }
 
       
-        App->GetLibraryModule()->AddAnimation(finalAnimUID, FileSystem::GetFileNameWithoutExtension(sourceFilePath));
-        App->GetLibraryModule()->AddName(FileSystem::GetFileNameWithoutExtension(sourceFilePath), finalAnimUID);
+        App->GetLibraryModule()->AddAnimation(finalAnimUID, fileName);
+        App->GetLibraryModule()->AddName(fileName, finalAnimUID);
         App->GetLibraryModule()->AddResource(saveFilePath, finalAnimUID);
 
         GLOG("%s saved as binary", FileSystem::GetFileNameWithoutExtension(sourceFilePath).c_str());
@@ -139,15 +140,9 @@ namespace AnimationImporter
 
     ResourceAnimation* LoadAnimation(UID animationUID)
     {
-        rapidjson::Document doc;
-        rapidjson::Value importOptions;
-        App->GetLibraryModule()->GetImportOptions(animationUID, doc, importOptions);
-
-        const std::string path = App->GetLibraryModule()->GetResourcePath(animationUID);
-        const std::string name = App->GetLibraryModule()->GetResourceName(animationUID);
-
-        char* buffer           = nullptr;
-        unsigned int fileSize  = FileSystem::Load(path.c_str(), &buffer);
+        const std::string path      = App->GetLibraryModule()->GetResourcePath(animationUID);
+        char* buffer                = nullptr;
+        const unsigned int fileSize = FileSystem::Load(path.c_str(), &buffer);
 
         if (fileSize == 0 || buffer == nullptr)
         {
@@ -159,14 +154,16 @@ namespace AnimationImporter
 
         uint32_t channelCount;
         memcpy(&channelCount, cursor, sizeof(uint32_t));
-        cursor                       += sizeof(uint32_t);
+        cursor += sizeof(uint32_t);
 
-        // Create animation resource with UID and name
-        ResourceAnimation* animation  = new ResourceAnimation(animationUID, name);
+        // Create animation resource
+        ResourceAnimation* animation =
+            new ResourceAnimation(animationUID, FileSystem::GetFileNameWithoutExtension(path));
 
         // Parse channels
         for (uint32_t i = 0; i < channelCount; ++i)
         {
+
             uint32_t nameSize;
             memcpy(&nameSize, cursor, sizeof(uint32_t));
             cursor += sizeof(uint32_t);
@@ -188,6 +185,7 @@ namespace AnimationImporter
             // Parse based on animation type
             if (animType == AnimationType::TRANSLATION)
             {
+
                 animChannel.posTimeStamps.resize(keyframeCount);
                 memcpy(animChannel.posTimeStamps.data(), cursor, keyframeCount * sizeof(float));
                 cursor += keyframeCount * sizeof(float);

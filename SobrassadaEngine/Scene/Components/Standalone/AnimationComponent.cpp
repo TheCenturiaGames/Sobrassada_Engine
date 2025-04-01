@@ -61,39 +61,19 @@ void AnimationComponent::OnStop()
     }
 }
 
-void AnimationComponent::OnUpdate()
+void AnimationComponent::OnPause()
 {
     if (animController != nullptr)
     {
-        animController->Update();
-        GameObject* ownerObj = parent;
-        if (ownerObj != nullptr)
-        {
-          
-            for (const UID childUID : ownerObj->GetChildren())
-            {
-                GameObject* childObj = App->GetSceneModule()->GetScene()->GetGameObjectByUID(childUID);
-                if (childObj != nullptr)
-                {
-                  
-                    std::string nodeName = childObj->GetName();
+        animController->Pause();
+    }
+}
 
-                   
-                    float3 position;
-                    Quat rotation;
-                    animController->GetTransform(nodeName, position, rotation);
-
-                   
-                    float4x4 transformMatrix = float4x4::FromTRS(position, rotation, float3(1.0f, 1.0f, 1.0f));
-
-                    
-                    childObj->SetLocalTransform(transformMatrix);
-
-                    
-                    //childObj->OnTransformUpdated();
-                }
-            }
-        }
+void AnimationComponent::OnResume()
+{
+    if (animController != nullptr)
+    {
+        animController->Resume();
     }
 }
 
@@ -112,7 +92,31 @@ void AnimationComponent::OnInspector()
              //Animation Time
             if (animController != nullptr && ImGui::TreeNode("Channels"))
             {
-                // Channel Information
+                for (const auto& channel : currentAnimResource->channels)
+                {
+                    ImGui::Text("Bone: %s", channel.first.c_str());
+
+                    if (ImGui::TreeNode(channel.first.c_str()))
+                    {
+                        const Channel& ch = channel.second;
+
+                        ImGui::Text("Positions: %d", ch.numPositions);
+                        if (ch.numPositions > 0)
+                        {
+                            ImGui::Text("First Position Time: %.2f", ch.posTimeStamps.front());
+                            ImGui::Text("Last Position Time: %.2f", ch.posTimeStamps.back());
+                        }
+
+                        ImGui::Text("Rotations: %d", ch.numRotations);
+                        if (ch.numRotations > 0)
+                        {
+                            ImGui::Text("First Rotation Time: %.2f", ch.rotTimeStamps.front());
+                            ImGui::Text("Last Rotation Time: %.2f", ch.rotTimeStamps.back());
+                        }
+
+                        ImGui::TreePop();
+                    }
+                }
                 ImGui::TreePop();
             }
         }
@@ -125,20 +129,57 @@ void AnimationComponent::OnInspector()
     {
         ImGui::Text("No animation assigned");
     }
-
- 
-    if (ImGui::Button("Select Animation"))
-    {
-        
-    }
 }
 
 void AnimationComponent::Render(float deltaTime)
 {
 }
 
+void AnimationComponent::Clone(const Component* other)
+{
+    if (other->GetType() == ComponentType::COMPONENT_ANIMATION)
+    {
+        const AnimationComponent* otherAnimation = static_cast<const AnimationComponent*>(other);
+      
+        AddAnimation(otherAnimation->currentAnimResource->GetUID());
+        
+    }
+    else
+    {
+        GLOG("It is not possible to clone a component of a different type!");
+    }
+}
+
 void AnimationComponent::Update(float deltaTime)
 {
+    if (!animController->IsPlaying()) return;
+    
+        if (boneMapping.empty())
+        {
+            SetBoneMapping();
+        }
+
+        animController->Update();
+
+    for (auto& channel : animController->GetCurrentAnimation()->channels)
+    {
+        const std::string& boneName = channel.first;
+
+         auto boneIt                 = boneMapping.find(boneName);
+
+         if (boneIt != boneMapping.end())
+         {
+             GameObject* bone = boneIt->second;
+             float3 position;
+             Quat rotation;
+
+             animController->GetTransform(boneName, position, rotation);
+
+             float4x4 transformMatrix = float4x4::FromTRS(position, rotation, float3(1.0, 1.0, 1.0));
+             bone->SetLocalTransform(transformMatrix);
+             bone->OnTransformUpdated();
+         }
+     }
 }
 
 void AnimationComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
@@ -163,6 +204,7 @@ void AnimationComponent::AddAnimation(UID animationUID)
         currentAnimResource     = newAnimation;
         currentAnimName = currentAnimResource->GetName();
         resource        = animationUID;
+        SetBoneMapping();
     }
 }
 
@@ -174,11 +216,37 @@ void AnimationComponent::SetAnimationResource(UID animResource)
   
 }
 
+void AnimationComponent::SetBoneMapping()
+{
+    boneMapping.clear();
+
+    std::function<void(GameObject*)> mapBones = [this, &mapBones](GameObject* obj)
+    {
+        if (obj == nullptr) return;
+
+        boneMapping[obj->GetName()] = obj;
+
+        for (const UID childUID : obj->GetChildren())
+        {
+            GameObject* child = App->GetSceneModule()->GetScene()->GetGameObjectByUID(childUID);
+
+            if (child != nullptr)
+            {
+                mapBones(child);
+            }
+        }
+    };
+    mapBones(parent);
+}
+
 void AnimationComponent::RenderEditorInspector()
 {
     Component::RenderEditorInspector();
-    
+    if (enabled)
+    {
         OnInspector();
+    }
+        
 }
 
 

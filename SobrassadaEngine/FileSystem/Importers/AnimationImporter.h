@@ -22,11 +22,9 @@ enum class  AnimationType : uint8_t
 namespace AnimationImporter
 {
     UID ImportAnimation(
-        const tinygltf::Model& model, const tinygltf::Animation& animation,
+        const tinygltf::Model& model, const tinygltf::Animation& animation, const std::string& name,
         const char* sourceFilePath, const std::string& targetFilePath, UID sourceUID
     );
     ResourceAnimation* LoadAnimation(UID animationUID);
-    void CopyAnimation(
-        const std::string& filePath, const std::string& targetFilePath, const std::string& name, const UID sourceUID
-    );
+   
 }; 
