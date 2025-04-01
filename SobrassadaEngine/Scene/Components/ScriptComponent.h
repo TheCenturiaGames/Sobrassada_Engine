@@ -26,6 +26,6 @@ class ScriptComponent : public Component
   private:
     std::string scriptName           = "Not selected";
     Script* scriptInstance           = nullptr;
-    std::vector<std::string> scripts = {"MyScript", "RotateGameObject"};
+    std::vector<std::string> scripts = {"RotateGameObject"};
     bool startScript                 = false;
 };

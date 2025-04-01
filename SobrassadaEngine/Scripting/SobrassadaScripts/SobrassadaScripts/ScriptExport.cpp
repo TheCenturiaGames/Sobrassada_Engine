@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "MyScript.h"
 #include "RotateGameObject.h"
 #include <string>
 
@@ -11,7 +10,6 @@
 
 extern "C" SOBRASSADA_API Script* CreateScript(const std::string& scriptType, GameObject* parent)
 {
-    if (scriptType == "MyScript") return new MyScript(parent);
     if (scriptType == "RotateGameObject") return new RotateGameObject(parent);
     return nullptr;
 }
