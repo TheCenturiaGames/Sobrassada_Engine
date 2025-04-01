@@ -6,9 +6,6 @@
 #include <vector>
 
 class ResourceStateMachine;
-struct Clip;
-struct State;
-struct Transition;
 
 namespace StateMachineManager
 {

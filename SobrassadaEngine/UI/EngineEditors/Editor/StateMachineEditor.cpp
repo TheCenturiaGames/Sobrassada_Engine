@@ -99,6 +99,7 @@ bool StateMachineEditor::RenderEditor()
 
     if (selectedNode != nullptr)
     {
+        bool rechargeTransition = false;
         ImGui::Begin("State Inspector");
 
         ImGui::Text("State");
@@ -116,6 +117,29 @@ bool StateMachineEditor::RenderEditor()
             {
                 resource->EditState(stateName, newName, selectedNode->GetClipName());
                 selectedNode->SetStateName(newName); 
+                auto transitionsCopy = resource->transitions;
+
+                for (const auto& transition : transitionsCopy)
+                {
+                    if (transition.fromState.GetString() == stateName)
+                    {
+                        std::string prevTrigger    = transition.triggerName.GetString();
+                        uint32_t prevInterpolation = transition.interpolationTime;
+                        resource->RemoveTransition(transition.fromState.GetString(), transition.toState.GetString());
+                        resource->AddTransition(
+                            newName, transition.toState.GetString(), prevTrigger, prevInterpolation
+                        );
+                    }
+                    else if (transition.toState.GetString() == stateName)
+                    {
+                        std::string prevTrigger    = transition.triggerName.GetString();
+                        uint32_t prevInterpolation = transition.interpolationTime;
+                        resource->RemoveTransition(transition.toState.GetString(), transition.fromState.GetString());
+                        resource->AddTransition(
+                            transition.fromState.GetString(), newName, prevTrigger, prevInterpolation
+                        );
+                    }
+                }
             }
         }
         char clipBuffer[128];
