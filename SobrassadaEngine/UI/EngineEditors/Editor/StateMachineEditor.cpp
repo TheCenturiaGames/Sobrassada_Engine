@@ -140,7 +140,7 @@ bool StateMachineEditor::RenderEditor()
         {
             static bool loopBuffer = clip->loop;
 
-            ImGui::Text("Clip UID: %llu", clip->clipUID);
+            ImGui::Text("Clip UID: %llu", clip->animationResourceUID);
 
             ImGui::Text("Clip Name: %s", clip->clipName.GetString().c_str());
 
@@ -149,7 +149,7 @@ bool StateMachineEditor::RenderEditor()
                 if (loopBuffer != clip->loop)
                 {
                     resource->EditClipInfo(
-                        clip->clipName.GetString(), clip->clipUID, clip->clipName.GetString(), loopBuffer
+                        clip->clipName.GetString(), clip->animationResourceUID, clip->clipName.GetString(), loopBuffer
                     );
                 }
             }
@@ -166,14 +166,35 @@ bool StateMachineEditor::RenderEditor()
         ImGui::Text("Connected Transitions");
         ImGui::Separator();
         int cont = 0;
-        for (const auto& transition : resource->transitions)
+        for (auto& transition : resource->transitions)
         {
+            bool modified = false;
+            char triggerBuffer[64]; 
+            strncpy_s(triggerBuffer, transition.triggerName.GetString().c_str(), sizeof(triggerBuffer));
+            triggerBuffer[sizeof(triggerBuffer) - 1] = '\0';
+
             if (transition.fromState.GetString() == selectedNode->GetStateName())
             {
                 ImGui::Text(
                     "-> %s (Trigger: %s, Blend: %u ms)", transition.toState.GetString().c_str(),
                     transition.triggerName.GetString().c_str(), transition.interpolationTime
                 );
+
+                ImGui::PushID(cont);
+                int tempInterpolationTime = static_cast<int>(transition.interpolationTime);
+                if (ImGui::InputInt("##BlendTime", &tempInterpolationTime))
+                {
+                    transition.interpolationTime =
+                        static_cast<uint32_t>(std::max(0, tempInterpolationTime)); // Evita negativos
+                    modified = true;
+                }
+
+                if (ImGui::InputText("##TriggerName", triggerBuffer, sizeof(triggerBuffer)))
+                {
+                    transition.triggerName = static_cast<std::string>(triggerBuffer);
+                    modified               = true;
+                }
+                ImGui::PopID();
             }
             else if (transition.toState.GetString() == selectedNode->GetStateName())
             {
@@ -181,7 +202,27 @@ bool StateMachineEditor::RenderEditor()
                     "<- %s (Trigger: %s, Blend: %u ms)", transition.fromState.GetString().c_str(),
                     transition.triggerName.GetString().c_str(), transition.interpolationTime
                 );
+
+                            ImGui::PushID(cont);
+                int tempInterpolationTime = static_cast<int>(transition.interpolationTime);
+                if (ImGui::InputInt("##BlendTime", &tempInterpolationTime))
+                {
+                    transition.interpolationTime =
+                        static_cast<uint32_t>(std::max(0, tempInterpolationTime)); // Evita negativos
+                    modified = true;
+                }
+
+                if (ImGui::InputText("##TriggerName", triggerBuffer, sizeof(triggerBuffer)))
+                {
+                    transition.triggerName = static_cast<std::string>(triggerBuffer);
+                    modified               = true;
+                }
+                ImGui::PopID();
+
             }
+
+            cont++;
+
         }
 
         ImGui::End();

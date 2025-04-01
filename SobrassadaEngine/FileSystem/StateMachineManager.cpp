@@ -43,7 +43,7 @@ namespace StateMachineManager
         for (const auto& clip : resource->clips)
         {
             rapidjson::Value clipJSON(rapidjson::kObjectType);
-            clipJSON.AddMember("ClipUID", clip.clipUID, allocator);
+            clipJSON.AddMember("ClipUID", clip.animationResourceUID, allocator);
             clipJSON.AddMember("ClipName", rapidjson::Value(clip.clipName.GetString().c_str(), allocator), allocator);
             clipJSON.AddMember("Loop", clip.loop, allocator);
 
@@ -164,7 +164,7 @@ namespace StateMachineManager
             for (const auto& clipJSON : stateMachineJSON["Clips"].GetArray())
             {
                 Clip clip;
-                clip.clipUID  = clipJSON["ClipUID"].GetUint64();
+                clip.animationResourceUID  = clipJSON["ClipUID"].GetUint64();
                 clip.clipName = HashString(clipJSON["ClipName"].GetString());
                 clip.loop     = clipJSON["Loop"].GetBool();
 

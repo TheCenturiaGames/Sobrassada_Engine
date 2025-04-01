@@ -24,7 +24,7 @@ struct HashString
 
 struct Clip
 {
-    UID clipUID;
+    UID animationResourceUID;
     HashString clipName;
     bool loop;
 };
@@ -53,7 +53,7 @@ class ResourceStateMachine : public Resource
     ResourceStateMachine(UID uid, const std::string& name);
     ~ResourceStateMachine() override = default;
 
-    void AddClip(UID clipUID, const std::string& name, bool loop);
+    void AddClip(UID animationResourceUID, const std::string& name, bool loop);
     bool RemoveClip(const std::string& name);
     bool EditClipInfo(const std::string& oldName, UID newUID, const std::string& newName, bool newLoop);
 
