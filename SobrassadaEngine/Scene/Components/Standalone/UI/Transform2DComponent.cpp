@@ -63,6 +63,7 @@ void Transform2DComponent::Init()
                                                                  ->GetScene()
                                                                  ->GetGameObjectByUID(parent->GetParent())
                                                                  ->GetComponentByType(COMPONENT_TRANSFORM_2D));
+        parentTransform->AddChildTransform(this);
     }
 }
 
@@ -163,7 +164,7 @@ void Transform2DComponent::RenderEditorInspector()
 
         if (ImGui::InputFloat2("Position", &position[0]))
         {
-            UpdateParentTransform();
+            UpdateParent3DTransform();
         }
         ImGui::InputFloat2("Size", &size[0]);
         ImGui::DragFloat2("Pivot", &pivot[0], 0.01f, 0.0f, 1.0f);
@@ -174,17 +175,33 @@ void Transform2DComponent::RenderEditorInspector()
     }
 }
 
-void Transform2DComponent::UpdateParentTransform()
+void Transform2DComponent::UpdateParent3DTransform()
 {
-    // float4x4 transform = parent->GetGlobalTransform();
-    // transform.SetTranslatePart(GetAnchorXPos(anchorsX.x) + position.x, GetAnchorYPos(anchorsY.x) + position.y, 0);
-    // parent->SetLocalTransform(transform);
+    float4x4 transform = parent->GetGlobalTransform();
+    transform.SetTranslatePart(GetAnchorXPos(anchorsX.x) + position.x, GetAnchorYPos(anchorsY.x) + position.y, 0);
+    parent->SetLocalTransform(transform);
+
+    for (const auto& child : childTransforms)
+    {
+        child->OnAnchorsUpdated();
+        child->UpdateParent3DTransform();
+    }
+}
+
+void Transform2DComponent::UpdateChildren2DTransforms()
+{
+
 }
 
 void Transform2DComponent::OnTransform3DUpdated(const float4x4& transform3D)
 {
-    // position.x = transform3D.TranslatePart().x - GetAnchorXPos(anchorsX.x);
-    // position.y = transform3D.TranslatePart().y - GetAnchorYPos(anchorsY.x);
+    position.x = transform3D.TranslatePart().x - GetAnchorXPos(anchorsX.x);
+    position.y = transform3D.TranslatePart().y - GetAnchorYPos(anchorsY.x);
+
+    for (const auto& child : childTransforms)
+    {
+        child->OnAnchorsUpdated();
+    }
 
     // Like in Unity, when anchors are separated probably position will be calculated in a different way
 }
@@ -192,15 +209,22 @@ void Transform2DComponent::OnTransform3DUpdated(const float4x4& transform3D)
 float2 Transform2DComponent::GetRenderingPosition() const
 {
     // Gets the position to use for rendering the widget (at the top-left corner of the widget space)
-    float2 parentPos;
+    // float2 parentPos;
+    //
+    // if (IsRootTransform2D())
+    //    parentPos = float2(
+    //        parent->GetParentGlobalTransform().TranslatePart().x, parent->GetParentGlobalTransform().TranslatePart().y
+    //    );
+    // else parentPos = float2(parentTransform->position.x, parentTransform->position.y);
 
-    if (IsRootTransform2D())
-        parentPos = float2(
-            parent->GetParentGlobalTransform().TranslatePart().x, parent->GetParentGlobalTransform().TranslatePart().y
-        );
-    else parentPos = float2(parentTransform->position.x, parentTransform->position.y);
+    return float2(
+        GetGlobalPosition().x - (size.x * pivot.x), GetGlobalPosition().y + (size.y * (1 - pivot.y))
+    );
+}
 
-    return float2(parentPos.x + position.x - (size.x * pivot.x), parentPos.y + position.y + (size.y * (1 - pivot.y)));
+float2 Transform2DComponent::GetGlobalPosition() const
+{
+    return float2(GetAnchorXPos(anchorsX.x) + position.x, GetAnchorYPos(anchorsY.x) + position.y);
 }
 
 void Transform2DComponent::GetCanvas()
@@ -241,7 +265,9 @@ float Transform2DComponent::GetAnchorXPos(const float anchor) const
     if (IsRootTransform2D())
         anchorPos = parent->GetParentGlobalTransform().TranslatePart().x +
                     (parentCanvas->GetWidth() * (anchor - 0.5f)); // 0.5f because canvas pivot is always in the middle
-    else anchorPos = parentTransform->position.x + (parentTransform->size.x * (anchor - parentTransform->pivot.x));
+    else
+        anchorPos =
+            parentTransform->GetGlobalPosition().x + (parentTransform->size.x * (anchor - parentTransform->pivot.x));
 
     return anchorPos;
 }
@@ -252,7 +278,9 @@ float Transform2DComponent::GetAnchorYPos(const float anchor) const
     if (IsRootTransform2D())
         anchorPos = parent->GetParentGlobalTransform().TranslatePart().y +
                     (parentCanvas->GetHeight() * (anchor - 0.5f)); // 0.5f because canvas pivot is always in the middle
-    else anchorPos = parentTransform->position.y + (parentTransform->size.y * (anchor - parentTransform->pivot.y));
+    else
+        anchorPos =
+            parentTransform->GetGlobalPosition().y + (parentTransform->size.y * (anchor - parentTransform->pivot.y));
 
     return anchorPos;
 }
@@ -260,4 +288,6 @@ float Transform2DComponent::GetAnchorYPos(const float anchor) const
 void Transform2DComponent::OnAnchorsUpdated()
 {
     // TODO: Update position according to new anchor values
+    position.x = parent->GetGlobalTransform().TranslatePart().x - GetAnchorXPos(anchorsX.x);
+    position.y = parent->GetGlobalTransform().TranslatePart().y - GetAnchorYPos(anchorsY.x);
 }

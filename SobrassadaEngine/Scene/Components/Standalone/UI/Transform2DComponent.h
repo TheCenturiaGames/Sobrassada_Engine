@@ -20,11 +20,13 @@ class Transform2DComponent : public Component
     void Render(float deltaTime) override;
     void RenderEditorInspector() override;
 
-    void UpdateParentTransform();
+    void UpdateParent3DTransform();
+    void UpdateChildren2DTransforms();
     void OnTransform3DUpdated(const float4x4& transform3D);
 
     float2 GetRenderingPosition() const;
-
+    float2 GetGlobalPosition() const;
+    void AddChildTransform(Transform2DComponent* newChild) { childTransforms.push_back(newChild); }
     CanvasComponent* GetParentCanvas() const { return parentCanvas; }
 
   private:
@@ -38,6 +40,7 @@ class Transform2DComponent : public Component
 
   public:
     Transform2DComponent* parentTransform;
+    std::vector<Transform2DComponent*> childTransforms;
 
     float2 position;
     float2 size;
