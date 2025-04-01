@@ -351,11 +351,12 @@ bool ResourceNavMesh::BuildNavMesh(
             }
         }
 
-        CreateDetourData();
-
-        delete context;
-        return true;
     }
+
+    CreateDetourData();
+
+    delete context;
+    return true;
 }
 
 void ResourceNavMesh::CreateDetourData()
