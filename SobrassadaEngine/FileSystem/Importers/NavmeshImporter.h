@@ -3,12 +3,11 @@
 #include <Globals.h>
 
 class ResourceNavmesh;
+class dtNavMesh;
 
 namespace NavmeshImporter
 {
-    UID ImportNavmesh(
-        const std::string& name, const char* filePath, const std::string& targetFilePath, UID sourceUID = INVALID_UID
-    );
+    void SaveNavmesh(const char* path, const dtNavMesh& navmesh);
 
     ResourceNavmesh* LoadNavmesh(UID navmeshUID);
 }; // namespace NavmeshImporter

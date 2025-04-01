@@ -22,7 +22,8 @@ enum class FileType
     Scene,
     Model,
     Prefab,
-    StateMachine
+    StateMachine,
+    Navmesh
 };
 
 class LibraryModule : public Module
