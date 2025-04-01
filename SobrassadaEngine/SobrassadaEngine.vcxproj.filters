@@ -393,6 +393,7 @@
     <ClCompile Include="Scene\Components\ScriptComponent.cpp">
       <Filter>Scene\Components</Filter>
     </ClCompile>
+    <ClCompile Include="ResourceManagement\Resources\ResourceNavmesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -731,6 +732,7 @@
     <ClInclude Include="Scene\Components\ScriptComponent.h">
       <Filter>Scene\Components</Filter>
     </ClInclude>
+    <ClInclude Include="ResourceManagement\Resources\ResourceNavmesh.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl">
