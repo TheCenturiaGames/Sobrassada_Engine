@@ -296,3 +296,12 @@ void Transform2DComponent::OnAnchorsUpdated()
     position.x = parent->GetGlobalTransform().TranslatePart().x - GetAnchorXPos(anchorsX.x);
     position.y = parent->GetGlobalTransform().TranslatePart().y - GetAnchorYPos(anchorsY.x);
 }
+
+void Transform2DComponent::OnSizeChanged()
+{
+    for (const auto& child : childTransforms)
+    {
+        child->OnAnchorsUpdated();
+        child->UpdateParent3DTransform();
+    }
+}
