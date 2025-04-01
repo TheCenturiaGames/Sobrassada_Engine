@@ -44,39 +44,39 @@ ResourceNavMesh::ResourceNavMesh(UID uid, const std::string& name) : Resource(ui
 {
     config          = new rcConfig();
     // Default Heightfield Options
-    config->bmin[0] = config->bmin[1] = config->bmin[2] = 0.0f;
-    config->bmax[0] = config->bmax[1] = config->bmax[2] = 0.0f;
-    config->cs                                          = 0.3f; // Default cell size
+    config->bmin[0] = config->bmin[1] = config->bmin[2] = FLT_MAX;
+    config->bmax[0] = config->bmax[1] = config->bmax[2] = FLT_MIN;
+    config->cs                                          = 0.1f; // Default cell size
     config->ch                                          = 0.2f; // Default cell height
     config->width                                       = 1000; // Arbitrary default width
     config->height                                      = 1000; // Arbitrary default height
 
     // Default Walkable Options
-    config->walkableSlopeAngle                          = 45.0f; // Max slope an agent can walk on
-    config->walkableClimb                               = 1;     // Max step height agent can climb
-    config->walkableHeight                              = 2;     // Min height required to pass
+    config->walkableSlopeAngle                          = 90.0f; // Max slope an agent can walk on
+    config->walkableClimb                               = 20;    // Max step height agent can climb
+    config->walkableHeight                              = 20;    // Min height required to pass
     config->walkableRadius                              = 1;     // Agent radius
 
     // Default Partition Options
     partitionType                                       = SAMPLE_PARTITION_MONOTONE;
-    config->minRegionArea                               = 4;  // Min region area (small regions will be removed)
-    config->mergeRegionArea                             = 10; // Merge regions smaller than this size
+    config->minRegionArea                               = 70; // Min region area (small regions will be removed)
+    config->mergeRegionArea                             = 20; // Merge regions smaller than this size
 
     // Default Contour Options
-    config->maxSimplificationError                      = 2.0f;
-    config->maxEdgeLen                                  = 15;
+    config->maxSimplificationError                      = 1.3f;
+    config->maxEdgeLen                                  = 12;
     config->maxVertsPerPoly                             = 6;
 
     // Default PolyMesh Options
-    config->detailSampleDist                            = 0.5f; // Higher = more accurate, lower = faster
-    config->detailSampleMaxError                        = 0.5f; // Higher = more smooth, lower = accurate
+    config->detailSampleDist                            = 6.0f; // Higher = more accurate, lower = faster
+    config->detailSampleMaxError                        = 1.0f; // Higher = more smooth, lower = accurate
 
     // Default Filters
     m_filterLowHangingObstacles                         = true;
     m_filterLedgeSpans                                  = true;
     m_filterWalkableLowHeightSpans                      = true;
 
-    m_agentHeight                                       = 2.0f;
+    m_agentHeight                                       = 1.0f;
     m_agentMaxClimb                                     = 0.5f;
     m_agentRadius                                       = 0.5f;
 
@@ -99,7 +99,10 @@ bool ResourceNavMesh::BuildNavMesh(
     int allTriangleCount = 0;
     int indexOffset      = 0;
 
-    context              = new rcContext;
+    context              = new rcContext();
+
+    std::vector<rcPolyMeshDetail*> myPolyMeshDetails;
+    std::vector<rcPolyMesh*> myPolyMeshes;
 
     // first pass to get necessary sizes and AABB
     for (const auto& mesh : meshes)
@@ -131,15 +134,11 @@ bool ResourceNavMesh::BuildNavMesh(
         const std::vector<Vertex>& meshVerts         = mesh.first->GetLocalVertices();
         const std::vector<unsigned int>& meshIndices = mesh.first->GetIndices();
 
-        int indexCount                               = mesh.first->GetIndexCount();
         int vertexCount                              = mesh.first->GetVertexCount();
-        int meshVertexCount                          = (int)meshVerts.size();
-        int meshTriangleCount                        = indexCount / 3; // triangles
 
         for (const Vertex& vertex : meshVerts)
         {
             float4 tmpvertex(vertex.position.x, vertex.position.y, vertex.position.z, 1);
-            // mesh.second.Transform(tmpvertex);
 
             tmpvertex = mesh.second.Transform(tmpvertex);
             navmeshVertices.push_back(tmpvertex.x);
@@ -153,7 +152,7 @@ bool ResourceNavMesh::BuildNavMesh(
         }
         indexOffset += vertexCount;
     }
-
+    rcCalcGridSize(config->bmin, config->bmax, config->cs, &config->width, &config->height);
     heightfield = rcAllocHeightfield();
 
     if (!heightfield)
@@ -178,6 +177,8 @@ bool ResourceNavMesh::BuildNavMesh(
         context, config->walkableSlopeAngle, navmeshVertices.data(), allVertexCount, navmeshTriangles.data(),
         allTriangleCount, triAreas
     );
+
+    // CHECK OBSTACLES HERE IN THE FUTURE
 
     if (!rcRasterizeTriangles(
             context, navmeshVertices.data(), allVertexCount, navmeshTriangles.data(), triAreas, allTriangleCount,
@@ -293,31 +294,24 @@ bool ResourceNavMesh::BuildNavMesh(
     }
 
     // Build polygon navmesh from the contours.
+
+    // temporal polymesh and detailpolymesh
     polymesh = rcAllocPolyMesh();
+
     if (!polymesh)
     {
-        GLOG("buildNavigation: Out of memory for polymesh");
-        delete context;
-        rcFreeCompactHeightfield(compactHeightfield);
-        rcFreeContourSet(contourSet);
+        GLOG("buildNavigation: Out of memory 'tempPolyMesh'.");
         return false;
     }
     if (!rcBuildPolyMesh(context, *contourSet, config->maxVertsPerPoly, *polymesh))
     {
         GLOG("buildNavigation: Could not triangulate contours.");
-        delete context;
-        rcFreeCompactHeightfield(compactHeightfield);
-        rcFreeContourSet(contourSet);
         return false;
     }
-
     polymeshDetail = rcAllocPolyMeshDetail();
     if (!polymeshDetail)
     {
-        GLOG("buildNavigation: Out of memory for detailed polymesh.");
-        delete context;
-        rcFreeCompactHeightfield(compactHeightfield);
-        rcFreeContourSet(contourSet);
+        GLOG("buildNavigation: Out of memory 'tempPolyMeshDetail'.");
         return false;
     }
 
@@ -327,9 +321,6 @@ bool ResourceNavMesh::BuildNavMesh(
         ))
     {
         GLOG("buildNavigation: Could not build detail mesh.");
-        delete context;
-        rcFreeCompactHeightfield(compactHeightfield);
-        rcFreeContourSet(contourSet);
         return false;
     }
 
@@ -338,10 +329,7 @@ bool ResourceNavMesh::BuildNavMesh(
 
     if (config->maxVertsPerPoly <= DT_VERTS_PER_POLYGON)
     {
-        unsigned char* navData = 0;
-        int navDataSize        = 0;
 
-        // Update poly flags from areas.
         for (int i = 0; i < polymesh->npolys; ++i)
         {
             if (polymesh->areas[i] == RC_WALKABLE_AREA) polymesh->areas[i] = SAMPLE_POLYAREA_GROUND;
@@ -361,84 +349,87 @@ bool ResourceNavMesh::BuildNavMesh(
             }
         }
 
-        dtNavMeshCreateParams params;
-        memset(&params, 0, sizeof(params));
-        params.verts            = polymesh->verts;
-        params.vertCount        = polymesh->nverts;
-        params.polys            = polymesh->polys;
-        params.polyAreas        = polymesh->areas;
-        params.polyFlags        = polymesh->flags;
-        params.polyCount        = polymesh->npolys;
-        params.nvp              = polymesh->nvp;
-        params.detailMeshes     = polymeshDetail->meshes;
-        params.detailVerts      = polymeshDetail->verts;
-        params.detailVertsCount = polymeshDetail->nverts;
-        params.detailTris       = polymeshDetail->tris;
-        params.detailTriCount   = polymeshDetail->ntris;
-        /*
-        params.offMeshConVerts  = meshes->getOffMeshConnectionVerts();
-        params.offMeshConRad    = m_geom->getOffMeshConnectionRads();
-        params.offMeshConDir    = m_geom->getOffMeshConnectionDirs();
-        params.offMeshConAreas  = m_geom->getOffMeshConnectionAreas(); This is used for jumping/doors/teleporting
-        params.offMeshConFlags  = m_geom->getOffMeshConnectionFlags();
-        params.offMeshConUserID = m_geom->getOffMeshConnectionId();
-        params.offMeshConCount  = m_geom->getOffMeshConnectionCount();
-        */
-        params.walkableHeight   = m_agentHeight;
-        params.walkableRadius   = m_agentRadius;
-        params.walkableClimb    = m_agentMaxClimb;
-        rcVcopy(params.bmin, polymesh->bmin);
-        rcVcopy(params.bmax, polymesh->bmax);
-        params.cs          = config->cs;
-        params.ch          = config->ch;
-        params.buildBvTree = true;
+        CreateDetourData();
 
-        if (!dtCreateNavMeshData(&params, &navData, &navDataSize))
-        {
-            GLOG("Could not build Detour navmesh.");
-            return false;
-        }
-
-        navMesh = dtAllocNavMesh();
-        if (!navMesh)
-        {
-            dtFree(navData);
-            GLOG("Could not create Detour navmesh");
-            return false;
-        }
-
-        dtStatus status;
-
-        status = navMesh->init(navData, navDataSize, DT_TILE_FREE_DATA);
-        if (dtStatusFailed(status))
-        {
-            dtFree(navData);
-            GLOG("Could not init Detour navmesh");
-            return false;
-        }
-        status = navQuery->init(navMesh, 2048);
-        if (dtStatusFailed(status))
-        {
-            GLOG("Could not init Detour navmesh query");
-            return false;
-        }
+        delete context;
+        return true;
     }
-
-    delete context;
-    return true;
 }
 
-void ResourceNavMesh::Render()
+void ResourceNavMesh::CreateDetourData()
 {
-    if (!navMesh)
+    if (!polymesh) return;
+    unsigned char* navData        = 0;
+    int navDataSize               = 0;
+
+    dtNavMeshCreateParams* params = new dtNavMeshCreateParams();
+
+    params->verts                 = polymesh->verts;
+    params->vertCount             = polymesh->nverts;
+    params->polys                 = polymesh->polys;
+    params->polyAreas             = polymesh->areas;
+    params->polyFlags             = polymesh->flags;
+    params->polyCount             = polymesh->npolys;
+    params->nvp                   = polymesh->nvp;
+    params->detailMeshes          = polymeshDetail->meshes;
+    params->detailVerts           = polymeshDetail->verts;
+    params->detailVertsCount      = polymeshDetail->nverts;
+    params->detailTris            = polymeshDetail->tris;
+    params->detailTriCount        = polymeshDetail->ntris;
+    /*
+    params.offMeshConVerts  = meshes->getOffMeshConnectionVerts();
+    params.offMeshConRad    = m_geom->getOffMeshConnectionRads();
+    params.offMeshConDir    = m_geom->getOffMeshConnectionDirs();
+    params.offMeshConAreas  = m_geom->getOffMeshConnectionAreas(); This is used for jumping/doors/teleporting
+    params.offMeshConFlags  = m_geom->getOffMeshConnectionFlags();
+    params.offMeshConUserID = m_geom->getOffMeshConnectionId();
+    params.offMeshConCount  = m_geom->getOffMeshConnectionCount();
+    */
+    params->walkableHeight        = m_agentHeight;
+    params->walkableRadius        = m_agentRadius;
+    params->walkableClimb         = m_agentMaxClimb;
+    rcVcopy(params->bmin, polymesh->bmin);
+    rcVcopy(params->bmax, polymesh->bmax);
+    params->cs          = config->cs;
+    params->ch          = config->ch;
+    params->buildBvTree = true;
+
+    if (!dtCreateNavMeshData(params, &navData, &navDataSize))
     {
+        GLOG("Could not build Detour navmesh.");
+        delete params;
         return;
     }
-    ResourceNavMesh* rsnav   = App->GetResourcesModule()->GetNavMesh();
-    dtNavMesh* navMesh       = App->GetResourcesModule()->GetNavMesh()->GetDetourNavMesh();
-    dtNavMeshQuery* navQuery = App->GetResourcesModule()->GetNavMesh()->GetDetourNavMeshQuery();
-    // App->GetDebugDrawModule()->DrawNavMesh(navMesh, navQuery, DRAWNAVMESH_COLOR_TILES);
+
+    delete params;
+
+    navMesh = dtAllocNavMesh();
+
+    if (!navMesh)
+    {
+        dtFree(navData);
+        GLOG("Could not create Detour navmesh");
+        return;
+    }
+
+    dtStatus status;
+
+    status = navMesh->init(navData, navDataSize, DT_TILE_FREE_DATA);
+    if (dtStatusFailed(status))
+    {
+        dtFree(navData);
+        GLOG("Could not init Detour navmesh");
+        return;
+    }
+    status = navQuery->init(navMesh, 2048);
+    if (dtStatusFailed(status))
+    {
+        GLOG("Could not init Detour navmesh query");
+        return;
+    }
 }
+
+
 
 void ResourceNavMesh::RenderNavmeshEditor()
 {

@@ -53,9 +53,10 @@ class ResourceNavMesh : public Resource
     bool BuildNavMesh(
         const std::vector<std::pair<const ResourceMesh*, const float4x4&>>& meshes, float minPoint[3], float maxPoint[3]
     );
-    void Render();
+
 
     void RenderNavmeshEditor();
+    void CreateDetourData();
 
     dtNavMesh* GetDetourNavMesh() { return navMesh; }
     dtNavMeshQuery* GetDetourNavMeshQuery() { return navQuery; }

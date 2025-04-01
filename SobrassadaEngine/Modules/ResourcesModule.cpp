@@ -93,8 +93,8 @@ void ResourcesModule::CreateNavMesh()
 {
 
     std::vector<std::pair<const ResourceMesh*, const float4x4&>> meshes;
-    float minPos[3]                                         = {0, 0, 0};
-    float maxPos[3]                                         = {0, 0, 0};
+    float minPos[3]                                         = {FLT_MAX, FLT_MAX, FLT_MAX};
+    float maxPos[3]                                         = {FLT_MIN, FLT_MIN, FLT_MIN};
 
     const std::unordered_map<UID, GameObject*>& gameObjects = App->GetSceneModule()->GetScene()->GetAllGameObjects();
 
@@ -121,7 +121,7 @@ void ResourcesModule::CreateNavMesh()
                     maxPos[1]                        = std::max(maxPos[1], aabb.maxPoint.y);
                     maxPos[2]                        = std::max(maxPos[2], aabb.maxPoint.z);
 
-                    meshes.push_back(std::pair(resourceMesh, globalMatrix));
+                    meshes.push_back({resourceMesh, globalMatrix});
                 }
             }
         }
