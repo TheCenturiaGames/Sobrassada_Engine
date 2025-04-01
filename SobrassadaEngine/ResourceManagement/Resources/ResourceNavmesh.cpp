@@ -44,8 +44,8 @@ ResourceNavMesh::ResourceNavMesh(UID uid, const std::string& name) : Resource(ui
 {
     config          = new rcConfig();
     // Default Heightfield Options
-    config->bmin[0] = config->bmin[1] = config->bmin[2] = 0.0f;
-    config->bmax[0] = config->bmax[1] = config->bmax[2] = 0.0f;
+    config->bmin[0] = config->bmin[1] = config->bmin[2] = FLT_MAX;
+    config->bmax[0] = config->bmax[1] = config->bmax[2] = FLT_MIN;
     config->cs                                          = 0.1f; // Default cell size
     config->ch                                          = 0.2f; // Default cell height
     config->width                                       = 1000; // Arbitrary default width
