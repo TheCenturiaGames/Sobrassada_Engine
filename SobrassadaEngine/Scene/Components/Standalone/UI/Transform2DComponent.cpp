@@ -177,15 +177,20 @@ void Transform2DComponent::RenderEditorInspector()
 
 void Transform2DComponent::UpdateParent3DTransform()
 {
-    float4x4 transform = parent->GetGlobalTransform();
-    transform.SetTranslatePart(GetAnchorXPos(anchorsX.x) + position.x, GetAnchorYPos(anchorsY.x) + position.y, 0);
+    // Get the parent local transform and update it according to the Transform2D. The parentTransform global 
+    // position is subtracted in order to get the anchor in a local position
+    float4x4 transform = parent->GetLocalTransform();
+    transform.SetTranslatePart(
+        GetAnchorXPos(anchorsX.x) + position.x - parentTransform->GetGlobalPosition().x,
+        GetAnchorYPos(anchorsY.x) + position.y - parentTransform->GetGlobalPosition().y, 0
+    );
     parent->SetLocalTransform(transform);
 
-    for (const auto& child : childTransforms)
-    {
-        child->OnAnchorsUpdated();
-        child->UpdateParent3DTransform();
-    }
+    //for (const auto& child : childTransforms)
+    //{
+    //    child->OnAnchorsUpdated();
+    //    child->UpdateParent3DTransform();
+    //}
 }
 
 void Transform2DComponent::UpdateChildren2DTransforms()
@@ -193,15 +198,16 @@ void Transform2DComponent::UpdateChildren2DTransforms()
 
 }
 
-void Transform2DComponent::OnTransform3DUpdated(const float4x4& transform3D)
+void Transform2DComponent::OnTransform3DUpdated(const float4x4& globalTransform3D)
 {
-    position.x = transform3D.TranslatePart().x - GetAnchorXPos(anchorsX.x);
-    position.y = transform3D.TranslatePart().y - GetAnchorYPos(anchorsY.x);
+    // S'ha de pillar la global te pinta
+    position.x = globalTransform3D.TranslatePart().x - GetAnchorXPos(anchorsX.x);
+    position.y = globalTransform3D.TranslatePart().y - GetAnchorYPos(anchorsY.x);
 
-    for (const auto& child : childTransforms)
-    {
-        child->OnAnchorsUpdated();
-    }
+    //for (const auto& child : childTransforms)
+    //{
+    //    child->OnAnchorsUpdated();
+    //}
 
     // Like in Unity, when anchors are separated probably position will be calculated in a different way
 }
@@ -287,7 +293,6 @@ float Transform2DComponent::GetAnchorYPos(const float anchor) const
 
 void Transform2DComponent::OnAnchorsUpdated()
 {
-    // TODO: Update position according to new anchor values
     position.x = parent->GetGlobalTransform().TranslatePart().x - GetAnchorXPos(anchorsX.x);
     position.y = parent->GetGlobalTransform().TranslatePart().y - GetAnchorYPos(anchorsY.x);
 }

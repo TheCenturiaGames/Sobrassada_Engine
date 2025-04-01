@@ -398,7 +398,7 @@ void GameObject::OnTransformUpdated()
     if (components.find(COMPONENT_TRANSFORM_2D) != components.end())
     {
         Transform2DComponent* transform2D = static_cast<Transform2DComponent*>(components.at(COMPONENT_TRANSFORM_2D));
-        transform2D->OnTransform3DUpdated(localTransform);
+        transform2D->OnTransform3DUpdated(globalTransform);
     }
 
     if (mobilitySettings == STATIC) App->GetSceneModule()->GetScene()->SetStaticModified();
