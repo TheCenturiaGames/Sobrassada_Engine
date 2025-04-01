@@ -5,6 +5,7 @@
 #include "CameraComponent.h"
 #include "CameraModule.h"
 #include "Component.h"
+#include "ComponentUtils.h"
 #include "DebugDrawModule.h"
 #include "EditorUIModule.h"
 #include "Framebuffer.h"
@@ -22,9 +23,8 @@
 #include "ResourceModel.h"
 #include "ResourcePrefab.h"
 #include "ResourcesModule.h"
-#include "ComponentUtils.h"
-#include "Standalone/MeshComponent.h"
 #include "SceneModule.h"
+#include "Standalone/MeshComponent.h"
 
 #include "SDL_mouse.h"
 #include "imgui.h"
@@ -137,7 +137,8 @@ void Scene::Init()
 }
 
 void Scene::Save(
-    rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator, UID newUID, const char* newName
+    rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator, SaveMode saveMode, UID newUID,
+    const char* newName
 )
 {
     if (newUID != INVALID_UID)
@@ -187,7 +188,7 @@ void Scene::Save(
     else GLOG("Light Config not found");
 
     // TODO Convert to parameter which can be set later manually instead of saving a scene as default "on scene save"
-    App->GetProjectModule()->SetAsStartupScene(sceneName);
+    if (saveMode != SaveMode::SavePlayMode) App->GetProjectModule()->SetAsStartupScene(sceneName);
 }
 
 void Scene::LoadComponents() const

@@ -10,8 +10,7 @@
 #include "SceneModule.h"
 #include "TextureImporter.h"
 
-#include "Libs/rapidjson/stringbuffer.h"
-#include "Libs/rapidjson/writer.h"
+#include "rapidjson/writer.h"
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
@@ -61,8 +60,9 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
 
         rapidjson::Value scene(rapidjson::kObjectType);
 
-        if (saveMode == SaveMode::SaveAs) loadedScene->Save(scene, allocator, GenerateUID(), sceneName.c_str());
-        else loadedScene->Save(scene, allocator);
+        if (saveMode == SaveMode::SaveAs)
+            loadedScene->Save(scene, allocator, saveMode, GenerateUID(), sceneName.c_str());
+        else loadedScene->Save(scene, allocator, saveMode);
 
         doc.AddMember("Scene", scene, allocator);
 

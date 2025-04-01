@@ -29,21 +29,16 @@ SceneModule::~SceneModule()
 
 bool SceneModule::Init()
 {
-    if (App->GetProjectModule()->IsProjectLoaded())
-    {
-        if (!App->GetProjectModule()->GetProjectConfig()->GetStartupScene().empty())
-        {
-            App->GetLibraryModule()->LoadScene(
-                (App->GetProjectModule()->GetProjectConfig()->GetStartupScene() + SCENE_EXTENSION).c_str()
-            );
+    if (!App->GetProjectModule()->IsProjectLoaded()) return true;
 
-            if (App->GetEngineConfig()->ShouldStartGameOnStartup()) SwitchPlayMode(true);
-        }
-        else
-        {
-            CreateScene();
-        }
-    }
+    const std::string& startupScene = App->GetProjectModule()->GetProjectConfig()->GetStartupScene();
+    bool startupSceneLoaded =
+        !startupScene.empty() && App->GetLibraryModule()->LoadScene((startupScene + SCENE_EXTENSION).c_str());
+
+    if (startupSceneLoaded && App->GetEngineConfig()->ShouldStartGameOnStartup()) SwitchPlayMode(true);
+
+    if (!startupSceneLoaded) CreateScene();
+
     return true;
 }
 
