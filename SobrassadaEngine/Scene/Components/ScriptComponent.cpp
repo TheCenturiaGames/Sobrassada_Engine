@@ -94,7 +94,7 @@ void ScriptComponent::RenderEditorInspector()
     }
 }
 
-void ScriptComponent::CreateScript(std::string scriptType)
+void ScriptComponent::CreateScript(const std::string& scriptType)
 {
     scriptName     = scriptType;
     scriptInstance = App->GetScriptModule()->CreateScript(scriptType, parent);

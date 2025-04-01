@@ -3,7 +3,7 @@
 #include "SceneModule.h"
 #include "Component.h"
 #include "Script.h"
-#include <ScriptComponent.h>
+#include "ScriptComponent.h"
 
 bool ScriptModule::Init()
 {

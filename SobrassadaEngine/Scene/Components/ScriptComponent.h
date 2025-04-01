@@ -18,10 +18,10 @@ class ScriptComponent : public Component
     void Render(float deltaTime) override;
     void RenderEditorInspector() override;
 
-    void CreateScript(std::string scriptType);
+    void CreateScript(const std::string& scriptType);
     void DeleteScript();
 
-    std::string GetScriptName() const { return scriptName; }
+    const std::string& GetScriptName() const { return scriptName; }
 
   private:
     std::string scriptName           = "Not selected";

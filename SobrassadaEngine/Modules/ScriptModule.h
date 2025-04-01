@@ -22,7 +22,7 @@ class ScriptModule : public Module
     update_status Update(float deltaTime) override;
     bool ShutDown() override;
 
-    Script* CreateScript(const std::string name, GameObject* parent) const { return createScriptFunc(name, parent); }
+    Script* CreateScript(const std::string& name, GameObject* parent) const { return createScriptFunc(name, parent); }
     void DestroyScript(Script* script) const { destroyScriptFunc(script); }
 
   private:
