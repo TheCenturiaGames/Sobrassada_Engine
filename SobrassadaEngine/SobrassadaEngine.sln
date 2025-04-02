@@ -4,16 +4,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SobrassadaEngine", "SobrassadaEngine.vcxproj", "{E053F624-9870-4D3A-B6B0-A97E1DB10148}"
-	ProjectSection(ProjectDependencies) = postProject
-		{371B9FA9-4C90-4AC6-A123-ACED756D6C77} = {371B9FA9-4C90-4AC6-A123-ACED756D6C77}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXTex", "DirectXTex\DirectXTex\DirectXTex_Desktop_2022.vcxproj", "{371B9FA9-4C90-4AC6-A123-ACED756D6C77}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SobrassadaScripts", "Scripting\SobrassadaScripts\SobrassadaScripts\SobrassadaScripts.vcxproj", "{3F4C08EB-F9E4-4CD2-85F1-26E62A73E599}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E053F624-9870-4D3A-B6B0-A97E1DB10148} = {E053F624-9870-4D3A-B6B0-A97E1DB10148}
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
