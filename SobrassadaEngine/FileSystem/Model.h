@@ -25,19 +25,19 @@ class Model
 {
   public:
     Model() = default;
-    Model(const UID id, const std::vector<NodeData>& nodes, const std::vector<Skin>& skins)
+    Model(const UID id, const std::vector<std::vector<NodeData>>& nodes, const std::vector<Skin>& skins)
         : uid(id), nodes(nodes), skins(skins) {};
     ~Model() = default;
 
-    const std::vector<NodeData>& GetNodes() const { return nodes; }
+    const std::vector<std::vector<NodeData>>& GetNodes() const { return nodes; }
     const Skin& GetSkin(int skinIndex) const { return skins[skinIndex]; }
 
     void SetUID(const UID uid) { this->uid = uid; }
-    void SetNodes(const std::vector<NodeData>& nodes) { this->nodes = nodes; }
+    void SetNodes(const std::vector<std::vector<NodeData>>& nodes) { this->nodes = nodes; }
     void SetSkins(const std::vector<Skin>& skins) { this->skins = skins; }
 
   private:
     UID uid;
-    std::vector<NodeData> nodes;
+    std::vector<std::vector<NodeData>> nodes;
     std::vector<Skin> skins;
 };

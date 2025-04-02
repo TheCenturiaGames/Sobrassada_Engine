@@ -84,7 +84,6 @@ void GeometryBatch::LoadData()
     std::vector<unsigned int> totalIndices;
     std::vector<float4x4> totalModels;
     std::vector<MaterialGPU> totalMaterials;
-    std::vector<std::vector<float4x4>> bindMatrices;
 
     unsigned int accVertexCount = 0;
     unsigned int accIndexCount  = 0;
@@ -115,9 +114,7 @@ void GeometryBatch::LoadData()
 
         if (hasBones)
         {
-            bindMatrices.push_back(component->GetBindMatrices());
             bonesCount.push_back(accBonesCount);
-
             accBonesCount += static_cast<unsigned int>(component->GetBindMatrices().size());
         }
     }
@@ -158,7 +155,7 @@ void GeometryBatch::LoadData()
     {
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, models[i]);
 
-        glBufferStorage(GL_SHADER_STORAGE_BUFFER, modelsSize, totalModels.data(), flags);
+        glBufferStorage(GL_SHADER_STORAGE_BUFFER, modelsSize, nullptr, flags);
         ptrModels[i] = (float4x4*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, modelsSize, flags);
 
         if (ptrModels[i] == nullptr)
@@ -173,7 +170,7 @@ void GeometryBatch::LoadData()
 
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, bones[i]);
 
-        glBufferStorage(GL_SHADER_STORAGE_BUFFER, bonesSize, bindMatrices.data(), flags);
+        glBufferStorage(GL_SHADER_STORAGE_BUFFER, bonesSize, nullptr, flags);
         ptrBones[i] = (float4x4*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, bonesSize, flags);
 
         if (ptrBones[i] == nullptr)
