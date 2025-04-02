@@ -393,6 +393,13 @@
     <ClCompile Include="FileSystem\Importers\NavmeshImporter.cpp">
       <Filter>FileSystem\Importers</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\AIAgentComponent.cpp" />
+    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourCrowd.cpp" />
+    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourLocalBoundary.cpp" />
+    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourObstacleAvoidance.cpp" />
+    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourPathCorridor.cpp" />
+    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourPathQueue.cpp" />
+    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourProximityGrid.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -728,6 +735,7 @@
     <ClInclude Include="FileSystem\Importers\NavmeshImporter.h">
       <Filter>FileSystem\Importers</Filter>
     </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\AIAgentComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl">
