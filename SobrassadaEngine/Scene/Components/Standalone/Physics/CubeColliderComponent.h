@@ -32,11 +32,11 @@ class CubeColliderComponent : public Component
 
   public:
     bool freezeRotation           = false;
-    float mass                    = 1.f;
+    float mass                    = 0.f;
     float3 centerOffset           = float3::zero;
     float3 centerRotation         = float3::zero;
     float3 size                   = float3::one;
-    ColliderType colliderType     = ColliderType::DYNAMIC;
+    ColliderType colliderType     = ColliderType::STATIC;
 
     btRigidBody* rigidBody        = nullptr;
     BulletMotionState motionState = BulletMotionState(nullptr, float3::zero, float3::zero, false);

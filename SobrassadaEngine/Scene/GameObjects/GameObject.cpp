@@ -430,7 +430,9 @@ AABB GameObject::GetHeriachyAABB()
             visitedGameObjects.insert(currentUID);
             GameObject* currentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentUID);
 
-            if (currentGameObject->GetGlobalAABB().IsFinite()) returnAABB.Enclose(currentGameObject->GetGlobalAABB());
+            const AABB& currentAABB       = currentGameObject->GetGlobalAABB();
+            if (currentAABB.IsFinite() && !currentAABB.IsDegenerate())
+                returnAABB.Enclose(currentGameObject->GetGlobalAABB());
 
             for (UID childID : currentGameObject->GetChildren())
                 toVisitGameObjects.push(childID);
@@ -450,7 +452,9 @@ AABB GameObject::GetHeriachyAABB()
             visitedGameObjects.insert(currentUID);
             GameObject* currentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentUID);
 
-            if (currentGameObject->GetGlobalAABB().IsFinite()) returnAABB.Enclose(currentGameObject->GetGlobalAABB());
+            const AABB& currentAABB       = currentGameObject->GetGlobalAABB();
+            if (currentAABB.IsFinite() && !currentAABB.IsDegenerate())
+                returnAABB.Enclose(currentGameObject->GetGlobalAABB());
 
             for (UID childID : currentGameObject->GetChildren())
                 toVisitGameObjects.push(childID);
@@ -754,6 +758,7 @@ void GameObject::OnDrawConnectionsToggle()
 
 void GameObject::UpdateMobilityHeriarchy(MobilitySettings type)
 {
+    SetMobility(type);
     std::set<UID> visitedGameObjects;
     std::stack<UID> toVisitGameObjects;
     UID sceneRootUID = App->GetSceneModule()->GetScene()->GetGameObjectRootUID();

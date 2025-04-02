@@ -598,7 +598,7 @@ void Scene::CreateStaticSpatialDataStruct()
 
         if (!objectIterator.second->IsStatic()) continue;
         if (objectIterator.second->GetUID() == gameObjectRootUID) continue;
-        if (objectBB.IsDegenerate()) continue;
+        if (!objectBB.IsFinite() || objectBB.IsDegenerate()) continue;
 
         sceneOctree->InsertElement(objectIterator.second);
     }
@@ -618,7 +618,7 @@ void Scene::CreateDynamicSpatialDataStruct()
 
         if (objectIterator.second->IsStatic()) continue;
         if (objectIterator.second->GetUID() == gameObjectRootUID) continue;
-        if (objectBB.IsDegenerate()) continue;
+        if (!objectBB.IsFinite() || objectBB.IsDegenerate()) continue;
 
         dynamicTree->InsertElement(objectIterator.second);
     }

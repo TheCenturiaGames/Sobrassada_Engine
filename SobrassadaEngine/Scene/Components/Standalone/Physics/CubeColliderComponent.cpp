@@ -106,7 +106,12 @@ void CubeColliderComponent::RenderEditorInspector()
             if (ImGui::Selectable(ColliderTypeStrings[i]))
             {
                 colliderType = ColliderType(i);
-                if (colliderType == ColliderType::STATIC) mass = 0.f;
+                if (colliderType == ColliderType::STATIC)
+                {
+                    mass = 0.f;
+                    parent->UpdateMobilityHeriarchy(MobilitySettings::STATIC);
+                }
+                else if (colliderType == ColliderType::DYNAMIC) parent->UpdateMobilityHeriarchy(MobilitySettings::DYNAMIC);
                 App->GetPhysicsModule()->UpdateCubeRigidBody(this);
             }
         }

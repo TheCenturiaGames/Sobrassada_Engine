@@ -79,6 +79,7 @@ class GameObject
 
     // Updates the transform for this game object and all descending children
     void UpdateTransformForGOBranch() const;
+    void UpdateMobilityHeriarchy(MobilitySettings type);
 
     const std::unordered_map<ComponentType, Component*>& GetComponents() const { return components; }
     Component* GetComponentByType(ComponentType type) const;
@@ -94,7 +95,6 @@ class GameObject
     void CreatePrefab();
     UID GetPrefabUID() const { return prefabUID; }
     void SetPrefabUID(const UID uid) { prefabUID = uid; }
-    void SetMobility(MobilitySettings newMobility) { mobilitySettings = newMobility; };
 
     void OnTransformUpdated();
     void UpdateComponents();
@@ -103,7 +103,8 @@ class GameObject
     void UpdateLocalTransform(const float4x4& parentGlobalTransform);
     void DrawNodes() const;
     void OnDrawConnectionsToggle();
-    void UpdateMobilityHeriarchy(MobilitySettings type);
+    
+    void SetMobility(MobilitySettings newMobility) { mobilitySettings = newMobility; };
 
   public:
     inline static UID currentRenamingUID = INVALID_UID;
