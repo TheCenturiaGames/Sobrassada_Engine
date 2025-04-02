@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EngineEditors/EngineEditorBase.h"
+#include "EngineEditorBase.h"
 
 class TextureEditor : public EngineEditorBase
 {

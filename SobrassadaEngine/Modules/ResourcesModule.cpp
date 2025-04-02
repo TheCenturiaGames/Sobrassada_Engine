@@ -1,18 +1,16 @@
 #include "ResourcesModule.h"
 
+#include "BatchManager.h"
+#include "Importer.h"
 #include "LibraryModule.h"
+#include "MeshImporter.h"
+#include "Resource.h"
+#include "ResourceMaterial.h"
+#include "ResourceMesh.h"
+#include "ResourceTexture.h"
 #include "SceneModule.h"
 #include "ShaderModule.h"
-#include <BatchManager.h>
-#include <Importer.h>
-#include <MeshImporter.h>
-#include <Resource.h>
-#include <ResourceMaterial.h>
-#include <ResourceMesh.h>
-#include <ResourceTexture.h>
-#include <Standalone/MeshComponent.h>
-
-#include <Algorithm/Random/LCG.h> // TODO: LCG remove includes
+#include "Standalone/MeshComponent.h"
 
 ResourcesModule::ResourcesModule()
 {

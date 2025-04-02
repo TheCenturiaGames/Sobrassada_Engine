@@ -153,9 +153,9 @@ namespace TextureImporter
 
     ResourceTexture* LoadCubemap(UID textureUID)
     {
-        std::string path       = App->GetLibraryModule()->GetResourcePath(textureUID);
+        const std::string& path       = App->GetLibraryModule()->GetResourcePath(textureUID);
 
-        std::string filename   = App->GetLibraryModule()->GetResourceName(textureUID);
+        const std::string& filename   = App->GetLibraryModule()->GetResourceName(textureUID);
 
         unsigned int textureID = 0;
         std::wstring wPath     = std::wstring(path.begin(), path.end());
@@ -164,7 +164,7 @@ namespace TextureImporter
         DirectX::TexMetadata texMetadata;
         OpenGLMetadata openGlMeta;
 
-        bool succeded = LoadTextureFile(wPath.c_str(), texMetadata, scratchImage);
+        const bool succeded = LoadTextureFile(wPath.c_str(), texMetadata, scratchImage);
         if (!succeded)
         {
             GLOG("Failed to load texture: %s", path.c_str());

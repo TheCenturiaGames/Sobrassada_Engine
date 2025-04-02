@@ -3,8 +3,8 @@
 #include "Component.h"
 #include "Globals.h"
 
-#include "Libs/rapidjson/document.h"
 #include "Math/float4x4.h"
+#include "rapidjson/document.h"
 #include <cstdint>
 
 class ResourceMesh;
@@ -28,9 +28,8 @@ class MeshComponent : public Component
     void Update(float deltaTime) override;
     void Render(float deltaTime) override;
 
-    bool HasBones() const { return bones.size() > 0; }
-
     void InitSkin();
+    void OnTransformUpdated();
 
     void BatchEditorMode();
 
@@ -44,6 +43,9 @@ class MeshComponent : public Component
     const std::vector<GameObject*>& GetBonesGO() const { return bones; }
     const std::vector<UID>& GetBones() const { return bonesUIDs; }
     const std::vector<float4x4>& GetBindMatrices() const { return bindMatrices; }
+    const float4x4& GetCombinedMatrix() const { return combinedMatrix; }
+    GeometryBatch* GetBatch() const { return batch; }
+
     void SetBones(const std::vector<GameObject*>& bones, const std::vector<UID> bonesIds)
     {
         this->bones     = bones;
@@ -56,12 +58,6 @@ class MeshComponent : public Component
         this->skinIndex = newIndex;
         hasBones        = true;
     }
-
-    void OnTransformUpdated();
-
-    const float4x4& GetCombinedMatrix() const { return combinedMatrix; }
-
-    GeometryBatch* GetBatch() const { return batch; }
 
   private:
     std::string currentMeshName       = "Not selected";

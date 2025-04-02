@@ -30,7 +30,7 @@ namespace ModelImporter
         const auto& scene = model.scenes[0]; // consider only one scene element in aray
         for (const auto& nodeID : scene.nodes)
         {
-            if (model.nodes[nodeID].name == "Camera" || model.nodes[nodeID].camera != -1) continue;
+            if (model.nodes[nodeID].camera != -1 || model.nodes [nodeID].name == "Camera") continue;
             FillNodes(model.nodes, nodeID, -1, meshesUIDs, orderedNodes); // -1 parentId for root
         }
         GLOG("Nodes filled");

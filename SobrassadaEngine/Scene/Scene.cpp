@@ -30,7 +30,7 @@
 #include "imgui.h"
 #include "imgui_internal.h"
 // guizmo after imgui include
-#include "./Libs/ImGuizmo/ImGuizmo.h"
+#include "ImGuizmo.h"
 #ifdef OPTICK
 #include "optick.h"
 #endif

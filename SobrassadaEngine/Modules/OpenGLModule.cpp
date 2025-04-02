@@ -1,11 +1,11 @@
 #include "OpenGLModule.h"
 
+#include "Application.h"
+#include "Framebuffer.h"
 #include "WindowModule.h"
-#include <Application.h>
-#include <Framebuffer.h>
 
+#include "glew.h"
 #include <Windows.h>
-#include <glew.h>
 
 OpenGLModule::OpenGLModule()
 {

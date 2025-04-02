@@ -11,11 +11,12 @@
 #include "SceneModule.h"
 
 #include "Math/float2.h"
+#include "Math/float3.h"
 #include "Math/float4x4.h"
-#include <SDL_assert.h>
+#include "SDL_assert.h"
+#include "glew.h"
+#include "tiny_gltf.h"
 #include <chrono>
-#include <glew.h>
-#include <tiny_gltf.h>
 
 ResourceMesh::ResourceMesh(
     UID uid, const std::string& name, const float3& maxPos, const float3& minPos, const rapidjson::Value& importOptions
@@ -85,20 +86,4 @@ void ResourceMesh::Render(
         glUniform1i(4, 1); // mesh has bones
     }
     else glUniform1i(4, 0); // mesh has no bones
-}
-
-const float4x4 ResourceMesh::TestSkinning(
-    int vertexIndex, const Vertex& vertex, const std::vector<GameObject*>& bones,
-    const std::vector<float4x4>& bindMatrices
-)
-{
-    float4x4 boneInfluence = float4x4::zero;
-    for (int i = 0; i < 4; ++i)
-    {
-        const float4x4& boneTransform  = bones[vertex.joint[i]]->GetGlobalTransform();
-        float4x4 skinSpace             = boneTransform * bindMatrices[vertex.joint[i]].Inverted();
-        boneInfluence                 += skinSpace * vertex.weights[i];
-    }
-
-    return boneInfluence;
 }

@@ -1,33 +1,33 @@
 #include "EditorUIModule.h"
 
+#include "Application.h"
 #include "CameraModule.h"
+#include "Component.h"
+#include "EngineEditorBase.h"
+#include "FileSystem.h"
+#include "GameTimer.h"
 #include "InputModule.h"
 #include "LibraryModule.h"
 #include "OpenGLModule.h"
 #include "ProjectModule.h"
+#include "SceneImporter.h"
 #include "SceneModule.h"
+#include "TextureEditor.h"
+#include "TextureImporter.h"
 #include "WindowModule.h"
-#include <Application.h>
-#include <Component.h>
-#include <EngineEditorBase.h>
-#include <FileSystem.h>
-#include <GameTimer.h>
-#include <SceneImporter.h>
-#include <TextureEditor.h>
-#include <TextureImporter.h>
 
+#include "Math/Quat.h"
 #include "SDL.h"
 #include "glew.h"
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl2.h"
 #include "imgui_internal.h"
-#include <Math/Quat.h>
+// imguizmo include after imgui
+#include "ImGuizmo.h"
 #include <cstring>
 #include <filesystem>
 #include <string>
-// imguizmo include after imgui
-#include <ImGuizmo.h>
 
 EditorUIModule::EditorUIModule() : width(0), height(0)
 {

@@ -1,13 +1,13 @@
 ﻿#include "ResourceMaterial.h"
 
 #include "Application.h"
-#include "Material.h"
 #include "LibraryModule.h"
+#include "Material.h"
 #include "ResourceTexture.h"
 #include "TextureImporter.h"
 
+#include "glew.h"
 #include "imgui.h"
-#include <glew.h>
 #include <unordered_set>
 
 ResourceMaterial::ResourceMaterial(UID uid, const std::string& name) : Resource(uid, name, ResourceType::Material)
@@ -144,7 +144,7 @@ void ResourceMaterial::LoadMaterialData(Material mat)
     ResourceTexture* normTexture = TextureImporter::LoadTexture(mat.GetNormalTexture());
     if (normTexture != nullptr)
     {
-        //GLOG("%s has normal", normTexture->GetName().c_str());
+        // GLOG("%s has normal", normTexture->GetName().c_str());
         normalTexture.textureID = normTexture->GetTextureID();
 
         material.normalTex      = glGetTextureHandleARB(normTexture->GetTextureID());

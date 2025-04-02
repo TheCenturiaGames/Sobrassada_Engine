@@ -3,8 +3,6 @@
 #include "Model.h"
 #include "Resource.h"
 
-class Model;
-
 class ResourceModel : public Resource
 {
   public:

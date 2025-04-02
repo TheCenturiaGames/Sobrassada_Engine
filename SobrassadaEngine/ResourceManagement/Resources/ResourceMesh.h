@@ -3,7 +3,6 @@
 #include "Resource.h"
 
 #include "Geometry/AABB.h"
-#include "Math/float3.h"
 #include "Math/float4x4.h"
 #include "rapidjson/document.h"
 #include <vector>
@@ -15,6 +14,11 @@ namespace tinygltf
     struct Primitive;
 } // namespace tinygltf
 
+namespace math
+{
+    class float3;
+}
+
 class ResourceMaterial;
 class GameObject;
 struct Vertex;
@@ -23,7 +27,7 @@ class ResourceMesh : public Resource
 {
   public:
     ResourceMesh(
-        UID uid, const std::string& name, const float3& maxPos, const float3& minPos,
+        UID uid, const std::string& name, const math::float3& maxPos, const math::float3& minPos,
         const rapidjson::Value& importOptions
     );
     ~ResourceMesh() override;
@@ -41,12 +45,6 @@ class ResourceMesh : public Resource
     const std::vector<unsigned int>& GetIndices() const { return indices; }
     const float4x4& GetDefaultTransform() const { return defaultTransform; }
     const unsigned int GetMode() const { return mode; }
-
-  private:
-    const float4x4 TestSkinning(
-        int vertexIndex, const Vertex& vertex, const std::vector<GameObject*>& bones,
-        const std::vector<float4x4>& bindMatrices
-    );
 
   private:
     unsigned int vbo         = 0; // should be deleted
