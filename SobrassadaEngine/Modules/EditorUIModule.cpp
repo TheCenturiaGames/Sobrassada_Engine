@@ -12,6 +12,7 @@
 #include "ProjectModule.h"
 #include "SceneImporter.h"
 #include "SceneModule.h"
+#include "ScriptModule.h"
 #include "TextureEditor.h"
 #include "TextureImporter.h"
 #include "WindowModule.h"
@@ -37,7 +38,8 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"Spot Light",           COMPONENT_SPOT_LIGHT          },
         {"Directional Light",    COMPONENT_DIRECTIONAL_LIGHT   },
         {"Character Controller", COMPONENT_CHARACTER_CONTROLLER},
-        {"Camera",               COMPONENT_CAMERA              }
+        {"Camera",               COMPONENT_CAMERA              },
+        {"Script",               COMPONENT_SCRIPT              }
     };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;

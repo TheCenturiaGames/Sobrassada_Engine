@@ -2,7 +2,7 @@
 
 #include "Globals.h"
 
-void glog(const char file[], int line, const char* format, ...)
+void glog(const char file[], int line, const char *format, ...)
 {
     static char tmp_string[4096];
     static char tmp_string2[4096];
@@ -18,8 +18,8 @@ void glog(const char file[], int line, const char* format, ...)
 #endif
 
     // Allocating memory to store logs
-    char* newString;
-    newString = (char*)malloc(4096);
+    char *newString;
+    newString = (char *)malloc(4096);
 
     if (newString == NULL) return;
 

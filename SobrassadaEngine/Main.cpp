@@ -27,7 +27,7 @@ enum MainState
 };
 
 Application* App         = NULL;
-std::vector<char*>* Logs = NULL;
+std::vector<char*> *Logs = NULL;
 
 int main(int argc, char** argv)
 {

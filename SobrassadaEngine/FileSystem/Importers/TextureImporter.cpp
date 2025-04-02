@@ -88,19 +88,19 @@ namespace TextureImporter
 
     ResourceTexture* LoadTexture(UID textureUID)
     {
-        std::string path     = App->GetLibraryModule()->GetResourcePath(textureUID);
+        const std::string& path     = App->GetLibraryModule()->GetResourcePath(textureUID);
 
-        std::string filename = App->GetLibraryModule()->GetResourceName(textureUID);
+        const std::string& filename = App->GetLibraryModule()->GetResourceName(textureUID);
 
         if (path.empty()) return nullptr; // TODO Use fallback texture instead
 
-        std::wstring wPath = std::wstring(path.begin(), path.end());
+        const std::wstring& wPath = std::wstring(path.begin(), path.end());
 
         DirectX::ScratchImage scratchImage;
         DirectX::TexMetadata texMetadata;
         OpenGLMetadata openGlMeta;
 
-        bool succeded = LoadTextureFile(wPath.c_str(), texMetadata, scratchImage);
+        const bool succeded = LoadTextureFile(wPath.c_str(), texMetadata, scratchImage);
         if (!succeded)
         {
             GLOG("Failed to load texture: %s", path.c_str());
@@ -124,7 +124,7 @@ namespace TextureImporter
 
         ResourceTexture::ConvertMetadata(texMetadata, openGlMeta);
 
-        int maxMipmapLevel = static_cast<int>(texMetadata.mipLevels - 1);
+        const int maxMipmapLevel = static_cast<int>(texMetadata.mipLevels - 1);
         if (texMetadata.mipLevels > 1)
         {
             for (size_t i = 0; i < texMetadata.mipLevels; ++i)
@@ -158,7 +158,7 @@ namespace TextureImporter
         const std::string& filename   = App->GetLibraryModule()->GetResourceName(textureUID);
 
         unsigned int textureID = 0;
-        std::wstring wPath     = std::wstring(path.begin(), path.end());
+        const std::wstring& wPath     = std::wstring(path.begin(), path.end());
 
         DirectX::ScratchImage scratchImage;
         DirectX::TexMetadata texMetadata;

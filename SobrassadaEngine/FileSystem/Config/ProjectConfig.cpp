@@ -26,7 +26,7 @@ void ProjectConfig::SetStartupScene(const std::string& newStartupSceneName)
 void ProjectConfig::Load()
 {
     rapidjson::Document doc;
-    bool loaded =
+    const bool loaded =
         FileSystem::LoadJSON((App->GetProjectModule()->GetLoadedProjectPath() + "ProjectConfig.json").c_str(), doc);
 
     if (!loaded)
