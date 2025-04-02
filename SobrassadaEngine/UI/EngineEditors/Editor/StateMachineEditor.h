@@ -22,6 +22,8 @@ class StateMachineEditor : public EngineEditorBase
     void ShowSavePopup();
     void LoadMachine();
     void ShowLoadPopup();
+    void RemoveStateNode(StateNode& node);
+
 
   private:
     UID uid;

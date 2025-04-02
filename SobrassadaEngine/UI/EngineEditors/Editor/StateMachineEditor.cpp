@@ -46,7 +46,17 @@ bool StateMachineEditor::RenderEditor()
     graph->rightClickPopUpContent(
         [this](ImFlow::BaseNode* node)
         {
-            if (node == nullptr && ImGui::MenuItem("Add State"))
+            if (node != nullptr)
+            {
+                if (ImGui::MenuItem("Delete State"))
+                {
+                    auto stateNode = dynamic_cast<StateNode*>(node);
+                    if (stateNode)
+                    {
+                        RemoveStateNode(*stateNode);
+                    }
+                }
+            }else if (node == nullptr && ImGui::MenuItem("Add State"))
             {
                 ImVec2 pos = graph->screen2grid(ImGui::GetMousePos());
             
@@ -559,5 +569,43 @@ void StateMachineEditor::ShowLoadPopup()
 
         ImGui::EndPopup();
     }
+
+}
+void StateMachineEditor::RemoveStateNode(StateNode& node)
+{
+    std::string stateName = node.GetStateName();
+    std::string clipName;
+
+    for (const auto& transition : resource->transitions)
+    {
+        if (transition.fromState.GetString() == stateName || transition.toState.GetString() == stateName)
+        {
+            resource->RemoveTransition(transition.fromState.GetString(), transition.toState.GetString());
+        }
+    }
+    for (const auto& state : resource->states)
+    {
+        if (state.name == stateName)
+        {
+            clipName = state.clipName.GetString();
+            resource->RemoveState(state.name.GetString());
+        }
+    }
+
+    for (const auto& clip : resource->clips)
+    {
+        if (clip.clipName == clipName)
+        {
+            resource->RemoveClip(clip.clipName.GetString());
+        }
+    }
+    auto& nodes = graph->getNodes();
+
+    auto it     = nodes.find(uid);
+    if (it != nodes.end())
+    {
+        nodes.erase(it); 
+    }
+
 
 }
