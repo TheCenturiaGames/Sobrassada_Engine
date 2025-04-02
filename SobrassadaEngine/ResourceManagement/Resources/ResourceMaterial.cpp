@@ -1,6 +1,7 @@
 ﻿#include "ResourceMaterial.h"
 
 #include "Application.h"
+#include "EditorUIModule.h"
 #include "FileSystem/Material.h"
 #include "LibraryModule.h"
 #include "ResourceManagement/Resources/ResourceTexture.h"
@@ -31,6 +32,28 @@ void ResourceMaterial::OnEditorUpdate()
         {
             ImGui::SetTooltip("Texture Dimensions: %d, %d", diffuseTexture.width, diffuseTexture.height);
         }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Select Texture"))
+        {
+            ImGui::OpenPopup(CONSTANT_TEXTURE_SELECT_DIALOG_ID);
+        }
+
+        if (ImGui::IsPopupOpen(CONSTANT_TEXTURE_SELECT_DIALOG_ID))
+        {
+            UID handle = ChangeTexture(
+                App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
+                    CONSTANT_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetTextureMap(), INVALID_UID
+                ),
+                diffuseTexture, material.diffuseTex
+            );
+
+            if (handle != NULL)
+            {
+                material.diffuseTex = handle;
+                updated             = true;
+            }
+        }
     }
 
     updated |= ImGui::SliderFloat3("Diffuse Color", &material.diffColor.x, 0.0f, 1.0f);
@@ -42,6 +65,27 @@ void ResourceMaterial::OnEditorUpdate()
         if (ImGui::IsItemHovered())
         {
             ImGui::SetTooltip("Texture Dimensions: %d, %d", metallicTexture.width, metallicTexture.height);
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Select Texture"))
+        {
+            ImGui::OpenPopup(CONSTANT_TEXTURE_SELECT_DIALOG_ID);
+        }
+
+        if (ImGui::IsPopupOpen(CONSTANT_TEXTURE_SELECT_DIALOG_ID))
+        {
+            UID handle = ChangeTexture(
+                App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
+                    CONSTANT_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetTextureMap(), INVALID_UID
+                ),
+                metallicTexture, material.metallicTex
+            );
+
+            if (handle != NULL)
+            {
+                material.metallicTex = handle;
+                updated              = true;
+            }
         }
         updated |= ImGui::SliderFloat("Metallic Factor", &material.metallicFactor, 0.0f, 1.0f);
         updated |= ImGui::SliderFloat("Roughness Factor", &material.roughnessFactor, 0.0f, 1.0f);
@@ -58,6 +102,27 @@ void ResourceMaterial::OnEditorUpdate()
                 ImGui::SetTooltip("Texture Dimensions: %d, %d", specularTexture.width, specularTexture.height);
             }
         }
+        ImGui::SameLine();
+        if (ImGui::Button("Select Texture"))
+        {
+            ImGui::OpenPopup(CONSTANT_TEXTURE_SELECT_DIALOG_ID);
+        }
+
+        if (ImGui::IsPopupOpen(CONSTANT_TEXTURE_SELECT_DIALOG_ID))
+        {
+            UID handle = ChangeTexture(
+                App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
+                    CONSTANT_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetTextureMap(), INVALID_UID
+                ),
+                specularTexture, material.specularTex
+            );
+
+            if (handle != NULL)
+            {
+                material.specularTex = handle;
+                updated              = true;
+            }
+        }
 
         updated |= ImGui::SliderFloat3("Specular Color", &material.specColor.x, 0.0f, 1.0f);
         if (!material.shininessInAlpha) updated |= ImGui::SliderFloat("Shininess", &material.shininess, 0.0f, 500.0f);
@@ -71,9 +136,54 @@ void ResourceMaterial::OnEditorUpdate()
         {
             ImGui::SetTooltip("Texture Dimensions: %d, %d", normalTexture.width, normalTexture.height);
         }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Select Texture"))
+        {
+            ImGui::OpenPopup(CONSTANT_TEXTURE_SELECT_DIALOG_ID);
+        }
+
+        if (ImGui::IsPopupOpen(CONSTANT_TEXTURE_SELECT_DIALOG_ID))
+        {
+            UID handle = ChangeTexture(
+                App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
+                    CONSTANT_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetTextureMap(), INVALID_UID
+                ),
+                normalTexture, material.normalTex
+            );
+
+            if (handle != NULL)
+            {
+                material.normalTex = handle;
+                updated              = true;
+            }
+        }
     }
 
     if (updated) UpdateUBO();
+}
+
+UID ResourceMaterial::ChangeTexture(UID newTexture, TextureInfo& textureToChange, UID textureGPU)
+{
+    if (newTexture == INVALID_UID) return NULL;
+
+    ResourceTexture* texture = TextureImporter::LoadTexture(newTexture);
+    if (texture != nullptr)
+    {
+        glMakeTextureHandleNonResidentARB(textureGPU);
+        glDeleteTextures(1, &textureToChange.textureID);
+
+        UID handle = glGetTextureHandleARB(texture->GetTextureID());
+        glMakeTextureHandleResidentARB(handle);
+
+        textureToChange.textureID = texture->GetTextureID();
+        textureToChange.width     = texture->GetTextureWidth();
+        textureToChange.height    = texture->GetTextureHeight();
+
+        return handle;
+    }
+    delete texture;
+    return NULL;
 }
 
 void ResourceMaterial::LoadMaterialData(Material mat)

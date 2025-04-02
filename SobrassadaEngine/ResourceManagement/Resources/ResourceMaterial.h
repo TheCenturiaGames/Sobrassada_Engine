@@ -49,6 +49,7 @@ class ResourceMaterial : public Resource
     void RenderMaterial(int program) const;
     void FreeMaterials() const;
     void UpdateUBO() const;
+    UID ChangeTexture(UID newTexture, TextureInfo& textureToChange, UID textureGPU);
 
   private:
     TextureInfo diffuseTexture;

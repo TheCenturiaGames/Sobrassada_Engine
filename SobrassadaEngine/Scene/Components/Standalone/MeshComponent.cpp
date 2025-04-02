@@ -125,13 +125,13 @@ void MeshComponent::RenderEditorInspector()
         ImGui::SameLine();
         if (ImGui::Button("Select material"))
         {
-            ImGui::OpenPopup(CONSTANT_TEXTURE_SELECT_DIALOG_ID);
+            ImGui::OpenPopup(CONSTANT_MATERIAL_SELECT_DIALOG_ID);
         }
 
-        if (ImGui::IsPopupOpen(CONSTANT_TEXTURE_SELECT_DIALOG_ID))
+        if (ImGui::IsPopupOpen(CONSTANT_MATERIAL_SELECT_DIALOG_ID))
         {
             AddMaterial(App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
-                CONSTANT_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetMaterialMap(), INVALID_UID
+                CONSTANT_MATERIAL_SELECT_DIALOG_ID, App->GetLibraryModule()->GetMaterialMap(), INVALID_UID
             ));
         }
 
