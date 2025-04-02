@@ -58,6 +58,8 @@ class Transform2DComponent : public Component
     float2 anchorsY;
     float4 margins;
 
+    bool marginUpdated;
+
   private:
     CanvasComponent* parentCanvas;
 };

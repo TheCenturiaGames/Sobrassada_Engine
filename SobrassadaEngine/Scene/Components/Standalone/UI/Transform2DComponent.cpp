@@ -89,7 +89,7 @@ void Transform2DComponent::Save(rapidjson::Value& targetState, rapidjson::Docume
     rapidjson::Value valAnchors(rapidjson::kArrayType);
     valAnchors.PushBack(anchorsX.x, allocator);
     valAnchors.PushBack(anchorsX.y, allocator);
-    valAnchors.PushBack(anchorsY.y, allocator);
+    valAnchors.PushBack(anchorsY.x, allocator);
     valAnchors.PushBack(anchorsY.y, allocator);
     targetState.AddMember("Anchors", valAnchors, allocator);
 }
@@ -248,6 +248,12 @@ void Transform2DComponent::UpdateChildren2DTransforms()
 
 void Transform2DComponent::OnTransform3DUpdated(const float4x4& globalTransform3D)
 {
+    if (marginUpdated)
+    {
+        marginUpdated = false;
+        return;
+    }
+
     if (anchorsX.x == anchorsX.y)
     {
         position.x = globalTransform3D.TranslatePart().x - GetAnchorXPos(anchorsX.x);
@@ -364,41 +370,56 @@ void Transform2DComponent::OnSizeChanged()
 
 void Transform2DComponent::OnLeftMarginChanged()
 {
+    marginUpdated = true;
     size.x =
         abs((GetAnchorXPos(anchorsX.x) + margins.x) -
             (parent->GetGlobalTransform().TranslatePart().x + (size.x * (1 - pivot.x))));
 
     position.x = ((GetAnchorXPos(anchorsX.x) + margins.x) + (GetAnchorXPos(anchorsX.y) + margins.y)) / 2;
+    if (!IsRootTransform2D()) position.x -= parentTransform->GetGlobalPosition().x;
+
     UpdateParent3DTransform();
 }
 
 void Transform2DComponent::OnRightMarginChanged()
 {
+    marginUpdated = true;
+
     size.x =
         abs((GetAnchorXPos(anchorsX.y) + margins.y) -
             (parent->GetGlobalTransform().TranslatePart().x - (size.x * pivot.x)));
 
     position.x = ((GetAnchorXPos(anchorsX.x) + margins.x) + (GetAnchorXPos(anchorsX.y) + margins.y)) / 2;
+    if (!IsRootTransform2D()) position.x -= parentTransform->GetGlobalPosition().x;
+
     UpdateParent3DTransform();
 }
 
 void Transform2DComponent::OnTopMarginChanged()
 {
+    marginUpdated = true;
+
     size.y =
         abs((GetAnchorYPos(anchorsY.y) + margins.z) -
             (parent->GetGlobalTransform().TranslatePart().y - (size.y * pivot.y)));
 
     position.y = ((GetAnchorYPos(anchorsY.y) + margins.z) + (GetAnchorYPos(anchorsY.x) + margins.w)) / 2;
+    if (!IsRootTransform2D()) position.y -= parentTransform->GetGlobalPosition().y;
+
     UpdateParent3DTransform();
 }
 
 void Transform2DComponent::OnBottomMarginChanged()
 {
+    marginUpdated = true;
+
     size.y =
         abs((GetAnchorYPos(anchorsY.x) + margins.w) -
             (parent->GetGlobalTransform().TranslatePart().y + (size.y * (1 - pivot.y))));
 
     position.y = ((GetAnchorYPos(anchorsY.y) + margins.z) + (GetAnchorYPos(anchorsY.x) + margins.w)) / 2;
+    if (!IsRootTransform2D()) position.y -= parentTransform->GetGlobalPosition().y;
+
     UpdateParent3DTransform();
 }
 
