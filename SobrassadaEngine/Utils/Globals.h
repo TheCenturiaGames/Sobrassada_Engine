@@ -53,7 +53,7 @@ constexpr bool FULL_DESKTOP = false;
 
 constexpr bool BORDERLESS               = false;
 constexpr bool RESIZABLE                = true;
-constexpr bool VSYNC                    = true;
+constexpr bool VSYNC                    = false;
 
 constexpr const char* TITLE             = "Sobrassada Engine";
 constexpr const char* ENGINE_NAME       = "Sobrassada";
@@ -69,6 +69,7 @@ constexpr char DELIMITER = '/';
 
 constexpr const char* FILENAME_SEPARATOR             = "_";
 constexpr const char* DEFAULT_SCENE_NAME             = "New Scene";
+constexpr const char* DEFAULT_NODE_NAME              = "Unnamed Node";
 
 constexpr float DEFAULT_GL_CLEAR_COLOR_RED           = 0.5f;
 constexpr float DEFAULT_GL_CLEAR_COLOR_GREEN         = 0.5f;
@@ -144,7 +145,8 @@ constexpr float PI                                      = 3.14159265359f;
 constexpr float RAD_DEGREE_CONV                         = 180.f / PI;
 constexpr float DEGREE_RAD_CONV                         = PI / 180.f;
 
-constexpr float MINIMUM_TREE_LEAF_SIZE                  = 1.f;
+constexpr float MINIMUM_TREE_LEAF_SIZE                  = 5.f;
+constexpr int PALETTE_SIZE                              = 64;
 
 inline UID GenerateUID()
 {

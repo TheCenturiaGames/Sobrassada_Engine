@@ -4,9 +4,9 @@
 #include "FileSystem.h"
 #include "ProjectModule.h"
 
-#include <document.h>
-#include <prettywriter.h>
-#include <stringbuffer.h>
+#include "rapidjson/document.h"
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
 
 ProjectConfig::ProjectConfig()
 {
