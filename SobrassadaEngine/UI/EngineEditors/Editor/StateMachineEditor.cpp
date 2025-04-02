@@ -602,4 +602,12 @@ void StateMachineEditor::RemoveStateNode(StateNode& node)
 
     auto& nodes = graph->getNodes();
 
+    auto it     = nodes.find(node.getUID());
+    if (it != nodes.end())
+    {
+        nodes.erase(it); 
+    }
+
+    selectedNode = nullptr;
+
 }
