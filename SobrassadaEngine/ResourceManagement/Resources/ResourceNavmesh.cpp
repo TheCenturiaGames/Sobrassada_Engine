@@ -80,19 +80,14 @@ ResourceNavMesh::ResourceNavMesh(UID uid, const std::string& name) : Resource(ui
     m_agentMaxClimb                                     = 0.5f;
     m_agentRadius                                       = 0.5f;
 
-    context                                             = nullptr;
-    heightfield                                         = nullptr;
-    compactHeightfield                                  = nullptr;
     triAreas                                            = nullptr;
-    contourSet                                          = nullptr;
-    polymesh                                            = nullptr;
-    polymeshDetail                                      = nullptr;
-    navMesh                                             = nullptr;
+
     navQuery                                            = dtAllocNavMeshQuery();
 }
 // add together all meshes to create navmesh - needs the direction to a vector of resourcemesh pointers
 bool ResourceNavMesh::BuildNavMesh(
-    const std::vector<std::pair<const ResourceMesh*, const float4x4&>>& meshes, float minPoint[3], float maxPoint[3]
+    const std::vector<std::pair<const ResourceMesh*, const float4x4&>>& meshes, const float minPoint[3],
+    const float maxPoint[3]
 )
 {
     int allVertexCount   = 0;
@@ -100,9 +95,6 @@ bool ResourceNavMesh::BuildNavMesh(
     int indexOffset      = 0;
 
     context              = new rcContext();
-
-    std::vector<rcPolyMeshDetail*> myPolyMeshDetails;
-    std::vector<rcPolyMesh*> myPolyMeshes;
 
     // first pass to get necessary sizes and AABB
     for (const auto& mesh : meshes)
@@ -327,6 +319,7 @@ bool ResourceNavMesh::BuildNavMesh(
     rcFreeCompactHeightfield(compactHeightfield);
     rcFreeContourSet(contourSet);
 
+    // mark areas for detour
     if (config->maxVertsPerPoly <= DT_VERTS_PER_POLYGON)
     {
 
@@ -348,7 +341,6 @@ bool ResourceNavMesh::BuildNavMesh(
                 polymesh->flags[i] = SAMPLE_POLYFLAGS_WALK | SAMPLE_POLYFLAGS_DOOR;
             }
         }
-
     }
 
     CreateDetourData();
@@ -429,8 +421,6 @@ void ResourceNavMesh::CreateDetourData()
         return;
     }
 }
-
-
 
 void ResourceNavMesh::RenderNavmeshEditor()
 {

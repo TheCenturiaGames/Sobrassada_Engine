@@ -106,7 +106,7 @@ void ResourcesModule::CreateNavMesh()
             if (gameObject)
             {
                 const MeshComponent* meshComponent = gameObject->GetMeshComponent();
-                const float4x4 globalMatrix        = gameObject->GetGlobalTransform();
+                const float4x4& globalMatrix        = gameObject->GetGlobalTransform();
 
                 if (meshComponent)
                 {
