@@ -599,13 +599,7 @@ void StateMachineEditor::RemoveStateNode(StateNode& node)
             resource->RemoveClip(clip.clipName.GetString());
         }
     }
+
     auto& nodes = graph->getNodes();
-
-    auto it     = nodes.find(uid);
-    if (it != nodes.end())
-    {
-        nodes.erase(it); 
-    }
-
 
 }
