@@ -122,6 +122,8 @@ void CubeColliderComponent::RenderEditorInspector()
     ImGui::EndDisabled();
 
     if (ImGui::InputFloat3("Center offset", &centerOffset[0])) App->GetPhysicsModule()->UpdateCubeRigidBody(this);
+    
+    if (ImGui::InputFloat3("Size", &size[0])) App->GetPhysicsModule()->UpdateCubeRigidBody(this);
 
     if (ImGui::Checkbox("Freeze rotation", &freezeRotation)) App->GetPhysicsModule()->UpdateCubeRigidBody(this);
 
