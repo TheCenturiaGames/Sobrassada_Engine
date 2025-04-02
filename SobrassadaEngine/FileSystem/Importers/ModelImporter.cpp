@@ -14,6 +14,7 @@
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
 #include "tiny_gltf.h"
+#include <set>
 
 namespace ModelImporter
 {
@@ -30,8 +31,8 @@ namespace ModelImporter
         const auto& scene = model.scenes[0]; // consider only one scene element in aray
         for (const auto& nodeID : scene.nodes)
         {
-            if (model.nodes[nodeID].camera != -1 || model.nodes [nodeID].name == "Camera") continue;
-            FillNodes(model.nodes, nodeID, -1, meshesUIDs, orderedNodes); // -1 parentId for root
+            if (model.nodes[nodeID].camera != -1 || model.nodes[nodeID].name == "Camera") continue;
+            FillNodes(model.nodes, nodeID, meshesUIDs, orderedNodes); // -1 parentId for root
         }
         GLOG("Nodes filled");
 
@@ -350,36 +351,44 @@ namespace ModelImporter
     }
 
     void FillNodes(
-        const std::vector<tinygltf::Node>& nodesList, int nodeId, int parentId,
+        const std::vector<tinygltf::Node>& nodesList, int nodeID,
         const std::vector<std::vector<std::pair<UID, UID>>>& meshesUIDs, std::vector<NodeData>& outNodes
     )
     {
-        // Fill node data
-        const tinygltf::Node& nodeData = nodesList[nodeId];
+        std::set<NodeParent> nodesToVisit;
+        nodesToVisit.insert({nodeID, -1});
 
-        if (nodeData.camera != -1) return;
-
-        NodeData newNode;
-        if (!nodeData.name.empty()) newNode.name = nodeData.name;
-        else newNode.name = DEFAULT_NODE_NAME;
-
-        if (nodeData.mesh != -1) newNode.transform = float4x4::identity;
-        else newNode.transform = MeshImporter::GetNodeTransform(nodeData);
-
-        if (outNodes.empty()) newNode.parentIndex = parentId;
-        else newNode.parentIndex = static_cast<int>(outNodes.size() - 1);
-
-        // Get reference to Mesh and Material UIDs
-        if (nodeData.mesh > -1) newNode.meshes = meshesUIDs[nodeData.mesh];
-
-        newNode.skinIndex = nodeData.skin;
-
-        outNodes.push_back(newNode);
-
-        // Call this function for every node child and give them their id, which their children will need
-        for (const auto& id : nodeData.children)
+        while (!nodesToVisit.empty())
         {
-            FillNodes(nodesList, id, nodeId, meshesUIDs, outNodes);
+            auto it                = nodesToVisit.begin();
+            NodeParent currentNode = *it;
+            nodesToVisit.erase(it);
+
+            int currentNodeIndex           = currentNode.nodeID;
+            const tinygltf::Node& nodeData = nodesList[currentNodeIndex];
+
+            if (nodeData.camera != -1) continue;
+
+            NodeData newNode;
+            if (!nodeData.name.empty()) newNode.name = nodeData.name;
+            else newNode.name = DEFAULT_NODE_NAME;
+
+            if (nodeData.mesh != -1) newNode.transform = float4x4::identity;
+            else newNode.transform = MeshImporter::GetNodeTransform(nodeData);
+
+            newNode.parentIndex = currentNode.parentID;
+
+            // Get reference to Mesh and Material UIDs
+            if (nodeData.mesh > -1) newNode.meshes = meshesUIDs[nodeData.mesh];
+
+            newNode.skinIndex = nodeData.skin;
+
+            outNodes.push_back(newNode);
+
+            for (const auto& id : nodeData.children)
+            {
+                nodesToVisit.insert({id, currentNodeIndex});
+            }
         }
     }
 } // namespace ModelImporter

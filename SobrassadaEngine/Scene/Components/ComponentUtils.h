@@ -22,7 +22,7 @@ enum ComponentType
     COMPONENT_CAMERA,
     COMPONENT_SCRIPT,
     FIRST = COMPONENT_NONE,
-    LAST  = COMPONENT_CAMERA
+    LAST  = COMPONENT_SCRIPT
 };
 
 class ComponentUtils

@@ -14,6 +14,17 @@ namespace tinygltf
     class Node;
 } // namespace tinygltf
 
+struct NodeParent
+{
+    int nodeID;
+    int parentID;
+
+    bool operator<(const NodeParent& other) const
+    {
+        return (parentID < other.parentID) || (parentID == other.parentID && nodeID < other.nodeID);
+    }
+};
+
 namespace ModelImporter
 {
     UID ImportModel(
@@ -25,7 +36,7 @@ namespace ModelImporter
     );
     ResourceModel* LoadModel(UID modelUID);
     void FillNodes(
-        const std::vector<tinygltf::Node>& nodesList, int nodeId, int parentId,
+        const std::vector<tinygltf::Node>& nodesList, int nodeId,
         const std::vector<std::vector<std::pair<UID, UID>>>& meshesUIDs, std::vector<NodeData>& outNodes
     );
     const float4x4 GetNodeTransform(const tinygltf::Node& node);
