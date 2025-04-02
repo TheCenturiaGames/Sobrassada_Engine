@@ -135,6 +135,10 @@ constexpr UID FALLBACK_TEXTURE_UID                   = 1200000000000000;
 constexpr const char* CONSTANT_MESH_SELECT_DIALOG_ID = "mesh-select";
 constexpr const char* CONSTANT_MATERIAL_SELECT_DIALOG_ID = "material-select";
 constexpr const char* CONSTANT_TEXTURE_SELECT_DIALOG_ID = "texture-select";
+constexpr const char* CONSTANT_DIFFUSE_TEXTURE_SELECT_DIALOG_ID = "diffuse-texture-select";
+constexpr const char* CONSTANT_METALLIC_TEXTURE_SELECT_DIALOG_ID = "metallic-texture-select";
+constexpr const char* CONSTANT_SPECULAR_TEXTURE_SELECT_DIALOG_ID = "specular-texture-select";
+constexpr const char* CONSTANT_NORMAL_TEXTURE_SELECT_DIALOG_ID = "normal-texture-select";
 constexpr const char* CONSTANT_PREFAB_SELECT_DIALOG_ID  = "prefab-select";
 constexpr const char* CONSTANT_MODEL_SELECT_DIALOG_ID   = "model-select";
 

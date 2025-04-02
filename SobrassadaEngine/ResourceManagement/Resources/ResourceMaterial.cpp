@@ -34,16 +34,16 @@ void ResourceMaterial::OnEditorUpdate()
         }
 
         ImGui::SameLine();
-        if (ImGui::Button("Select Texture"))
+        if (ImGui::Button("Select Diffuse Texture"))
         {
-            ImGui::OpenPopup(CONSTANT_TEXTURE_SELECT_DIALOG_ID);
+            ImGui::OpenPopup(CONSTANT_DIFFUSE_TEXTURE_SELECT_DIALOG_ID);
         }
 
-        if (ImGui::IsPopupOpen(CONSTANT_TEXTURE_SELECT_DIALOG_ID))
+        if (ImGui::IsPopupOpen(CONSTANT_DIFFUSE_TEXTURE_SELECT_DIALOG_ID))
         {
             UID handle = ChangeTexture(
                 App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
-                    CONSTANT_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetTextureMap(), INVALID_UID
+                    CONSTANT_DIFFUSE_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetTextureMap(), INVALID_UID
                 ),
                 diffuseTexture, material.diffuseTex
             );
@@ -66,17 +66,18 @@ void ResourceMaterial::OnEditorUpdate()
         {
             ImGui::SetTooltip("Texture Dimensions: %d, %d", metallicTexture.width, metallicTexture.height);
         }
+        
         ImGui::SameLine();
-        if (ImGui::Button("Select Texture"))
+        if (ImGui::Button("Select Metallic Texture"))
         {
-            ImGui::OpenPopup(CONSTANT_TEXTURE_SELECT_DIALOG_ID);
+            ImGui::OpenPopup(CONSTANT_METALLIC_TEXTURE_SELECT_DIALOG_ID);
         }
 
-        if (ImGui::IsPopupOpen(CONSTANT_TEXTURE_SELECT_DIALOG_ID))
+        if (ImGui::IsPopupOpen(CONSTANT_METALLIC_TEXTURE_SELECT_DIALOG_ID))
         {
             UID handle = ChangeTexture(
                 App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
-                    CONSTANT_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetTextureMap(), INVALID_UID
+                    CONSTANT_METALLIC_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetTextureMap(), INVALID_UID
                 ),
                 metallicTexture, material.metallicTex
             );
@@ -87,6 +88,7 @@ void ResourceMaterial::OnEditorUpdate()
                 updated              = true;
             }
         }
+        
         updated |= ImGui::SliderFloat("Metallic Factor", &material.metallicFactor, 0.0f, 1.0f);
         updated |= ImGui::SliderFloat("Roughness Factor", &material.roughnessFactor, 0.0f, 1.0f);
     }
@@ -102,8 +104,9 @@ void ResourceMaterial::OnEditorUpdate()
                 ImGui::SetTooltip("Texture Dimensions: %d, %d", specularTexture.width, specularTexture.height);
             }
         }
+        
         ImGui::SameLine();
-        if (ImGui::Button("Select Texture"))
+        if (ImGui::Button("Select Specular Texture"))
         {
             ImGui::OpenPopup(CONSTANT_TEXTURE_SELECT_DIALOG_ID);
         }
@@ -123,7 +126,7 @@ void ResourceMaterial::OnEditorUpdate()
                 updated              = true;
             }
         }
-
+        
         updated |= ImGui::SliderFloat3("Specular Color", &material.specColor.x, 0.0f, 1.0f);
         if (!material.shininessInAlpha) updated |= ImGui::SliderFloat("Shininess", &material.shininess, 0.0f, 500.0f);
     }
@@ -136,9 +139,9 @@ void ResourceMaterial::OnEditorUpdate()
         {
             ImGui::SetTooltip("Texture Dimensions: %d, %d", normalTexture.width, normalTexture.height);
         }
-
+        
         ImGui::SameLine();
-        if (ImGui::Button("Select Texture"))
+        if (ImGui::Button("Select Normal Texture"))
         {
             ImGui::OpenPopup(CONSTANT_TEXTURE_SELECT_DIALOG_ID);
         }
@@ -158,6 +161,7 @@ void ResourceMaterial::OnEditorUpdate()
                 updated              = true;
             }
         }
+        
     }
 
     if (updated) UpdateUBO();
