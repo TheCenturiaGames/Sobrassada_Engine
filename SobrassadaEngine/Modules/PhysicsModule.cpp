@@ -37,19 +37,6 @@ update_status PhysicsModule::PreUpdate(float deltaTime)
 
     dynamicsWorld->stepSimulation(deltaTime, 10);
 
-    // print positions of all objects
-    for (int j = dynamicsWorld->getNumCollisionObjects() - 1; j >= 0; j--)
-    {
-        btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[j];
-        btRigidBody* body      = btRigidBody::upcast(obj);
-        btTransform trans;
-        if (body && body->getMotionState())
-        {
-            // body->getMotionState()->getWorldTransform(trans);
-            trans = body->getWorldTransform();
-            body->getMotionState()->setWorldTransform(trans);
-        }
-    }
     return UPDATE_CONTINUE;
 }
 
@@ -108,7 +95,7 @@ void PhysicsModule::CreateCubeRigidBody(CubeColliderComponent* colliderComponent
     btVector3 localInertia(1, 0, 0);
     if (isDynamic) collisionShape->calculateLocalInertia(colliderComponent->mass, localInertia);
 
-    // MotionState
+    // MotionState for RENDER AND
     colliderComponent->motionState = BulletMotionState(
         colliderComponent, colliderComponent->centerOffset, colliderComponent->centerRotation,
         colliderComponent->freezeRotation
@@ -124,7 +111,6 @@ void PhysicsModule::CreateCubeRigidBody(CubeColliderComponent* colliderComponent
 
     colliderComponent->rigidBody = newRigidBody;
 
-    // TODO UPDATE WITH CHANNELS
     AddRigidBody(newRigidBody, colliderComponent->GetColliderType(), colliderComponent->GetLayer());
 }
 
@@ -143,6 +129,28 @@ void PhysicsModule::DeleteCubeRigidBody(CubeColliderComponent* colliderComponent
 // TODO UPDATE WITH CHANNELS
 void PhysicsModule::AddRigidBody(btRigidBody* rigidBody, ColliderType colliderType, ColliderLayer layerType)
 {
+    switch (colliderType)
+    {
+    case ColliderType::DYNAMIC:
+        rigidBody->setCollisionFlags(rigidBody->getCollisionFlags() | btCollisionObject::CF_DYNAMIC_OBJECT);
+        break;
+    case ColliderType::KINEMATIC:
+        rigidBody->setCollisionFlags(rigidBody->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+        rigidBody->setActivationState(DISABLE_DEACTIVATION);
+        break;
+    case ColliderType::TRIGGER:
+        rigidBody->setCollisionFlags(
+            rigidBody->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT |
+            btCollisionObject::CF_NO_CONTACT_RESPONSE
+        );
+        break;
+    case ColliderType::STATIC:
+        rigidBody->setCollisionFlags(rigidBody->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+        break;
+    default:
+        break;
+    }
+
     int group                     = 1 << (int)layerType;
 
     int mask                      = 0;
