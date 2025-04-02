@@ -171,7 +171,8 @@ void Transform2DComponent::RenderEditorInspector()
         }
         else
         {
-            if (ImGui::DragFloat("Left", &margins.x, 0.1f)) OnMarginsChanged();
+            float leftMargin = margins.x;
+            if (ImGui::DragFloat("Left", &margins.x, 0.1f)) OnLeftMarginChanged();
         }
 
         ImGui::SameLine();
@@ -183,7 +184,7 @@ void Transform2DComponent::RenderEditorInspector()
         }
         else
         {
-            if (ImGui::DragFloat("Top", &margins.z, 0.1f)) OnMarginsChanged();
+            if (ImGui::DragFloat("Top", &margins.z, 0.1f)) OnTopMarginChanged();
         }
 
         // Width / Right
@@ -193,7 +194,7 @@ void Transform2DComponent::RenderEditorInspector()
         }
         else
         {
-            if (ImGui::DragFloat("Right", &margins.y, 0.1f)) OnMarginsChanged();
+            if (ImGui::DragFloat("Right", &margins.y, 0.1f)) OnRightMarginChanged();
         }
 
         ImGui::SameLine();
@@ -205,10 +206,8 @@ void Transform2DComponent::RenderEditorInspector()
         }
         else
         {
-            if (ImGui::DragFloat("Bottom", &margins.w, 0.1f)) OnMarginsChanged();
+            if (ImGui::DragFloat("Bottom", &margins.w, 0.1f)) OnBottomMarginChanged();
         }
-
-        ImGui::InputFloat2("Size", &size[0]);
 
         ImGui::PopItemWidth();
 
@@ -228,11 +227,18 @@ void Transform2DComponent::UpdateParent3DTransform()
 {
     // Get the parent local transform and update it according to the Transform2D. The parentTransform global
     // position is subtracted in order to get the anchor in a local position
+
+    float2 localPos;
+    if (anchorsX.x == anchorsX.y && !IsRootTransform2D())
+        localPos.x = GetAnchorXPos(anchorsX.x) + position.x - parentTransform->GetGlobalPosition().x;
+    else localPos.x = position.x;
+
+    if (anchorsY.x == anchorsY.y && !IsRootTransform2D())
+        localPos.y = GetAnchorYPos(anchorsY.x) + position.y - parentTransform->GetGlobalPosition().y;
+    else localPos.y = position.y;
+
     float4x4 transform = parent->GetLocalTransform();
-    transform.SetTranslatePart(
-        GetAnchorXPos(anchorsX.x) + position.x - parentTransform->GetGlobalPosition().x,
-        GetAnchorYPos(anchorsY.x) + position.y - parentTransform->GetGlobalPosition().y, 0
-    );
+    transform.SetTranslatePart(localPos.x, localPos.y, 0);
     parent->SetLocalTransform(transform);
 }
 
@@ -242,11 +248,25 @@ void Transform2DComponent::UpdateChildren2DTransforms()
 
 void Transform2DComponent::OnTransform3DUpdated(const float4x4& globalTransform3D)
 {
-    position.x = globalTransform3D.TranslatePart().x - GetAnchorXPos(anchorsX.x);
-    position.y = globalTransform3D.TranslatePart().y - GetAnchorYPos(anchorsY.x);
+    if (anchorsX.x == anchorsX.y)
+    {
+        position.x = globalTransform3D.TranslatePart().x - GetAnchorXPos(anchorsX.x);
+    }
+    else
+    {
+        position.x = parent->GetLocalTransform().TranslatePart().x;
+        UpdateHorizontalMargins();
+    }
 
-    if (anchorsX.x != anchorsX.y) UpdateHorizontalMargins();
-    if (anchorsY.x != anchorsY.y) UpdateVerticalMargins();
+    if (anchorsY.x == anchorsY.y)
+    {
+        position.y = globalTransform3D.TranslatePart().y - GetAnchorYPos(anchorsY.x);
+    }
+    else
+    {
+        position.y = parent->GetLocalTransform().TranslatePart().y;
+        UpdateVerticalMargins();
+    }
 
     // Like in Unity, when anchors are separated probably position will be calculated in a different way
 }
@@ -324,10 +344,12 @@ float Transform2DComponent::GetAnchorYPos(const float anchor) const
 
 void Transform2DComponent::OnAnchorsUpdated()
 {
-    if (anchorsX.x == anchorsX.y) position.x = parent->GetGlobalTransform().TranslatePart().x - GetAnchorXPos(anchorsX.x);
+    if (anchorsX.x == anchorsX.y)
+        position.x = parent->GetGlobalTransform().TranslatePart().x - GetAnchorXPos(anchorsX.x);
     else UpdateHorizontalMargins();
 
-    if (anchorsY.x == anchorsY.y) position.y = parent->GetGlobalTransform().TranslatePart().y - GetAnchorYPos(anchorsY.x);
+    if (anchorsY.x == anchorsY.y)
+        position.y = parent->GetGlobalTransform().TranslatePart().y - GetAnchorYPos(anchorsY.x);
     else UpdateVerticalMargins();
 }
 
@@ -340,9 +362,44 @@ void Transform2DComponent::OnSizeChanged()
     }
 }
 
-void Transform2DComponent::OnMarginsChanged()
+void Transform2DComponent::OnLeftMarginChanged()
 {
+    size.x =
+        abs((GetAnchorXPos(anchorsX.x) + margins.x) -
+            (parent->GetGlobalTransform().TranslatePart().x + (size.x * (1 - pivot.x))));
 
+    position.x = ((GetAnchorXPos(anchorsX.x) + margins.x) + (GetAnchorXPos(anchorsX.y) + margins.y)) / 2;
+    UpdateParent3DTransform();
+}
+
+void Transform2DComponent::OnRightMarginChanged()
+{
+    size.x =
+        abs((GetAnchorXPos(anchorsX.y) + margins.y) -
+            (parent->GetGlobalTransform().TranslatePart().x - (size.x * pivot.x)));
+
+    position.x = ((GetAnchorXPos(anchorsX.x) + margins.x) + (GetAnchorXPos(anchorsX.y) + margins.y)) / 2;
+    UpdateParent3DTransform();
+}
+
+void Transform2DComponent::OnTopMarginChanged()
+{
+    size.y =
+        abs((GetAnchorYPos(anchorsY.y) + margins.z) -
+            (parent->GetGlobalTransform().TranslatePart().y - (size.y * pivot.y)));
+
+    position.y = ((GetAnchorYPos(anchorsY.y) + margins.z) + (GetAnchorYPos(anchorsY.x) + margins.w)) / 2;
+    UpdateParent3DTransform();
+}
+
+void Transform2DComponent::OnBottomMarginChanged()
+{
+    size.y =
+        abs((GetAnchorYPos(anchorsY.x) + margins.w) -
+            (parent->GetGlobalTransform().TranslatePart().y + (size.y * (1 - pivot.y))));
+
+    position.y = ((GetAnchorYPos(anchorsY.y) + margins.z) + (GetAnchorYPos(anchorsY.x) + margins.w)) / 2;
+    UpdateParent3DTransform();
 }
 
 void Transform2DComponent::UpdateHorizontalMargins()

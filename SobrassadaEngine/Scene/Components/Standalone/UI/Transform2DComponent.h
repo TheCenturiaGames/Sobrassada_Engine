@@ -39,9 +39,13 @@ class Transform2DComponent : public Component
 
     void OnAnchorsUpdated();
     void OnSizeChanged();
-    void OnMarginsChanged();
     void UpdateHorizontalMargins();
     void UpdateVerticalMargins();
+
+    void OnLeftMarginChanged();
+    void OnRightMarginChanged();
+    void OnTopMarginChanged();
+    void OnBottomMarginChanged();
 
   public:
     Transform2DComponent* parentTransform;
