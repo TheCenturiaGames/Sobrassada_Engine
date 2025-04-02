@@ -2,6 +2,7 @@
 
 #include "Component.h"
 #include "Math/float2.h"
+#include "Math/float4.h"
 
 class CanvasComponent;
 
@@ -38,6 +39,9 @@ class Transform2DComponent : public Component
 
     void OnAnchorsUpdated();
     void OnSizeChanged();
+    void OnMarginsChanged();
+    void UpdateHorizontalMargins();
+    void UpdateVerticalMargins();
 
   public:
     Transform2DComponent* parentTransform;
@@ -48,6 +52,7 @@ class Transform2DComponent : public Component
     float2 pivot;
     float2 anchorsX;
     float2 anchorsY;
+    float4 margins;
 
   private:
     CanvasComponent* parentCanvas;
