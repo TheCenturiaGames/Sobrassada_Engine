@@ -3,6 +3,7 @@
 #include "BulletMotionState.h"
 #include "BulletUserPointer.h"
 #include "Component.h"
+#include "Delegate.h"
 
 #include "Math/float3.h"
 #include <bitset>
@@ -29,6 +30,9 @@ class CubeColliderComponent : public Component
 
     ColliderType GetColliderType() const { return colliderType; }
     ColliderLayer GetLayer() const { return layer; }
+    const CollisionDelegate& GetCallback() const { return onCollissionCallback; }
+
+    void OnCollision(GameObject* otherObject, float3 collisionNormal);
 
   public:
     bool freezeRotation           = false;
@@ -40,6 +44,7 @@ class CubeColliderComponent : public Component
 
     btRigidBody* rigidBody        = nullptr;
     BulletMotionState motionState = BulletMotionState(nullptr, float3::zero, float3::zero, false);
-    BulletUserPointer userPointer = BulletUserPointer(this, ComponentType::COMPONENT_CUBE_COLLIDER);
+    CollisionDelegate onCollissionCallback;
+    BulletUserPointer userPointer = BulletUserPointer(this, &onCollissionCallback);
     ColliderLayer layer           = ColliderLayer::WORLD_OBJECTS;
 };

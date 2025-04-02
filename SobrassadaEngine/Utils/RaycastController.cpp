@@ -74,7 +74,7 @@ namespace RaycastController
         if (selectedGameObject)
         {
             const MeshComponent* meshComponent = selectedGameObject->GetMeshComponent();
-            if (meshComponent && meshComponent->HasBones())
+            if (meshComponent)
             {
                 SceneModule* sceneModule = App->GetSceneModule();
 

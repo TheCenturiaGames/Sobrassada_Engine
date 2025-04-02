@@ -99,6 +99,8 @@ class GameObject
     void OnTransformUpdated();
     void UpdateComponents();
     AABB GetHeriachyAABB();
+
+    void SetPosition(float3& newPosition) { position = newPosition; };
   private:
     void UpdateLocalTransform(const float4x4& parentGlobalTransform);
     void DrawNodes() const;

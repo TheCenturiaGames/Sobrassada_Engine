@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Globals.h"
+#include "Delegate.h"
 
 #include <Libs/rapidjson/document.h>
 #include <Math/float4x4.h>
@@ -46,6 +47,8 @@ enum class ColliderLayer : uint8_t
 };
 
 constexpr const char* ColliderLayerStrings[] = {"World Objects", "Triggers", "Enemies", "Player"};
+
+typedef Delegate<void, GameObject*, float3> CollisionDelegate;
 
 class ComponentUtils
 {

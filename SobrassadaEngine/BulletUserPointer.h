@@ -1,17 +1,21 @@
 #pragma once
 
 #include "ComponentUtils.h"
+#include "Delegate.h"
+
+#include "Math/float3.h"
 
 class Component;
+class GameObject;
 
 struct BulletUserPointer
 {
-    BulletUserPointer(Component* component, ComponentType type)
+    BulletUserPointer(Component* component, CollisionDelegate* newCallback)
     {
-        collider     = component;
-        colliderType = type;
+        collider            = component;
+        onCollisionCallback = newCallback;
     }
 
     Component* collider;
-    ComponentType colliderType;
+    CollisionDelegate* onCollisionCallback;
 };

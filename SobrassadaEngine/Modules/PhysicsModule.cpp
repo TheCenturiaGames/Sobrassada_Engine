@@ -5,6 +5,7 @@
 #include "SceneModule.h"
 #include "Standalone/Physics/CubeColliderComponent.h"
 
+#include "Math/float3.h"
 #include "btBulletDynamicsCommon.h"
 
 PhysicsModule::PhysicsModule()
@@ -41,14 +42,25 @@ update_status PhysicsModule::PreUpdate(float deltaTime)
     int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds();
     for (int currentManifold = 0; currentManifold < numManifolds; ++currentManifold)
     {
+        // Collision Handler
         btPersistentManifold* contactManifold =
             dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(currentManifold);
 
-        BulletUserPointer* body1UserPointer =
-            static_cast<BulletUserPointer*>(contactManifold->getBody0()->getUserPointer());
-        BulletUserPointer* body2UserPointer =
-            static_cast<BulletUserPointer*>(contactManifold->getBody1()->getUserPointer());
+        // CHECKING THAT THERE IS AN ACTUAL COLLISION
+        if (contactManifold->getNumContacts() > 0)
+        {
+            // Getting own data structure to handle callbacks
+            BulletUserPointer* firstUserPointer =
+                static_cast<BulletUserPointer*>(contactManifold->getBody0()->getUserPointer());
+            BulletUserPointer* secondUserPointer =
+                static_cast<BulletUserPointer*>(contactManifold->getBody1()->getUserPointer());
 
+            // Calculating normal
+            float3 normal = float3(contactManifold->getContactPoint(0).m_normalWorldOnB);
+
+            firstUserPointer->onCollisionCallback->Call(secondUserPointer->collider->GetParent(), normal);
+            secondUserPointer->onCollisionCallback->Call(firstUserPointer->collider->GetParent(), -normal);
+        }
     }
 
     return UPDATE_CONTINUE;

@@ -13,7 +13,7 @@ CubeColliderComponent::CubeColliderComponent(UID uid, GameObject* parent)
     AABB parentAABB = parent->GetGlobalAABB();
     if (parentAABB.IsFinite())
     {
-        size = parentAABB.HalfSize();
+        size         = parentAABB.HalfSize();
         centerOffset = parentAABB.CenterPoint() - parent->GetPosition();
     }
     else
@@ -23,6 +23,10 @@ CubeColliderComponent::CubeColliderComponent(UID uid, GameObject* parent)
         centerOffset      = heriachyAABB.CenterPoint() - parent->GetPosition();
     }
 
+    onCollissionCallback = CollisionDelegate(
+        std::bind(&CubeColliderComponent::OnCollision, this, std::placeholders::_1, std::placeholders::_2)
+    );
+    userPointer = BulletUserPointer(this, &onCollissionCallback);
     App->GetPhysicsModule()->CreateCubeRigidBody(this);
 }
 
@@ -54,6 +58,10 @@ CubeColliderComponent::CubeColliderComponent(const rapidjson::Value& initialStat
         size                              = {dataArray[0].GetFloat(), dataArray[1].GetFloat(), dataArray[2].GetFloat()};
     }
 
+    onCollissionCallback = CollisionDelegate(
+        std::bind(&CubeColliderComponent::OnCollision, this, std::placeholders::_1, std::placeholders::_2)
+    );
+    userPointer = BulletUserPointer(this, &onCollissionCallback);
     App->GetPhysicsModule()->CreateCubeRigidBody(this);
 }
 
@@ -111,7 +119,8 @@ void CubeColliderComponent::RenderEditorInspector()
                     mass = 0.f;
                     parent->UpdateMobilityHeriarchy(MobilitySettings::STATIC);
                 }
-                else if (colliderType == ColliderType::DYNAMIC) parent->UpdateMobilityHeriarchy(MobilitySettings::DYNAMIC);
+                else if (colliderType == ColliderType::DYNAMIC)
+                    parent->UpdateMobilityHeriarchy(MobilitySettings::DYNAMIC);
                 App->GetPhysicsModule()->UpdateCubeRigidBody(this);
             }
         }
@@ -127,7 +136,7 @@ void CubeColliderComponent::RenderEditorInspector()
     ImGui::EndDisabled();
 
     if (ImGui::InputFloat3("Center offset", &centerOffset[0])) App->GetPhysicsModule()->UpdateCubeRigidBody(this);
-    
+
     if (ImGui::InputFloat3("Size", &size[0])) App->GetPhysicsModule()->UpdateCubeRigidBody(this);
 
     if (ImGui::Checkbox("Freeze rotation", &freezeRotation)) App->GetPhysicsModule()->UpdateCubeRigidBody(this);
@@ -161,4 +170,8 @@ void CubeColliderComponent::Render(float deltaTime)
 void CubeColliderComponent::ParentUpdated()
 {
     App->GetPhysicsModule()->UpdateCubeRigidBody(this);
+}
+
+void CubeColliderComponent::OnCollision(GameObject* otherObject, float3 collisionNormal)
+{
 }
