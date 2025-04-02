@@ -49,7 +49,7 @@ MeshComponent::MeshComponent(const rapidjson::Value& initialState, GameObject* p
         {
             ResourceModel* model = static_cast<ResourceModel*>(App->GetResourcesModule()->RequestResource(modelUID));
             skinIndex            = initialState["SkinIndex"].GetInt();
-            bindMatrices         = model->GetModelData().GetSkin(skinIndex).inverseBindMatrices;
+            if (model != nullptr) bindMatrices = model->GetModelData().GetSkin(skinIndex).inverseBindMatrices;
         }
     }
 

@@ -32,7 +32,7 @@ namespace ModelImporter
         for (const auto& nodeID : scene.nodes)
         {
             if (model.nodes[nodeID].camera != -1 || model.nodes[nodeID].name == "Camera") continue;
-            FillNodes(model.nodes, nodeID, -1, meshesUIDs, orderedNodes); // -1 parentId for root
+            FillNodes(model.nodes, nodeID, 0, meshesUIDs, orderedNodes); // -1 parentId for root
         }
         GLOG("Nodes filled");
 
