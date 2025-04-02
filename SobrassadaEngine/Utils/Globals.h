@@ -53,7 +53,7 @@ constexpr bool FULL_DESKTOP = false;
 
 constexpr bool BORDERLESS               = false;
 constexpr bool RESIZABLE                = true;
-constexpr bool VSYNC                    = true;
+constexpr bool VSYNC                    = false;
 
 constexpr const char* TITLE             = "Sobrassada Engine";
 constexpr const char* ENGINE_NAME       = "Sobrassada";
