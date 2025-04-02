@@ -37,6 +37,20 @@ update_status PhysicsModule::PreUpdate(float deltaTime)
 
     dynamicsWorld->stepSimulation(deltaTime, 10);
 
+    // COLLISION CHECKS
+    int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds();
+    for (int currentManifold = 0; currentManifold < numManifolds; ++currentManifold)
+    {
+        btPersistentManifold* contactManifold =
+            dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(currentManifold);
+
+        BulletUserPointer* body1UserPointer =
+            static_cast<BulletUserPointer*>(contactManifold->getBody0()->getUserPointer());
+        BulletUserPointer* body2UserPointer =
+            static_cast<BulletUserPointer*>(contactManifold->getBody1()->getUserPointer());
+
+    }
+
     return UPDATE_CONTINUE;
 }
 
@@ -107,7 +121,7 @@ void PhysicsModule::CreateCubeRigidBody(CubeColliderComponent* colliderComponent
     );
     btRigidBody* newRigidBody = new btRigidBody(rbInfo);
 
-    newRigidBody->setUserPointer(&colliderComponent->collider);
+    newRigidBody->setUserPointer(&colliderComponent->userPointer);
 
     colliderComponent->rigidBody = newRigidBody;
 

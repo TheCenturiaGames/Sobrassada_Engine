@@ -4,14 +4,14 @@
 
 class Component;
 
-struct Collider
+struct BulletUserPointer
 {
-    Collider(Component* component, ComponentType type)
+    BulletUserPointer(Component* component, ComponentType type)
     {
         collider     = component;
         colliderType = type;
     }
 
-    void* collider;
+    Component* collider;
     ComponentType colliderType;
 };

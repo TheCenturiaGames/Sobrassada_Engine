@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BulletMotionState.h"
-#include "Collider.h"
+#include "BulletUserPointer.h"
 #include "Component.h"
 
 #include "Math/float3.h"
@@ -40,6 +40,6 @@ class CubeColliderComponent : public Component
 
     btRigidBody* rigidBody        = nullptr;
     BulletMotionState motionState = BulletMotionState(nullptr, float3::zero, float3::zero, false);
-    Collider collider             = Collider(this, ComponentType::COMPONENT_CUBE_COLLIDER);
+    BulletUserPointer userPointer = BulletUserPointer(this, ComponentType::COMPONENT_CUBE_COLLIDER);
     ColliderLayer layer           = ColliderLayer::WORLD_OBJECTS;
 };

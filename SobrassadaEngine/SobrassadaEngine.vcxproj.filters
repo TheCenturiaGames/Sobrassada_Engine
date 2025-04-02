@@ -746,7 +746,7 @@
     <ClInclude Include="Utils\Physics\BulletMotionState.h">
       <Filter>Utils\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="Collider.h">
+    <ClInclude Include="BulletUserPointer.h">
       <Filter>Utils\Physics</Filter>
     </ClInclude>
   </ItemGroup>
