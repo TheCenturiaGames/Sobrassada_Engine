@@ -454,10 +454,25 @@ void StateMachineEditor::SaveMachine()
 
 void StateMachineEditor::ShowSavePopup()
 {
+    bool alreadySaved                = false;
     static char stateMachineName[128] = "";
+    static std::vector<std::string> allStateMachineNames;
 
     if (ImGui::BeginPopupModal("Save State Machine", NULL, ImGuiWindowFlags_AlwaysAutoResize))
     {
+        if (allStateMachineNames.empty())
+        {
+            allStateMachineNames = StateMachineManager::GetAllStateMachineNames();
+        }
+        for (int i = 0; i < allStateMachineNames.size(); i++)
+        {
+            if (resource->GetName() == allStateMachineNames[i])
+            {
+                strncpy_s(stateMachineName, sizeof(stateMachineName), allStateMachineNames[i].c_str(), _TRUNCATE);
+                alreadySaved = true;
+            }
+        }
+
         ImGui::Text("Enter the name for the State Machine:");
         ImGui::InputText("##StateMachineName", stateMachineName, IM_ARRAYSIZE(stateMachineName));
 
@@ -466,7 +481,7 @@ void StateMachineEditor::ShowSavePopup()
             if (strlen(stateMachineName) > 0)
             {
                 resource->SetName(std::string(stateMachineName));
-                StateMachineManager::Save(resource, false);
+                StateMachineManager::Save(resource, alreadySaved);
                 ImGui::CloseCurrentPopup();
             }
         }
