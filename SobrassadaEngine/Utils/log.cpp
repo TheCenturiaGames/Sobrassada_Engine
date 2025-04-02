@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Globals.h"
 
 void glog(const char file[], int line, const char *format, ...)

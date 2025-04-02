@@ -6,6 +6,11 @@
 
 #include <map>
 
+class BatchManager;
+class GeometryBatch;
+class MeshComponent;
+class Resource;
+
 class ResourcesModule : public Module
 {
   public:
@@ -13,6 +18,7 @@ class ResourcesModule : public Module
     ~ResourcesModule() override;
 
     bool Init() override;
+    //update_status PostUpdate(float deltaTime) override;
     bool ShutDown() override;
 
     void CreateNavMesh();
@@ -22,10 +28,13 @@ class ResourcesModule : public Module
 
     void UnloadAllResources();
 
+    BatchManager* GetBatchManager() { return batchManager; }
+
   private:
     Resource* CreateNewResource(UID uid);
 
   private:
     std::map<UID, Resource*> resources;
+    BatchManager* batchManager = nullptr;
     ResourceNavMesh myNavmesh;
 };

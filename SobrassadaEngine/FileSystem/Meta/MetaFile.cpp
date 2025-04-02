@@ -5,9 +5,9 @@
 #include "Globals.h"
 #include "ProjectModule.h"
 
-#include "Libs/rapidjson/prettywriter.h"
-#include "Libs/rapidjson/stringbuffer.h"
-#include "Libs/rapidjson/writer.h"
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
 
 MetaFile::MetaFile(UID uid, const std::string& assetPath)
     : assetUID(uid), lastModified(FileSystem::GetLastModifiedTime(assetPath))
