@@ -91,7 +91,7 @@ class Scene
 
     void SetStaticModified() { staticModified = true; }
     void SetDynamicModified() { dynamicModified = true; }
-
+    
   private:
     void CreateStaticSpatialDataStruct();
     void CreateDynamicSpatialDataStruct();

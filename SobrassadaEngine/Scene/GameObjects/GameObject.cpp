@@ -405,6 +405,63 @@ void GameObject::UpdateComponents()
     }
 }
 
+AABB GameObject::GetHeriachyAABB()
+{
+    AABB returnAABB;
+    returnAABB.SetNegativeInfinity();
+
+    std::set<UID> visitedGameObjects;
+    std::stack<UID> toVisitGameObjects;
+    UID sceneRootUID = App->GetSceneModule()->GetScene()->GetGameObjectRootUID();
+    // ADD "THIS" GAME OBJECT SO WHEN ASCENDING HERIARCHY WE DON'T REVISIT OUR CHILDREN
+    visitedGameObjects.insert(uid);
+
+    // FIRST UPDATE DOWN THE HERIARCHY
+    for (UID gameObjectID : children)
+        toVisitGameObjects.push(gameObjectID);
+
+    while (!toVisitGameObjects.empty())
+    {
+        UID currentUID = toVisitGameObjects.top();
+        toVisitGameObjects.pop();
+
+        if (visitedGameObjects.find(currentUID) == visitedGameObjects.end())
+        {
+            visitedGameObjects.insert(currentUID);
+            GameObject* currentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentUID);
+
+            if (currentGameObject->GetGlobalAABB().IsFinite()) returnAABB.Enclose(currentGameObject->GetGlobalAABB());
+
+            for (UID childID : currentGameObject->GetChildren())
+                toVisitGameObjects.push(childID);
+        }
+    }
+
+    // UPDATE UP THE HERIARCHY
+    if (parentUID != sceneRootUID) toVisitGameObjects.push(parentUID);
+
+    while (!toVisitGameObjects.empty())
+    {
+        UID currentUID = toVisitGameObjects.top();
+        toVisitGameObjects.pop();
+
+        if (visitedGameObjects.find(currentUID) == visitedGameObjects.end())
+        {
+            visitedGameObjects.insert(currentUID);
+            GameObject* currentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentUID);
+
+            if (currentGameObject->GetGlobalAABB().IsFinite()) returnAABB.Enclose(currentGameObject->GetGlobalAABB());
+
+            for (UID childID : currentGameObject->GetChildren())
+                toVisitGameObjects.push(childID);
+
+            if (currentGameObject->GetParent() != sceneRootUID) toVisitGameObjects.push(currentGameObject->GetParent());
+        }
+    }
+
+    return returnAABB;
+}
+
 void GameObject::UpdateLocalTransform(const float4x4& parentGlobalTransform)
 {
     localTransform = parentGlobalTransform.Inverted() * globalTransform;

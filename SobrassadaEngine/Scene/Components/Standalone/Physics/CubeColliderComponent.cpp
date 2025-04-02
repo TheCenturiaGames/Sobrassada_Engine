@@ -10,6 +10,19 @@
 CubeColliderComponent::CubeColliderComponent(UID uid, GameObject* parent)
     : Component(uid, parent, "Cube Collider", COMPONENT_CUBE_COLLIDER)
 {
+    AABB parentAABB = parent->GetGlobalAABB();
+    if (parentAABB.IsFinite())
+    {
+        size = parentAABB.HalfSize();
+        centerOffset = parentAABB.CenterPoint() - parent->GetPosition();
+    }
+    else
+    {
+        AABB heriachyAABB = parent->GetHeriachyAABB();
+        size              = heriachyAABB.HalfSize();
+        centerOffset      = heriachyAABB.CenterPoint() - parent->GetPosition();
+    }
+
     App->GetPhysicsModule()->CreateCubeRigidBody(this);
 }
 
