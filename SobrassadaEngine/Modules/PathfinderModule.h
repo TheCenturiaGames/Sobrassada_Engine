@@ -11,6 +11,7 @@ class PathfinderModule : public Module
     PathfinderModule();
     ~PathfinderModule();
     bool Init() override;
+    update_status Update(float deltaTime) override;
 
     std::vector<float3> FindPath(float3 start, float3 end);
 

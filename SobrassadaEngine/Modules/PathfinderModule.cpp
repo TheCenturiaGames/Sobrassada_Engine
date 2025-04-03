@@ -1,11 +1,13 @@
+#include "PathfinderModule.h"
+
 #include "Application.h"
 #include "SceneModule.h"
 
-#include "DetourCrowd.h"
-#include "DetourNavMesh.h"
-#include "DetourNavMeshBuilder.h"
-#include "DetourNavMeshQuery.h"
-#include "PathfinderModule.h"
+#include <DetourCrowd.h>
+#include <DetourNavMesh.h>
+#include <DetourNavMeshBuilder.h>
+#include <DetourNavMeshQuery.h>
+
 
 PathfinderModule::PathfinderModule()
 {
