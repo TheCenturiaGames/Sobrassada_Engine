@@ -402,6 +402,9 @@
     <ClCompile Include="Scene\Components\Standalone\Physics\SphereColliderComponent.cpp">
       <Filter>Scene\Components\Physics</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\Physics\CapsuleColliderComponent.cpp">
+      <Filter>Scene\Components\Physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -753,6 +756,9 @@
       <Filter>Utils\Physics</Filter>
     </ClInclude>
     <ClInclude Include="Scene\Components\Standalone\Physics\SphereColliderComponent.h">
+      <Filter>Scene\Components\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\Physics\CapsuleColliderComponent.h">
       <Filter>Scene\Components\Physics</Filter>
     </ClInclude>
   </ItemGroup>

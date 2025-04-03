@@ -16,6 +16,7 @@ class btRigidBody;
 
 class CubeColliderComponent;
 class SphereColliderComponent;
+class CapsuleColliderComponent;
 
 constexpr float DEFAULT_GRAVITY = -9.81f;
 
@@ -46,6 +47,10 @@ class PhysicsModule : public Module
     void CreateSphereRigidBody(SphereColliderComponent* colliderComponent);
     void UpdateSphereRigidBody(SphereColliderComponent* colliderComponent);
     void DeleteSphereRigidBody(SphereColliderComponent* colliderComponent);
+
+    void CreateCapsuleRigidBody(CapsuleColliderComponent* colliderComponent);
+    void UpdateCapsuleRigidBody(CapsuleColliderComponent* colliderComponent);
+    void DeleteCapsuleRigidBody(CapsuleColliderComponent* colliderComponent);
 
     float GetGravity() const { return gravity; }
     std::vector<LayerBitset>& GetLayerConfig() { return colliderLayerConfig; }

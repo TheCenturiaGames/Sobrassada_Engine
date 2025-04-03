@@ -40,7 +40,8 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"Character Controller", COMPONENT_CHARACTER_CONTROLLER},
         {"Camera",               COMPONENT_CAMERA              },
         {"Cube Collider",        COMPONENT_CUBE_COLLIDER       },
-        {"Sphere Collider",      COMPONENT_SPHERE_COLLIDER     }
+        {"Sphere Collider",      COMPONENT_SPHERE_COLLIDER     },
+        {"Capsule Collider",     COMPONENT_CAPSULE_COLLIDER    }
     };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;

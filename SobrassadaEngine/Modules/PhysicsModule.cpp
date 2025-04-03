@@ -7,6 +7,7 @@
 #include "SceneModule.h"
 #include "Standalone/Physics/CubeColliderComponent.h"
 #include "Standalone/Physics/SphereColliderComponent.h"
+#include "Standalone/Physics/CapsuleColliderComponent.h"
 
 #include "Math/float3.h"
 #include "btBulletDynamicsCommon.h"
@@ -191,6 +192,48 @@ void PhysicsModule::UpdateSphereRigidBody(SphereColliderComponent* colliderCompo
 }
 
 void PhysicsModule::DeleteSphereRigidBody(SphereColliderComponent* colliderComponent)
+{
+    bodiesToRemove.push_back(colliderComponent->rigidBody);
+    colliderComponent->rigidBody = nullptr;
+}
+
+void PhysicsModule::CreateCapsuleRigidBody(CapsuleColliderComponent* colliderComponent)
+{
+    // Collision shape
+    btCollisionShape* collisionShape = new btCapsuleShape(colliderComponent->radius, colliderComponent->length);
+
+    bool isDynamic                   = (colliderComponent->mass != 0.f);
+
+    // Inertia
+    btVector3 localInertia(1, 0, 0);
+    if (isDynamic) collisionShape->calculateLocalInertia(colliderComponent->mass, localInertia);
+
+    // MotionState for RENDER AND
+    colliderComponent->motionState = BulletMotionState(
+        colliderComponent, colliderComponent->centerOffset, colliderComponent->centerRotation,
+        colliderComponent->freezeRotation
+    );
+
+    // Creating final RigidBody
+    btRigidBody::btRigidBodyConstructionInfo rbInfo(
+        btScalar(colliderComponent->mass), &colliderComponent->motionState, collisionShape, localInertia
+    );
+    btRigidBody* newRigidBody = new btRigidBody(rbInfo);
+
+    newRigidBody->setUserPointer(&colliderComponent->userPointer);
+
+    colliderComponent->rigidBody = newRigidBody;
+
+    AddRigidBody(newRigidBody, colliderComponent->GetColliderType(), colliderComponent->GetLayer());
+}
+
+void PhysicsModule::UpdateCapsuleRigidBody(CapsuleColliderComponent* colliderComponent)
+{
+    DeleteCapsuleRigidBody(colliderComponent);
+    CreateCapsuleRigidBody(colliderComponent);
+}
+
+void PhysicsModule::DeleteCapsuleRigidBody(CapsuleColliderComponent* colliderComponent)
 {
     bodiesToRemove.push_back(colliderComponent->rigidBody);
     colliderComponent->rigidBody = nullptr;
