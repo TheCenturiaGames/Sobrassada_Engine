@@ -34,6 +34,7 @@ bool ResourcesModule::ShutDown()
 {
     UnloadAllResources();
     batchManager->UnloadAllBatches();
+    delete tmpNavmesh;
     return true;
 }
 
