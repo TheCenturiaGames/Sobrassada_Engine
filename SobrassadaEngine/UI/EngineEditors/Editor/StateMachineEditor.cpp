@@ -106,251 +106,247 @@ bool StateMachineEditor::RenderEditor()
     ImGui::End();
 
     //INSPECTOR
-
     if (selectedNode != nullptr)
     {
-        bool rechargeTransition = false;
-        ImGui::Begin("State Inspector");
-
-        ImGui::Text("State");
-        ImGui::Separator();
-
-        std::string stateName = selectedNode->GetStateName();
-        char nameBuffer[128];
-        strncpy_s(nameBuffer, stateName.c_str(), sizeof(nameBuffer));
-        nameBuffer[sizeof(nameBuffer) - 1] = '\0';
-
-        if (ImGui::InputText("State Name", nameBuffer, sizeof(nameBuffer)))
-        {
-            std::string newName(nameBuffer);
-            if (newName != stateName)
-            {
-                resource->EditState(stateName, newName, selectedNode->GetClipName());
-                selectedNode->SetStateName(newName); 
-                auto transitionsCopy = resource->transitions;
-
-                for (const auto& transition : transitionsCopy)
-                {
-                    if (transition.fromState.GetString() == stateName)
-                    {
-                        std::string prevTrigger    = transition.triggerName.GetString();
-                        uint32_t prevInterpolation = transition.interpolationTime;
-                        resource->RemoveTransition(transition.fromState.GetString(), transition.toState.GetString());
-                        resource->AddTransition(
-                            newName, transition.toState.GetString(), prevTrigger, prevInterpolation
-                        );
-                    }
-                    else if (transition.toState.GetString() == stateName)
-                    {
-                        std::string prevTrigger    = transition.triggerName.GetString();
-                        uint32_t prevInterpolation = transition.interpolationTime;
-                        resource->RemoveTransition(transition.toState.GetString(), transition.fromState.GetString());
-                        resource->AddTransition(
-                            transition.fromState.GetString(), newName, prevTrigger, prevInterpolation
-                        );
-                    }
-                }
-            }
-        }
-        char clipBuffer[128];
-        strncpy_s(clipBuffer, selectedNode->GetClipName().c_str(), sizeof(clipBuffer));
-        clipBuffer[sizeof(clipBuffer) - 1] = '\0';
-
-        int currentClipIndex               = -1;
-        for (size_t i = 0; i < availableClips.size(); ++i)
-        {
-            if (availableClips[i] == selectedNode->GetClipName())
-            {
-                currentClipIndex = static_cast<int>(i);
-                break;
-            }
-        }
-
-        if (ImGui::Combo(
-                "Associated Clip", &currentClipIndex,
-                [](void* data, int idx, const char** out_text)
-                {
-                    auto* clips = static_cast<std::vector<std::string>*>(data);
-                    if (out_text) *out_text = (*clips)[idx].c_str();
-                    return true;
-                },
-                &availableClips, availableClips.size()
-            ))
-        {
-            if (currentClipIndex >= 0 && availableClips[currentClipIndex] != selectedNode->GetClipName())
-            {
-                resource->EditState(
-                    selectedNode->GetStateName(), selectedNode->GetStateName(), availableClips[currentClipIndex]
-                );
-                selectedNode->SetClipName(availableClips[currentClipIndex]);
-            }
-        }
-
-        
-        ImGui::Spacing();
-        ImGui::Text("Clip Information");
-        ImGui::Separator();
-        const Clip* clip = resource->GetClip(selectedNode->GetClipName());
-        if (clip)
-        {
-            static bool loopBuffer = clip->loop;
-
-            ImGui::Text("Clip UID: %llu", clip->animationResourceUID);
-
-            ImGui::Text("Clip Name: %s", clip->clipName.GetString().c_str());
-
-            if (ImGui::Checkbox("Loop", &loopBuffer))
-            {
-                if (loopBuffer != clip->loop)
-                {
-                    resource->EditClipInfo(
-                        clip->clipName.GetString(), clip->animationResourceUID, clip->clipName.GetString(), loopBuffer
-                    );
-                }
-            }
-        }
-        else
-        {
-            ImGui::TextColored(
-                ImVec4(1, 0.5f, 0.5f, 1.0f), "No Clip found with name: %s", selectedNode->GetClipName().c_str()
-            );
-        }
-
-
-        ImGui::Spacing();
-        ImGui::Text("Connected Transitions");
-        ImGui::Separator();
-        int cont = 0;
-        for (auto& transition : resource->transitions)
-        {
-            bool modified = false;
-            char triggerBuffer[64]; 
-            strncpy_s(triggerBuffer, transition.triggerName.GetString().c_str(), sizeof(triggerBuffer));
-            triggerBuffer[sizeof(triggerBuffer) - 1] = '\0';
-
-            if (transition.fromState.GetString() == selectedNode->GetStateName())
-            {
-                ImGui::Text(
-                    "-> %s (Trigger: %s, Blend: %u ms)", transition.toState.GetString().c_str(),
-                    transition.triggerName.GetString().c_str(), transition.interpolationTime
-                );
-
-                ImGui::PushID(cont);
-                int tempInterpolationTime = static_cast<int>(transition.interpolationTime);
-                if (ImGui::InputInt("##BlendTime", &tempInterpolationTime))
-                {
-                    transition.interpolationTime =
-                        static_cast<uint32_t>(std::max(0, tempInterpolationTime)); // Evitar negativos
-                    modified = true;
-                }
-
-                //Trigger
-                int currentTriggerIndex = -1;
-                for (size_t i = 0; i < availableTriggers.size(); ++i)
-                {
-                    if (availableTriggers[i] ==
-                        transition.triggerName.GetString()) 
-                    {
-                        currentTriggerIndex = static_cast<int>(i);
-                        break;
-                    }
-                }
-
-                if (ImGui::Combo(
-                        "##TriggerName", &currentTriggerIndex,
-                        [](void* data, int idx, const char** out_text)
-                        {
-                            auto* triggers = static_cast<std::vector<std::string>*>(data);
-                            if (out_text) *out_text = (*triggers)[idx].c_str();
-                            return true;
-                        },
-                        &availableTriggers, availableTriggers.size()
-                    ))
-                {
-                    if (currentTriggerIndex >= 0 &&
-                        availableTriggers[currentTriggerIndex] != transition.triggerName.GetString())
-                    {
-                        transition.triggerName =
-                            availableTriggers[currentTriggerIndex]; 
-                        modified = true;
-                    }
-                }
-                ImGui::PopID();
-
-                if (modified)
-                {
-                    resource->EditTransition(
-                        transition.fromState.GetString(), transition.toState.GetString(),
-                        transition.triggerName.GetString(), transition.interpolationTime
-                    );
-                }
-            }
-            else if (transition.toState.GetString() == selectedNode->GetStateName())
-            {
-                ImGui::Text(
-                    "<- %s (Trigger: %s, Blend: %u ms)", transition.fromState.GetString().c_str(),
-                    transition.triggerName.GetString().c_str(), transition.interpolationTime
-                );
-
-                            ImGui::PushID(cont);
-                int tempInterpolationTime = static_cast<int>(transition.interpolationTime);
-                if (ImGui::InputInt("##BlendTime", &tempInterpolationTime))
-                {
-                    transition.interpolationTime =
-                        static_cast<uint32_t>(std::max(0, tempInterpolationTime)); // Evita negativos
-                    modified = true;
-                }
-
-                //Trigger
-                int currentTriggerIndex = -1;
-                for (size_t i = 0; i < availableTriggers.size(); ++i)
-                {
-                    if (availableTriggers[i] == transition.triggerName.GetString())
-                    {
-                        currentTriggerIndex = static_cast<int>(i);
-                        break;
-                    }
-                }
-
-                if (ImGui::Combo(
-                        "##TriggerName", &currentTriggerIndex,
-                        [](void* data, int idx, const char** out_text)
-                        {
-                            auto* triggers = static_cast<std::vector<std::string>*>(data);
-                            if (out_text) *out_text = (*triggers)[idx].c_str();
-                            return true;
-                        },
-                        &availableTriggers, availableTriggers.size()
-                    ))
-                {
-                    if (currentTriggerIndex >= 0 &&
-                        availableTriggers[currentTriggerIndex] != transition.triggerName.GetString())
-                    {
-                        transition.triggerName = availableTriggers[currentTriggerIndex];
-                        modified               = true;
-                    }
-                }
-                ImGui::PopID();
-                
-                if (modified)
-                {
-                    resource->EditTransition(
-                        transition.toState.GetString(), transition.fromState.GetString(), transition.triggerName.GetString(),
-                        transition.interpolationTime
-                    );
-                }
-
-            }
-
-            cont++;
-
-        }
-
-        ImGui::End();
+        ShowInspector();
     }
 
 
     return true;
+}
+
+void StateMachineEditor::ShowInspector()
+{
+    bool rechargeTransition = false;
+    ImGui::Begin("State Inspector");
+
+    ImGui::Text("State");
+    ImGui::Separator();
+
+    std::string stateName = selectedNode->GetStateName();
+    char nameBuffer[128];
+    strncpy_s(nameBuffer, stateName.c_str(), sizeof(nameBuffer));
+    nameBuffer[sizeof(nameBuffer) - 1] = '\0';
+
+    if (ImGui::InputText("State Name", nameBuffer, sizeof(nameBuffer)))
+    {
+        std::string newName(nameBuffer);
+        if (newName != stateName)
+        {
+            resource->EditState(stateName, newName, selectedNode->GetClipName());
+            selectedNode->SetStateName(newName);
+            auto transitionsCopy = resource->transitions;
+
+            for (const auto& transition : transitionsCopy)
+            {
+                if (transition.fromState.GetString() == stateName)
+                {
+                    std::string prevTrigger    = transition.triggerName.GetString();
+                    uint32_t prevInterpolation = transition.interpolationTime;
+                    resource->RemoveTransition(transition.fromState.GetString(), transition.toState.GetString());
+                    resource->AddTransition(newName, transition.toState.GetString(), prevTrigger, prevInterpolation);
+                }
+                else if (transition.toState.GetString() == stateName)
+                {
+                    std::string prevTrigger    = transition.triggerName.GetString();
+                    uint32_t prevInterpolation = transition.interpolationTime;
+                    resource->RemoveTransition(transition.toState.GetString(), transition.fromState.GetString());
+                    resource->AddTransition(transition.fromState.GetString(), newName, prevTrigger, prevInterpolation);
+                }
+            }
+        }
+    }
+    char clipBuffer[128];
+    strncpy_s(clipBuffer, selectedNode->GetClipName().c_str(), sizeof(clipBuffer));
+    clipBuffer[sizeof(clipBuffer) - 1] = '\0';
+
+    int currentClipIndex               = -1;
+    for (size_t i = 0; i < availableClips.size(); ++i)
+    {
+        if (availableClips[i] == selectedNode->GetClipName())
+        {
+            currentClipIndex = static_cast<int>(i);
+            break;
+        }
+    }
+
+    if (ImGui::Combo(
+            "Associated Clip", &currentClipIndex,
+            [](void* data, int idx, const char** out_text)
+            {
+                auto* clips = static_cast<std::vector<std::string>*>(data);
+                if (out_text) *out_text = (*clips)[idx].c_str();
+                return true;
+            },
+            &availableClips, availableClips.size()
+        ))
+    {
+        if (currentClipIndex >= 0 && availableClips[currentClipIndex] != selectedNode->GetClipName())
+        {
+            resource->EditState(
+                selectedNode->GetStateName(), selectedNode->GetStateName(), availableClips[currentClipIndex]
+            );
+            selectedNode->SetClipName(availableClips[currentClipIndex]);
+        }
+    }
+
+    ImGui::Spacing();
+    ImGui::Text("Clip Information");
+    ImGui::Separator();
+    const Clip* clip = resource->GetClip(selectedNode->GetClipName());
+    if (clip)
+    {
+        static bool loopBuffer = clip->loop;
+
+        ImGui::Text("Clip UID: %llu", clip->animationResourceUID);
+
+        ImGui::Text("Clip Name: %s", clip->clipName.GetString().c_str());
+
+        if (ImGui::Checkbox("Loop", &loopBuffer))
+        {
+            if (loopBuffer != clip->loop)
+            {
+                resource->EditClipInfo(
+                    clip->clipName.GetString(), clip->animationResourceUID, clip->clipName.GetString(), loopBuffer
+                );
+            }
+        }
+    }
+    else
+    {
+        ImGui::TextColored(
+            ImVec4(1, 0.5f, 0.5f, 1.0f), "No Clip found with name: %s", selectedNode->GetClipName().c_str()
+        );
+    }
+
+    ImGui::Spacing();
+    ImGui::Text("Connected Transitions");
+    ImGui::Separator();
+    int cont = 0;
+    for (auto& transition : resource->transitions)
+    {
+        bool modified = false;
+        char triggerBuffer[64];
+        strncpy_s(triggerBuffer, transition.triggerName.GetString().c_str(), sizeof(triggerBuffer));
+        triggerBuffer[sizeof(triggerBuffer) - 1] = '\0';
+
+        if (transition.fromState.GetString() == selectedNode->GetStateName())
+        {
+            ImGui::Text(
+                "-> %s (Trigger: %s, Blend: %u ms)", transition.toState.GetString().c_str(),
+                transition.triggerName.GetString().c_str(), transition.interpolationTime
+            );
+
+            ImGui::PushID(cont);
+            int tempInterpolationTime = static_cast<int>(transition.interpolationTime);
+            if (ImGui::InputInt("##BlendTime", &tempInterpolationTime))
+            {
+                transition.interpolationTime =
+                    static_cast<uint32_t>(std::max(0, tempInterpolationTime)); // Evitar negativos
+                modified = true;
+            }
+
+            // Trigger
+            int currentTriggerIndex = -1;
+            for (size_t i = 0; i < availableTriggers.size(); ++i)
+            {
+                if (availableTriggers[i] == transition.triggerName.GetString())
+                {
+                    currentTriggerIndex = static_cast<int>(i);
+                    break;
+                }
+            }
+
+            if (ImGui::Combo(
+                    "##TriggerName", &currentTriggerIndex,
+                    [](void* data, int idx, const char** out_text)
+                    {
+                        auto* triggers = static_cast<std::vector<std::string>*>(data);
+                        if (out_text) *out_text = (*triggers)[idx].c_str();
+                        return true;
+                    },
+                    &availableTriggers, availableTriggers.size()
+                ))
+            {
+                if (currentTriggerIndex >= 0 &&
+                    availableTriggers[currentTriggerIndex] != transition.triggerName.GetString())
+                {
+                    transition.triggerName = availableTriggers[currentTriggerIndex];
+                    modified               = true;
+                }
+            }
+            ImGui::PopID();
+
+            if (modified)
+            {
+                resource->EditTransition(
+                    transition.fromState.GetString(), transition.toState.GetString(),
+                    transition.triggerName.GetString(), transition.interpolationTime
+                );
+            }
+        }
+        else if (transition.toState.GetString() == selectedNode->GetStateName())
+        {
+            ImGui::Text(
+                "<- %s (Trigger: %s, Blend: %u ms)", transition.fromState.GetString().c_str(),
+                transition.triggerName.GetString().c_str(), transition.interpolationTime
+            );
+
+            ImGui::PushID(cont);
+            int tempInterpolationTime = static_cast<int>(transition.interpolationTime);
+            if (ImGui::InputInt("##BlendTime", &tempInterpolationTime))
+            {
+                transition.interpolationTime =
+                    static_cast<uint32_t>(std::max(0, tempInterpolationTime)); // Evita negativos
+                modified = true;
+            }
+
+            // Trigger
+            int currentTriggerIndex = -1;
+            for (size_t i = 0; i < availableTriggers.size(); ++i)
+            {
+                if (availableTriggers[i] == transition.triggerName.GetString())
+                {
+                    currentTriggerIndex = static_cast<int>(i);
+                    break;
+                }
+            }
+
+            if (ImGui::Combo(
+                    "##TriggerName", &currentTriggerIndex,
+                    [](void* data, int idx, const char** out_text)
+                    {
+                        auto* triggers = static_cast<std::vector<std::string>*>(data);
+                        if (out_text) *out_text = (*triggers)[idx].c_str();
+                        return true;
+                    },
+                    &availableTriggers, availableTriggers.size()
+                ))
+            {
+                if (currentTriggerIndex >= 0 &&
+                    availableTriggers[currentTriggerIndex] != transition.triggerName.GetString())
+                {
+                    transition.triggerName = availableTriggers[currentTriggerIndex];
+                    modified               = true;
+                }
+            }
+            ImGui::PopID();
+
+            if (modified)
+            {
+                resource->EditTransition(
+                    transition.toState.GetString(), transition.fromState.GetString(),
+                    transition.triggerName.GetString(), transition.interpolationTime
+                );
+            }
+        }
+
+        cont++;
+    }
+
+    ImGui::End();
+
+
 }
 
 void StateMachineEditor::BuildGraph()
@@ -363,7 +359,7 @@ void StateMachineEditor::BuildGraph()
 
     for (const auto& state : resource->states)
     {
-        ImVec2 position = ImVec2(500, 200); 
+        ImVec2 position = state.position; 
 
         auto newNode    = graph->placeNodeAt<StateNode>(position);
         if (newNode)
@@ -474,6 +470,18 @@ void StateMachineEditor::ShowSavePopup()
         {
             allStateMachineNames = StateMachineManager::GetAllStateMachineNames();
 
+            //Save all node positions
+            for (auto& state : resource->states)
+            {
+                for (const auto& [uid, node] : graph->getNodes()) 
+                {
+                    if (node->getName() == state.name.GetString())
+                    {
+                        state.position = node->getPos();
+                    }
+                }
+            }
+
             for (const std::string& name : allStateMachineNames)
             {
                 if (resource->GetName() == name)
@@ -516,7 +524,8 @@ void StateMachineEditor::ShowSavePopup()
 
 void StateMachineEditor::LoadMachine()
 {
-
+    availableClips.clear();
+    availableTriggers.clear();
     ImGui::OpenPopup("Load State Machine");
 }
 

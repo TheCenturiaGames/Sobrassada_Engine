@@ -23,6 +23,7 @@ class StateMachineEditor : public EngineEditorBase
     void LoadMachine();
     void ShowLoadPopup();
     void RemoveStateNode(StateNode& node);
+    void ShowInspector();
 
 
   private:
@@ -31,6 +32,7 @@ class StateMachineEditor : public EngineEditorBase
     std::unique_ptr<ImFlow::ImNodeFlow> graph;
     std::vector<std::string> availableClips;
     std::vector<std::string> availableTriggers;
+    std::vector<std::shared_ptr<StateNode>> nodes;
     char stateMachineName[128] = "";
     bool alreadySaved          = false;
     StateNode* selectedNode = nullptr;

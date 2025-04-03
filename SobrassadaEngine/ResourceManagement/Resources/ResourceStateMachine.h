@@ -5,6 +5,7 @@
 #include "Math/float2.h"
 #include <string>
 #include <vector>
+#include "imgui.h"
 
 struct HashString
 {
@@ -34,6 +35,7 @@ struct State
 {
     HashString name;
     HashString clipName;
+    ImVec2 position;
 };
 
 struct Transition

@@ -58,6 +58,10 @@ namespace StateMachineManager
             rapidjson::Value stateJSON(rapidjson::kObjectType);
             stateJSON.AddMember("StateName", rapidjson::Value(state.name.GetString().c_str(), allocator), allocator);
             stateJSON.AddMember("ClipName", rapidjson::Value(state.clipName.GetString().c_str(), allocator), allocator);
+            rapidjson::Value position(rapidjson::kObjectType);
+            position.AddMember("x", state.position.x, allocator);
+            position.AddMember("y", state.position.y, allocator);
+            stateJSON.AddMember("Position", position, allocator);
 
             statesArray.PushBack(stateJSON, allocator);
         }
@@ -180,6 +184,11 @@ namespace StateMachineManager
                 State state;
                 state.name     = HashString(stateJSON["StateName"].GetString());
                 state.clipName = HashString(stateJSON["ClipName"].GetString());
+                if (stateJSON.HasMember("Position") && stateJSON["Position"].IsObject())
+                {
+                    state.position.x = stateJSON["Position"]["x"].GetFloat();
+                    state.position.y = stateJSON["Position"]["y"].GetFloat();
+                }
 
                 stateMachine->states.push_back(state);
             }
