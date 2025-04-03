@@ -2,11 +2,14 @@
 
 #include "Application.h"
 #include "SceneModule.h"
+#include "LibraryModule.h"
+
 
 #include <DetourCrowd.h>
 #include <DetourNavMesh.h>
-#include <DetourNavMeshBuilder.h>
+#include <DetourCommon.h>
 #include <DetourNavMeshQuery.h>
+
 
 
 PathfinderModule::PathfinderModule()
@@ -50,42 +53,42 @@ std::vector<float3> PathfinderModule::FindPath(float3 start, float3 end)
 
     dtPolyRef startRef, endRef;
     float closestStart[3], closestEnd[3];
-    navQuery->findNearestPoly(startPos, {2, 4, 2}, &filter, &startRef, closestStart);
-    navQuery->findNearestPoly(endPos, {2, 4, 2}, &filter, &endRef, closestEnd);
+
+    float extent[3] = {2.0f, 4.0f, 2.0f};
+
+    // Find closest navmesh polygons
+    navQuery->findNearestPoly(startPos, extent, &filter, &startRef, closestStart);
+    navQuery->findNearestPoly(endPos, extent, &filter, &endRef, closestEnd);
 
     if (!startRef || !endRef) return path; // No valid path
 
+    // Find path through navmesh
     dtPolyRef pathPolys[256];
     int pathCount = 0;
     navQuery->findPath(startRef, endRef, closestStart, closestEnd, &filter, pathPolys, &pathCount, 256);
 
-    if (pathCount > 0)
+    if (pathCount == 0) return path; 
+
+    // straight-line path
+    float straightPath[256 * 3];          // positions (x,y,z)
+    unsigned char straightPathFlags[256]; // flags for path points
+    dtPolyRef straightPathRefs[256];      // polygon references
+    int straightPathCount = 0;
+
+    navQuery->findStraightPath(
+        closestStart, closestEnd, pathPolys, pathCount, straightPath, straightPathFlags, straightPathRefs,
+        &straightPathCount, 256
+    );
+
+    // Store waypoints
+    for (int j = 0; j < straightPathCount; j++)
     {
-        float smoothPos[3];
-        dtPolyRef smoothPathPolys[256];
-        memcpy(smoothPathPolys, pathPolys, sizeof(dtPolyRef) * pathCount);
-        int smoothCount = 0;
-
-        dtVcopy(smoothPos, closestStart);
-        path.push_back(float3(smoothPos[0], smoothPos[1], smoothPos[2]));
-
-        for (int i = 0; i < pathCount && smoothCount < 256; i++)
-        {
-            float3 nextPoint;
-            dtPolyRef polyRef = smoothPathPolys[i];
-            dtStraightPath straightPath[256];
-            int straightPathCount = 0;
-
-            navQuery->findStraightPath(
-                smoothPos, closestEnd, smoothPathPolys, pathCount, (float*)&straightPath, nullptr, nullptr,
-                &straightPathCount, 256
-            );
-
-            for (int j = 0; j < straightPathCount; j++)
-            {
-                path.push_back(float3(straightPath[j].pos[0], straightPath[j].pos[1], straightPath[j].pos[2]));
-            }
-        }
+        path.emplace_back(straightPath[j * 3], straightPath[j * 3 + 1], straightPath[j * 3 + 2]);
     }
+
     return path;
+}
+
+void PathfinderModule::QueryNavmesh(UID uid)
+{
 }
