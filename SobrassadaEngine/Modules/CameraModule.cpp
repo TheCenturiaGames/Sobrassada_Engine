@@ -32,7 +32,7 @@ bool CameraModule::Init()
     camera.up                        = float3::unitY;
 
     camera.nearPlaneDistance         = 0.1f;
-    camera.farPlaneDistance          = 6000.f;
+    camera.farPlaneDistance          = 1500.f;
 
     camera.horizontalFov             = (float)HFOV / RAD_DEGREE_CONV;
 
@@ -336,18 +336,4 @@ void CameraModule::FocusCamera()
     camera.front       = (center - newPosition).Normalized();
 
     viewMatrix         = camera.ViewMatrix();
-}
-
-void CameraModule::SetOrthographic()
-{
-    camera.type               = FrustumType::OrthographicFrustum;
-    camera.orthographicWidth = App->GetWindowModule()->GetWidth();
-    camera.orthographicHeight = App->GetWindowModule()->GetHeight();
-    projectionMatrix = camera.ProjectionMatrix();
-}
-
-void CameraModule::SetPerspective()
-{
-    camera.type = FrustumType::PerspectiveFrustum;
-    projectionMatrix = camera.ProjectionMatrix();
 }

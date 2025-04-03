@@ -37,12 +37,12 @@ void CanvasComponent::Init()
 
     localComponentAABB = AABB(
         float3(
-            parent->GetGlobalTransform().TranslatePart().x - (width / 2.0f),
-            parent->GetGlobalTransform().TranslatePart().y - (height / 2.0f), 0
+            parent->GetGlobalTransform().TranslatePart().x - (width / 4.0f),
+            parent->GetGlobalTransform().TranslatePart().y - (height / 4.0f), 0
         ),
         float3(
-            parent->GetGlobalTransform().TranslatePart().x + (width / 2.0f),
-            parent->GetGlobalTransform().TranslatePart().y + (height / 2.0f), 0
+            parent->GetGlobalTransform().TranslatePart().x + (width / 4.0f),
+            parent->GetGlobalTransform().TranslatePart().y + (height / 4.0f), 0
         )
     );
 }
@@ -149,17 +149,17 @@ void CanvasComponent::RenderEditorInspector()
 
 void CanvasComponent::OnWindowResize(const unsigned int width, const unsigned int height)
 {
-    this->width        = width;
-    this->height       = height;
+    this->width        = (float)width;
+    this->height       = (float)height;
 
     localComponentAABB = AABB(
         float3(
-            parent->GetGlobalTransform().TranslatePart().x - (width / 2.0f),
-            parent->GetGlobalTransform().TranslatePart().y - (height / 2.0f), 0
+            parent->GetGlobalTransform().TranslatePart().x - (width / 4.0f),
+            parent->GetGlobalTransform().TranslatePart().y - (height / 4.0f), 0
         ),
         float3(
-            parent->GetGlobalTransform().TranslatePart().x + (width / 2.0f),
-            parent->GetGlobalTransform().TranslatePart().y + (height / 2.0f), 0
+            parent->GetGlobalTransform().TranslatePart().x + (width / 4.0f),
+            parent->GetGlobalTransform().TranslatePart().y + (height / 4.0f), 0
         )
     );
 

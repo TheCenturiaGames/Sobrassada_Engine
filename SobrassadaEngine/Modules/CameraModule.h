@@ -50,9 +50,6 @@ class CameraModule : public Module
 
     void SetAspectRatio(float newAspectRatio);
 
-    void SetOrthographic();
-    void SetPerspective();
-
   private:
     void Controls(float deltaTime);
     void TriggerFocusCamera();
