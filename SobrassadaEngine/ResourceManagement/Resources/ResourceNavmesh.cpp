@@ -428,16 +428,13 @@ void ResourceNavMesh::CreateDetourData()
 void ResourceNavMesh::RenderNavmeshEditor()
 {
 
-    ImGui::DragFloat("Cell Size", &config->cs, 0.1f, 0.1f, 2);
-    ImGui::DragFloat("Cell Height", &config->ch, 0.1f, 0.1f, 2);
+    ImGui::SliderFloat("Cell Size", &config->cs, 0.1f, 1.0f);
+    ImGui::SliderFloat("Cell Height", &config->ch, 0.1f, 1.0f);
 
-    ImGui::DragInt("Max Navmesh Width", &config->width, 1, 10, 10000);
-    ImGui::DragInt("Max Navmesh Height", &config->height, 1, 10, 10000);
-
-    ImGui::DragFloat("Max Walkable Slope Angle", &config->walkableSlopeAngle, 0.1f, 0.f, 90.f);
-    ImGui::DragInt("Max Walkable Climb", &config->walkableClimb, 1, 1, 100);
-    ImGui::DragInt("Max Walkable Height", &config->walkableHeight, 1, 1, 100);
-    ImGui::DragInt("Agent raidus", &config->walkableRadius, 1, 1, 100);
+    ImGui::SliderFloat("Max Walkable Slope Angle", &config->walkableSlopeAngle, 0.f, 90.f);
+    ImGui::SliderInt("Max Walkable Climb", &config->walkableClimb, 1, 100);
+    ImGui::SliderInt("Max Walkable Height", &config->walkableHeight, 1, 100);
+    ImGui::SliderInt("Agent Radius", &config->walkableRadius, 1, 100);
 
     SamplePartitionType currentSelection = SamplePartitionType ::SAMPLE_PARTITION_MONOTONE;
     int currentIndex                            = static_cast<int>(currentSelection);
@@ -451,25 +448,21 @@ void ResourceNavMesh::RenderNavmeshEditor()
         partitionType    = currentSelection;
     }
 
-    ImGui::DragInt("Minimum Region Area", &config->minRegionArea, 1, 1, 100);
-    ImGui::DragInt("Merge Region Area", &config->mergeRegionArea, 10, 10, 100);
+    ImGui::SliderInt("Minimum Region Area", &config->minRegionArea, 1, 100);
+    ImGui::SliderInt("Merge Region Area", &config->mergeRegionArea, 10, 100);
 
-    ImGui::DragFloat("Max Simplification Error", &config->maxSimplificationError, 0.1f, 0.1f, 5);
-    ImGui::DragInt("Max Edges Length", &config->maxEdgeLen, 1, 1, 100);
-    ImGui::DragInt("Max Vertices Per Polygon", &config->maxVertsPerPoly, 1, 1, 100);
+    ImGui::SliderFloat("Max Simplification Error", &config->maxSimplificationError, 0.1f, 5.0f);
+    ImGui::SliderInt("Max Edges Length", &config->maxEdgeLen, 1, 100);
+    ImGui::SliderInt("Max Vertices Per Polygon", &config->maxVertsPerPoly, 1, 100);
 
-    ImGui::DragFloat(
-        "Detail Sample Distance (hiher - more accurate but slower)", &config->detailSampleDist, 0.1f, 0.1f, 5
-    );
-    ImGui::DragFloat(
-        "Detail Sample Max Error (higher - smoother but less accurate)", &config->detailSampleMaxError, 0.1f, 0.1f, 5
-    );
+    ImGui::SliderFloat("Detail Sample Distance", &config->detailSampleDist, 0.1f, 5.0f);
+    ImGui::SliderFloat("Detail Sample Max Error", &config->detailSampleMaxError, 0.1f, 5.0f);
 
-    ImGui::Checkbox("Filter Low hanging Obstacles", &m_filterLowHangingObstacles);
+    ImGui::Checkbox("Filter Low Hanging Obstacles", &m_filterLowHangingObstacles);
     ImGui::Checkbox("Filter Ledge Spans", &m_filterLedgeSpans);
     ImGui::Checkbox("Filter Walkable Low Height Spans", &m_filterWalkableLowHeightSpans);
 
-    ImGui::DragFloat("Detour Agent Height", &m_agentHeight, 0.1f, 0.1f, 5);
-    ImGui::DragFloat("Detour Max Agent Climb", &m_agentMaxClimb, 0.1f, 0.1f, 5);
-    ImGui::DragFloat("Detour Agent Radius", &m_agentRadius, 0.1f, 0.1f, 5);
+    ImGui::SliderFloat("Detour Agent Height", &m_agentHeight, 0.1f, 5.0f);
+    ImGui::SliderFloat("Detour Max Agent Climb", &m_agentMaxClimb, 0.1f, 5.0f);
+    ImGui::SliderFloat("Detour Agent Radius", &m_agentRadius, 0.1f, 5.0f);
 }
