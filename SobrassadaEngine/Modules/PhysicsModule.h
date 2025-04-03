@@ -35,12 +35,15 @@ class PhysicsModule : public Module
     //TODO READ FROM CONFIG FILE
     void LoadLayerData();
     void EmptyWorld();
+    void RebuildWorld();
 
     void CreateCubeRigidBody(CubeColliderComponent* colliderComponent);
     void UpdateCubeRigidBody(CubeColliderComponent* colliderComponent);
     void DeleteCubeRigidBody(CubeColliderComponent* colliderComponent);
 
     float GetGravity() const { return gravity; }
+    std::vector<LayerBitset>& GetLayerConfig() { return colliderLayerConfig; }
+
 
     void SetGravity(float newGravity)
     {

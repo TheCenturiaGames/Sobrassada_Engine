@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "BulletDebugDraw.h"
+#include "GameObject.h"
 #include "SceneModule.h"
 #include "Standalone/Physics/CubeColliderComponent.h"
 
@@ -229,5 +230,15 @@ void PhysicsModule::EmptyWorld()
         btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[i];
         dynamicsWorld->removeCollisionObject(obj);
         delete obj;
+    }
+}
+
+void PhysicsModule::RebuildWorld()
+{
+    const auto& allGameObjects = App->GetSceneModule()->GetScene()->GetAllGameObjects();
+
+    for (const auto& gameObject : allGameObjects)
+    {
+        gameObject.second->UpdateComponents();
     }
 }
