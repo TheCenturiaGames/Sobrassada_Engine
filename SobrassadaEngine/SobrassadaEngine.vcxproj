@@ -281,6 +281,7 @@
     <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourPathCorridor.cpp" />
     <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourPathQueue.cpp" />
     <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourProximityGrid.cpp" />
+    <ClCompile Include="Modules\PathfinderModule.cpp" />
     <ClCompile Include="Scene\Components\Standalone\AIAgentComponent.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceStateMachine.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceNavmesh.cpp" />
@@ -442,6 +443,7 @@
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_extra_math.h" />
     <ClInclude Include="FileSystem\StateMachineManager.h" />
     <ClInclude Include="FileSystem\Importers\NavmeshImporter.h" />
+    <ClInclude Include="Modules\PathfinderModule.h" />
     <ClInclude Include="Scene\Components\Standalone\AIAgentComponent.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceStateMachine.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceNavmesh.h" />
