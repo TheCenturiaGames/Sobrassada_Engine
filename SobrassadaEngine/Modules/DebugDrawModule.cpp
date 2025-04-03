@@ -11,8 +11,10 @@
 #include "Quadtree.h"
 #include "SceneModule.h"
 #include "ResourcesModule.h"
+#include "ResourceNavmesh.h"
 #include "DetourNavMesh.h"
 #include "DetourNavMeshQuery.h"
+
 
 #include "SDL_video.h"
 #define DEBUG_DRAW_IMPLEMENTATION
@@ -765,11 +767,11 @@ void DebugDrawModule::HandleDebugRenderOptions()
     }
     if (debugOptionValues[(int)DebugOptions::RENDER_NAVMESH])
     {
-        if (App->GetResourcesModule()->GetNavMesh())
+        if (const ResourceNavMesh* navmesh = App->GetResourcesModule()->GetNavMesh())
         {
             DrawNavMesh(
-                App->GetResourcesModule()->GetNavMesh()->GetDetourNavMesh(),
-                App->GetResourcesModule()->GetNavMesh()->GetDetourNavMeshQuery(), DRAWNAVMESH_COLOR_TILES
+                navmesh->GetDetourNavMesh(),
+                navmesh->GetDetourNavMeshQuery(), DRAWNAVMESH_COLOR_TILES
             );
         }
     }

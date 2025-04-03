@@ -12,6 +12,7 @@
 #include "ProjectModule.h"
 #include "SceneImporter.h"
 #include "ResourcesModule.h"
+#include "ResourceNavmesh.h"
 #include "SceneModule.h"
 #include "ScriptModule.h"
 #include "TextureEditor.h"

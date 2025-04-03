@@ -1,14 +1,16 @@
 #include "ResourceNavMesh.h"
+
 #include "Application.h"
 #include "DebugDrawModule.h"
-#include "DetourNavMeshBuilder.h"
-#include "DetourNavMeshQuery.h"
 #include "EditorUIModule.h"
 #include "FileSystem/Mesh.h"
-#include "Recast.h"
-#include "ResourceMesh.h"
-#include "ResourcesModule.h"
-#include "algorithm"
+
+#include <DetourNavMeshBuilder.h>
+#include <DetourNavMeshQuery.h>
+#include <Recast.h>
+#include <ResourceMesh.h>
+#include <ResourcesModule.h>
+#include <algorithm>
 
 ResourceNavMesh::~ResourceNavMesh()
 {
@@ -126,7 +128,7 @@ bool ResourceNavMesh::BuildNavMesh(
         const std::vector<Vertex>& meshVerts         = mesh.first->GetLocalVertices();
         const std::vector<unsigned int>& meshIndices = mesh.first->GetIndices();
 
-        int vertexCount                              = mesh.first->GetVertexCount();
+        const int vertexCount                              = mesh.first->GetVertexCount();
 
         for (const Vertex& vertex : meshVerts)
         {
@@ -349,6 +351,7 @@ bool ResourceNavMesh::BuildNavMesh(
     return true;
 }
 
+
 void ResourceNavMesh::CreateDetourData()
 {
     if (!polymesh) return;
@@ -436,11 +439,11 @@ void ResourceNavMesh::RenderNavmeshEditor()
     ImGui::DragInt("Max Walkable Height", &config->walkableHeight, 1, 1, 100);
     ImGui::DragInt("Agent raidus", &config->walkableRadius, 1, 1, 100);
 
-    static SamplePartitionType currentSelection = SamplePartitionType ::SAMPLE_PARTITION_MONOTONE;
+    SamplePartitionType currentSelection = SamplePartitionType ::SAMPLE_PARTITION_MONOTONE;
     int currentIndex                            = static_cast<int>(currentSelection);
 
     const char* partitionLabels[]               = {
-        "SIMPLE_PARTITION_WATERSHED", "SAMPLE_PARTITION_MONOTONE", "SIMEPLE_PARTITION_LAYERS"
+        "SAMPLE_PARTITION_WATERSHED", "SAMPLE_PARTITION_MONOTONE", "SAMPLE_PARTITION_LAYERS"
     };
     if (ImGui::ListBox("Partition Type", &currentIndex, partitionLabels, IM_ARRAYSIZE(partitionLabels)))
     {
