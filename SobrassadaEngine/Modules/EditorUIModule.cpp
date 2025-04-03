@@ -41,7 +41,7 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"Transform 2D",         COMPONENT_TRANSFORM_2D        },
         {"UI Canvas",            COMPONENT_CANVAS              },
         {"UI Label",             COMPONENT_LABEL               },
-        {"Camera",               COMPONENT_CAMERA              }
+        {"Camera",               COMPONENT_CAMERA              },
         {"Script",               COMPONENT_SCRIPT              }
     };
     fullscreen    = FULLSCREEN;
