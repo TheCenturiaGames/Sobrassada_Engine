@@ -48,8 +48,6 @@ namespace SceneImporter
             for (const auto& primitive : srcMesh.primitives)
             {
                 std::string name = srcMesh.name + std::to_string(n);
-                UID meshUID      = MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath, targetFilePath);
-                n++;
 
                 UID matUID   = INVALID_UID;
                 matIndex = primitive.material;
@@ -66,10 +64,7 @@ namespace SceneImporter
                 {
                     matUID = matIndices[matIndex];
                 }
-                else if (it != matIndices.end()) matUID = it->second;
-                else GLOG("Material index invalid")
                 
-                std::string name = srcMesh.name + std::to_string(n);
                 UID meshUID      = MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath, targetFilePath, INVALID_UID, matUID);
                 n++;
                 
