@@ -19,8 +19,8 @@ struct NavMeshTileHeader
     int dataSize;
 };
 
-static const int NAVMESHSET_MAGIC   = 'S' << 24 | 'O' << 16 | 'B' << 8 | 'R';
-static const int NAVMESHSET_VERSION = 1;
+const int NAVMESHSET_MAGIC   = 'S' << 24 | 'O' << 16 | 'B' << 8 | 'R';
+const int NAVMESHSET_VERSION = 1;
 
 UID NavmeshImporter::SaveNavmesh(const char* name, const dtNavMesh& navmesh)
 {
