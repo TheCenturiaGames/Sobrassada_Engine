@@ -408,6 +408,7 @@ void StateMachineEditor::BuildGraph()
             }
         }
     }
+    GLOG("Total de enlaces en graph después de añadirlos: %d", graph->getLinks().size());
 }
 
 void StateMachineEditor::DetectNewTransitions()
@@ -583,22 +584,13 @@ void StateMachineEditor::RemoveStateNode(StateNode& node)
             resource->RemoveTransition(transition.fromState.GetString(), transition.toState.GetString());
         }
     }
-    for (const auto& state : resource->states)
-    {
-        if (state.name == stateName)
-        {
-            clipName = state.clipName.GetString();
-            resource->RemoveState(state.name.GetString());
-        }
-    }
+    
+    auto state = resource->GetState(stateName);
+    clipName   = state->clipName.GetString();
+    resource->RemoveState(state->name.GetString());
 
-    for (const auto& clip : resource->clips)
-    {
-        if (clip.clipName == clipName)
-        {
-            resource->RemoveClip(clip.clipName.GetString());
-        }
-    }
+    auto clip   = resource->GetClip(clipName);
+    resource->RemoveClip(clip->clipName.GetString());
 
     auto& nodes = graph->getNodes();
 
