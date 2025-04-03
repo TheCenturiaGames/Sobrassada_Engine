@@ -24,6 +24,7 @@ class GameObject
     GameObject(std::string name);
     GameObject(UID parentUID, std::string name);
     GameObject(UID parentUID, GameObject* refObject);
+    GameObject(const GameObject& other);
 
     GameObject(const rapidjson::Value& initialState);
 

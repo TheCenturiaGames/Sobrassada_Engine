@@ -115,6 +115,34 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
     }
 }
 
+GameObject::GameObject(const GameObject& other)
+    : name(other.name), parentUID(other.parentUID), prefabUID(other.prefabUID), position(other.position),
+      rotation(other.rotation), scale(other.scale), localTransform(other.localTransform),
+      globalTransform(other.globalTransform), drawNodes(other.drawNodes), mobilitySettings(other.mobilitySettings)
+{
+    uid       = GenerateUID();
+
+    localAABB = AABB();
+    localAABB.SetNegativeInfinity();
+
+    globalOBB  = OBB(localAABB);
+    globalAABB = AABB(globalOBB);
+
+    for (const auto& component : other.components)
+    {
+        CreateComponent(component.first);
+        Component* newComponent = GetComponentByType(component.first);
+        if (newComponent && component.second)
+        {
+            newComponent->Clone(component.second);
+        }
+    }
+
+    OnAABBUpdated();
+}
+
+
+
 GameObject::~GameObject()
 {
     for (auto& component : components)
@@ -373,12 +401,18 @@ Component* GameObject::GetComponentByType(ComponentType type) const
 
 MeshComponent* GameObject::GetMeshComponent() const
 {
-    if (components.find(COMPONENT_MESH) != components.end())
+    auto it = components.find(COMPONENT_MESH);
+    if (it != components.end())
     {
-        return dynamic_cast<MeshComponent*>(components.at(COMPONENT_MESH));
+        Component* comp = it->second;
+
+        GLOG("GetMeshComponent: base pointer = %p", comp);
+
+        return dynamic_cast<MeshComponent*>(comp);
     }
     return nullptr;
 }
+
 
 void GameObject::OnTransformUpdated()
 {

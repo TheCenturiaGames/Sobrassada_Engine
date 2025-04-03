@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EngineEditors/EngineEditorBase.h"
+#include "PrefabPortView.h"
 
 class ResourcePrefab;
 class GameObject;
@@ -18,4 +19,7 @@ class PrefabEditor : public EngineEditorBase
     void DrawHierarchyRecursive(GameObject* go);
 
     GameObject* selectedGameObject = nullptr;
+    std::unique_ptr<PrefabPortView> portView;
+
+    bool openPrefabViewer = false;
 };

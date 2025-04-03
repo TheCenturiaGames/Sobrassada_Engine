@@ -9,7 +9,9 @@
 
 PrefabEditor::PrefabEditor(const std::string& editorName, UID uid) : EngineEditorBase(editorName, uid)
 {
+    portView = std::make_unique<PrefabPortView>(); // crea el portview
 }
+
 
 PrefabEditor::~PrefabEditor()
 {
@@ -18,9 +20,10 @@ PrefabEditor::~PrefabEditor()
 bool PrefabEditor::RenderEditor()
 {
     if (!EngineEditorBase::RenderEditor()) return false;
-    ImGui::Begin(name.c_str());
-    const auto& prefabMap = App->GetLibraryModule()->GetPrefabMap();
 
+    ImGui::Begin(name.c_str());
+
+    const auto& prefabMap = App->GetLibraryModule()->GetPrefabMap();
     if (prefabMap.empty())
     {
         ImGui::Text("No prefabs loaded.");
@@ -44,37 +47,30 @@ bool PrefabEditor::RenderEditor()
         if (ImGui::Selectable(name.c_str(), selectedPrefab == prefab))
         {
             selectedPrefab = prefab;
+            portView->SetPrefab(prefab);
         }
     }
 
+
     if (selectedPrefab)
     {
-        bool openPrefabViewer = true; // member variable?
-        if (ImGui::Begin("Prefab Viewer", &openPrefabViewer))
+        if (!openPrefabViewer)
+        {
+            openPrefabViewer = true;
+            portView->SetPrefab(selectedPrefab); // només quan s'obre la finestra
+        }
+
+        if (openPrefabViewer && ImGui::Begin("Prefab Viewer", &openPrefabViewer))
         {
             ImVec2 windowSize = ImGui::GetContentRegionAvail();
-
-            //Divide: left (portview) i right (herarchy + properties)
             float leftWidth   = windowSize.x * 0.6f;
             float rightWidth  = windowSize.x - leftWidth;
 
             ImGui::BeginChild("Left_Preview", ImVec2(leftWidth, windowSize.y), true);
             {
                 ImGui::Text("Portview");
-
-                ImVec2 size = ImVec2(leftWidth - 20, leftWidth - 20); // Square
-
-                // previewtexture
-                // ImGui::Image(previewTexture, size);
-
-                
-                ImGui::Dummy(size);
-                ImGui::GetWindowDrawList()->AddRect(
-                    ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), IM_COL32(255, 255, 255, 255) // white line
-                );
-                ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10);
-                ImGui::Text("No preview available.");
-
+                portView->Update(0.016f);
+                portView->RenderContent();
             }
             ImGui::EndChild();
 
@@ -89,11 +85,10 @@ bool PrefabEditor::RenderEditor()
                 {
                     ImGui::Text("Hierarchy");
                     treeHierarchyView();
-                    // Tree gameobjects
                 }
                 ImGui::EndChild();
 
-               ImGui::BeginChild("Properties", ImVec2(rightWidth, propsHeight), true);
+                ImGui::BeginChild("Properties", ImVec2(rightWidth, propsHeight), true);
                 {
                     if (selectedGameObject)
                     {
@@ -109,16 +104,25 @@ bool PrefabEditor::RenderEditor()
                 ImGui::EndChild();
             }
             ImGui::EndChild();
+
+            ImGui::End(); // Prefab Viewer
         }
-        ImGui::End();
 
+        // Quan la finestra es tanca, netejem tot
+        if (!openPrefabViewer)
+        {
+            selectedPrefab     = nullptr;
+            selectedGameObject = nullptr;
+            portView->SetPrefab(nullptr);
+        }
     }
-
 
 
     ImGui::End();
     return true;
 }
+
+
 
 void PrefabEditor::treeHierarchyView()
 {

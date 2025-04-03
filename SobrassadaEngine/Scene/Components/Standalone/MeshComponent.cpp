@@ -21,6 +21,8 @@ MeshComponent::MeshComponent(const UID uid, GameObject* parent) : Component(uid,
 
 MeshComponent::MeshComponent(const rapidjson::Value& initialState, GameObject* parent) : Component(initialState, parent)
 {
+    GLOG("MeshComponent deserialized: parent UID = %llu", parent ? parent->GetUID() : 0);
+
     if (initialState.HasMember("Mesh"))
     {
         AddMesh(initialState["Mesh"].GetUint64(), false);
@@ -82,13 +84,20 @@ void MeshComponent::Save(rapidjson::Value& targetState, rapidjson::Document::All
 
 void MeshComponent::Clone(const Component* other)
 {
+    GLOG("MeshComponent::Clone - Cloning from type: %d", other->GetType());
     if (other->GetType() == ComponentType::COMPONENT_MESH)
     {
         const MeshComponent* otherMesh = static_cast<const MeshComponent*>(other);
+
         enabled                        = otherMesh->enabled;
 
-        AddMesh(otherMesh->currentMesh->GetUID());
-        AddMaterial(otherMesh->currentMaterial->GetUID());
+        if (otherMesh->currentMesh != nullptr)
+        {
+            GLOG("Cloning mesh UID: %llu", otherMesh->currentMesh->GetUID());
+        }
+
+        AddMesh(otherMesh->currentMesh ? otherMesh->currentMesh->GetUID() : INVALID_UID);
+        AddMaterial(otherMesh->currentMaterial ? otherMesh->currentMaterial->GetUID() : INVALID_UID);
 
         modelUID     = otherMesh->modelUID;
         skinIndex    = otherMesh->skinIndex;
@@ -96,9 +105,10 @@ void MeshComponent::Clone(const Component* other)
     }
     else
     {
-        GLOG("It is not possible to clone a component of a different type!");
+        GLOG("ERROR: MeshComponent::Clone - Tried to clone from component of different type (%d)", other->GetType());
     }
 }
+
 
 void MeshComponent::RenderEditorInspector()
 {
@@ -148,20 +158,34 @@ void MeshComponent::Render(float deltaTime)
 {
     if (enabled && currentMesh != nullptr)
     {
+        GLOG("MeshComponent::Render - currentMesh = %p", currentMesh);
+        GLOG("MeshComponent::Render - currentMaterial = %p", currentMaterial);
+
         unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
         int program            = App->GetShaderModule()->GetMetallicRoughnessProgram();
 
         if (currentMaterial != nullptr)
         {
+            GLOG(
+                "MeshComponent::Render - Material is MetallicRoughness: %d", currentMaterial->GetIsMetallicRoughness()
+            );
             if (!currentMaterial->GetIsMetallicRoughness())
                 program = App->GetShaderModule()->GetSpecularGlossinessProgram();
         }
+
         if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
             cameraUBO = App->GetSceneModule()->GetScene()->GetMainCamera()->GetUbo();
 
+        GLOG("MeshComponent::Render - calling currentMesh->Render()");
+
         currentMesh->Render(program, combinedMatrix, cameraUBO, currentMaterial, bones, bindMatrices);
     }
+    else
+    {
+        GLOG("MeshComponent::Render - Skipped. Enabled: %d, currentMesh: %p", enabled, currentMesh);
+    }
 }
+
 
 void MeshComponent::InitSkin()
 {

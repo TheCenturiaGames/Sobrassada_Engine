@@ -48,25 +48,38 @@ Component* ComponentUtils::CreateExistingComponent(const rapidjson::Value& initi
 {
     if (initialState.HasMember("Type"))
     {
+        Component* newComponent = nullptr;
+
         switch (initialState["Type"].GetInt())
         {
         case COMPONENT_NONE:
             return nullptr;
         case COMPONENT_MESH:
-            return new MeshComponent(initialState, parent);
+            newComponent = new MeshComponent(initialState, parent);
+            break;
         case COMPONENT_POINT_LIGHT:
-            return new PointLightComponent(initialState, parent);
+            newComponent = new PointLightComponent(initialState, parent);
+            break;
         case COMPONENT_SPOT_LIGHT:
-            return new SpotLightComponent(initialState, parent);
+            newComponent = new SpotLightComponent(initialState, parent);
+            break;
         case COMPONENT_DIRECTIONAL_LIGHT:
-            return new DirectionalLightComponent(initialState, parent);
+            newComponent = new DirectionalLightComponent(initialState, parent);
+            break;
         case COMPONENT_CHARACTER_CONTROLLER:
-            return new CharacterControllerComponent(initialState, parent);
+            newComponent = new CharacterControllerComponent(initialState, parent);
+            break;
         case COMPONENT_CAMERA:
-            return new CameraComponent(initialState, parent);
+            newComponent = new CameraComponent(initialState, parent);
+            break;
         default:
             return nullptr;
         }
+
+        if (newComponent != nullptr)
+            GLOG("Created component of type: %d (%s)", newComponent->GetType(), typeid(*newComponent).name());
+
+        return newComponent;
     }
     return nullptr;
 }
