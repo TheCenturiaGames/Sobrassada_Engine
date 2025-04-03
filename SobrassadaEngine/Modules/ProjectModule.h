@@ -1,9 +1,11 @@
 ﻿#pragma once
-#include "Config/ProjectConfig.h"
+
 #include "Module.h"
 
 #include <string>
 #include <vector>
+
+class ProjectConfig;
 
 class ProjectModule : public Module
 {

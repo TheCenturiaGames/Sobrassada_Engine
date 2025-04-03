@@ -387,6 +387,18 @@
     <ClCompile Include="FileSystem\StateMachineManager.cpp">
       <Filter>FileSystem</Filter>
     </ClCompile>
+    <ClCompile Include="Modules\ScriptModule.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\ScriptComponent.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\Batching\BatchManager.cpp">
+      <Filter>FileSystem\Batching</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\Batching\GeometryBatch.cpp">
+      <Filter>FileSystem\Batching</Filter>
+    </ClCompile>
     <ClCompile Include="UI\EngineEditors\Editor\StateMachineEditor.cpp">
       <Filter>UI\EngineEditors</Filter>
     </ClCompile>
@@ -463,6 +475,9 @@
     </Filter>
     <Filter Include="FileSystem\Importers">
       <UniqueIdentifier>{16f8a1d8-a659-4cc6-8af0-fff819224bf0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FileSystem\Batching">
+      <UniqueIdentifier>{bf8dc33a-6c9e-43fb-bb6c-b5055f64ed3c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -724,6 +739,21 @@
     </ClInclude>
     <ClInclude Include="FileSystem\Config\ProjectConfig.h">
       <Filter>FileSystem\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Script.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\ScriptModule.h">
+      <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\ScriptComponent.h">
+      <Filter>Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\Batching\BatchManager.h">
+      <Filter>FileSystem\Batching</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\Batching\GeometryBatch.h">
+      <Filter>FileSystem\Batching</Filter>
     </ClInclude>
     <ClInclude Include="UI\EngineEditors\Editor\StateMachineEditor.h">
       <Filter>UI\EngineEditors</Filter>

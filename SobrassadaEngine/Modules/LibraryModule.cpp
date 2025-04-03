@@ -11,11 +11,10 @@
 #include "TextureImporter.h"
 #include "FileSystem/StateMachineManager.h"
 
-#include "Libs/rapidjson/stringbuffer.h"
-#include "Libs/rapidjson/writer.h"
-#include "document.h"
-#include "prettywriter.h"
-#include "stringbuffer.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/document.h"
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
 #include <filesystem>
 #include <fstream>
 
@@ -62,8 +61,9 @@ bool LibraryModule::SaveScene(const char* path, SaveMode saveMode) const
 
         rapidjson::Value scene(rapidjson::kObjectType);
 
-        if (saveMode == SaveMode::SaveAs) loadedScene->Save(scene, allocator, GenerateUID(), sceneName.c_str());
-        else loadedScene->Save(scene, allocator);
+        if (saveMode == SaveMode::SaveAs)
+            loadedScene->Save(scene, allocator, saveMode, GenerateUID(), sceneName.c_str());
+        else loadedScene->Save(scene, allocator, saveMode);
 
         doc.AddMember("Scene", scene, allocator);
 
@@ -360,8 +360,8 @@ const std::string& LibraryModule::GetResourcePath(UID resourceID) const
     auto it = resourcePathsMap.find(resourceID);
     if (it != resourcePathsMap.end())
     {
-        GLOG("requested uid: %llu", resourceID);
-        GLOG("obtained path: %s", it->second.c_str());
+        //GLOG("requested uid: %llu", resourceID);
+        //GLOG("obtained path: %s", it->second.c_str());
         return it->second;
     }
     static const std::string emptyString = "";
@@ -373,8 +373,8 @@ const std::string& LibraryModule::GetResourceName(UID resourceID) const
     auto it = namesMap.find(resourceID);
     if (it != namesMap.end())
     {
-        GLOG("requested uid: %llu", resourceID);
-        GLOG("obtained name: %s", it->second.c_str());
+        //GLOG("requested uid: %llu", resourceID);
+        //GLOG("obtained name: %s", it->second.c_str());
         return it->second;
     }
     static const std::string emptyString = "";
