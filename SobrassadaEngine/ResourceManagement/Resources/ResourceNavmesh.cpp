@@ -82,8 +82,6 @@ ResourceNavMesh::ResourceNavMesh(UID uid, const std::string& name) : Resource(ui
     m_agentMaxClimb                                     = 0.5f;
     m_agentRadius                                       = 0.5f;
 
-    triAreas                                            = nullptr;
-
     navQuery                                            = dtAllocNavMeshQuery();
 }
 // add together all meshes to create navmesh - needs the direction to a vector of resourcemesh pointers
@@ -96,7 +94,7 @@ bool ResourceNavMesh::BuildNavMesh(
     int allTriangleCount = 0;
     int indexOffset      = 0;
 
-    context              = new rcContext();
+    rcContext* context   = new rcContext();
 
     // first pass to get necessary sizes and AABB
     for (const auto& mesh : meshes)
@@ -128,7 +126,7 @@ bool ResourceNavMesh::BuildNavMesh(
         const std::vector<Vertex>& meshVerts         = mesh.first->GetLocalVertices();
         const std::vector<unsigned int>& meshIndices = mesh.first->GetIndices();
 
-        const int vertexCount                              = mesh.first->GetVertexCount();
+        const int vertexCount                        = mesh.first->GetVertexCount();
 
         for (const Vertex& vertex : meshVerts)
         {
@@ -165,7 +163,7 @@ bool ResourceNavMesh::BuildNavMesh(
         return false;
     }
 
-    triAreas = new unsigned char[allTriangleCount]();
+    unsigned char* triAreas = new unsigned char[allTriangleCount]();
 
     rcMarkWalkableTriangles(
         context, config->walkableSlopeAngle, navmeshVertices.data(), allVertexCount, navmeshTriangles.data(),
@@ -351,7 +349,6 @@ bool ResourceNavMesh::BuildNavMesh(
     return true;
 }
 
-
 void ResourceNavMesh::CreateDetourData()
 {
     if (!polymesh) return;
@@ -437,9 +434,9 @@ void ResourceNavMesh::RenderNavmeshEditor()
     ImGui::SliderInt("Agent Radius", &config->walkableRadius, 1, 100);
 
     SamplePartitionType currentSelection = SamplePartitionType ::SAMPLE_PARTITION_MONOTONE;
-    int currentIndex                            = static_cast<int>(currentSelection);
+    int currentIndex                     = static_cast<int>(currentSelection);
 
-    const char* partitionLabels[]               = {
+    const char* partitionLabels[]        = {
         "SAMPLE_PARTITION_WATERSHED", "SAMPLE_PARTITION_MONOTONE", "SAMPLE_PARTITION_LAYERS"
     };
     if (ImGui::ListBox("Partition Type", &currentIndex, partitionLabels, IM_ARRAYSIZE(partitionLabels)))

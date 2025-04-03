@@ -63,7 +63,6 @@ class ResourceNavMesh : public Resource
 
   private:
     rcConfig* config                         = nullptr;
-    rcContext* context                       = nullptr;
     rcHeightfield* heightfield               = nullptr;
     rcCompactHeightfield* compactHeightfield = nullptr;
     rcContourSet* contourSet                 = nullptr;
@@ -79,8 +78,6 @@ class ResourceNavMesh : public Resource
     float m_agentMaxClimb;
     float m_agentHeight;
     float m_agentRadius;
-
-    unsigned char* triAreas;
 
     int partitionType;
 };

@@ -21,6 +21,7 @@ ResourcesModule::ResourcesModule()
 ResourcesModule::~ResourcesModule()
 {
     delete batchManager;
+    delete tmpNavmesh;
 }
 
 bool ResourcesModule::Init()
@@ -34,7 +35,6 @@ bool ResourcesModule::ShutDown()
 {
     UnloadAllResources();
     batchManager->UnloadAllBatches();
-    delete tmpNavmesh;
     return true;
 }
 
