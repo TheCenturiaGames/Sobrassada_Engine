@@ -270,6 +270,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\Physics\SphereColliderComponent.cpp" />
     <ClCompile Include="Utils\Physics\BulletMotionState.cpp" />
     <ClCompile Include="Scene\Components\Standalone\Physics\CubeColliderComponent.cpp" />
     <ClCompile Include="DebugDraw\BulletDebugDraw.cpp" />
@@ -430,7 +431,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
-    <ClInclude Include="BulletUserPointer.h" />
+    <ClInclude Include="Utils\Physics\BulletUserPointer.h" />
+    <ClInclude Include="Scene\Components\Standalone\Physics\SphereColliderComponent.h" />
     <ClInclude Include="Utils\Physics\BulletMotionState.h" />
     <ClInclude Include="Scene\Components\Standalone\Physics\CubeColliderComponent.h" />
     <ClInclude Include="DebugDraw\BulletDebugDraw.h" />

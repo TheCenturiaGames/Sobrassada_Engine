@@ -18,11 +18,12 @@ enum class DebugOptions : uint8_t
     RENDER_OBB,
     RENDER_OCTREE,
     RENDER_DYNAMICTREE,
-    RENDER_CAMERA_RAY
+    RENDER_CAMERA_RAY,
+    RENDER_PHYSICS_WORLD
 };
 
 constexpr const char* DebugStrings[] = {"Render Lights", "Render Wireframe", "AABB",      "OBB",
-                                        "Octree",        "Dynamic Tree",     "Camera Ray"};
+                                        "Octree",        "Dynamic Tree",     "Camera Ray", "Physics World"};
 
 class DebugDrawModule : public Module
 {

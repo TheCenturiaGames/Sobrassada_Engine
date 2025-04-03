@@ -375,6 +375,8 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
                     App->GetDebugDrawModule()->FlipDebugOptionValue(i);
                     if (i == (int)DebugOptions::RENDER_WIREFRAME)
                         App->GetOpenGLModule()->SetRenderWireframe(currentBitValue);
+                    else if(i == (int)DebugOptions::RENDER_PHYSICS_WORLD)
+                        App->GetPhysicsModule()->SetDebugOption(currentBitValue);
                 }
             }
 

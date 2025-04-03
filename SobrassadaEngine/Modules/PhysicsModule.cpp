@@ -2,9 +2,11 @@
 
 #include "Application.h"
 #include "BulletDebugDraw.h"
+#include "DebugDrawModule.h"
 #include "GameObject.h"
 #include "SceneModule.h"
 #include "Standalone/Physics/CubeColliderComponent.h"
+#include "Standalone/Physics/SphereColliderComponent.h"
 
 #include "Math/float3.h"
 #include "btBulletDynamicsCommon.h"
@@ -19,7 +21,7 @@ PhysicsModule::PhysicsModule()
 
     debugDraw              = new BulletDebugDraw();
 
-    debugDraw->setDebugMode(2);
+    debugDraw->setDebugMode(0);
 
     dynamicsWorld->setGravity(btVector3(0, gravity, 0));
     dynamicsWorld->setDebugDrawer(debugDraw);
@@ -115,7 +117,6 @@ void PhysicsModule::CreateCubeRigidBody(CubeColliderComponent* colliderComponent
         btScalar(colliderComponent->size.x), btScalar(colliderComponent->size.y), btScalar(colliderComponent->size.z)
     ));
 
-    // DYNAMIC -> THIS WILL COME FROM ENUM INSIDE COMPONENT
     bool isDynamic                   = (colliderComponent->mass != 0.f);
 
     // Inertia
@@ -153,7 +154,53 @@ void PhysicsModule::DeleteCubeRigidBody(CubeColliderComponent* colliderComponent
     colliderComponent->rigidBody = nullptr;
 }
 
-// TODO UPDATE WITH CHANNELS
+void PhysicsModule::CreateSphereRigidBody(SphereColliderComponent* colliderComponent)
+{
+    // Collision shape
+    btCollisionShape* collisionShape = new btSphereShape(colliderComponent->radius);
+
+    bool isDynamic                   = (colliderComponent->mass != 0.f);
+
+    // Inertia
+    btVector3 localInertia(1, 0, 0);
+    if (isDynamic) collisionShape->calculateLocalInertia(colliderComponent->mass, localInertia);
+
+    // MotionState for RENDER AND
+    colliderComponent->motionState = BulletMotionState(
+        colliderComponent, colliderComponent->centerOffset, colliderComponent->centerRotation,
+        colliderComponent->freezeRotation
+    );
+
+    // Creating final RigidBody
+    btRigidBody::btRigidBodyConstructionInfo rbInfo(
+        btScalar(colliderComponent->mass), &colliderComponent->motionState, collisionShape, localInertia
+    );
+    btRigidBody* newRigidBody = new btRigidBody(rbInfo);
+
+    newRigidBody->setUserPointer(&colliderComponent->userPointer);
+
+    colliderComponent->rigidBody = newRigidBody;
+
+    AddRigidBody(newRigidBody, colliderComponent->GetColliderType(), colliderComponent->GetLayer());
+}
+
+void PhysicsModule::UpdateSphereRigidBody(SphereColliderComponent* colliderComponent)
+{
+    DeleteSphereRigidBody(colliderComponent);
+    CreateSphereRigidBody(colliderComponent);
+}
+
+void PhysicsModule::DeleteSphereRigidBody(SphereColliderComponent* colliderComponent)
+{
+    bodiesToRemove.push_back(colliderComponent->rigidBody);
+    colliderComponent->rigidBody = nullptr;
+}
+
+void PhysicsModule::SetDebugOption(int option)
+{
+    debugDraw->setDebugMode(option);
+}
+
 void PhysicsModule::AddRigidBody(btRigidBody* rigidBody, ColliderType colliderType, ColliderLayer layerType)
 {
     switch (colliderType)

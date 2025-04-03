@@ -15,6 +15,7 @@ class BulletDebugDraw;
 class btRigidBody;
 
 class CubeColliderComponent;
+class SphereColliderComponent;
 
 constexpr float DEFAULT_GRAVITY = -9.81f;
 
@@ -42,6 +43,10 @@ class PhysicsModule : public Module
     void UpdateCubeRigidBody(CubeColliderComponent* colliderComponent);
     void DeleteCubeRigidBody(CubeColliderComponent* colliderComponent);
 
+    void CreateSphereRigidBody(SphereColliderComponent* colliderComponent);
+    void UpdateSphereRigidBody(SphereColliderComponent* colliderComponent);
+    void DeleteSphereRigidBody(SphereColliderComponent* colliderComponent);
+
     float GetGravity() const { return gravity; }
     std::vector<LayerBitset>& GetLayerConfig() { return colliderLayerConfig; }
 
@@ -52,9 +57,9 @@ class PhysicsModule : public Module
         updateGravity = true;
     };
 
+    void SetDebugOption(int option);
 
   private:
-    // TODO UPDATE WITH CHANNELS
     void AddRigidBody(btRigidBody* rigidBody, ColliderType colliderType, ColliderLayer layerType);
 
   private:

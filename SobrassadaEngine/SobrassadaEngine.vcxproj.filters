@@ -399,6 +399,9 @@
     <ClCompile Include="Utils\Physics\BulletMotionState.cpp">
       <Filter>Utils\Physics</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\Physics\SphereColliderComponent.cpp">
+      <Filter>Scene\Components\Physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -746,8 +749,11 @@
     <ClInclude Include="Utils\Physics\BulletMotionState.h">
       <Filter>Utils\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="BulletUserPointer.h">
+    <ClInclude Include="Utils\Physics\BulletUserPointer.h">
       <Filter>Utils\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\Physics\SphereColliderComponent.h">
+      <Filter>Scene\Components\Physics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

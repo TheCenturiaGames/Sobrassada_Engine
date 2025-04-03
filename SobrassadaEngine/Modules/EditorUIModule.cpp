@@ -39,7 +39,8 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"Directional Light",    COMPONENT_DIRECTIONAL_LIGHT   },
         {"Character Controller", COMPONENT_CHARACTER_CONTROLLER},
         {"Camera",               COMPONENT_CAMERA              },
-        {"Cube Collider",        COMPONENT_CUBE_COLLIDER       }
+        {"Cube Collider",        COMPONENT_CUBE_COLLIDER       },
+        {"Sphere Collider",      COMPONENT_SPHERE_COLLIDER     }
     };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;

@@ -9,6 +9,7 @@
 #include "Standalone/Lights/SpotLightComponent.h"
 #include "Standalone/MeshComponent.h"
 #include "Standalone/Physics/CubeColliderComponent.h"
+#include "Standalone/Physics/SphereColliderComponent.h"
 
 #include <cstdint>
 
@@ -39,6 +40,9 @@ Component* ComponentUtils::CreateEmptyComponent(const ComponentType type, const 
         break;
     case COMPONENT_CUBE_COLLIDER:
         generatedComponent = new CubeColliderComponent(uid, parent);
+        break;
+    case COMPONENT_SPHERE_COLLIDER:
+        generatedComponent = new SphereColliderComponent(uid, parent);
         break;
     default:
         return nullptr;
@@ -71,6 +75,9 @@ Component* ComponentUtils::CreateExistingComponent(const rapidjson::Value& initi
             return new CameraComponent(initialState, parent);
         case COMPONENT_CUBE_COLLIDER:
             return new CubeColliderComponent(initialState, parent);
+            break;
+        case COMPONENT_SPHERE_COLLIDER:
+            return new SphereColliderComponent(initialState, parent);
             break;
         default:
             return nullptr;
