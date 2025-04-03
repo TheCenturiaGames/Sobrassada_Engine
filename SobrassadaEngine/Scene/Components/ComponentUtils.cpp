@@ -10,6 +10,7 @@
 #include "Standalone/UI/CanvasComponent.h"
 #include "Standalone/UI/Transform2DComponent.h"
 #include "Standalone/UI/UILabelComponent.h"
+#include "ScriptComponent.h"
 
 #include <cstdint>
 
@@ -47,6 +48,9 @@ Component* ComponentUtils::CreateEmptyComponent(const ComponentType type, const 
     case COMPONENT_CAMERA:
         generatedComponent = new CameraComponent(uid, parent);
         break;
+    case COMPONENT_SCRIPT:
+        generatedComponent = new ScriptComponent(uid, parent);
+        break;
     default:
         return nullptr;
     }
@@ -82,6 +86,8 @@ Component* ComponentUtils::CreateExistingComponent(const rapidjson::Value& initi
             return new UILabelComponent(initialState, parent);
         case COMPONENT_CAMERA:
             return new CameraComponent(initialState, parent);
+        case COMPONENT_SCRIPT:
+            return new ScriptComponent(initialState, parent);
         default:
             return nullptr;
         }

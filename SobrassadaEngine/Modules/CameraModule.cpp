@@ -1,15 +1,15 @@
 #include "CameraModule.h"
 
+#include "Application.h"
+#include "GameObject.h"
 #include "InputModule.h"
 #include "ProjectModule.h"
 #include "SceneModule.h"
 #include "WindowModule.h"
-#include <Application.h>
-#include <GameObject.h>
 
 #include "DebugDraw/debugdraw.h"
+#include "Math/Quat.h"
 #include "MathGeoLib.h"
-#include <Math/Quat.h>
 #include "SDL_scancode.h"
 #include "glew.h"
 #include <functional>

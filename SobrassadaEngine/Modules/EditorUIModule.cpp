@@ -1,33 +1,34 @@
 #include "EditorUIModule.h"
 
+#include "Application.h"
 #include "CameraModule.h"
+#include "Component.h"
+#include "EngineEditorBase.h"
+#include "FileSystem.h"
+#include "GameTimer.h"
 #include "InputModule.h"
 #include "LibraryModule.h"
 #include "OpenGLModule.h"
 #include "ProjectModule.h"
+#include "SceneImporter.h"
 #include "SceneModule.h"
+#include "ScriptModule.h"
+#include "TextureEditor.h"
+#include "TextureImporter.h"
 #include "WindowModule.h"
-#include <Application.h>
-#include <Component.h>
-#include <EngineEditorBase.h>
-#include <FileSystem.h>
-#include <GameTimer.h>
-#include <SceneImporter.h>
-#include <TextureEditor.h>
-#include <TextureImporter.h>
 
+#include "Math/Quat.h"
 #include "SDL.h"
 #include "glew.h"
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl2.h"
 #include "imgui_internal.h"
-#include <Math/Quat.h>
+// imguizmo include after imgui
+#include "ImGuizmo.h"
 #include <cstring>
 #include <filesystem>
 #include <string>
-// imguizmo include after imgui
-#include <ImGuizmo.h>
 
 EditorUIModule::EditorUIModule() : width(0), height(0)
 {
@@ -41,6 +42,7 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"UI Canvas",            COMPONENT_CANVAS              },
         {"UI Label",             COMPONENT_LABEL               },
         {"Camera",               COMPONENT_CAMERA              }
+        {"Script",               COMPONENT_SCRIPT              }
     };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;
@@ -1172,13 +1174,14 @@ void EditorUIModule::EditorSettings(bool& editorSettingsMenu)
     if (ImGui::CollapsingHeader("Application"))
     {
         ImGui::SeparatorText("Information");
-        ImGui::InputText(
-            "App Name", const_cast<char*>(ENGINE_NAME), IM_ARRAYSIZE(ENGINE_NAME), ImGuiInputTextFlags_ReadOnly
-        );
-        ImGui::InputText(
-            "Organization", const_cast<char*>(ORGANIZATION_NAME), IM_ARRAYSIZE(ORGANIZATION_NAME),
-            ImGuiInputTextFlags_ReadOnly
-        );
+
+        std::string appName = ENGINE_NAME;
+        char* charAppName   = &appName[0];
+        ImGui::InputText("App Name", charAppName, strlen(charAppName), ImGuiInputTextFlags_ReadOnly);
+
+        std::string organizationName = ORGANIZATION_NAME;
+        char* charOrganizationName   = &organizationName[0];
+        ImGui::InputText("Organization", charOrganizationName, strlen(ORGANIZATION_NAME), ImGuiInputTextFlags_ReadOnly);
 
         ImGui::SeparatorText("Ms and Fps Graph");
         FramePlots(vsync);

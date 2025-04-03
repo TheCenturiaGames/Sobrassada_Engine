@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <Globals.h>
+#include "Globals.h"
 
 class Resource;
 
