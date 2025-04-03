@@ -10,20 +10,11 @@
 CapsuleColliderComponent::CapsuleColliderComponent(UID uid, GameObject* parent)
     : Component(uid, parent, "Capsule Collider", COMPONENT_CAPSULE_COLLIDER)
 {
-    AABB parentAABB = parent->GetGlobalAABB();
-    if (parentAABB.IsFinite())
-    {
-        radius       = parentAABB.Size().MaxElement() / 2.f;
-        length       = parentAABB.Size().y / 2.f;
-        centerOffset = parentAABB.CenterPoint() - parent->GetPosition();
-    }
-    else
-    {
-        AABB heriachyAABB = parent->GetHeriachyAABB();
-        radius            = heriachyAABB.Size().MaxElement() / 2.f;
-        length            = heriachyAABB.Size().y / 2.f;
-        centerOffset      = heriachyAABB.CenterPoint() - parent->GetPosition();
-    }
+
+    AABB heriachyAABB    = parent->GetHeriachyAABB();
+    radius               = heriachyAABB.Size().MaxElement() / 2.f;
+    length               = heriachyAABB.Size().y / 2.f;
+    centerOffset         = heriachyAABB.CenterPoint() - parent->GetPosition();
 
     onCollissionCallback = CollisionDelegate(
         std::bind(&CapsuleColliderComponent::OnCollision, this, std::placeholders::_1, std::placeholders::_2)
@@ -169,6 +160,11 @@ void CapsuleColliderComponent::Render(float deltaTime)
 
 void CapsuleColliderComponent::ParentUpdated()
 {
+    AABB heriachyAABB = parent->GetHeriachyAABB();
+    radius            = heriachyAABB.Size().MaxElement() / 2.f;
+    length            = heriachyAABB.Size().y / 2.f;
+    centerOffset      = heriachyAABB.CenterPoint() - parent->GetPosition();
+
     App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
 }
 

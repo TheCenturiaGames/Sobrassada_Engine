@@ -11,21 +11,12 @@
 SphereColliderComponent::SphereColliderComponent(UID uid, GameObject* parent)
     : Component(uid, parent, "Shpere Collider", COMPONENT_SPHERE_COLLIDER)
 {
-    AABB parentAABB = parent->GetGlobalAABB();
-    if (parentAABB.IsFinite())
-    {
-        Sphere sphere = parentAABB.MinimalEnclosingSphere();
-        radius        = sphere.r;
-        centerOffset  = parentAABB.CenterPoint() - parent->GetPosition();
-    }
-    else
-    {
-        AABB heriachyAABB = parent->GetHeriachyAABB();
-        Sphere sphere     = heriachyAABB.MinimalEnclosingSphere();
 
-        radius            = sphere.r;
-        centerOffset      = heriachyAABB.CenterPoint() - parent->GetPosition();
-    }
+    AABB heriachyAABB    = parent->GetHeriachyAABB();
+    Sphere sphere        = heriachyAABB.MinimalEnclosingSphere();
+
+    radius               = sphere.r;
+    centerOffset         = heriachyAABB.CenterPoint() - parent->GetPosition();
 
     onCollissionCallback = CollisionDelegate(
         std::bind(&SphereColliderComponent::OnCollision, this, std::placeholders::_1, std::placeholders::_2)
@@ -166,6 +157,12 @@ void SphereColliderComponent::Render(float deltaTime)
 
 void SphereColliderComponent::ParentUpdated()
 {
+    AABB heriachyAABB = parent->GetHeriachyAABB();
+    Sphere sphere     = heriachyAABB.MinimalEnclosingSphere();
+
+    radius            = sphere.r;
+    centerOffset      = heriachyAABB.CenterPoint() - parent->GetPosition();
+
     App->GetPhysicsModule()->UpdateSphereRigidBody(this);
 }
 

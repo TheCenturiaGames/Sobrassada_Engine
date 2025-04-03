@@ -10,18 +10,10 @@
 CubeColliderComponent::CubeColliderComponent(UID uid, GameObject* parent)
     : Component(uid, parent, "Cube Collider", COMPONENT_CUBE_COLLIDER)
 {
-    AABB parentAABB = parent->GetGlobalAABB();
-    if (parentAABB.IsFinite())
-    {
-        size         = parentAABB.HalfSize();
-        centerOffset = parentAABB.CenterPoint() - parent->GetPosition();
-    }
-    else
-    {
-        AABB heriachyAABB = parent->GetHeriachyAABB();
-        size              = heriachyAABB.HalfSize();
-        centerOffset      = heriachyAABB.CenterPoint() - parent->GetPosition();
-    }
+
+    AABB heriachyAABB    = parent->GetHeriachyAABB();
+    size                 = heriachyAABB.HalfSize();
+    centerOffset         = heriachyAABB.CenterPoint() - parent->GetPosition();
 
     onCollissionCallback = CollisionDelegate(
         std::bind(&CubeColliderComponent::OnCollision, this, std::placeholders::_1, std::placeholders::_2)
@@ -169,6 +161,10 @@ void CubeColliderComponent::Render(float deltaTime)
 
 void CubeColliderComponent::ParentUpdated()
 {
+    AABB heriachyAABB = parent->GetHeriachyAABB();
+    size              = heriachyAABB.HalfSize();
+    centerOffset      = heriachyAABB.CenterPoint() - parent->GetPosition();
+
     App->GetPhysicsModule()->UpdateCubeRigidBody(this);
 }
 
