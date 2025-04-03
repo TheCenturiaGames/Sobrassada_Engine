@@ -49,6 +49,8 @@ Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUI
     gameObjectRootUID     = initialState["RootGameObject"].GetUint64();
     selectedGameObjectUID = gameObjectRootUID;
 
+    App->GetPhysicsModule()->LoadLayerData(&initialState);
+
     // Deserialize GameObjects
     if (initialState.HasMember("GameObjects") && initialState["GameObjects"].IsArray())
     {
@@ -149,6 +151,8 @@ void Scene::Save(
     targetState.AddMember("Name", rapidjson::Value(sceneName.c_str(), allocator), allocator);
 
     targetState.AddMember("RootGameObject", gameObjectRootUID, allocator);
+
+    App->GetPhysicsModule()->SaveLayerData(targetState, allocator);
 
     // Serialize GameObjects
     rapidjson::Value gameObjectsJSON(rapidjson::kArrayType);

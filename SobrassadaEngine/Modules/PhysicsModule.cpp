@@ -25,11 +25,11 @@ PhysicsModule::PhysicsModule()
     dynamicsWorld->setDebugDrawer(debugDraw);
 
     colliderLayerConfig.assign(sizeof(ColliderLayerStrings) / sizeof(char*), LayerBitset().reset());
+    LoadLayerData();
 }
 
 bool PhysicsModule::Init()
 {
-    LoadLayerData();
     return true;
 }
 
@@ -191,25 +191,87 @@ void PhysicsModule::AddRigidBody(btRigidBody* rigidBody, ColliderType colliderTy
 }
 
 // TODO READ FROM CONFIG FILE
-void PhysicsModule::LoadLayerData()
+void PhysicsModule::LoadLayerData(const rapidjson::Value* initialState)
 {
-    // STATIC OBJECT
-    int config =
-        1 << (int)ColliderLayer::PLAYER | 1 << (int)ColliderLayer::ENEMY | 1 << (int)ColliderLayer::WORLD_OBJECTS;
-    colliderLayerConfig[0] |= config;
+    for (int i = 0; i < colliderLayerConfig.size(); ++i)
+        colliderLayerConfig[i].reset();
+    // loading defaults if no scene state with saved data
+    if (initialState == nullptr)
+    {
+        // STATIC OBJECT
+        int config =
+            1 << (int)ColliderLayer::PLAYER | 1 << (int)ColliderLayer::ENEMY | 1 << (int)ColliderLayer::WORLD_OBJECTS;
+        colliderLayerConfig[0] |= config;
 
-    // TRIGGER
-    config                  = 1 << (int)ColliderLayer::PLAYER;
-    colliderLayerConfig[1] |= config;
+        // TRIGGER
+        config                  = 1 << (int)ColliderLayer::PLAYER;
+        colliderLayerConfig[1] |= config;
 
-    // ENEMY
-    config                  = 1 << (int)ColliderLayer::PLAYER | 1 << (int)ColliderLayer::WORLD_OBJECTS;
-    colliderLayerConfig[2] |= config;
+        // ENEMY
+        config                  = 1 << (int)ColliderLayer::PLAYER | 1 << (int)ColliderLayer::WORLD_OBJECTS;
+        colliderLayerConfig[2] |= config;
 
-    // PLAYER
-    config =
-        1 << (int)ColliderLayer::ENEMY | 1 << (int)ColliderLayer::WORLD_OBJECTS | 1 << (int)ColliderLayer::TRIGGERS;
-    colliderLayerConfig[3] |= config;
+        // PLAYER
+        config =
+            1 << (int)ColliderLayer::ENEMY | 1 << (int)ColliderLayer::WORLD_OBJECTS | 1 << (int)ColliderLayer::TRIGGERS;
+        colliderLayerConfig[3] |= config;
+    }
+    else
+    {
+        // LOADING LAYER CONFIG IN ORDER OF ColliderLayerStrings[]
+        const rapidjson::Value& initialStateRef = *initialState;
+        int currentMask                         = 0;
+
+        if (initialStateRef.HasMember("WorldObjectsMask"))
+        {
+            currentMask             = initialStateRef["WorldObjectsMask"].GetInt();
+
+            colliderLayerConfig[0] |= currentMask;
+        }
+
+        if (initialStateRef.HasMember("TriggerMask"))
+        {
+            currentMask             = initialStateRef["TriggerMask"].GetInt();
+
+            colliderLayerConfig[1] |= currentMask;
+        }
+
+        if (initialStateRef.HasMember("EnemyMask"))
+        {
+            currentMask             = initialStateRef["EnemyMask"].GetInt();
+
+            colliderLayerConfig[2] |= currentMask;
+        }
+
+        if (initialStateRef.HasMember("PlayerMask"))
+        {
+            currentMask             = initialStateRef["PlayerMask"].GetInt();
+
+            colliderLayerConfig[3] |= currentMask;
+        }
+    }
+}
+
+void PhysicsModule::SaveLayerData(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator)
+{
+    // SAVING LAYER CONFIG IN ORDER OF ColliderLayerStrings[]
+
+    int masks[sizeof(ColliderLayerStrings) / sizeof(char*)] {};
+
+    for (int i = 0; i < colliderLayerConfig.size(); ++i)
+    {
+        int currentMask = 0;
+        for (int j = 0; j < colliderLayerConfig[i].size(); ++j)
+        {
+            if (colliderLayerConfig[i][j]) currentMask |= 1 << j;
+        }
+        masks[i] = currentMask;
+    }
+
+    targetState.AddMember("WorldObjectsMask", masks[0], allocator);
+    targetState.AddMember("TriggerMask", masks[1], allocator);
+    targetState.AddMember("EnemyMask", masks[2], allocator);
+    targetState.AddMember("PlayerMask", masks[3], allocator);
 }
 
 void PhysicsModule::EmptyWorld()

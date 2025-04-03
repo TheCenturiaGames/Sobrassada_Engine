@@ -85,9 +85,9 @@ class GameObject
     Component* GetComponentByType(ComponentType type) const;
 
     MeshComponent* GetMeshComponent() const;
-    const float3& GetPosition() const { return position; } 
-    const float3& GetRotation() const { return rotation; } 
-    const float3& GetScale() const { return scale; } 
+    const float3& GetPosition() const { return position; }
+    const float3& GetRotation() const { return rotation; }
+    const float3& GetScale() const { return scale; }
 
     void SetLocalTransform(const float4x4& newTransform) { localTransform = newTransform; }
     void DrawGizmos() const;
@@ -101,11 +101,12 @@ class GameObject
     AABB GetHeriachyAABB();
 
     void SetPosition(float3& newPosition) { position = newPosition; };
+
   private:
     void UpdateLocalTransform(const float4x4& parentGlobalTransform);
     void DrawNodes() const;
     void OnDrawConnectionsToggle();
-    
+
     void SetMobility(MobilitySettings newMobility) { mobilitySettings = newMobility; };
 
   public:

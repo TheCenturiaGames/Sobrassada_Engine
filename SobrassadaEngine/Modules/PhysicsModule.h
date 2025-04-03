@@ -33,7 +33,8 @@ class PhysicsModule : public Module
     bool ShutDown() override;
 
     //TODO READ FROM CONFIG FILE
-    void LoadLayerData();
+    void LoadLayerData(const rapidjson::Value* initialState = nullptr);
+    void SaveLayerData(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator);
     void EmptyWorld();
     void RebuildWorld();
 
