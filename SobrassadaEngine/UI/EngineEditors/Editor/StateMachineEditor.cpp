@@ -403,12 +403,12 @@ void StateMachineEditor::BuildGraph()
                 }
                 else
                 {
-                    GLOG("Error: Uno de los nodos no tiene pines válidos.");
+                    GLOG("Error: One of the nodes has no valid pins.");
                 }
             }
         }
     }
-    GLOG("Total de enlaces en graph después de añadirlos: %d", graph->getLinks().size());
+    GLOG("Total links in graph after adding them: %d", graph->getLinks().size());
 }
 
 void StateMachineEditor::DetectNewTransitions()
@@ -465,23 +465,25 @@ void StateMachineEditor::SaveMachine()
 
 void StateMachineEditor::ShowSavePopup()
 {
-    bool alreadySaved                = false;
-    static char stateMachineName[128] = "";
+    static bool initialized = false;
     static std::vector<std::string> allStateMachineNames;
 
     if (ImGui::BeginPopupModal("Save State Machine", NULL, ImGuiWindowFlags_AlwaysAutoResize))
     {
-        if (allStateMachineNames.empty())
+        if (!initialized)
         {
             allStateMachineNames = StateMachineManager::GetAllStateMachineNames();
-        }
-        for (int i = 0; i < allStateMachineNames.size(); i++)
-        {
-            if (resource->GetName() == allStateMachineNames[i])
+
+            for (const std::string& name : allStateMachineNames)
             {
-                strncpy_s(stateMachineName, sizeof(stateMachineName), allStateMachineNames[i].c_str(), _TRUNCATE);
-                alreadySaved = true;
+                if (resource->GetName() == name)
+                {
+                    strncpy_s(stateMachineName, sizeof(stateMachineName), name.c_str(), _TRUNCATE);
+                    alreadySaved = true;
+                    break;
+                }
             }
+            initialized = true;
         }
 
         ImGui::Text("Enter the name for the State Machine:");
@@ -489,11 +491,16 @@ void StateMachineEditor::ShowSavePopup()
 
         if (ImGui::Button("Save"))
         {
+            if (std::string(stateMachineName) != resource->GetName())
+            {
+                alreadySaved = false;
+            }
             if (strlen(stateMachineName) > 0)
             {
                 resource->SetName(std::string(stateMachineName));
                 StateMachineManager::Save(resource, alreadySaved);
                 ImGui::CloseCurrentPopup();
+                initialized = false; 
             }
         }
 
@@ -501,6 +508,7 @@ void StateMachineEditor::ShowSavePopup()
         if (ImGui::Button("Cancel"))
         {
             ImGui::CloseCurrentPopup();
+            initialized = false; 
         }
         ImGui::EndPopup();
     }

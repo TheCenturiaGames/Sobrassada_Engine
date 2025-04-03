@@ -31,5 +31,7 @@ class StateMachineEditor : public EngineEditorBase
     std::unique_ptr<ImFlow::ImNodeFlow> graph;
     std::vector<std::string> availableClips;
     std::vector<std::string> availableTriggers;
+    char stateMachineName[128] = "";
+    bool alreadySaved          = false;
     StateNode* selectedNode = nullptr;
 };

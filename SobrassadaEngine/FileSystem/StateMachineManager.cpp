@@ -8,8 +8,8 @@
 #include <ResourceStateMachine.h>
 
 #include "Math/Quat.h"
-#include "prettywriter.h"
-#include "stringbuffer.h"
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
 #include <Math/float4x4.h>
 #include <filesystem>
 #include <queue>
