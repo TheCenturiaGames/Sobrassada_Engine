@@ -1,19 +1,22 @@
 #include "MeshComponent.h"
 
 #include "Application.h"
+#include "BatchManager.h"
 #include "CameraComponent.h"
 #include "CameraModule.h"
 #include "EditorUIModule.h"
+#include "GeometryBatch.h"
 #include "LibraryModule.h"
 #include "MeshImporter.h"
-#include "ResourceManagement/Resources/ResourceModel.h"
+#include "ResourceMaterial.h"
+#include "ResourceMesh.h"
+#include "ResourceModel.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
 #include "ShaderModule.h"
-// #include "Scene/GameObjects/GameObject.h"
 
+#include "Math/Quat.h"
 #include "imgui.h"
-#include <Math/Quat.h>
 
 MeshComponent::MeshComponent(const UID uid, GameObject* parent) : Component(uid, parent, "Mesh", COMPONENT_MESH)
 {
@@ -46,8 +49,16 @@ MeshComponent::MeshComponent(const rapidjson::Value& initialState, GameObject* p
         {
             ResourceModel* model = static_cast<ResourceModel*>(App->GetResourcesModule()->RequestResource(modelUID));
             skinIndex            = initialState["SkinIndex"].GetInt();
-            bindMatrices         = model->GetModelData().GetSkin(skinIndex).inverseBindMatrices;
+            if (model != nullptr) bindMatrices = model->GetModelData().GetSkin(skinIndex).inverseBindMatrices;
         }
+    }
+
+    if (!bonesUIDs.empty() && !bindMatrices.empty()) hasBones = true;
+
+    if (currentMesh != nullptr && currentMaterial != nullptr)
+    {
+        batch = App->GetResourcesModule()->GetBatchManager()->RequestBatch(this);
+        batch->AddComponent(this);
     }
 }
 
@@ -55,6 +66,8 @@ MeshComponent::~MeshComponent()
 {
     App->GetResourcesModule()->ReleaseResource(currentMaterial);
     App->GetResourcesModule()->ReleaseResource(currentMesh);
+
+    if (uniqueBatch) App->GetResourcesModule()->GetBatchManager()->RemoveBatch(batch);
 }
 
 void MeshComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
@@ -142,25 +155,14 @@ void MeshComponent::RenderEditorInspector()
 
 void MeshComponent::Update(float deltaTime)
 {
+    if (batch == nullptr && currentMesh != nullptr && currentMaterial != nullptr)
+    {
+        BatchEditorMode();
+    }
 }
 
 void MeshComponent::Render(float deltaTime)
 {
-    if (enabled && currentMesh != nullptr)
-    {
-        unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
-        int program            = App->GetShaderModule()->GetMetallicRoughnessProgram();
-
-        if (currentMaterial != nullptr)
-        {
-            if (!currentMaterial->GetIsMetallicRoughness())
-                program = App->GetShaderModule()->GetSpecularGlossinessProgram();
-        }
-        if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
-            cameraUBO = App->GetSceneModule()->GetScene()->GetMainCamera()->GetUbo();
-
-        currentMesh->Render(program, combinedMatrix, cameraUBO, currentMaterial, bones, bindMatrices);
-    }
 }
 
 void MeshComponent::InitSkin()
@@ -190,6 +192,8 @@ void MeshComponent::AddMesh(UID resource, bool updateParent)
 
         localComponentAABB = AABB(currentMesh->GetAABB());
         if (updateParent) parent->OnAABBUpdated();
+
+        if (batch) BatchEditorMode();
     }
 }
 
@@ -206,7 +210,18 @@ void MeshComponent::AddMaterial(UID resource)
         App->GetResourcesModule()->ReleaseResource(currentMaterial);
         currentMaterial     = newMaterial;
         currentMaterialName = currentMaterial->GetName();
+
+        if (batch) BatchEditorMode();
     }
+}
+
+void MeshComponent::BatchEditorMode()
+{
+    if (uniqueBatch) App->GetResourcesModule()->GetBatchManager()->RemoveBatch(batch);
+    batch = App->GetResourcesModule()->GetBatchManager()->CreateNewBatch(this);
+    batch->AddComponent(this);
+    batch->LoadData();
+    uniqueBatch = true;
 }
 
 void MeshComponent::OnTransformUpdated()

@@ -2,8 +2,8 @@
 
 #include "Globals.h"
 #include "LightsConfig.h"
-#include "Math/float4x4.h"
 
+#include "Math/float4x4.h"
 #include <map>
 #include <tuple>
 #include <unordered_map>
@@ -15,6 +15,7 @@ class Octree;
 class ResourcePrefab;
 class Quadtree;
 class CameraComponent;
+enum class SaveMode;
 
 class Scene
 {
@@ -26,7 +27,7 @@ class Scene
 
     void Init();
     void Save(
-        rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator, UID newUID = INVALID_UID,
+        rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator, SaveMode saveMode, UID newUID = INVALID_UID,
         const char* newName = nullptr
     );
 

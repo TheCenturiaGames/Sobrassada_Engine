@@ -13,7 +13,9 @@
 #define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_EXTERNAL_IMAGE
 #define TINYGLTF_IMPLEMENTATION /* Only in one of the includes */
-#include <tiny_gltf.h>
+#include "tiny_gltf.h"
+#include <utility>
+#include <unordered_set>
 
 namespace SceneImporter
 {
@@ -35,27 +37,34 @@ namespace SceneImporter
         tinygltf::Model model = LoadModelGLTF(filePath, targetFilePath);
 
         std::vector<std::vector<std::pair<UID, UID>>> gltfMeshes;
-        std::vector<std::pair<int,UID>> matIndices;
+        std::unordered_map<int, UID> matIndices;
+
         for (const auto& srcMesh : model.meshes)
         {
-            int n        = 0;
+            int n = 0;
             int matIndex = -1;
             std::vector<std::pair<UID, UID>> primitives;
 
             for (const auto& primitive : srcMesh.primitives)
             {
-                UID matUID = INVALID_UID;
-                matIndex   = primitive.material;
+                std::string name = srcMesh.name + std::to_string(n);
+                UID meshUID      = MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath, targetFilePath);
+                n++;
 
-                auto it    = std::find_if(
-                    matIndices.begin(), matIndices.end(),
-                    [matIndex](const std::pair<int, UID>& elem) { return elem.first == matIndex; }
-                );
-
-                if (it == matIndices.end() && matIndex != -1)
+                UID matUID   = INVALID_UID;
+                matIndex = primitive.material;
+                if (matIndex == -1)
+                {
+                    GLOG("Material index invalid for mesh: %s", name.c_str());
+                }
+                else if (matIndices.find(matIndex) == matIndices.end())
                 {
                     matUID = MaterialImporter::ImportMaterial(model, matIndex, filePath, targetFilePath);
-                    matIndices.emplace_back(matIndex, matUID);
+                    matIndices[matIndex] = matUID;
+                }
+                else
+                {
+                    matUID = matIndices[matIndex];
                 }
                 else if (it != matIndices.end()) matUID = it->second;
                 else GLOG("Material index invalid")
@@ -67,7 +76,7 @@ namespace SceneImporter
                 primitives.emplace_back(meshUID, matUID);
                 GLOG("New primitive with mesh UID: %d and Material UID: %d", meshUID, matUID);
             }
-            gltfMeshes.emplace_back(primitives);
+            gltfMeshes.push_back(primitives);
         }
 
         GLOG("Total .gltf meshes: %d", gltfMeshes.size());

@@ -1,22 +1,25 @@
 #include "ResourcesModule.h"
 
+#include "BatchManager.h"
 #include "Importer.h"
 #include "LibraryModule.h"
 #include "MeshImporter.h"
-#include "ResourceManagement/Resources/ResourceMaterial.h"
-#include "ResourceManagement/Resources/ResourceMesh.h"
-#include "ResourceManagement/Resources/ResourceTexture.h"
+#include "Resource.h"
+#include "ResourceMaterial.h"
+#include "ResourceMesh.h"
+#include "ResourceTexture.h"
 #include "SceneModule.h"
 #include "ShaderModule.h"
-
-#include <Algorithm/Random/LCG.h> // TODO: LCG remove includes
+#include "Standalone/MeshComponent.h"
 
 ResourcesModule::ResourcesModule()
 {
+    batchManager = new BatchManager();
 }
 
 ResourcesModule::~ResourcesModule()
 {
+    delete batchManager;
 }
 
 bool ResourcesModule::Init()
@@ -26,11 +29,8 @@ bool ResourcesModule::Init()
 
 bool ResourcesModule::ShutDown()
 {
-    for (auto resource : resources)
-    {
-        delete resource.second;
-    }
-    resources.clear();
+    UnloadAllResources();
+    batchManager->UnloadAllBatches();
     return true;
 }
 
