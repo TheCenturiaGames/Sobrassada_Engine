@@ -45,6 +45,7 @@ class Application
     CameraModule* GetCameraModule() { return cameraModule; }
     DebugDrawModule* GetDebugDrawModule() { return debugDraw; }
     UserInterfaceModule* GetUserInterfaceModule() { return UIModule; }
+    PathfinderModule* GetPathfinderModule() { return pathModule; }
 
     EngineTimer* GetEngineTimer() { return engineTimer; }
     GameTimer* GetGameTimer() { return gameTimer; }
@@ -66,6 +67,7 @@ class Application
     CameraModule* cameraModule       = nullptr;
     DebugDrawModule* debugDraw       = nullptr;
     UserInterfaceModule* UIModule    = nullptr;
+    PathfinderModule* pathModule     = nullptr;
 
     EngineTimer* engineTimer         = nullptr;
     GameTimer* gameTimer             = nullptr;

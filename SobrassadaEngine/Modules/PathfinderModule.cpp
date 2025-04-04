@@ -1,16 +1,13 @@
 #include "PathfinderModule.h"
 
 #include "Application.h"
-#include "SceneModule.h"
 #include "LibraryModule.h"
+#include "SceneModule.h"
 
-
+#include <DetourCommon.h>
 #include <DetourCrowd.h>
 #include <DetourNavMesh.h>
-#include <DetourCommon.h>
 #include <DetourNavMeshQuery.h>
-
-
 
 PathfinderModule::PathfinderModule()
 {
@@ -23,8 +20,7 @@ PathfinderModule::~PathfinderModule()
 
 bool PathfinderModule::Init()
 {
-
-    crowd = dtAllocCrowd();
+    if (!crowd) crowd = dtAllocCrowd();
     return true;
 }
 
@@ -67,7 +63,7 @@ std::vector<float3> PathfinderModule::FindPath(float3 start, float3 end)
     int pathCount = 0;
     navQuery->findPath(startRef, endRef, closestStart, closestEnd, &filter, pathPolys, &pathCount, 256);
 
-    if (pathCount == 0) return path; 
+    if (pathCount == 0) return path;
 
     // straight-line path
     float straightPath[256 * 3];          // positions (x,y,z)
@@ -87,6 +83,39 @@ std::vector<float3> PathfinderModule::FindPath(float3 start, float3 end)
     }
 
     return path;
+}
+
+// All ai agent components will call this to add themselves to crowd
+int PathfinderModule::CreateAgent(float3 position, float radius, float height, float speed)
+{
+    if (!crowd) return -1;
+
+    dtCrowdAgentParams params;
+    memset(&params, 0, sizeof(params));
+    params.radius                = radius;
+    params.height                = height;
+    params.maxSpeed              = speed;
+    params.maxAcceleration       = 8.0f;
+    params.collisionQueryRange   = radius * 12.0f;
+    params.pathOptimizationRange = radius * 30.0f;
+    params.updateFlags           = DT_CROWD_ANTICIPATE_TURNS | DT_CROWD_OBSTACLE_AVOIDANCE | DT_CROWD_SEPARATION;
+    params.obstacleAvoidanceType = 3;
+    params.separationWeight      = 2.0f;
+
+    float pos[3]                 = {position.x, position.y, position.z};
+    int agentId                  = crowd->addAgent(pos, &params);
+    return agentId;
+}
+
+void PathfinderModule::RemoveAgent(int agentId)
+{
+    if (!crowd) return;
+    if (agentId < 0 || agentId >= crowd->getAgentCount()) return;
+
+    const dtCrowdAgent* agent = crowd->getAgent(agentId);
+    if (!agent || !agent->active) return;
+
+    crowd->removeAgent(agentId);
 }
 
 void PathfinderModule::QueryNavmesh(UID uid)

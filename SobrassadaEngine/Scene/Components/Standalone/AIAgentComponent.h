@@ -15,6 +15,8 @@ class AIAgentComponent : public Component
     AIAgentComponent(const rapidjson::Value& initialState, GameObject* parent);
     ~AIAgentComponent() override;
 
+    void AddToCrowd();
+    void RecreateAgent();
     void SetAgentPosition(float3 agentPosition) { agentPosition = agentPosition; }
     void setPath(const float3& destination); 
     void Update(float deltaTime) override;
@@ -22,5 +24,9 @@ class AIAgentComponent : public Component
 
   private:
     float3 agentPosition;
-    float speed;
+    float speed  = 3.5f;
+    float radius = 0.6f;
+    float height = 2.0f;
+    int agentId  = -1; // Assigned by dtCrowd
+    bool autoAdd = true; //automatically add to crowd without user input
 };
