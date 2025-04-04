@@ -294,7 +294,6 @@
     <ClCompile Include="FileSystem\Batching\GeometryBatch.cpp" />
     <ClCompile Include="Libs\ImNodeFlow-1.2.2\src\ImNodeFlow.cpp" />
     <ClCompile Include="FileSystem\StateMachineManager.cpp" />
-    <ClCompile Include="Modules\ScriptModule.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceNavmesh.cpp" />
     <ClCompile Include="Modules\GameUIModule.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceStateMachine.cpp" />
