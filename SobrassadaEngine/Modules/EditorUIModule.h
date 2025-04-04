@@ -1,12 +1,12 @@
 #pragma once
 
+#include "ComponentUtils.h"
+#include "Globals.h"
 #include "Module.h"
-#include <ComponentUtils.h>
-#include <Globals.h>
-#include <NodeEditor.h>
+#include "NodeEditor.h"
 
-#include <Math/float3.h>
-#include <Math/float4x4.h>
+#include "Math/float3.h"
+#include "Math/float4x4.h"
 #include <deque>
 #include <string>
 #include <unordered_map>
@@ -24,7 +24,8 @@ enum EditorType
 {
     BASE,
     ANIMATION,
-    NODE
+    NODE,
+    TEXTURE
 };
 
 enum class GizmoOperation

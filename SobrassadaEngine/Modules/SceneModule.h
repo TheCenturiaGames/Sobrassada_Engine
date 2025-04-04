@@ -3,7 +3,7 @@
 #include "Module.h"
 #include "Scene.h"
 
-#include <document.h>
+#include "rapidjson/document.h"
 
 class GameObject;
 

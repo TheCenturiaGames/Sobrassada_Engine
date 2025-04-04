@@ -5,6 +5,7 @@
 #include "GameObject.h"
 #include "SceneModule.h"
 #include "Standalone/MeshComponent.h"
+#include "ResourceMesh.h"
 
 #include "Geometry/Triangle.h"
 #include "Math/float4x4.h"

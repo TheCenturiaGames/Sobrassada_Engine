@@ -18,6 +18,7 @@ class SceneModule;
 class CameraModule;
 class DebugDrawModule;
 class UserInterfaceModule;
+class ScriptModule;
 class PhysicsModule;
 
 class EngineTimer;
@@ -46,6 +47,7 @@ class Application
     CameraModule* GetCameraModule() { return cameraModule; }
     DebugDrawModule* GetDebugDrawModule() { return debugDraw; }
     UserInterfaceModule* GetUserInterfaceModule() { return UIModule; }
+    ScriptModule* GetScriptModule() { return scriptModule; }
     PhysicsModule* GetPhysicsModule() { return physicsModule; }
 
     EngineTimer* GetEngineTimer() { return engineTimer; }
@@ -68,6 +70,7 @@ class Application
     CameraModule* cameraModule       = nullptr;
     DebugDrawModule* debugDraw       = nullptr;
     UserInterfaceModule* UIModule    = nullptr;
+    ScriptModule* scriptModule       = nullptr;
     PhysicsModule* physicsModule     = nullptr;
 
     EngineTimer* engineTimer         = nullptr;

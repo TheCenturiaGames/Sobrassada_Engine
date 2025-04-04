@@ -3,8 +3,8 @@
 #include "Globals.h"
 #include "Delegate.h"
 
-#include <Libs/rapidjson/document.h>
-#include <Math/float4x4.h>
+#include "Math/float4x4.h"
+#include "rapidjson/document.h"
 #include <cstdint>
 
 class Component;
@@ -21,6 +21,7 @@ enum ComponentType
     COMPONENT_DIRECTIONAL_LIGHT,
     COMPONENT_CHARACTER_CONTROLLER,
     COMPONENT_CAMERA,
+    COMPONENT_SCRIPT,
     COMPONENT_CUBE_COLLIDER,
     COMPONENT_SPHERE_COLLIDER,
     COMPONENT_CAPSULE_COLLIDER,

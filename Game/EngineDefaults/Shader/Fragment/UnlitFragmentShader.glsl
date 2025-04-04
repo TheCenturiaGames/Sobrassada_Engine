@@ -2,19 +2,19 @@
 
 #extension GL_ARB_bindless_texture : require
 
+#define PI 3.14159265359
+
 in vec3 pos;
 in vec2 uv0;
 in vec3 normal;
 in vec4 tangent;
+flat in int instance_index;
 
 out vec4 outColor;
 
 uniform vec3 cameraPos;
 
-#define PI 3.14159265359
-
-// Material UBO
-layout(std140, binding = 1) uniform Material
+struct Material
 {
     vec4 diffColor;
     vec3 specColor;
@@ -28,7 +28,12 @@ layout(std140, binding = 1) uniform Material
     uvec2 normalTex;
 };
 
+readonly layout(std430, binding = 11) buffer Materials {
+    Material materials[];
+};
+
 void main()
 {
-   outColor = texture(sampler2D(diffuseTex), uv0);
+    Material mat = materials[instance_index];
+    outColor = texture(sampler2D(mat.diffuseTex), uv0);
 }

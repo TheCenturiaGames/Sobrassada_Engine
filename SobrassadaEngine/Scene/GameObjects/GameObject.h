@@ -3,9 +3,9 @@
 #include "ComponentUtils.h"
 #include "Globals.h"
 
-#include <Geometry/AABB.h>
-#include <Geometry/OBB.h>
-#include <Libs/rapidjson/document.h>
+#include "Geometry/AABB.h"
+#include "Geometry/OBB.h"
+#include "rapidjson/document.h"
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -18,7 +18,7 @@ enum MobilitySettings
     STATIC  = 1,
 };
 
-class GameObject
+class SOBRASADA_API_ENGINE GameObject
 {
   public:
     GameObject(std::string name);

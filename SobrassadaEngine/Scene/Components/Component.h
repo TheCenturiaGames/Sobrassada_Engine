@@ -3,7 +3,7 @@
 #include "ComponentUtils.h"
 
 #include "Geometry/AABB.h"
-#include "Libs/rapidjson/document.h"
+#include "rapidjson/document.h"
 
 class GameObject;
 
@@ -32,6 +32,7 @@ class Component
 
     ComponentType GetType() const { return type; }
     const char* GetName() const { return name; }
+    const bool GetEnabled() const { return enabled; }
 
     const float4x4& GetGlobalTransform() const;
 
