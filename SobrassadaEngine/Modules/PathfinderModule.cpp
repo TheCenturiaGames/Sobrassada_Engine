@@ -2,9 +2,9 @@
 
 #include "Application.h"
 #include "LibraryModule.h"
-#include "SceneModule.h"
-#include "ResourcesModule.h"
 #include "ResourceNavmesh.h"
+#include "ResourcesModule.h"
+#include "SceneModule.h"
 
 #include <DetourCommon.h>
 #include <DetourCrowd.h>
@@ -15,13 +15,18 @@ PathfinderModule::PathfinderModule()
 {
 }
 
+bool PathfinderModule ::Init()
+{
+    if (!crowd) crowd = dtAllocCrowd();
+    return true;
+}
+
 PathfinderModule::~PathfinderModule()
 {
     dtFreeCrowd(crowd);
     dtFreeNavMeshQuery(navQuery);
     delete navmesh;
 }
-
 
 update_status PathfinderModule::Update(float deltaTime)
 {
@@ -37,10 +42,11 @@ update_status PathfinderModule::Update(float deltaTime)
 
     return UPDATE_CONTINUE;
 }
+
 /*
 std::vector<float3> PathfinderModule::FindPath(float3 start, float3 end)
 {
-    
+
     std::vector<float3> path;
 
     dtQueryFilter filter;
@@ -81,9 +87,9 @@ std::vector<float3> PathfinderModule::FindPath(float3 start, float3 end)
     {
         path.emplace_back(straightPath[j * 3], straightPath[j * 3 + 1], straightPath[j * 3 + 2]);
     }
-    
+
     return path;
-    
+
 
 }
 */
@@ -123,7 +129,6 @@ void PathfinderModule::RemoveAgent(int agentId)
 
 void PathfinderModule::InitQuerySystem()
 {
-    if (crowd == nullptr) crowd = dtAllocCrowd(); 
 
     navmesh  = App->GetResourcesModule()->GetNavMesh();
     navQuery = navmesh->GetDetourNavMeshQuery();
@@ -136,4 +141,8 @@ void PathfinderModule::InitQuerySystem()
     {
         GLOG("Failed to initialize Pathfinder crowd system.");
     }
+}
+
+void PathfinderModule::HandleClickNavigation()
+{
 }

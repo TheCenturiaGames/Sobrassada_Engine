@@ -12,6 +12,7 @@
 #include "ShaderModule.h"
 #include "ResourceNavmesh.h"
 #include "Standalone/MeshComponent.h"
+#include "PathfinderModule.h"
 
 ResourcesModule::ResourcesModule()
 {
@@ -130,4 +131,6 @@ void ResourcesModule::CreateNavMesh()
         }
     }
     tmpNavmesh->BuildNavMesh(meshes, minPos, maxPos);
+    App->GetPathfinderModule()->InitQuerySystem();
+
 }
