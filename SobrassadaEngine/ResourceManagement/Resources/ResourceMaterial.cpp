@@ -109,9 +109,10 @@ void ResourceMaterial::OnEditorUpdate()
             {
                 ImGui::SetTooltip("Texture Dimensions: %d, %d", specularTexture.width, specularTexture.height);
             }
+            ImGui::SameLine();
         }
         
-        ImGui::SameLine();
+        
         if (ImGui::Button("Select Specular Texture"))
         {
             ImGui::OpenPopup(CONSTANT_TEXTURE_SELECT_DIALOG_ID);
@@ -169,6 +170,9 @@ void ResourceMaterial::OnEditorUpdate()
         }
         
     }
+
+    //TODO: override metadata material
+    //if (updated)
 }
 
 UID ResourceMaterial::ChangeTexture(UID newTexture, TextureInfo& textureToChange, UID textureGPU)

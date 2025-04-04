@@ -39,8 +39,10 @@ class ResourceMaterial : public Resource
     void LoadMaterialData(Material mat);
     void FreeMaterials() const;
 
-    void UpdateUBO() const;
     UID ChangeTexture(UID newTexture, TextureInfo& textureToChange, UID textureGPU);
+
+    const bool GetIsMetallicRoughness() const { return metallicTexture.textureID != 0 ? true : false; }
+    const MaterialGPU GetMaterial() const { return material; }
 
   private:
     TextureInfo diffuseTexture;
