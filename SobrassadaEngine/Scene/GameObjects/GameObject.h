@@ -85,7 +85,7 @@ class SOBRASADA_API_ENGINE GameObject
 
     MeshComponent* GetMeshComponent() const;
 
-    void SetLocalTransform(const float4x4& newTransform) { localTransform = newTransform; }
+    void SetLocalTransform(const float4x4& newTransform);
     void DrawGizmos() const;
 
     void CreatePrefab();
