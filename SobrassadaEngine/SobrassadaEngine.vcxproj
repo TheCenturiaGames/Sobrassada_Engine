@@ -295,6 +295,7 @@
     <ClCompile Include="FileSystem\Batching\GeometryBatch.cpp" />
     <ClCompile Include="Libs\ImNodeFlow-1.2.2\src\ImNodeFlow.cpp" />
     <ClCompile Include="FileSystem\StateMachineManager.cpp" />
+    <ClCompile Include="ResourceManagement\Resources\ResourceNavmesh.cpp" />
     <ClCompile Include="Modules\GameUIModule.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceStateMachine.cpp" />
     <ClCompile Include="Scene\Components\CameraComponent.cpp" />
@@ -321,47 +322,47 @@
     <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourNavMeshQuery.cpp" />
     <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourNode.cpp" />
     <ClCompile Include="Libs\RecastDetour\Recast\Source\Recast.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastAlloc.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastArea.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastAssert.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastContour.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastFilter.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastLayers.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastMesh.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastMeshDetail.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastRasterization.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastRegion.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Modules\CameraModule.cpp" />
@@ -469,6 +470,7 @@
     <ClInclude Include="Scene\Components\Standalone\UI\UILabelComponent.h" />
     <ClInclude Include="Utils\TextManager.h" />
     <ClInclude Include="Modules\ScriptModule.h" />
+    <ClInclude Include="ResourceManagement\Resources\ResourceNavmesh.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceStateMachine.h" />
     <ClInclude Include="Scene\Components\CameraComponent.h" />
     <ClInclude Include="Scene\Components\ScriptComponent.h" />
