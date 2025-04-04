@@ -7,6 +7,7 @@
 #include "Standalone/Lights/PointLightComponent.h"
 #include "Standalone/Lights/SpotLightComponent.h"
 #include "Standalone/MeshComponent.h"
+#include "Standalone/AIAgentComponent.h"
 #include "ScriptComponent.h"
 
 #include <cstdint>
@@ -39,6 +40,8 @@ Component* ComponentUtils::CreateEmptyComponent(const ComponentType type, const 
     case COMPONENT_SCRIPT:
         generatedComponent = new ScriptComponent(uid, parent);
         break;
+    case COMPONENT_AIAGENT:
+        generatedComponent = new AIAgentComponent(uid, parent);
     default:
         return nullptr;
     }
@@ -70,6 +73,8 @@ Component* ComponentUtils::CreateExistingComponent(const rapidjson::Value& initi
             return new CameraComponent(initialState, parent);
         case COMPONENT_SCRIPT:
             return new ScriptComponent(initialState, parent);
+        case COMPONENT_AIAGENT:
+            return new AIAgentComponent(initialState, parent);
         default:
             return nullptr;
         }

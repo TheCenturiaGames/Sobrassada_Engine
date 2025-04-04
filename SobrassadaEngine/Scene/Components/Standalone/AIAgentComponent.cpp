@@ -6,10 +6,16 @@
 
 #include <DetourCrowd.h>
 
-AIAgentComponent::AIAgentComponent(UID uid, GameObject* parent, float3 position, float moveSpeed)
+AIAgentComponent::AIAgentComponent(UID uid, GameObject* parent)
     : Component(uid, parent, "AI Agent Controller", COMPONENT_AIAGENT)
 {
-    agentPosition = position;
+    float4x4 transformMatrix = parent->GetGlobalTransform();
+    agentPosition            = float3(transformMatrix[0][3], transformMatrix[1][3], transformMatrix[2][3]);
+    speed                    = 3.5f;
+    radius                   = 0.6f;
+    height                   = 2.0f;
+    agentId                  = -1;
+    autoAdd                  = false;
 }
 
 AIAgentComponent::AIAgentComponent(const rapidjson::Value& initialState, GameObject* parent)
@@ -38,6 +44,29 @@ void AIAgentComponent::Update(float deltaTime)
     if (!App->GetSceneModule()->GetInPlayMode()) return;
 
     if (deltaTime <= 0.0f) return;
+}
+
+void AIAgentComponent::Render(float deltaTime)
+{
+}
+
+void AIAgentComponent::Clone(const Component* other)
+{
+
+    if (other->GetType() == ComponentType::COMPONENT_AIAGENT)
+    {
+        const AIAgentComponent* otherAIAgent = static_cast<const AIAgentComponent*>(other);
+        agentPosition                                       = otherAIAgent->agentPosition;
+        speed                                              = otherAIAgent->speed;
+        radius                                             = otherAIAgent->radius;
+        height                                             = otherAIAgent->height;
+        agentId                                            = -1;
+        autoAdd                                            = false;
+    }
+    else
+    {
+        GLOG("It is not possible to clone a component of a different type!");
+    }
 }
 
 // OPTIONAL TODO save agents as a resource in the future.
