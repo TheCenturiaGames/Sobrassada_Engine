@@ -2,14 +2,11 @@
 
 #include "Component.h"
 
+#include "Math/float3.h"
+
 namespace TextManager
 {
     struct FontData;
-}
-
-namespace math
-{
-    class float3;
 }
 
 class Transform2DComponent;
