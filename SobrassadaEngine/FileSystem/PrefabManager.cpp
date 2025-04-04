@@ -5,12 +5,12 @@
 #include "LibraryModule.h"
 #include "MetaPrefab.h"
 #include "ProjectModule.h"
-#include "ResourceManagement/Resources/ResourcePrefab.h"
-#include "Scene/GameObjects/GameObject.h"
+#include "ResourcePrefab.h"
+#include "GameObject.h"
 #include "SceneModule.h"
 
-#include "prettywriter.h"
-#include "stringbuffer.h"
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
 #include <filesystem>
 #include <queue>
 

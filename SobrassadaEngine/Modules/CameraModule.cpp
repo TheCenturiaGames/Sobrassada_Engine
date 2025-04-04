@@ -1,15 +1,15 @@
 #include "CameraModule.h"
 
+#include "Application.h"
+#include "GameObject.h"
 #include "InputModule.h"
 #include "ProjectModule.h"
 #include "SceneModule.h"
 #include "WindowModule.h"
-#include <Application.h>
-#include <GameObject.h>
 
 #include "DebugDraw/debugdraw.h"
+#include "Math/Quat.h"
 #include "MathGeoLib.h"
-#include <Math/Quat.h>
 #include "SDL_scancode.h"
 #include "glew.h"
 #include <functional>
@@ -32,7 +32,7 @@ bool CameraModule::Init()
     camera.up                        = float3::unitY;
 
     camera.nearPlaneDistance         = 0.1f;
-    camera.farPlaneDistance          = 6000.f;
+    camera.farPlaneDistance          = 2500.f;
 
     camera.horizontalFov             = (float)HFOV / RAD_DEGREE_CONV;
 

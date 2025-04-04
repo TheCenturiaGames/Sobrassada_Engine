@@ -1,6 +1,6 @@
 ﻿#include "ResourceTexture.h"
 
-#include <glew.h>
+#include "glew.h"
 
 ResourceTexture::ResourceTexture(uint64_t uid, const std::string& name) : Resource(uid, name, ResourceType::Texture)
 {
@@ -77,7 +77,6 @@ void ResourceTexture::ConvertMetadata(const DirectX::TexMetadata& metadata, Open
         assert(false && "Unsupported format");
     }
 }
-
 
 unsigned int ResourceTexture::GetCubemapFaceID(int faceIndex) const
 {

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Module.h"
-#include "Scene/Components/Standalone/UI/CanvasComponent.h"
 
 #include <ft2build.h>
 #include <vector>
@@ -11,6 +10,8 @@ namespace TextManager
 {
     struct FontData;
 }
+
+class CanvasComponent;
 
 class GameUIModule : public Module
 {
@@ -29,6 +30,4 @@ class GameUIModule : public Module
 
   private:
     std::vector<CanvasComponent*> canvases;
-
-    unsigned int uiWidgetProgram = 0;
 };
