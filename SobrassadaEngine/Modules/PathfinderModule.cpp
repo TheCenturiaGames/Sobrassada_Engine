@@ -119,9 +119,9 @@ void PathfinderModule::RemoveAgent(int agentId)
     crowd->removeAgent(agentId);
 }
 
-void PathfinderModule::QueryNavmesh()
+void PathfinderModule::InitQuerySystem()
 {
     navmesh = App->GetResourcesModule()->GetNavMesh();
     navQuery = navmesh->GetDetourNavMeshQuery();
-
+    crowd->init(maxAgents, maxAgentRadius, navmesh->GetDetourNavMesh());
 }
