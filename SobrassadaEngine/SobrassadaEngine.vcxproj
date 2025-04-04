@@ -296,6 +296,7 @@
     <ClCompile Include="FileSystem\StateMachineManager.cpp" />
     <ClCompile Include="Modules\ScriptModule.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceNavmesh.cpp" />
+    <ClCompile Include="Modules\GameUIModule.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceStateMachine.cpp" />
     <ClCompile Include="Scene\Components\CameraComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\UI\CanvasComponent.cpp" />
