@@ -10,8 +10,13 @@
 #include "imgui.h"
 #include <unordered_set>
 
-ResourceMaterial::ResourceMaterial(UID uid, const std::string& name) : Resource(uid, name, ResourceType::Material)
+ResourceMaterial::ResourceMaterial(UID uid, const std::string& name, const rapidjson::Value& importOptions)
+    : Resource(uid, name, ResourceType::Material)
 {
+    if (importOptions.HasMember("defaultTextureUID") && importOptions["defaultTextureUID"].IsUint64())
+        defaultTextureUID = importOptions["defaultTextureUID"].GetUint64();
+
+    else defaultTextureUID = INVALID_UID;
 }
 
 ResourceMaterial::~ResourceMaterial()

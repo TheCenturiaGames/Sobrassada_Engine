@@ -4,6 +4,7 @@
 
 #include "Math/float3.h"
 #include "Math/float4.h"
+#include "rapidjson/document.h"
 
 class Material;
 
@@ -31,7 +32,7 @@ struct MaterialGPU
 class ResourceMaterial : public Resource
 {
   public:
-    ResourceMaterial(UID uid, const std::string& name);
+    ResourceMaterial(UID uid, const std::string& name, const rapidjson::Value& importOptions);
     ~ResourceMaterial() override;
 
     void OnEditorUpdate();
@@ -48,4 +49,5 @@ class ResourceMaterial : public Resource
     TextureInfo normalTexture;
 
     MaterialGPU material;
+    UID defaultTextureUID = INVALID_UID;
 };
