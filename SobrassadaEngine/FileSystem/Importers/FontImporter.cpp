@@ -20,7 +20,7 @@ namespace FontImporter
 
         std::string name      = FileSystem::GetFileNameWithoutExtension(filePath);
 
-        UID fontUID          = GenerateUID();
+        UID fontUID           = GenerateUID();
         fontUID               = App->GetLibraryModule()->AssignFiletypeUID(fontUID, FileType::Font);
 
         std::string assetPath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(filePath);
@@ -47,7 +47,7 @@ namespace FontImporter
 
     ResourceFont* LoadFont(UID fontUID)
     {
-        const std::string filePath   = App->GetLibraryModule()->GetResourcePath(fontUID);
+        const std::string filePath = App->GetLibraryModule()->GetResourcePath(fontUID);
         ResourceFont* resourceFont = new ResourceFont(fontUID, FileSystem::GetFileNameWithoutExtension(filePath));
         resourceFont->SetFilepath(filePath);
 

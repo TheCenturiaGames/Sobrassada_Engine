@@ -405,7 +405,6 @@
     <ClCompile Include="FileSystem\Importers\FontImporter.cpp">
       <Filter>FileSystem\Importers</Filter>
     </ClCompile>
-    <ClCompile Include="FileSystem\Meta\MetaFont.cpp" />
     <ClCompile Include="Modules\ScriptModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
@@ -419,7 +418,10 @@
       <Filter>FileSystem\Batching</Filter>
     </ClCompile>
     <ClCompile Include="ResourceManagement\Resources\ResourceNavmesh.cpp">
-    <Filter>Resources</Filter>
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\Meta\MetaFont.cpp">
+      <Filter>FileSystem\Meta</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -771,7 +773,6 @@
     <ClInclude Include="FileSystem\Importers\FontImporter.h">
       <Filter>FileSystem\Importers</Filter>
     </ClInclude>
-    <ClInclude Include="FileSystem\Meta\MetaFont.h" />
     <ClInclude Include="Utils\Script.h">
       <Filter>Utils</Filter>
     </ClInclude>
@@ -788,7 +789,10 @@
       <Filter>FileSystem\Batching</Filter>
     </ClInclude>
     <ClInclude Include="ResourceManagement\Resources\ResourceNavmesh.h">
-    <Filter>Resources</Filter>
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\Meta\MetaFont.h">
+      <Filter>FileSystem\Meta</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
