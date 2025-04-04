@@ -27,8 +27,8 @@ class Scene
 
     void Init();
     void Save(
-        rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator, SaveMode saveMode, UID newUID = INVALID_UID,
-        const char* newName = nullptr
+        rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator, SaveMode saveMode,
+        UID newUID = INVALID_UID, const char* newName = nullptr
     );
 
     void LoadComponents() const;
@@ -75,6 +75,7 @@ class Scene
     bool GetDoInputs() const { return doInputs; }
     bool GetDoMouseInputs() const { return doMouseInputs; }
     bool GetStopPlaying() const { return stopPlaying; }
+    bool GetSceneVisible() const { return sceneVisible; }
 
     const std::tuple<float, float>& GetWindowPosition() const { return sceneWindowPosition; };
     const std::tuple<float, float>& GetWindowSize() const { return sceneWindowSize; };
@@ -103,6 +104,7 @@ class Scene
     bool stopPlaying   = false;
     bool doInputs      = false;
     bool doMouseInputs = false;
+    bool sceneVisible  = false;
 
     std::unordered_map<UID, GameObject*> gameObjectsContainer;
 
