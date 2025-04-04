@@ -41,6 +41,14 @@ UILabelComponent::UILabelComponent(const rapidjson::Value& initialState, GameObj
         fontType =
             static_cast<ResourceFont*>(App->GetResourcesModule()->RequestResource(initialState["FontUID"].GetUint64()));
     }
+    else
+    {
+        // To prevent crashes in older saved scenes, load the default one if there is no font saved
+        GLOG("[Warning] No font type found for the component %s in the saved scene", name);
+        fontType = static_cast<ResourceFont*>(
+            App->GetResourcesModule()->RequestResource(App->GetLibraryModule()->GetFontMap().at("Roboto-Regular"))
+        );
+    }
 
     if (initialState.HasMember("FontColor") && initialState["FontColor"].IsArray())
     {
