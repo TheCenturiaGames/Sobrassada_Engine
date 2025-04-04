@@ -12,7 +12,7 @@ SphereColliderComponent::SphereColliderComponent(UID uid, GameObject* parent)
     : Component(uid, parent, "Shpere Collider", COMPONENT_SPHERE_COLLIDER)
 {
 
-    AABB heriachyAABB    = parent->GetHeriachyAABB();
+    AABB heriachyAABB    = parent->GetHierarchyAABB();
     Sphere sphere        = heriachyAABB.MinimalEnclosingSphere();
 
     radius               = sphere.r;
@@ -104,10 +104,10 @@ void SphereColliderComponent::RenderEditorInspector()
                 if (colliderType == ColliderType::STATIC)
                 {
                     mass = 0.f;
-                    parent->UpdateMobilityHeriarchy(MobilitySettings::STATIC);
+                    parent->UpdateMobilityHierarchy(MobilitySettings::STATIC);
                 }
                 else if (colliderType == ColliderType::DYNAMIC)
-                    parent->UpdateMobilityHeriarchy(MobilitySettings::DYNAMIC);
+                    parent->UpdateMobilityHierarchy(MobilitySettings::DYNAMIC);
                 App->GetPhysicsModule()->UpdateSphereRigidBody(this);
             }
         }
@@ -161,7 +161,7 @@ void SphereColliderComponent::Render(float deltaTime)
 
 void SphereColliderComponent::ParentUpdated()
 {
-    AABB heriachyAABB = parent->GetHeriachyAABB();
+    AABB heriachyAABB = parent->GetHierarchyAABB();
     Sphere sphere     = heriachyAABB.MinimalEnclosingSphere();
 
     radius            = sphere.r;

@@ -271,7 +271,7 @@ void GameObject::RenderEditorInspector()
             {
                 App->GetSceneModule()->GetScene()->SetStaticModified();
                 App->GetSceneModule()->GetScene()->SetDynamicModified();
-                UpdateMobilityHeriarchy(STATIC);
+                UpdateMobilityHierarchy(STATIC);
             }
         }
         ImGui::SameLine();
@@ -281,7 +281,7 @@ void GameObject::RenderEditorInspector()
             {
                 App->GetSceneModule()->GetScene()->SetStaticModified();
                 App->GetSceneModule()->GetScene()->SetDynamicModified();
-                UpdateMobilityHeriarchy(DYNAMIC);
+                UpdateMobilityHierarchy(DYNAMIC);
             }
         }
 
@@ -410,7 +410,7 @@ void GameObject::UpdateComponents()
     }
 }
 
-AABB GameObject::GetHeriachyAABB()
+AABB GameObject::GetHierarchyAABB()
 {
     AABB returnAABB;
     returnAABB.SetNegativeInfinity();
@@ -737,7 +737,7 @@ void GameObject::OnDrawConnectionsToggle()
     }
 }
 
-void GameObject::UpdateMobilityHeriarchy(MobilitySettings type)
+void GameObject::UpdateMobilityHierarchy(MobilitySettings type)
 {
     SetMobility(type);
     std::set<UID> visitedGameObjects;

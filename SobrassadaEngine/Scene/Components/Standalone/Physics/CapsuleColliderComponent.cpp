@@ -11,7 +11,7 @@ CapsuleColliderComponent::CapsuleColliderComponent(UID uid, GameObject* parent)
     : Component(uid, parent, "Capsule Collider", COMPONENT_CAPSULE_COLLIDER)
 {
 
-    AABB heriachyAABB    = parent->GetHeriachyAABB();
+    AABB heriachyAABB    = parent->GetHierarchyAABB();
     radius               = heriachyAABB.Size().MaxElement() / 2.f;
     length               = heriachyAABB.Size().y / 2.f;
     centerOffset         = heriachyAABB.CenterPoint() - parent->GetPosition();
@@ -104,10 +104,10 @@ void CapsuleColliderComponent::RenderEditorInspector()
                 if (colliderType == ColliderType::STATIC)
                 {
                     mass = 0.f;
-                    parent->UpdateMobilityHeriarchy(MobilitySettings::STATIC);
+                    parent->UpdateMobilityHierarchy(MobilitySettings::STATIC);
                 }
                 else if (colliderType == ColliderType::DYNAMIC)
-                    parent->UpdateMobilityHeriarchy(MobilitySettings::DYNAMIC);
+                    parent->UpdateMobilityHierarchy(MobilitySettings::DYNAMIC);
                 App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
             }
         }
@@ -163,7 +163,7 @@ void CapsuleColliderComponent::Render(float deltaTime)
 
 void CapsuleColliderComponent::ParentUpdated()
 {
-    AABB heriachyAABB = parent->GetHeriachyAABB();
+    AABB heriachyAABB = parent->GetHierarchyAABB();
     radius            = heriachyAABB.Size().MaxElement() / 2.f;
     length            = heriachyAABB.Size().y / 2.f;
     centerOffset      = heriachyAABB.CenterPoint() - parent->GetPosition();

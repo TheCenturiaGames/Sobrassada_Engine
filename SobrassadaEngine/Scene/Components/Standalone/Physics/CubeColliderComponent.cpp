@@ -11,7 +11,7 @@ CubeColliderComponent::CubeColliderComponent(UID uid, GameObject* parent)
     : Component(uid, parent, "Cube Collider", COMPONENT_CUBE_COLLIDER)
 {
 
-    AABB heriachyAABB    = parent->GetHeriachyAABB();
+    AABB heriachyAABB    = parent->GetHierarchyAABB();
     size                 = heriachyAABB.HalfSize();
     centerOffset         = heriachyAABB.CenterPoint() - parent->GetPosition();
 
@@ -109,10 +109,10 @@ void CubeColliderComponent::RenderEditorInspector()
                 if (colliderType == ColliderType::STATIC)
                 {
                     mass = 0.f;
-                    parent->UpdateMobilityHeriarchy(MobilitySettings::STATIC);
+                    parent->UpdateMobilityHierarchy(MobilitySettings::STATIC);
                 }
                 else if (colliderType == ColliderType::DYNAMIC)
-                    parent->UpdateMobilityHeriarchy(MobilitySettings::DYNAMIC);
+                    parent->UpdateMobilityHierarchy(MobilitySettings::DYNAMIC);
                 App->GetPhysicsModule()->UpdateCubeRigidBody(this);
             }
         }
@@ -166,7 +166,7 @@ void CubeColliderComponent::Render(float deltaTime)
 
 void CubeColliderComponent::ParentUpdated()
 {
-    AABB heriachyAABB = parent->GetHeriachyAABB();
+    AABB heriachyAABB = parent->GetHierarchyAABB();
     size              = heriachyAABB.HalfSize();
     centerOffset      = heriachyAABB.CenterPoint() - parent->GetPosition();
 

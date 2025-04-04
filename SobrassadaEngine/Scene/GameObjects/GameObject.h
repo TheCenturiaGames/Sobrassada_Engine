@@ -80,7 +80,7 @@ class SOBRASADA_API_ENGINE GameObject
 
     // Updates the transform for this game object and all descending children
     void UpdateTransformForGOBranch() const;
-    void UpdateMobilityHeriarchy(MobilitySettings type);
+    void UpdateMobilityHierarchy(MobilitySettings type);
 
     const std::unordered_map<ComponentType, Component*>& GetComponents() const { return components; }
     Component* GetComponentByType(ComponentType type) const;
@@ -99,7 +99,7 @@ class SOBRASADA_API_ENGINE GameObject
 
     void OnTransformUpdated();
     void UpdateComponents();
-    AABB GetHeriachyAABB();
+    AABB GetHierarchyAABB();
 
     void SetPosition(float3& newPosition) { position = newPosition; };
 
