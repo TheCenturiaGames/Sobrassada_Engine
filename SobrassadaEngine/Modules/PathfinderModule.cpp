@@ -24,7 +24,7 @@ bool PathfinderModule ::Init()
 PathfinderModule::~PathfinderModule()
 {
     dtFreeCrowd(crowd);
-    //dtFreeNavMeshQuery(navQuery);
+    //dtFreeNavMeshQuery(navQuery); TODO when saving navmesh, re-enable this
     if (navmesh) navmesh = nullptr;
 }
 

@@ -37,6 +37,11 @@ AIAgentComponent::AIAgentComponent(const rapidjson::Value& initialState, GameObj
 
 AIAgentComponent::~AIAgentComponent()
 {
+    if (agentId != -1)
+    {
+        App->GetPathfinderModule()->RemoveAgent(agentId); // Step 1: Remove old agent
+        agentId = -1;
+    }
 }
 
 void AIAgentComponent::Update(float deltaTime)
@@ -102,8 +107,35 @@ void AIAgentComponent::Save(rapidjson::Value& targetState, rapidjson::Document::
 
 void AIAgentComponent::setPath(const float3& destination)
 {
-}
 
+    if (agentId == -1) return;
+
+    PathfinderModule* pathfinder = App->GetPathfinderModule();
+    dtNavMeshQuery* navQuery     = pathfinder->GetNavQuery();
+    if (!navQuery) return;
+
+    float pos[3] = {destination.x, destination.y, destination.z};
+
+    // Prepare for finding the nearest poly
+    dtQueryFilter filter;
+    float extents[3] = {2.0f, 4.0f, 2.0f}; // bounding box for the search area
+    float nearestPoint[3];
+    dtPolyRef targetRef;
+
+    dtStatus status = navQuery->findNearestPoly(pos, extents, &filter, &targetRef, nearestPoint);
+    if (dtStatusFailed(status) || targetRef == 0)
+    {
+        GLOG("Failed to find valid target poly for movement.");
+        return;
+    }
+
+    // Request move to destination
+    bool result = pathfinder->GetCrowd()->requestMoveTarget(agentId, targetRef, pos);
+    if (!result)
+    {
+        GLOG("Crowd agent failed to request movement.");
+    }
+}
 void AIAgentComponent::AddToCrowd()
 {
     if (agentId != -1)

@@ -18,6 +18,8 @@ class PathfinderModule : public Module
 
     //std::vector<float3> FindPath(float3 start, float3 end);
     int CreateAgent(float3 position, float radius, float height, float speed);
+    dtCrowd* GetCrowd() const { return crowd; }
+    dtNavMeshQuery* GetNavQuery() const { return navQuery; }
     void RemoveAgent(int agentId);
     void InitQuerySystem();
     void HandleClickNavigation(); // Perform raycast and set destination
