@@ -124,34 +124,50 @@ void StateMachineEditor::ShowInspector()
     ImGui::Separator();
 
     std::string stateName = selectedNode->GetStateName();
-    char nameBuffer[128];
+    char nameBuffer[128]  = "";
     strncpy_s(nameBuffer, stateName.c_str(), sizeof(nameBuffer));
     nameBuffer[sizeof(nameBuffer) - 1] = '\0';
+
 
     if (ImGui::InputText("State Name", nameBuffer, sizeof(nameBuffer)))
     {
         std::string newName(nameBuffer);
+
         if (newName != stateName)
         {
-            resource->EditState(stateName, newName, selectedNode->GetClipName());
-            selectedNode->SetStateName(newName);
-            auto transitionsCopy = resource->transitions;
-
-            for (const auto& transition : transitionsCopy)
+            const State* existingState = resource->GetState(newName);
+            if (existingState != nullptr)
             {
-                if (transition.fromState.GetString() == stateName)
+                ImGui::TextColored(
+                    ImVec4(1, 0.5f, 0.5f, 1.0f), "A state with the name \"%s\" already exists!", nameBuffer
+                );
+            }
+            else
+            {
+                resource->EditState(stateName, newName, selectedNode->GetClipName());
+                selectedNode->SetStateName(newName);
+                auto transitionsCopy = resource->transitions;
+
+                for (const auto& transition : transitionsCopy)
                 {
-                    std::string prevTrigger    = transition.triggerName.GetString();
-                    uint32_t prevInterpolation = transition.interpolationTime;
-                    resource->RemoveTransition(transition.fromState.GetString(), transition.toState.GetString());
-                    resource->AddTransition(newName, transition.toState.GetString(), prevTrigger, prevInterpolation);
-                }
-                else if (transition.toState.GetString() == stateName)
-                {
-                    std::string prevTrigger    = transition.triggerName.GetString();
-                    uint32_t prevInterpolation = transition.interpolationTime;
-                    resource->RemoveTransition(transition.toState.GetString(), transition.fromState.GetString());
-                    resource->AddTransition(transition.fromState.GetString(), newName, prevTrigger, prevInterpolation);
+                    if (transition.fromState.GetString() == stateName)
+                    {
+                        std::string prevTrigger    = transition.triggerName.GetString();
+                        uint32_t prevInterpolation = transition.interpolationTime;
+                        resource->RemoveTransition(transition.fromState.GetString(), transition.toState.GetString());
+                        resource->AddTransition(
+                            newName, transition.toState.GetString(), prevTrigger, prevInterpolation
+                        );
+                    }
+                    else if (transition.toState.GetString() == stateName)
+                    {
+                        std::string prevTrigger    = transition.triggerName.GetString();
+                        uint32_t prevInterpolation = transition.interpolationTime;
+                        resource->RemoveTransition(transition.toState.GetString(), transition.fromState.GetString());
+                        resource->AddTransition(
+                            transition.fromState.GetString(), newName, prevTrigger, prevInterpolation
+                        );
+                    }
                 }
             }
         }
@@ -196,7 +212,7 @@ void StateMachineEditor::ShowInspector()
     const Clip* clip = resource->GetClip(selectedNode->GetClipName());
     if (clip)
     {
-        static bool loopBuffer = clip->loop;
+        bool loopBuffer = clip->loop;
 
         ImGui::Text("Clip UID: %llu", clip->animationResourceUID);
 
@@ -352,6 +368,26 @@ void StateMachineEditor::ShowInspector()
 void StateMachineEditor::BuildGraph()
 {
     selectedNode = nullptr;
+    if (graph)
+    {
+        for (auto& [uid, node] : graph->getNodes())
+        {
+            if (node)
+            {
+                for (const auto& pin : node->getIns())
+                {
+                    pin->deleteLink();
+                }
+
+                
+                for (const auto& pin : node->getOuts())
+                {
+                    pin->deleteLink();
+                }
+            }
+        }
+        graph->getNodes().clear(); // ahora sí es seguro borrar los nodos
+    }
     graph = std::make_unique<ImFlow::ImNodeFlow>("StateMachineGraph_" + std::to_string(uid));
 
     std::unordered_map<std::string, std::shared_ptr<StateNode>> stateNodes;
