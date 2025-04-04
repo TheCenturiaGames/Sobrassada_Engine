@@ -21,29 +21,25 @@ PathfinderModule::~PathfinderModule()
     delete navmesh;
 }
 
-bool PathfinderModule::Init()
-{
-    if (!crowd) crowd = dtAllocCrowd();
-    return true;
-}
 
 update_status PathfinderModule::Update(float deltaTime)
 {
 
-    if (!App->GetSceneModule()->GetInPlayMode()) return;
+    if (!App->GetSceneModule()->GetInPlayMode()) return UPDATE_ERROR;
 
-    if (deltaTime <= 0.0f) return;
+    if (deltaTime <= 0.0f) return UPDATE_ERROR;
 
     if (crowd->getAgentCount() > 0)
     {
         crowd->update(deltaTime, nullptr);
     }
 
-    return update_status();
+    return UPDATE_CONTINUE;
 }
-
+/*
 std::vector<float3> PathfinderModule::FindPath(float3 start, float3 end)
 {
+    
     std::vector<float3> path;
 
     dtQueryFilter filter;
@@ -84,9 +80,12 @@ std::vector<float3> PathfinderModule::FindPath(float3 start, float3 end)
     {
         path.emplace_back(straightPath[j * 3], straightPath[j * 3 + 1], straightPath[j * 3 + 2]);
     }
-
+    
     return path;
+    
+
 }
+*/
 
 // All ai agent components will call this to add themselves to crowd
 int PathfinderModule::CreateAgent(float3 position, float radius, float height, float speed)
@@ -123,7 +122,17 @@ void PathfinderModule::RemoveAgent(int agentId)
 
 void PathfinderModule::InitQuerySystem()
 {
-    navmesh = App->GetResourcesModule()->GetNavMesh();
+    if (crowd == nullptr) crowd = dtAllocCrowd(); 
+
+    navmesh  = App->GetResourcesModule()->GetNavMesh();
     navQuery = navmesh->GetDetourNavMeshQuery();
-    crowd->init(maxAgents, maxAgentRadius, navmesh->GetDetourNavMesh());
+
+    if (crowd != nullptr && navmesh != nullptr)
+    {
+        crowd->init(maxAgents, maxAgentRadius, navmesh->GetDetourNavMesh());
+    }
+    else
+    {
+        GLOG("Failed to initialize Pathfinder crowd system.");
+    }
 }

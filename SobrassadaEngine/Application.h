@@ -18,6 +18,7 @@ class SceneModule;
 class CameraModule;
 class DebugDrawModule;
 class UserInterfaceModule;
+class PathfinderModule;
 
 class EngineTimer;
 class GameTimer;
