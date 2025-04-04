@@ -1,6 +1,8 @@
 #pragma once
 
+#include "Globals.h"
 #include "Math/float2.h"
+
 #include <map>
 
 
@@ -11,6 +13,7 @@ namespace TextManager
     struct Character
     {
         unsigned int textureID = 0;
+        UID bindlessUID        = 0;
         float2 size            = float2::zero;
         float2 bearing         = float2::zero;
         unsigned int advance   = 0;
