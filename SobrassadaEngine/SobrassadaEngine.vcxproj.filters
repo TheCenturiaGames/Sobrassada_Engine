@@ -418,6 +418,9 @@
     <ClCompile Include="FileSystem\Batching\GeometryBatch.cpp">
       <Filter>FileSystem\Batching</Filter>
     </ClCompile>
+    <ClCompile Include="ResourceManagement\Resources\ResourceNavmesh.cpp">
+    <Filter>Resources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -783,6 +786,9 @@
     </ClInclude>
     <ClInclude Include="FileSystem\Batching\GeometryBatch.h">
       <Filter>FileSystem\Batching</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManagement\Resources\ResourceNavmesh.h">
+    <Filter>Resources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
