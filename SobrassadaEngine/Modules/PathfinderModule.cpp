@@ -24,8 +24,8 @@ bool PathfinderModule ::Init()
 PathfinderModule::~PathfinderModule()
 {
     dtFreeCrowd(crowd);
-    dtFreeNavMeshQuery(navQuery);
-    delete navmesh;
+    //dtFreeNavMeshQuery(navQuery);
+    if (navmesh) navmesh = nullptr;
 }
 
 update_status PathfinderModule::Update(float deltaTime)

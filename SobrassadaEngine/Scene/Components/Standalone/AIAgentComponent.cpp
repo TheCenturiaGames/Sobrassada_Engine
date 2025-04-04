@@ -3,6 +3,8 @@
 #include "Application.h"
 #include "PathfinderModule.h"
 #include "SceneModule.h"
+#include "EditorUIModule.h"
+
 
 #include <DetourCrowd.h>
 
@@ -48,6 +50,21 @@ void AIAgentComponent::Update(float deltaTime)
 
 void AIAgentComponent::Render(float deltaTime)
 {
+}
+
+void AIAgentComponent::RenderEditorInspector()
+{
+    Component::RenderEditorInspector();
+
+    if (enabled)
+    {
+        ImGui::DragFloat("Speed", &speed, 0.1f, 0.1f, 200.f, "%.2f");
+        ImGui::DragFloat("Radius", &radius, 0.1f, 0.1f, 200.f, "%.2f");
+        ImGui::DragFloat("Height", &height, 0.1f, 0.1f, 200.f, "%.2f");
+        ImGui::Checkbox("AutoAdd", &autoAdd);
+        
+        if (ImGui::Button("Create Agent")) RecreateAgent();
+    }
 }
 
 void AIAgentComponent::Clone(const Component* other)

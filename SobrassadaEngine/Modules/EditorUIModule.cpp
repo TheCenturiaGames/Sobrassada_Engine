@@ -41,7 +41,8 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"Directional Light",    COMPONENT_DIRECTIONAL_LIGHT   },
         {"Character Controller", COMPONENT_CHARACTER_CONTROLLER},
         {"Camera",               COMPONENT_CAMERA              },
-        {"Script",               COMPONENT_SCRIPT              }
+        {"Script",               COMPONENT_SCRIPT              },
+        {"AI Agent",            COMPONENT_AIAGENT             }
     };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;

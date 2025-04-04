@@ -23,7 +23,7 @@ enum ComponentType
     COMPONENT_SCRIPT,
     COMPONENT_AIAGENT,
     FIRST = COMPONENT_NONE,
-    LAST  = COMPONENT_SCRIPT
+    LAST  = COMPONENT_AIAGENT
 };
 
 class ComponentUtils

@@ -20,9 +20,10 @@ class AIAgentComponent : public Component
     void SetAgentPosition(float3 agentPosition) { agentPosition = agentPosition; }
     void setPath(const float3& destination); 
     void Update(float deltaTime) override;
-    virtual void Render(float deltaTime) override;
-    virtual void Clone(const Component* other) override;
-    virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
+    void Render(float deltaTime) override;
+    void RenderEditorInspector() override;
+    void Clone(const Component* other) override;
+    void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
 
   private:
     float3 agentPosition;

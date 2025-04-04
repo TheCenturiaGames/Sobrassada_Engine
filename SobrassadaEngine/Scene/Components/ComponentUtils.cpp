@@ -42,6 +42,7 @@ Component* ComponentUtils::CreateEmptyComponent(const ComponentType type, const 
         break;
     case COMPONENT_AIAGENT:
         generatedComponent = new AIAgentComponent(uid, parent);
+        break;
     default:
         return nullptr;
     }
