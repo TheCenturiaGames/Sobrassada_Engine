@@ -1,4 +1,4 @@
-#include "ResourceNavMesh.h"
+#include "ResourceNavmesh.h"
 
 #include "Application.h"
 #include "DebugDrawModule.h"
@@ -96,9 +96,6 @@ bool ResourceNavMesh::BuildNavMesh(
 
     rcContext* context   = new rcContext();
 
-    std::vector<rcPolyMeshDetail*> myPolyMeshDetails;
-    std::vector<rcPolyMesh*> myPolyMeshes;
-
     // first pass to get necessary sizes and AABB
     for (const auto& mesh : meshes)
     {
@@ -130,9 +127,6 @@ bool ResourceNavMesh::BuildNavMesh(
         const std::vector<unsigned int>& meshIndices = mesh.first->GetIndices();
 
         const int vertexCount                        = mesh.first->GetVertexCount();
-        int vertexCount                              = mesh.first->GetVertexCount();
-        int meshVertexCount                          = (int)meshVerts.size();
-        int meshTriangleCount                        = indexCount / 3; // triangles
 
         for (const Vertex& vertex : meshVerts)
         {
@@ -306,7 +300,6 @@ bool ResourceNavMesh::BuildNavMesh(
         GLOG("buildNavigation: Could not triangulate contours.");
         return false;
     }
-    
     polymeshDetail = rcAllocPolyMeshDetail();
     if (!polymeshDetail)
     {
@@ -322,11 +315,10 @@ bool ResourceNavMesh::BuildNavMesh(
         GLOG("buildNavigation: Could not build detail mesh.");
         return false;
     }
-    
-
 
     rcFreeCompactHeightfield(compactHeightfield);
     rcFreeContourSet(contourSet);
+
     // mark areas for detour
     if (config->maxVertsPerPoly <= DT_VERTS_PER_POLYGON)
     {
@@ -348,9 +340,7 @@ bool ResourceNavMesh::BuildNavMesh(
             {
                 polymesh->flags[i] = SAMPLE_POLYFLAGS_WALK | SAMPLE_POLYFLAGS_DOOR;
             }
-        
         }
-
     }
 
     CreateDetourData();
@@ -358,7 +348,6 @@ bool ResourceNavMesh::BuildNavMesh(
     delete context;
     return true;
 }
-
 
 void ResourceNavMesh::CreateDetourData()
 {
@@ -397,9 +386,6 @@ void ResourceNavMesh::CreateDetourData()
     params->cs          = config->cs;
     params->ch          = config->ch;
     params->buildBvTree = true;
-        params.cs          = config->cs;
-        params.ch          = config->ch;
-        params.buildBvTree = true;
 
     if (!dtCreateNavMeshData(params, &navData, &navDataSize))
     {
@@ -418,6 +404,9 @@ void ResourceNavMesh::CreateDetourData()
         GLOG("Could not create Detour navmesh");
         return;
     }
+
+    dtStatus status;
+
     status = navMesh->init(navData, navDataSize, DT_TILE_FREE_DATA);
     if (dtStatusFailed(status))
     {
@@ -429,13 +418,10 @@ void ResourceNavMesh::CreateDetourData()
     if (dtStatusFailed(status))
     {
         GLOG("Could not init Detour navmesh query");
-{
-    if (!navMesh)
-    {
         return;
     }
 }
-*/
+
 void ResourceNavMesh::RenderNavmeshEditor()
 {
 

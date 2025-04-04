@@ -4,6 +4,7 @@
 #include "LibraryModule.h"
 #include "SceneModule.h"
 #include "ResourcesModule.h"
+#include "ResourceNavmesh.h"
 
 #include <DetourCommon.h>
 #include <DetourCrowd.h>
@@ -25,9 +26,9 @@ PathfinderModule::~PathfinderModule()
 update_status PathfinderModule::Update(float deltaTime)
 {
 
-    if (!App->GetSceneModule()->GetInPlayMode()) return UPDATE_ERROR;
+    if (!App->GetSceneModule()->GetInPlayMode()) return UPDATE_CONTINUE;
 
-    if (deltaTime <= 0.0f) return UPDATE_ERROR;
+    if (deltaTime <= 0.0f) return UPDATE_CONTINUE;
 
     if (crowd->getAgentCount() > 0)
     {
