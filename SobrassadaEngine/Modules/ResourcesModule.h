@@ -30,9 +30,6 @@ class ResourcesModule : public Module
     Resource* CreateNewResource(UID uid);
 
   private:
-    // We will need to do a resourceProgram
-    int specularGlossinessProgram = -1;
-    int metallicRoughnessProgram  = -1;
     std::map<UID, Resource*> resources;
     BatchManager* batchManager = nullptr;
 };
