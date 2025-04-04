@@ -10,12 +10,14 @@ class GameObject;
 
 struct BulletUserPointer
 {
-    BulletUserPointer(Component* component, CollisionDelegate* newCallback)
+    BulletUserPointer(Component* component, CollisionDelegate* newCallback, bool generateCallback)
     {
         collider            = component;
         onCollisionCallback = newCallback;
+        this->generateCallback = generateCallback;
     }
 
     Component* collider;
     CollisionDelegate* onCollisionCallback;
+    bool generateCallback;
 };

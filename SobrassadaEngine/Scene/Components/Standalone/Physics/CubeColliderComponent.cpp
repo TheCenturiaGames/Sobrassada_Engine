@@ -18,7 +18,7 @@ CubeColliderComponent::CubeColliderComponent(UID uid, GameObject* parent)
     onCollissionCallback = CollisionDelegate(
         std::bind(&CubeColliderComponent::OnCollision, this, std::placeholders::_1, std::placeholders::_2)
     );
-    userPointer = BulletUserPointer(this, &onCollissionCallback);
+    userPointer = BulletUserPointer(this, &onCollissionCallback, generateCallback);
     App->GetPhysicsModule()->CreateCubeRigidBody(this);
 }
 
@@ -26,11 +26,10 @@ CubeColliderComponent::CubeColliderComponent(const rapidjson::Value& initialStat
     : Component(initialState, parent)
 {
     if (initialState.HasMember("FreezeRotation")) freezeRotation = initialState["FreezeRotation"].GetBool();
-
     if (initialState.HasMember("Mass")) mass = initialState["Mass"].GetFloat();
-
     if (initialState.HasMember("ColliderType")) colliderType = ColliderType(initialState["ColliderType"].GetInt());
     if (initialState.HasMember("ColliderLayer")) layer = ColliderLayer(initialState["ColliderLayer"].GetInt());
+    if (initialState.HasMember("GenerateCallback")) generateCallback = initialState["GenerateCallback"].GetBool();
 
     if (initialState.HasMember("CenterOffset"))
     {
@@ -53,7 +52,7 @@ CubeColliderComponent::CubeColliderComponent(const rapidjson::Value& initialStat
     onCollissionCallback = CollisionDelegate(
         std::bind(&CubeColliderComponent::OnCollision, this, std::placeholders::_1, std::placeholders::_2)
     );
-    userPointer = BulletUserPointer(this, &onCollissionCallback);
+    userPointer = BulletUserPointer(this, &onCollissionCallback, generateCallback);
     App->GetPhysicsModule()->CreateCubeRigidBody(this);
 }
 
@@ -70,6 +69,7 @@ void CubeColliderComponent::Save(rapidjson::Value& targetState, rapidjson::Docum
     targetState.AddMember("Mass", mass, allocator);
     targetState.AddMember("ColliderType", (int)colliderType, allocator);
     targetState.AddMember("ColliderLayer", (int)layer, allocator);
+    targetState.AddMember("GenerateCallback", generateCallback, allocator);
 
     // CENTER OFFSET
     rapidjson::Value centerOffsetSave(rapidjson::kArrayType);
@@ -148,6 +148,11 @@ void CubeColliderComponent::RenderEditorInspector()
             }
         }
         ImGui::EndCombo();
+    }
+
+    if (ImGui::Checkbox("Generate Callbacks", &generateCallback))
+    {
+        userPointer = BulletUserPointer(this, &onCollissionCallback, generateCallback);
     }
 }
 

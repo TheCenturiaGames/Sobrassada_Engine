@@ -5,9 +5,9 @@
 #include "DebugDrawModule.h"
 #include "GameObject.h"
 #include "SceneModule.h"
+#include "Standalone/Physics/CapsuleColliderComponent.h"
 #include "Standalone/Physics/CubeColliderComponent.h"
 #include "Standalone/Physics/SphereColliderComponent.h"
-#include "Standalone/Physics/CapsuleColliderComponent.h"
 
 #include "Math/float3.h"
 #include "btBulletDynamicsCommon.h"
@@ -62,8 +62,10 @@ update_status PhysicsModule::PreUpdate(float deltaTime)
             // Calculating normal
             float3 normal = float3(contactManifold->getContactPoint(0).m_normalWorldOnB);
 
-            firstUserPointer->onCollisionCallback->Call(secondUserPointer->collider->GetParent(), normal);
-            secondUserPointer->onCollisionCallback->Call(firstUserPointer->collider->GetParent(), -normal);
+            if (firstUserPointer->generateCallback)
+                firstUserPointer->onCollisionCallback->Call(secondUserPointer->collider->GetParent(), normal);
+            if (secondUserPointer->generateCallback)
+                secondUserPointer->onCollisionCallback->Call(firstUserPointer->collider->GetParent(), -normal);
         }
     }
 
@@ -140,7 +142,7 @@ void PhysicsModule::CreateCubeRigidBody(CubeColliderComponent* colliderComponent
 
     colliderComponent->rigidBody = newRigidBody;
 
-    AddRigidBody(newRigidBody, colliderComponent->GetColliderType(), colliderComponent->GetLayer());
+    AddRigidBody(newRigidBody, colliderComponent->colliderType, colliderComponent->layer);
 }
 
 void PhysicsModule::UpdateCubeRigidBody(CubeColliderComponent* colliderComponent)
@@ -182,7 +184,7 @@ void PhysicsModule::CreateSphereRigidBody(SphereColliderComponent* colliderCompo
 
     colliderComponent->rigidBody = newRigidBody;
 
-    AddRigidBody(newRigidBody, colliderComponent->GetColliderType(), colliderComponent->GetLayer());
+    AddRigidBody(newRigidBody, colliderComponent->colliderType, colliderComponent->layer);
 }
 
 void PhysicsModule::UpdateSphereRigidBody(SphereColliderComponent* colliderComponent)
@@ -224,7 +226,7 @@ void PhysicsModule::CreateCapsuleRigidBody(CapsuleColliderComponent* colliderCom
 
     colliderComponent->rigidBody = newRigidBody;
 
-    AddRigidBody(newRigidBody, colliderComponent->GetColliderType(), colliderComponent->GetLayer());
+    AddRigidBody(newRigidBody, colliderComponent->colliderType, colliderComponent->layer);
 }
 
 void PhysicsModule::UpdateCapsuleRigidBody(CapsuleColliderComponent* colliderComponent)

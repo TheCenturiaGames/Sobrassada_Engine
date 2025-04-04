@@ -34,7 +34,6 @@ class PhysicsModule : public Module
     update_status PostUpdate(float deltaTime) override;
     bool ShutDown() override;
 
-    //TODO READ FROM CONFIG FILE
     void LoadLayerData(const rapidjson::Value* initialState = nullptr);
     void SaveLayerData(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator);
     void EmptyWorld();
@@ -54,7 +53,6 @@ class PhysicsModule : public Module
 
     float GetGravity() const { return gravity; }
     std::vector<LayerBitset>& GetLayerConfig() { return colliderLayerConfig; }
-
 
     void SetGravity(float newGravity)
     {

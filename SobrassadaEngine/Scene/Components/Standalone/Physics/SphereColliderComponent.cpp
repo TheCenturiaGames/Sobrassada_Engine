@@ -22,7 +22,7 @@ SphereColliderComponent::SphereColliderComponent(UID uid, GameObject* parent)
         std::bind(&SphereColliderComponent::OnCollision, this, std::placeholders::_1, std::placeholders::_2)
     );
 
-    userPointer = BulletUserPointer(this, &onCollissionCallback);
+    userPointer = BulletUserPointer(this, &onCollissionCallback, generateCallback);
     App->GetPhysicsModule()->CreateSphereRigidBody(this);
 }
 
@@ -30,11 +30,11 @@ SphereColliderComponent::SphereColliderComponent(const rapidjson::Value& initial
     : Component(initialState, parent)
 {
     if (initialState.HasMember("FreezeRotation")) freezeRotation = initialState["FreezeRotation"].GetBool();
-
     if (initialState.HasMember("Mass")) mass = initialState["Mass"].GetFloat();
-
     if (initialState.HasMember("ColliderType")) colliderType = ColliderType(initialState["ColliderType"].GetInt());
     if (initialState.HasMember("ColliderLayer")) layer = ColliderLayer(initialState["ColliderLayer"].GetInt());
+    if (initialState.HasMember("GenerateCallback")) generateCallback = initialState["GenerateCallback"].GetBool();
+    if (initialState.HasMember("Radius")) radius = initialState["Radius"].GetFloat();
 
     if (initialState.HasMember("CenterOffset"))
     {
@@ -48,13 +48,11 @@ SphereColliderComponent::SphereColliderComponent(const rapidjson::Value& initial
         centerRotation                    = {dataArray[0].GetFloat(), dataArray[1].GetFloat(), dataArray[2].GetFloat()};
     }
 
-    if (initialState.HasMember("Radius")) radius = initialState["Radius"].GetFloat();
-
     onCollissionCallback = CollisionDelegate(
         std::bind(&SphereColliderComponent::OnCollision, this, std::placeholders::_1, std::placeholders::_2)
     );
 
-    userPointer = BulletUserPointer(this, &onCollissionCallback);
+    userPointer = BulletUserPointer(this, &onCollissionCallback, generateCallback);
     App->GetPhysicsModule()->CreateSphereRigidBody(this);
 }
 
@@ -72,6 +70,7 @@ void SphereColliderComponent::Save(rapidjson::Value& targetState, rapidjson::Doc
     targetState.AddMember("ColliderType", (int)colliderType, allocator);
     targetState.AddMember("ColliderLayer", (int)layer, allocator);
     targetState.AddMember("Radius", radius, allocator);
+    targetState.AddMember("GenerateCallback", generateCallback, allocator);
 
     // CENTER OFFSET
     rapidjson::Value centerOffsetSave(rapidjson::kArrayType);
@@ -144,6 +143,11 @@ void SphereColliderComponent::RenderEditorInspector()
             }
         }
         ImGui::EndCombo();
+    }
+
+    if (ImGui::Checkbox("Generate Callbacks", &generateCallback))
+    {
+        userPointer = BulletUserPointer(this, &onCollissionCallback, generateCallback);
     }
 }
 

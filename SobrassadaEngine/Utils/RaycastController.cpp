@@ -71,7 +71,7 @@ namespace RaycastController
             }
         }
 
-        if (!selectedGameObject->IsTopParent())
+        if (selectedGameObject && !selectedGameObject->IsTopParent())
         {
             SceneModule* sceneModule     = App->GetSceneModule();
 

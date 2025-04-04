@@ -20,7 +20,7 @@ CapsuleColliderComponent::CapsuleColliderComponent(UID uid, GameObject* parent)
         std::bind(&CapsuleColliderComponent::OnCollision, this, std::placeholders::_1, std::placeholders::_2)
     );
 
-    userPointer = BulletUserPointer(this, &onCollissionCallback);
+    userPointer = BulletUserPointer(this, &onCollissionCallback, generateCallback);
     App->GetPhysicsModule()->CreateCapsuleRigidBody(this);
 }
 
@@ -28,11 +28,12 @@ CapsuleColliderComponent::CapsuleColliderComponent(const rapidjson::Value& initi
     : Component(uid, parent, "Capsule Collider", COMPONENT_CAPSULE_COLLIDER)
 {
     if (initialState.HasMember("FreezeRotation")) freezeRotation = initialState["FreezeRotation"].GetBool();
-
     if (initialState.HasMember("Mass")) mass = initialState["Mass"].GetFloat();
-
     if (initialState.HasMember("ColliderType")) colliderType = ColliderType(initialState["ColliderType"].GetInt());
     if (initialState.HasMember("ColliderLayer")) layer = ColliderLayer(initialState["ColliderLayer"].GetInt());
+    if (initialState.HasMember("GenerateCallback")) generateCallback = initialState["GenerateCallback"].GetBool();
+    if (initialState.HasMember("Radius")) radius = initialState["Radius"].GetFloat();
+    if (initialState.HasMember("Length")) length = initialState["Length"].GetFloat();
 
     if (initialState.HasMember("CenterOffset"))
     {
@@ -46,14 +47,11 @@ CapsuleColliderComponent::CapsuleColliderComponent(const rapidjson::Value& initi
         centerRotation                    = {dataArray[0].GetFloat(), dataArray[1].GetFloat(), dataArray[2].GetFloat()};
     }
 
-    if (initialState.HasMember("Radius")) radius = initialState["Radius"].GetFloat();
-    if (initialState.HasMember("Length")) length = initialState["Length"].GetFloat();
-
     onCollissionCallback = CollisionDelegate(
         std::bind(&CapsuleColliderComponent::OnCollision, this, std::placeholders::_1, std::placeholders::_2)
     );
 
-    userPointer = BulletUserPointer(this, &onCollissionCallback);
+    userPointer = BulletUserPointer(this, &onCollissionCallback, generateCallback);
     App->GetPhysicsModule()->CreateCapsuleRigidBody(this);
 }
 
@@ -72,6 +70,7 @@ void CapsuleColliderComponent::Save(rapidjson::Value& targetState, rapidjson::Do
     targetState.AddMember("ColliderLayer", (int)layer, allocator);
     targetState.AddMember("Radius", radius, allocator);
     targetState.AddMember("Length", length, allocator);
+    targetState.AddMember("GenerateCallback", generateCallback, allocator);
 
     // CENTER OFFSET
     rapidjson::Value centerOffsetSave(rapidjson::kArrayType);
@@ -126,7 +125,6 @@ void CapsuleColliderComponent::RenderEditorInspector()
     if (ImGui::InputFloat3("Center offset", &centerOffset[0])) App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
 
     if (ImGui::InputFloat("Radius", &radius)) App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
-    ImGui::SameLine();
     if (ImGui::InputFloat("Length", &length)) App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
 
     if (ImGui::Checkbox("Freeze rotation", &freezeRotation)) App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
@@ -147,6 +145,11 @@ void CapsuleColliderComponent::RenderEditorInspector()
             }
         }
         ImGui::EndCombo();
+    }
+
+    if (ImGui::Checkbox("Generate Callbacks", &generateCallback))
+    {
+        userPointer = BulletUserPointer(this, &onCollissionCallback, generateCallback);
     }
 }
 

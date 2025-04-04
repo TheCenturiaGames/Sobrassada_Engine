@@ -28,13 +28,10 @@ class CapsuleColliderComponent : public Component
 
     void ParentUpdated() override;
 
-    ColliderType GetColliderType() const { return colliderType; }
-    ColliderLayer GetLayer() const { return layer; }
-    const CollisionDelegate& GetCallback() const { return onCollissionCallback; }
-
     void OnCollision(GameObject* otherObject, float3 collisionNormal);
 
   public:
+    bool generateCallback         = true;
     bool freezeRotation           = false;
     float mass                    = 0.f;
     float3 centerOffset           = float3::zero;
@@ -46,6 +43,6 @@ class CapsuleColliderComponent : public Component
     btRigidBody* rigidBody        = nullptr;
     BulletMotionState motionState = BulletMotionState(nullptr, float3::zero, float3::zero, false);
     CollisionDelegate onCollissionCallback;
-    BulletUserPointer userPointer = BulletUserPointer(this, &onCollissionCallback);
+    BulletUserPointer userPointer = BulletUserPointer(this, &onCollissionCallback, generateCallback);
     ColliderLayer layer           = ColliderLayer::WORLD_OBJECTS;
 };
