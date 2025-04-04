@@ -3,7 +3,7 @@
 #include "Globals.h"
 #include "Module.h"
 
-#include <Libs/rapidjson/document.h>
+#include "rapidjson/document.h"
 #include <string>
 #include <unordered_map>
 

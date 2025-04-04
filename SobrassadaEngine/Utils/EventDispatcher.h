@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Delegate.h"
+
 #include <map>
 
 /*

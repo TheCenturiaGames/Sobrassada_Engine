@@ -9,7 +9,6 @@
 #include "Standalone/MeshComponent.h"
 
 #include "imgui.h"
-
 #include <set>
 #include <stack>
 
