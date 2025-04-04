@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "LibraryModule.h"
 #include "SceneModule.h"
+#include "ResourcesModule.h"
 
 #include <DetourCommon.h>
 #include <DetourCrowd.h>
@@ -118,6 +119,9 @@ void PathfinderModule::RemoveAgent(int agentId)
     crowd->removeAgent(agentId);
 }
 
-void PathfinderModule::QueryNavmesh(UID uid)
+void PathfinderModule::QueryNavmesh()
 {
+    navmesh = App->GetResourcesModule()->GetNavMesh();
+    navQuery = navmesh->GetDetourNavMeshQuery();
+
 }

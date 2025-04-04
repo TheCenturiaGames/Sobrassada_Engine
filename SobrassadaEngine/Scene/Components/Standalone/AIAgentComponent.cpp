@@ -1,11 +1,10 @@
 #include "AIAgentComponent.h"
 
 #include "Application.h"
-#include "SceneModule.h"
 #include "PathfinderModule.h"
+#include "SceneModule.h"
 
 #include <DetourCrowd.h>
-
 
 AIAgentComponent::AIAgentComponent(UID uid, GameObject* parent, float3 position, float moveSpeed)
     : Component(uid, parent, "AI Agent Controller", COMPONENT_AIAGENT)
@@ -39,7 +38,6 @@ void AIAgentComponent::Update(float deltaTime)
     if (!App->GetSceneModule()->GetInPlayMode()) return;
 
     if (deltaTime <= 0.0f) return;
-
 }
 
 // OPTIONAL TODO save agents as a resource in the future.
@@ -67,9 +65,8 @@ void AIAgentComponent::AddToCrowd()
         GLOG("Failed to load AI agent. Duplicate AI agent.");
         return;
     }
-     
-    agentId = App->GetPathfinderModule()->CreateAgent(agentPosition, radius, height, speed);
 
+    agentId = App->GetPathfinderModule()->CreateAgent(agentPosition, radius, height, speed);
 }
 
 void AIAgentComponent::RecreateAgent()
