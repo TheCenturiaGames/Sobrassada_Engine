@@ -81,8 +81,8 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
         );
 
         position = localTransform.TranslatePart();
-        rotation   = localTransform.RotatePart().ToEulerXYZ();
-        scale = localTransform.GetScale();
+        rotation = localTransform.RotatePart().ToEulerXYZ();
+        scale    = localTransform.GetScale();
     }
 
     // Deserialize Components
@@ -327,7 +327,7 @@ void GameObject::RenderEditorInspector()
 
         ImGui::End();
 
-        if (!App->GetSceneModule()->GetInPlayMode())
+        if (!App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetSceneVisible())
         {
             if (App->GetEditorUIModule()->RenderImGuizmo(
                     localTransform, globalTransform, parentTransform, position, rotation, scale
