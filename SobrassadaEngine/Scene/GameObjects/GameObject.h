@@ -34,6 +34,7 @@ class GameObject
     const float4x4& GetParentGlobalTransform() const;
 
     bool IsStatic() const { return mobilitySettings == MobilitySettings::STATIC; };
+    bool IsTopParent() const { return isTopParent; };
 
     bool AddGameObject(UID gameObjectUID);
     bool RemoveGameObject(UID gameObjectUID);
@@ -140,4 +141,5 @@ class GameObject
 
     ComponentType selectedComponentIndex = COMPONENT_NONE;
     int mobilitySettings                 = STATIC;
+    bool isTopParent                     = false;
 };

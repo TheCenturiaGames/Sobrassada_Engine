@@ -64,6 +64,9 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
     name                   = initialState["Name"].GetString();
     selectedComponentIndex = COMPONENT_NONE;
     mobilitySettings       = initialState["Mobility"].GetInt();
+    if (initialState.HasMember("IsTopParent")) 
+        isTopParent = initialState["IsTopParent"].GetBool();
+   
 
     if (initialState.HasMember("PrefabUID")) prefabUID = initialState["PrefabUID"].GetUint64();
 
@@ -158,6 +161,7 @@ void GameObject::Save(rapidjson::Value& targetState, rapidjson::Document::Alloca
     targetState.AddMember("ParentUID", parentUID, allocator);
     targetState.AddMember("Name", rapidjson::Value(name.c_str(), allocator), allocator);
     targetState.AddMember("Mobility", mobilitySettings, allocator);
+    targetState.AddMember("IsTopParent", isTopParent, allocator);
 
     if (prefabUID != INVALID_UID) targetState.AddMember("PrefabUID", prefabUID, allocator);
 
@@ -223,6 +227,8 @@ void GameObject::RenderEditorInspector()
     {
         ImGui::SameLine();
         if (ImGui::Checkbox("Draw nodes", &drawNodes)) OnDrawConnectionsToggle();
+        ImGui::SameLine();
+        ImGui::Checkbox("Is top parent", &isTopParent);
         if (ImGui::Button("Add Component"))
         {
             ImGui::OpenPopup("ComponentSelection");
@@ -436,30 +442,6 @@ AABB GameObject::GetHeriachyAABB()
 
             for (UID childID : currentGameObject->GetChildren())
                 toVisitGameObjects.push(childID);
-        }
-    }
-
-    // UPDATE UP THE HERIARCHY
-    if (parentUID != sceneRootUID) toVisitGameObjects.push(parentUID);
-
-    while (!toVisitGameObjects.empty())
-    {
-        UID currentUID = toVisitGameObjects.top();
-        toVisitGameObjects.pop();
-
-        if (visitedGameObjects.find(currentUID) == visitedGameObjects.end())
-        {
-            visitedGameObjects.insert(currentUID);
-            GameObject* currentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentUID);
-
-            const AABB& currentAABB       = currentGameObject->GetGlobalAABB();
-            if (currentAABB.IsFinite() && !currentAABB.IsDegenerate())
-                returnAABB.Enclose(currentGameObject->GetGlobalAABB());
-
-            for (UID childID : currentGameObject->GetChildren())
-                toVisitGameObjects.push(childID);
-
-            if (currentGameObject->GetParent() != sceneRootUID) toVisitGameObjects.push(currentGameObject->GetParent());
         }
     }
 

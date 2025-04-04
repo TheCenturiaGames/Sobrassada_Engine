@@ -350,8 +350,6 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
     ImGui::SetNextItemWidth(100.0f);
     if (ImGui::SliderFloat("Time scale", &timeScale, 0, 4)) gameTimer->SetTimeScale(timeScale);
 
-    ImGui::SameLine();
-
     // RENDER OPTIONS
     if (ImGui::Button("Render options"))
     {
