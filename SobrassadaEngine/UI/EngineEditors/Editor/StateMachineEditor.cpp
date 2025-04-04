@@ -313,7 +313,7 @@ void StateMachineEditor::ShowInspector()
             if (ImGui::InputInt("##BlendTime", &tempInterpolationTime))
             {
                 transition.interpolationTime =
-                    static_cast<uint32_t>(std::max(0, tempInterpolationTime)); // Evita negativos
+                    static_cast<uint32_t>(std::max(0, tempInterpolationTime)); // Evitar negativos
                 modified = true;
             }
 
@@ -386,7 +386,7 @@ void StateMachineEditor::BuildGraph()
                 }
             }
         }
-        graph->getNodes().clear(); // ahora sí es seguro borrar los nodos
+        graph->getNodes().clear(); 
     }
     graph = std::make_unique<ImFlow::ImNodeFlow>("StateMachineGraph_" + std::to_string(uid));
 
