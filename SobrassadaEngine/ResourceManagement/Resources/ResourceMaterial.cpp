@@ -99,6 +99,19 @@ void ResourceMaterial::LoadMaterialData(Material mat)
         diffuseTexture.width  = diffTexture->GetTextureWidth();
         diffuseTexture.height = diffTexture->GetTextureHeight();
     }
+    else
+    {
+        ResourceTexture* fallbackTexture = TextureImporter::LoadTexture(FALLBACK_TEXTURE_UID);
+        diffuseTexture.textureID         = fallbackTexture->GetTextureID();
+
+        material.diffuseTex              = glGetTextureHandleARB(fallbackTexture->GetTextureID());
+        glMakeTextureHandleResidentARB(material.diffuseTex);
+
+        diffuseTexture.width  = fallbackTexture->GetTextureWidth();
+        diffuseTexture.height = fallbackTexture->GetTextureHeight();
+        
+        delete fallbackTexture;
+    }
 
     if (diffuseTexture.textureID == 0)
     {
