@@ -16,7 +16,9 @@ PathfinderModule::PathfinderModule()
 
 PathfinderModule::~PathfinderModule()
 {
+    dtFreeCrowd(crowd);
     dtFreeNavMeshQuery(navQuery);
+    delete navmesh;
 }
 
 bool PathfinderModule::Init()
