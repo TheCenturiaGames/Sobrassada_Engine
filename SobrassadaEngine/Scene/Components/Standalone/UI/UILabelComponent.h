@@ -8,6 +8,7 @@ namespace TextManager
 {
     struct FontData;
 }
+
 class Transform2DComponent;
 class CanvasComponent;
 

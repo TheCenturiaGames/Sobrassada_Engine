@@ -11,7 +11,7 @@ class Transform2DComponent : public Component
   public:
     Transform2DComponent(UID uid, GameObject* parent);
     Transform2DComponent(const rapidjson::Value& initialState, GameObject* parent);
-    ~Transform2DComponent();
+    ~Transform2DComponent() override;
 
     void Init() override;
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;

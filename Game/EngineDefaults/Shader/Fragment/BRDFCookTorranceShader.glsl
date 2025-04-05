@@ -2,18 +2,32 @@
 
 #extension GL_ARB_bindless_texture : require
 
+#define PI 3.14159265359
+
 in vec3 pos;
 in vec2 uv0;
 in vec3 normal;
 in vec4 tangent;
+flat in int instance_index;
 
 out vec4 outColor;
 
 uniform vec3 cameraPos;
 
-#define PI 3.14159265359
+struct Material
+{
+    vec4 diffColor;
+    vec3 specColor;
+    float shininess;
+    bool shininessInAlpha;
+    float metallicFactor;
+    float roughnessFactor;
+    uvec2 diffuseTex;
+    uvec2 specularTex;
+    uvec2 metallicTex;
+    uvec2 normalTex;
+};
 
-// Lights data structures
 struct DirectionalLight
 {
     vec3 direction;
@@ -36,7 +50,7 @@ struct SpotLight
 };
 
 
-// Lights SSBOs
+// UBOs
 layout(std140, binding = 2) uniform Ambient
 {
 	vec4 ambient_color;		// rbg = color & alpha = intensity
@@ -48,6 +62,7 @@ layout(std140, binding = 3) uniform Directional
     vec4 directional_color;
 };
 
+// SSBOs
 readonly layout(std430, binding = 4) buffer PointLights
 {
 	int pointLightsCount;
@@ -60,34 +75,22 @@ readonly layout(std430, binding = 5) buffer SpotLights
 	SpotLight spotLights[];
 };
 
-
-// Material UBO
-layout(std140, binding = 1) uniform Material
-{
-    vec4 diffColor;
-    vec3 specColor;
-    float shininess;
-    bool shininessInAlpha;
-    float metallicFactor;
-    float roughnessFactor;
-    uvec2 diffuseTex;
-    uvec2 specularTex;
-    uvec2 metallicTex;
-    uvec2 normalTex;
+readonly layout(std430, binding = 11) buffer Materials {
+    Material materials[];
 };
 
 
 float PointLightAttenuation(const int index) 
 {
 	float distance = length(pos - pointLights[index].position.xyz);
-	return pow(max(1 - pow((distance / pointLights[index].position.w), 4), 0), 2) / (pow(distance, 2) + 1);
+	return pow(max(1 - pow((distance / pointLights[index].position.w), 4.0), 0.0), 2.0) / (pow(distance, 2.0) + 1.0);
 }
 
 float SpotLightAttenuation(const int index)
 {
 	vec3 dirLight = normalize(spotLights[index].direction);
 	float distance = dot(pos - spotLights[index].position.xyz, dirLight);
-	float Fatt = pow(max(1 - pow((distance / spotLights[index].position.w), 4), 0), 2) / (pow(distance, 2) + 1);
+	float Fatt = pow(max(1 - pow((distance / spotLights[index].position.w), 4.0), 0.0), 2.0) / (pow(distance, 2.0) + 1.0);
 
 	vec3 D = normalize(pos - spotLights[index].position.xyz);
 	float C = dot(D, dirLight);
@@ -123,7 +126,7 @@ vec3 RenderLight(vec3 L, vec3 N, vec3 texColor, vec3 Li, float NdotL, float alph
     float NdotV = max(dot(N, V), 0.0001);
     float NdotH = max(dot(N, H), 0.0001);
 
-    vec3 BaseColor = diffColor.rgb * texColor;
+    vec3 BaseColor = materials[instance_index].diffColor.rgb * texColor;
     vec3 Cd = BaseColor * (1 - metalness);
     vec3 RF0 = mix(vec3(0.04), BaseColor, metalness);
     
@@ -170,8 +173,9 @@ vec3 RenderSpotLight(const int index, const vec3 N, const vec3 texColor, const f
 
 void main()
 {
-    vec3 texColor = pow(texture(sampler2D(diffuseTex), uv0).rgb, vec3(2.2f));
-    vec4 metallicRoughnessTexColor = pow(texture(sampler2D(metallicTex), uv0), vec4(2.2));
+    Material mat = materials[instance_index];
+    vec3 texColor = pow(texture(sampler2D(mat.diffuseTex), uv0).rgb, vec3(2.2f));
+    vec4 metallicRoughnessTexColor = pow(texture(sampler2D(mat.metallicTex), uv0), vec4(2.2));
     float alpha = metallicRoughnessTexColor.a;
 
 
@@ -181,16 +185,16 @@ void main()
 
     vec3 N = normalize(normal);
     // Retrive normal for normal map
-    if (normalTex.r != 0 || normalTex.g != 0) {
+    if (mat.normalTex.r != 0 || mat.normalTex.g != 0) {
         mat3 space = CreateTBN();
-        vec3 texNormal = (texture(sampler2D(normalTex), uv0).xyz*2.0-1.0);
+        vec3 texNormal = (texture(sampler2D(mat.normalTex), uv0).xyz*2.0-1.0);
         vec3 final_normal = space * texNormal;
         N = normalize(final_normal);
     }
 
-    float roughness = roughnessFactor * metallicRoughnessTexColor.y;
+    float roughness = mat.roughnessFactor * metallicRoughnessTexColor.y;
     //roughness = roughness * roughness;
-    float metallic = metallicFactor * metallicRoughnessTexColor.z;
+    float metallic = mat.metallicFactor * metallicRoughnessTexColor.z;
 
     // Point Lights
     for (int i = 0; i < pointLightsCount; ++i)
@@ -214,6 +218,6 @@ void main()
     }
 
     vec3 ldr = hdr.rgb / (hdr.rgb + vec3(1.0));
-    ldr = pow(hdr, vec3(1/2.2));
+    ldr = pow(hdr, vec3(1.0/2.2));
     outColor = vec4(ldr, alpha);
 }

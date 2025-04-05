@@ -2,11 +2,13 @@
 
 #include "Module.h"
 
-#include <Math/float4x4.h>
+#include "Math/float4x4.h"
 #include <bitset>
 #include <list>
 
 class DDRenderInterfaceCoreGL;
+class dtNavMeshQuery;
+class dtNavMesh;
 class Camera;
 
 enum class DebugOptions : uint8_t
@@ -17,11 +19,19 @@ enum class DebugOptions : uint8_t
     RENDER_OBB,
     RENDER_OCTREE,
     RENDER_DYNAMICTREE,
-    RENDER_CAMERA_RAY
+    RENDER_CAMERA_RAY,
+    RENDER_NAVMESH
 };
 
-constexpr const char* DebugStrings[] = {"Render Lights", "Render Wireframe", "AABB",      "OBB",
-                                        "Octree",        "Dynamic Tree",     "Camera Ray"};
+enum DrawNavMeshFlags
+{
+    DRAWNAVMESH_OFFMESHCONS = 0x01,
+    DRAWNAVMESH_CLOSEDLIST  = 0x02,
+    DRAWNAVMESH_COLOR_TILES = 0x04
+};
+
+constexpr const char* DebugStrings[] = {"Render Lights", "Render Wireframe", "AABB",       "OBB",
+                                        "Octree",        "Dynamic Tree",     "Camera Ray", "Navmesh"};
 
 class DebugDrawModule : public Module
 {
@@ -49,6 +59,8 @@ class DebugDrawModule : public Module
     void DrawCross(const float3& center, const float length);
     void DrawPoint(const float3& center, const float size);
     void DrawCone(const float3& center, const float3& dir, const float baseRadius, const float apexRadius);
+
+    void DrawNavMesh(const dtNavMesh* navMesh, const dtNavMeshQuery* navQuery, unsigned char flags);
 
     void FlipDebugOptionValue(int position) { debugOptionValues.flip(position); }
 

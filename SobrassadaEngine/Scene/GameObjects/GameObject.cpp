@@ -10,7 +10,6 @@
 #include "Standalone/UI/Transform2DComponent.h"
 
 #include "imgui.h"
-
 #include <set>
 #include <stack>
 
@@ -330,7 +329,7 @@ void GameObject::RenderEditorInspector()
 
         ImGui::End();
 
-        if (!App->GetSceneModule()->GetInPlayMode())
+        if (!App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetSceneVisible())
         {
             if (App->GetEditorUIModule()->RenderImGuizmo(
                     localTransform, globalTransform, parentTransform, position, rotation, scale

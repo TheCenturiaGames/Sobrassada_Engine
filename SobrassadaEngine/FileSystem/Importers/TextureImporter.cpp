@@ -5,7 +5,7 @@
 #include "LibraryModule.h"
 #include "MetaTexture.h"
 #include "ProjectModule.h"
-#include "ResourceManagement/Resources/ResourceTexture.h"
+#include "ResourceTexture.h"
 
 #include "DirectXTex/DirectXTex.h"
 #include "glew.h"
@@ -88,38 +88,28 @@ namespace TextureImporter
 
     ResourceTexture* LoadTexture(UID textureUID)
     {
-        std::string path = App->GetLibraryModule()->GetResourcePath(textureUID);
+        const std::string& path     = App->GetLibraryModule()->GetResourcePath(textureUID);
+
+        const std::string& filename = App->GetLibraryModule()->GetResourceName(textureUID);
 
         if (path.empty()) return nullptr; // TODO Use fallback texture instead
 
-        std::string fileName = FileSystem::GetFileNameWithoutExtension(path);
+        const std::wstring& wPath = std::wstring(path.begin(), path.end());
 
-        std::wstring wPath   = std::wstring(path.begin(), path.end());
+        DirectX::ScratchImage scratchImage;
+        DirectX::TexMetadata texMetadata;
+        OpenGLMetadata openGlMeta;
 
-        DirectX::ScratchImage outImage;
-        DirectX::TexMetadata outMetadata;
-
-        HRESULT hr = LoadFromDDSFile(wPath.c_str(), DirectX::DDS_FLAGS_NONE, &outMetadata, outImage);
-
-        if (FAILED(hr))
-        {
-            hr = LoadFromTGAFile(wPath.c_str(), DirectX::TGA_FLAGS_NONE, &outMetadata, outImage);
-        }
-
-        if (FAILED(hr))
-        {
-            hr = DirectX::LoadFromWICFile(wPath.c_str(), DirectX::WIC_FLAGS_NONE, &outMetadata, outImage);
-        }
-
-        if (FAILED(hr))
+        const bool succeded = LoadTextureFile(wPath.c_str(), texMetadata, scratchImage);
+        if (!succeded)
         {
             GLOG("Failed to load texture: %s", path.c_str());
             return nullptr;
         }
 
-        ResourceTexture* texture = new ResourceTexture(textureUID, FileSystem::GetFileNameWithoutExtension(path));
+        ResourceTexture* texture = new ResourceTexture(textureUID, filename);
 
-        texture->LoadData(outMetadata, outImage);
+        texture->LoadData(texMetadata, scratchImage);
         unsigned int textureID;
         glGenTextures(1, &textureID);
 
@@ -130,97 +120,84 @@ namespace TextureImporter
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(outMetadata.mipLevels - 1));
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(texMetadata.mipLevels - 1));
 
-        unsigned int internalFormat;
-        unsigned int format;
-        unsigned int type;
-        switch (outMetadata.format)
-        {
-        case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
-        case DXGI_FORMAT_R8G8B8A8_UNORM:
-            internalFormat = GL_RGBA8;
-            format         = GL_RGBA;
-            type           = GL_UNSIGNED_BYTE;
-            // formatName     = "DXGI_FORMAT_R8G8B8A8_UNORM";
-            break;
-        case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:
-        case DXGI_FORMAT_B8G8R8A8_UNORM:
-            internalFormat = GL_RGBA8;
-            format         = GL_BGRA;
-            type           = GL_UNSIGNED_BYTE;
-            // formatName     = "DXGI_FORMAT_B8G8R8A8_UNORM";
-            break;
-        case DXGI_FORMAT_B5G6R5_UNORM:
-            internalFormat = GL_RGB8;
-            format         = GL_BGR;
-            type           = GL_UNSIGNED_BYTE;
-            // formatName     = "DXGI_FORMAT_B5G6R5_UNORM";
-            break;
-        default:
-            assert(false && "Unsupported format");
-        }
+        ResourceTexture::ConvertMetadata(texMetadata, openGlMeta);
 
-        int maxMipmapLevel = static_cast<int>(outMetadata.mipLevels - 1);
-        if (outMetadata.mipLevels > 1)
+        const int maxMipmapLevel = static_cast<int>(texMetadata.mipLevels - 1);
+        if (texMetadata.mipLevels > 1)
         {
-            for (size_t i = 0; i < outMetadata.mipLevels; ++i)
+            for (size_t i = 0; i < texMetadata.mipLevels; ++i)
             {
-                const DirectX::Image* mip = outImage.GetImage(i, 0, 0);
+                const DirectX::Image* mip = scratchImage.GetImage(i, 0, 0);
                 glTexImage2D(
-                    GL_TEXTURE_2D, static_cast<GLint>(i), internalFormat, static_cast<GLsizei>(mip->width),
-                    static_cast<GLsizei>(mip->height), 0, format, type, mip->pixels
+                    GL_TEXTURE_2D, static_cast<GLint>(i), openGlMeta.internalFormat, static_cast<GLsizei>(mip->width),
+                    static_cast<GLsizei>(mip->height), 0, openGlMeta.format, openGlMeta.type, mip->pixels
                 );
             }
         }
         else
         {
-            const DirectX::Image* baseImage = outImage.GetImage(0, 0, 0);
+            const DirectX::Image* baseImage = scratchImage.GetImage(0, 0, 0);
             glTexImage2D(
-                GL_TEXTURE_2D, 0, internalFormat, static_cast<GLsizei>(outMetadata.width),
-                static_cast<GLsizei>(outMetadata.height), 0, format, type, baseImage->pixels
+                GL_TEXTURE_2D, 0, openGlMeta.internalFormat, static_cast<GLsizei>(texMetadata.width),
+                static_cast<GLsizei>(texMetadata.height), 0, openGlMeta.format, openGlMeta.type, baseImage->pixels
             );
             glGenerateMipmap(GL_TEXTURE_2D);
         }
 
         texture->SetTextureID(textureID);
+
         return texture;
     }
 
-    unsigned int LoadCubemap(const char* texturePath)
+    ResourceTexture* LoadCubemap(UID textureUID)
     {
-        unsigned int textureId = 0;
-        std::string textureString(texturePath);
-        std::wstring wPath = std::wstring(textureString.begin(), textureString.end());
+        const std::string& path       = App->GetLibraryModule()->GetResourcePath(textureUID);
+
+        const std::string& filename   = App->GetLibraryModule()->GetResourceName(textureUID);
+
+        unsigned int textureID = 0;
+        const std::wstring& wPath     = std::wstring(path.begin(), path.end());
 
         DirectX::ScratchImage scratchImage;
         DirectX::TexMetadata texMetadata;
         OpenGLMetadata openGlMeta;
 
-        bool succeded = LoadTextureFile(wPath.c_str(), texMetadata, scratchImage);
-        if (succeded)
+        const bool succeded = LoadTextureFile(wPath.c_str(), texMetadata, scratchImage);
+        if (!succeded)
         {
-            ResourceTexture::ConvertMetadata(texMetadata, openGlMeta);
-
-            glGenTextures(1, &textureId);
-            glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
-
-            // Sending texture to OpenGL
-            for (int i = 0; i < texMetadata.arraySize; ++i)
-            {
-                const DirectX::Image* face = scratchImage.GetImage(0, i, 0);
-                glTexImage2D(
-                    GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, openGlMeta.internalFormat, static_cast<GLsizei>(face->width),
-                    static_cast<GLsizei>(face->height), 0, openGlMeta.format, openGlMeta.type, face->pixels
-                );
-            }
-            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+            GLOG("Failed to load texture: %s", path.c_str());
+            return nullptr;
         }
-        return textureId;
+
+        ResourceTexture* texture = new ResourceTexture(textureUID, filename);
+
+        texture->LoadData(texMetadata, scratchImage);
+
+        ResourceTexture::ConvertMetadata(texMetadata, openGlMeta);
+
+        glGenTextures(1, &textureID);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+        // Sending texture to OpenGL
+        for (int i = 0; i < texMetadata.arraySize; ++i)
+        {
+            const DirectX::Image* face = scratchImage.GetImage(0, i, 0);
+            glTexImage2D(
+                GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, openGlMeta.internalFormat, static_cast<GLsizei>(face->width),
+                static_cast<GLsizei>(face->height), 0, openGlMeta.format, openGlMeta.type, face->pixels
+            );
+        }
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+        texture->SetTextureID(textureID);
+
+        return texture;
     }
 
     bool LoadTextureFile(const wchar_t* texturePath, DirectX::TexMetadata& outMetadata, DirectX::ScratchImage& outImage)
@@ -239,5 +216,4 @@ namespace TextureImporter
 
         return false;
     }
-
 }; // namespace TextureImporter

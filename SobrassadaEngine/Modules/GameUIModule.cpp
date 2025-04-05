@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "TextManager.h"
 #include "CameraModule.h"
+#include "Scene/Components/Standalone/UI/CanvasComponent.h"
 
 #include "glew.h"
 

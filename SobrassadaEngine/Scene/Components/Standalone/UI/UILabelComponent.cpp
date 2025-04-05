@@ -110,13 +110,17 @@ void UILabelComponent::Render(float deltaTime)
     if (parentCanvas == nullptr) return;
 
     const int uiProgram = App->GetShaderModule()->GetUIWidgetProgram();
-    if (uiProgram == -1) GLOG("Error with UI Program");
+    if (uiProgram == -1)
+    {
+        GLOG("Error with UI Program");
+        return;
+    }
 
     glUseProgram(uiProgram);
 
-    const float4x4 view =
+    const float4x4& view =
         parentCanvas->IsInWorldSpaceEditor() ? App->GetCameraModule()->GetViewMatrix() : float4x4::identity;
-    const float4x4 proj =
+    const float4x4& proj =
         parentCanvas->IsInWorldSpaceEditor()
             ? App->GetCameraModule()->GetProjectionMatrix()
             : float4x4::D3DOrthoProjLH(

@@ -4,12 +4,12 @@
 #include "FileSystem.h"
 #include "LibraryModule.h"
 #include "MetaModel.h"
-#include <ResourceStateMachine.h>
+#include "ResourceStateMachine.h"
 
 #include "Math/Quat.h"
-#include "prettywriter.h"
-#include "stringbuffer.h"
-#include <Math/float4x4.h>
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+#include "Math/float4x4.h"
 
 namespace StateMachineManager
 {

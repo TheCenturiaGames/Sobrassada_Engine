@@ -9,13 +9,13 @@
 #include "ResourcesModule.h"
 #include "SceneModule.h"
 #include "ShaderModule.h"
+#include "Standalone/Lights/DirectionalLightComponent.h"
+#include "Standalone/Lights/PointLightComponent.h"
+#include "Standalone/Lights/SpotLightComponent.h"
 #include "TextureImporter.h"
-#include "imgui.h"
 
-#include "../Scene/Components/Standalone/Lights/DirectionalLightComponent.h"
-#include "../Scene/Components/Standalone/Lights/PointLightComponent.h"
-#include "../Scene/Components/Standalone/Lights/SpotLightComponent.h"
 #include "glew.h"
+#include "imgui.h"
 #include <cstddef>
 
 LightsConfig::LightsConfig()
@@ -30,9 +30,18 @@ LightsConfig::~LightsConfig()
     glDeleteBuffers(1, &directionalBufferId);
     glDeleteBuffers(1, &pointBufferId);
     glDeleteBuffers(1, &spotBufferId);
+
     glDeleteVertexArrays(1, &skyboxVao);
     glDeleteBuffers(1, &skyboxVbo);
     glDeleteProgram(skyboxProgram);
+    FreeCubemap();
+}
+
+void LightsConfig::FreeCubemap() const
+{
+
+    glMakeTextureHandleNonResidentARB(skyboxHandle);
+    glDeleteTextures(1, &skyboxID);
 }
 
 void LightsConfig::InitSkybox()
@@ -70,7 +79,7 @@ void LightsConfig::InitSkybox()
     glBindVertexArray(0);
 
     // default skybox texture
-    skyboxTexture = LoadSkyboxTexture(App->GetLibraryModule()->GetTextureUID("cubemap"));
+    LoadSkyboxTexture(App->GetLibraryModule()->GetTextureUID("cubemap"));
 
     // Load the skybox shaders
     skyboxProgram = App->GetShaderModule()->CreateShaderProgram(SKYBOX_VERTEX_SHADER_PATH, SKYBOX_FRAGMENT_SHADER_PATH);
@@ -103,8 +112,7 @@ void LightsConfig::RenderSkybox() const
     glUniformMatrix4fv(0, 1, GL_TRUE, projection.ptr());
     glUniformMatrix4fv(1, 1, GL_TRUE, view.ptr());
 
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
+    glUniformHandleui64ARB(glGetUniformLocation(skyboxProgram, "skybox"), skyboxHandle);
 
     glBindVertexArray(skyboxVao);
     App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 36);
@@ -116,12 +124,25 @@ void LightsConfig::RenderSkybox() const
     App->GetOpenGLModule()->SetDepthFunc(true);
 }
 
-unsigned int LightsConfig::LoadSkyboxTexture(UID cubemapUid)
+void LightsConfig::LoadSkyboxTexture(UID resource)
 {
-    std::string stringPath = App->GetLibraryModule()->GetResourcePath(cubemapUid);
-    skyboxUID              = cubemapUid;
-    currentTextureName     = App->GetLibraryModule()->GetResourceName(cubemapUid);
-    return TextureImporter::LoadCubemap(stringPath.c_str());
+    if (resource == INVALID_UID) return;
+
+    if (currentTexture != nullptr && currentTexture->GetUID() == resource) return;
+
+    ResourceTexture* newCubemap = TextureImporter::LoadCubemap(resource);
+    if (newCubemap != nullptr)
+    {
+        FreeCubemap();
+        App->GetResourcesModule()->ReleaseResource(currentTexture);
+        currentTexture     = newCubemap;
+        currentTextureName = currentTexture->GetName();
+        skyboxUID          = currentTexture->GetUID();
+
+        skyboxID           = currentTexture->GetTextureID();
+        skyboxHandle       = glGetTextureHandleARB(currentTexture->GetTextureID());
+        glMakeTextureHandleResidentARB(skyboxHandle);
+    }
 }
 
 void LightsConfig::SaveData(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
@@ -142,7 +163,7 @@ void LightsConfig::LoadData(const rapidjson::Value& lights)
     const rapidjson::Value& ambientColorArray = lights["Ambient Color"];
     ambientColor = {ambientColorArray[0].GetFloat(), ambientColorArray[1].GetFloat(), ambientColorArray[2].GetFloat()};
     ambientIntensity = lights["Ambient Intensity"].GetFloat();
-    skyboxTexture    = LoadSkyboxTexture(lights["Skybox UID"].GetUint64());
+    LoadSkyboxTexture(lights["Skybox UID"].GetUint64());
 }
 
 void LightsConfig::EditorParams(bool& lightConfig)
@@ -163,10 +184,11 @@ void LightsConfig::EditorParams(bool& lightConfig)
 
     if (ImGui::IsPopupOpen(CONSTANT_TEXTURE_SELECT_DIALOG_ID))
     {
-        const UID uid = LoadSkyboxTexture(App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
+        const UID uid = App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
             CONSTANT_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetTextureMap(), INVALID_UID
-        ));
-        if (uid != INVALID_UID) skyboxTexture = static_cast<unsigned int>(uid);
+        );
+
+        if (uid != INVALID_UID) LoadSkyboxTexture(uid);
     }
 
     ImGui::SeparatorText("Ambient light");

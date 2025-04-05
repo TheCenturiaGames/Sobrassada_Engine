@@ -1,5 +1,7 @@
 #include "TextManager.h"
-#include "Globals.h"
+
+#include "Application.h"
+#include "OpenGLModule.h"
 
 #include "Math/float4x4.h"
 #include "glew.h"
@@ -40,9 +42,12 @@ namespace TextManager
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+            UID bindlessUID = glGetTextureHandleARB(texture);
+            glMakeTextureHandleResidentARB(bindlessUID);
+
             // Store the data of the character texture
             Character character = {
-                texture,
+                texture, bindlessUID,
                 float2(static_cast<float>(face->glyph->bitmap.width), static_cast<float>(face->glyph->bitmap.rows)),
                 float2(static_cast<float>(face->glyph->bitmap_left), static_cast<float>(face->glyph->bitmap_top)),
                 static_cast<unsigned int>(face->glyph->advance.x)
@@ -84,7 +89,12 @@ namespace TextManager
     {
         for (const auto& c : characters)
         {
-            if (c.second.textureID != 0) glDeleteTextures(1, &c.second.textureID);
+            if (c.second.textureID != 0)
+            {
+                glMakeTextureHandleNonResidentARB(c.second.bindlessUID);
+                glDeleteTextures(1, &c.second.textureID);
+            }
+            
         }
         characters.clear();
     }
@@ -99,10 +109,8 @@ namespace TextManager
 
         int x = 0;
         int y = -1 * fontData.fontSize;
-        glActiveTexture(GL_TEXTURE0);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-        // GLOG("Text size: %d", text.length());
         for (char c : text)
         {
             if (c == '\n')
@@ -117,7 +125,7 @@ namespace TextManager
                 y -= fontData.fontSize;
             }
 
-            const Character character  = fontData.characters[c];
+            const Character character = fontData.characters[c];
 
             const float xPos          = x + character.bearing.x;
             const float yPos          = y - (character.size.y - character.bearing.y);
@@ -126,14 +134,16 @@ namespace TextManager
 
             // Positions - Uvs interleaved
             const float vertices[]    = {xPos,         yPos + height, 0.0f,         0.0f, xPos, yPos,
-                                   0.0f,         1.0f,          xPos + width, yPos, 1.0f, 1.0f,
+                                         0.0f,         1.0f,          xPos + width, yPos, 1.0f, 1.0f,
 
-                                   xPos + width, yPos + height, 1.0f,         0.0f, xPos, yPos + height,
-                                   0.0f,         0.0f,          xPos + width, yPos, 1.0f, 1.0f};
+                                         xPos + width, yPos + height, 1.0f,         0.0f, xPos, yPos + height,
+                                         0.0f,         0.0f,          xPos + width, yPos, 1.0f, 1.0f};
 
-            glBindTexture(GL_TEXTURE_2D, character.textureID);
+            GLuint lower = static_cast<GLuint>(character.bindlessUID & 0xFFFFFFFF);
+            GLuint higher = static_cast<GLuint>(character.bindlessUID >> 32);
+            glUniform2ui(4, lower, higher);
             glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
+            App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 6);
 
             x += (character.advance >> 6);
         }
