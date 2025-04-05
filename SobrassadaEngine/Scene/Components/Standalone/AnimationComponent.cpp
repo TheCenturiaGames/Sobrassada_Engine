@@ -159,7 +159,7 @@ void AnimationComponent::Update(float deltaTime)
             SetBoneMapping();
         }
 
-        animController->Update();
+        animController->Update(deltaTime);
 
     for (auto& channel : currentAnimResource->channels)
     {

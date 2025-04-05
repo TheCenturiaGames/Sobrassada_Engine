@@ -14,7 +14,7 @@ class AnimController
                                     
     void GetTransform(const std::string& nodeName, float3& pos, Quat& rot); 
 
-    update_status Update();  
+    update_status Update(float deltaTime);  
     void Play(UID resource, bool loop);
     void Stop();
     void Pause();
@@ -35,6 +35,6 @@ class AnimController
     float currentTime                    = 0; 
     bool loop                       = false;
     bool playAnimation                      = false;
-    float playbackSpeed                     = 0.5f;
+    float playbackSpeed                     = 1.0f;
     ResourceAnimation* animation            = nullptr;
 };

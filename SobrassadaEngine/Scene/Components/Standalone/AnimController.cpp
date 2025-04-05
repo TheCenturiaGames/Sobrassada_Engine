@@ -50,20 +50,19 @@ void AnimController::Resume()
     playAnimation = true;
 }
 
-update_status AnimController::Update()
+update_status AnimController::Update(float deltaTime)
 {
     if (!playAnimation || resource == 0) return UPDATE_CONTINUE;
 
-    float rawDeltaTime    = App->GetEngineTimer()->GetTime();
+    
 
-    const float MAX_DELTA = 0.1f;
-    rawDeltaTime          = (rawDeltaTime > MAX_DELTA) ? MAX_DELTA : rawDeltaTime;
-    float deltaTime       = rawDeltaTime * playbackSpeed;
+ 
+    deltaTime   *= playbackSpeed;
 
-    GLOG(
+    /*GLOG(
         "Raw delta time: %f, Capped delta: %f, Playback speed: %f", App->GetEngineTimer()->GetTime(), rawDeltaTime,
         playbackSpeed
-    );
+    );*/
 
     float previousTime  = currentTime;
     currentTime        += deltaTime;
@@ -75,19 +74,19 @@ update_status AnimController::Update()
     }
 
     const float duration = animation->GetDuration();
-    GLOG("Animation time update: %f -> %f (duration: %f)", previousTime, currentTime, duration);
+    //GLOG("Animation time update: %f -> %f (duration: %f)", previousTime, currentTime, duration);
 
     if (currentTime > duration)
     {
         if (loop)
         {
             currentTime = fmod(currentTime, duration);
-            GLOG("Animation looped: new time = %f", currentTime);
+            //GLOG("Animation looped: new time = %f", currentTime);
         }
         else
         {
             currentTime = duration;
-            GLOG("Animation reached end: time = %f", currentTime);
+            //GLOG("Animation reached end: time = %f", currentTime);
             playAnimation = false;
 
            if (animation != nullptr)
@@ -113,7 +112,7 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
     if (animChannel == nullptr) return;
 
     float animDuration = animation->GetDuration();
-    GLOG("Animation duration: %f, Current time: %f", animDuration, currentTime);
+    //GLOG("Animation duration: %f, Current time: %f", animDuration, currentTime);
 
 
     if (animChannel->numPositions > 0)
@@ -121,7 +120,7 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
         if (animChannel->numPositions == 1)
         {
             pos = animChannel->positions[0];
-            GLOG("Single position keyframe: (%f,%f,%f)", pos.x, pos.y, pos.z);
+            //GLOG("Single position keyframe: (%f,%f,%f)", pos.x, pos.y, pos.z);
         }
         else
         {
@@ -136,12 +135,12 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
             if (nextIndex >= animChannel->numPositions)
             {
                 pos = animChannel->positions[animChannel->numPositions - 1];
-                GLOG("Past last position keyframe: (%f,%f,%f)", pos.x, pos.y, pos.z);
+                //GLOG("Past last position keyframe: (%f,%f,%f)", pos.x, pos.y, pos.z);
             }
             else if (nextIndex == 0)
             {
                 pos = animChannel->positions[0];
-                GLOG("Before first position keyframe: (%f,%f,%f)", pos.x, pos.y, pos.z);
+                //GLOG("Before first position keyframe: (%f,%f,%f)", pos.x, pos.y, pos.z);
             }
             else
             {
@@ -154,10 +153,10 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
                 lambda          = (lambda < 0) ? 0 : (lambda > 1) ? 1 : lambda;
 
                 pos = float3::Lerp(animChannel->positions[prevIndex], animChannel->positions[nextIndex], lambda);
-                GLOG(
+                /*GLOG(
                     "Position interpolation: (%f,%f,%f), Lambda: %f, Times: %f to %f", pos.x, pos.y, pos.z, lambda,
                     startTime, endTime
-                );
+                );*/
             }
         }
     }
@@ -182,12 +181,12 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
             if (nextIndex >= animChannel->numRotations)
             {
                 rot = animChannel->rotations[animChannel->numRotations - 1].Normalized();
-                GLOG("Past last rotation keyframe: (%f,%f,%f,%f)", rot.x, rot.y, rot.z, rot.w);
+                //GLOG("Past last rotation keyframe: (%f,%f,%f,%f)", rot.x, rot.y, rot.z, rot.w);
             }
             else if (nextIndex == 0)
             {
                 rot = animChannel->rotations[0].Normalized();
-                GLOG("Before first rotation keyframe: (%f,%f,%f,%f)", rot.x, rot.y, rot.z, rot.w);
+                //GLOG("Before first rotation keyframe: (%f,%f,%f,%f)", rot.x, rot.y, rot.z, rot.w);
             }
             else
             {
@@ -201,10 +200,10 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
 
                 rot = Quat::Slerp(animChannel->rotations[prevIndex], animChannel->rotations[nextIndex], lambda)
                           .Normalized();
-                GLOG(
+                /*GLOG(
                     "Rotation interpolation: (%f,%f,%f,%f), Lambda: %f, Times: %f to %f", rot.x, rot.y, rot.z, rot.w,
                     lambda, startTime, endTime
-                );
+                );*/
             }
         }
     }
