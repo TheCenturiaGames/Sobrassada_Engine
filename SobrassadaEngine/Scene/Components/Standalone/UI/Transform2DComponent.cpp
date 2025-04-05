@@ -5,6 +5,7 @@
 #include "DebugDrawModule.h"
 #include "Scene.h"
 #include "SceneModule.h"
+#include "UILabelComponent.h"
 
 #include "imgui.h"
 #include <queue>
@@ -51,6 +52,14 @@ Transform2DComponent::Transform2DComponent(const rapidjson::Value& initialState,
 
 Transform2DComponent::~Transform2DComponent()
 {
+    if (parentTransform != nullptr) parentTransform->RemoveChild(this);
+
+    if (parent->GetComponentByType(COMPONENT_LABEL) != nullptr)
+    {
+        UILabelComponent* label = static_cast<UILabelComponent*>(parent->GetComponentByType(COMPONENT_LABEL));
+        label->RemoveTransform();
+    }
+    // Future UI Components will have to also be checked here
 }
 
 void Transform2DComponent::Init()
@@ -149,19 +158,19 @@ void Transform2DComponent::Render(float deltaTime)
     if (App->GetSceneModule()->GetScene()->GetSelectedGameObject()->GetUID() == parent->GetUID())
     {
         // Top-left
-        float3 x1 = float3(GetAnchorXPos(anchorsX.x), GetAnchorYPos(anchorsY.y), 0);
+        const float3 x1 = float3(GetAnchorXPos(anchorsX.x), GetAnchorYPos(anchorsY.y), 0);
         debugDraw->DrawCone(x1, float3(-10, 10, 0), 5, 1);
 
         // Top-right
-        float3 x2 = float3(GetAnchorXPos(anchorsX.y), GetAnchorYPos(anchorsY.y), 0);
+        const float3 x2 = float3(GetAnchorXPos(anchorsX.y), GetAnchorYPos(anchorsY.y), 0);
         debugDraw->DrawCone(x2, float3(10, 10, 0), 5, 1);
 
         // Bottom-left
-        float3 y1 = float3(GetAnchorXPos(anchorsX.x), GetAnchorYPos(anchorsY.x), 0);
+        const float3 y1 = float3(GetAnchorXPos(anchorsX.x), GetAnchorYPos(anchorsY.x), 0);
         debugDraw->DrawCone(y1, float3(-10, -10, 0), 5, 1);
 
         // Bottom-right
-        float3 y2 = float3(GetAnchorXPos(anchorsX.y), GetAnchorYPos(anchorsY.x), 0);
+        const float3 y2 = float3(GetAnchorXPos(anchorsX.y), GetAnchorYPos(anchorsY.x), 0);
         debugDraw->DrawCone(y2, float3(10, -10, 0), 5, 1);
     }
 }
@@ -342,7 +351,7 @@ void Transform2DComponent::GetCanvas()
 
 bool Transform2DComponent::IsRootTransform2D() const
 {
-    // Returns if the parent is the canvas component, which means this gameObject is the root of the UI
+    // Returns true if the parent is the canvas component
     return parentCanvas->GetParentUID() == parent->GetParent();
 }
 
@@ -501,4 +510,10 @@ void Transform2DComponent::UpdateVerticalMargins()
 
     margins.z = (parent->GetGlobalTransform().TranslatePart().y + (size.y * (1 - pivot.y))) - GetAnchorYPos(anchorsY.y);
     margins.w = (parent->GetGlobalTransform().TranslatePart().y - (size.y * pivot.y)) - GetAnchorYPos(anchorsY.x);
+}
+
+void Transform2DComponent::RemoveChild(Transform2DComponent* child)
+{
+    const auto& it = std::find(childTransforms.begin(), childTransforms.end(), child);
+    if (it != childTransforms.end()) childTransforms.erase(it);
 }

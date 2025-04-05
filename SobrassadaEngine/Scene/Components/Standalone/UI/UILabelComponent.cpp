@@ -129,7 +129,7 @@ void UILabelComponent::Render(float deltaTime)
 
     float width = 0;
     float3 startPos;
-    if (transform2D != nullptr)
+    if (transform2D)
     {
         startPos = float3(transform2D->GetRenderingPosition(), 0) - parent->GetGlobalTransform().TranslatePart();
         width = transform2D->size.x;
