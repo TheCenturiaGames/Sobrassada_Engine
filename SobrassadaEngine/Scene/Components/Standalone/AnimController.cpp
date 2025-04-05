@@ -21,13 +21,6 @@ AnimController::~AnimController()
 
 void AnimController::Play(UID newResource, bool shouldLoop)
 {
-   
-    if (animation != nullptr)
-    {
-        App->GetResourcesModule()->ReleaseResource(animation);
-        animation = nullptr;
-    }
-
     resource      = newResource;
     currentTime   = 0;
     loop          = shouldLoop;
@@ -108,7 +101,7 @@ update_status AnimController::Update()
         }
     }
 
-    
+    App->GetResourcesModule()->ReleaseResource(animation);
     return UPDATE_CONTINUE;
 }
 

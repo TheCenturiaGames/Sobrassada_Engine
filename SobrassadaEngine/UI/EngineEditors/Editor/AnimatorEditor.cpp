@@ -147,22 +147,21 @@ bool AnimatorEditor::RenderEditor()
             }
         }
 
-        // Animation library section
+      
         if (ImGui::CollapsingHeader("Animation Library"))
         {
-            // Here you would list available animations from your resource system
-            // This is just a placeholder - implement based on your resource management system
+            
             ImGui::Text("Available Animations:");
-            // Example: List animations and allow for selection and assignment
+           
         }
 
-        // Update animation time if playing
+        
         if (playing && currentAnimComp && currentAnimComp->GetAnimationController())
         {
-            // Get the time from the controller to keep in sync
+          
             currentTime = currentAnimComp->GetAnimationController()->GetTime();
 
-            // Check if animation has reached its end
+            
             if (currentTime >= animationDuration)
             {
                 currentTime = 0.0f;
