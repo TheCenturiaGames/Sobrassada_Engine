@@ -65,7 +65,7 @@ namespace SceneImporter
                     matUID = matIndices[matIndex];
                 }
                 
-                UID meshUID      = MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath, targetFilePath, INVALID_UID, matUID);
+                const UID meshUID      = MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath, targetFilePath, INVALID_UID, matUID);
                 n++;
                 
                 primitives.emplace_back(meshUID, matUID);
