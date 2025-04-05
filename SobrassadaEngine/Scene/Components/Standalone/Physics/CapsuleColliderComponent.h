@@ -42,7 +42,7 @@ class CapsuleColliderComponent : public Component
     float3 centerRotation         = float3::zero;
     float radius                  = 1.f;
     float length                  = 1.f;
-    ColliderType colliderType     = ColliderType::STATIC;
+    ColliderType colliderType     = ColliderType::DYNAMIC;
 
     btRigidBody* rigidBody        = nullptr;
     BulletMotionState motionState = BulletMotionState(nullptr, float3::zero, float3::zero, false);

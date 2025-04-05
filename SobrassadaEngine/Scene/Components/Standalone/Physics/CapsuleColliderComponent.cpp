@@ -100,17 +100,28 @@ void CapsuleColliderComponent::RenderEditorInspector()
             if (ImGui::Selectable(ColliderTypeStrings[i]))
             {
                 colliderType = ColliderType(i);
-                if (colliderType == ColliderType::STATIC) parent->UpdateMobilityHierarchy(MobilitySettings::STATIC);
-
+                if (colliderType == ColliderType::STATIC)
+                {
+                    parent->UpdateMobilityHierarchy(MobilitySettings::STATIC);
+                    mass = 0.f;
+                }
                 else if (colliderType == ColliderType::DYNAMIC)
+                {
                     parent->UpdateMobilityHierarchy(MobilitySettings::DYNAMIC);
+                    mass = 1.f;
+                }
                 App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
             }
         }
         ImGui::EndCombo();
     }
 
-    if (ImGui::InputFloat("Mass", &mass)) App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
+    ImGui::BeginDisabled(colliderType == ColliderType::STATIC);
+    if (ImGui::InputFloat("Mass", &mass))
+    {
+        App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
+    }
+    ImGui::EndDisabled();
 
     if (ImGui::InputFloat3("Center offset", &centerOffset[0])) App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
 
