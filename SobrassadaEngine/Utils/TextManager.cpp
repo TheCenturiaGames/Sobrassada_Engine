@@ -99,7 +99,7 @@ namespace TextManager
         characters.clear();
     }
 
-    void RenderText(FontData& fontData, const std::string& text, const unsigned vbo, const float maxWidth)
+    void RenderText(FontData& fontData, const std::string& text, const float3& startPos, const unsigned vbo, const float maxWidth)
     {
         // When deferred lightning works, this won't be needed as transparency will be properly handled
         glDisable(GL_DEPTH_TEST);
@@ -107,8 +107,8 @@ namespace TextManager
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        int x = 0;
-        int y = -1 * fontData.fontSize;
+        int x = startPos.x;
+        int y = startPos.y - fontData.fontSize;
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
         for (char c : text)
