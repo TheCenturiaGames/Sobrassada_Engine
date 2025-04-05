@@ -13,13 +13,21 @@ class PrefabEditor : public EngineEditorBase
     ~PrefabEditor() override;
 
   private:
+    // Core editor logic
     bool RenderEditor() override;
-    ResourcePrefab* selectedPrefab = nullptr;
+    void RenderPrefabList();
+    void HandlePrefabViewer();
+    void RenderPrefabPortView();
+    void RenderPrefabSidePanel(float width, float height);
+
+    // Hierarchy rendering
     void treeHierarchyView();
-    void DrawHierarchyRecursive(GameObject* go);
+    std::vector<GameObject*> GetRootGameObjects(ResourcePrefab* prefab);
+    void DrawHierarchyRecursiveFiltered(GameObject* go, const std::string& filter);
 
-    GameObject* selectedGameObject = nullptr;
-    std::unique_ptr<PrefabPortView> portView;
-
-    bool openPrefabViewer = false;
+    // State
+    ResourcePrefab* selectedPrefab           = nullptr;
+    GameObject* selectedGameObject           = nullptr;
+    std::unique_ptr<PrefabPortView> portView = nullptr;
+    bool openPrefabViewer                    = false;
 };
