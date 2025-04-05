@@ -36,7 +36,7 @@ bool AnimatorEditor::RenderEditor()
             {
                 ImGui::Text("Selected Object: %s", selectedObj->GetName().c_str());
 
-                // See if it has an animation component
+               
                 currentAnimComp = static_cast<AnimationComponent*>(selectedObj->GetAnimationComponent());
 
                 if (currentAnimComp)
