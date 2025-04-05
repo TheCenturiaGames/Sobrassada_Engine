@@ -100,7 +100,8 @@ void PathfinderModule::InitQuerySystem()
 //called by clicking in the game
 void PathfinderModule::HandleClickNavigation()
 {
-    if (!clickNavigationEnabled || !App->GetSceneModule()->GetDoInputsScene()) return; // from UI
+    if (!clickNavigationEnabled || !App->GetSceneModule()->GetInPlayMode()) return; // from UI
+    
 
     int agentId            = 0; //  from UI
     LineSegment ray        = App->GetCameraModule()->CastCameraRay();
@@ -108,7 +109,7 @@ void PathfinderModule::HandleClickNavigation()
     float3 hitPoint;
     if (!RaycastToGround(ray, hitPoint))
     {
-        GLOG("Ray did nasot hit ground.");
+        GLOG("Ray did not hit ground.");
         return;
     }
 
