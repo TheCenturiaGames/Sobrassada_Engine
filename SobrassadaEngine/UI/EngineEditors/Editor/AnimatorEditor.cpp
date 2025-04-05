@@ -28,10 +28,10 @@ bool AnimatorEditor::RenderEditor()
 
     if (ImGui::Begin(name.c_str(), &stillOpen))
     {
-        // Object selection section
+       
         if (ImGui::CollapsingHeader("Object Selection", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            // Get the currently selected object from your scene/editor
+            
             GameObject* selectedObj = App->GetSceneModule()->GetScene()->GetSelectedGameObject();
 
             if (selectedObj)
