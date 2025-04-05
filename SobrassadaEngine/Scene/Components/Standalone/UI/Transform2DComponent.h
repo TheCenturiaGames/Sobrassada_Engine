@@ -60,7 +60,7 @@ class Transform2DComponent : public Component
     float4 margins;
     float4 previousMargins;
 
-    bool marginUpdated;
+    bool transfomr2DUpdated;
 
   private:
     CanvasComponent* parentCanvas;
