@@ -49,7 +49,6 @@ class Application
     GameUIModule* GetGameUIModule() { return gameUIModule; }
     ScriptModule* GetScriptModule() { return scriptModule; }
     PathfinderModule* GetPathfinderModule() { return pathModule; }
-
     EngineTimer* GetEngineTimer() { return engineTimer; }
     GameTimer* GetGameTimer() { return gameTimer; }
 

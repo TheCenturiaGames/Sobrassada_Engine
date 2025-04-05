@@ -19,6 +19,7 @@
 #include "GameUIModule.h"
 #include "WindowModule.h"
 #include "PathfinderModule.h"
+#include "GameUIModule.h"
 
 #ifdef OPTICK
 #include "optick.h"
@@ -41,7 +42,6 @@ Application::Application()
     modules.push_back(cameraModule = new CameraModule());
     modules.push_back(debugDraw = new DebugDrawModule());
     modules.push_back(editorUIModule = new EditorUIModule());
-    modules.push_back(UIModule = new UserInterfaceModule());
     modules.push_back(pathModule = new PathfinderModule());
 
     engineTimer = new EngineTimer();

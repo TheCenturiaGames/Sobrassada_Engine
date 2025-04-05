@@ -5,6 +5,7 @@
 #include "SceneImporter.h"
 #include "SceneModule.h"
 #include "WindowModule.h"
+#include "PathfinderModule.h"
 
 #include "SDL.h"
 #include "imgui_impl_sdl2.h"
@@ -87,6 +88,10 @@ update_status InputModule::PreUpdate(float deltaTime)
             break;
         case SDL_MOUSEBUTTONDOWN:
             mouseButtons[sdlEvent.button.button - 1] = KEY_DOWN;
+            if (sdlEvent.button.button == SDL_BUTTON_LEFT)
+            {
+                App->GetPathfinderModule()->HandleClickNavigation(); // trigger navigation logic
+            }
             break;
 
         case SDL_MOUSEBUTTONUP:

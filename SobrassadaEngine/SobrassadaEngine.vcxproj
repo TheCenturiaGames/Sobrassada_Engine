@@ -311,7 +311,6 @@
     <ClCompile Include="Scene\Components\CameraComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\UI\CanvasComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\UI\UILabelComponent.cpp" />
-    <ClCompile Include="Modules\ScriptModule.cpp" />
     <ClCompile Include="Scene\Components\ScriptComponent.cpp" />
     <ClCompile Include="UI\EngineEditors\Editor\NodeEditor.cpp" />
     <ClCompile Include="UI\EngineEditors\Editor\TextureEditor.cpp" />
