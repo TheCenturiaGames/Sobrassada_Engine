@@ -16,6 +16,7 @@
 #include "SceneModule.h"
 #include "ScriptModule.h"
 #include "TextureEditor.h"
+#include "PrefabEditor.h"
 #include "TextureImporter.h"
 #include "WindowModule.h"
 

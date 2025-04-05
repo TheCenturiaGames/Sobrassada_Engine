@@ -324,9 +324,6 @@
     <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
       <Filter>UI\EngineEditors</Filter>
     </ClCompile>
-    <ClCompile Include="FileSystem\PrefabManager.cpp">
-      <Filter>FileSystem</Filter>
-    </ClCompile>
     <ClCompile Include="Utils\Trees\Octree.cpp">
       <Filter>Utils\Tree</Filter>
     </ClCompile>
@@ -421,7 +418,7 @@
       <Filter>FileSystem\Batching</Filter>
     </ClCompile>
     <ClCompile Include="ResourceManagement\Resources\ResourceNavmesh.cpp">
-    <Filter>Resources</Filter>
+      <Filter>Resources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -789,7 +786,7 @@
       <Filter>FileSystem\Batching</Filter>
     </ClInclude>
     <ClInclude Include="ResourceManagement\Resources\ResourceNavmesh.h">
-    <Filter>Resources</Filter>
+      <Filter>Resources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

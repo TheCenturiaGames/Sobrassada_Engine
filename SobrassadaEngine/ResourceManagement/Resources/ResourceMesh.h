@@ -39,6 +39,7 @@ class ResourceMesh : public Resource
     void LoadData(unsigned int mode, const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices);
 
     const AABB& GetAABB() const { return aabb; }
+    unsigned int GetVAO() const { return vao; }
     int GetIndexCount() const { return indexCount; }
     int GetVertexCount() const { return vertexCount; }
     const std::vector<Vertex>& GetLocalVertices() const { return vertices; }
@@ -47,7 +48,9 @@ class ResourceMesh : public Resource
     const unsigned int GetMode() const { return mode; }
 
   private:
-    unsigned int vbo         = 0; // should be deleted
+    unsigned int vao         = 0;
+    unsigned int vbo         = 0;
+    unsigned int ebo         = 0;
     unsigned int mode        = 0;
     unsigned int vertexCount = 0;
     unsigned int indexCount  = 0;

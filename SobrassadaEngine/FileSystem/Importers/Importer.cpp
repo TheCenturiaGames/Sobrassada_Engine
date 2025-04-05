@@ -5,7 +5,7 @@
 #include "MaterialImporter.h"
 #include "MeshImporter.h"
 #include "ModelImporter.h"
-#include "PrefabManager.h"
+#include "PrefabImporter.h"
 #include "Resource.h"
 #include "ResourceMaterial.h"
 #include "ResourceMesh.h"

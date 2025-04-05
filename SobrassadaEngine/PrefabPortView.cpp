@@ -52,6 +52,7 @@ void PrefabPortView::ApplyInitialTransform()
     float4x4 transform =
         float4x4::FromTRS(float3(0, 0, -1.0f), Quat::RotateY(15.0f * DEGREE_RAD_CONV), float3(1, 1, 1));
     previewGO->SetLocalTransform(transform);
+    previewGO->UpdateTransformForGOBranch();
 }
 
 void PrefabPortView::LoadMeshAndMaterialFromComponent(MeshComponent* mesh)
@@ -102,9 +103,19 @@ void PrefabPortView::RenderContent()
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    float4x4 model            = previewGO->GetGlobalTransform();
+    matrices.viewMatrix       = camera.ViewMatrix();
+    matrices.projectionMatrix = camera.ProjectionMatrix();
+    matrices.viewMatrix.Transpose();
+    matrices.projectionMatrix.Transpose();
+
+    glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(CameraMatrices), &matrices);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
     if (loadedMesh)
     {
-        loadedMesh->Render(0, previewGO->GetGlobalTransform(), cameraUBO, nullptr, {}, {});
+        loadedMesh->Render(0, model, cameraUBO, loadedMaterial, {}, {});
     }
 
     framebuffer->Unbind();
