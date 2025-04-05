@@ -59,6 +59,7 @@ class Transform2DComponent : public Component
     std::vector<Transform2DComponent*> childTransforms;
 
     bool transform2DUpdated;
+    float2 previousPosition;
     float4 previousMargins;
     float4 margins;
 };

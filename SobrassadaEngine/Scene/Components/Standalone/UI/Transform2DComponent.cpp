@@ -378,11 +378,17 @@ void Transform2DComponent::OnAnchorsUpdated()
 {
     // when anchors are updated either update the positions respecting their distance or update the margins
     if (anchorsX.x == anchorsX.y)
-        position.x = parent->GetGlobalTransform().TranslatePart().x - GetAnchorXPos(anchorsX.x);
+    {
+        previousPosition.x = position.x;
+        position.x         = parent->GetGlobalTransform().TranslatePart().x - GetAnchorXPos(anchorsX.x);
+    }
     else UpdateHorizontalMargins();
 
     if (anchorsY.x == anchorsY.y)
-        position.y = parent->GetGlobalTransform().TranslatePart().y - GetAnchorYPos(anchorsY.x);
+    {
+        previousPosition.y = position.y;
+        position.y         = parent->GetGlobalTransform().TranslatePart().y - GetAnchorYPos(anchorsY.x);
+    }
     else UpdateVerticalMargins();
 }
 
@@ -393,7 +399,11 @@ void Transform2DComponent::OnSizeChanged()
     {
         child->OnAnchorsUpdated();
 
-        if (child->anchorsX.x != child->anchorsX.y)
+        if (child->anchorsX.x == child->anchorsX.y)
+        {
+            child->position.x = child->previousPosition.x;
+        }
+        else
         {
             child->margins.x = child->previousMargins.x;
             child->OnLeftMarginChanged();
@@ -402,7 +412,11 @@ void Transform2DComponent::OnSizeChanged()
             child->OnRightMarginChanged();
         }
 
-        if (child->anchorsY.x != child->anchorsY.y)
+        if (child->anchorsY.x == child->anchorsY.y)
+        {
+            child->position.y = child->previousPosition.y;
+        }
+        else
         {
             child->margins.z = child->previousMargins.z;
             child->OnTopMarginChanged();
