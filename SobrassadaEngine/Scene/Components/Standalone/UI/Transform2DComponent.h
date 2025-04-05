@@ -56,7 +56,9 @@ class Transform2DComponent : public Component
     float2 pivot;
     float2 anchorsX;
     float2 anchorsY;
+
     float4 margins;
+    float4 previousMargins;
 
     bool marginUpdated;
 
