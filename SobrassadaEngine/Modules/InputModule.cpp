@@ -4,6 +4,7 @@
 #include "FileSystem.h"
 #include "SceneImporter.h"
 #include "SceneModule.h"
+#include "WindowModule.h"
 
 #include "SDL.h"
 #include "imgui_impl_sdl2.h"
@@ -79,6 +80,7 @@ update_status InputModule::PreUpdate(float deltaTime)
             if (sdlEvent.window.event == SDL_WINDOWEVENT_RESIZED ||
                 sdlEvent.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
             {
+                App->GetWindowModule()->WindowResized(sdlEvent.window.data1, sdlEvent.window.data2);
                 // App->GetOpenGLModule()->WindowResized(sdlEvent.window.data1, sdlEvent.window.data2);
                 // App->GetEditorModule()->SetNewScreenSize(sdlEvent.window.data1, sdlEvent.window.data2);
             }

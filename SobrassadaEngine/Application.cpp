@@ -16,7 +16,7 @@
 #include "SceneModule.h"
 #include "ScriptModule.h"
 #include "ShaderModule.h"
-#include "UserInterfaceModule.h"
+#include "GameUIModule.h"
 #include "WindowModule.h"
 #include "PathfinderModule.h"
 
@@ -37,6 +37,7 @@ Application::Application()
     modules.push_back(inputModule = new InputModule());
     modules.push_back(shaderModule = new ShaderModule());
     modules.push_back(sceneModule = new SceneModule());
+    modules.push_back(gameUIModule = new GameUIModule());
     modules.push_back(cameraModule = new CameraModule());
     modules.push_back(debugDraw = new DebugDrawModule());
     modules.push_back(editorUIModule = new EditorUIModule());

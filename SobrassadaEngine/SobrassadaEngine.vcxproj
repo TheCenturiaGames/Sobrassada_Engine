@@ -305,8 +305,13 @@
     <ClCompile Include="Scene\Components\Standalone\AIAgentComponent.cpp" />
     <ClCompile Include="Modules\ScriptModule.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceNavmesh.cpp" />
+
+    <ClCompile Include="Modules\GameUIModule.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceStateMachine.cpp" />
     <ClCompile Include="Scene\Components\CameraComponent.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\UI\CanvasComponent.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\UI\UILabelComponent.cpp" />
+    <ClCompile Include="Modules\ScriptModule.cpp" />
     <ClCompile Include="Scene\Components\ScriptComponent.cpp" />
     <ClCompile Include="UI\EngineEditors\Editor\NodeEditor.cpp" />
     <ClCompile Include="UI\EngineEditors\Editor\TextureEditor.cpp" />
@@ -373,9 +378,9 @@
     <ClCompile Include="Modules\EditorUIModule.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourcePrefab.cpp" />
     <ClCompile Include="Modules\ProjectModule.cpp" />
-    <ClCompile Include="Modules\UserInterfaceModule.cpp" />
     <ClCompile Include="Scene\Components\Standalone\CharacterControllerComponent.cpp" />
     <ClCompile Include="UI\EngineEditors\Nodes\CustomNode.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\UI\Transform2DComponent.cpp" />
     <ClCompile Include="Utils\EngineTimer.cpp" />
     <ClCompile Include="FileSystem\Importers\Importer.cpp" />
     <ClCompile Include="Libs\ImGuizmo\ImGuizmo.cpp" />
@@ -451,6 +456,7 @@
     <ClCompile Include="Scene\Scene.cpp" />
     <ClCompile Include="Utils\GameTimer.cpp" />
     <ClCompile Include="Modules\WindowModule.cpp" />
+    <ClCompile Include="Utils\TextManager.cpp" />
     <ClCompile Include="Utils\Trees\Octree.cpp" />
     <ClCompile Include="Utils\Trees\Quadtree.cpp" />
   </ItemGroup>
@@ -466,6 +472,10 @@
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_bezier_math.h" />
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_extra_math.h" />
     <ClInclude Include="FileSystem\StateMachineManager.h" />
+    <ClInclude Include="Modules\GameUIModule.h" />
+    <ClInclude Include="Scene\Components\Standalone\UI\CanvasComponent.h" />
+    <ClInclude Include="Scene\Components\Standalone\UI\UILabelComponent.h" />
+    <ClInclude Include="Utils\TextManager.h" />
     <ClInclude Include="Modules\ScriptModule.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceNavmesh.h" />
     <ClInclude Include="FileSystem\Importers\NavmeshImporter.h" />
@@ -496,6 +506,7 @@
     <ClInclude Include="Modules\ResourcesModule.h" />
     <ClInclude Include="Modules\SceneModule.h" />
     <ClInclude Include="FileSystem\Importers\ModelImporter.h" />
+    <ClInclude Include="Scene\Components\Standalone\UI\Transform2DComponent.h" />
     <ClInclude Include="Utils\Delegate.h" />
     <ClInclude Include="Utils\EventDispatcher.h" />
     <ClInclude Include="Utils\Interpolation.h" />
@@ -514,7 +525,6 @@
     <ClInclude Include="FileSystem\Importers\MeshImporter.h" />
     <ClInclude Include="FileSystem\Importers\SceneImporter.h" />
     <ClInclude Include="Scene\Components\Standalone\CharacterControllerComponent.h" />
-    <ClInclude Include="Modules\UserInterfaceModule.h" />
     <ClInclude Include="UI\EngineEditors\EngineEditorBase.h" />
     <ClInclude Include="Utils\EngineTimer.h" />
     <ClInclude Include="Scene\Components\Component.h" />

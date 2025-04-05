@@ -7,6 +7,7 @@
 #include "PrefabManager.h"
 #include "SceneModule.h"
 #include "Standalone/MeshComponent.h"
+#include "Standalone/UI/Transform2DComponent.h"
 
 #include "imgui.h"
 #include <set>
@@ -81,8 +82,8 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
         );
 
         position = localTransform.TranslatePart();
-        rotation   = localTransform.RotatePart().ToEulerXYZ();
-        scale = localTransform.GetScale();
+        rotation = localTransform.RotatePart().ToEulerXYZ();
+        scale    = localTransform.GetScale();
     }
 
     // Deserialize Components
@@ -237,7 +238,8 @@ void GameObject::RenderEditorInspector()
 
         const float4x4& parentTransform = GetParentGlobalTransform();
 
-        if (selectedComponentIndex != COMPONENT_NONE)
+        if (selectedComponentIndex != COMPONENT_NONE &&
+            !(GetComponentByType(COMPONENT_CANVAS) && selectedComponentIndex == COMPONENT_TRANSFORM_2D))
         {
             ImGui::SameLine();
             if (ImGui::Button("Remove Component"))
@@ -327,7 +329,7 @@ void GameObject::RenderEditorInspector()
 
         ImGui::End();
 
-        if (!App->GetSceneModule()->GetInPlayMode())
+        if (!App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetSceneVisible())
         {
             if (App->GetEditorUIModule()->RenderImGuizmo(
                     localTransform, globalTransform, parentTransform, position, rotation, scale
@@ -390,6 +392,14 @@ void GameObject::OnTransformUpdated()
     {
         meshComponent->OnTransformUpdated();
     }
+
+    // If the gameObject has a transform2D, update it
+    if (components.find(COMPONENT_TRANSFORM_2D) != components.end())
+    {
+        Transform2DComponent* transform2D = static_cast<Transform2DComponent*>(components.at(COMPONENT_TRANSFORM_2D));
+        transform2D->OnTransform3DUpdated(localTransform);
+    }
+
     if (mobilitySettings == STATIC) App->GetSceneModule()->GetScene()->SetStaticModified();
     else App->GetSceneModule()->GetScene()->SetDynamicModified();
 }
@@ -645,6 +655,15 @@ void GameObject::RenderEditor()
     }
 }
 
+void GameObject::SetLocalTransform(const float4x4& newTransform)
+{
+    localTransform = newTransform;
+    position       = localTransform.TranslatePart();
+    rotation       = localTransform.RotatePart().ToEulerXYZ();
+    scale          = localTransform.GetScale();
+    UpdateTransformForGOBranch();
+}
+
 void GameObject::DrawGizmos() const
 {
     if (drawNodes) DrawNodes();
@@ -741,7 +760,7 @@ bool GameObject::CreateComponent(const ComponentType componentType)
     if (components.find(componentType) == components.end())
     // TODO Allow override of components after displaying an info box
     {
-        Component* createdComponent = ComponentUtils::CreateEmptyComponent(componentType, GetUID(), this);
+        Component* createdComponent = ComponentUtils::CreateEmptyComponent(componentType, GenerateUID(), this);
         if (createdComponent != nullptr)
         {
             components.insert({componentType, createdComponent});
