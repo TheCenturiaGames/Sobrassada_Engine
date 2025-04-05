@@ -772,9 +772,6 @@ void Scene::LoadModel(const UID modelUID)
             for (UID uid : animUIDs)
             {
                 GLOG("Setting aimation resource with UID %llu ", uid);
-               
-                ResourceAnimation* animation = (ResourceAnimation*)App->GetResourcesModule()->RequestResource(uid);
-                animComponent->SetCurrentAnimation(animation);
                 animComponent->SetAnimationResource(uid);
                 
                 GLOG("Animation UID: %d", uid);

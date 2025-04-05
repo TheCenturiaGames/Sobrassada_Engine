@@ -30,7 +30,6 @@ class AnimationComponent : public Component
     void AddAnimation(UID resource);
     UID GetAnimationResource() const { GLOG("Resource AnimUID  is: %d",resource) return resource; }
     void SetAnimationResource(UID animResource);
-    void SetCurrentAnimation(ResourceAnimation* resourceAnim) { currentAnimResource = resourceAnim; }
     ResourceAnimation* GetCurrentAnimation() const { return currentAnimResource; }
     AnimController* GetAnimationController() { return animController; }
     std::unordered_map<std::string, GameObject*> GetBoneMapping() const { return boneMapping; }
