@@ -4,7 +4,6 @@
 #include "SceneModule.h"
 #include "Scene/Scene.h"
 #include "ResourceManagement/Resources/ResourceAnimation.h"
-#include "SceneModule.h"
 #include "imgui.h"
 
 AnimatorEditor::AnimatorEditor(const std::string& editorName, const UID uid) : EngineEditorBase(editorName, uid)

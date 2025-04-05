@@ -2,6 +2,7 @@
 #include "EngineEditorBase.h"
 class GameObject;
 class ResourceAnimation;
+class AnimationComponent;
 class AnimatorEditor : public EngineEditorBase
 {
   public:

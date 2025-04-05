@@ -101,7 +101,7 @@ update_status AnimController::Update()
         }
     }
 
-    App->GetResourcesModule()->ReleaseResource(animation);
+   
     return UPDATE_CONTINUE;
 }
 
