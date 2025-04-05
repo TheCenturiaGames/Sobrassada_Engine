@@ -100,7 +100,7 @@ void PathfinderModule::InitQuerySystem()
 //called by clicking in the game
 void PathfinderModule::HandleClickNavigation()
 {
-    if (!clickNavigationEnabled) return; // from UI
+    if (!clickNavigationEnabled || !App->GetSceneModule()->GetDoInputsScene()) return; // from UI
 
     int agentId            = 0; //  from UI
     LineSegment ray        = App->GetCameraModule()->CastCameraRay();
