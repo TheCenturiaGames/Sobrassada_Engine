@@ -7,9 +7,12 @@
 #include "MetaPrefab.h"
 #include "ResourcePrefab.h"
 #include "ProjectModule.h"
+#include "ResourcePrefab.h"
+#include "GameObject.h"
+#include "SceneModule.h"
 
-#include "prettywriter.h"
-#include "stringbuffer.h"
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
 #include <filesystem>
 #include <queue>
 #include <fstream>

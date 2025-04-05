@@ -33,7 +33,7 @@ class ResourceTexture : public Resource
 
   private:
     unsigned int textureID = 0;
-    DirectX::ScratchImage scratchImage;
+    DirectX::ScratchImage scratchImage; // TODO: needed?
     DirectX::TexMetadata metadata;
     OpenGLMetadata openGLMetadata;
     unsigned int m_CubemapFaceIDs[6] = {0};

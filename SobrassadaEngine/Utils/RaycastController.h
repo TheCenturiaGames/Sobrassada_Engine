@@ -2,6 +2,7 @@
 
 #include "Octree.h"
 #include "Quadtree.h"
+
 #include <vector>
 
 namespace math

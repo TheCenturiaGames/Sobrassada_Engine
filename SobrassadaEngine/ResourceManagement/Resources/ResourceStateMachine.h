@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Math/float2.h"
 #include "Resource.h"
+
+#include "Math/float2.h"
 #include <string>
 #include <vector>
 

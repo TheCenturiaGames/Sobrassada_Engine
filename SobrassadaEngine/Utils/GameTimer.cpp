@@ -1,6 +1,8 @@
 #include "GameTimer.h"
+
 #include "Application.h"
 #include "Globals.h"
+
 #include "SDL.h"
 
 GameTimer::GameTimer()

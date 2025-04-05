@@ -1,4 +1,4 @@
-﻿#include "ComponentUtils.h"
+#include "ComponentUtils.h"
 
 #include "CameraComponent.h"
 #include "Component.h"
@@ -7,6 +7,10 @@
 #include "Standalone/Lights/PointLightComponent.h"
 #include "Standalone/Lights/SpotLightComponent.h"
 #include "Standalone/MeshComponent.h"
+#include "Standalone/UI/CanvasComponent.h"
+#include "Standalone/UI/Transform2DComponent.h"
+#include "Standalone/UI/UILabelComponent.h"
+#include "ScriptComponent.h"
 
 #include <cstdint>
 
@@ -32,8 +36,20 @@ Component* ComponentUtils::CreateEmptyComponent(const ComponentType type, const 
     case COMPONENT_CHARACTER_CONTROLLER:
         generatedComponent = new CharacterControllerComponent(uid, parent);
         break;
+    case COMPONENT_TRANSFORM_2D:
+        generatedComponent = new Transform2DComponent(uid, parent);
+        break;
+    case COMPONENT_CANVAS:
+        generatedComponent = new CanvasComponent(uid, parent);
+        break;
+    case COMPONENT_LABEL:
+        generatedComponent = new UILabelComponent(uid, parent);
+        break;
     case COMPONENT_CAMERA:
         generatedComponent = new CameraComponent(uid, parent);
+        break;
+    case COMPONENT_SCRIPT:
+        generatedComponent = new ScriptComponent(uid, parent);
         break;
     default:
         return nullptr;
@@ -67,11 +83,17 @@ Component* ComponentUtils::CreateExistingComponent(const rapidjson::Value& initi
             newComponent = new DirectionalLightComponent(initialState, parent);
             break;
         case COMPONENT_CHARACTER_CONTROLLER:
-            newComponent = new CharacterControllerComponent(initialState, parent);
-            break;
+            return new CharacterControllerComponent(initialState, parent);
+        case COMPONENT_TRANSFORM_2D:
+            return new Transform2DComponent(initialState, parent);
+        case COMPONENT_CANVAS:
+            return new CanvasComponent(initialState, parent);
+        case COMPONENT_LABEL:
+            return new UILabelComponent(initialState, parent);
         case COMPONENT_CAMERA:
-            newComponent = new CameraComponent(initialState, parent);
-            break;
+            return new CameraComponent(initialState, parent);
+        case COMPONENT_SCRIPT:
+            return new ScriptComponent(initialState, parent);
         default:
             return nullptr;
         }

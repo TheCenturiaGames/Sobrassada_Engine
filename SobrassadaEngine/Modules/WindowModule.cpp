@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "ProjectModule.h"
+#include "GameUIModule.h"
 
 WindowModule::WindowModule()
 {
@@ -74,6 +75,7 @@ void WindowModule::WindowResized(const unsigned int width, const unsigned int he
 {
     windowWidth  = width;
     windowHeight = height;
+    App->GetGameUIModule()->OnWindowResize(width, height);
 }
 
 SDL_DisplayMode& WindowModule::GetDesktopDisplayMode()

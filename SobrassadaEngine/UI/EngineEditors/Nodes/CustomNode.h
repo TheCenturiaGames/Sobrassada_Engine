@@ -1,5 +1,7 @@
 #pragma once
-#include "Libs/ImNodeFlow-1.2.2/include/ImNodeFlow.h"
+
+#include "ImNodeFlow.h"
+
 class CustomNode : public ImFlow::BaseNode
 {
   public:

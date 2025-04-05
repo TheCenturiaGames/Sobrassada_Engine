@@ -2,7 +2,7 @@
 
 #include "../LightComponent.h"
 
-#include <Libs/rapidjson/document.h>
+#include "rapidjson/document.h"
 
 class SpotLightComponent : public LightComponent
 {

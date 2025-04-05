@@ -4,7 +4,8 @@
 #include "Framebuffer.h"
 #include "WindowModule.h"
 
-#include "Windows.h"
+#include "glew.h"
+#include <Windows.h>
 
 OpenGLModule::OpenGLModule()
 {
@@ -99,8 +100,43 @@ bool OpenGLModule::ShutDown()
     return true;
 }
 
+void OpenGLModule::DrawElements(GLenum mode, GLsizei count, GLenum type, const void* indices)
+{
+    glDrawElements(mode, count, type, indices);
+    drawCallsCount++;
+}
+
+void OpenGLModule::DrawArrays(GLenum mode, GLint first, GLsizei count)
+{
+    glDrawArrays(mode, first, count);
+    drawCallsCount++;
+}
+
 void OpenGLModule::SetRenderWireframe(bool renderWireframe)
 {
     if (renderWireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
+
+void OpenGLModule::SetDepthTest(bool enable)
+{
+    if (enable) glEnable(GL_DEPTH_TEST);
+    else glDisable(GL_DEPTH_TEST);
+}
+
+void OpenGLModule::SetFaceCull(bool enable)
+{
+    if (enable) glEnable(GL_CULL_FACE);
+    else glDisable(GL_CULL_FACE);
+}
+
+void OpenGLModule::SetDepthFunc(bool enable)
+{
+    if (enable) glDepthFunc(GL_LESS);
+    else glDepthFunc(GL_ALWAYS);
+}
+
+void OpenGLModule::SetFrontFaceMode(int mode)
+{
+    glFrontFace(mode);
 }

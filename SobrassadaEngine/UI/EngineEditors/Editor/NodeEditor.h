@@ -1,9 +1,9 @@
 #pragma once
 
+#include "EngineEditorBase.h"
 #include "Globals.h"
-#include "UI/EngineEditors/EngineEditorBase.h"
 
-#include "Libs/ImNodeFlow-1.2.2/include/ImNodeFlow.h"
+#include "ImNodeFlow.h"
 #include "imgui.h"
 #include <string>
 #include <vector>

@@ -1,6 +1,8 @@
 #include "EngineTimer.h"
+
 #include "Application.h"
 #include "Globals.h"
+
 #include "SDL.h"
 
 EngineTimer::EngineTimer() : time(0), startTime(0), deltaTime(0), isEnabled(false)

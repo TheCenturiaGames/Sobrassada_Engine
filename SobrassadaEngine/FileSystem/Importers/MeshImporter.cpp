@@ -6,13 +6,13 @@
 #include "Mesh.h"
 #include "MetaMesh.h"
 #include "ProjectModule.h"
-#include "ResourceManagement/Resources/ResourceMesh.h"
+#include "ResourceMesh.h"
 
-#include <Libs/rapidjson/document.h>
-#include <Math/Quat.h>
+#include "Math/Quat.h"
+#include "rapidjson/document.h"
+#include "tiny_gltf.h"
 #include <algorithm>
 #include <memory>
-#include <tiny_gltf.h>
 #include <vector>
 
 namespace MeshImporter
@@ -433,7 +433,7 @@ namespace MeshImporter
         unsigned int vertexCount  = header[1];
         unsigned int mode         = header[2];
         unsigned int indexMode    = header[3];
-        GLOG("The mode for the mesh is %d", mode);
+        // GLOG("The mode for the mesh is %d", mode);
 
         // Create Mesh
         std::vector<Vertex> tmpVertices;

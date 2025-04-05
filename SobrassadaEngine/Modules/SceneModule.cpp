@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "CameraModule.h"
 #include "Config/EngineConfig.h"
+#include "Config/ProjectConfig.h"
 #include "EditorUIModule.h"
 #include "FileSystem.h"
 #include "GameObject.h"
@@ -14,6 +15,9 @@
 #include "ResourcesModule.h"
 
 #include <SDL_mouse.h>
+#ifdef OPTICK
+#include "optick.h"
+#endif
 
 SceneModule::SceneModule()
 {
@@ -25,21 +29,16 @@ SceneModule::~SceneModule()
 
 bool SceneModule::Init()
 {
-    if (App->GetProjectModule()->IsProjectLoaded())
-    {
-        if (!App->GetProjectModule()->GetProjectConfig()->GetStartupScene().empty())
-        {
-            App->GetLibraryModule()->LoadScene(
-                (App->GetProjectModule()->GetProjectConfig()->GetStartupScene() + SCENE_EXTENSION).c_str()
-            );
+    if (!App->GetProjectModule()->IsProjectLoaded()) return true;
 
-            if (App->GetEngineConfig()->ShouldStartGameOnStartup()) SwitchPlayMode(true);
-        }
-        else
-        {
-            CreateScene();
-        }
-    }
+    const std::string& startupScene = App->GetProjectModule()->GetProjectConfig()->GetStartupScene();
+    bool startupSceneLoaded =
+        !startupScene.empty() && App->GetLibraryModule()->LoadScene((startupScene + SCENE_EXTENSION).c_str());
+
+    if (startupSceneLoaded && App->GetEngineConfig()->ShouldStartGameOnStartup()) SwitchPlayMode(true);
+
+    if (!startupSceneLoaded) CreateScene();
+
     return true;
 }
 
@@ -61,6 +60,9 @@ update_status SceneModule::Render(float deltaTime)
 {
     if (loadedScene != nullptr)
     {
+#ifdef OPTICK
+        OPTICK_CATEGORY("SceneModule::Render", Optick::Category::Rendering)
+#endif
         return loadedScene->Render(deltaTime);
     }
 
@@ -163,7 +165,7 @@ void SceneModule::CloseScene()
     // TODO Warning dialog before closing scene without saving
     delete loadedScene;
     loadedScene = nullptr;
-    if (App->GetResourcesModule() != nullptr) App->GetResourcesModule()->UnloadAllResources();
+    if (App->GetResourcesModule() != nullptr) App->GetResourcesModule()->ShutDown();
 }
 
 void SceneModule::SwitchPlayMode(bool play)

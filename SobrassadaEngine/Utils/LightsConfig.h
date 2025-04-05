@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../ResourceManagement/Resources/ResourceTexture.h"
 #include "Globals.h"
+#include "ResourceTexture.h"
 
 #include "Math/float3.h"
 #include "Math/float4.h"
-#include <Libs/rapidjson/document.h>
+#include "rapidjson/document.h"
 #include <memory>
 
 class Component;
@@ -88,7 +88,8 @@ class LightsConfig
     void LoadData(const rapidjson::Value& lights);
 
   private:
-    unsigned int LoadSkyboxTexture(UID cubemapUID);
+    void LoadSkyboxTexture(UID cubemapUID);
+    void FreeCubemap() const;
 
     void GetAllPointLights(const std::vector<Component*>& components);
     void GetAllSpotLights(const std::vector<Component*>& components);
@@ -99,10 +100,11 @@ class LightsConfig
     void SetSpotLightsShaderData() const;
 
   private:
-    UID skyboxUID              = 0;
+    UID skyboxUID              = INVALID_UID;
     unsigned int skyboxVbo     = 0;
     unsigned int skyboxVao     = 0;
-    unsigned int skyboxTexture = 0;
+    unsigned int skyboxID      = 0;
+    uint64_t skyboxHandle     = 0;
     unsigned int skyboxProgram = 0;
 
     float3 ambientColor;

@@ -1,10 +1,11 @@
 #pragma once
 
 #include "CameraModule.h"
+#include "Component.h"
+
 #include "Geometry/Frustum.h"
 #include "Math/float4x4.h"
-#include "Scene/Components/Component.h"
-#include <Libs/rapidjson/document.h>
+#include "rapidjson/document.h"
 
 class CameraComponent : public Component
 {

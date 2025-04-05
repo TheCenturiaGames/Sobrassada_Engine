@@ -1,13 +1,13 @@
 ﻿#include "ResourceMaterial.h"
 
 #include "Application.h"
-#include "FileSystem/Material.h"
 #include "LibraryModule.h"
-#include "ResourceManagement/Resources/ResourceTexture.h"
+#include "Material.h"
+#include "ResourceTexture.h"
 #include "TextureImporter.h"
 
+#include "glew.h"
 #include "imgui.h"
-#include <glew.h>
 #include <unordered_set>
 
 ResourceMaterial::ResourceMaterial(UID uid, const std::string& name) : Resource(uid, name, ResourceType::Material)
@@ -72,8 +72,6 @@ void ResourceMaterial::OnEditorUpdate()
             ImGui::SetTooltip("Texture Dimensions: %d, %d", normalTexture.width, normalTexture.height);
         }
     }
-
-    if (updated) UpdateUBO();
 }
 
 void ResourceMaterial::LoadMaterialData(Material mat)
@@ -146,7 +144,7 @@ void ResourceMaterial::LoadMaterialData(Material mat)
     ResourceTexture* normTexture = TextureImporter::LoadTexture(mat.GetNormalTexture());
     if (normTexture != nullptr)
     {
-        GLOG("%s has normal", normTexture->GetName().c_str());
+        // GLOG("%s has normal", normTexture->GetName().c_str());
         normalTexture.textureID = normTexture->GetTextureID();
 
         material.normalTex      = glGetTextureHandleARB(normTexture->GetTextureID());
@@ -156,29 +154,13 @@ void ResourceMaterial::LoadMaterialData(Material mat)
         normalTexture.height = normTexture->GetTextureHeight();
     }
 
-    glGenBuffers(1, &ubo);
-    glBindBuffer(GL_UNIFORM_BUFFER, ubo);
-    glBufferData(GL_UNIFORM_BUFFER, sizeof(MaterialGPU), &material, GL_DYNAMIC_DRAW);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
     delete diffTexture;
     delete metallicRoughnessTexture;
     delete normTexture;
 }
 
-void ResourceMaterial::RenderMaterial(int program) const
-{
-    glBindBuffer(GL_UNIFORM_BUFFER, ubo);
-
-    unsigned int blockIdx = glGetUniformBlockIndex(program, "Material");
-    glUniformBlockBinding(program, blockIdx, 1);
-    glBindBufferBase(GL_UNIFORM_BUFFER, 1, ubo);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-}
-
 void ResourceMaterial::FreeMaterials() const
 {
-
     glMakeTextureHandleNonResidentARB(material.diffuseTex);
     glDeleteTextures(1, &diffuseTexture.textureID);
 
@@ -190,13 +172,4 @@ void ResourceMaterial::FreeMaterials() const
 
     glMakeTextureHandleNonResidentARB(material.normalTex);
     glDeleteTextures(1, &normalTexture.textureID);
-
-    glDeleteBuffers(1, &ubo);
-}
-
-void ResourceMaterial::UpdateUBO() const
-{
-    glBindBuffer(GL_UNIFORM_BUFFER, ubo);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(MaterialGPU), &material);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }

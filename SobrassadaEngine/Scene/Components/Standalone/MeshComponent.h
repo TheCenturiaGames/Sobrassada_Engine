@@ -1,13 +1,15 @@
 ﻿#pragma once
 
+#include "Component.h"
 #include "Globals.h"
-#include "ResourceManagement/Resources/ResourceMaterial.h"
-#include "ResourceManagement/Resources/ResourceMesh.h"
-#include "Scene/Components/Component.h"
 
 #include "Math/float4x4.h"
-#include <Libs/rapidjson/document.h>
+#include "rapidjson/document.h"
 #include <cstdint>
+
+class ResourceMesh;
+class ResourceMaterial;
+class GeometryBatch;
 
 class MeshComponent : public Component
 {
@@ -26,16 +28,24 @@ class MeshComponent : public Component
     void Update(float deltaTime) override;
     void Render(float deltaTime) override;
 
-    bool HasBones() const { return bones.size() > 0; }
-
     void InitSkin();
+    void OnTransformUpdated();
+
+    void BatchEditorMode();
 
     const ResourceMesh* GetResourceMesh() const { return currentMesh; }
+    const ResourceMaterial* GetResourceMaterial() const { return currentMaterial; }
 
     void AddMesh(UID resource, bool updateParent = true);
     void AddMaterial(UID resource);
 
+    const bool GetHasBones() const { return hasBones; }
+    const std::vector<GameObject*>& GetBonesGO() const { return bones; }
     const std::vector<UID>& GetBones() const { return bonesUIDs; }
+    const std::vector<float4x4>& GetBindMatrices() const { return bindMatrices; }
+    const float4x4& GetCombinedMatrix() const { return combinedMatrix; }
+    GeometryBatch* GetBatch() const { return batch; }
+
     void SetBones(const std::vector<GameObject*>& bones, const std::vector<UID> bonesIds)
     {
         this->bones     = bones;
@@ -43,11 +53,11 @@ class MeshComponent : public Component
     }
     void SetBindMatrices(const std::vector<float4x4>& bindTransforms) { this->bindMatrices = bindTransforms; }
     void SetModelUID(const UID newModelUID) { this->modelUID = newModelUID; }
-    void SetSkinIndex(const int newIndex) { this->skinIndex = newIndex; }
-
-    void OnTransformUpdated();
-
-    const float4x4& GetCombinedMatrix() const { return combinedMatrix; }
+    void SetSkinIndex(const int newIndex)
+    {
+        this->skinIndex = newIndex;
+        hasBones        = true;
+    }
 
   private:
     std::string currentMeshName       = "Not selected";
@@ -59,9 +69,13 @@ class MeshComponent : public Component
     std::vector<UID> bonesUIDs;
     std::vector<GameObject*> bones;
     std::vector<float4x4> bindMatrices;
+    bool hasBones           = false;
 
     UID modelUID            = INVALID_UID;
     int skinIndex           = -1;
 
     float4x4 combinedMatrix = float4x4::identity;
+
+    GeometryBatch* batch    = nullptr;
+    bool uniqueBatch        = false;
 };

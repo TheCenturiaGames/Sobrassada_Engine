@@ -1,11 +1,11 @@
 ﻿#pragma once
 
 #include "ComponentUtils.h"
+#include "GameObject.h"
 #include "Globals.h"
-#include "Scene/GameObjects/GameObject.h"
 
-#include <Geometry/AABB.h>
-#include <Libs/rapidjson/document.h>
+#include "Geometry/AABB.h"
+#include "rapidjson/document.h"
 
 class Component
 {
@@ -30,6 +30,7 @@ class Component
 
     ComponentType GetType() const { return type; }
     const char* GetName() const { return name; }
+    const bool GetEnabled() const { return enabled; }
 
     const float4x4& GetGlobalTransform() const;
 
