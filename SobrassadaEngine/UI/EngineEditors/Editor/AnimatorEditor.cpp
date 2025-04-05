@@ -85,7 +85,7 @@ bool AnimatorEditor::RenderEditor()
                             currentAnimComp->OnResume();
                         }
 
-                        // Timeline slider
+                       
                         if (ImGui::SliderFloat("Timeline", &currentTime, 0.0f, animationDuration, "%.2f sec"))
                         {
                             // When user manually changes the time, update the animation controller
