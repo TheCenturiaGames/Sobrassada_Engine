@@ -171,7 +171,11 @@ void CapsuleColliderComponent::OnCollision(GameObject* otherObject, float3 colli
 void CapsuleColliderComponent::CalculateCollider()
 {
     AABB heriachyAABB = parent->GetHierarchyAABB();
-    radius            = heriachyAABB.Size().MaxElement() / 2.f;
-    length            = heriachyAABB.Size().y / 2.f;
-    centerOffset      = heriachyAABB.CenterPoint() - parent->GetPosition();
+
+    if (heriachyAABB.IsFinite() && !heriachyAABB.IsDegenerate())
+    {
+        radius       = heriachyAABB.Size().MaxElement() / 2.f;
+        length       = heriachyAABB.Size().y / 2.f;
+        centerOffset = heriachyAABB.CenterPoint() - parent->GetPosition();
+    }
 }

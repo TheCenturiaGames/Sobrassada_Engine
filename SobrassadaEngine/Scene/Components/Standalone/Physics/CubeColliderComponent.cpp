@@ -178,6 +178,10 @@ void CubeColliderComponent::OnCollision(GameObject* otherObject, float3 collisio
 void CubeColliderComponent::CalculateCollider()
 {
     AABB heriachyAABB = parent->GetHierarchyAABB();
-    size              = heriachyAABB.HalfSize();
-    centerOffset      = heriachyAABB.CenterPoint() - parent->GetPosition();
+    if (heriachyAABB.IsFinite() && !heriachyAABB.IsDegenerate())
+    {
+        size         = heriachyAABB.HalfSize();
+        centerOffset = heriachyAABB.CenterPoint() - parent->GetPosition();
+    }
+
 }

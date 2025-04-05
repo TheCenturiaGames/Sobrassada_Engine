@@ -171,8 +171,12 @@ void SphereColliderComponent::OnCollision(GameObject* otherObject, float3 collis
 void SphereColliderComponent::CalculateCollider()
 {
     AABB heriachyAABB = parent->GetHierarchyAABB();
-    Sphere sphere     = heriachyAABB.MinimalEnclosingSphere();
+    
+    if (heriachyAABB.IsFinite() && !heriachyAABB.IsDegenerate())
+    {
+        Sphere sphere = heriachyAABB.MinimalEnclosingSphere();
 
-    radius            = sphere.r;
-    centerOffset      = heriachyAABB.CenterPoint() - parent->GetPosition();
+        radius        = sphere.r;
+        centerOffset  = heriachyAABB.CenterPoint() - parent->GetPosition();
+    }
 }
