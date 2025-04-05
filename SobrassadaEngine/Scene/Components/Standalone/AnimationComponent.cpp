@@ -161,7 +161,7 @@ void AnimationComponent::Update(float deltaTime)
 
         animController->Update();
 
-    for (auto& channel : animController->GetCurrentAnimation()->channels)
+    for (auto& channel : currentAnimResource->channels)
     {
         const std::string& boneName = channel.first;
 
