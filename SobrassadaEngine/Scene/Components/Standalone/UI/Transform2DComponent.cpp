@@ -138,19 +138,19 @@ void Transform2DComponent::Render(float deltaTime)
     {
         // Top-left
         float3 x1 = float3(GetAnchorXPos(anchorsX.x), GetAnchorYPos(anchorsY.y), 0);
-        debugDraw->DrawCone(x1, float3(-20, 20, 0), 10, 1);
+        debugDraw->DrawCone(x1, float3(-10, 10, 0), 5, 1);
 
         // Top-right
         float3 x2 = float3(GetAnchorXPos(anchorsX.y), GetAnchorYPos(anchorsY.y), 0);
-        debugDraw->DrawCone(x2, float3(20, 20, 0), 10, 1);
+        debugDraw->DrawCone(x2, float3(10, 10, 0), 5, 1);
 
         // Bottom-left
         float3 y1 = float3(GetAnchorXPos(anchorsX.x), GetAnchorYPos(anchorsY.x), 0);
-        debugDraw->DrawCone(y1, float3(-20, -20, 0), 10, 1);
+        debugDraw->DrawCone(y1, float3(-10, -10, 0), 5, 1);
 
         // Bottom-right
         float3 y2 = float3(GetAnchorXPos(anchorsX.y), GetAnchorYPos(anchorsY.x), 0);
-        debugDraw->DrawCone(y2, float3(20, -20, 0), 10, 1);
+        debugDraw->DrawCone(y2, float3(10, -10, 0), 5, 1);
     }
 }
 
@@ -209,13 +209,18 @@ void Transform2DComponent::RenderEditorInspector()
 
         ImGui::PopItemWidth();
 
-        ImGui::DragFloat2("Pivot", &pivot[0], 0.01f, 0.0f, 1.0f);
+        if (ImGui::DragFloat2("Pivot", &pivot[0], 0.01f, 0.0f, 1.0f))
+        {
+            OnAnchorsUpdated();
+            OnSizeChanged(); 
+        }
         ImGui::Spacing();
         ImGui::Text("Anchors");
 
         if (ImGui::DragFloat2("X-axis bounds", &anchorsX.x, 0.001f, 0.0f, 1.0f)) OnAnchorsUpdated();
         if (ImGui::DragFloat2("Y-axis bounds", &anchorsY.x, 0.001f, 0.0f, 1.0f)) OnAnchorsUpdated();
 
+        ImGui::Separator();
         ImGui::InputFloat2("Debug pos", &position.x);
         ImGui::InputFloat2("Debug size", &size.x);
     }
@@ -404,6 +409,7 @@ void Transform2DComponent::OnLeftMarginChanged()
 
     position.x = ((GetAnchorXPos(anchorsX.x) + margins.x) + (GetAnchorXPos(anchorsX.y) + margins.y)) / 2;
     if (!IsRootTransform2D()) position.x -= parentTransform->GetGlobalPosition().x;
+    position.x += (pivot.x - 0.5f) * (size.x);
 
     UpdateParent3DTransform();
     OnSizeChanged();
@@ -417,6 +423,7 @@ void Transform2DComponent::OnRightMarginChanged()
 
     position.x = ((GetAnchorXPos(anchorsX.x) + margins.x) + (GetAnchorXPos(anchorsX.y) + margins.y)) / 2;
     if (!IsRootTransform2D()) position.x -= parentTransform->GetGlobalPosition().x;
+    position.x += (pivot.x - 0.5f) * (size.x);
 
     UpdateParent3DTransform();
     OnSizeChanged();
@@ -430,6 +437,7 @@ void Transform2DComponent::OnTopMarginChanged()
 
     position.y = ((GetAnchorYPos(anchorsY.y) + margins.z) + (GetAnchorYPos(anchorsY.x) + margins.w)) / 2;
     if (!IsRootTransform2D()) position.y -= parentTransform->GetGlobalPosition().y;
+    position.y += (pivot.y - 0.5f) * (size.y);
 
     UpdateParent3DTransform();
     OnSizeChanged();
@@ -443,6 +451,7 @@ void Transform2DComponent::OnBottomMarginChanged()
 
     position.y = ((GetAnchorYPos(anchorsY.y) + margins.z) + (GetAnchorYPos(anchorsY.x) + margins.w)) / 2;
     if (!IsRootTransform2D()) position.y -= parentTransform->GetGlobalPosition().y;
+    position.y += (pivot.y - 0.5f) * (size.y);
 
     UpdateParent3DTransform();
     OnSizeChanged();

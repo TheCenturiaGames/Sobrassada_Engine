@@ -2,14 +2,14 @@
 
 #include "CameraComponent.h"
 #include "Component.h"
-#include "CharacterControllerComponent.h"
-#include "Lights/DirectionalLightComponent.h"
-#include "Lights/PointLightComponent.h"
-#include "Lights/SpotLightComponent.h"
-#include "MeshComponent.h"
-#include "UI/CanvasComponent.h"
-#include "UI/Transform2DComponent.h"
-#include "UI/UILabelComponent.h"
+#include "Standalone/CharacterControllerComponent.h"
+#include "Standalone/Lights/DirectionalLightComponent.h"
+#include "Standalone/Lights/PointLightComponent.h"
+#include "Standalone/Lights/SpotLightComponent.h"
+#include "Standalone/MeshComponent.h"
+#include "Standalone/UI/CanvasComponent.h"
+#include "Standalone/UI/Transform2DComponent.h"
+#include "Standalone/UI/UILabelComponent.h"
 #include "ScriptComponent.h"
 
 #include <cstdint>
