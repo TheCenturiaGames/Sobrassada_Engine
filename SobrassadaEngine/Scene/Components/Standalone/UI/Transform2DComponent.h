@@ -22,7 +22,6 @@ class Transform2DComponent : public Component
     void RenderEditorInspector() override;
 
     void UpdateParent3DTransform();
-    void UpdateChildren2DTransforms();
     void OnTransform3DUpdated(const float4x4& transform3D);
 
     float2 GetRenderingPosition() const;
@@ -48,20 +47,18 @@ class Transform2DComponent : public Component
     void OnBottomMarginChanged();
 
   public:
-    Transform2DComponent* parentTransform;
-    std::vector<Transform2DComponent*> childTransforms;
-
     float2 position;
     float2 size;
     float2 pivot;
     float2 anchorsX;
     float2 anchorsY;
 
-    float4 margins;
-    float4 previousMargins;
-
-    bool transfomr2DUpdated;
-
   private:
     CanvasComponent* parentCanvas;
+    Transform2DComponent* parentTransform;
+    std::vector<Transform2DComponent*> childTransforms;
+
+    bool transform2DUpdated;
+    float4 previousMargins;
+    float4 margins;
 };
