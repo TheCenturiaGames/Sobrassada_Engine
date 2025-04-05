@@ -20,11 +20,9 @@ AnimatorEditor::~AnimatorEditor()
 
 bool AnimatorEditor::RenderEditor()
 {
+   
     bool stillOpen                             = true;
-    static bool playing                        = false;
-    static float currentTime                   = 0.0f;
-    static float animationDuration             = 5.0f;
-    static AnimationComponent* currentAnimComp = nullptr;
+   
 
     if (ImGui::Begin(name.c_str(), &stillOpen))
     {

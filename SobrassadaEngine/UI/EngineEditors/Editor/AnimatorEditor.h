@@ -15,5 +15,8 @@ class AnimatorEditor : public EngineEditorBase
     private:
     GameObject* selectedObject;
     ResourceAnimation* selectedAnimation;
- 
+     bool playing                        = false;
+     float currentTime                   = 0.0f;
+     float animationDuration             = 5.0f;
+    AnimationComponent* currentAnimComp = nullptr;
 };
