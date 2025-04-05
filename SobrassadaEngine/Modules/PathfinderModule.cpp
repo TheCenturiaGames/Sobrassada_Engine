@@ -9,6 +9,7 @@
 #include "SceneModule.h"
 
 #include "Geometry/Plane.h"
+#include "ImGui.h"
 
 #include <DetourCommon.h>
 #include <DetourCrowd.h>
@@ -34,7 +35,6 @@ PathfinderModule::~PathfinderModule()
 
 update_status PathfinderModule::Update(float deltaTime)
 {
-
     if (!App->GetSceneModule()->GetInPlayMode()) return UPDATE_CONTINUE;
 
     if (deltaTime <= 0.0f) return UPDATE_CONTINUE;
@@ -100,7 +100,6 @@ void PathfinderModule::InitQuerySystem()
 //called by clicking in the game
 void PathfinderModule::HandleClickNavigation()
 {
-
     if (!clickNavigationEnabled) return; // from UI
 
     int agentId            = 0; //  from UI
@@ -109,7 +108,7 @@ void PathfinderModule::HandleClickNavigation()
     float3 hitPoint;
     if (!RaycastToGround(ray, hitPoint))
     {
-        GLOG("Ray did not hit ground.");
+        GLOG("Ray did nasot hit ground.");
         return;
     }
 
@@ -134,6 +133,11 @@ bool PathfinderModule::RaycastToGround(const LineSegment& ray, float3& outHitPoi
 
     return false;
 } 
+
+void PathfinderModule::RenderCrowdEditor()
+{
+    ImGui::Checkbox("Navigation Enabled", &clickNavigationEnabled);
+}
 
 
 void PathfinderModule::AddAIAgentComponent(int agentId, AIAgentComponent* comp)

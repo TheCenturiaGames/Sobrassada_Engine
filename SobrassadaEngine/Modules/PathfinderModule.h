@@ -18,7 +18,6 @@ class PathfinderModule : public Module
     bool Init() override;
     update_status Update(float deltaTime) override;
 
-
     int CreateAgent(float3& position, float radius, float height, float speed);
     dtCrowd* GetCrowd() const { return crowd; }
     dtNavMeshQuery* GetNavQuery() const { return navQuery; }
@@ -26,6 +25,7 @@ class PathfinderModule : public Module
     void InitQuerySystem();
     void HandleClickNavigation(); // Perform raycast and set destination
     bool RaycastToGround(const LineSegment& ray, float3& outHitPoint);
+    void RenderCrowdEditor();
 
     void AddAIAgentComponent(int agentId, AIAgentComponent* comp);
     void RemoveAIAgentComponent(int agentId);
