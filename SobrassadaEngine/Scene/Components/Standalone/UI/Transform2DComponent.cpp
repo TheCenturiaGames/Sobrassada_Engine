@@ -171,7 +171,7 @@ void Transform2DComponent::RenderEditorInspector()
         }
         else
         {
-            float leftMargin = margins.x;
+            //previousMargins.x = margins.x;
             if (ImGui::DragFloat("Left", &margins.x, 0.1f)) OnLeftMarginChanged();
         }
 
@@ -184,6 +184,7 @@ void Transform2DComponent::RenderEditorInspector()
         }
         else
         {
+            //previousMargins.z = margins.z;
             if (ImGui::DragFloat("Top", &margins.z, 0.1f)) OnTopMarginChanged();
         }
 
@@ -194,6 +195,7 @@ void Transform2DComponent::RenderEditorInspector()
         }
         else
         {
+            //previousMargins.y = margins.y;
             if (ImGui::DragFloat("Right", &margins.y, 0.1f)) OnRightMarginChanged();
         }
 
@@ -206,6 +208,7 @@ void Transform2DComponent::RenderEditorInspector()
         }
         else
         {
+            //previousMargins.w = margins.w;
             if (ImGui::DragFloat("Bottom", &margins.w, 0.1f)) OnBottomMarginChanged();
         }
 
@@ -241,6 +244,10 @@ void Transform2DComponent::UpdateParent3DTransform()
     transform.SetTranslatePart(localPos.x, localPos.y, 0);
 
     marginUpdated = true;
+    for (const auto& child : childTransforms)
+    {
+        child->marginUpdated = true;
+    }
     parent->SetLocalTransform(transform);
 }
 
@@ -367,11 +374,9 @@ void Transform2DComponent::OnSizeChanged()
 {
     for (const auto& child : childTransforms)
     {
-        if (child->anchorsX.x == child->anchorsX.y || child->anchorsY.x == child->anchorsY.y)
-        {
-            child->OnAnchorsUpdated();
-        } 
-        else if (child->anchorsX.x != child->anchorsX.y)
+        child->OnAnchorsUpdated();
+
+        if (child->anchorsX.x != child->anchorsX.y)
         {
             child->margins.x = child->previousMargins.x;
             child->OnLeftMarginChanged();
@@ -379,14 +384,15 @@ void Transform2DComponent::OnSizeChanged()
             child->margins.y = child->previousMargins.y;
             child->OnRightMarginChanged();
         }
-        else if (child->anchorsY.x == child->anchorsY.y)
+
+        if (child->anchorsY.x != child->anchorsY.y)
         {
             child->margins.z = child->previousMargins.z;
             child->OnTopMarginChanged();
 
             child->margins.w = child->previousMargins.w;
             child->OnBottomMarginChanged();
-        }
+        } 
 
         child->UpdateParent3DTransform();
     }
