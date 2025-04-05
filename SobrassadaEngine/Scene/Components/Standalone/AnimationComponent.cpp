@@ -89,7 +89,7 @@ void AnimationComponent::OnInspector()
             ImGui::Text("Animation: %s", currentAnimResource->GetName().c_str());
             ImGui::Text("Duration: %.2f seconds", currentAnimResource->GetDuration());
 
-             //Animation Time
+            
             if (animController != nullptr && ImGui::TreeNode("Channels"))
             {
                 for (const auto& channel : currentAnimResource->channels)

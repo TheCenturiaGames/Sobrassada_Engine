@@ -8,8 +8,9 @@ class ResourceAnimation;
 class AnimController
 {
   public:
+   
     AnimController();
-    ~AnimController() = default;
+    ~AnimController();
                                     
     void GetTransform(const std::string& nodeName, float3& pos, Quat& rot); 
 
@@ -20,13 +21,14 @@ class AnimController
     void Resume();
     
    ResourceAnimation* GetCurrentAnimation() { return animation; }
+    void SetAnimationResource(ResourceAnimation* anim) { animation = anim; }
     void SetPlaybackSpeed(float speed) { playbackSpeed = speed; }
     void SetTime(float time) { currentTime = time; }
     float GetTime() const { return currentTime; }
     bool IsPlaying() const { return playAnimation; }
 
   
-  private:
+  
    
   private:
     UID resource; 
