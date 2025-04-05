@@ -414,6 +414,7 @@ AABB GameObject::GetHierarchyAABB()
 {
     AABB returnAABB;
     returnAABB.SetNegativeInfinity();
+    returnAABB.Enclose(globalAABB);
 
     std::set<UID> visitedGameObjects;
     std::stack<UID> toVisitGameObjects;

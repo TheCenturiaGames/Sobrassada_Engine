@@ -9,14 +9,10 @@
 #include "Libs/rapidjson/document.h"
 
 SphereColliderComponent::SphereColliderComponent(UID uid, GameObject* parent)
-    : Component(uid, parent, "Shpere Collider", COMPONENT_SPHERE_COLLIDER)
+    : Component(uid, parent, "Sphere Collider", COMPONENT_SPHERE_COLLIDER)
 {
 
-    AABB heriachyAABB    = parent->GetHierarchyAABB();
-    Sphere sphere        = heriachyAABB.MinimalEnclosingSphere();
-
-    radius               = sphere.r;
-    centerOffset         = heriachyAABB.CenterPoint() - parent->GetPosition();
+    CalculateCollider();
 
     onCollissionCallback = CollisionDelegate(
         std::bind(&SphereColliderComponent::OnCollision, this, std::placeholders::_1, std::placeholders::_2)
@@ -35,6 +31,7 @@ SphereColliderComponent::SphereColliderComponent(const rapidjson::Value& initial
     if (initialState.HasMember("ColliderLayer")) layer = ColliderLayer(initialState["ColliderLayer"].GetInt());
     if (initialState.HasMember("GenerateCallback")) generateCallback = initialState["GenerateCallback"].GetBool();
     if (initialState.HasMember("Radius")) radius = initialState["Radius"].GetFloat();
+    if (initialState.HasMember("FitToSize")) fitToSize = initialState["FitToSize"].GetBool();
 
     if (initialState.HasMember("CenterOffset"))
     {
@@ -71,6 +68,7 @@ void SphereColliderComponent::Save(rapidjson::Value& targetState, rapidjson::Doc
     targetState.AddMember("ColliderLayer", (int)layer, allocator);
     targetState.AddMember("Radius", radius, allocator);
     targetState.AddMember("GenerateCallback", generateCallback, allocator);
+    targetState.AddMember("FitToSize", fitToSize, allocator);
 
     // CENTER OFFSET
     rapidjson::Value centerOffsetSave(rapidjson::kArrayType);
@@ -101,11 +99,8 @@ void SphereColliderComponent::RenderEditorInspector()
             if (ImGui::Selectable(ColliderTypeStrings[i]))
             {
                 colliderType = ColliderType(i);
-                if (colliderType == ColliderType::STATIC)
-                {
-                    mass = 0.f;
-                    parent->UpdateMobilityHierarchy(MobilitySettings::STATIC);
-                }
+                if (colliderType == ColliderType::STATIC) parent->UpdateMobilityHierarchy(MobilitySettings::STATIC);
+
                 else if (colliderType == ColliderType::DYNAMIC)
                     parent->UpdateMobilityHierarchy(MobilitySettings::DYNAMIC);
                 App->GetPhysicsModule()->UpdateSphereRigidBody(this);
@@ -114,13 +109,10 @@ void SphereColliderComponent::RenderEditorInspector()
         ImGui::EndCombo();
     }
 
-    ImGui::BeginDisabled(colliderType != ColliderType::DYNAMIC);
     if (ImGui::InputFloat("Mass", &mass))
     {
-        if (mass == 0.f) colliderType = ColliderType::STATIC;
         App->GetPhysicsModule()->UpdateSphereRigidBody(this);
     }
-    ImGui::EndDisabled();
 
     if (ImGui::InputFloat3("Center offset", &centerOffset[0])) App->GetPhysicsModule()->UpdateSphereRigidBody(this);
 
@@ -145,6 +137,12 @@ void SphereColliderComponent::RenderEditorInspector()
         ImGui::EndCombo();
     }
 
+    if (ImGui::Checkbox("Fit to size", &fitToSize))
+    {
+        CalculateCollider();
+        App->GetPhysicsModule()->UpdateSphereRigidBody(this);
+    }
+
     if (ImGui::Checkbox("Generate Callbacks", &generateCallback))
     {
         userPointer = BulletUserPointer(this, &onCollissionCallback, generateCallback);
@@ -161,15 +159,20 @@ void SphereColliderComponent::Render(float deltaTime)
 
 void SphereColliderComponent::ParentUpdated()
 {
-    AABB heriachyAABB = parent->GetHierarchyAABB();
-    Sphere sphere     = heriachyAABB.MinimalEnclosingSphere();
-
-    radius            = sphere.r;
-    centerOffset      = heriachyAABB.CenterPoint() - parent->GetPosition();
+    if (fitToSize) CalculateCollider();
 
     App->GetPhysicsModule()->UpdateSphereRigidBody(this);
 }
 
 void SphereColliderComponent::OnCollision(GameObject* otherObject, float3 collisionNormal)
 {
+}
+
+void SphereColliderComponent::CalculateCollider()
+{
+    AABB heriachyAABB = parent->GetHierarchyAABB();
+    Sphere sphere     = heriachyAABB.MinimalEnclosingSphere();
+
+    radius            = sphere.r;
+    centerOffset      = heriachyAABB.CenterPoint() - parent->GetPosition();
 }

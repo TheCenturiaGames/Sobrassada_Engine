@@ -30,10 +30,14 @@ class SphereColliderComponent : public Component
 
     void OnCollision(GameObject* otherObject, float3 collisionNormal);
 
+  private:
+    void CalculateCollider();
+
   public:
     bool generateCallback         = true;
     bool freezeRotation           = false;
-    float mass                    = 0.f;
+    bool fitToSize                = false;
+    float mass                    = 1.f;
     float3 centerOffset           = float3::zero;
     float3 centerRotation         = float3::zero;
     float radius                  = 1.f;

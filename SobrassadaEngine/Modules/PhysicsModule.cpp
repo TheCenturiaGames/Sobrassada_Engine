@@ -123,7 +123,7 @@ void PhysicsModule::CreateCubeRigidBody(CubeColliderComponent* colliderComponent
     bool isDynamic                   = (colliderComponent->mass != 0.f);
 
     // Inertia
-    btVector3 localInertia(1, 0, 0);
+    btVector3 localInertia(0, 0, 0);
     if (isDynamic) collisionShape->calculateLocalInertia(colliderComponent->mass, localInertia);
 
     // MotionState for RENDER AND
@@ -165,7 +165,7 @@ void PhysicsModule::CreateSphereRigidBody(SphereColliderComponent* colliderCompo
     bool isDynamic                   = (colliderComponent->mass != 0.f);
 
     // Inertia
-    btVector3 localInertia(1, 0, 0);
+    btVector3 localInertia(0, 0, 0);
     if (isDynamic) collisionShape->calculateLocalInertia(colliderComponent->mass, localInertia);
 
     // MotionState for RENDER AND
@@ -207,7 +207,7 @@ void PhysicsModule::CreateCapsuleRigidBody(CapsuleColliderComponent* colliderCom
     bool isDynamic                   = (colliderComponent->mass != 0.f);
 
     // Inertia
-    btVector3 localInertia(1, 0, 0);
+    btVector3 localInertia(0, 0, 0);
     if (isDynamic) collisionShape->calculateLocalInertia(colliderComponent->mass, localInertia);
 
     // MotionState for RENDER AND

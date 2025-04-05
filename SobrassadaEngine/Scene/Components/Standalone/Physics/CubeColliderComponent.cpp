@@ -11,9 +11,7 @@ CubeColliderComponent::CubeColliderComponent(UID uid, GameObject* parent)
     : Component(uid, parent, "Cube Collider", COMPONENT_CUBE_COLLIDER)
 {
 
-    AABB heriachyAABB    = parent->GetHierarchyAABB();
-    size                 = heriachyAABB.HalfSize();
-    centerOffset         = heriachyAABB.CenterPoint() - parent->GetPosition();
+    CalculateCollider();
 
     onCollissionCallback = CollisionDelegate(
         std::bind(&CubeColliderComponent::OnCollision, this, std::placeholders::_1, std::placeholders::_2)
@@ -30,6 +28,7 @@ CubeColliderComponent::CubeColliderComponent(const rapidjson::Value& initialStat
     if (initialState.HasMember("ColliderType")) colliderType = ColliderType(initialState["ColliderType"].GetInt());
     if (initialState.HasMember("ColliderLayer")) layer = ColliderLayer(initialState["ColliderLayer"].GetInt());
     if (initialState.HasMember("GenerateCallback")) generateCallback = initialState["GenerateCallback"].GetBool();
+    if (initialState.HasMember("FitToSize")) fitToSize = initialState["FitToSize"].GetBool();
 
     if (initialState.HasMember("CenterOffset"))
     {
@@ -70,6 +69,7 @@ void CubeColliderComponent::Save(rapidjson::Value& targetState, rapidjson::Docum
     targetState.AddMember("ColliderType", (int)colliderType, allocator);
     targetState.AddMember("ColliderLayer", (int)layer, allocator);
     targetState.AddMember("GenerateCallback", generateCallback, allocator);
+    targetState.AddMember("FitToSize", fitToSize, allocator);
 
     // CENTER OFFSET
     rapidjson::Value centerOffsetSave(rapidjson::kArrayType);
@@ -106,11 +106,8 @@ void CubeColliderComponent::RenderEditorInspector()
             if (ImGui::Selectable(ColliderTypeStrings[i]))
             {
                 colliderType = ColliderType(i);
-                if (colliderType == ColliderType::STATIC)
-                {
-                    mass = 0.f;
-                    parent->UpdateMobilityHierarchy(MobilitySettings::STATIC);
-                }
+                if (colliderType == ColliderType::STATIC) parent->UpdateMobilityHierarchy(MobilitySettings::STATIC);
+
                 else if (colliderType == ColliderType::DYNAMIC)
                     parent->UpdateMobilityHierarchy(MobilitySettings::DYNAMIC);
                 App->GetPhysicsModule()->UpdateCubeRigidBody(this);
@@ -119,13 +116,10 @@ void CubeColliderComponent::RenderEditorInspector()
         ImGui::EndCombo();
     }
 
-    ImGui::BeginDisabled(colliderType != ColliderType::DYNAMIC);
     if (ImGui::InputFloat("Mass", &mass))
     {
-        if (mass == 0.f) colliderType = ColliderType::STATIC;
         App->GetPhysicsModule()->UpdateCubeRigidBody(this);
     }
-    ImGui::EndDisabled();
 
     if (ImGui::InputFloat3("Center offset", &centerOffset[0])) App->GetPhysicsModule()->UpdateCubeRigidBody(this);
 
@@ -150,6 +144,12 @@ void CubeColliderComponent::RenderEditorInspector()
         ImGui::EndCombo();
     }
 
+    if (ImGui::Checkbox("Fit to size", &fitToSize))
+    {
+        CalculateCollider();
+        App->GetPhysicsModule()->UpdateCubeRigidBody(this);
+    }
+
     if (ImGui::Checkbox("Generate Callbacks", &generateCallback))
     {
         userPointer = BulletUserPointer(this, &onCollissionCallback, generateCallback);
@@ -166,13 +166,18 @@ void CubeColliderComponent::Render(float deltaTime)
 
 void CubeColliderComponent::ParentUpdated()
 {
-    AABB heriachyAABB = parent->GetHierarchyAABB();
-    size              = heriachyAABB.HalfSize();
-    centerOffset      = heriachyAABB.CenterPoint() - parent->GetPosition();
+    if (fitToSize) CalculateCollider();
 
     App->GetPhysicsModule()->UpdateCubeRigidBody(this);
 }
 
 void CubeColliderComponent::OnCollision(GameObject* otherObject, float3 collisionNormal)
 {
+}
+
+void CubeColliderComponent::CalculateCollider()
+{
+    AABB heriachyAABB = parent->GetHierarchyAABB();
+    size              = heriachyAABB.HalfSize();
+    centerOffset      = heriachyAABB.CenterPoint() - parent->GetPosition();
 }

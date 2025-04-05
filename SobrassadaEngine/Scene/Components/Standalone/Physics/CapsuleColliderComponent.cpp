@@ -11,10 +11,7 @@ CapsuleColliderComponent::CapsuleColliderComponent(UID uid, GameObject* parent)
     : Component(uid, parent, "Capsule Collider", COMPONENT_CAPSULE_COLLIDER)
 {
 
-    AABB heriachyAABB    = parent->GetHierarchyAABB();
-    radius               = heriachyAABB.Size().MaxElement() / 2.f;
-    length               = heriachyAABB.Size().y / 2.f;
-    centerOffset         = heriachyAABB.CenterPoint() - parent->GetPosition();
+    CalculateCollider();
 
     onCollissionCallback = CollisionDelegate(
         std::bind(&CapsuleColliderComponent::OnCollision, this, std::placeholders::_1, std::placeholders::_2)
@@ -34,6 +31,7 @@ CapsuleColliderComponent::CapsuleColliderComponent(const rapidjson::Value& initi
     if (initialState.HasMember("GenerateCallback")) generateCallback = initialState["GenerateCallback"].GetBool();
     if (initialState.HasMember("Radius")) radius = initialState["Radius"].GetFloat();
     if (initialState.HasMember("Length")) length = initialState["Length"].GetFloat();
+    if (initialState.HasMember("FitToSize")) fitToSize = initialState["FitToSize"].GetBool();
 
     if (initialState.HasMember("CenterOffset"))
     {
@@ -71,6 +69,7 @@ void CapsuleColliderComponent::Save(rapidjson::Value& targetState, rapidjson::Do
     targetState.AddMember("Radius", radius, allocator);
     targetState.AddMember("Length", length, allocator);
     targetState.AddMember("GenerateCallback", generateCallback, allocator);
+    targetState.AddMember("FitToSize", fitToSize, allocator);
 
     // CENTER OFFSET
     rapidjson::Value centerOffsetSave(rapidjson::kArrayType);
@@ -101,11 +100,8 @@ void CapsuleColliderComponent::RenderEditorInspector()
             if (ImGui::Selectable(ColliderTypeStrings[i]))
             {
                 colliderType = ColliderType(i);
-                if (colliderType == ColliderType::STATIC)
-                {
-                    mass = 0.f;
-                    parent->UpdateMobilityHierarchy(MobilitySettings::STATIC);
-                }
+                if (colliderType == ColliderType::STATIC) parent->UpdateMobilityHierarchy(MobilitySettings::STATIC);
+
                 else if (colliderType == ColliderType::DYNAMIC)
                     parent->UpdateMobilityHierarchy(MobilitySettings::DYNAMIC);
                 App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
@@ -114,13 +110,7 @@ void CapsuleColliderComponent::RenderEditorInspector()
         ImGui::EndCombo();
     }
 
-    ImGui::BeginDisabled(colliderType != ColliderType::DYNAMIC);
-    if (ImGui::InputFloat("Mass", &mass))
-    {
-        if (mass == 0.f) colliderType = ColliderType::STATIC;
-        App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
-    }
-    ImGui::EndDisabled();
+    if (ImGui::InputFloat("Mass", &mass)) App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
 
     if (ImGui::InputFloat3("Center offset", &centerOffset[0])) App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
 
@@ -147,6 +137,12 @@ void CapsuleColliderComponent::RenderEditorInspector()
         ImGui::EndCombo();
     }
 
+    if (ImGui::Checkbox("Fit to size", &fitToSize))
+    {
+        CalculateCollider();
+        App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
+    }
+
     if (ImGui::Checkbox("Generate Callbacks", &generateCallback))
     {
         userPointer = BulletUserPointer(this, &onCollissionCallback, generateCallback);
@@ -163,14 +159,19 @@ void CapsuleColliderComponent::Render(float deltaTime)
 
 void CapsuleColliderComponent::ParentUpdated()
 {
-    AABB heriachyAABB = parent->GetHierarchyAABB();
-    radius            = heriachyAABB.Size().MaxElement() / 2.f;
-    length            = heriachyAABB.Size().y / 2.f;
-    centerOffset      = heriachyAABB.CenterPoint() - parent->GetPosition();
+    if (fitToSize) CalculateCollider();
 
     App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
 }
 
 void CapsuleColliderComponent::OnCollision(GameObject* otherObject, float3 collisionNormal)
 {
+}
+
+void CapsuleColliderComponent::CalculateCollider()
+{
+    AABB heriachyAABB = parent->GetHierarchyAABB();
+    radius            = heriachyAABB.Size().MaxElement() / 2.f;
+    length            = heriachyAABB.Size().y / 2.f;
+    centerOffset      = heriachyAABB.CenterPoint() - parent->GetPosition();
 }
