@@ -4,7 +4,7 @@
 #include "FileSystem.h"
 #include "LibraryModule.h"
 #include "MetaFont.h"
-#include "ResourceManagement/Resources/ResourceFont.h"
+#include "ResourceFont.h"
 
 namespace FontImporter
 {
