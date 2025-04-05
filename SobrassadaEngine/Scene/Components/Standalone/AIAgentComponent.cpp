@@ -51,6 +51,17 @@ void AIAgentComponent::Update(float deltaTime)
     if (!App->GetSceneModule()->GetInPlayMode()) return;
 
     if (deltaTime <= 0.0f) return;
+
+    if (agentId == -1) return;
+
+    const dtCrowdAgent* ag = App->GetPathfinderModule()->GetCrowd()->getAgent(agentId);
+    if (ag && ag->active)
+    {
+        float3 newPos(ag->npos[0], ag->npos[1], ag->npos[2]);
+        float4x4 transform = parent->GetLocalTransform();
+        transform.SetTranslatePart(newPos);
+        parent->SetLocalTransform(transform); // Change parent position
+    }
 }
 
 void AIAgentComponent::Render(float deltaTime)
@@ -105,7 +116,7 @@ void AIAgentComponent::Save(rapidjson::Value& targetState, rapidjson::Document::
     targetState.AddMember("AutoAdd", autoAdd, allocator);
 }
 
-void AIAgentComponent::setPath(const float3& destination)
+void AIAgentComponent::setPath(const float3& destination) const
 {
 
     if (agentId == -1) return;
@@ -145,13 +156,19 @@ void AIAgentComponent::AddToCrowd()
     }
 
     agentId = App->GetPathfinderModule()->CreateAgent(agentPosition, radius, height, speed);
+
+    if (agentId != -1)
+    {
+        App->GetPathfinderModule()->AddAIAgentComponent(agentId, this);
+    }
 }
 
 void AIAgentComponent::RecreateAgent()
 {
     if (agentId != -1)
     {
-        App->GetPathfinderModule()->RemoveAgent(agentId); // Step 1: Remove old agent
+        App->GetPathfinderModule()->RemoveAgent(agentId); 
+        App->GetPathfinderModule()->RemoveAIAgentComponent(agentId);
         agentId = -1;
     }
 

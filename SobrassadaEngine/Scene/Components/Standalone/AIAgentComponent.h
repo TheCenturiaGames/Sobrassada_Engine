@@ -18,7 +18,7 @@ class AIAgentComponent : public Component
     void AddToCrowd();
     void RecreateAgent();
     void SetAgentPosition(float3 agentPosition) { agentPosition = agentPosition; }
-    void setPath(const float3& destination); 
+    void setPath(const float3& destination) const;
     void Update(float deltaTime) override;
     void Render(float deltaTime) override;
     void RenderEditorInspector() override;

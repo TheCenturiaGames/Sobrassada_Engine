@@ -1,10 +1,14 @@
 #include "PathfinderModule.h"
 
 #include "Application.h"
+#include "Components/Standalone/AIAgentComponent.h"
 #include "LibraryModule.h"
 #include "ResourceNavmesh.h"
 #include "ResourcesModule.h"
+#include "CameraModule.h"
 #include "SceneModule.h"
+
+#include "Geometry/Plane.h"
 
 #include <DetourCommon.h>
 #include <DetourCrowd.h>
@@ -24,7 +28,7 @@ bool PathfinderModule ::Init()
 PathfinderModule::~PathfinderModule()
 {
     dtFreeCrowd(crowd);
-    //dtFreeNavMeshQuery(navQuery); TODO when saving navmesh, re-enable this
+    // dtFreeNavMeshQuery(navQuery); TODO when saving navmesh, re-enable this
     if (navmesh) navmesh = nullptr;
 }
 
@@ -43,59 +47,8 @@ update_status PathfinderModule::Update(float deltaTime)
     return UPDATE_CONTINUE;
 }
 
-/*
-std::vector<float3> PathfinderModule::FindPath(float3 start, float3 end)
-{
-
-    std::vector<float3> path;
-
-    dtQueryFilter filter;
-    float startPos[3] = {start.x, start.y, start.z};
-    float endPos[3]   = {end.x, end.y, end.z};
-
-    dtPolyRef startRef, endRef;
-    float closestStart[3], closestEnd[3];
-
-    float extent[3] = {2.0f, 4.0f, 2.0f};
-
-    // Find closest navmesh polygons
-    navQuery->findNearestPoly(startPos, extent, &filter, &startRef, closestStart);
-    navQuery->findNearestPoly(endPos, extent, &filter, &endRef, closestEnd);
-
-    if (!startRef || !endRef) return path; // No valid path
-
-    // Find path through navmesh
-    dtPolyRef pathPolys[256];
-    int pathCount = 0;
-    navQuery->findPath(startRef, endRef, closestStart, closestEnd, &filter, pathPolys, &pathCount, 256);
-
-    if (pathCount == 0) return path;
-
-    // straight-line path
-    float straightPath[256 * 3];          // positions (x,y,z)
-    unsigned char straightPathFlags[256]; // flags for path points
-    dtPolyRef straightPathRefs[256];      // polygon references
-    int straightPathCount = 0;
-
-    navQuery->findStraightPath(
-        closestStart, closestEnd, pathPolys, pathCount, straightPath, straightPathFlags, straightPathRefs,
-        &straightPathCount, 256
-    );
-
-    // Store waypoints
-    for (int j = 0; j < straightPathCount; j++)
-    {
-        path.emplace_back(straightPath[j * 3], straightPath[j * 3 + 1], straightPath[j * 3 + 2]);
-    }
-
-    return path;
-
-
-}
-*/
-
 // All ai agent components will call this to add themselves to crowd
-int PathfinderModule::CreateAgent(float3 position, float radius, float height, float speed)
+int PathfinderModule::CreateAgent(float3& position, float radius, float height, float speed)
 {
     if (!crowd) return -1;
 
@@ -125,6 +78,7 @@ void PathfinderModule::RemoveAgent(int agentId)
     if (!agent || !agent->active) return;
 
     crowd->removeAgent(agentId);
+    RemoveAIAgentComponent(agentId);
 }
 
 void PathfinderModule::InitQuerySystem()
@@ -143,6 +97,56 @@ void PathfinderModule::InitQuerySystem()
     }
 }
 
+//called by clicking in the game
 void PathfinderModule::HandleClickNavigation()
 {
+
+    if (!clickNavigationEnabled) return; // from UI
+
+    int agentId            = 0; //  from UI
+    LineSegment ray        = App->GetCameraModule()->CastCameraRay();
+
+    float3 hitPoint;
+    if (!RaycastToGround(ray, hitPoint))
+    {
+        GLOG("Ray did not hit ground.");
+        return;
+    }
+
+    AIAgentComponent* comp = GetComponentFromAgentId(agentId);
+    if (comp != nullptr)
+    {
+        comp->setPath(hitPoint);
+    }
+
+}
+
+bool PathfinderModule::RaycastToGround(const LineSegment& ray, float3& outHitPoint)
+{
+    Plane groundPlane(float3::unitY, 0.0f); // Ground at Y = 0
+    float distance = 0.0f;
+
+    if (ray.Intersects(groundPlane, &distance))
+    {
+        outHitPoint = ray.GetPoint(distance);
+        return true;
+    }
+
+    return false;
+} 
+
+
+void PathfinderModule::AddAIAgentComponent(int agentId, AIAgentComponent* comp)
+{
+    agentComponentMap[agentId] = comp;
+}
+
+void PathfinderModule::RemoveAIAgentComponent(int agentId)
+{
+    agentComponentMap.erase(agentId);
+}
+AIAgentComponent* PathfinderModule::GetComponentFromAgentId(int agentId)
+{
+    auto it = agentComponentMap.find(agentId);
+    return (it != agentComponentMap.end()) ? it->second : nullptr;
 }
