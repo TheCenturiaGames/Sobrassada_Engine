@@ -5,6 +5,7 @@
     "lastModifiedDate": 0,
     "importOptions": {
         "shader": "1932647236901744476",
-        "useOcclusion": false
+        "useOcclusion": false,
+		"defaultTextureUID": 1290233345777347
     }
 }
