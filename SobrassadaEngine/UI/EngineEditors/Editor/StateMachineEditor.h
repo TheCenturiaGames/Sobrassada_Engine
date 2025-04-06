@@ -24,6 +24,7 @@ class StateMachineEditor : public EngineEditorBase
     void ShowLoadPopup();
     void RemoveStateNode(StateNode& node);
     void ShowInspector();
+    void DeleteStateResource(StateNode& node);
 
 
   private:

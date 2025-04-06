@@ -106,14 +106,23 @@ bool StateMachineEditor::RenderEditor()
     ImGui::End();
 
     //INSPECTOR
-    if (selectedNode && selectedNode->toDestroy())
-    {
-        selectedNode = nullptr;
-    }
-
     if (selectedNode != nullptr)
     {
-        ShowInspector();
+        if (ImGui::IsKeyPressed(ImGuiKey_Delete) && !selectedNode->toDestroy())
+        {
+            DeleteStateResource(*selectedNode); 
+            selectedNode->destroy();            
+        }
+
+
+        if (!selectedNode->toDestroy())
+        {
+            ShowInspector();
+        }
+        else
+        {
+            selectedNode = nullptr;
+        }
     }
 
     return true;
@@ -631,23 +640,7 @@ void StateMachineEditor::ShowLoadPopup()
 }
 void StateMachineEditor::RemoveStateNode(StateNode& node)
 {
-    std::string stateName = node.GetStateName();
-    std::string clipName;
-
-    for (const auto& transition : resource->transitions)
-    {
-        if (transition.fromState.GetString() == stateName || transition.toState.GetString() == stateName)
-        {
-            resource->RemoveTransition(transition.fromState.GetString(), transition.toState.GetString());
-        }
-    }
-    
-    auto state = resource->GetState(stateName);
-    clipName   = state->clipName.GetString();
-    resource->RemoveState(state->name.GetString());
-
-    auto clip   = resource->GetClip(clipName);
-    resource->RemoveClip(clip->clipName.GetString());
+    DeleteStateResource(node);
 
     auto& nodes = graph->getNodes();
 
@@ -659,4 +652,26 @@ void StateMachineEditor::RemoveStateNode(StateNode& node)
 
     selectedNode = nullptr;
 
+}
+
+void StateMachineEditor::DeleteStateResource(StateNode& node)
+{
+    GLOG("hola");
+    std::string stateName = node.GetStateName();
+    std::string clipName;
+
+    for (const auto& transition : resource->transitions)
+    {
+        if (transition.fromState.GetString() == stateName || transition.toState.GetString() == stateName)
+        {
+            resource->RemoveTransition(transition.fromState.GetString(), transition.toState.GetString());
+        }
+    }
+
+    auto state = resource->GetState(stateName);
+    clipName   = state->clipName.GetString();
+    resource->RemoveState(state->name.GetString());
+
+    auto clip = resource->GetClip(clipName);
+    resource->RemoveClip(clip->clipName.GetString());
 }
