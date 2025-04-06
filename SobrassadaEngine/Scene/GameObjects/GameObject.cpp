@@ -407,7 +407,6 @@ MeshComponent* GameObject::GetMeshComponent() const
     {
         Component* comp = it->second;
 
-        GLOG("GetMeshComponent: base pointer = %p", comp);
 
         return dynamic_cast<MeshComponent*>(comp);
     }

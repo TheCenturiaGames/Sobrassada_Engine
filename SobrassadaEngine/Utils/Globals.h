@@ -4,8 +4,8 @@
 #include "Algorithm/Random/LCG.h"
 #include <Geometry/AABB.h>
 #include <stdio.h>
-#include <windows.h>
 #include <vector>
+#include <windows.h>
 
 #ifdef SOBRASADA_ENGINE_API
 #define SOBRASADA_API_ENGINE __declspec(dllexport)
@@ -13,9 +13,9 @@
 #define SOBRASADA_API_ENGINE __declspec(dllimport)
 #endif
 
-#pragma warning(disable: 4251)
+#pragma warning(disable : 4251)
 
-extern SOBRASADA_API_ENGINE std::vector<char*> *Logs;
+extern SOBRASADA_API_ENGINE std::vector<char*>* Logs;
 
 SOBRASADA_API_ENGINE void glog(const char file[], int line, const char* format, ...);
 
@@ -83,9 +83,9 @@ constexpr float DEFAULT_CAMERA_DRAG_SENSITIVITY      = 0.05f;
 constexpr float DEFAULT_CAMERA_WHEEL_SENSITIVITY     = 2.f;
 constexpr float DEFAULT_CAMERA_ZOOM_SENSITIVITY      = 0.5f;
 
-constexpr const char* GAME_PATH  = "..\\Game";
-constexpr const char* DEBUG_DLL_PATH = "..\\SobrassadaEngine\\x64\\Debug\\SobrassadaScripts.dll";
-constexpr const char* RELEASE_DLL_PATH = "..\\SobrassadaEngine\\x64\\Release\\SobrassadaScripts.dll";
+constexpr const char* GAME_PATH                      = "..\\Game";
+constexpr const char* DEBUG_DLL_PATH                 = "..\\SobrassadaEngine\\x64\\Debug\\SobrassadaScripts.dll";
+constexpr const char* RELEASE_DLL_PATH               = "..\\SobrassadaEngine\\x64\\Release\\SobrassadaScripts.dll";
 
 constexpr const char* ENGINE_DEFAULT_ASSETS          = "EngineDefaults/";
 constexpr const char* ASSETS_PATH                    = "Assets/";
@@ -122,12 +122,14 @@ constexpr int MAX_COMPONENT_NAME_LENGTH              = 64;
 constexpr const char* LIGHTS_VERTEX_SHADER_PATH      = "./EngineDefaults/Shader/Vertex/VertexShader.glsl";
 constexpr const char* SKYBOX_VERTEX_SHADER_PATH      = "./EngineDefaults/Shader/Vertex/SkyboxVertex.glsl";
 constexpr const char* UIWIDGET_VERTEX_SHADER_PATH    = "./EngineDefaults/Shader/Vertex/UIWidgetVertex.glsl";
+constexpr const char* PREFAB_VERTEX_SHADER_PATH      = "./EngineDefaults/Shader/Vertex/PrefabVertex.glsl";
 
 constexpr const char* UNLIT_FRAGMENT_SHADER_PATH     = "./EngineDefaults/Shader/Fragment/UnlitFragmentShader.glsl";
 constexpr const char* SKYBOX_FRAGMENT_SHADER_PATH    = "./EngineDefaults/Shader/Fragment/SkyboxFragment.glsl";
 constexpr const char* SPECULAR_FRAGMENT_SHADER_PATH  = "./EngineDefaults/Shader/Fragment/BRDFPhongFragmentShader.glsl";
 constexpr const char* METALLIC_FRAGMENT_SHADER_PATH  = "./EngineDefaults/Shader/Fragment/BRDFCookTorranceShader.glsl";
 constexpr const char* UIWIDGET_FRAGMENT_SHADER_PATH  = "./EngineDefaults/Shader/Fragment/UIWidgetFragment.glsl";
+constexpr const char* PREFAB_FRAGMENT_SHADER_PATH    = "./EngineDefaults/Shader/Fragment/PrefabFragment.glsl";
 
 using UID                                            = uint64_t;
 

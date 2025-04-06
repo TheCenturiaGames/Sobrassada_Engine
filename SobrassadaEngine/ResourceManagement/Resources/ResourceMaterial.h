@@ -1,6 +1,8 @@
 ﻿#pragma once
 
 #include "Resource.h"
+#include "ResourceMaterial.h"
+#include <glew.h>
 
 #include "Math/float3.h"
 #include "Math/float4.h"
@@ -40,6 +42,8 @@ class ResourceMaterial : public Resource
 
     const bool GetIsMetallicRoughness() const { return metallicTexture.textureID != 0 ? true : false; }
     const MaterialGPU GetMaterial() const { return material; }
+    GLuint GetDiffuseTextureID() const { return diffuseTexture.textureID; }
+
 
   private:
     TextureInfo diffuseTexture;

@@ -2,6 +2,8 @@
 #include "Application.h"
 #include "OpenGLModule.h"
 #include "ResourcesModule.h"
+#include "SceneModule.h"
+#include "ShaderModule.h"
 #include "Standalone/MeshComponent.h"
 
 #include "Math/Quat.h"
@@ -12,6 +14,7 @@ PrefabPortView::PrefabPortView()
 {
     SetupFramebuffer();
 
+    // Matrix camera configuration
     glGenBuffers(1, &cameraUBO);
     glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
     glBufferData(GL_UNIFORM_BUFFER, sizeof(CameraMatrices), nullptr, GL_DYNAMIC_DRAW);
@@ -27,24 +30,51 @@ PrefabPortView::~PrefabPortView()
 void PrefabPortView::SetPrefab(ResourcePrefab* prefab)
 {
     CleanupPreview();
-    currentPrefab       = prefab;
+    currentPrefab                                 = prefab;
 
-    const auto& objects = prefab->GetGameObjectsVector();
-    if (objects.empty()) return;
+    const std::vector<GameObject*>& prefabObjects = currentPrefab->GetGameObjectsVector();
+    if (prefabObjects.empty()) return;
 
-    CreatePreviewGameObject(objects[0]);
+    GameObject* originalRoot = prefabObjects[0];
+    previewGO                = CloneGameObjectHierarchy(originalRoot, prefabObjects);
+
     ApplyInitialTransform();
 
-    if (auto* mesh = previewGO->GetMeshComponent())
+    if (MeshComponent* mesh = previewGO->GetMeshComponent())
     {
         LoadMeshAndMaterialFromComponent(mesh);
+        SetupCamera();
     }
 }
 
-void PrefabPortView::CreatePreviewGameObject(GameObject* original)
+// Rebuild the gameobject prefab tree
+GameObject* PrefabPortView::CloneGameObjectHierarchy(GameObject* original, const std::vector<GameObject*>& allObjects)
 {
-    previewGO = new GameObject(*original);
-    previewGO->UpdateTransformForGOBranch();
+    std::unordered_map<UID, GameObject*> cloneMap;
+
+    for (GameObject* go : allObjects)
+    {
+        GameObject* clone      = new GameObject(*go);
+        cloneMap[go->GetUID()] = clone;
+    }
+
+    for (GameObject* go : allObjects)
+    {
+        GameObject* clone = cloneMap[go->GetUID()];
+
+        if (go->GetParent() != INVALID_UID)
+        {
+            auto it = cloneMap.find(go->GetParent());
+            if (it != cloneMap.end())
+            {
+                GameObject* parentClone = it->second;
+                clone->SetParent(parentClone->GetUID());
+                parentClone->AddGameObject(clone->GetUID());
+            }
+        }
+        App->GetSceneModule()->GetScene()->AddGameObject(clone->GetUID(), clone);
+    }
+    return cloneMap[original->GetUID()];
 }
 
 void PrefabPortView::ApplyInitialTransform()
@@ -60,69 +90,52 @@ void PrefabPortView::LoadMeshAndMaterialFromComponent(MeshComponent* mesh)
     if (const ResourceMesh* resMesh = mesh->GetResourceMesh())
     {
         loadedMesh = static_cast<ResourceMesh*>(App->GetResourcesModule()->RequestResource(resMesh->GetUID()));
+        if (loadedMesh && loadedMesh->GetVAO() == 0)
+        {
+            loadedMesh->UploadToVRAM();
+        }
     }
 
-    UID materialUID = INVALID_UID;
-    rapidjson::Document dummyDoc;
-    dummyDoc.SetObject();
-    rapidjson::Value dummyState(rapidjson::kObjectType);
-    mesh->Save(dummyState, dummyDoc.GetAllocator());
-
-    if (dummyState.HasMember("Material"))
-    {
-        materialUID = dummyState["Material"].GetUint64();
-    }
-
-    if (materialUID != INVALID_UID)
-    {
-        loadedMaterial = static_cast<ResourceMaterial*>(App->GetResourcesModule()->RequestResource(materialUID));
-    }
-}
-
-void PrefabPortView::Update(float dt)
-{
-    if (!currentPrefab) return;
-    SetupCamera();
+    UID materialUID = mesh->GetMaterialUID();
 }
 
 void PrefabPortView::RenderContent()
 {
-    if (!framebuffer || !previewGO || !loadedMesh)
-    {
-        ImGui::Text("Missing resources to render prefab.");
-        return;
-    }
-
-    SetupCamera();
-
     ImVec2 viewportSize = ImVec2((float)width, (float)height);
     ImVec2 viewportPos  = ImGui::GetCursorScreenPos();
 
+    // Bind the framebuffer and prepare it for rendering
     framebuffer->Bind();
     glViewport(0, 0, width, height);
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // Compute matrices for rendering
     float4x4 model            = previewGO->GetGlobalTransform();
     matrices.viewMatrix       = camera.ViewMatrix();
     matrices.projectionMatrix = camera.ProjectionMatrix();
     matrices.viewMatrix.Transpose();
     matrices.projectionMatrix.Transpose();
 
+    // Upload camera matrices to the uniform buffer
     glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(CameraMatrices), &matrices);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-    if (loadedMesh)
-    {
-        loadedMesh->Render(0, model, cameraUBO, loadedMaterial, {}, {});
-    }
+    // Render the mesh with material (if available)
+    int prefabShader = App->GetShaderModule()->GetPrefabProgram();
+
+    loadedMesh->RenderSimple(prefabShader, model, cameraUBO, loadedMaterial);
+
 
     framebuffer->Unbind();
 
+    // Draw the rendered image to the ImGui viewport
     ImGui::Image((ImTextureID)(intptr_t)framebuffer->GetTextureID(), viewportSize, ImVec2(0, 1), ImVec2(1, 0));
 }
 
+
+// Where the prefab will be shown
 void PrefabPortView::SetupFramebuffer()
 {
     framebuffer = new Framebuffer(width, height, true);
@@ -130,8 +143,6 @@ void PrefabPortView::SetupFramebuffer()
 
 void PrefabPortView::SetupCamera()
 {
-    if (!currentPrefab) return;
-
     AABB combinedAABB;
     combinedAABB.SetNegativeInfinity();
 
@@ -158,11 +169,13 @@ void PrefabPortView::SetupCamera()
     camera.verticalFov       = 2.0f * atanf(tanf(camera.horizontalFov * 0.5f) * (1.0f / aspect));
 }
 
+// Clean last prefab portview shown and frees resources
 void PrefabPortView::CleanupPreview()
 {
     if (previewGO)
     {
-        delete previewGO;
+        UID previewRootUID = previewGO->GetUID();
+        App->GetSceneModule()->GetScene()->RemoveGameObjectHierarchy(previewRootUID);
         previewGO = nullptr;
     }
 

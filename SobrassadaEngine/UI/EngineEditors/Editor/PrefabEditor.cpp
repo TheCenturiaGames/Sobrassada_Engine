@@ -105,8 +105,15 @@ void PrefabEditor::HandlePrefabViewer()
 void PrefabEditor::RenderPrefabPortView()
 {
     ImGui::Text("Portview");
-    portView->Update(0.016f); // Assume fixed delta time
-    portView->RenderContent();
+
+    if (portView && portView->HasValidMesh())
+    {
+        portView->RenderContent();
+    }
+    else
+    {
+        ImGui::Text("No mesh to display.");
+    }
 }
 
 // Renders the hierarchy tree and property panel for selected GameObject

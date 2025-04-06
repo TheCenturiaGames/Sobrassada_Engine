@@ -20,13 +20,13 @@ class PrefabPortView
     ~PrefabPortView();
 
     void SetPrefab(ResourcePrefab* prefab); // Assign a prefab to preview
-    void Update(float dt);                  // Updates internal camera state
     void RenderContent();                   // Main render function called from ImGui window
+    bool HasValidMesh() const { return loadedMesh != nullptr; }
 
   private:
     // Resource handling
     void CleanupPreview(); // Deletes old GameObject and releases resources
-    void CreatePreviewGameObject(GameObject* original);
+    GameObject* CloneGameObjectHierarchy(GameObject* original, const std::vector<GameObject*>& allObjects);
     void ApplyInitialTransform();
     void LoadMeshAndMaterialFromComponent(MeshComponent* mesh);
 

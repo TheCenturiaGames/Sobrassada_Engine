@@ -37,6 +37,10 @@ class ResourceMesh : public Resource
         const std::vector<GameObject*>& bones, const std::vector<float4x4>& bindMatrices
     );
     void LoadData(unsigned int mode, const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices);
+    void
+    RenderSimple(int program, const float4x4& modelMatrix, unsigned int cameraUBO, const ResourceMaterial* material);
+
+    void UploadToVRAM();
 
     const AABB& GetAABB() const { return aabb; }
     unsigned int GetVAO() const { return vao; }
@@ -46,6 +50,7 @@ class ResourceMesh : public Resource
     const std::vector<unsigned int>& GetIndices() const { return indices; }
     const float4x4& GetDefaultTransform() const { return defaultTransform; }
     const unsigned int GetMode() const { return mode; }
+
 
   private:
     unsigned int vao         = 0;

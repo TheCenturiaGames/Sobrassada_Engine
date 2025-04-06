@@ -21,6 +21,7 @@ bool ShaderModule::Init()
     metallicRoughnessProgramUnlit  = CreateShaderProgram(LIGHTS_VERTEX_SHADER_PATH, UNLIT_FRAGMENT_SHADER_PATH);
 
     uiWidgetProgram                = CreateShaderProgram(UIWIDGET_VERTEX_SHADER_PATH, UIWIDGET_FRAGMENT_SHADER_PATH);
+    prefabProgram                 = CreateShaderProgram(UIWIDGET_VERTEX_SHADER_PATH, UIWIDGET_FRAGMENT_SHADER_PATH);
     return true;
 }
 
@@ -31,6 +32,7 @@ bool ShaderModule::ShutDown()
     glDeleteProgram(metallicRoughnessProgram);
     glDeleteProgram(metallicRoughnessProgramUnlit);
     glDeleteProgram(uiWidgetProgram);
+    glDeleteProgram(prefabProgram);
     return true;
 }
 

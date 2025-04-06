@@ -87,3 +87,60 @@ void ResourceMesh::Render(
     }
     else glUniform1i(4, 0); // mesh has no bones
 }
+
+// For the prefab rendering portview
+void ResourceMesh::RenderSimple(
+    int program, const float4x4& modelMatrix, unsigned int cameraUBO, const ResourceMaterial* material
+)
+{
+    glUseProgram(program);
+
+    // Bind camera UBO
+    glBindBufferBase(GL_UNIFORM_BUFFER, 0, cameraUBO);
+
+    // Send model matrix
+    GLint modelLoc = glGetUniformLocation(program, "modelMatrix");
+    glUniformMatrix4fv(modelLoc, 1, GL_TRUE, modelMatrix.ptr());
+
+    // Load material texture (if available)
+    if (material)
+    {
+        GLuint texID = material->GetDiffuseTextureID();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texID);
+
+        GLint texLoc = glGetUniformLocation(program, "uDiffuse");
+        glUniform1i(texLoc, 0); // Texture unit 0
+    }
+
+    // Draw mesh
+    glBindVertexArray(vao);
+    glDrawElements(mode, indexCount, GL_UNSIGNED_INT, nullptr);
+    glBindVertexArray(0);
+
+    glUseProgram(0);
+}
+
+void ResourceMesh::UploadToVRAM()
+{
+    if (vao != 0) return;
+
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+
+    glGenBuffers(1, &ebo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoord));
+
+    glBindVertexArray(0);
+}
