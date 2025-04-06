@@ -106,11 +106,15 @@ bool StateMachineEditor::RenderEditor()
     ImGui::End();
 
     //INSPECTOR
+    if (selectedNode && selectedNode->toDestroy())
+    {
+        selectedNode = nullptr;
+    }
+
     if (selectedNode != nullptr)
     {
         ShowInspector();
     }
-
 
     return true;
 }
