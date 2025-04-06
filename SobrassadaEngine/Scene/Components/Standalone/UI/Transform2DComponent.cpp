@@ -52,7 +52,7 @@ Transform2DComponent::Transform2DComponent(const rapidjson::Value& initialState,
 
 Transform2DComponent::~Transform2DComponent()
 {
-    if (parentTransform != nullptr) parentTransform->RemoveChild(this);
+    //if (parentTransform != nullptr) parentTransform->RemoveChild(this);
 
     if (parent->GetComponentByType(COMPONENT_LABEL) != nullptr)
     {
