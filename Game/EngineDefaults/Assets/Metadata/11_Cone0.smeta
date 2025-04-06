@@ -5,6 +5,24 @@
     "lastModifiedDate": 0,
     "importOptions": {
         "generateTangents": false,
+        "transform": [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+        ],
 		"defaultMaterialUID": 1300000000000000
     }
 }
