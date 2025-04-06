@@ -190,7 +190,7 @@ void MeshComponent::AddMesh(UID resource, bool updateParent)
         if (currentMaterial == nullptr)
         {
             const UID defaultMat = newMesh->GetDefaultMaterialUID();
-            if (defaultMat != INVALID_UID) AddMaterial(defaultMat);
+            AddMaterial(defaultMat);
         }
 
         localComponentAABB = AABB(currentMesh->GetAABB());
@@ -202,7 +202,13 @@ void MeshComponent::AddMesh(UID resource, bool updateParent)
 
 void MeshComponent::AddMaterial(UID resource)
 {
-    if (resource == INVALID_UID) return;
+    bool isMaterialInvalid = false;
+
+    if (resource == INVALID_UID || App->GetResourcesModule()->RequestResource(resource) == nullptr)
+    {
+        resource = DEFAULT_MATERIAL_UID;
+        isMaterialInvalid = true;
+    }
 
     if (currentMaterial != nullptr && currentMaterial->GetUID() == resource) return;
 
@@ -213,6 +219,8 @@ void MeshComponent::AddMaterial(UID resource)
         App->GetResourcesModule()->ReleaseResource(currentMaterial);
         currentMaterial     = newMaterial;
         currentMaterialName = currentMaterial->GetName();
+
+        if (isMaterialInvalid) newMaterial->ChangeFallBackTexture();
 
         if (batch) BatchEditorMode();
     }

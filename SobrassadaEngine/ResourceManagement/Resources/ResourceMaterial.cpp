@@ -198,6 +198,11 @@ UID ResourceMaterial::ChangeTexture(UID newTexture, TextureInfo& textureToChange
     return NULL;
 }
 
+void ResourceMaterial::ChangeFallBackTexture()
+{
+    ChangeTexture(FALLBACK_TEXTURE_UID, diffuseTexture, material.diffuseTex);
+}
+
 void ResourceMaterial::LoadMaterialData(Material mat)
 {
     material.diffColor           = mat.GetDiffuseFactor();

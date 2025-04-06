@@ -40,6 +40,7 @@ class ResourceMaterial : public Resource
     void FreeMaterials() const;
 
     UID ChangeTexture(UID newTexture, TextureInfo& textureToChange, UID textureGPU);
+    void ChangeFallBackTexture();
 
     const bool GetIsMetallicRoughness() const { return metallicTexture.textureID != 0 ? true : false; }
     const MaterialGPU GetMaterial() const { return material; }
