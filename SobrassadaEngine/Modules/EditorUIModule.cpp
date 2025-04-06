@@ -11,6 +11,8 @@
 #include "OpenGLModule.h"
 #include "ProjectModule.h"
 #include "SceneImporter.h"
+#include "ResourcesModule.h"
+#include "ResourceNavmesh.h"
 #include "SceneModule.h"
 #include "ScriptModule.h"
 #include "TextureEditor.h"
@@ -38,6 +40,9 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"Spot Light",           COMPONENT_SPOT_LIGHT          },
         {"Directional Light",    COMPONENT_DIRECTIONAL_LIGHT   },
         {"Character Controller", COMPONENT_CHARACTER_CONTROLLER},
+        {"Transform 2D",         COMPONENT_TRANSFORM_2D        },
+        {"UI Canvas",            COMPONENT_CANVAS              },
+        {"UI Label",             COMPONENT_LABEL               },
         {"Camera",               COMPONENT_CAMERA              },
         {"Script",               COMPONENT_SCRIPT              }
     };
@@ -243,6 +248,8 @@ void EditorUIModule::Draw()
 
     if (saveMenu) SaveDialog(saveMenu);
 
+    if (navmesh) Navmesh(navmesh);
+
     if (editorSettingsMenu) EditorSettings(editorSettingsMenu);
 }
 
@@ -307,6 +314,7 @@ void EditorUIModule::MainMenu()
             if (ImGui::MenuItem("Hierarchy", "", hierarchyMenu)) hierarchyMenu = !hierarchyMenu;
             if (ImGui::MenuItem("Inspector", "", inspectorMenu)) inspectorMenu = !inspectorMenu;
             if (ImGui::MenuItem("Lights Config", "", lightConfig)) lightConfig = !lightConfig;
+            if (ImGui::MenuItem("Navmesh", "", navmesh)) navmesh = !navmesh;
             ImGui::EndDisabled();
 
             ImGui::EndMenu();
@@ -390,6 +398,23 @@ void EditorUIModule::LoadDialog(bool& loadMenu)
         selectedLoad  = -1;
         inputFileLoad = "";
     }
+}
+
+void EditorUIModule::Navmesh(bool& navmesh)
+{
+    if (!navmesh) return;
+
+    ImGui::Begin("NavMesh Creation", &navmesh, ImGuiWindowFlags_None);
+
+    if (ImGui::Button("Create NavMesh"))
+    {
+        App->GetResourcesModule()->CreateNavMesh();
+        ImGui::Text("NavMesh created!");
+    }
+
+    App->GetResourcesModule()->GetNavMesh()->RenderNavmeshEditor();
+
+    ImGui::End();
 }
 
 void EditorUIModule::LoadPrefabDialog(bool& loadPrefab)

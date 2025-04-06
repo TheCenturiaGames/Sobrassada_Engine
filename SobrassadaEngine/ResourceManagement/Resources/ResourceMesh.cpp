@@ -46,6 +46,12 @@ ResourceMesh::ResourceMesh(
         aabb.maxPoint = defaultTransform.MulPos(maxPos);
         aabb.minPoint = defaultTransform.MulPos(minPos);
     }
+
+    if (importOptions.HasMember("defaultMaterialUID") && importOptions["defaultMaterialUID"].IsUint64())
+        defaultMaterialUID = importOptions["defaultMaterialUID"].GetUint64();
+
+    else defaultMaterialUID = INVALID_UID;
+
 }
 
 ResourceMesh::~ResourceMesh()
