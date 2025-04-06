@@ -608,11 +608,11 @@ void StateMachineEditor::ShowLoadPopup()
             {
                 GLOG("Loading State Machine: %s", selectedName.c_str());
 
-                const ResourceStateMachine* stateMachine = (const ResourceStateMachine*)App->GetResourcesModule()->RequestResource(selectedUID);
+                ResourceStateMachine* stateMachine = (ResourceStateMachine*)App->GetResourcesModule()->RequestResource(selectedUID);
                 if (stateMachine)
                 {
                     GLOG("Successfully loaded State Machine: %s", selectedName.c_str());
-                    resource = const_cast<ResourceStateMachine*>(stateMachine);
+                    resource = stateMachine;
                     BuildGraph();
                     ImGui::CloseCurrentPopup();
                 }
