@@ -6,13 +6,13 @@
 #include "Mesh.h"
 #include "MetaMesh.h"
 #include "ProjectModule.h"
-#include "ResourceManagement/Resources/ResourceMesh.h"
+#include "ResourceMesh.h"
 
-#include <Libs/rapidjson/document.h>
-#include <Math/Quat.h>
+#include "Math/Quat.h"
+#include "rapidjson/document.h"
+#include "tiny_gltf.h"
 #include <algorithm>
 #include <memory>
-#include <tiny_gltf.h>
 #include <vector>
 
 namespace MeshImporter
@@ -20,7 +20,7 @@ namespace MeshImporter
 
     UID ImportMesh(
         const tinygltf::Model& model, const tinygltf::Mesh& mesh, const tinygltf::Primitive& primitive,
-        const std::string& name, const char* sourceFilePath, const std::string& targetFilePath, UID sourceUID
+        const std::string& name, const char* sourceFilePath, const std::string& targetFilePath, UID sourceUID, UID defaultMatUID
     )
     {
         enum DataType dataType = UNSIGNED_CHAR;
@@ -327,7 +327,7 @@ namespace MeshImporter
             const float4x4& meshTransform = GetMeshDefaultTransform(model, nameNoExt);
 
             std::string assetPath         = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
-            MetaMesh meta(finalMeshUID, assetPath, generateTangents, meshTransform);
+            MetaMesh meta(finalMeshUID, assetPath, generateTangents, meshTransform, defaultMatUID);
             meta.Save(name, assetPath);
         }
         else finalMeshUID = sourceUID;
@@ -433,7 +433,7 @@ namespace MeshImporter
         unsigned int vertexCount  = header[1];
         unsigned int mode         = header[2];
         unsigned int indexMode    = header[3];
-        GLOG("The mode for the mesh is %d", mode);
+        // GLOG("The mode for the mesh is %d", mode);
 
         // Create Mesh
         std::vector<Vertex> tmpVertices;

@@ -6,15 +6,14 @@
 #include "MeshImporter.h"
 #include "ModelImporter.h"
 #include "PrefabManager.h"
-#include "AnimationImporter.h"
-#include "ResourceManagement/Resources/Resource.h"
-#include "ResourceManagement/Resources/ResourceMaterial.h"
-#include "ResourceManagement/Resources/ResourceMesh.h"
-#include "ResourceManagement/Resources/ResourceModel.h"
-#include "ResourceManagement/Resources/ResourcePrefab.h"
-#include "ResourceManagement/Resources/ResourceTexture.h"
-#include "ResourceManagement/Resources/ResourceAnimation.h"
+#include "Resource.h"
+#include "ResourceMaterial.h"
+#include "ResourceMesh.h"
+#include "ResourceModel.h"
+#include "ResourcePrefab.h"
+#include "ResourceTexture.h"
 #include "TextureImporter.h"
+#include "ResourceAnimation.h"
 
 Resource* Importer::Load(UID uid)
 {

@@ -4,9 +4,9 @@
 #include "FileSystem.h"
 #include "ProjectModule.h"
 
-#include <document.h>
-#include <prettywriter.h>
-#include <stringbuffer.h>
+#include "rapidjson/document.h"
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
 
 ProjectConfig::ProjectConfig()
 {
@@ -26,7 +26,7 @@ void ProjectConfig::SetStartupScene(const std::string& newStartupSceneName)
 void ProjectConfig::Load()
 {
     rapidjson::Document doc;
-    bool loaded =
+    const bool loaded =
         FileSystem::LoadJSON((App->GetProjectModule()->GetLoadedProjectPath() + "ProjectConfig.json").c_str(), doc);
 
     if (!loaded)

@@ -4,6 +4,7 @@
     "assetPath": "Assets/DefaultCube.gltf",
     "lastModifiedDate": 0,
     "importOptions": {
-        "generateTangents": true
+        "generateTangents": true,
+		"defaultMaterialUID": 1328585117198369
     }
 }

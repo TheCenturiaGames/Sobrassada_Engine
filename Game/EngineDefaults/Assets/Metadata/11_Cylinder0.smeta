@@ -4,6 +4,7 @@
     "assetPath": "Assets/DefaultCylinder.gltf",
     "lastModifiedDate": 0,
     "importOptions": {
-        "generateTangents": false
+        "generateTangents": false,
+		"defaultMaterialUID": 1328585117198369
     }
 }

@@ -14,7 +14,9 @@
 #define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_EXTERNAL_IMAGE
 #define TINYGLTF_IMPLEMENTATION /* Only in one of the includes */
-#include <tiny_gltf.h>
+#include "tiny_gltf.h"
+#include <utility>
+#include <unordered_set>
 
 namespace SceneImporter
 {
@@ -36,32 +38,41 @@ namespace SceneImporter
         tinygltf::Model model = LoadModelGLTF(filePath, targetFilePath);
 
         std::vector<std::vector<std::pair<UID, UID>>> gltfMeshes;
-        std::vector<int> matIndices;
+        std::unordered_map<int, UID> matIndices;
+
         for (const auto& srcMesh : model.meshes)
         {
-            int n        = 0;
+            int n = 0;
             int matIndex = -1;
             std::vector<std::pair<UID, UID>> primitives;
 
             for (const auto& primitive : srcMesh.primitives)
             {
                 std::string name = srcMesh.name + std::to_string(n);
-                UID meshUID      = MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath, targetFilePath);
-                n++;
 
-                UID matUID = INVALID_UID;
-                matIndex   = primitive.material;
-                if (matIndex == -1) GLOG("Material index invalid for mesh: %s", name.c_str())
-                else if (std::find(matIndices.begin(), matIndices.end(), matIndex) == matIndices.end())
+                UID matUID   = INVALID_UID;
+                matIndex = primitive.material;
+                if (matIndex == -1)
+                {
+                    GLOG("Material index invalid for mesh: %s", name.c_str());
+                }
+                else if (matIndices.find(matIndex) == matIndices.end())
                 {
                     matUID = MaterialImporter::ImportMaterial(model, matIndex, filePath, targetFilePath);
-                    matIndices.push_back(matIndex);
+                    matIndices[matIndex] = matUID;
                 }
-
+                else
+                {
+                    matUID = matIndices[matIndex];
+                }
+                
+                const UID meshUID      = MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath, targetFilePath, INVALID_UID, matUID);
+                n++;
+                
                 primitives.emplace_back(meshUID, matUID);
                 GLOG("New primitive with mesh UID: %d and Material UID: %d", meshUID, matUID);
             }
-            gltfMeshes.emplace_back(primitives);
+            gltfMeshes.push_back(primitives);
         }
 
         GLOG("Total .gltf meshes: %d", gltfMeshes.size());

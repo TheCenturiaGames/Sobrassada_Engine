@@ -2,8 +2,8 @@
 
 #include "FileSystem.h"
 
-#include <prettywriter.h>
-#include <stringbuffer.h>
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
 
 EngineConfig::EngineConfig()
 {

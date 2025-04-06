@@ -13,9 +13,10 @@
 
 #include "Math/Quat.h"
 #include "Math/float4x4.h"
-#include "prettywriter.h"
-#include "stringbuffer.h"
-#include <tiny_gltf.h>
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+#include "tiny_gltf.h"
+#include <set>
 
 namespace ModelImporter
 {
@@ -26,10 +27,21 @@ namespace ModelImporter
     {
         // Get Nodes data
         Model newModel;
-        std::vector<NodeData> orderedNodes;
+        std::vector<std::vector<NodeData>> orderedNodes;
+        unsigned int accNodesInserted = 0;
 
         GLOG("Start filling nodes")
-        FillNodes(model.nodes, 0, -1, meshesUIDs, orderedNodes); // -1 parentId for root
+        for (const auto& scene : model.scenes)
+        {
+            for (const auto& nodeID : scene.nodes)
+            {
+                std::vector<NodeData> loadNodes;
+                if (model.nodes[nodeID].camera != -1 || model.nodes[nodeID].name == "Camera") continue;
+                FillNodes(model.nodes, nodeID, 0, meshesUIDs, loadNodes, accNodesInserted); // -1 parentId for root
+                orderedNodes.push_back(loadNodes);
+                accNodesInserted += static_cast<unsigned int>(loadNodes.size());
+            }
+        }
         GLOG("Nodes filled");
 
         newModel.SetNodes(orderedNodes);
@@ -75,8 +87,8 @@ namespace ModelImporter
 
         rapidjson::Value modelJSON(rapidjson::kObjectType);
 
-        const std::string modelName = FileSystem::GetFileNameWithoutExtension(filePath);
-        std::string assetPath       = MODELS_ASSETS_PATH + modelName + MODEL_EXTENSION;
+        const std::string& modelName = FileSystem::GetFileNameWithoutExtension(filePath);
+        std::string assetPath        = MODELS_ASSETS_PATH + modelName + MODEL_EXTENSION;
         UID finalModelUID;
         if (sourceUID == INVALID_UID)
         {
@@ -142,39 +154,41 @@ namespace ModelImporter
 
         // Serialize ordered nodes
         rapidjson::Value nodesJSON(rapidjson::kArrayType);
-
-        for (const NodeData& node : orderedNodes)
+        for (const std::vector<NodeData>& nodes : orderedNodes)
         {
-            rapidjson::Value nodeDataJSON(rapidjson::kObjectType);
-            nodeDataJSON.AddMember("Name", rapidjson::Value(node.name.c_str(), allocator), allocator);
-
-            rapidjson::Value valTransform(rapidjson::kArrayType);
-            for (int i = 0; i < 4; ++i)
+            for (const NodeData& node : nodes)
             {
-                for (int j = 0; j < 4; ++j)
+                rapidjson::Value nodeDataJSON(rapidjson::kObjectType);
+                nodeDataJSON.AddMember("Name", rapidjson::Value(node.name.c_str(), allocator), allocator);
+
+                rapidjson::Value valTransform(rapidjson::kArrayType);
+                for (int i = 0; i < 4; ++i)
                 {
-                    valTransform.PushBack(node.transform[i][j], allocator);
+                    for (int j = 0; j < 4; ++j)
+                    {
+                        valTransform.PushBack(node.transform[i][j], allocator);
+                    }
                 }
-            }
 
-            nodeDataJSON.AddMember("Transform", valTransform, allocator);
-            nodeDataJSON.AddMember("ParentIndex", node.parentIndex, allocator);
+                nodeDataJSON.AddMember("Transform", valTransform, allocator);
+                nodeDataJSON.AddMember("ParentIndex", node.parentIndex, allocator);
 
-            // Save mesh and material UID in same array
-            if (node.meshes.size() > 0)
-            {
-                rapidjson::Value valMeshes(rapidjson::kArrayType);
-                for (const std::pair<UID, UID>& ids : node.meshes)
+                // Save mesh and material UID in same array
+                if (node.meshes.size() > 0)
                 {
-                    valMeshes.PushBack(ids.first, allocator);
-                    valMeshes.PushBack(ids.second, allocator);
+                    rapidjson::Value valMeshes(rapidjson::kArrayType);
+                    for (const std::pair<UID, UID>& ids : node.meshes)
+                    {
+                        valMeshes.PushBack(ids.first, allocator);
+                        valMeshes.PushBack(ids.second, allocator);
+                    }
+                    nodeDataJSON.AddMember("MeshesMaterials", valMeshes, allocator);
                 }
-                nodeDataJSON.AddMember("MeshesMaterials", valMeshes, allocator);
+
+                if (node.skinIndex != -1) nodeDataJSON.AddMember("SkinIndex", node.skinIndex, allocator);
+
+                nodesJSON.PushBack(nodeDataJSON, allocator);
             }
-
-            if (node.skinIndex != -1) nodeDataJSON.AddMember("SkinIndex", node.skinIndex, allocator);
-
-            nodesJSON.PushBack(nodeDataJSON, allocator);
         }
         modelJSON.AddMember("Nodes", nodesJSON, allocator);
 
@@ -185,6 +199,17 @@ namespace ModelImporter
             animationsJSON.PushBack(animUID, allocator);
         }
         modelJSON.AddMember("Animations", animationsJSON, allocator);
+        rapidjson::Value scenesJSON(rapidjson::kArrayType);
+        std::size_t accNodes = 0;
+        for (const std::vector<NodeData>& nodes : orderedNodes)
+        {
+            rapidjson::Value nodePair(rapidjson::kObjectType);
+            nodePair.AddMember("rootNode", accNodes, allocator);
+            nodePair.AddMember("sceneSize", nodes.size(), allocator);
+            scenesJSON.PushBack(nodePair, allocator);
+            accNodes += nodes.size();
+        }
+        modelJSON.AddMember("Scenes", scenesJSON, allocator);
 
         // Serialize skins
         rapidjson::Value skinsJSON(rapidjson::kArrayType);
@@ -272,7 +297,7 @@ namespace ModelImporter
     ResourceModel* LoadModel(UID modelUID)
     {
         rapidjson::Document doc;
-        const std::string filePath = App->GetLibraryModule()->GetResourcePath(modelUID);
+        const std::string& filePath = App->GetLibraryModule()->GetResourcePath(modelUID);
 
         if (!FileSystem::LoadJSON(filePath.c_str(), doc)) return nullptr;
 
@@ -287,57 +312,67 @@ namespace ModelImporter
         // Scene values
         UID uid                     = modelJSON["UID"].GetUint64();
 
-        std::vector<NodeData> loadedNodes;
-
-        // Deserialize Nodes
-        if (modelJSON.HasMember("Nodes") && modelJSON["Nodes"].IsArray())
+        std::vector<std::vector<NodeData>> loadedNodes;
+        if (modelJSON.HasMember("Scenes") && modelJSON["Scenes"].IsArray())
         {
-            const rapidjson::Value& nodesJSON = modelJSON["Nodes"];
-
-            for (rapidjson::SizeType i = 0; i < nodesJSON.Size(); i++)
+            if (modelJSON.HasMember("Nodes") && modelJSON["Nodes"].IsArray())
             {
-                const rapidjson::Value& nodeJSON = nodesJSON[i];
+                const rapidjson::Value& scenesJSON = modelJSON["Scenes"];
+                const rapidjson::Value& nodesJSON  = modelJSON["Nodes"];
 
-                NodeData newNode;
-                newNode.name = nodeJSON["Name"].GetString();
-
-                if (nodeJSON.HasMember("Transform") && nodeJSON["Transform"].IsArray() &&
-                    nodeJSON["Transform"].Size() == 16)
+                for (rapidjson::SizeType i = 0; i < scenesJSON.Size(); i++)
                 {
-                    const rapidjson::Value& initLocalTransform = nodeJSON["Transform"];
-                    int counter                                = 0;
-                    for (int i = 0; i < 4; ++i)
+                    std::vector<NodeData> newNodes;
+                    const rapidjson::Value& sceneJSON = scenesJSON[i];
+                    int rootNode                      = sceneJSON["rootNode"].GetInt();
+                    int size                          = sceneJSON["sceneSize"].GetInt();
+                    for (int k = 0; k < size; k++)
                     {
-                        for (int j = 0; j < 4; ++j)
+                        const rapidjson::Value& nodeJSON = nodesJSON[rootNode + k];
+
+                        NodeData newNode;
+                        newNode.name = nodeJSON["Name"].GetString();
+
+                        if (nodeJSON.HasMember("Transform") && nodeJSON["Transform"].IsArray() &&
+                            nodeJSON["Transform"].Size() == 16)
                         {
-                            newNode.transform[i][j] = initLocalTransform[counter].GetFloat();
-                            ++counter;
+                            const rapidjson::Value& initLocalTransform = nodeJSON["Transform"];
+                            int counter                                = 0;
+                            for (int i = 0; i < 4; ++i)
+                            {
+                                for (int j = 0; j < 4; ++j)
+                                {
+                                    newNode.transform[i][j] = initLocalTransform[counter].GetFloat();
+                                    ++counter;
+                                }
+                            }
                         }
+
+                        newNode.parentIndex = nodeJSON["ParentIndex"].GetInt();
+
+                        if (nodeJSON.HasMember("MeshesMaterials") && nodeJSON["MeshesMaterials"].IsArray())
+                        {
+                            const rapidjson::Value& uids = nodeJSON["MeshesMaterials"];
+
+                            for (rapidjson::SizeType i = 0; i < uids.Size(); i += 2)
+                            {
+                                newNode.meshes.emplace_back(uids[i].GetUint64(), uids[i + 1].GetUint64());
+                            }
+                        }
+
+                        if (nodeJSON.HasMember("SkinIndex") && nodeJSON["SkinIndex"].IsInt())
+                        {
+                            newNode.skinIndex = nodeJSON["SkinIndex"].GetInt();
+                        }
+                        else
+                        {
+                            newNode.skinIndex = -1;
+                        }
+
+                        newNodes.push_back(newNode);
                     }
+                    loadedNodes.push_back(newNodes);
                 }
-
-                newNode.parentIndex = nodeJSON["ParentIndex"].GetInt();
-
-                if (nodeJSON.HasMember("MeshesMaterials") && nodeJSON["MeshesMaterials"].IsArray())
-                {
-                    const rapidjson::Value& uids = nodeJSON["MeshesMaterials"];
-
-                    for (rapidjson::SizeType i = 0; i < uids.Size(); i += 2)
-                    {
-                        newNode.meshes.emplace_back(uids[i].GetUint64(), uids[i + 1].GetUint64());
-                    }
-                }
-
-                if (nodeJSON.HasMember("SkinIndex") && nodeJSON["SkinIndex"].IsInt())
-                {
-                    newNode.skinIndex = nodeJSON["SkinIndex"].GetInt();
-                }
-                else
-                {
-                    newNode.skinIndex = -1;
-                }
-
-                loadedNodes.push_back(newNode);
             }
         }
         
@@ -416,19 +451,24 @@ namespace ModelImporter
 
     void FillNodes(
         const std::vector<tinygltf::Node>& nodesList, int nodeId, int parentId,
-        const std::vector<std::vector<std::pair<UID, UID>>>& meshesUIDs, std::vector<NodeData>& outNodes
+        const std::vector<std::vector<std::pair<UID, UID>>>& meshesUIDs, std::vector<NodeData>& outNodes, const unsigned int accNodesInserted
     )
     {
         // Fill node data
         const tinygltf::Node& nodeData = nodesList[nodeId];
 
+        if (nodeData.camera != -1) return;
+
         NodeData newNode;
-        newNode.name = nodeData.name;
+        if (!nodeData.name.empty()) newNode.name = nodeData.name;
+        else newNode.name = DEFAULT_NODE_NAME;
 
         if (nodeData.mesh != -1) newNode.transform = float4x4::identity;
         else newNode.transform = MeshImporter::GetNodeTransform(nodeData);
 
-        newNode.parentIndex = parentId;
+        if (parentId == -1) newNode.parentIndex = parentId;
+        else if (parentId < nodeId) newNode.parentIndex = parentId + accNodesInserted;
+        else newNode.parentIndex = static_cast<int>(outNodes.size() - 1) + accNodesInserted;
 
         // Get reference to Mesh and Material UIDs
         if (nodeData.mesh > -1) newNode.meshes = meshesUIDs[nodeData.mesh];
@@ -440,7 +480,7 @@ namespace ModelImporter
         // Call this function for every node child and give them their id, which their children will need
         for (const auto& id : nodeData.children)
         {
-            FillNodes(nodesList, id, nodeId, meshesUIDs, outNodes);
+            FillNodes(nodesList, id, nodeId, meshesUIDs, outNodes, accNodesInserted);
         }
     }
 } // namespace ModelImporter

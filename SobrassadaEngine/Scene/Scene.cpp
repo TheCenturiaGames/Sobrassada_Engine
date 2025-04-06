@@ -1,13 +1,17 @@
 ﻿#include "Scene.h"
 
 #include "Application.h"
+#include "BatchManager.h"
+#include "CameraComponent.h"
 #include "CameraModule.h"
 #include "Component.h"
+#include "ComponentUtils.h"
 #include "DebugDrawModule.h"
 #include "EditorUIModule.h"
 #include "Framebuffer.h"
 #include "GameObject.h"
 #include "GameTimer.h"
+#include "GeometryBatch.h"
 #include "Importer.h"
 #include "InputModule.h"
 #include "LibraryModule.h"
@@ -15,21 +19,24 @@
 #include "OpenGLModule.h"
 #include "ProjectModule.h"
 #include "Quadtree.h"
-#include "ResourceManagement/Resources/Resource.h"
-#include "ResourceManagement/Resources/ResourceModel.h"
-#include "ResourceManagement/Resources/ResourcePrefab.h"
+#include "Resource.h"
+#include "ResourceModel.h"
+#include "ResourcePrefab.h"
 #include "ResourcesModule.h"
 #include "Scene/Components/ComponentUtils.h"
 #include "Scene/Components/Standalone/AnimationComponent.h"
 #include "Scene/Components/Standalone/MeshComponent.h"
 #include "SceneModule.h"
+#include "Standalone/MeshComponent.h"
 
 #include "SDL_mouse.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 // guizmo after imgui include
-#include "./Libs/ImGuizmo/ImGuizmo.h"
-#include "CameraComponent.h"
+#include "ImGuizmo.h"
+#ifdef OPTICK
+#include "optick.h"
+#endif
 
 Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 {
@@ -70,6 +77,8 @@ Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUI
     }
 
     GLOG("%s scene loaded", sceneName.c_str());
+
+    App->GetResourcesModule()->GetBatchManager()->LoadData();
 }
 
 Scene::~Scene()
@@ -131,7 +140,8 @@ void Scene::Init()
 }
 
 void Scene::Save(
-    rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator, UID newUID, const char* newName
+    rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator, SaveMode saveMode, UID newUID,
+    const char* newName
 )
 {
     if (newUID != INVALID_UID)
@@ -181,7 +191,7 @@ void Scene::Save(
     else GLOG("Light Config not found");
 
     // TODO Convert to parameter which can be set later manually instead of saving a scene as default "on scene save"
-    App->GetProjectModule()->SetAsStartupScene(sceneName);
+    if (saveMode != SaveMode::SavePlayMode) App->GetProjectModule()->SetAsStartupScene(sceneName);
 }
 
 void Scene::LoadComponents() const
@@ -212,6 +222,9 @@ void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGa
 
 update_status Scene::Update(float deltaTime)
 {
+#ifdef OPTICK
+    OPTICK_CATEGORY("Scene::Update", Optick::Category::GameLogic)
+#endif
     for (auto& gameObject : gameObjectsContainer)
     {
         std::unordered_map<ComponentType, Component*> componentList = gameObject.second->GetComponents();
@@ -220,6 +233,11 @@ update_status Scene::Update(float deltaTime)
             component.second->Update(deltaTime);
         }
     }
+
+    ImGuiWindow* window = ImGui::FindWindowByName(sceneName.c_str());
+    if (window && !(window->Hidden || window->Collapsed)) sceneVisible = true;
+    else sceneVisible = false;
+
     return UPDATE_CONTINUE;
 }
 
@@ -232,17 +250,43 @@ update_status Scene::Render(float deltaTime) const
     std::vector<GameObject*> objectsToRender;
     CheckObjectsToRender(objectsToRender);
 
-    for (auto& gameObject : objectsToRender)
     {
-        if (gameObject != nullptr)
+#ifdef OPTICK
+        OPTICK_CATEGORY("Scene::MeshesToRender", Optick::Category::GameLogic)
+#endif
+        BatchManager* batchManager = App->GetResourcesModule()->GetBatchManager();
+        std::vector<MeshComponent*> meshesToRender;
+
+        for (const auto& gameObject : objectsToRender)
         {
-            gameObject->Render(deltaTime);
+            MeshComponent* mesh = gameObject->GetMeshComponent();
+            if (mesh != nullptr && mesh->GetEnabled() && mesh->GetBatch() != nullptr) meshesToRender.push_back(mesh);
+        }
+
+        batchManager->Render(meshesToRender);
+    }
+
+    {
+#ifdef OPTICK
+        OPTICK_CATEGORY("Scene::GameObject::Render", Optick::Category::Rendering)
+#endif
+        for (const auto& gameObject : objectsToRender)
+        {
+            if (gameObject != nullptr)
+            {
+                gameObject->Render(deltaTime);
+            }
         }
     }
 
-    for (const auto& gameObject : gameObjectsContainer)
     {
-        gameObject.second->DrawGizmos();
+#ifdef OPTICK
+        OPTICK_CATEGORY("Scene::GameObject::DrawGizmos", Optick::Category::Rendering)
+#endif
+        for (const auto& gameObject : gameObjectsContainer)
+        {
+            gameObject.second->DrawGizmos();
+        }
     }
 
     return UPDATE_CONTINUE;
@@ -578,7 +622,7 @@ void Scene::CreateStaticSpatialDataStruct()
     // PARAMETRIZED IN FUTURE
     float3 octreeCenter = float3::zero;
     float octreeLength  = 200;
-    int nodeCapacity    = 5;
+    int nodeCapacity    = 10;
     sceneOctree         = new Octree(octreeCenter, octreeLength, nodeCapacity);
 
     for (const auto& objectIterator : gameObjectsContainer)
@@ -633,12 +677,16 @@ void Scene::UpdateDynamicSpatialStructure()
 
 void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects) const
 {
+#ifdef OPTICK
+    OPTICK_CATEGORY("Scene::CheckObjectsToRender", Optick::Category::GameLogic)
+#endif
     std::vector<GameObject*> queriedObjects;
     FrustumPlanes frustumPlanes = App->GetCameraModule()->GetFrustrumPlanes();
     if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
         frustumPlanes = App->GetSceneModule()->GetScene()->GetMainCamera()->GetFrustrumPlanes();
 
     sceneOctree->QueryElements<FrustumPlanes>(frustumPlanes, queriedObjects);
+
     dynamicTree->QueryElements<FrustumPlanes>(frustumPlanes, queriedObjects);
 
     for (auto gameObject : queriedObjects)
@@ -666,7 +714,7 @@ void Scene::LoadModel(const UID modelUID)
 
         ResourceModel* newModel            = (ResourceModel*)App->GetResourcesModule()->RequestResource(modelUID);
         const Model& model                 = newModel->GetModelData();
-        const std::vector<NodeData>& nodes = model.GetNodes();
+        const std::vector<NodeData>& nodesScene = model.GetNodes();
         
         GLOG("Model Animation UID: %llu", newModel->GetAnimationUID());
 
@@ -691,71 +739,90 @@ void Scene::LoadModel(const UID modelUID)
         gameObjectsArray.push_back(rootObject);
 
         for (int i = 1; i < nodes.size(); ++i)
-        {
-            GameObject* gameObject = new GameObject(gameObjectsArray[nodes[i].parentIndex]->GetUID(), nodes[i].name);
-            gameObject->SetLocalTransform(nodes[i].transform);
+    
 
-            gameObjectsArray.emplace_back(gameObject);
-            GetGameObjectByUID(gameObjectsArray[nodes[i].parentIndex]->GetUID())->AddGameObject(gameObject->GetUID());
-            AddGameObject(gameObject->GetUID(), gameObject);
-        }
-
-        // Iterate again to add the meshes and skins. Can't be done in the same loop because the bones have
-        // to be already created
-        for (int i = 0; i < nodes.size(); ++i)
+        for (const std::vector<NodeData>& nodes : nodesScene)
         {
-            if (nodes[i].meshes.size() > 0)
+            GameObject* rootObject =
+                new GameObject(GetGameObjectRootUID(), App->GetLibraryModule()->GetResourceName(modelUID));
+            rootObject->SetLocalTransform(nodes[0].transform);
+
+            // Add the gameObject to the rootObject
+            GetGameObjectByUID(GetGameObjectRootUID())->AddGameObject(rootObject->GetUID());
+            AddGameObject(rootObject->GetUID(), rootObject);
+
+            std::vector<GameObject*> gameObjectsArray;
+            gameObjectsArray.push_back(rootObject);
+
+            for (int i = 1; i < nodes.size(); ++i)
             {
-                GameObject* currentGameObject = gameObjectsArray[i];
-                GLOG("Node %s has %d meshes", nodes[i].name.c_str(), nodes[i].meshes.size());
+                GameObject* gameObject =
+                    new GameObject(gameObjectsArray[nodes[i].parentIndex]->GetUID(), nodes[i].name);
+                gameObject->SetLocalTransform(nodes[i].transform);
 
-                unsigned meshNum = 1;
-                
-                for (const auto& mesh : nodes[i].meshes)
+                gameObjectsArray.emplace_back(gameObject);
+                GetGameObjectByUID(gameObjectsArray[nodes[i].parentIndex]->GetUID())
+                    ->AddGameObject(gameObject->GetUID());
+                AddGameObject(gameObject->GetUID(), gameObject);
+            }
+
+            // Iterate again to add the meshes and skins. Can't be done in the same loop because the bones have
+            // to be already created
+            for (int i = 0; i < nodes.size(); ++i)
+            {
+                if (nodes[i].meshes.size() > 0)
                 {
-                    GameObject* meshObject = nullptr;
-                    if (nodes[i].meshes.size() > 1)
-                    {
-                        meshObject = new GameObject(
-                            currentGameObject->GetUID(),
-                            currentGameObject->GetName() + " Mesh " + std::to_string(meshNum)
-                        );
-                        ++meshNum;
-                    }
-                    else
-                    {
-                        meshObject = currentGameObject;
-                    }
+                    GameObject* currentGameObject = gameObjectsArray[i];
+                    GLOG("Node %s has %d meshes", nodes[i].name.c_str(), nodes[i].meshes.size());
 
-                    if (meshObject->CreateComponent(COMPONENT_MESH))
+                    unsigned meshNum = 1;
+
+                    for (const auto& mesh : nodes[i].meshes)
                     {
+                        GameObject* meshObject = nullptr;
                         if (nodes[i].meshes.size() > 1)
                         {
-                            currentGameObject->AddGameObject(meshObject->GetUID());
-                            AddGameObject(meshObject->GetUID(), meshObject);
+                            meshObject = new GameObject(
+                                currentGameObject->GetUID(),
+                                currentGameObject->GetName() + " Mesh " + std::to_string(meshNum)
+                            );
+                            ++meshNum;
+                        }
+                        else
+                        {
+                            meshObject = currentGameObject;
                         }
 
-                        MeshComponent* meshComponent = meshObject->GetMeshComponent();
-                        meshComponent->SetModelUID(modelUID);
-                        meshComponent->AddMesh(mesh.first);
-                        meshComponent->AddMaterial(mesh.second);
-
-                        // Add skin to meshComponent
-                        if (nodes[i].skinIndex != -1)
+                        if (meshObject->CreateComponent(COMPONENT_MESH))
                         {
-                            GLOG("Node %s has skin index: %d", nodes[i].name.c_str(), nodes[i].skinIndex);
-                            Skin skin = model.GetSkin(nodes[i].skinIndex);
-
-                            std::vector<GameObject*> bones;
-                            std::vector<UID> bonesIds;
-                            for (int index : skin.bonesIndices)
+                            if (nodes[i].meshes.size() > 1)
                             {
-                                bonesIds.push_back(gameObjectsArray[index]->GetUID());
-                                bones.push_back(gameObjectsArray[index]);
+                                currentGameObject->AddGameObject(meshObject->GetUID());
+                                AddGameObject(meshObject->GetUID(), meshObject);
                             }
-                            meshComponent->SetBones(bones, bonesIds);
-                            meshComponent->SetBindMatrices(skin.inverseBindMatrices);
-                            meshComponent->SetSkinIndex(nodes[i].skinIndex);
+
+                            MeshComponent* meshComponent = meshObject->GetMeshComponent();
+                            meshComponent->SetModelUID(modelUID);
+                            meshComponent->AddMesh(mesh.first);
+                            meshComponent->AddMaterial(mesh.second);
+
+                            // Add skin to meshComponent
+                            if (nodes[i].skinIndex != -1)
+                            {
+                                GLOG("Node %s has skin index: %d", nodes[i].name.c_str(), nodes[i].skinIndex);
+                                Skin skin = model.GetSkin(nodes[i].skinIndex);
+
+                                std::vector<GameObject*> bones;
+                                std::vector<UID> bonesIds;
+                                for (int index : skin.bonesIndices)
+                                {
+                                    bonesIds.push_back(gameObjectsArray[index]->GetUID());
+                                    bones.push_back(gameObjectsArray[index]);
+                                }
+                                meshComponent->SetBones(bones, bonesIds);
+                                meshComponent->SetBindMatrices(skin.inverseBindMatrices);
+                                meshComponent->SetSkinIndex(nodes[i].skinIndex);
+                            }
                         }
 
 
