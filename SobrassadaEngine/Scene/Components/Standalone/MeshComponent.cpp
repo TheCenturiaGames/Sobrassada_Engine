@@ -186,6 +186,13 @@ void MeshComponent::AddMesh(UID resource, bool updateParent)
         App->GetResourcesModule()->ReleaseResource(currentMesh);
         currentMeshName    = newMesh->GetName();
         currentMesh        = newMesh;
+        
+        if (currentMaterial == nullptr)
+        {
+            const UID defaultMat = newMesh->GetDefaultMaterialUID();
+            if (defaultMat != INVALID_UID) AddMaterial(defaultMat);
+        }
+
         localComponentAABB = AABB(currentMesh->GetAABB());
         if (updateParent) parent->OnAABBUpdated();
 

@@ -46,6 +46,8 @@ class ResourceMesh : public Resource
     const float4x4& GetDefaultTransform() const { return defaultTransform; }
     const unsigned int GetMode() const { return mode; }
 
+    const UID GetDefaultMaterialUID() const { return defaultMaterialUID; }
+
   private:
     unsigned int vbo         = 0; // should be deleted
     unsigned int mode        = 0;
@@ -59,4 +61,6 @@ class ResourceMesh : public Resource
 
     bool generateTangents     = false;
     float4x4 defaultTransform = float4x4::identity;
+    
+    UID defaultMaterialUID    = INVALID_UID;
 };
