@@ -2,10 +2,10 @@
 
 #include "Globals.h"
 #include "UI/EngineEditors/EngineEditorBase.h"
-#include "ResourceManagement/Resources/ResourceStateMachine.h"
-#include "Libs/ImNodeFlow-1.2.2/include/ImNodeFlow.h"
-#include "UI/EngineEditors/Nodes/StateNode.h"
+#include "ImNodeFlow-1.2.2/include/ImNodeFlow.h"
 
+class ResourceStateMachine;
+class StateNode;
 
 class StateMachineEditor : public EngineEditorBase
 {
@@ -37,4 +37,7 @@ class StateMachineEditor : public EngineEditorBase
     char stateMachineName[128] = "";
     bool alreadySaved          = false;
     StateNode* selectedNode = nullptr;
+    bool saveInitialized    = false;
+    int selectedIndex = -1;
+    std::vector<std::string> allStateMachineNames;
 };

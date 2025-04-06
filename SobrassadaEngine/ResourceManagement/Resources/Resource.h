@@ -16,7 +16,7 @@ enum class ResourceType
     Animation, // 15
     Prefab,    // 16
     StateMachine,//17
-    Navmesh,   // 17
+    Navmesh,   // 18
 };
 
 class Resource

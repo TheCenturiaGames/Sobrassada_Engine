@@ -1,5 +1,5 @@
-#include "UI/EngineEditors/Editor/StateMachineEditor.h"
-#include "UI/EngineEditors/Nodes/StateNode.h"
+#include "StateMachineEditor.h"
+#include "StateNode.h"
 #include "FileSystem/StateMachineManager.h"
 #include "Application.h"
 #include "ResourcesModule.h"
@@ -33,9 +33,9 @@ bool StateMachineEditor::RenderEditor()
     ShowLoadPopup();
     graph->update();
 
-    for (auto& pair : graph->getNodes())
+    for (const auto& pair : graph->getNodes())
     {
-        auto& node = pair.second;
+        const auto& node = pair.second;
         if (node->isSelected())
         {
             selectedNode = dynamic_cast<StateNode*>(node.get());
@@ -50,7 +50,7 @@ bool StateMachineEditor::RenderEditor()
             {
                 if (ImGui::MenuItem("Delete State"))
                 {
-                    auto stateNode = dynamic_cast<StateNode*>(node);
+                    StateNode* stateNode = dynamic_cast<StateNode*>(node);
                     if (stateNode)
                     {
                         RemoveStateNode(*stateNode);
@@ -136,7 +136,7 @@ void StateMachineEditor::ShowInspector()
     ImGui::Text("State");
     ImGui::Separator();
 
-    std::string stateName = selectedNode->GetStateName();
+    const std::string& stateName = selectedNode->GetStateName();
     char nameBuffer[128]  = "";
     strncpy_s(nameBuffer, stateName.c_str(), sizeof(nameBuffer));
     nameBuffer[sizeof(nameBuffer) - 1] = '\0';
@@ -383,7 +383,7 @@ void StateMachineEditor::BuildGraph()
     selectedNode = nullptr;
     if (graph)
     {
-        for (auto& [uid, node] : graph->getNodes())
+        for (const auto& [uid, node] : graph->getNodes())
         {
             if (node)
             {
@@ -460,15 +460,15 @@ void StateMachineEditor::DetectNewTransitions()
 {
     for (const auto& linkWeak : graph->getLinks())
     {
-        if (auto link = linkWeak.lock())
+        if (const auto link = linkWeak.lock())
         {
             ImFlow::Pin* startPin = link->left(); 
             ImFlow::Pin* endPin   = link->right();
 
             if (!startPin || !endPin) continue;
 
-            auto startNode = dynamic_cast<StateNode*>(startPin->getParent());
-            auto endNode   = dynamic_cast<StateNode*>(endPin->getParent());
+            const auto startNode = dynamic_cast<StateNode*>(startPin->getParent());
+            const auto endNode   = dynamic_cast<StateNode*>(endPin->getParent());
 
             if (startNode && endNode)
             {
@@ -510,12 +510,10 @@ void StateMachineEditor::SaveMachine()
 
 void StateMachineEditor::ShowSavePopup()
 {
-    static bool initialized = false;
-    static std::vector<std::string> allStateMachineNames;
 
     if (ImGui::BeginPopupModal("Save State Machine", NULL, ImGuiWindowFlags_AlwaysAutoResize))
     {
-        if (!initialized)
+        if (!saveInitialized)
         {
             allStateMachineNames = StateMachineManager::GetAllStateMachineNames();
 
@@ -540,7 +538,7 @@ void StateMachineEditor::ShowSavePopup()
                     break;
                 }
             }
-            initialized = true;
+            saveInitialized = true;
         }
 
         ImGui::Text("Enter the name for the State Machine:");
@@ -555,9 +553,9 @@ void StateMachineEditor::ShowSavePopup()
             if (strlen(stateMachineName) > 0)
             {
                 resource->SetName(std::string(stateMachineName));
-                StateMachineManager::Save(resource, alreadySaved);
+                StateMachineManager::SaveStateMachine(resource, alreadySaved);
                 ImGui::CloseCurrentPopup();
-                initialized = false; 
+                saveInitialized = false; 
             }
         }
 
@@ -565,7 +563,7 @@ void StateMachineEditor::ShowSavePopup()
         if (ImGui::Button("Cancel"))
         {
             ImGui::CloseCurrentPopup();
-            initialized = false; 
+            saveInitialized = false; 
         }
         ImGui::EndPopup();
     }
@@ -580,22 +578,20 @@ void StateMachineEditor::LoadMachine()
 
 void StateMachineEditor::ShowLoadPopup()
 {
-    static std::vector<std::string> stateMachineNames;
-    static int selectedIndex = -1;
 
     if (ImGui::BeginPopupModal("Load State Machine", NULL, ImGuiWindowFlags_AlwaysAutoResize)){
-        if (stateMachineNames.empty())
+        if (allStateMachineNames.empty())
         {
-            stateMachineNames = StateMachineManager::GetAllStateMachineNames();
+            allStateMachineNames = StateMachineManager::GetAllStateMachineNames();
         }
         ImGui::Text("Select a State Machine to Load:");
         ImGui::Separator();
 
         if (ImGui::BeginListBox("##StateMachineList", ImVec2(-FLT_MIN, 10 * ImGui::GetTextLineHeightWithSpacing())))
         {
-            for (size_t i = 0; i < stateMachineNames.size(); i++)
+            for (size_t i = 0; i < allStateMachineNames.size(); i++)
             {
-                if (ImGui::Selectable(stateMachineNames[i].c_str(), selectedIndex == (int)i))
+                if (ImGui::Selectable(allStateMachineNames[i].c_str(), selectedIndex == (int)i))
                 {
                     selectedIndex = (int)i;
                 }
@@ -605,7 +601,7 @@ void StateMachineEditor::ShowLoadPopup()
 
         if (ImGui::Button("Load") && selectedIndex >= 0)
         {
-            std::string selectedName = stateMachineNames[selectedIndex];
+            std::string selectedName = allStateMachineNames[selectedIndex];
             UID selectedUID          = StateMachineManager::GetStateMachineUID(selectedName);
 
             if (selectedUID != 0)
@@ -656,8 +652,7 @@ void StateMachineEditor::RemoveStateNode(StateNode& node)
 
 void StateMachineEditor::DeleteStateResource(StateNode& node)
 {
-    GLOG("hola");
-    std::string stateName = node.GetStateName();
+    const std::string& stateName = node.GetStateName();
     std::string clipName;
 
     for (const auto& transition : resource->transitions)
@@ -668,10 +663,10 @@ void StateMachineEditor::DeleteStateResource(StateNode& node)
         }
     }
 
-    auto state = resource->GetState(stateName);
+    const State* state = resource->GetState(stateName);
     clipName   = state->clipName.GetString();
     resource->RemoveState(state->name.GetString());
 
-    auto clip = resource->GetClip(clipName);
+    const Clip* clip = resource->GetClip(clipName);
     resource->RemoveClip(clip->clipName.GetString());
 }

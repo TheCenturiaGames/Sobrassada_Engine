@@ -13,6 +13,7 @@
 #include "SceneImporter.h"
 #include "ResourcesModule.h"
 #include "ResourceNavmesh.h"
+#include "ResourceStateMachine.h"
 #include "SceneModule.h"
 #include "ScriptModule.h"
 #include "TextureEditor.h"

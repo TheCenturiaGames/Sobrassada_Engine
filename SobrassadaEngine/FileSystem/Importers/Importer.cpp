@@ -7,13 +7,13 @@
 #include "ModelImporter.h"
 #include "PrefabManager.h"
 #include "StateMachineManager.h"
-#include "ResourceManagement/Resources/Resource.h"
-#include "ResourceManagement/Resources/ResourceMaterial.h"
-#include "ResourceManagement/Resources/ResourceMesh.h"
-#include "ResourceManagement/Resources/ResourceModel.h"
-#include "ResourceManagement/Resources/ResourcePrefab.h"
-#include "ResourceManagement/Resources/ResourceTexture.h"
-#include "ResourceManagement/Resources/ResourceStateMachine.h"
+#include "Resource.h"
+#include "ResourceMaterial.h"
+#include "ResourceMesh.h"
+#include "ResourceModel.h"
+#include "ResourcePrefab.h"
+#include "ResourceTexture.h"
+#include "ResourceStateMachine.h"
 #include "TextureImporter.h"
 
 Resource* Importer::Load(UID uid)
@@ -35,7 +35,7 @@ Resource* Importer::Load(UID uid)
     case ResourceType::Prefab:
         return PrefabManager::LoadPrefab(uid);
     case ResourceType::StateMachine:
-        return StateMachineManager::Load(uid);
+        return StateMachineManager::LoadStateMachine(uid);
 
     default:
         GLOG("Unknown resource type: %d", type)

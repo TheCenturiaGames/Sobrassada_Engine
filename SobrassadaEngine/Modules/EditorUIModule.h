@@ -3,10 +3,10 @@
 #include "ComponentUtils.h"
 #include "Globals.h"
 #include "Module.h"
-#include <ComponentUtils.h>
-#include <Globals.h>
-#include <NodeEditor.h>
-#include <StateMachineEditor.h>
+#include "ComponentUtils.h"
+#include "Globals.h"
+#include "NodeEditor.h"
+#include "StateMachineEditor.h"
 
 #include "Math/float3.h"
 #include "Math/float4x4.h"

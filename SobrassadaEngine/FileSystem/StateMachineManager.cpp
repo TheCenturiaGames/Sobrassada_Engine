@@ -5,19 +5,19 @@
 #include "LibraryModule.h"
 #include "MetaStateMachine.h"
 #include "ProjectModule.h"
-#include <ResourceStateMachine.h>
+#include "ResourceStateMachine.h"
 
 #include "Math/Quat.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
-#include <Math/float4x4.h>
+#include "Math/float4x4.h"
 #include <filesystem>
 #include <queue>
 
 
 namespace StateMachineManager
 {
-    UID Save(ResourceStateMachine* resource, bool override
+    UID SaveStateMachine(const ResourceStateMachine* resource, bool override
     )
     {
         // Create doc Json
@@ -27,11 +27,10 @@ namespace StateMachineManager
 
         rapidjson::Value stateMachineJSON(rapidjson::kObjectType);
 
-        UID uid              = GenerateUID();
-        std::string savePath = STATEMACHINES_LIB_PATH + std::string("StateMachine") + STATEMACHINE_EXTENSION;
-        UID stateMachineUID =
+        const UID uid              = GenerateUID();
+        const UID stateMachineUID =
             override ? resource->GetUID() : App->GetLibraryModule()->AssignFiletypeUID(uid, FileType::StateMachine);
-        savePath = App->GetProjectModule()->GetLoadedProjectPath() + STATEMACHINES_LIB_PATH +
+        const std::string savePath = App->GetProjectModule()->GetLoadedProjectPath() + STATEMACHINES_LIB_PATH +
                    std::to_string(stateMachineUID) + STATEMACHINE_EXTENSION;
         std::string stateName = resource->GetName();
 
@@ -93,12 +92,12 @@ namespace StateMachineManager
         doc.Accept(writer);
 
          // Create meta file
-        std::string assetPath = STATEMACHINES_LIB_PATH + stateName + STATEMACHINE_EXTENSION;
+        std::string assetPath = STATEMACHINES_ASSETS_PATH + stateName + STATEMACHINE_EXTENSION;
         MetaStateMachine meta(stateMachineUID, assetPath);
         meta.Save(stateName, assetPath);
-        assetPath = App->GetProjectModule()->GetLoadedProjectPath() + STATEMACHINES_LIB_PATH + stateName +
+        assetPath = App->GetProjectModule()->GetLoadedProjectPath() + STATEMACHINES_ASSETS_PATH + stateName +
                     STATEMACHINE_EXTENSION;
-        // Save in assets
+
         unsigned int bytesWritten = (unsigned int
         )FileSystem::Save(assetPath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
         if (bytesWritten == 0)
@@ -107,21 +106,19 @@ namespace StateMachineManager
             return INVALID_UID;
         }
 
-        std::string machinePath = STATEMACHINES_LIB_PATH + std::to_string(stateMachineUID) + STATEMACHINE_EXTENSION;
         bytesWritten = (unsigned int
-        )FileSystem::Save(machinePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
+        )FileSystem::Save(savePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
    
         if (bytesWritten == 0)
         {
-            GLOG("Failed to save state machine file: %s", machinePath.c_str());
+            GLOG("Failed to save state machine file: %s", savePath.c_str());
             return INVALID_UID;
         }
-
+        GLOG("Saved in %s", savePath.c_str());
         App->GetLibraryModule()->AddStateMachine(stateMachineUID, stateName);
         App->GetLibraryModule()->AddName(stateName, stateMachineUID);
-        App->GetLibraryModule()->AddResource(machinePath, stateMachineUID);
+        App->GetLibraryModule()->AddResource(savePath, stateMachineUID);
 
-       // Load(stateMachineUID);
 
         return stateMachineUID;
 
@@ -129,7 +126,8 @@ namespace StateMachineManager
 
     void CopyMachine(const std::string& filePath, const std::string& targetFilePath, const std::string& name, const UID sourceUID)
     {
-        std::string destination = STATEMACHINES_LIB_PATH + std::to_string(sourceUID) + STATEMACHINE_EXTENSION;
+        std::string destination =
+            targetFilePath + STATEMACHINES_LIB_PATH + std::to_string(sourceUID) + STATEMACHINE_EXTENSION;
         FileSystem::Copy(filePath.c_str(), destination.c_str());
 
         App->GetLibraryModule()->AddStateMachine(sourceUID, name);
@@ -137,7 +135,7 @@ namespace StateMachineManager
         App->GetLibraryModule()->AddResource(destination, sourceUID);
     }
 
-    ResourceStateMachine* Load(UID stateMachineUID)
+    ResourceStateMachine* LoadStateMachine(UID stateMachineUID)
     {
         std::string path = App->GetLibraryModule()->GetResourcePath(stateMachineUID);
         if (path.empty())
