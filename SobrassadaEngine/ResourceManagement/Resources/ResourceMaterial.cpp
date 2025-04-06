@@ -39,8 +39,10 @@ void ResourceMaterial::OnEditorUpdate()
             ImGui::SetTooltip("Texture Dimensions: %d, %d", diffuseTexture.width, diffuseTexture.height);
         }
 
-        ImGui::SameLine();
-        if (ImGui::Button("Select Diffuse Texture"))
+        //ImGui::SameLine();
+
+        //TODO: commented all select buttons until save data to meta is implemented
+        /*if (ImGui::Button("Select Diffuse Texture"))
         {
             ImGui::OpenPopup(CONSTANT_DIFFUSE_TEXTURE_SELECT_DIALOG_ID);
         }
@@ -59,7 +61,7 @@ void ResourceMaterial::OnEditorUpdate()
                 material.diffuseTex = handle;
                 updated             = true;
             }
-        }
+        }*/
     }
 
     updated |= ImGui::SliderFloat3("Diffuse Color", &material.diffColor.x, 0.0f, 1.0f);
@@ -73,7 +75,8 @@ void ResourceMaterial::OnEditorUpdate()
             ImGui::SetTooltip("Texture Dimensions: %d, %d", metallicTexture.width, metallicTexture.height);
         }
         
-        ImGui::SameLine();
+        // TODO: commented all select buttons until save data to meta is implemented
+        /*ImGui::SameLine();
         if (ImGui::Button("Select Metallic Texture"))
         {
             ImGui::OpenPopup(CONSTANT_METALLIC_TEXTURE_SELECT_DIALOG_ID);
@@ -93,7 +96,7 @@ void ResourceMaterial::OnEditorUpdate()
                 material.metallicTex = handle;
                 updated              = true;
             }
-        }
+        }*/
         
         updated |= ImGui::SliderFloat("Metallic Factor", &material.metallicFactor, 0.0f, 1.0f);
         updated |= ImGui::SliderFloat("Roughness Factor", &material.roughnessFactor, 0.0f, 1.0f);
@@ -109,11 +112,11 @@ void ResourceMaterial::OnEditorUpdate()
             {
                 ImGui::SetTooltip("Texture Dimensions: %d, %d", specularTexture.width, specularTexture.height);
             }
-            ImGui::SameLine();
+            //ImGui::SameLine();
         }
         
-        
-        if (ImGui::Button("Select Specular Texture"))
+        // TODO: commented all select buttons until save data to meta is implemented
+        /*if (ImGui::Button("Select Specular Texture"))
         {
             ImGui::OpenPopup(CONSTANT_TEXTURE_SELECT_DIALOG_ID);
         }
@@ -132,7 +135,7 @@ void ResourceMaterial::OnEditorUpdate()
                 material.specularTex = handle;
                 updated              = true;
             }
-        }
+        }*/
         
         updated |= ImGui::SliderFloat3("Specular Color", &material.specColor.x, 0.0f, 1.0f);
         if (!material.shininessInAlpha) updated |= ImGui::SliderFloat("Shininess", &material.shininess, 0.0f, 500.0f);
@@ -146,8 +149,8 @@ void ResourceMaterial::OnEditorUpdate()
         {
             ImGui::SetTooltip("Texture Dimensions: %d, %d", normalTexture.width, normalTexture.height);
         }
-        
-        ImGui::SameLine();
+        // TODO: commented all select buttons until save data to meta is implemented
+        /*ImGui::SameLine();
         if (ImGui::Button("Select Normal Texture"))
         {
             ImGui::OpenPopup(CONSTANT_TEXTURE_SELECT_DIALOG_ID);
@@ -167,7 +170,7 @@ void ResourceMaterial::OnEditorUpdate()
                 material.normalTex = handle;
                 updated              = true;
             }
-        }
+        }*/
         
     }
 
