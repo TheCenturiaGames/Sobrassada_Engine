@@ -1,0 +1,28 @@
+{
+    "UID": 1132803422538657,
+    "name": "Player0",
+    "assetPath": "Assets/Player.gltf",
+    "lastModifiedDate": 0,
+    "importOptions": {
+        "generateTangents": false,
+        "transform": [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.00028208954608999193,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+        ],
+        "defaultMaterialUID": 1337607302845945
+    }
+}

@@ -712,10 +712,10 @@ void Scene::LoadModel(const UID modelUID)
     {
         GLOG("Load model %d", modelUID);
 
-        ResourceModel* newModel            = (ResourceModel*)App->GetResourcesModule()->RequestResource(modelUID);
-        const Model& model                 = newModel->GetModelData();
-        const std::vector<NodeData>& nodesScene = model.GetNodes();
-        
+        ResourceModel* newModel = (ResourceModel*)App->GetResourcesModule()->RequestResource(modelUID);
+        const Model& model      = newModel->GetModelData();
+        const std::vector<std::vector<NodeData>>& nodesScene = model.GetNodes();
+
         GLOG("Model Animation UID: %llu", newModel->GetAnimationUID());
 
         const auto& animUIDs = newModel->GetAllAnimationUIDs();
@@ -725,21 +725,6 @@ void Scene::LoadModel(const UID modelUID)
         {
             GLOG("Animation UID in list: %llu ", uid);
         }
-
-        GameObject* rootObject =
-            new GameObject(GetGameObjectRootUID(), App->GetLibraryModule()->GetResourceName(modelUID));
-
-        rootObject->SetLocalTransform(nodes[0].transform);
-        
-        // Add the gameObject to the rootObject
-        GetGameObjectByUID(GetGameObjectRootUID())->AddGameObject(rootObject->GetUID());
-        AddGameObject(rootObject->GetUID(), rootObject);
-
-        std::vector<GameObject*> gameObjectsArray;
-        gameObjectsArray.push_back(rootObject);
-
-        for (int i = 1; i < nodes.size(); ++i)
-    
 
         for (const std::vector<NodeData>& nodes : nodesScene)
         {
@@ -823,32 +808,32 @@ void Scene::LoadModel(const UID modelUID)
                                 meshComponent->SetBindMatrices(skin.inverseBindMatrices);
                                 meshComponent->SetSkinIndex(nodes[i].skinIndex);
                             }
+
+                             if (!animUIDs.empty())
+                            {
+                                rootObject->CreateComponent(COMPONENT_ANIMATION);
+                                AnimationComponent* animComponent = rootObject->GetAnimationComponent();
+
+                                GLOG("Model has %zu animations", animUIDs.size());
+                                for (UID uid : animUIDs)
+                                {
+                                    GLOG("Setting aimation resource with UID %llu ", uid);
+                                    animComponent->SetAnimationResource(uid);
+
+                                    GLOG("Animation UID: %d", uid);
+                                }
+                            }
+                            else
+                            {
+                                GLOG("No animations found for this model");
+                            }
                         }
-
-
                     }
                 }
             }
+           
+            rootObject->UpdateTransformForGOBranch();
         }
-        if (!animUIDs.empty())
-        {
-            rootObject->CreateComponent(COMPONENT_ANIMATION);
-            AnimationComponent* animComponent = rootObject->GetAnimationComponent();
-
-            GLOG("Model has %zu animations", animUIDs.size());
-            for (UID uid : animUIDs)
-            {
-                GLOG("Setting aimation resource with UID %llu ", uid);
-                animComponent->SetAnimationResource(uid);
-                
-                GLOG("Animation UID: %d", uid);
-            }
-        }
-        else
-        {
-            GLOG("No animations found for this model");
-        }
-        rootObject->UpdateTransformForGOBranch();
     }
 }
 
