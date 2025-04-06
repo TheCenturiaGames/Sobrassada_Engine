@@ -38,10 +38,15 @@ class AnimationComponent : public Component
     void SetBoneMapping();
 
     AnimController* animController = nullptr;
+    AnimationComponent* currentAnimComp    = nullptr; 
     ResourceAnimation* currentAnimResource        = nullptr;
     UID resource                   = INVALID_UID;
     std::string currentAnimName           = "None";
     GameObject* owner                     = nullptr;
     std::unordered_map<std::string, GameObject*> boneMapping;
+
+    float animationDuration = 0.0f;
+    bool playing            = false; 
+    float currentTime       = 0.0f;
   
 };

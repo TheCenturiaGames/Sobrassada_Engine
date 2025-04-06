@@ -10,7 +10,6 @@
 #include <Application.h>
 #include <Component.h>
 #include <EngineEditorBase.h>
-#include <AnimatorEditor.h>
 #include <FileSystem.h>
 #include <GameTimer.h>
 #include <SceneImporter.h>
@@ -317,9 +316,6 @@ void EditorUIModule::MainMenu()
             if (ImGui::MenuItem("Mockup Base Engine Editor", "")) OpenEditor(CreateEditor(EditorType::BASE));
 
             if (ImGui::MenuItem("Node Editor", "")) OpenEditor(CreateEditor(EditorType::NODE));
-
-            if (ImGui::MenuItem("Animation Editor", "")) OpenEditor(CreateEditor(EditorType::ANIMATION));
-
 
             if (ImGui::MenuItem("Texture Library"))
                 OpenEditor(new TextureLibraryEditor("Texture Library", GenerateUID()));
@@ -1147,9 +1143,6 @@ EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
         break;
     case EditorType::NODE:
         return new NodeEditor("NodeEditor" + std::to_string(uid), uid);
-
-    case EditorType::ANIMATION:
-        return new AnimatorEditor("AnimationEditor" + std::to_string(uid), uid);
 
     default:
         return nullptr;

@@ -50,6 +50,12 @@ void AnimController::Resume()
     playAnimation = true;
 }
 
+Quat AnimController::Interpolate(Quat& first, Quat& second, float lambda)
+{
+    if (first.Dot(second) >= 0.0f) return Quat::Lerp(first, second, lambda).Normalized();
+    else return Quat::Lerp(first, second.Neg(), lambda).Normalized();
+}
+
 update_status AnimController::Update(float deltaTime)
 {
     if (!playAnimation || resource == 0) return UPDATE_CONTINUE;
@@ -198,8 +204,8 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
 
                 lambda          = (lambda < 0) ? 0 : (lambda > 1) ? 1 : lambda;
 
-                rot = Quat::Slerp(animChannel->rotations[prevIndex], animChannel->rotations[nextIndex], lambda)
-                          .Normalized();
+                rot = Interpolate(animChannel->rotations[prevIndex], animChannel->rotations[nextIndex], lambda);
+                          
                 /*GLOG(
                     "Rotation interpolation: (%f,%f,%f,%f), Lambda: %f, Times: %f to %f", rot.x, rot.y, rot.z, rot.w,
                     lambda, startTime, endTime

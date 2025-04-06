@@ -26,11 +26,12 @@ class AnimController
     void SetTime(float time) { currentTime = time; }
     float GetTime() const { return currentTime; }
     bool IsPlaying() const { return playAnimation; }
-
+    
   
   
    
   private:
+    Quat Interpolate(Quat& first, Quat& second, float lambda);
     UID resource; 
     float currentTime                    = 0; 
     bool loop                       = false;

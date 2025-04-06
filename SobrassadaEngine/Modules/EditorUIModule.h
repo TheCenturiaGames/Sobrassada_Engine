@@ -23,7 +23,6 @@ namespace ImGuizmo
 enum EditorType
 {
     BASE,
-    ANIMATION,
     NODE
 };
 

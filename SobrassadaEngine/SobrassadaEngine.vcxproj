@@ -281,7 +281,6 @@
     <ClCompile Include="Scene\Components\CameraComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\AnimationComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\AnimController.cpp" />
-    <ClCompile Include="UI\EngineEditors\Editor\AnimatorEditor.cpp" />
     <ClCompile Include="UI\EngineEditors\Editor\NodeEditor.cpp" />
     <ClCompile Include="UI\EngineEditors\Editor\TextureLibraryEditor.cpp" />
     <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp" />
@@ -445,7 +444,6 @@
     <ClInclude Include="Scene\Components\CameraComponent.h" />
     <ClInclude Include="Scene\Components\Standalone\AnimationComponent.h" />
     <ClInclude Include="Scene\Components\Standalone\AnimController.h" />
-    <ClInclude Include="UI\EngineEditors\Editor\AnimatorEditor.h" />
     <ClInclude Include="UI\EngineEditors\Editor\NodeEditor.h" />
     <ClInclude Include="UI\EngineEditors\Editor\TextureLibraryEditor.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
