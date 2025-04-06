@@ -170,8 +170,8 @@ void AnimationComponent::Update(float deltaTime)
          if (boneIt != boneMapping.end())
          {
              GameObject* bone = boneIt->second;
-             float3 position;
-             Quat rotation;
+             float3 position = bone->GetLocalTransform().TranslatePart();
+             Quat rotation = Quat(bone->GetLocalTransform().RotatePart());
 
              animController->GetTransform(boneName, position, rotation);
 
