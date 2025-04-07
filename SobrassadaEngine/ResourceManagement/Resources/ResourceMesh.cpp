@@ -98,8 +98,8 @@ void ResourceMesh::RenderSimple(
     // Bind camera UBO
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, cameraUBO);
 
-    // Send model matrix
-    GLint modelLoc = glGetUniformLocation(program, "modelMatrix");
+   // Send model matrix
+    GLint modelLoc = glGetUniformLocation(program, "model");
     glUniformMatrix4fv(modelLoc, 1, GL_TRUE, modelMatrix.ptr());
 
     // Load material texture (if available)
@@ -109,7 +109,7 @@ void ResourceMesh::RenderSimple(
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texID);
 
-        GLint texLoc = glGetUniformLocation(program, "uDiffuse");
+        GLint texLoc = glGetUniformLocation(program, "albedoTex");
         glUniform1i(texLoc, 0); // Texture unit 0
     }
 

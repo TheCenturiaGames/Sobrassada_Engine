@@ -53,4 +53,6 @@ class PrefabPortView
 
     // Gizmo config
     int gizmoOperation = ImGuizmo::ROTATE;
+
+    std::vector<GameObject*> previewObjects;
 };

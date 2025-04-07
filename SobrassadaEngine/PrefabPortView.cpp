@@ -56,12 +56,12 @@ GameObject* PrefabPortView::CloneGameObjectHierarchy(GameObject* original, const
     {
         GameObject* clone      = new GameObject(*go);
         cloneMap[go->GetUID()] = clone;
+        previewObjects.push_back(clone); 
     }
 
     for (GameObject* go : allObjects)
     {
         GameObject* clone = cloneMap[go->GetUID()];
-
         if (go->GetParent() != INVALID_UID)
         {
             auto it = cloneMap.find(go->GetParent());
@@ -72,8 +72,8 @@ GameObject* PrefabPortView::CloneGameObjectHierarchy(GameObject* original, const
                 parentClone->AddGameObject(clone->GetUID());
             }
         }
-        App->GetSceneModule()->GetScene()->AddGameObject(clone->GetUID(), clone);
     }
+
     return cloneMap[original->GetUID()];
 }
 
@@ -97,42 +97,60 @@ void PrefabPortView::LoadMeshAndMaterialFromComponent(MeshComponent* mesh)
     }
 
     UID materialUID = mesh->GetMaterialUID();
+    if (materialUID != INVALID_UID)
+    {
+        loadedMaterial = static_cast<ResourceMaterial*>(App->GetResourcesModule()->RequestResource(materialUID));
+    }
 }
 
 void PrefabPortView::RenderContent()
 {
     ImVec2 viewportSize = ImVec2((float)width, (float)height);
-    ImVec2 viewportPos  = ImGui::GetCursorScreenPos();
+    ImVec2 viewportPos  = ImGui::GetCursorScreenPos(); // For the guizmo
 
-    // Bind the framebuffer and prepare it for rendering
     framebuffer->Bind();
+    glEnable(GL_DEPTH_TEST);
     glViewport(0, 0, width, height);
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Compute matrices for rendering
     float4x4 model            = previewGO->GetGlobalTransform();
     matrices.viewMatrix       = camera.ViewMatrix();
     matrices.projectionMatrix = camera.ProjectionMatrix();
-    matrices.viewMatrix.Transpose();
-    matrices.projectionMatrix.Transpose();
 
-    // Upload camera matrices to the uniform buffer
     glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(CameraMatrices), &matrices);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-    // Render the mesh with material (if available)
     int prefabShader = App->GetShaderModule()->GetPrefabProgram();
-
     loadedMesh->RenderSimple(prefabShader, model, cameraUBO, loadedMaterial);
-
 
     framebuffer->Unbind();
 
-    // Draw the rendered image to the ImGui viewport
+    // Draw the texture of framebuffer in ImGui
     ImGui::Image((ImTextureID)(intptr_t)framebuffer->GetTextureID(), viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+
+    // ------------- IMGUIZMO SETUP -------------
+    ImGuizmo::SetOrthographic(false);
+    ImGuizmo::SetDrawlist();
+    ImGuizmo::SetRect(viewportPos.x, viewportPos.y, viewportSize.x, viewportSize.y);
+
+    float4x4 local    = previewGO->GetLocalTransform();
+
+    float* view       = (float*)matrices.viewMatrix.Transposed().v;
+    float* projection = (float*)matrices.projectionMatrix.Transposed().v;
+    float* transform  = (float*)local.v;
+
+    ImGuizmo::Manipulate(view, projection, (ImGuizmo::OPERATION)gizmoOperation, ImGuizmo::LOCAL, transform);
+
+    if (ImGuizmo::IsUsing())
+    {
+        previewGO->SetLocalTransform(local);
+        previewGO->UpdateTransformForGOBranch();
+    }
 }
+
+
 
 
 // Where the prefab will be shown
@@ -172,12 +190,12 @@ void PrefabPortView::SetupCamera()
 // Clean last prefab portview shown and frees resources
 void PrefabPortView::CleanupPreview()
 {
-    if (previewGO)
+    for (GameObject* go : previewObjects)
     {
-        UID previewRootUID = previewGO->GetUID();
-        App->GetSceneModule()->GetScene()->RemoveGameObjectHierarchy(previewRootUID);
-        previewGO = nullptr;
+        delete go;
     }
+    previewObjects.clear();
+    previewGO = nullptr;
 
     if (loadedMesh)
     {
