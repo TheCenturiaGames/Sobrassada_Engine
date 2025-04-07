@@ -36,6 +36,7 @@ namespace StateMachineManager
 
         stateMachineJSON.AddMember("UID", stateMachineUID, allocator);
         stateMachineJSON.AddMember("Name", rapidjson::Value(stateName.c_str(), allocator), allocator);
+        //stateMachineJSON.AddMember("Triggers", rapidjson::Value(stateName.c_str(), allocator), allocator);
 
          //Clips
         rapidjson::Value clipsArray(rapidjson::kArrayType);

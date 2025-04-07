@@ -283,9 +283,9 @@ void StateMachineEditor::ShowInspector()
 
             // Trigger
             int currentTriggerIndex = -1;
-            for (size_t i = 0; i < availableTriggers.size(); ++i)
+            for (size_t i = 0; i < resource->availableTriggers.size(); ++i)
             {
-                if (availableTriggers[i] == transition.triggerName.GetString())
+                if (resource->availableTriggers[i] == transition.triggerName.GetString())
                 {
                     currentTriggerIndex = static_cast<int>(i);
                     break;
@@ -300,13 +300,13 @@ void StateMachineEditor::ShowInspector()
                         if (out_text) *out_text = (*triggers)[idx].c_str();
                         return true;
                     },
-                    &availableTriggers, availableTriggers.size()
+                    &resource->availableTriggers, resource->availableTriggers.size()
                 ))
             {
                 if (currentTriggerIndex >= 0 &&
-                    availableTriggers[currentTriggerIndex] != transition.triggerName.GetString())
+                    resource->availableTriggers[currentTriggerIndex] != transition.triggerName.GetString())
                 {
-                    transition.triggerName = availableTriggers[currentTriggerIndex];
+                    transition.triggerName = resource->availableTriggers[currentTriggerIndex];
                     modified               = true;
                 }
             }
@@ -338,9 +338,9 @@ void StateMachineEditor::ShowInspector()
 
             // Trigger
             int currentTriggerIndex = -1;
-            for (size_t i = 0; i < availableTriggers.size(); ++i)
+            for (size_t i = 0; i < resource->availableTriggers.size(); ++i)
             {
-                if (availableTriggers[i] == transition.triggerName.GetString())
+                if (resource->availableTriggers[i] == transition.triggerName.GetString())
                 {
                     currentTriggerIndex = static_cast<int>(i);
                     break;
@@ -355,13 +355,13 @@ void StateMachineEditor::ShowInspector()
                         if (out_text) *out_text = (*triggers)[idx].c_str();
                         return true;
                     },
-                    &availableTriggers, availableTriggers.size()
+                    &resource->availableTriggers, resource->availableTriggers.size()
                 ))
             {
                 if (currentTriggerIndex >= 0 &&
-                    availableTriggers[currentTriggerIndex] != transition.triggerName.GetString())
+                    resource->availableTriggers[currentTriggerIndex] != transition.triggerName.GetString())
                 {
-                    transition.triggerName = availableTriggers[currentTriggerIndex];
+                    transition.triggerName = resource->availableTriggers[currentTriggerIndex];
                     modified               = true;
                 }
             }
@@ -450,7 +450,7 @@ void StateMachineEditor::BuildGraph()
                 {
                     auto link = std::make_shared<ImFlow::Link>(outputPin.get(), inputPin.get(), graph.get());
                     graph->addLink(link);
-                    availableTriggers.push_back(transition.triggerName.GetString());
+                   resource->availableTriggers.push_back(transition.triggerName.GetString());
                 }
                 else
                 {
@@ -578,7 +578,7 @@ void StateMachineEditor::ShowSavePopup()
 void StateMachineEditor::LoadMachine()
 {
     availableClips.clear();
-    availableTriggers.clear();
+    resource->availableTriggers.clear();
     ImGui::OpenPopup("Load State Machine");
 }
 
@@ -696,10 +696,10 @@ void StateMachineEditor::ShowTriggersPopup()
         {
             if (strlen(newTriggerName) > 0)
             {
-                const bool alreadyExists = std::find(availableTriggers.begin(),availableTriggers.end(), newTriggerName) != availableTriggers.end();
+                const bool alreadyExists = std::find(resource->availableTriggers.begin(),resource->availableTriggers.end(), newTriggerName) != resource->availableTriggers.end();
                 if (!alreadyExists)
                 {
-                    availableTriggers.push_back(newTriggerName);
+                    resource->availableTriggers.push_back(newTriggerName);
                     strcpy_s(newTriggerName, "");
                 }
             }
@@ -708,7 +708,7 @@ void StateMachineEditor::ShowTriggersPopup()
         ImGui::Separator();
         ImGui::Text("Available Triggers:");
 
-        for (const std::string& trigger : availableTriggers)
+        for (const std::string& trigger : resource->availableTriggers)
         {
             if (ImGui::Button(trigger.c_str()))
             {

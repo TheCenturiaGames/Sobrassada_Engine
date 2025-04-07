@@ -52,6 +52,7 @@ class ResourceStateMachine : public Resource
     std::vector<Clip> clips;
     std::vector<State> states;
     std::vector<Transition> transitions;
+    std::vector<std::string> availableTriggers;
 
     ResourceStateMachine(UID uid, const std::string& name);
     ~ResourceStateMachine() override = default;
@@ -82,5 +83,6 @@ class ResourceStateMachine : public Resource
     void SetUID(UID uid) { stateMachineUID = uid; };
 
   private:
+    State* activeState = nullptr;
     UID stateMachineUID;
 };

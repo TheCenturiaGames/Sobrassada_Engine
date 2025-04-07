@@ -34,7 +34,6 @@ class StateMachineEditor : public EngineEditorBase
     ResourceStateMachine* resource = nullptr;
     std::unique_ptr<ImFlow::ImNodeFlow> graph;
     std::vector<std::string> availableClips;
-    std::vector<std::string> availableTriggers;
     std::vector<std::shared_ptr<StateNode>> nodes;
     char stateMachineName[128] = "";
     bool alreadySaved          = false;
