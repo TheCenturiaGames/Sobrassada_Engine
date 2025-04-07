@@ -31,6 +31,12 @@ bool StateMachineEditor::RenderEditor()
         LoadMachine();
     }
     ShowLoadPopup();
+    ImGui::SameLine();
+    if (ImGui::Button("Triggers"))
+    {
+        ShowTriggers();
+    }
+    ShowTriggersPopup();
     graph->update();
 
     for (const auto& pair : graph->getNodes())
@@ -93,7 +99,7 @@ bool StateMachineEditor::RenderEditor()
                         resource->AddTransition(
                             sourceNode->GetStateName(), inputPinRaw->GetStateName(), "Trigger", 200
                         );
-                        availableTriggers.push_back("Trigger");
+                        //availableTriggers.push_back("Trigger");
                         auto newLink =
                             std::make_shared<ImFlow::Link>(dragged, inputPinRaw->getInputPin().get(), graph.get());
                         graph->addLink(newLink);
@@ -479,7 +485,7 @@ void StateMachineEditor::DetectNewTransitions()
                 {
                     GLOG("Creating transition from %s to %s", fromState.c_str(), toState.c_str());
                     resource->AddTransition(fromState, toState, "Trigger", 200);
-                    availableTriggers.push_back("Trigger");
+                    //availableTriggers.push_back("Trigger");
                 }
             }
         }
@@ -634,6 +640,7 @@ void StateMachineEditor::ShowLoadPopup()
     }
 
 }
+
 void StateMachineEditor::RemoveStateNode(StateNode& node)
 {
     DeleteStateResource(node);
@@ -669,4 +676,53 @@ void StateMachineEditor::DeleteStateResource(StateNode& node)
 
     const Clip* clip = resource->GetClip(clipName);
     resource->RemoveClip(clip->clipName.GetString());
+}
+
+void StateMachineEditor::ShowTriggers()
+{
+    ImGui::OpenPopup("Available Triggers");
+}
+
+void StateMachineEditor::ShowTriggersPopup()
+{
+
+    if (ImGui::BeginPopupModal("Available Triggers", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ImGui::Text("Add a new trigger:");
+
+        ImGui::InputText("##NewTriggerInput", newTriggerName, IM_ARRAYSIZE(newTriggerName));
+
+        if (ImGui::Button("Add Trigger"))
+        {
+            if (strlen(newTriggerName) > 0)
+            {
+                const bool alreadyExists = std::find(availableTriggers.begin(),availableTriggers.end(), newTriggerName) != availableTriggers.end();
+                if (!alreadyExists)
+                {
+                    availableTriggers.push_back(newTriggerName);
+                    strcpy_s(newTriggerName, "");
+                }
+            }
+        }
+
+        ImGui::Separator();
+        ImGui::Text("Available Triggers:");
+
+        for (const std::string& trigger : availableTriggers)
+        {
+            if (ImGui::Button(trigger.c_str()))
+            {
+                GLOG("Trigger selected: %s", trigger.c_str());
+            }
+        }
+
+        ImGui::Separator();
+
+        if (ImGui::Button("Cancel"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
 }

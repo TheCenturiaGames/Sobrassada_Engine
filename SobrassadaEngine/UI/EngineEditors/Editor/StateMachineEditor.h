@@ -25,6 +25,8 @@ class StateMachineEditor : public EngineEditorBase
     void RemoveStateNode(StateNode& node);
     void ShowInspector();
     void DeleteStateResource(StateNode& node);
+    void ShowTriggers();
+    void ShowTriggersPopup();
 
 
   private:
@@ -40,4 +42,5 @@ class StateMachineEditor : public EngineEditorBase
     bool saveInitialized    = false;
     int selectedIndex = -1;
     std::vector<std::string> allStateMachineNames;
+    char newTriggerName[64] = "";
 };
