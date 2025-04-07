@@ -74,8 +74,10 @@ void PrefabEditor::HandlePrefabViewer()
         portView->SetPrefab(selectedPrefab);
     }
 
-    if (openPrefabViewer && ImGui::Begin("Prefab Viewer", &openPrefabViewer))
+    if (openPrefabViewer)
     {
+        ImGui::Begin("Prefab Viewer", &openPrefabViewer);
+
         ImVec2 windowSize = ImGui::GetContentRegionAvail();
         float leftWidth   = windowSize.x * 0.6f;
         float rightWidth  = windowSize.x - leftWidth;

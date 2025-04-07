@@ -21,7 +21,7 @@ bool ShaderModule::Init()
     metallicRoughnessProgramUnlit  = CreateShaderProgram(LIGHTS_VERTEX_SHADER_PATH, UNLIT_FRAGMENT_SHADER_PATH);
 
     uiWidgetProgram                = CreateShaderProgram(UIWIDGET_VERTEX_SHADER_PATH, UIWIDGET_FRAGMENT_SHADER_PATH);
-    prefabProgram                 = CreateShaderProgram(UIWIDGET_VERTEX_SHADER_PATH, UIWIDGET_FRAGMENT_SHADER_PATH);
+    prefabProgram                  = CreateShaderProgram(PREFAB_VERTEX_SHADER_PATH, PREFAB_FRAGMENT_SHADER_PATH);
     return true;
 }
 

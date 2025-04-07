@@ -114,7 +114,10 @@ void PrefabPortView::RenderContent()
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    float4x4 model            = previewGO->GetGlobalTransform();
+    float4x4 rotation         = previewGO->GetLocalTransform();
+    float3 fixedPosition      = float3(0, 0, -1.0f);
+    float4x4 model            = float4x4::FromTRS(fixedPosition, rotation.RotatePart(), float3(0.05, 0.05, 0.05));
+
     matrices.viewMatrix       = camera.ViewMatrix();
     matrices.projectionMatrix = camera.ProjectionMatrix();
 
@@ -127,28 +130,31 @@ void PrefabPortView::RenderContent()
 
     framebuffer->Unbind();
 
-    // Draw the texture of framebuffer in ImGui
     ImGui::Image((ImTextureID)(intptr_t)framebuffer->GetTextureID(), viewportSize, ImVec2(0, 1), ImVec2(1, 0));
 
-    // ------------- IMGUIZMO SETUP -------------
     ImGuizmo::SetOrthographic(false);
     ImGuizmo::SetDrawlist();
     ImGuizmo::SetRect(viewportPos.x, viewportPos.y, viewportSize.x, viewportSize.y);
 
-    float4x4 local    = previewGO->GetLocalTransform();
-
     float* view       = (float*)matrices.viewMatrix.Transposed().v;
     float* projection = (float*)matrices.projectionMatrix.Transposed().v;
-    float* transform  = (float*)local.v;
 
-    ImGuizmo::Manipulate(view, projection, (ImGuizmo::OPERATION)gizmoOperation, ImGuizmo::LOCAL, transform);
+    float matrix[16];
+    memcpy(matrix, previewGO->GetLocalTransform().v, sizeof(float) * 16);
+
+    ImGuizmo::Manipulate(view, projection, static_cast<ImGuizmo::OPERATION>(gizmoOperation), ImGuizmo::LOCAL, matrix);
 
     if (ImGuizmo::IsUsing())
     {
-        previewGO->SetLocalTransform(local);
-        previewGO->UpdateTransformForGOBranch();
+        float4x4 newTransform;
+        memcpy(newTransform.v, matrix, sizeof(float) * 16);
+        Quat rotation         = Quat(newTransform.Float3x3Part());
+        float4x4 pureRotation = float4x4::FromTRS(float3::zero, rotation, float3(1, 1, 1));
+        previewGO->SetLocalTransform(pureRotation);
     }
 }
+
+
 
 
 

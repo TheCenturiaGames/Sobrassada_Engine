@@ -102,6 +102,7 @@ void ResourceMesh::RenderSimple(
     GLint modelLoc = glGetUniformLocation(program, "model");
     glUniformMatrix4fv(modelLoc, 1, GL_TRUE, modelMatrix.ptr());
 
+
     // Load material texture (if available)
     if (material)
     {
