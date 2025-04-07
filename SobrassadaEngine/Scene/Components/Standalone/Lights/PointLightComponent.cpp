@@ -9,10 +9,8 @@
 #include <vector>
 
 PointLightComponent::PointLightComponent(UID uid, GameObject* parent)
-    : LightComponent(uid, parent, "Point Light", COMPONENT_POINT_LIGHT)
+    : range(1), gizmosMode(0), LightComponent(uid, parent, "Point Light", COMPONENT_POINT_LIGHT)
 {
-    range      = 1;
-    gizmosMode = 0;
 }
 
 PointLightComponent::PointLightComponent(const rapidjson::Value& initialState, GameObject* parent)

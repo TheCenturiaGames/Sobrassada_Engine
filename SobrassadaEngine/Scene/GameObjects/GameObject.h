@@ -90,7 +90,7 @@ class SOBRASADA_API_ENGINE GameObject
     const float3& GetRotation() const { return rotation; }
     const float3& GetScale() const { return scale; }
 
-    void SetLocalTransform(const float4x4& newTransform) { localTransform = newTransform; }
+    void SetLocalTransform(const float4x4& newTransform);
     void DrawGizmos() const;
 
     void CreatePrefab();

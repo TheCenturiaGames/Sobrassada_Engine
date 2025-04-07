@@ -26,6 +26,7 @@ namespace ModelImporter
         // Get Nodes data
         Model newModel;
         std::vector<std::vector<NodeData>> orderedNodes;
+        unsigned int accNodesInserted = 0;
 
         GLOG("Start filling nodes")
         for (const auto& scene : model.scenes)
@@ -34,8 +35,9 @@ namespace ModelImporter
             {
                 std::vector<NodeData> loadNodes;
                 if (model.nodes[nodeID].camera != -1 || model.nodes[nodeID].name == "Camera") continue;
-                FillNodes(model.nodes, nodeID, 0, meshesUIDs, loadNodes); // -1 parentId for root
+                FillNodes(model.nodes, nodeID, 0, meshesUIDs, loadNodes, accNodesInserted); // -1 parentId for root
                 orderedNodes.push_back(loadNodes);
+                accNodesInserted += static_cast<unsigned int>(loadNodes.size());
             }
         }
         GLOG("Nodes filled");
@@ -380,7 +382,7 @@ namespace ModelImporter
 
     void FillNodes(
         const std::vector<tinygltf::Node>& nodesList, int nodeId, int parentId,
-        const std::vector<std::vector<std::pair<UID, UID>>>& meshesUIDs, std::vector<NodeData>& outNodes
+        const std::vector<std::vector<std::pair<UID, UID>>>& meshesUIDs, std::vector<NodeData>& outNodes, const unsigned int accNodesInserted
     )
     {
         // Fill node data
@@ -395,8 +397,9 @@ namespace ModelImporter
         if (nodeData.mesh != -1) newNode.transform = float4x4::identity;
         else newNode.transform = MeshImporter::GetNodeTransform(nodeData);
 
-        if (parentId < nodeId) newNode.parentIndex = parentId;
-        else newNode.parentIndex = static_cast<int>(outNodes.size() - 1);
+        if (parentId == -1) newNode.parentIndex = parentId;
+        else if (parentId < nodeId) newNode.parentIndex = parentId + accNodesInserted;
+        else newNode.parentIndex = static_cast<int>(outNodes.size() - 1) + accNodesInserted;
 
         // Get reference to Mesh and Material UIDs
         if (nodeData.mesh > -1) newNode.meshes = meshesUIDs[nodeData.mesh];
@@ -408,7 +411,7 @@ namespace ModelImporter
         // Call this function for every node child and give them their id, which their children will need
         for (const auto& id : nodeData.children)
         {
-            FillNodes(nodesList, id, nodeId, meshesUIDs, outNodes);
+            FillNodes(nodesList, id, nodeId, meshesUIDs, outNodes, accNodesInserted);
         }
     }
 } // namespace ModelImporter

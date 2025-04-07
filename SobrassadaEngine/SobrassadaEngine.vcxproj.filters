@@ -324,9 +324,6 @@
     <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
       <Filter>UI\EngineEditors</Filter>
     </ClCompile>
-    <ClCompile Include="Modules\UserInterfaceModule.cpp">
-      <Filter>Modules</Filter>
-    </ClCompile>
     <ClCompile Include="FileSystem\PrefabManager.cpp">
       <Filter>FileSystem</Filter>
     </ClCompile>
@@ -387,6 +384,21 @@
     <ClCompile Include="FileSystem\StateMachineManager.cpp">
       <Filter>FileSystem</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\UI\CanvasComponent.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\UI\UILabelComponent.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\UI\Transform2DComponent.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\TextManager.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\GameUIModule.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
     <ClCompile Include="Modules\ScriptModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
@@ -416,6 +428,9 @@
     </ClCompile>
     <ClCompile Include="Scene\Components\Standalone\Physics\CapsuleColliderComponent.cpp">
       <Filter>Scene\Components\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceManagement\Resources\ResourceNavmesh.cpp">
+    <Filter>Resources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -683,9 +698,6 @@
     <ClInclude Include="Scene\Components\CameraComponent.h">
       <Filter>Scene\Components</Filter>
     </ClInclude>
-    <ClInclude Include="Modules\UserInterfaceModule.h">
-      <Filter>Modules</Filter>
-    </ClInclude>
     <ClInclude Include="Utils\Trees\Quadtree.h">
       <Filter>Utils\Tree</Filter>
     </ClInclude>
@@ -755,6 +767,21 @@
     <ClInclude Include="FileSystem\Config\ProjectConfig.h">
       <Filter>FileSystem\Config</Filter>
     </ClInclude>
+    <ClInclude Include="Utils\TextManager.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\UI\CanvasComponent.h">
+      <Filter>Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\UI\UILabelComponent.h">
+      <Filter>Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\UI\Transform2DComponent.h">
+      <Filter>Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\GameUIModule.h">
+      <Filter>Modules</Filter>
+    </ClInclude>
     <ClInclude Include="Utils\Script.h">
       <Filter>Utils</Filter>
     </ClInclude>
@@ -790,6 +817,9 @@
     </ClInclude>
     <ClInclude Include="Scene\Components\Standalone\Physics\CapsuleColliderComponent.h">
       <Filter>Scene\Components\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManagement\Resources\ResourceNavmesh.h">
+    <Filter>Resources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

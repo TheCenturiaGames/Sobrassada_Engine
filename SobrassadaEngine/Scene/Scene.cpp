@@ -237,6 +237,11 @@ update_status Scene::Update(float deltaTime)
             component.second->Update(deltaTime);
         }
     }
+
+    ImGuiWindow* window = ImGui::FindWindowByName(sceneName.c_str());
+    if (window && !(window->Hidden || window->Collapsed)) sceneVisible = true;
+    else sceneVisible = false;
+
     return UPDATE_CONTINUE;
 }
 
@@ -726,9 +731,9 @@ void Scene::LoadModel(const UID modelUID)
 
         for (const std::vector<NodeData>& nodes : nodesScene)
         {
-             GameObject* rootObject =
-                 new GameObject(GetGameObjectRootUID(), App->GetLibraryModule()->GetResourceName(modelUID));
-             rootObject->SetLocalTransform(nodes[0].transform);
+            GameObject* rootObject =
+                new GameObject(GetGameObjectRootUID(), App->GetLibraryModule()->GetResourceName(modelUID));
+            rootObject->SetLocalTransform(nodes[0].transform);
 
             // Add the gameObject to the rootObject
             GetGameObjectByUID(GetGameObjectRootUID())->AddGameObject(rootObject->GetUID());

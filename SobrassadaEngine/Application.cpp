@@ -17,7 +17,7 @@
 #include "SceneModule.h"
 #include "ScriptModule.h"
 #include "ShaderModule.h"
-#include "UserInterfaceModule.h"
+#include "GameUIModule.h"
 #include "WindowModule.h"
 
 #ifdef OPTICK
@@ -38,10 +38,10 @@ Application::Application()
     modules.push_back(shaderModule = new ShaderModule());
     modules.push_back(physicsModule = new PhysicsModule());
     modules.push_back(sceneModule = new SceneModule());
+    modules.push_back(gameUIModule = new GameUIModule());
     modules.push_back(cameraModule = new CameraModule());
     modules.push_back(debugDraw = new DebugDrawModule());
     modules.push_back(editorUIModule = new EditorUIModule());
-    modules.push_back(UIModule = new UserInterfaceModule());
 
     engineTimer = new EngineTimer();
     engineTimer->Start();
