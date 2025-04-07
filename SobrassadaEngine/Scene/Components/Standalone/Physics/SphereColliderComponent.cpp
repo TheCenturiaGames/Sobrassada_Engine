@@ -11,6 +11,7 @@
 SphereColliderComponent::SphereColliderComponent(UID uid, GameObject* parent)
     : Component(uid, parent, "Sphere Collider", COMPONENT_SPHERE_COLLIDER)
 {
+    parent->UpdateMobilityHierarchy(MobilitySettings::DYNAMIC);
 
     CalculateCollider();
 
@@ -44,6 +45,11 @@ SphereColliderComponent::SphereColliderComponent(const rapidjson::Value& initial
         const rapidjson::Value& dataArray = initialState["CenterRotation"];
         centerRotation                    = {dataArray[0].GetFloat(), dataArray[1].GetFloat(), dataArray[2].GetFloat()};
     }
+
+    if (colliderType == ColliderType::STATIC && !parent->IsStatic())
+        parent->UpdateMobilityHierarchy(MobilitySettings::STATIC);
+    else if (!(colliderType == ColliderType::STATIC) && parent->IsStatic())
+        parent->UpdateMobilityHierarchy(MobilitySettings::DYNAMIC);
 
     onCollissionCallback = CollisionDelegate(
         std::bind(&SphereColliderComponent::OnCollision, this, std::placeholders::_1, std::placeholders::_2)
@@ -105,7 +111,7 @@ void SphereColliderComponent::RenderEditorInspector()
                     mass = 0.f;
                 }
 
-                else if (colliderType == ColliderType::DYNAMIC)
+                else
                 {
                     parent->UpdateMobilityHierarchy(MobilitySettings::DYNAMIC);
                     mass = 1.f;
@@ -181,7 +187,7 @@ void SphereColliderComponent::OnCollision(GameObject* otherObject, float3 collis
 void SphereColliderComponent::CalculateCollider()
 {
     AABB heriachyAABB = parent->GetHierarchyAABB();
-    
+
     if (heriachyAABB.IsFinite() && !heriachyAABB.IsDegenerate())
     {
         Sphere sphere = heriachyAABB.MinimalEnclosingSphere();

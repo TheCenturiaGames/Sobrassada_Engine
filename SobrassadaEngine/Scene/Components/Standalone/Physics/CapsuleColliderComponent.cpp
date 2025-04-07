@@ -11,6 +11,8 @@ CapsuleColliderComponent::CapsuleColliderComponent(UID uid, GameObject* parent)
     : Component(uid, parent, "Capsule Collider", COMPONENT_CAPSULE_COLLIDER)
 {
 
+    parent->UpdateMobilityHierarchy(MobilitySettings::DYNAMIC);
+
     CalculateCollider();
 
     onCollissionCallback = CollisionDelegate(
@@ -48,6 +50,11 @@ CapsuleColliderComponent::CapsuleColliderComponent(const rapidjson::Value& initi
     onCollissionCallback = CollisionDelegate(
         std::bind(&CapsuleColliderComponent::OnCollision, this, std::placeholders::_1, std::placeholders::_2)
     );
+
+    if (colliderType == ColliderType::STATIC && !parent->IsStatic())
+        parent->UpdateMobilityHierarchy(MobilitySettings::STATIC);
+    else if (!(colliderType == ColliderType::STATIC) && parent->IsStatic())
+        parent->UpdateMobilityHierarchy(MobilitySettings::DYNAMIC);
 
     userPointer = BulletUserPointer(this, &onCollissionCallback, generateCallback);
     App->GetPhysicsModule()->CreateCapsuleRigidBody(this);
@@ -105,7 +112,7 @@ void CapsuleColliderComponent::RenderEditorInspector()
                     parent->UpdateMobilityHierarchy(MobilitySettings::STATIC);
                     mass = 0.f;
                 }
-                else if (colliderType == ColliderType::DYNAMIC)
+                else
                 {
                     parent->UpdateMobilityHierarchy(MobilitySettings::DYNAMIC);
                     mass = 1.f;

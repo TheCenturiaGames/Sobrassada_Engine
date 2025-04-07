@@ -11,6 +11,8 @@ CubeColliderComponent::CubeColliderComponent(UID uid, GameObject* parent)
     : Component(uid, parent, "Cube Collider", COMPONENT_CUBE_COLLIDER)
 {
 
+    parent->UpdateMobilityHierarchy(MobilitySettings::DYNAMIC);
+
     CalculateCollider();
 
     onCollissionCallback = CollisionDelegate(
@@ -47,6 +49,11 @@ CubeColliderComponent::CubeColliderComponent(const rapidjson::Value& initialStat
         const rapidjson::Value& dataArray = initialState["Size"];
         size                              = {dataArray[0].GetFloat(), dataArray[1].GetFloat(), dataArray[2].GetFloat()};
     }
+
+    if (colliderType == ColliderType::STATIC && !parent->IsStatic())
+        parent->UpdateMobilityHierarchy(MobilitySettings::STATIC);
+    else if (!(colliderType == ColliderType::STATIC) && parent->IsStatic())
+        parent->UpdateMobilityHierarchy(MobilitySettings::DYNAMIC);
 
     onCollissionCallback = CollisionDelegate(
         std::bind(&CubeColliderComponent::OnCollision, this, std::placeholders::_1, std::placeholders::_2)
@@ -112,7 +119,7 @@ void CubeColliderComponent::RenderEditorInspector()
                     mass = 0.f;
                 }
 
-                else if (colliderType == ColliderType::DYNAMIC)
+                else
                 {
                     parent->UpdateMobilityHierarchy(MobilitySettings::DYNAMIC);
                     mass = 1.f;
