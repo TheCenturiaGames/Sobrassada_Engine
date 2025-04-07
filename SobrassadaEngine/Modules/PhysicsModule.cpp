@@ -47,7 +47,7 @@ update_status PhysicsModule::PreUpdate(float deltaTime)
     for (int currentManifold = 0; currentManifold < numManifolds; ++currentManifold)
     {
         // Collision Handler
-        btPersistentManifold* contactManifold =
+        const btPersistentManifold* contactManifold =
             dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(currentManifold);
 
         // CHECKING THAT THERE IS AN ACTUAL COLLISION
@@ -60,7 +60,7 @@ update_status PhysicsModule::PreUpdate(float deltaTime)
                 static_cast<BulletUserPointer*>(contactManifold->getBody1()->getUserPointer());
 
             // Calculating normal
-            float3 normal = float3(contactManifold->getContactPoint(0).m_normalWorldOnB);
+            const float3 normal = float3(contactManifold->getContactPoint(0).m_normalWorldOnB);
 
             if (firstUserPointer->generateCallback)
                 firstUserPointer->onCollisionCallback->Call(secondUserPointer->collider->GetParent(), normal);
@@ -120,7 +120,7 @@ void PhysicsModule::CreateCubeRigidBody(CubeColliderComponent* colliderComponent
         btScalar(colliderComponent->size.x), btScalar(colliderComponent->size.y), btScalar(colliderComponent->size.z)
     ));
 
-    bool isDynamic                   = (colliderComponent->mass != 0.f);
+    const bool isDynamic             = (colliderComponent->mass != 0.f);
 
     // Inertia
     btVector3 localInertia(0, 0, 0);
@@ -162,7 +162,7 @@ void PhysicsModule::CreateSphereRigidBody(SphereColliderComponent* colliderCompo
     // Collision shape
     btCollisionShape* collisionShape = new btSphereShape(colliderComponent->radius);
 
-    bool isDynamic                   = (colliderComponent->mass != 0.f);
+    const bool isDynamic                   = (colliderComponent->mass != 0.f);
 
     // Inertia
     btVector3 localInertia(0, 0, 0);
@@ -204,7 +204,7 @@ void PhysicsModule::CreateCapsuleRigidBody(CapsuleColliderComponent* colliderCom
     // Collision shape
     btCollisionShape* collisionShape = new btCapsuleShape(colliderComponent->radius, colliderComponent->length);
 
-    bool isDynamic                   = (colliderComponent->mass != 0.f);
+    const bool isDynamic                   = (colliderComponent->mass != 0.f);
 
     // Inertia
     btVector3 localInertia(0, 0, 0);
@@ -270,7 +270,7 @@ void PhysicsModule::AddRigidBody(btRigidBody* rigidBody, ColliderType colliderTy
         break;
     }
 
-    int group                     = 1 << (int)layerType;
+    const int group                     = 1 << (int)layerType;
 
     int mask                      = 0;
     const LayerBitset& maskBitset = colliderLayerConfig[(int)layerType];

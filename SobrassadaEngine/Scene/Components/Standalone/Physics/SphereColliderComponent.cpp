@@ -93,7 +93,7 @@ void SphereColliderComponent::RenderEditorInspector()
 {
     if (ImGui::BeginCombo("Collider type", ColliderTypeStrings[(int)colliderType]))
     {
-        int colliderStringSize = sizeof(ColliderTypeStrings) / sizeof(char*);
+        const int colliderStringSize = sizeof(ColliderTypeStrings) / sizeof(char*);
         for (int i = 0; i < colliderStringSize; ++i)
         {
             if (ImGui::Selectable(ColliderTypeStrings[i]))

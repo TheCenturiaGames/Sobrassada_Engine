@@ -13,10 +13,12 @@ void BulletDebugDraw::drawContactPoint(
     const btVector3& PointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color
 )
 {
+    App->GetDebugDrawModule()->DrawContactPoint(PointOnB, normalOnB, distance, lifeTime, color);
 }
 
 void BulletDebugDraw::draw3dText(const btVector3& location, const char* textString)
 {
+    App->GetDebugDrawModule()->Draw3DText(location, textString);
 }
 
 void BulletDebugDraw::reportErrorWarning(const char* warningString)

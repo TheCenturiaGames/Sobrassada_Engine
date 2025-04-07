@@ -136,7 +136,7 @@ void CapsuleColliderComponent::RenderEditorInspector()
     // COLLIDER LAYER SETTINGS
     if (ImGui::BeginCombo("Layer options", ColliderLayerStrings[(int)layer]))
     {
-        int colliderStringSize = sizeof(ColliderLayerStrings) / sizeof(char*);
+        const int colliderStringSize = sizeof(ColliderLayerStrings) / sizeof(char*);
         for (int i = 0; i < colliderStringSize; ++i)
         {
             if (ImGui::Selectable(ColliderLayerStrings[i]))

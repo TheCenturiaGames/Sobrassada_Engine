@@ -428,13 +428,13 @@ AABB GameObject::GetHierarchyAABB()
 
     while (!toVisitGameObjects.empty())
     {
-        UID currentUID = toVisitGameObjects.top();
+        const UID currentUID = toVisitGameObjects.top();
         toVisitGameObjects.pop();
 
         if (visitedGameObjects.find(currentUID) == visitedGameObjects.end())
         {
             visitedGameObjects.insert(currentUID);
-            GameObject* currentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentUID);
+            const GameObject* currentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentUID);
 
             const AABB& currentAABB       = currentGameObject->GetGlobalAABB();
             if (currentAABB.IsFinite() && !currentAABB.IsDegenerate())

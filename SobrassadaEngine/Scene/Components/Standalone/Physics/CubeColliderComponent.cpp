@@ -100,7 +100,7 @@ void CubeColliderComponent::RenderEditorInspector()
 
     if (ImGui::BeginCombo("Collider type", ColliderTypeStrings[(int)colliderType]))
     {
-        int colliderStringSize = sizeof(ColliderTypeStrings) / sizeof(char*);
+        const int colliderStringSize = sizeof(ColliderTypeStrings) / sizeof(char*);
         for (int i = 0; i < colliderStringSize; ++i)
         {
             if (ImGui::Selectable(ColliderTypeStrings[i]))
@@ -142,7 +142,7 @@ void CubeColliderComponent::RenderEditorInspector()
     // COLLIDER LAYER SETTINGS
     if (ImGui::BeginCombo("Layer options", ColliderLayerStrings[(int)layer]))
     {
-        int colliderStringSize = sizeof(ColliderLayerStrings) / sizeof(char*);
+        const int colliderStringSize = sizeof(ColliderLayerStrings) / sizeof(char*);
         for (int i = 0; i < colliderStringSize; ++i)
         {
             if (ImGui::Selectable(ColliderLayerStrings[i]))

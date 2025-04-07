@@ -728,6 +728,28 @@ void DebugDrawModule::DrawAxisTriad(const float4x4& transform, bool depthEnabled
     dd::axisTriad(transform, 0.005f, 0.05f, 0, depthEnabled);
 }
 
+void DebugDrawModule::Draw3DText(const btVector3& location, const char* textString)
+{
+    CameraModule* cameraModule = App->GetCameraModule();
+
+    const float4x4& projection = cameraModule->GetProjectionMatrix();
+    const float4x4& view       = cameraModule->GetViewMatrix();
+    const float3 pos           = float3(location);
+
+    auto framebuffer           = App->GetOpenGLModule()->GetFramebuffer();
+    int width                      = framebuffer->GetTextureWidth();
+    int height                     = framebuffer->GetTextureHeight();
+
+    dd::projectedText(textString, pos, float3::zero, view * projection, 0, 0, width, height);
+}
+
+void DebugDrawModule::DrawContactPoint(
+    const btVector3& PointOnB, const btVector3& normalOnB, float distance, int lifeTime, const btVector3& color
+)
+{
+    dd::vertexNormal(float3(PointOnB), float3(normalOnB), distance, lifeTime);
+}
+
 void DebugDrawModule::HandleDebugRenderOptions()
 {
     SceneModule* sceneModule   = App->GetSceneModule();
