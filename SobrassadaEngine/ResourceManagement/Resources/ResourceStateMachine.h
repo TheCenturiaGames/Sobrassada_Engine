@@ -82,7 +82,14 @@ class ResourceStateMachine : public Resource
 
     void SetUID(UID uid) { stateMachineUID = uid; };
 
+    void SetDefaultState(State* state) { defaultState = state; }
+    const State* GetDefaultState() { return defaultState; }
+
+    void SetActiveState(State* state) { activeState = state; }
+    const State* GetActiveState() { return activeState; }
+
   private:
+    State* defaultState = nullptr;
     State* activeState = nullptr;
     UID stateMachineUID;
 };

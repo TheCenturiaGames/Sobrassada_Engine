@@ -100,6 +100,11 @@ void ResourceStateMachine::AddState(const std::string& stateName, const std::str
     newState.name     = stateHash;
     newState.clipName = HashString(clipName);
 
+    if (states.size() == 0)
+    {
+        defaultState = &newState;
+    }
+
     states.push_back(newState);
 }
 

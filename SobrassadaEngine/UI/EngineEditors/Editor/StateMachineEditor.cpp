@@ -8,6 +8,18 @@ StateMachineEditor::StateMachineEditor(const std::string& editorName, UID uid, R
     : EngineEditorBase(editorName, uid), uid(uid), resource(stateMachine)
 {
     graph = std::make_unique<ImFlow::ImNodeFlow>("StateMachineGraph_" + std::to_string(uid));
+
+    ImVec2 pos   = ImVec2(0,0);
+
+    auto newNode = graph->placeNodeAt<StateNode>(pos);
+    if (newNode)
+    {
+        auto newStateNode = std::dynamic_pointer_cast<StateNode>(newNode);
+        if (newStateNode)
+        {
+            CreateBaseState(*newStateNode.get());
+        }
+    }
 }
 
 StateMachineEditor::~StateMachineEditor()
@@ -48,7 +60,6 @@ bool StateMachineEditor::RenderEditor()
         }
     }
    
-
     graph->rightClickPopUpContent(
         [this](ImFlow::BaseNode* node)
         {
@@ -140,6 +151,15 @@ void StateMachineEditor::ShowInspector()
     ImGui::Begin("State Inspector");
 
     ImGui::Text("State");
+
+    const State* defaultState = resource->GetDefaultState();
+    GLOG("DEFAULT: %s", defaultState->name.GetString().c_str());
+    if (selectedNode->GetStateName() == defaultState->name.GetString())
+    {
+        ImGui::SameLine();
+        ImGui::Text(" - Default");
+    }
+
     ImGui::Separator();
 
     const std::string& stateName = selectedNode->GetStateName();
