@@ -4,7 +4,7 @@
 #include "PathfinderModule.h"
 #include "SceneModule.h"
 #include "EditorUIModule.h"
-
+#include "ResourceNavmesh.h"
 
 #include <DetourCrowd.h>
 
@@ -43,7 +43,7 @@ AIAgentComponent::~AIAgentComponent()
         agentId = -1;
     }
 }
-
+//Updates agent position evey frame
 void AIAgentComponent::Update(float deltaTime)
 {
     if (!enabled) return;
@@ -115,7 +115,7 @@ void AIAgentComponent::Save(rapidjson::Value& targetState, rapidjson::Document::
     targetState.AddMember("Height", height, allocator);
     targetState.AddMember("AutoAdd", autoAdd, allocator);
 }
-
+//finds closest navmesh walkable trianle.
 void AIAgentComponent::setPath(const float3& destination) const
 {
 

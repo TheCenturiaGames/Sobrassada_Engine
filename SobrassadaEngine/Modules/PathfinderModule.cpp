@@ -3,15 +3,14 @@
 #include "Application.h"
 #include "Components/Standalone/AIAgentComponent.h"
 #include "LibraryModule.h"
-#include "ResourceNavmesh.h"
 #include "ResourcesModule.h"
 #include "CameraModule.h"
 #include "SceneModule.h"
+#include "ResourceNavmesh.h"
 
 #include "Geometry/Plane.h"
 #include "ImGui.h"
 
-#include <DetourCommon.h>
 #include <DetourCrowd.h>
 #include <DetourNavMesh.h>
 #include <DetourNavMeshQuery.h>
@@ -97,7 +96,7 @@ void PathfinderModule::InitQuerySystem()
     }
 }
 
-//called by clicking in the game
+//Currently called by clicking in the game, but any float3 will move the agents there. ONLY WORKS IN PLAY MODE
 void PathfinderModule::HandleClickNavigation()
 {
     if (!clickNavigationEnabled || !App->GetSceneModule()->GetInPlayMode()) return; // from UI

@@ -1,8 +1,7 @@
 #pragma once
 #include "Globals.h"
 
-#include "ResourceManagement/Resources/ResourceNavmesh.h"
-#include "Scene/Components/Component.h"
+#include "Component.h"
 
 
 #include <vector>
