@@ -153,11 +153,15 @@ void StateMachineEditor::ShowInspector()
     ImGui::Text("State");
 
     const State* defaultState = resource->GetDefaultState();
-    GLOG("DEFAULT: %s", defaultState->name.GetString().c_str());
-    if (selectedNode->GetStateName() == defaultState->name.GetString())
+    if (defaultState)
     {
-        ImGui::SameLine();
-        ImGui::Text(" - Default");
+        GLOG("DEFAULT: %s", defaultState->name.GetString().c_str());
+
+        if (selectedNode->GetStateName() == defaultState->name.GetString())
+        {
+            ImGui::SameLine();
+            ImGui::Text("- Default");
+        }
     }
 
     ImGui::Separator();

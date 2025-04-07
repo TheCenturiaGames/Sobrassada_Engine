@@ -100,22 +100,43 @@ void ResourceStateMachine::AddState(const std::string& stateName, const std::str
     newState.name     = stateHash;
     newState.clipName = HashString(clipName);
 
-    if (states.size() == 0)
+    states.push_back(newState);
+
+   if (states.size() == 1)
     {
-        defaultState = &newState;
+        defaultStateIndex = 0;
     }
 
-    states.push_back(newState);
 }
 
 bool ResourceStateMachine::RemoveState(const std::string& stateName)
 {
     HashString stateHash(stateName);
-    for (auto it = states.begin(); it != states.end(); ++it)
+    for (size_t i = 0; i < states.size(); ++i)
     {
-        if (it->name == stateHash)
+        if (states[i].name == stateHash)
         {
-            states.erase(it);
+            if ((int)i == defaultStateIndex)
+            {
+                states.erase(states.begin() + i);
+                if (!states.empty())
+                {
+                    defaultStateIndex = 0; 
+                }
+                else
+                {
+                    defaultStateIndex = -1;
+                }
+            }
+            else
+            {
+                states.erase(states.begin() + i);
+                if (defaultStateIndex > (int)i)
+                {
+                    defaultStateIndex--;
+                }
+            }
+
             return true;
         }
     }
