@@ -1,28 +1,27 @@
 #include "AnimationComponent.h"
-#include "ResourceManagement/Resources/ResourceAnimation.h"
-#include "ResourceManagement/Resources/Resource.h"
-#include "GameObject.h"
+
+#include "AnimController.h"
 #include "Application.h"
 #include "CameraModule.h"
 #include "EditorUIModule.h"
+#include "GameObject.h"
 #include "LibraryModule.h"
+#include "Resource.h"
+#include "ResourceAnimation.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
 
 #include "imgui.h"
-#include <Math/Quat.h>
+#include "Math/Quat.h"
 
-AnimationComponent::AnimationComponent(
-    const UID uid, GameObject* parent
-)
+AnimationComponent::AnimationComponent(const UID uid, GameObject* parent)
     : Component(uid, parent, "Animation", COMPONENT_ANIMATION)
 {
     animController = new AnimController();
-  
 }
 
 AnimationComponent::AnimationComponent(const rapidjson::Value& initialState, GameObject* parent)
-    : Component(initialState, parent )
+    : Component(initialState, parent)
 {
     animController = new AnimController();
     if (initialState.HasMember("Animations") && initialState["Animations"].IsUint64())
@@ -79,17 +78,16 @@ void AnimationComponent::OnResume()
 
 void AnimationComponent::OnInspector()
 {
-   
+
     if (resource != 0)
     {
         currentAnimResource = dynamic_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
-        
+
         if (currentAnimResource != nullptr)
         {
             ImGui::Text("Animation: %s", currentAnimResource->GetName().c_str());
             ImGui::Text("Duration: %.2f seconds", currentAnimResource->GetDuration());
 
-            
             if (animController != nullptr && ImGui::TreeNode("Channels"))
             {
                 for (const auto& channel : currentAnimResource->channels)
@@ -130,7 +128,7 @@ void AnimationComponent::OnInspector()
         ImGui::Text("No animation assigned");
     }
 
-     if (ImGui::CollapsingHeader("Object Selection", ImGuiTreeNodeFlags_DefaultOpen))
+    if (ImGui::CollapsingHeader("Object Selection", ImGuiTreeNodeFlags_DefaultOpen))
     {
 
         GameObject* selectedObj = App->GetSceneModule()->GetScene()->GetSelectedGameObject();
@@ -263,10 +261,7 @@ void AnimationComponent::OnInspector()
             currentTime = 0.0f;
         }
     }
-
-   
 }
-
 
 void AnimationComponent::Render(float deltaTime)
 {
@@ -277,9 +272,8 @@ void AnimationComponent::Clone(const Component* other)
     if (other->GetType() == ComponentType::COMPONENT_ANIMATION)
     {
         const AnimationComponent* otherAnimation = static_cast<const AnimationComponent*>(other);
-      
+
         AddAnimation(otherAnimation->currentAnimResource->GetUID());
-        
     }
     else
     {
@@ -290,41 +284,42 @@ void AnimationComponent::Clone(const Component* other)
 void AnimationComponent::Update(float deltaTime)
 {
     if (!animController->IsPlaying()) return;
-    
-        if (boneMapping.empty())
-        {
-            SetBoneMapping();
-        }
 
-        animController->Update(deltaTime);
+    if (boneMapping.empty())
+    {
+        SetBoneMapping();
+    }
+
+    animController->Update(deltaTime);
 
     for (auto& channel : currentAnimResource->channels)
     {
         const std::string& boneName = channel.first;
 
-         auto boneIt                 = boneMapping.find(boneName);
+        auto boneIt                 = boneMapping.find(boneName);
 
-         if (boneIt != boneMapping.end())
-         {
-             GameObject* bone = boneIt->second;
-             float3 position = bone->GetLocalTransform().TranslatePart();
-             Quat rotation = Quat(bone->GetLocalTransform().RotatePart());
+        if (boneIt != boneMapping.end())
+        {
+            GameObject* bone = boneIt->second;
+            float3 position  = bone->GetLocalTransform().TranslatePart();
+            Quat rotation    = Quat(bone->GetLocalTransform().RotatePart());
 
-             animController->GetTransform(boneName, position, rotation);
+            animController->GetTransform(boneName, position, rotation);
 
-             float4x4 transformMatrix = float4x4::FromTRS(position, rotation, float3(1.0, 1.0, 1.0));
-             bone->SetLocalTransform(transformMatrix);
-             bone->OnTransformUpdated();
-         }
-     }
+            float4x4 transformMatrix = float4x4::FromTRS(position, rotation, float3(1.0, 1.0, 1.0));
+            bone->SetLocalTransform(transformMatrix);
+            bone->OnTransformUpdated();
+        }
+    }
 }
 
 void AnimationComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
 {
     Component::Save(targetState, allocator);
 
-    targetState.AddMember("Animations", currentAnimResource != nullptr ? currentAnimResource->GetUID() : INVALID_UID, allocator);
- 
+    targetState.AddMember(
+        "Animations", currentAnimResource != nullptr ? currentAnimResource->GetUID() : INVALID_UID, allocator
+    );
 }
 
 void AnimationComponent::AddAnimation(UID animationUID)
@@ -338,9 +333,9 @@ void AnimationComponent::AddAnimation(UID animationUID)
     if (newAnimation != nullptr)
     {
         App->GetResourcesModule()->ReleaseResource(currentAnimResource);
-        currentAnimResource     = newAnimation;
-        currentAnimName = currentAnimResource->GetName();
-        resource        = animationUID;
+        currentAnimResource = newAnimation;
+        currentAnimName     = currentAnimResource->GetName();
+        resource            = animationUID;
         SetBoneMapping();
     }
 }
@@ -350,7 +345,6 @@ void AnimationComponent::SetAnimationResource(UID animResource)
     resource = animResource;
     AddAnimation(resource);
     GLOG("Setting animation resource: %llu", resource);
-  
 }
 
 void AnimationComponent::SetBoneMapping()
@@ -383,7 +377,4 @@ void AnimationComponent::RenderEditorInspector()
     {
         OnInspector();
     }
-        
 }
-
-

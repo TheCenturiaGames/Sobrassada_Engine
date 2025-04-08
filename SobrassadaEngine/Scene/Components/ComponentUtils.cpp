@@ -1,21 +1,20 @@
 ﻿#include "ComponentUtils.h"
-#include "ComponentUtils.h"
 
 #include "CameraComponent.h"
 #include "Component.h"
+#include "ScriptComponent.h"
+#include "Standalone/AnimationComponent.h"
 #include "Standalone/CharacterControllerComponent.h"
 #include "Standalone/Lights/DirectionalLightComponent.h"
 #include "Standalone/Lights/PointLightComponent.h"
 #include "Standalone/Lights/SpotLightComponent.h"
 #include "Standalone/MeshComponent.h"
-#include "Standalone/AnimationComponent.h"
+#include "Standalone/Physics/CapsuleColliderComponent.h"
+#include "Standalone/Physics/CubeColliderComponent.h"
+#include "Standalone/Physics/SphereColliderComponent.h"
 #include "Standalone/UI/CanvasComponent.h"
 #include "Standalone/UI/Transform2DComponent.h"
 #include "Standalone/UI/UILabelComponent.h"
-#include "Standalone/Physics/CubeColliderComponent.h"
-#include "Standalone/Physics/SphereColliderComponent.h"
-#include "Standalone/Physics/CapsuleColliderComponent.h"
-#include "ScriptComponent.h"
 
 #include <cstdint>
 
@@ -56,7 +55,7 @@ Component* ComponentUtils::CreateEmptyComponent(const ComponentType type, const 
     case COMPONENT_SCRIPT:
         generatedComponent = new ScriptComponent(uid, parent);
         break;
-      case COMPONENT_CUBE_COLLIDER:
+    case COMPONENT_CUBE_COLLIDER:
         generatedComponent = new CubeColliderComponent(uid, parent);
         break;
     case COMPONENT_SPHERE_COLLIDER:
@@ -65,8 +64,9 @@ Component* ComponentUtils::CreateEmptyComponent(const ComponentType type, const 
     case COMPONENT_CAPSULE_COLLIDER:
         generatedComponent = new CapsuleColliderComponent(uid, parent);
         break;
-        case COMPONENT_ANIMATION:
+    case COMPONENT_ANIMATION:
         generatedComponent = new AnimationComponent(uid, parent);
+        break;
     default:
         return nullptr;
     }
