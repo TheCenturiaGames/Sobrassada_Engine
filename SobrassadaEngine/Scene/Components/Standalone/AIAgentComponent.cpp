@@ -9,7 +9,7 @@
 #include <DetourCrowd.h>
 
 AIAgentComponent::AIAgentComponent(UID uid, GameObject* parent)
-    : Component(uid, parent, "AI Agent Controller", COMPONENT_AIAGENT)
+    : Component(uid, parent, "AI Agent", COMPONENT_AIAGENT)
 {
     float4x4 transformMatrix = parent->GetGlobalTransform();
     agentPosition            = float3(transformMatrix[0][3], transformMatrix[1][3], transformMatrix[2][3]);
