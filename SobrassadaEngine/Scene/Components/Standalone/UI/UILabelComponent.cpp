@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "CameraModule.h"
 #include "CanvasComponent.h"
+#include "GameObject.h"
 #include "Scene.h"
 #include "SceneModule.h"
 #include "ShaderModule.h"

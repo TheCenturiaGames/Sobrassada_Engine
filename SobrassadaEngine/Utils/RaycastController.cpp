@@ -72,23 +72,20 @@ namespace RaycastController
             }
         }
 
-        if (selectedGameObject)
+        if (selectedGameObject && !selectedGameObject->IsTopParent())
         {
-            const MeshComponent* meshComponent = selectedGameObject->GetMeshComponent();
-            if (meshComponent && meshComponent->GetHasBones())
+            SceneModule* sceneModule     = App->GetSceneModule();
+
+            UID rootGameObject           = sceneModule->GetScene()->GetGameObjectRootUID();
+            GameObject* parentGameobject = sceneModule->GetScene()->GetGameObjectByUID(selectedGameObject->GetParent());
+
+            while (parentGameobject->GetUID() != rootGameObject && !parentGameobject->IsTopParent())
             {
-                SceneModule* sceneModule = App->GetSceneModule();
-
-                UID rootGameObject       = sceneModule->GetScene()->GetGameObjectRootUID();
-                GameObject* parentGameobject =
-                    sceneModule->GetScene()->GetGameObjectByUID(selectedGameObject->GetParent());
-
-                while (parentGameobject->GetUID() != rootGameObject)
-                {
-                    selectedGameObject = parentGameobject;
-                    parentGameobject   = sceneModule->GetScene()->GetGameObjectByUID(selectedGameObject->GetParent());
-                }
+                selectedGameObject = parentGameobject;
+                parentGameobject   = sceneModule->GetScene()->GetGameObjectByUID(selectedGameObject->GetParent());
             }
+
+            if (parentGameobject->IsTopParent()) selectedGameObject = parentGameobject;
         }
 
         return selectedGameObject;

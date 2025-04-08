@@ -112,6 +112,7 @@ class EditorUIModule : public Module
     void OpenGLConfig();
     void GameTimerConfig() const;
     void HardwareConfig() const;
+    void PhysicsConfig() const;
     void ShowCaps() const;
 
     void ImportDialog(bool& import);
