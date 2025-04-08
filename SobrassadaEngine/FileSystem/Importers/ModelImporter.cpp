@@ -439,8 +439,12 @@ namespace ModelImporter
 
         ResourceModel* resourceModel = new ResourceModel(uid, FileSystem::GetFileNameWithoutExtension(filePath));
         resourceModel->SetModelData(Model(uid, loadedNodes, loadedSkins));
-        resourceModel->SetAllAnimationUIDs(loadedAnimations);
-        resourceModel->SetAnimationUID(loadedAnimations[0]);
+        if (loadedAnimations.size() > 0)
+        {
+            resourceModel->SetAllAnimationUIDs(loadedAnimations);
+            resourceModel->SetAnimationUID(loadedAnimations[0]);
+        }
+       
 
         return resourceModel;
     }
