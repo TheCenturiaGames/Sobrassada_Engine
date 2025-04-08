@@ -19,7 +19,7 @@ class ResourceTexture : public Resource
 
     void LoadData(const DirectX::TexMetadata& metadata, const DirectX::ScratchImage& scratchImage);
     static void ConvertMetadata(const DirectX::TexMetadata& metadata, OpenGLMetadata& outMetadata);
-
+    void CubeMapToTexture(int width, int height);
 
     unsigned int GetTextureID() const { return textureID; }
     int GetTextureWidth() { return (int)metadata.width; }
