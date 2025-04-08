@@ -9,6 +9,9 @@
 #include "optick.h"
 #endif
 
+#include <AK/SoundEngine/Common/AkSoundEngine.h>
+#include <AK/IBytes.h>
+
 #include <memory>
 
 extern "C"

@@ -199,14 +199,14 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);SOBRASADA_ENGINE_API</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs;.\Libs\ImNodeFlow-1.2.2\include;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Batching;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;.\Libs\bullet\include;.\Libs\bullet\include\LinearMath;.\Utils\Physics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs;.\Libs\Wwise\samples\SoundEngine\Win32;.\Libs\Wwise\include;.\Libs\ImNodeFlow-1.2.2\include;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Batching;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;.\Libs\bullet\include;.\Libs\bullet\include\LinearMath;.\Utils\Physics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>.\Libs\glew-2.1.0\lib;.\DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration)\;.\Libs\freetype\lib;.\Libs\bullet\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>LinearMath_debug.lib;BulletCollision_debug.lib;BulletDynamics_debug.lib;DirectXTex.lib;glew32.lib;opengl32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>.\Libs\glew-2.1.0\lib;.\DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration)\;.\Libs\freetype\lib;.\Libs\bullet\lib;.\Libs\Wwise\$(Platform)_vc170\$(Configuration)(StaticCRT)\lib;.\Libs\Wwise\$(Platform)_vc170\$(Configuration)\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>DirectXTex.lib;glew32.lib;opengl32.lib;freetype.lib;Ak3DAudioBedMixerFX.lib;AkOpusDecoder.lib;AkAudioInputSource.lib;AkCompressorFX.lib;AkDelayFX.lib;AkExpanderFX.lib;AkFlangerFX.lib;AkGainFX.lib;AkGuitarDistortionFX.lib;AkHarmonizerFX.lib;AkMatrixReverbFX.lib;AkMeterFX.lib;AkParametricEQFX.lib;AkPeakLimiterFX.lib;AkPitchShifterFX.lib;AkRecorderFX.lib;AkRoomVerbFX.lib;AkSilenceSource.lib;AkSineSource.lib;AkStereoDelayFX.lib;AkSynthOneSource.lib;AkTimeStretchFX.lib;AkToneSource.lib;AkTremoloFX.lib;AkMusicEngine.lib;AkSoundEngine.lib;AkMemoryMgr.lib;AkStreamMgr.lib;AkVorbisDecoder.lib;LinearMath_debug.lib;BulletCollision_debug.lib;BulletDynamics_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -220,14 +220,14 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;GAME;%(PreprocessorDefinitions);SOBRASADA_ENGINE_API</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs;.\Libs\ImNodeFlow-1.2.2\include;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Batching;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;.\Libs\bullet\include;.\Libs\bullet\include\LinearMath;.\Utils\Physics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs;.\Libs\Wwise\samples\SoundEngine\Win32;.\Libs\Wwise\include;.\Libs\ImNodeFlow-1.2.2\include;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Batching;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;.\Libs\bullet\include;.\Libs\bullet\include\LinearMath;.\Utils\Physics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>.\Libs\glew-2.1.0\lib;.\DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration)\;.\Libs\freetype\lib;.\Libs\Optick_1.4.0\lib\LibDebug;.\Libs\bullet\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>LinearMath_debug.lib;BulletCollision_debug.lib;BulletDynamics_debug.lib;OptickCore.lib;DirectXTex.lib;glew32.lib;opengl32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>.\Libs\glew-2.1.0\lib;.\DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration)\;.\Libs\freetype\lib;.\Libs\Optick_1.4.0\lib\LibDebug;.\Libs\bullet\lib;.\Libs\Wwise\$(Platform)_vc170\Release(StaticCRT)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>DirectXTex.lib;glew32.lib;opengl32.lib;freetype.lib;Ak3DAudioBedMixerFX.lib;AkOpusDecoder.lib;AkAudioInputSource.lib;AkCompressorFX.lib;AkDelayFX.lib;AkExpanderFX.lib;AkFlangerFX.lib;AkGainFX.lib;AkGuitarDistortionFX.lib;AkHarmonizerFX.lib;AkMatrixReverbFX.lib;AkMeterFX.lib;AkParametricEQFX.lib;AkPeakLimiterFX.lib;AkPitchShifterFX.lib;AkRecorderFX.lib;AkRoomVerbFX.lib;AkSilenceSource.lib;AkSineSource.lib;AkStereoDelayFX.lib;AkSynthOneSource.lib;AkTimeStretchFX.lib;AkToneSource.lib;AkTremoloFX.lib;AkMusicEngine.lib;AkSoundEngine.lib;AkMemoryMgr.lib;AkStreamMgr.lib;AkVorbisDecoder.lib;OptickCore.lib;LinearMath_debug.lib;BulletCollision_debug.lib;BulletDynamics_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -243,7 +243,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;OPTICK;%(PreprocessorDefinitions);SOBRASADA_ENGINE_API</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs;.\Libs\ImNodeFlow-1.2.2\include;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Batching;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;.\Libs\bullet\include\LinearMath;.\Utils\Physics;.\Libs\bullet\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs;.\Libs\Wwise\samples\SoundEngine\Win32;.\Libs\Wwise\include;.\Libs\ImNodeFlow-1.2.2\include;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Batching;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;.\Libs\bullet\include\LinearMath;.\Utils\Physics;.\Libs\bullet\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -251,8 +251,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>.\Libs\Optick_1.4.0\lib\LibDebug;.\Libs\glew-2.1.0\lib;.\DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration)\;.\Libs\freetype\lib;.\Libs\bullet\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>OptickCore.lib;LinearMath.lib;BulletCollision.lib;BulletDynamics.lib;DirectXTex.lib;glew32.lib;opengl32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>.\Libs\Optick_1.4.0\lib\LibDebug;.\Libs\glew-2.1.0\lib;.\DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration)\;.\Libs\freetype\lib;.\Libs\bullet\lib;.\Libs\Wwise\$(Platform)_vc170\$(Configuration)(StaticCRT)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>DirectXTex.lib;glew32.lib;opengl32.lib;freetype.lib;Ak3DAudioBedMixerFX.lib;AkOpusDecoder.lib;AkAudioInputSource.lib;AkCompressorFX.lib;AkDelayFX.lib;AkExpanderFX.lib;AkFlangerFX.lib;AkGainFX.lib;AkGuitarDistortionFX.lib;AkHarmonizerFX.lib;AkMatrixReverbFX.lib;AkMeterFX.lib;AkParametricEQFX.lib;AkPeakLimiterFX.lib;AkPitchShifterFX.lib;AkRecorderFX.lib;AkRoomVerbFX.lib;AkSilenceSource.lib;AkSineSource.lib;AkStereoDelayFX.lib;AkSynthOneSource.lib;AkTimeStretchFX.lib;AkToneSource.lib;AkTremoloFX.lib;AkMusicEngine.lib;AkSoundEngine.lib;AkMemoryMgr.lib;AkStreamMgr.lib;AkVorbisDecoder.lib;OptickCore.lib;LinearMath.lib;BulletCollision.lib;BulletDynamics.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -268,7 +268,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;GAME;%(PreprocessorDefinitions);SOBRASADA_ENGINE_API</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs;.\Libs\ImNodeFlow-1.2.2\include;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Batching;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;.\Libs\bullet\include;.\Libs\bullet\include\LinearMath;.\Utils\Physics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs;.\Libs\Wwise\samples\SoundEngine\Win32;.\Libs\Wwise\include;.\Libs\ImNodeFlow-1.2.2\include;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Batching;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;.\Libs\bullet\include;.\Libs\bullet\include\LinearMath;.\Utils\Physics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -276,8 +276,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>.\Libs\glew-2.1.0\lib;.\DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration)\;.\Libs\freetype\lib;.\Libs\bullet\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>LinearMath.lib;BulletCollision.lib;BulletDynamics.lib;DirectXTex.lib;glew32.lib;opengl32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>.\Libs\glew-2.1.0\lib;.\DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration)\;.\Libs\freetype\lib;.\Libs\bullet\lib;.\Libs\Wwise\$(Platform)_vc170\Release(StaticCRT)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>DirectXTex.lib;glew32.lib;opengl32.lib;freetype.lib;Ak3DAudioBedMixerFX.lib;AkOpusDecoder.lib;AkAudioInputSource.lib;AkCompressorFX.lib;AkDelayFX.lib;AkExpanderFX.lib;AkFlangerFX.lib;AkGainFX.lib;AkGuitarDistortionFX.lib;AkHarmonizerFX.lib;AkMatrixReverbFX.lib;AkMeterFX.lib;AkParametricEQFX.lib;AkPeakLimiterFX.lib;AkPitchShifterFX.lib;AkRecorderFX.lib;AkRoomVerbFX.lib;AkSilenceSource.lib;AkSineSource.lib;AkStereoDelayFX.lib;AkSynthOneSource.lib;AkTimeStretchFX.lib;AkToneSource.lib;AkTremoloFX.lib;AkMusicEngine.lib;AkSoundEngine.lib;AkMemoryMgr.lib;AkStreamMgr.lib;AkVorbisDecoder.lib;LinearMath.lib;BulletCollision.lib;BulletDynamics.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
