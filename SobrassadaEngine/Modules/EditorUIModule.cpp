@@ -20,6 +20,7 @@
 #include "TextureEditor.h"
 #include "TextureImporter.h"
 #include "WindowModule.h"
+#include "StateMachineEditor.h"
 
 #include "Math/Quat.h"
 #include "SDL.h"
@@ -1178,7 +1179,7 @@ EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
         return new NodeEditor("NodeEditor_" + std::to_string(uid), uid);
 
     case EditorType::ANIMATION:
-        return new StateMachineEditor("StateMachineEditor " + std::to_string(uid), uid, stateMachine);
+        return new StateMachineEditor("StateMachineEditor_" + std::to_string(uid), uid, stateMachine);
 
     case EditorType::TEXTURE:
         return new TextureEditor("TextureEditor_" + std::to_string(uid), uid);

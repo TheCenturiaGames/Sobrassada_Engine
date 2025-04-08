@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Globals.h"
-#include "UI/EngineEditors/EngineEditorBase.h"
-#include "ImNodeFlow-1.2.2/include/ImNodeFlow.h"
+#include "EngineEditorBase.h"
+#include "ImNodeFlow.h"
 
 class ResourceStateMachine;
 class StateNode;
@@ -31,6 +31,7 @@ class StateMachineEditor : public EngineEditorBase
 
   private:
     UID uid;
+    int stateCont                  = 0;
     ResourceStateMachine* resource = nullptr;
     std::unique_ptr<ImFlow::ImNodeFlow> graph;
     std::vector<std::string> availableClips;

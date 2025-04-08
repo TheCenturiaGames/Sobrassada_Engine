@@ -1,8 +1,9 @@
 #include "StateMachineEditor.h"
-#include "StateNode.h"
-#include "FileSystem/StateMachineManager.h"
+
 #include "Application.h"
+#include "FileSystem/StateMachineManager.h"
 #include "ResourcesModule.h"
+#include "StateNode.h"
 
 StateMachineEditor::StateMachineEditor(const std::string& editorName, UID uid, ResourceStateMachine* stateMachine)
     : EngineEditorBase(editorName, uid), uid(uid), resource(stateMachine)
@@ -32,7 +33,7 @@ bool StateMachineEditor::RenderEditor()
 
     ImGui::Begin(name.c_str());
 
-     if (ImGui::Button("Save"))
+    if (ImGui::Button("Save"))
     {
         SaveMachine();
     }
@@ -59,7 +60,7 @@ bool StateMachineEditor::RenderEditor()
             selectedNode = dynamic_cast<StateNode*>(node.get());
         }
     }
-   
+
     graph->rightClickPopUpContent(
         [this](ImFlow::BaseNode* node)
         {
@@ -73,10 +74,11 @@ bool StateMachineEditor::RenderEditor()
                         RemoveStateNode(*stateNode);
                     }
                 }
-            }else if (node == nullptr && ImGui::MenuItem("Add State"))
+            }
+            else if (node == nullptr && ImGui::MenuItem("Add State"))
             {
-                ImVec2 pos = graph->screen2grid(ImGui::GetMousePos());
-            
+                ImVec2 pos   = graph->screen2grid(ImGui::GetMousePos());
+
                 auto newNode = graph->placeNodeAt<StateNode>(pos);
                 if (newNode)
                 {
@@ -91,7 +93,7 @@ bool StateMachineEditor::RenderEditor()
     );
 
     DetectNewTransitions();
-    
+
     graph->droppedLinkPopUpContent(
         [this](ImFlow::Pin* dragged)
         {
@@ -122,15 +124,14 @@ bool StateMachineEditor::RenderEditor()
 
     ImGui::End();
 
-    //INSPECTOR
+    // INSPECTOR
     if (selectedNode != nullptr)
     {
         if (ImGui::IsKeyPressed(ImGuiKey_Delete) && !selectedNode->toDestroy())
         {
-            DeleteStateResource(*selectedNode); 
-            selectedNode->destroy();            
+            DeleteStateResource(*selectedNode);
+            selectedNode->destroy();
         }
-
 
         if (!selectedNode->toDestroy())
         {
@@ -167,10 +168,9 @@ void StateMachineEditor::ShowInspector()
     ImGui::Separator();
 
     const std::string& stateName = selectedNode->GetStateName();
-    char nameBuffer[128]  = "";
+    char nameBuffer[128]         = "";
     strncpy_s(nameBuffer, stateName.c_str(), sizeof(nameBuffer));
     nameBuffer[sizeof(nameBuffer) - 1] = '\0';
-
 
     if (ImGui::InputText("State Name", nameBuffer, sizeof(nameBuffer)))
     {
@@ -237,7 +237,7 @@ void StateMachineEditor::ShowInspector()
                 if (out_text) *out_text = (*clips)[idx].c_str();
                 return true;
             },
-            &availableClips, availableClips.size()
+            &availableClips, (int)availableClips.size()
         ))
     {
         if (currentClipIndex >= 0 && availableClips[currentClipIndex] != selectedNode->GetClipName())
@@ -324,7 +324,7 @@ void StateMachineEditor::ShowInspector()
                         if (out_text) *out_text = (*triggers)[idx].c_str();
                         return true;
                     },
-                    &resource->availableTriggers, resource->availableTriggers.size()
+                    &resource->availableTriggers, (int)resource->availableTriggers.size()
                 ))
             {
                 if (currentTriggerIndex >= 0 &&
@@ -379,7 +379,7 @@ void StateMachineEditor::ShowInspector()
                         if (out_text) *out_text = (*triggers)[idx].c_str();
                         return true;
                     },
-                    &resource->availableTriggers, resource->availableTriggers.size()
+                    &resource->availableTriggers, (int)resource->availableTriggers.size()
                 ))
             {
                 if (currentTriggerIndex >= 0 &&
@@ -404,8 +404,6 @@ void StateMachineEditor::ShowInspector()
     }
 
     ImGui::End();
-
-
 }
 
 void StateMachineEditor::BuildGraph()
@@ -422,14 +420,13 @@ void StateMachineEditor::BuildGraph()
                     pin->deleteLink();
                 }
 
-                
                 for (const auto& pin : node->getOuts())
                 {
                     pin->deleteLink();
                 }
             }
         }
-        graph->getNodes().clear(); 
+        graph->getNodes().clear();
     }
     graph = std::make_unique<ImFlow::ImNodeFlow>("StateMachineGraph_" + std::to_string(uid));
 
@@ -438,7 +435,7 @@ void StateMachineEditor::BuildGraph()
 
     for (const auto& state : resource->states)
     {
-        ImVec2 position = state.position; 
+        ImVec2 position = state.position;
 
         auto newNode    = graph->placeNodeAt<StateNode>(position);
         if (newNode)
@@ -453,6 +450,7 @@ void StateMachineEditor::BuildGraph()
                 stateNodes[state.name.GetString()] = stateNode;
             }
         }
+        stateCont++;
     }
 
     for (const auto& transition : resource->transitions)
@@ -492,7 +490,7 @@ void StateMachineEditor::DetectNewTransitions()
     {
         if (const auto link = linkWeak.lock())
         {
-            ImFlow::Pin* startPin = link->left(); 
+            ImFlow::Pin* startPin = link->left();
             ImFlow::Pin* endPin   = link->right();
 
             if (!startPin || !endPin) continue;
@@ -519,7 +517,7 @@ void StateMachineEditor::DetectNewTransitions()
 void StateMachineEditor::CreateBaseState(StateNode& node)
 {
     State newState;
-    std::string stateName = "NewState_" + std::to_string(resource->states.size());
+    std::string stateName = "NewState_" + std::to_string(stateCont);
     std::string clipName  = "Clip_" + std::to_string(resource->clips.size());
 
     newState.name         = HashString(stateName);
@@ -530,7 +528,7 @@ void StateMachineEditor::CreateBaseState(StateNode& node)
     resource->AddState(newState.name.GetString(), newState.clipName.GetString());
     node.SetStateName(stateName);
     node.SetClipName(clipName);
-
+    stateCont++;
 }
 
 void StateMachineEditor::SaveMachine()
@@ -547,10 +545,10 @@ void StateMachineEditor::ShowSavePopup()
         {
             allStateMachineNames = StateMachineManager::GetAllStateMachineNames();
 
-            //Save all node positions
+            // Save all node positions
             for (auto& state : resource->states)
             {
-                for (const auto& [uid, node] : graph->getNodes()) 
+                for (const auto& [uid, node] : graph->getNodes())
                 {
                     if (node->getName() == state.name.GetString())
                     {
@@ -585,7 +583,7 @@ void StateMachineEditor::ShowSavePopup()
                 resource->SetName(std::string(stateMachineName));
                 StateMachineManager::SaveStateMachine(resource, alreadySaved);
                 ImGui::CloseCurrentPopup();
-                saveInitialized = false; 
+                saveInitialized = false;
             }
         }
 
@@ -593,7 +591,7 @@ void StateMachineEditor::ShowSavePopup()
         if (ImGui::Button("Cancel"))
         {
             ImGui::CloseCurrentPopup();
-            saveInitialized = false; 
+            saveInitialized = false;
         }
         ImGui::EndPopup();
     }
@@ -609,7 +607,8 @@ void StateMachineEditor::LoadMachine()
 void StateMachineEditor::ShowLoadPopup()
 {
 
-    if (ImGui::BeginPopupModal("Load State Machine", NULL, ImGuiWindowFlags_AlwaysAutoResize)){
+    if (ImGui::BeginPopupModal("Load State Machine", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    {
         if (allStateMachineNames.empty())
         {
             allStateMachineNames = StateMachineManager::GetAllStateMachineNames();
@@ -638,7 +637,8 @@ void StateMachineEditor::ShowLoadPopup()
             {
                 GLOG("Loading State Machine: %s", selectedName.c_str());
 
-                ResourceStateMachine* stateMachine = (ResourceStateMachine*)App->GetResourcesModule()->RequestResource(selectedUID);
+                ResourceStateMachine* stateMachine =
+                    (ResourceStateMachine*)App->GetResourcesModule()->RequestResource(selectedUID);
                 if (stateMachine)
                 {
                     GLOG("Successfully loaded State Machine: %s", selectedName.c_str());
@@ -651,7 +651,6 @@ void StateMachineEditor::ShowLoadPopup()
                     GLOG("Failed to load State Machine: %s", selectedName.c_str());
                 }
             }
-        
         }
         ImGui::SameLine();
 
@@ -662,7 +661,6 @@ void StateMachineEditor::ShowLoadPopup()
 
         ImGui::EndPopup();
     }
-
 }
 
 void StateMachineEditor::RemoveStateNode(StateNode& node)
@@ -674,11 +672,10 @@ void StateMachineEditor::RemoveStateNode(StateNode& node)
     auto it     = nodes.find(node.getUID());
     if (it != nodes.end())
     {
-        nodes.erase(it); 
+        nodes.erase(it);
     }
 
     selectedNode = nullptr;
-
 }
 
 void StateMachineEditor::DeleteStateResource(StateNode& node)
@@ -695,7 +692,7 @@ void StateMachineEditor::DeleteStateResource(StateNode& node)
     }
 
     const State* state = resource->GetState(stateName);
-    clipName   = state->clipName.GetString();
+    clipName           = state->clipName.GetString();
     resource->RemoveState(state->name.GetString());
 
     const Clip* clip = resource->GetClip(clipName);

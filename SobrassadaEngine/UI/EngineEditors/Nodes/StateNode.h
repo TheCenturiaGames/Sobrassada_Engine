@@ -1,6 +1,5 @@
 #pragma once
-#include "Libs/ImNodeFlow-1.2.2/include/ImNodeFlow.h"
-#include "ResourceManagement/Resources/ResourceStateMachine.h"
+#include "ResourceStateMachine.h"
 
 class StateNode : public ImFlow::BaseNode
 {

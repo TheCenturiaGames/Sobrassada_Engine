@@ -32,7 +32,7 @@ namespace StateMachineManager
             override ? resource->GetUID() : App->GetLibraryModule()->AssignFiletypeUID(uid, FileType::StateMachine);
         const std::string savePath = App->GetProjectModule()->GetLoadedProjectPath() + STATEMACHINES_LIB_PATH +
                    std::to_string(stateMachineUID) + STATEMACHINE_EXTENSION;
-        std::string stateName = resource->GetName();
+        const std::string stateName = resource->GetName();
 
         stateMachineJSON.AddMember("UID", stateMachineUID, allocator);
         stateMachineJSON.AddMember("Name", rapidjson::Value(stateName.c_str(), allocator), allocator);
@@ -127,7 +127,7 @@ namespace StateMachineManager
 
     void CopyMachine(const std::string& filePath, const std::string& targetFilePath, const std::string& name, const UID sourceUID)
     {
-        std::string destination =
+        const std::string destination =
             targetFilePath + STATEMACHINES_LIB_PATH + std::to_string(sourceUID) + STATEMACHINE_EXTENSION;
         FileSystem::Copy(filePath.c_str(), destination.c_str());
 
@@ -202,7 +202,7 @@ namespace StateMachineManager
                 t.fromState         = HashString(transitionJSON["FromState"].GetString());
                 t.toState           = HashString(transitionJSON["ToState"].GetString());
                 t.triggerName       = HashString(transitionJSON["Trigger"].GetString());
-                t.interpolationTime = transitionJSON["InterpolationTime"].GetFloat();
+                t.interpolationTime = transitionJSON["InterpolationTime"].GetInt();
 
                 stateMachine->transitions.push_back(t);
             }
