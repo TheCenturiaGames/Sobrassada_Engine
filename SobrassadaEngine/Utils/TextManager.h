@@ -21,6 +21,7 @@ namespace TextManager
 
     struct FontData
     {
+        std::string fontName;
         unsigned int fontSize;
         std::map<char, Character> characters;
 
