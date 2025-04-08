@@ -5,6 +5,7 @@
 #include "GameObject.h"
 #include "SceneModule.h"
 #include "Standalone/MeshComponent.h"
+#include "ResourceMesh.h"
 
 #include "Geometry/Triangle.h"
 #include "Math/float4x4.h"
@@ -71,23 +72,20 @@ namespace RaycastController
             }
         }
 
-        if (selectedGameObject)
+        if (selectedGameObject && !selectedGameObject->IsTopParent())
         {
-            const MeshComponent* meshComponent = selectedGameObject->GetMeshComponent();
-            if (meshComponent && meshComponent->HasBones())
+            SceneModule* sceneModule     = App->GetSceneModule();
+
+            UID rootGameObject           = sceneModule->GetScene()->GetGameObjectRootUID();
+            GameObject* parentGameobject = sceneModule->GetScene()->GetGameObjectByUID(selectedGameObject->GetParent());
+
+            while (parentGameobject->GetUID() != rootGameObject && !parentGameobject->IsTopParent())
             {
-                SceneModule* sceneModule = App->GetSceneModule();
-
-                UID rootGameObject       = sceneModule->GetScene()->GetGameObjectRootUID();
-                GameObject* parentGameobject =
-                    sceneModule->GetScene()->GetGameObjectByUID(selectedGameObject->GetParent());
-
-                while (parentGameobject->GetUID() != rootGameObject)
-                {
-                    selectedGameObject = parentGameobject;
-                    parentGameobject   = sceneModule->GetScene()->GetGameObjectByUID(selectedGameObject->GetParent());
-                }
+                selectedGameObject = parentGameobject;
+                parentGameobject   = sceneModule->GetScene()->GetGameObjectByUID(selectedGameObject->GetParent());
             }
+
+            if (parentGameobject->IsTopParent()) selectedGameObject = parentGameobject;
         }
 
         return selectedGameObject;

@@ -3,12 +3,13 @@
 #include "Application.h"
 #include "DebugDrawModule.h"
 #include "Framebuffer.h"
+#include "GameObject.h"
 #include "InputModule.h"
 #include "OpenGLModule.h"
 #include "SceneModule.h"
-#include "glew.h"
 
 #include "ImGui.h"
+#include "glew.h"
 #include <vector>
 
 CameraComponent::CameraComponent(UID uid, GameObject* parent) : Component(uid, parent, "Camera", COMPONENT_CAMERA)

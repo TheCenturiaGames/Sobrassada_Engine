@@ -1,12 +1,12 @@
 #pragma once
 
+#include "ComponentUtils.h"
+#include "Globals.h"
 #include "Module.h"
-#include <ComponentUtils.h>
-#include <Globals.h>
-#include <NodeEditor.h>
+#include "NodeEditor.h"
 
-#include <Math/float3.h>
-#include <Math/float4x4.h>
+#include "Math/float3.h"
+#include "Math/float4x4.h"
 #include <deque>
 #include <string>
 #include <unordered_map>
@@ -24,7 +24,8 @@ enum EditorType
 {
     BASE,
     ANIMATION,
-    NODE
+    NODE,
+    TEXTURE
 };
 
 enum class GizmoOperation
@@ -109,6 +110,7 @@ class EditorUIModule : public Module
     void OpenGLConfig();
     void GameTimerConfig() const;
     void HardwareConfig() const;
+    void PhysicsConfig() const;
     void ShowCaps() const;
 
     void ImportDialog(bool& import);
@@ -118,6 +120,7 @@ class EditorUIModule : public Module
     void SaveDialog(bool& save);
     void Console(bool& consoleMenu) const;
     void About(bool& aboutMenu);
+    void Navmesh(bool& navmesh);
     std::string FormatWithCommas(unsigned int number) const;
 
     void OpenEditor(EngineEditorBase* editorToOpen);
@@ -144,6 +147,7 @@ class EditorUIModule : public Module
     bool aboutMenu          = false;
     bool editorSettingsMenu = false;
     bool closeApplication   = false;
+    bool navmesh            = false;
 
     int maximumPlotData     = 50;
     std::deque<float> framerate;

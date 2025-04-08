@@ -2,9 +2,10 @@
 
 #include "Globals.h"
 #include "LightsConfig.h"
-#include "Math/float4x4.h"
 
+#include "Math/float4x4.h"
 #include <map>
+#include <vector>
 #include <tuple>
 #include <unordered_map>
 
@@ -15,6 +16,7 @@ class Octree;
 class ResourcePrefab;
 class Quadtree;
 class CameraComponent;
+enum class SaveMode;
 
 class Scene
 {
@@ -26,8 +28,8 @@ class Scene
 
     void Init();
     void Save(
-        rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator, UID newUID = INVALID_UID,
-        const char* newName = nullptr
+        rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator, SaveMode saveMode,
+        UID newUID = INVALID_UID, const char* newName = nullptr
     );
 
     void LoadComponents() const;
@@ -56,6 +58,9 @@ class Scene
     void AddGameObject(UID uid, GameObject* newGameObject) { gameObjectsContainer.insert({uid, newGameObject}); }
     void RemoveGameObjectHierarchy(UID gameObjectUUID);
 
+    void AddGameObjectToUpdate(GameObject* gameObject) { gameObjectsToUpdate.push_back(gameObject); }
+    void UpdateGameObjects();
+
     const std::string& GetSceneName() const { return sceneName; }
     UID GetSceneUID() const { return sceneUID; }
     UID GetGameObjectRootUID() const { return gameObjectRootUID; }
@@ -74,6 +79,7 @@ class Scene
     bool GetDoInputs() const { return doInputs; }
     bool GetDoMouseInputs() const { return doMouseInputs; }
     bool GetStopPlaying() const { return stopPlaying; }
+    bool GetSceneVisible() const { return sceneVisible; }
 
     const std::tuple<float, float>& GetWindowPosition() const { return sceneWindowPosition; };
     const std::tuple<float, float>& GetWindowSize() const { return sceneWindowSize; };
@@ -87,7 +93,7 @@ class Scene
 
     void SetStaticModified() { staticModified = true; }
     void SetDynamicModified() { dynamicModified = true; }
-
+    
   private:
     void CreateStaticSpatialDataStruct();
     void CreateDynamicSpatialDataStruct();
@@ -102,6 +108,7 @@ class Scene
     bool stopPlaying   = false;
     bool doInputs      = false;
     bool doMouseInputs = false;
+    bool sceneVisible  = false;
 
     std::unordered_map<UID, GameObject*> gameObjectsContainer;
 
@@ -116,4 +123,6 @@ class Scene
 
     bool staticModified                          = false;
     bool dynamicModified                         = false;
+
+    std::vector<GameObject*> gameObjectsToUpdate;
 };

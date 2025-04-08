@@ -5,7 +5,7 @@
 #pragma comment(lib, "Libs/SDL/lib/SDL2.lib")
 #pragma comment(lib, "Libs/SDL/lib/SDL2main.lib")
 
-#ifdef _DEBUG
+#ifdef OPTICK
 #include "optick.h"
 #endif
 
@@ -27,7 +27,7 @@ enum MainState
 };
 
 Application* App         = NULL;
-std::vector<char*>* Logs = NULL;
+std::vector<char*> *Logs = NULL;
 
 int main(int argc, char** argv)
 {
@@ -38,7 +38,7 @@ int main(int argc, char** argv)
 
     while (mainState != MAIN_EXIT)
     {
-#ifdef _DEBUG
+#ifdef OPTICK
         OPTICK_FRAME("Main application update");
 #endif
         switch (mainState)

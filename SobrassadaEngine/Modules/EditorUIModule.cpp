@@ -1,33 +1,37 @@
 #include "EditorUIModule.h"
 
+#include "Application.h"
 #include "CameraModule.h"
+#include "Component.h"
+#include "EngineEditorBase.h"
+#include "FileSystem.h"
+#include "GameTimer.h"
 #include "InputModule.h"
 #include "LibraryModule.h"
 #include "OpenGLModule.h"
+#include "PhysicsModule.h"
 #include "ProjectModule.h"
+#include "SceneImporter.h"
+#include "ResourcesModule.h"
+#include "ResourceNavmesh.h"
 #include "SceneModule.h"
+#include "ScriptModule.h"
+#include "TextureEditor.h"
+#include "TextureImporter.h"
 #include "WindowModule.h"
-#include <Application.h>
-#include <Component.h>
-#include <EngineEditorBase.h>
-#include <FileSystem.h>
-#include <GameTimer.h>
-#include <SceneImporter.h>
-#include <TextureImporter.h>
-#include <TextureLibraryEditor.h>
 
+#include "Math/Quat.h"
 #include "SDL.h"
 #include "glew.h"
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl2.h"
 #include "imgui_internal.h"
-#include <Math/Quat.h>
+// imguizmo include after imgui
+#include "ImGuizmo.h"
 #include <cstring>
 #include <filesystem>
 #include <string>
-// imguizmo include after imgui
-#include <ImGuizmo.h>
 
 EditorUIModule::EditorUIModule() : width(0), height(0)
 {
@@ -37,7 +41,14 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"Spot Light",           COMPONENT_SPOT_LIGHT          },
         {"Directional Light",    COMPONENT_DIRECTIONAL_LIGHT   },
         {"Character Controller", COMPONENT_CHARACTER_CONTROLLER},
-        {"Camera",               COMPONENT_CAMERA              }
+        {"Transform 2D",         COMPONENT_TRANSFORM_2D        },
+        {"UI Canvas",            COMPONENT_CANVAS              },
+        {"UI Label",             COMPONENT_LABEL               },
+        {"Camera",               COMPONENT_CAMERA              },
+        {"Cube Collider",        COMPONENT_CUBE_COLLIDER       },
+        {"Sphere Collider",      COMPONENT_SPHERE_COLLIDER     },
+        {"Capsule Collider",     COMPONENT_CAPSULE_COLLIDER    },
+        {"Script",               COMPONENT_SCRIPT              }
     };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;
@@ -241,6 +252,8 @@ void EditorUIModule::Draw()
 
     if (saveMenu) SaveDialog(saveMenu);
 
+    if (navmesh) Navmesh(navmesh);
+
     if (editorSettingsMenu) EditorSettings(editorSettingsMenu);
 }
 
@@ -305,6 +318,7 @@ void EditorUIModule::MainMenu()
             if (ImGui::MenuItem("Hierarchy", "", hierarchyMenu)) hierarchyMenu = !hierarchyMenu;
             if (ImGui::MenuItem("Inspector", "", inspectorMenu)) inspectorMenu = !inspectorMenu;
             if (ImGui::MenuItem("Lights Config", "", lightConfig)) lightConfig = !lightConfig;
+            if (ImGui::MenuItem("Navmesh", "", navmesh)) navmesh = !navmesh;
             ImGui::EndDisabled();
 
             ImGui::EndMenu();
@@ -316,8 +330,7 @@ void EditorUIModule::MainMenu()
 
             if (ImGui::MenuItem("Node Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::NODE));
 
-            if (ImGui::MenuItem("Texture Library"))
-                OpenEditor(new TextureLibraryEditor("Texture Library", GenerateUID()));
+            if (ImGui::MenuItem("Texture Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::TEXTURE));
 
             ImGui::EndMenu();
         }
@@ -389,6 +402,23 @@ void EditorUIModule::LoadDialog(bool& loadMenu)
         selectedLoad  = -1;
         inputFileLoad = "";
     }
+}
+
+void EditorUIModule::Navmesh(bool& navmesh)
+{
+    if (!navmesh) return;
+
+    ImGui::Begin("NavMesh Creation", &navmesh, ImGuiWindowFlags_None);
+
+    if (ImGui::Button("Create NavMesh"))
+    {
+        App->GetResourcesModule()->CreateNavMesh();
+        ImGui::Text("NavMesh created!");
+    }
+
+    App->GetResourcesModule()->GetNavMesh()->RenderNavmeshEditor();
+
+    ImGui::End();
 }
 
 void EditorUIModule::LoadPrefabDialog(bool& loadPrefab)
@@ -971,6 +1001,7 @@ void EditorUIModule::About(bool& aboutMenu)
     ImGui::Text(" - UI: FreeType: v2.13.3");
     ImGui::Text(" - RecastNavigation: v1.6.0");
     ImGui::Text(" - ImNodeFlow: v1.2.2");
+    ImGui::Text(" - Bullet: v3.25");
     ImGui::Text("%s is licensed under the MIT License, see LICENSE for more information.", ENGINE_NAME);
 
     ImGui::Checkbox("Config/Build Information", &showConfigInfo);
@@ -1141,8 +1172,11 @@ EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
         return new EngineEditorBase("Base Editor " + std::to_string(uid), uid);
         break;
     case EditorType::NODE:
-        return new NodeEditor("NodeEditor" + std::to_string(uid), uid);
+        return new NodeEditor("NodeEditor_" + std::to_string(uid), uid);
 
+    case EditorType::TEXTURE:
+        return new TextureEditor("TextureEditor_" + std::to_string(uid), uid);
+        break;
     default:
         return nullptr;
     }
@@ -1166,13 +1200,14 @@ void EditorUIModule::EditorSettings(bool& editorSettingsMenu)
     if (ImGui::CollapsingHeader("Application"))
     {
         ImGui::SeparatorText("Information");
-        ImGui::InputText(
-            "App Name", const_cast<char*>(ENGINE_NAME), IM_ARRAYSIZE(ENGINE_NAME), ImGuiInputTextFlags_ReadOnly
-        );
-        ImGui::InputText(
-            "Organization", const_cast<char*>(ORGANIZATION_NAME), IM_ARRAYSIZE(ORGANIZATION_NAME),
-            ImGuiInputTextFlags_ReadOnly
-        );
+
+        std::string appName = ENGINE_NAME;
+        char* charAppName   = &appName[0];
+        ImGui::InputText("App Name", charAppName, strlen(charAppName), ImGuiInputTextFlags_ReadOnly);
+
+        std::string organizationName = ORGANIZATION_NAME;
+        char* charOrganizationName   = &organizationName[0];
+        ImGui::InputText("Organization", charOrganizationName, strlen(ORGANIZATION_NAME), ImGuiInputTextFlags_ReadOnly);
 
         ImGui::SeparatorText("Ms and Fps Graph");
         FramePlots(vsync);
@@ -1239,6 +1274,12 @@ void EditorUIModule::EditorSettings(bool& editorSettingsMenu)
     if (ImGui::CollapsingHeader("Hardware"))
     {
         HardwareConfig();
+    }
+
+    ImGui::Spacing();
+    if (ImGui::CollapsingHeader("Physics"))
+    {
+        PhysicsConfig();
     }
 
     ImGui::End();
@@ -1475,6 +1516,73 @@ void EditorUIModule::HardwareConfig() const
         ImGui::SameLine();
         ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%.2f MB", vramReserved / 1024.0f);
     }
+}
+
+void EditorUIModule::PhysicsConfig() const
+{
+    PhysicsModule* physicsModule = App->GetPhysicsModule();
+
+    float worldGravity           = physicsModule->GetGravity();
+    if (ImGui::InputFloat("World gravity", &worldGravity))
+    {
+        physicsModule->SetGravity(worldGravity);
+    }
+
+    std::vector<LayerBitset>& configBitset = physicsModule->GetLayerConfig();
+    const char* tableStrings[IM_ARRAYSIZE(ColliderLayerStrings) + 1];
+    tableStrings[0] = "LAYERS";
+
+    for (int i = 1; i < IM_ARRAYSIZE(ColliderLayerStrings) + 1; ++i)
+    {
+        tableStrings[i] = ColliderLayerStrings[i - 1];
+    }
+
+    const int columns_count = IM_ARRAYSIZE(tableStrings);
+    const int rows_count    = columns_count;
+
+    static ImGuiTableFlags table_flags =
+        ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY |
+        ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_Hideable |
+        ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_HighlightHoveredColumn;
+    static ImGuiTableColumnFlags column_flags = ImGuiTableColumnFlags_AngledHeader | ImGuiTableColumnFlags_WidthFixed;
+
+    if (ImGui::BeginTable(
+            "table_angled_headers", columns_count, table_flags, ImVec2(0.0f, ImGui::GetTextLineHeightWithSpacing() * 12)
+        ))
+    {
+        ImGui::TableSetupColumn(tableStrings[0], ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoReorder);
+        for (int n = 1; n < columns_count; n++)
+            ImGui::TableSetupColumn(tableStrings[n], column_flags);
+
+        ImGui::TableAngledHeadersRow();
+        ImGui::TableHeadersRow(); // Draw remaining headers and allow access to context-menu and other functions.
+        for (int row = 1; row < rows_count; row++)
+        {
+            ImGui::PushID(row);
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            ImGui::AlignTextToFramePadding();
+            ImGui::Text(tableStrings[row]);
+            for (int column = 1; column < columns_count; column++)
+            {
+                if (ImGui::TableSetColumnIndex(column) && row > 0)
+                {
+                    bool currentBitValue = configBitset[row - 1][column - 1];
+                    ImGui::PushID(column);
+                    if (ImGui::Checkbox("", &currentBitValue))
+                    {
+                        configBitset[row - 1][column - 1].flip();
+                        physicsModule->RebuildWorld();
+                    }
+                    ImGui::PopID();
+                }
+            }
+            ImGui::PopID();
+        }
+        ImGui::EndTable();
+    }
+
+    // ImGui::ShowDemoWindow();
 }
 
 void EditorUIModule::ShowCaps() const

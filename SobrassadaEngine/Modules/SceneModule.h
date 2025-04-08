@@ -3,7 +3,9 @@
 #include "Module.h"
 #include "Scene.h"
 
-#include <document.h>
+#include "rapidjson/document.h"
+
+class GameObject;
 
 class SceneModule : public Module
 {
@@ -37,6 +39,8 @@ class SceneModule : public Module
     Scene* GetScene() const { return loadedScene; }
 
     bool GetInPlayMode() const { return inPlayMode; }
+
+    void AddGameObjectToUpdate(GameObject* gameObject) { loadedScene->AddGameObjectToUpdate(gameObject); };
 
   private:
     Scene* loadedScene = nullptr;

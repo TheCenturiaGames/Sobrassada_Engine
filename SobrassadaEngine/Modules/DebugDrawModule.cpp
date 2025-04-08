@@ -10,6 +10,11 @@
 #include "OpenGLModule.h"
 #include "Quadtree.h"
 #include "SceneModule.h"
+#include "ResourcesModule.h"
+#include "ResourceNavmesh.h"
+#include "DetourNavMesh.h"
+#include "DetourNavMeshQuery.h"
+
 
 #include "SDL_video.h"
 #define DEBUG_DRAW_IMPLEMENTATION
@@ -18,6 +23,7 @@
 #include "Geometry/OBB.h"
 #include "glew.h"
 #include "imgui.h"
+#include "btVector3.h"
 #include <unordered_map>
 
 class DDRenderInterfaceCoreGL final : public dd::RenderInterface
@@ -688,6 +694,14 @@ void DebugDrawModule::DrawLine(
     dd::line(origin, dir + origin, color, 0, enableDepth);
 }
 
+// TODO, CHECK IF PROPER WAY OF IMPLEMENTATION
+void DebugDrawModule::DrawLine(const btVector3& from, const btVector3& to, const btVector3& color)
+{
+    dd::line(
+        float3(from.x(), from.y(), from.z()), float3(to.x(), to.y(), to.z()), float3(color.x(), color.y(), color.z())
+    );
+}
+
 void DebugDrawModule::DrawCircle(const float3& center, const float3& upVector, const float3& color, const float radius)
 {
     dd::circle(center, upVector, color, radius, 40);
@@ -717,6 +731,28 @@ void DebugDrawModule::Draw(const float4x4& view, const float4x4& proj, unsigned 
 void DebugDrawModule::DrawAxisTriad(const float4x4& transform, bool depthEnabled)
 {
     dd::axisTriad(transform, 0.005f, 0.05f, 0, depthEnabled);
+}
+
+void DebugDrawModule::Draw3DText(const btVector3& location, const char* textString)
+{
+    CameraModule* cameraModule = App->GetCameraModule();
+
+    const float4x4& projection = cameraModule->GetProjectionMatrix();
+    const float4x4& view       = cameraModule->GetViewMatrix();
+    const float3 pos           = float3(location);
+
+    auto framebuffer           = App->GetOpenGLModule()->GetFramebuffer();
+    int width                      = framebuffer->GetTextureWidth();
+    int height                     = framebuffer->GetTextureHeight();
+
+    dd::projectedText(textString, pos, float3::zero, view * projection, 0, 0, width, height);
+}
+
+void DebugDrawModule::DrawContactPoint(
+    const btVector3& PointOnB, const btVector3& normalOnB, float distance, int lifeTime, const btVector3& color
+)
+{
+    dd::vertexNormal(float3(PointOnB), float3(normalOnB), distance, lifeTime);
 }
 
 void DebugDrawModule::HandleDebugRenderOptions()
@@ -759,5 +795,99 @@ void DebugDrawModule::HandleDebugRenderOptions()
     if (debugOptionValues[(int)DebugOptions::RENDER_CAMERA_RAY])
     {
         DrawLineSegment(cameraModule->GetLastCastedRay(), float3(1.f, 1.f, 0.f));
+    }
+    if (debugOptionValues[(int)DebugOptions::RENDER_NAVMESH])
+    {
+        if (const ResourceNavMesh* navmesh = App->GetResourcesModule()->GetNavMesh())
+        {
+            DrawNavMesh(
+                navmesh->GetDetourNavMesh(),
+                navmesh->GetDetourNavMeshQuery(), DRAWNAVMESH_COLOR_TILES
+            );
+        }
+    }
+}
+static unsigned int DetourTransCol(unsigned int c, unsigned int a)
+{
+    return (a << 24) | (c & 0x00ffffff);
+}
+
+static int DetourBit(int a, int b)
+{
+    return (a & (1 << b)) >> b;
+}
+
+static unsigned int DetourRGBA(int r, int g, int b, int a)
+{
+    return ((unsigned int)r) | ((unsigned int)g << 8) | ((unsigned int)b << 16) | ((unsigned int)a << 24);
+}
+
+
+static unsigned int DetourIntToCol(int i, int a)
+{
+    int r = DetourBit(i, 1) + DetourBit(i, 3) * 2 + 1;
+    int g = DetourBit(i, 2) + DetourBit(i, 4) * 2 + 1;
+    int b = DetourBit(i, 0) + DetourBit(i, 5) * 2 + 1;
+    return DetourRGBA(r * 63, g * 63, b * 63, a);
+}
+
+static unsigned int AreaToCol(unsigned int area)
+{
+    if (area == 0)
+    {
+        // Treat zero area type as default.
+        return DetourRGBA(0, 192, 255, 255);
+    }
+    else
+    {
+        return DetourIntToCol(area, 255);
+    }
+}
+void DebugDrawModule::DrawNavMesh(const dtNavMesh* navMesh, const dtNavMeshQuery* navQuery, unsigned char flags)
+{
+    if (!navMesh) return;
+
+    for (int i = 0; i < navMesh->getMaxTiles(); ++i)
+    {
+        const dtMeshTile* tile = navMesh->getTile(i);
+        if (!tile || !tile->header) continue;
+
+        dtPolyRef base         = navMesh->getPolyRefBase(tile);
+        int tileNum            = navMesh->decodePolyIdTile(base);
+        unsigned int tileColor = DetourIntToCol(tileNum, 128);
+
+        // Iterate through each polygon in the tile
+        for (int j = 0; j < tile->header->polyCount; ++j)
+        {
+            const dtPoly* p = &tile->polys[j];
+            if (p->getType() == DT_POLYTYPE_OFFMESH_CONNECTION) continue;
+
+            const dtPolyDetail* pd = &tile->detailMeshes[j];
+
+            unsigned int col;
+            if (navQuery && navQuery->isInClosedList(base | (dtPolyRef)j)) col = DetourRGBA(255, 196, 0, 64);
+            else col = DetourTransCol(AreaToCol(p->getArea()), 64);
+
+            std::vector<LineSegment> lines;
+
+            for (int k = 0; k < pd->triCount; ++k)
+            {
+                const unsigned char* t = &tile->detailTris[(pd->triBase + k) * 4];
+
+                float3 v[3];
+                for (int l = 0; l < 3; ++l)
+                {
+                    if (t[l] < p->vertCount) v[l] = float3(&tile->verts[p->verts[t[l]] * 3]);
+                    else v[l] = float3(&tile->detailVerts[(pd->vertBase + t[l] - p->vertCount) * 3]);
+                }
+
+                // Draw Triangle Edges
+                lines.push_back(LineSegment(v[0], v[1]));
+                lines.push_back(LineSegment(v[1], v[2]));
+                lines.push_back(LineSegment(v[2], v[0]));
+            }
+
+            RenderLines(lines, float3(0.0f, 1.0f, 0.0f)); // Green color
+        }
     }
 }

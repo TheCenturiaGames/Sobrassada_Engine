@@ -1,6 +1,7 @@
 #include "WindowModule.h"
 
 #include "Application.h"
+#include "GameUIModule.h"
 #include "ProjectModule.h"
 
 WindowModule::WindowModule()
@@ -50,7 +51,7 @@ bool WindowModule::Init()
         else
         {
             screenSurface = SDL_GetWindowSurface(window);
-            SetVsync(VSYNC);
+            vsync         = VSYNC;
         }
     }
 
@@ -74,6 +75,7 @@ void WindowModule::WindowResized(const unsigned int width, const unsigned int he
 {
     windowWidth  = width;
     windowHeight = height;
+    App->GetGameUIModule()->OnWindowResize(width, height);
 }
 
 SDL_DisplayMode& WindowModule::GetDesktopDisplayMode()
