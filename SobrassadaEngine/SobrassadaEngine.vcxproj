@@ -494,12 +494,14 @@
     <ClInclude Include="FileSystem\Meta\MetaMaterial.h" />
     <ClInclude Include="FileSystem\Meta\MetaMesh.h" />
     <ClInclude Include="FileSystem\Meta\MetaTexture.h" />
+     <ClInclude Include="FileSystem\Meta\MetaAnimation.h" />
     <ClInclude Include="Modules\CameraModule.h" />
     <ClInclude Include="Modules\EditorUIModule.h" />
     <ClInclude Include="Modules\ProjectModule.h" />
     <ClInclude Include="Modules\ResourcesModule.h" />
     <ClInclude Include="Modules\SceneModule.h" />
     <ClInclude Include="FileSystem\Importers\ModelImporter.h" />
+       <ClInclude Include="FileSystem\Importers\AnimationImporter.h" />
     <ClInclude Include="Scene\Components\Standalone\UI\Transform2DComponent.h" />
     <ClInclude Include="Utils\Delegate.h" />
     <ClInclude Include="Utils\EventDispatcher.h" />
