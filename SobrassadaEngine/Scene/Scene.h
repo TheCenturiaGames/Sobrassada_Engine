@@ -58,7 +58,7 @@ class Scene
     void AddGameObject(UID uid, GameObject* newGameObject) { gameObjectsContainer.insert({uid, newGameObject}); }
     void RemoveGameObjectHierarchy(UID gameObjectUUID);
 
-    void AddGameObjectToUpdate(GameObject* gameObject) { gameObjectsToUpdate.push_back(gameObject); }
+    void AddGameObjectToUpdate(GameObject* gameObject);
     void UpdateGameObjects();
 
     const std::string& GetSceneName() const { return sceneName; }
