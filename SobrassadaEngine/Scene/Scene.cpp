@@ -23,11 +23,10 @@
 #include "ResourceModel.h"
 #include "ResourcePrefab.h"
 #include "ResourcesModule.h"
-#include "Scene/Components/ComponentUtils.h"
-#include "Scene/Components/Standalone/AnimationComponent.h"
-#include "Scene/Components/Standalone/MeshComponent.h"
-#include "SceneModule.h"
+#include "Standalone/AnimationComponent.h"
 #include "Standalone/MeshComponent.h"
+#include "SceneModule.h"
+
 
 #include "SDL_mouse.h"
 #include "imgui.h"
@@ -809,7 +808,7 @@ void Scene::LoadModel(const UID modelUID)
                                 meshComponent->SetSkinIndex(nodes[i].skinIndex);
                             }
 
-                             if (!animUIDs.empty())
+                            if (!animUIDs.empty())
                             {
                                 rootObject->CreateComponent(COMPONENT_ANIMATION);
                                 AnimationComponent* animComponent = rootObject->GetAnimationComponent();
@@ -831,7 +830,7 @@ void Scene::LoadModel(const UID modelUID)
                     }
                 }
             }
-           
+
             rootObject->UpdateTransformForGOBranch();
         }
     }

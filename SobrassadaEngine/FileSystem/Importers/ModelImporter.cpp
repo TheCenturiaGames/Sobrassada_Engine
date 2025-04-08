@@ -7,7 +7,7 @@
 #include "MetaModel.h"
 #include "Model.h"
 #include "ProjectModule.h"
-#include "ResourceManagement/Resources/ResourceModel.h"
+#include "ResourceModel.h"
 #include "AnimationImporter.h"
 #include "MetaAnimation.h"
 
@@ -103,8 +103,6 @@ namespace ModelImporter
         assetPath = targetFilePath + assetPath;
 
         newModel.SetUID(finalModelUID);
-        const std::string animName = FileSystem::GetFileNameWithoutExtension(filePath);
-        std::string animAssetPath       = ANIMATIONS_ASSETS_PATH + animName + ANIMATION_EXTENSION;
         std::vector<UID> animationUIDs;
         //Import Animations
         if (model.animations.size() > 0)
@@ -252,10 +250,9 @@ namespace ModelImporter
         rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
         doc.Accept(writer);
 
-        std::string saveFilePath = App->GetProjectModule()->GetLoadedProjectPath() + MODELS_LIB_PATH +
+        const std::string saveFilePath = App->GetProjectModule()->GetLoadedProjectPath() + MODELS_LIB_PATH +
                                    std::to_string(finalModelUID) + MODEL_EXTENSION;
-        unsigned int bytesWritten = (unsigned int
-        )FileSystem::Save(saveFilePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
+        const size_t bytesWritten = FileSystem::Save(saveFilePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
         if (bytesWritten == 0)
         {
             GLOG("Failed to save model file: %s", saveFilePath);
@@ -264,8 +261,7 @@ namespace ModelImporter
 
         if (sourceUID == INVALID_UID)
         {
-            unsigned int bytesWritten = (unsigned int
-            )FileSystem::Save(assetPath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
+            size_t bytesWritten = FileSystem::Save(assetPath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
             if (bytesWritten == 0)
             {
                 GLOG("Failed to save model file: %s", assetPath);

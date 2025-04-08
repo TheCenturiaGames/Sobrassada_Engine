@@ -13,7 +13,7 @@ class AnimationComponent : public Component
     AnimationComponent(UID uid, GameObject* parent);
     AnimationComponent(const rapidjson::Value& initialState, GameObject* parent);
     
-    ~AnimationComponent();
+    ~AnimationComponent() override;
     void OnPlay();
     void OnStop();
     void OnPause();
@@ -29,10 +29,11 @@ class AnimationComponent : public Component
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
     void AddAnimation(UID resource);
     UID GetAnimationResource() const { GLOG("Resource AnimUID  is: %d",resource) return resource; }
-    void SetAnimationResource(UID animResource);
     ResourceAnimation* GetCurrentAnimation() const { return currentAnimResource; }
     AnimController* GetAnimationController() { return animController; }
     std::unordered_map<std::string, GameObject*> GetBoneMapping() const { return boneMapping; }
+
+     void SetAnimationResource(UID animResource);
 
   private:
     void SetBoneMapping();

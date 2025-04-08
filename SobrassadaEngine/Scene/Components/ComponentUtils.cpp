@@ -49,11 +49,11 @@ Component* ComponentUtils::CreateEmptyComponent(const ComponentType type, const 
     case COMPONENT_CAMERA:
         generatedComponent = new CameraComponent(uid, parent);
         break;
-    case COMPONENT_ANIMATION:
-        generatedComponent = new AnimationComponent(uid, parent);
-        break;
     case COMPONENT_SCRIPT:
         generatedComponent = new ScriptComponent(uid, parent);
+        break;
+    case COMPONENT_ANIMATION:
+        generatedComponent = new AnimationComponent(uid, parent);
         break;
     default:
         return nullptr;

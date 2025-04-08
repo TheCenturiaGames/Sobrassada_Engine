@@ -7,8 +7,8 @@
 namespace tinygltf
 {
     class Model;
-    class Animation;
-    class AnimationSampler;
+    struct Animation;
+    struct AnimationSampler;
     struct Accessor;
     struct BufferView;
     struct Buffer;

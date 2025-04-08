@@ -31,7 +31,7 @@ class Model
 
     const std::vector<std::vector<NodeData>>& GetNodes() const { return nodes; }
     const Skin& GetSkin(int skinIndex) const { return skins[skinIndex]; }
-    UID GetAnimationUID() const { return animUID; }
+    const UID GetAnimationUID() const { return animUID; }
     const std::vector<UID>& GetAllAnimationUIDs() const { return allAnimUIDs; }
 
     void SetUID(const UID uid) { this->uid = uid; }

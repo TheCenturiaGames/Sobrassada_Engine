@@ -7,7 +7,7 @@
 #include "ProjectModule.h"
 #include "ResourceAnimation.h"
 
-#include <Libs/rapidjson/document.h>
+#include "rapidjson/document.h"
 #include <memory>
 #include <tiny_gltf.h>
 #include <vector>
@@ -45,7 +45,7 @@ namespace AnimationImporter
             const float* values =
                 reinterpret_cast<const float*>(&outputBuffer.data[output.byteOffset + outputView.byteOffset]);
 
-            size_t keyframeCount        = input.count;
+            const size_t keyframeCount        = input.count;
 
             const std::string& nodeName = model.nodes[channel.target_node].name;
             const uint32_t nameSize     = static_cast<uint32_t>(nodeName.size());
@@ -99,10 +99,10 @@ namespace AnimationImporter
         UID finalAnimUID;
         if (sourceUID == INVALID_UID)
         {
-            UID animationUID      = GenerateUID();
+            const UID animationUID      = GenerateUID();
             finalAnimUID          = App->GetLibraryModule()->AssignFiletypeUID(animationUID, FileType::Animation);
 
-            std::string assetPath = ANIMATIONS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
+            const std::string assetPath = ANIMATIONS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
             MetaAnimation meta(finalAnimUID, assetPath);
 
             
@@ -116,11 +116,11 @@ namespace AnimationImporter
 
         // Construct save paths 
 
-        std::string saveFilePath = App->GetProjectModule()->GetLoadedProjectPath() + ANIMATIONS_PATH +
+        const std::string saveFilePath = App->GetProjectModule()->GetLoadedProjectPath() + ANIMATIONS_PATH +
                                    std::to_string(finalAnimUID) + ANIMATION_EXTENSION;
       
-        unsigned int bytesWritten =
-            (unsigned int)FileSystem::Save(saveFilePath.c_str(), buffer.data(), buffer.size(), true);
+        size_t bytesWritten =
+            FileSystem::Save(saveFilePath.c_str(), buffer.data(), buffer.size(), true);
 
         if (bytesWritten == 0)
         {
