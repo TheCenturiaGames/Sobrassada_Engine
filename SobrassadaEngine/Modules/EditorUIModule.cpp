@@ -9,6 +9,7 @@
 #include "InputModule.h"
 #include "LibraryModule.h"
 #include "OpenGLModule.h"
+#include "PhysicsModule.h"
 #include "ProjectModule.h"
 #include "SceneImporter.h"
 #include "ResourcesModule.h"
@@ -45,6 +46,9 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"UI Canvas",            COMPONENT_CANVAS              },
         {"UI Label",             COMPONENT_LABEL               },
         {"Camera",               COMPONENT_CAMERA              },
+        {"Cube Collider",        COMPONENT_CUBE_COLLIDER       },
+        {"Sphere Collider",      COMPONENT_SPHERE_COLLIDER     },
+        {"Capsule Collider",     COMPONENT_CAPSULE_COLLIDER    },
         {"Script",               COMPONENT_SCRIPT              }
     };
     fullscreen    = FULLSCREEN;
@@ -1273,6 +1277,12 @@ void EditorUIModule::EditorSettings(bool& editorSettingsMenu)
         HardwareConfig();
     }
 
+    ImGui::Spacing();
+    if (ImGui::CollapsingHeader("Physics"))
+    {
+        PhysicsConfig();
+    }
+
     ImGui::End();
 }
 
@@ -1507,6 +1517,73 @@ void EditorUIModule::HardwareConfig() const
         ImGui::SameLine();
         ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%.2f MB", vramReserved / 1024.0f);
     }
+}
+
+void EditorUIModule::PhysicsConfig() const
+{
+    PhysicsModule* physicsModule = App->GetPhysicsModule();
+
+    float worldGravity           = physicsModule->GetGravity();
+    if (ImGui::InputFloat("World gravity", &worldGravity))
+    {
+        physicsModule->SetGravity(worldGravity);
+    }
+
+    std::vector<LayerBitset>& configBitset = physicsModule->GetLayerConfig();
+    const char* tableStrings[IM_ARRAYSIZE(ColliderLayerStrings) + 1];
+    tableStrings[0] = "LAYERS";
+
+    for (int i = 1; i < IM_ARRAYSIZE(ColliderLayerStrings) + 1; ++i)
+    {
+        tableStrings[i] = ColliderLayerStrings[i - 1];
+    }
+
+    const int columns_count = IM_ARRAYSIZE(tableStrings);
+    const int rows_count    = columns_count;
+
+    static ImGuiTableFlags table_flags =
+        ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY |
+        ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_Hideable |
+        ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_HighlightHoveredColumn;
+    static ImGuiTableColumnFlags column_flags = ImGuiTableColumnFlags_AngledHeader | ImGuiTableColumnFlags_WidthFixed;
+
+    if (ImGui::BeginTable(
+            "table_angled_headers", columns_count, table_flags, ImVec2(0.0f, ImGui::GetTextLineHeightWithSpacing() * 12)
+        ))
+    {
+        ImGui::TableSetupColumn(tableStrings[0], ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoReorder);
+        for (int n = 1; n < columns_count; n++)
+            ImGui::TableSetupColumn(tableStrings[n], column_flags);
+
+        ImGui::TableAngledHeadersRow();
+        ImGui::TableHeadersRow(); // Draw remaining headers and allow access to context-menu and other functions.
+        for (int row = 1; row < rows_count; row++)
+        {
+            ImGui::PushID(row);
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            ImGui::AlignTextToFramePadding();
+            ImGui::Text(tableStrings[row]);
+            for (int column = 1; column < columns_count; column++)
+            {
+                if (ImGui::TableSetColumnIndex(column) && row > 0)
+                {
+                    bool currentBitValue = configBitset[row - 1][column - 1];
+                    ImGui::PushID(column);
+                    if (ImGui::Checkbox("", &currentBitValue))
+                    {
+                        configBitset[row - 1][column - 1].flip();
+                        physicsModule->RebuildWorld();
+                    }
+                    ImGui::PopID();
+                }
+            }
+            ImGui::PopID();
+        }
+        ImGui::EndTable();
+    }
+
+    // ImGui::ShowDemoWindow();
 }
 
 void EditorUIModule::ShowCaps() const

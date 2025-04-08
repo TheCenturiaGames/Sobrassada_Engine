@@ -17,6 +17,7 @@
 #include "LibraryModule.h"
 #include "Octree.h"
 #include "OpenGLModule.h"
+#include "PhysicsModule.h"
 #include "ProjectModule.h"
 #include "Quadtree.h"
 #include "Resource.h"
@@ -54,6 +55,8 @@ Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUI
     this->sceneName       = initialState["Name"].GetString();
     gameObjectRootUID     = initialState["RootGameObject"].GetUint64();
     selectedGameObjectUID = gameObjectRootUID;
+
+    App->GetPhysicsModule()->LoadLayerData(&initialState);
 
     // Deserialize GameObjects
     if (initialState.HasMember("GameObjects") && initialState["GameObjects"].IsArray())
@@ -95,6 +98,8 @@ Scene::~Scene()
     lightsConfig = nullptr;
     sceneOctree  = nullptr;
     dynamicTree  = nullptr;
+
+    App->GetPhysicsModule()->EmptyWorld();
 
     GLOG("%s scene closed", sceneName.c_str());
 }
@@ -156,6 +161,8 @@ void Scene::Save(
     targetState.AddMember("Name", rapidjson::Value(sceneName.c_str(), allocator), allocator);
 
     targetState.AddMember("RootGameObject", gameObjectRootUID, allocator);
+
+    App->GetPhysicsModule()->SaveLayerData(targetState, allocator);
 
     // Serialize GameObjects
     rapidjson::Value gameObjectsJSON(rapidjson::kArrayType);
@@ -387,8 +394,6 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
     ImGui::SetNextItemWidth(100.0f);
     if (ImGui::SliderFloat("Time scale", &timeScale, 0, 4)) gameTimer->SetTimeScale(timeScale);
 
-    ImGui::SameLine();
-
     // RENDER OPTIONS
     if (ImGui::Button("Render options"))
     {
@@ -412,6 +417,8 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
                     App->GetDebugDrawModule()->FlipDebugOptionValue(i);
                     if (i == (int)DebugOptions::RENDER_WIREFRAME)
                         App->GetOpenGLModule()->SetRenderWireframe(currentBitValue);
+                    else if(i == (int)DebugOptions::RENDER_PHYSICS_WORLD)
+                        App->GetPhysicsModule()->SetDebugOption(currentBitValue);
                 }
             }
 
@@ -600,6 +607,15 @@ void Scene::RemoveGameObjectHierarchy(UID gameObjectUID)
     }
 }
 
+void Scene::UpdateGameObjects()
+{
+    for (GameObject* gameObject : gameObjectsToUpdate)
+    {
+        if (gameObject) gameObject->UpdateComponents();
+    }
+    gameObjectsToUpdate.clear();
+}
+
 const std::vector<Component*> Scene::GetAllComponents() const
 {
     std::vector<Component*> collectedComponents;
@@ -630,7 +646,7 @@ void Scene::CreateStaticSpatialDataStruct()
 
         if (!objectIterator.second->IsStatic()) continue;
         if (objectIterator.second->GetUID() == gameObjectRootUID) continue;
-        if (objectBB.IsDegenerate()) continue;
+        if (!objectBB.IsFinite() || objectBB.IsDegenerate()) continue;
 
         sceneOctree->InsertElement(objectIterator.second);
     }
@@ -650,7 +666,7 @@ void Scene::CreateDynamicSpatialDataStruct()
 
         if (objectIterator.second->IsStatic()) continue;
         if (objectIterator.second->GetUID() == gameObjectRootUID) continue;
-        if (objectBB.IsDegenerate()) continue;
+        if (!objectBB.IsFinite() || objectBB.IsDegenerate()) continue;
 
         dynamicTree->InsertElement(objectIterator.second);
     }

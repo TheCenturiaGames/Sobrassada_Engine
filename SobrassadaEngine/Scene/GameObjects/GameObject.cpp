@@ -65,6 +65,9 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
     name                   = initialState["Name"].GetString();
     selectedComponentIndex = COMPONENT_NONE;
     mobilitySettings       = initialState["Mobility"].GetInt();
+    if (initialState.HasMember("IsTopParent")) 
+        isTopParent = initialState["IsTopParent"].GetBool();
+   
 
     if (initialState.HasMember("PrefabUID")) prefabUID = initialState["PrefabUID"].GetUint64();
 
@@ -159,6 +162,7 @@ void GameObject::Save(rapidjson::Value& targetState, rapidjson::Document::Alloca
     targetState.AddMember("ParentUID", parentUID, allocator);
     targetState.AddMember("Name", rapidjson::Value(name.c_str(), allocator), allocator);
     targetState.AddMember("Mobility", mobilitySettings, allocator);
+    targetState.AddMember("IsTopParent", isTopParent, allocator);
 
     if (prefabUID != INVALID_UID) targetState.AddMember("PrefabUID", prefabUID, allocator);
 
@@ -224,6 +228,8 @@ void GameObject::RenderEditorInspector()
     {
         ImGui::SameLine();
         if (ImGui::Checkbox("Draw nodes", &drawNodes)) OnDrawConnectionsToggle();
+        ImGui::SameLine();
+        ImGui::Checkbox("Is top parent", &isTopParent);
         if (ImGui::Button("Add Component"))
         {
             ImGui::OpenPopup("ComponentSelection");
@@ -267,7 +273,7 @@ void GameObject::RenderEditorInspector()
             {
                 App->GetSceneModule()->GetScene()->SetStaticModified();
                 App->GetSceneModule()->GetScene()->SetDynamicModified();
-                UpdateMobilityHeriarchy(STATIC);
+                UpdateMobilityHierarchy(STATIC);
             }
         }
         ImGui::SameLine();
@@ -277,7 +283,7 @@ void GameObject::RenderEditorInspector()
             {
                 App->GetSceneModule()->GetScene()->SetStaticModified();
                 App->GetSceneModule()->GetScene()->SetDynamicModified();
-                UpdateMobilityHeriarchy(DYNAMIC);
+                UpdateMobilityHierarchy(DYNAMIC);
             }
         }
 
@@ -346,8 +352,9 @@ void GameObject::RenderEditorInspector()
     }
 }
 
-void GameObject::UpdateTransformForGOBranch() const
+void GameObject::UpdateTransformForGOBranch()
 {
+    App->GetSceneModule()->AddGameObjectToUpdate(this);
     std::stack<UID> childrenBuffer;
     childrenBuffer.push(uid);
 
@@ -357,6 +364,7 @@ void GameObject::UpdateTransformForGOBranch() const
         childrenBuffer.pop();
         if (gameObject != nullptr)
         {
+            App->GetSceneModule()->AddGameObjectToUpdate(gameObject);
             gameObject->OnAABBUpdated();
             for (UID child : gameObject->GetChildren())
                 childrenBuffer.push(child);
@@ -412,6 +420,52 @@ void GameObject::OnTransformUpdated()
 
     if (mobilitySettings == STATIC) App->GetSceneModule()->GetScene()->SetStaticModified();
     else App->GetSceneModule()->GetScene()->SetDynamicModified();
+}
+
+void GameObject::UpdateComponents()
+{
+    for (const auto& component : components)
+    {
+        if (component.second) component.second->ParentUpdated();
+    }
+}
+
+AABB GameObject::GetHierarchyAABB()
+{
+    AABB returnAABB;
+    returnAABB.SetNegativeInfinity();
+    returnAABB.Enclose(globalAABB);
+
+    std::set<UID> visitedGameObjects;
+    std::stack<UID> toVisitGameObjects;
+    UID sceneRootUID = App->GetSceneModule()->GetScene()->GetGameObjectRootUID();
+    // ADD "THIS" GAME OBJECT SO WHEN ASCENDING HERIARCHY WE DON'T REVISIT OUR CHILDREN
+    visitedGameObjects.insert(uid);
+
+    // FIRST UPDATE DOWN THE HERIARCHY
+    for (UID gameObjectID : children)
+        toVisitGameObjects.push(gameObjectID);
+
+    while (!toVisitGameObjects.empty())
+    {
+        const UID currentUID = toVisitGameObjects.top();
+        toVisitGameObjects.pop();
+
+        if (visitedGameObjects.find(currentUID) == visitedGameObjects.end())
+        {
+            visitedGameObjects.insert(currentUID);
+            const GameObject* currentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentUID);
+
+            const AABB& currentAABB       = currentGameObject->GetGlobalAABB();
+            if (currentAABB.IsFinite() && !currentAABB.IsDegenerate())
+                returnAABB.Enclose(currentGameObject->GetGlobalAABB());
+
+            for (UID childID : currentGameObject->GetChildren())
+                toVisitGameObjects.push(childID);
+        }
+    }
+
+    return returnAABB;
 }
 
 void GameObject::UpdateLocalTransform(const float4x4& parentGlobalTransform)
@@ -713,8 +767,10 @@ void GameObject::OnDrawConnectionsToggle()
     }
 }
 
-void GameObject::UpdateMobilityHeriarchy(ComponentMobilitySettings type)
+void GameObject::UpdateMobilityHierarchy(MobilitySettings type)
 {
+    App->GetSceneModule()->AddGameObjectToUpdate(this);
+    SetMobility(type);
     std::set<UID> visitedGameObjects;
     std::stack<UID> toVisitGameObjects;
     UID sceneRootUID = App->GetSceneModule()->GetScene()->GetGameObjectRootUID();
@@ -736,6 +792,7 @@ void GameObject::UpdateMobilityHeriarchy(ComponentMobilitySettings type)
             GameObject* currentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentUID);
 
             currentGameObject->SetMobility(type);
+            App->GetSceneModule()->AddGameObjectToUpdate(currentGameObject);
 
             for (UID childID : currentGameObject->GetChildren())
                 toVisitGameObjects.push(childID);
@@ -756,6 +813,7 @@ void GameObject::UpdateMobilityHeriarchy(ComponentMobilitySettings type)
             GameObject* currentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentUID);
 
             currentGameObject->SetMobility(type);
+            App->GetSceneModule()->AddGameObjectToUpdate(currentGameObject);
 
             for (UID childID : currentGameObject->GetChildren())
                 toVisitGameObjects.push(childID);

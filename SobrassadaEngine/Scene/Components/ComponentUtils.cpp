@@ -1,4 +1,5 @@
 ﻿#include "ComponentUtils.h"
+#include "ComponentUtils.h"
 
 #include "CameraComponent.h"
 #include "Component.h"
@@ -11,6 +12,9 @@
 #include "Standalone/UI/CanvasComponent.h"
 #include "Standalone/UI/Transform2DComponent.h"
 #include "Standalone/UI/UILabelComponent.h"
+#include "Standalone/Physics/CubeColliderComponent.h"
+#include "Standalone/Physics/SphereColliderComponent.h"
+#include "Standalone/Physics/CapsuleColliderComponent.h"
 #include "ScriptComponent.h"
 
 #include <cstdint>
@@ -52,9 +56,17 @@ Component* ComponentUtils::CreateEmptyComponent(const ComponentType type, const 
     case COMPONENT_SCRIPT:
         generatedComponent = new ScriptComponent(uid, parent);
         break;
-    case COMPONENT_ANIMATION:
-        generatedComponent = new AnimationComponent(uid, parent);
+      case COMPONENT_CUBE_COLLIDER:
+        generatedComponent = new CubeColliderComponent(uid, parent);
         break;
+    case COMPONENT_SPHERE_COLLIDER:
+        generatedComponent = new SphereColliderComponent(uid, parent);
+        break;
+    case COMPONENT_CAPSULE_COLLIDER:
+        generatedComponent = new CapsuleColliderComponent(uid, parent);
+        break;
+        case COMPONENT_ANIMATION:
+        generatedComponent = new AnimationComponent(uid, parent);
     default:
         return nullptr;
     }
@@ -90,10 +102,16 @@ Component* ComponentUtils::CreateExistingComponent(const rapidjson::Value& initi
             return new UILabelComponent(initialState, parent);
         case COMPONENT_CAMERA:
             return new CameraComponent(initialState, parent);
-        case COMPONENT_ANIMATION:
-            return new AnimationComponent(initialState, parent);
         case COMPONENT_SCRIPT:
             return new ScriptComponent(initialState, parent);
+        case COMPONENT_CUBE_COLLIDER:
+            return new CubeColliderComponent(initialState, parent);
+        case COMPONENT_SPHERE_COLLIDER:
+            return new SphereColliderComponent(initialState, parent);
+        case COMPONENT_CAPSULE_COLLIDER:
+            return new CapsuleColliderComponent(initialState, parent);
+        case COMPONENT_ANIMATION:
+            return new AnimationComponent(initialState, parent);
         default:
             return nullptr;
         }
