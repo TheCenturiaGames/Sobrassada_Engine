@@ -119,7 +119,7 @@ namespace AnimationImporter
         const std::string saveFilePath = App->GetProjectModule()->GetLoadedProjectPath() + ANIMATIONS_PATH +
                                    std::to_string(finalAnimUID) + ANIMATION_EXTENSION;
       
-        size_t bytesWritten =
+        const size_t bytesWritten =
             FileSystem::Save(saveFilePath.c_str(), buffer.data(), buffer.size(), true);
 
         if (bytesWritten == 0)
