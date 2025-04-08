@@ -422,7 +422,9 @@ void StateMachineEditor::BuildGraph()
 
                 stateNodes[state.name.GetString()] = stateNode;
             }
+            
         }
+        stateCont++;
     }
 
     for (const auto& transition : resource->transitions)
@@ -489,7 +491,7 @@ void StateMachineEditor::DetectNewTransitions()
 void StateMachineEditor::CreateBaseState(StateNode& node)
 {
     State newState;
-    std::string stateName = "NewState_" + std::to_string(resource->states.size());
+    std::string stateName = "NewState_" + std::to_string(stateCont);
     std::string clipName  = "Clip_" + std::to_string(resource->clips.size());
 
     newState.name         = HashString(stateName);
@@ -500,7 +502,7 @@ void StateMachineEditor::CreateBaseState(StateNode& node)
     resource->AddState(newState.name.GetString(), newState.clipName.GetString());
     node.SetStateName(stateName);
     node.SetClipName(clipName);
-
+    stateCont++;
 }
 
 void StateMachineEditor::SaveMachine()
