@@ -26,8 +26,8 @@ void ResourceStateMachine::AddClip(UID animationResourceUID, const std::string& 
 
     Clip newClip;
     newClip.animationResourceUID = animationResourceUID;
-    newClip.clipName = hashName;
-    newClip.loop     = loopFlag;
+    newClip.clipName             = hashName;
+    newClip.loop                 = loopFlag;
     clips.push_back(newClip);
 }
 
@@ -57,7 +57,7 @@ bool ResourceStateMachine::EditClipInfo(
         if (clip.clipName == hashOld)
         {
             clip.animationResourceUID = newUID;
-            clip.loop    = newLoop;
+            clip.loop                 = newLoop;
 
             if (HashString(newName) != hashOld)
             {
@@ -102,12 +102,11 @@ void ResourceStateMachine::AddState(const std::string& stateName, const std::str
 
     states.push_back(newState);
 
-   if (states.size() == 1)
+    if (states.size() == 1)
     {
         defaultStateIndex = 0;
         activeStateIndex  = 0;
     }
-
 }
 
 bool ResourceStateMachine::RemoveState(const std::string& stateName)
@@ -117,25 +116,24 @@ bool ResourceStateMachine::RemoveState(const std::string& stateName)
     {
         if (states[i].name == stateHash)
         {
+            states.erase(states.begin() + i);
+
             if ((int)i == defaultStateIndex)
             {
-                states.erase(states.begin() + i);
-                if (!states.empty())
-                {
-                    defaultStateIndex = 0; 
-                }
-                else
-                {
-                    defaultStateIndex = -1;
-                }
+                defaultStateIndex = states.empty() ? -1 : 0;
             }
-            else
+            else if (defaultStateIndex > (int)i)
             {
-                states.erase(states.begin() + i);
-                if (defaultStateIndex > (int)i)
-                {
-                    defaultStateIndex--;
-                }
+                defaultStateIndex--;
+            }
+
+            if ((int)i == activeStateIndex)
+            {
+                activeStateIndex = states.empty() ? -1 : 0;
+            }
+            else if (activeStateIndex > (int)i)
+            {
+                activeStateIndex--;
             }
 
             return true;

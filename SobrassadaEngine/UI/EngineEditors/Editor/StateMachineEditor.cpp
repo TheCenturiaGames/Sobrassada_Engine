@@ -8,9 +8,9 @@
 StateMachineEditor::StateMachineEditor(const std::string& editorName, UID uid, ResourceStateMachine* stateMachine)
     : EngineEditorBase(editorName, uid), uid(uid), resource(stateMachine)
 {
-    graph = std::make_unique<ImFlow::ImNodeFlow>("StateMachineGraph_" + std::to_string(uid));
+    graph        = std::make_unique<ImFlow::ImNodeFlow>("StateMachineGraph_" + std::to_string(uid));
 
-    ImVec2 pos   = ImVec2(0,0);
+    ImVec2 pos   = ImVec2(0, 0);
 
     auto newNode = graph->placeNodeAt<StateNode>(pos);
     if (newNode)
@@ -59,11 +59,11 @@ bool StateMachineEditor::RenderEditor()
 
         if (activeState && stateNode->GetStateName() == activeState->name.GetString())
         {
-            stateNode->SetColor(ImColor(0.2f, 0.8f, 0.2f)); //Verde
+            stateNode->SetColor(ImColor(0.2f, 0.8f, 0.2f)); // Verde
         }
         else
         {
-            stateNode->SetColor(ImColor(0.2f, 0.4f, 0.8f)); //Azul
+            stateNode->SetColor(ImColor(0.2f, 0.4f, 0.8f)); // Azul
         }
 
         const auto& node = pair.second;
@@ -126,7 +126,7 @@ bool StateMachineEditor::RenderEditor()
                         resource->AddTransition(
                             sourceNode->GetStateName(), inputPinRaw->GetStateName(), "Trigger", 200
                         );
-                        //availableTriggers.push_back("Trigger");
+                        // availableTriggers.push_back("Trigger");
                         auto newLink =
                             std::make_shared<ImFlow::Link>(dragged, inputPinRaw->getInputPin().get(), graph.get());
                         graph->addLink(newLink);
@@ -493,7 +493,7 @@ void StateMachineEditor::BuildGraph()
                 {
                     auto link = std::make_shared<ImFlow::Link>(outputPin.get(), inputPin.get(), graph.get());
                     graph->addLink(link);
-                   //resource->availableTriggers.push_back(transition.triggerName.GetString());
+                    // resource->availableTriggers.push_back(transition.triggerName.GetString());
                 }
                 else
                 {
@@ -530,7 +530,7 @@ void StateMachineEditor::DetectNewTransitions()
                 {
                     GLOG("Creating transition from %s to %s", fromState.c_str(), toState.c_str());
                     resource->AddTransition(fromState, toState, "Trigger", 200);
-                    //availableTriggers.push_back("Trigger");
+                    // availableTriggers.push_back("Trigger");
                 }
             }
         }
@@ -739,7 +739,9 @@ void StateMachineEditor::ShowTriggersPopup()
         {
             if (strlen(newTriggerName) > 0)
             {
-                const bool alreadyExists = std::find(resource->availableTriggers.begin(),resource->availableTriggers.end(), newTriggerName) != resource->availableTriggers.end();
+                const bool alreadyExists =
+                    std::find(resource->availableTriggers.begin(), resource->availableTriggers.end(), newTriggerName) !=
+                    resource->availableTriggers.end();
                 if (!alreadyExists)
                 {
                     resource->availableTriggers.push_back(newTriggerName);
@@ -758,14 +760,15 @@ void StateMachineEditor::ShowTriggersPopup()
                 GLOG("Trigger selected: %s", trigger.c_str());
                 for (const auto& transition : resource->transitions)
                 {
-                    if (transition.triggerName == trigger && transition.fromState.GetString() == resource->GetActiveState()->name.GetString())
+                    if (transition.triggerName == trigger &&
+                        transition.fromState.GetString() == resource->GetActiveState()->name.GetString())
                     {
                         for (size_t i = 0; i < resource->states.size(); ++i)
                         {
                             if (resource->states[i].name.GetString() == transition.toState.GetString())
                             {
                                 resource->SetActiveState(static_cast<int>(i));
-                                break; 
+                                break;
                             }
                         }
                     }
