@@ -17,6 +17,7 @@ enum class ResourceType
     Prefab,    // 16
     StateMachine,//17
     Navmesh,   // 18
+    Font,         // 19
 };
 
 class Resource
