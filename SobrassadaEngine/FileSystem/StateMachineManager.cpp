@@ -36,7 +36,17 @@ namespace StateMachineManager
 
         stateMachineJSON.AddMember("UID", stateMachineUID, allocator);
         stateMachineJSON.AddMember("Name", rapidjson::Value(stateName.c_str(), allocator), allocator);
-        //stateMachineJSON.AddMember("Triggers", rapidjson::Value(stateName.c_str(), allocator), allocator);
+        rapidjson::Value triggersArray(rapidjson::kArrayType);
+
+        for (const std::string& trigger : resource->availableTriggers)
+        {
+            rapidjson::Value triggerValue;
+            triggerValue.SetString(trigger.c_str(), static_cast<rapidjson::SizeType>(trigger.length()), allocator);
+            triggersArray.PushBack(triggerValue, allocator);
+        }
+
+        stateMachineJSON.AddMember("Triggers", triggersArray, allocator);
+
 
          //Clips
         rapidjson::Value clipsArray(rapidjson::kArrayType);
@@ -160,6 +170,20 @@ namespace StateMachineManager
 
 
         ResourceStateMachine* stateMachine = new ResourceStateMachine(uid, name);
+
+        if (stateMachineJSON.HasMember("Triggers") && stateMachineJSON["Triggers"].IsArray())
+        {
+            stateMachine->availableTriggers.clear(); 
+            const rapidjson::Value& triggersArray = stateMachineJSON["Triggers"];
+
+            for (rapidjson::SizeType i = 0; i < triggersArray.Size(); ++i)
+            {
+                if (triggersArray[i].IsString())
+                {
+                    stateMachine->availableTriggers.push_back(triggersArray[i].GetString());
+                }
+            }
+        }
 
         //Clips
         if (stateMachineJSON.HasMember("Clips") && stateMachineJSON["Clips"].IsArray())

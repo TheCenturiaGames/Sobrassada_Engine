@@ -89,11 +89,15 @@ class ResourceStateMachine : public Resource
         return nullptr;
     }
 
-    void SetActiveState(State* state) { activeState = state; }
-    const State* GetActiveState() { return activeState; }
+    //void SetActiveState(State* state) { activeState = state; }
+    const State* GetActiveState()
+    {
+        if (activeStateIndex >= 0 && activeStateIndex < (int)states.size()) return &states[activeStateIndex];
+        return nullptr;
+    }
 
   private:
     int defaultStateIndex = -1;
-    State* activeState = nullptr;
+    int activeStateIndex  = -1;
     UID stateMachineUID;
 };

@@ -156,12 +156,19 @@ void StateMachineEditor::ShowInspector()
     const State* defaultState = resource->GetDefaultState();
     if (defaultState)
     {
-        GLOG("DEFAULT: %s", defaultState->name.GetString().c_str());
-
         if (selectedNode->GetStateName() == defaultState->name.GetString())
         {
             ImGui::SameLine();
             ImGui::Text("- Default");
+        }
+    }
+    const State* activeState = resource->GetActiveState();
+    if (activeState)
+    {
+        if (selectedNode->GetStateName() == activeState->name.GetString())
+        {
+            ImGui::SameLine();
+            ImGui::Text("- Active State");
         }
     }
 
@@ -472,7 +479,7 @@ void StateMachineEditor::BuildGraph()
                 {
                     auto link = std::make_shared<ImFlow::Link>(outputPin.get(), inputPin.get(), graph.get());
                     graph->addLink(link);
-                   resource->availableTriggers.push_back(transition.triggerName.GetString());
+                   //resource->availableTriggers.push_back(transition.triggerName.GetString());
                 }
                 else
                 {
@@ -600,7 +607,6 @@ void StateMachineEditor::ShowSavePopup()
 void StateMachineEditor::LoadMachine()
 {
     availableClips.clear();
-    resource->availableTriggers.clear();
     ImGui::OpenPopup("Load State Machine");
 }
 
@@ -734,6 +740,10 @@ void StateMachineEditor::ShowTriggersPopup()
             if (ImGui::Button(trigger.c_str()))
             {
                 GLOG("Trigger selected: %s", trigger.c_str());
+                for (const auto& transitions : resource->transitions)
+                {
+                    //TODO: CAMBIAR ACTIVE STATE
+                }
             }
         }
 

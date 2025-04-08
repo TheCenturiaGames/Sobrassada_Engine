@@ -105,6 +105,7 @@ void ResourceStateMachine::AddState(const std::string& stateName, const std::str
    if (states.size() == 1)
     {
         defaultStateIndex = 0;
+        activeStateIndex  = 0;
     }
 
 }
