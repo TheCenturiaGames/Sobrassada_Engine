@@ -79,7 +79,7 @@ class SOBRASADA_API_ENGINE GameObject
     bool RemoveComponent(ComponentType componentType);
 
     // Updates the transform for this game object and all descending children
-    void UpdateTransformForGOBranch() const;
+    void UpdateTransformForGOBranch();
     void UpdateMobilityHierarchy(MobilitySettings type);
 
     const std::unordered_map<ComponentType, Component*>& GetComponents() const { return components; }

@@ -179,6 +179,17 @@ void CapsuleColliderComponent::ParentUpdated()
 {
     if (fitToSize) CalculateCollider();
 
+    if (parent->IsStatic() && colliderType != ColliderType::STATIC)
+    {
+        mass = 0.f;
+        colliderType = ColliderType::STATIC;
+    }
+    else if (!parent->IsStatic() && colliderType == ColliderType::STATIC)
+    {
+        mass         = 1.f;
+        colliderType = ColliderType::DYNAMIC;
+    }
+
     App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
 }
 

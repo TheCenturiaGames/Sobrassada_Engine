@@ -261,7 +261,6 @@ void GameObject::RenderEditorInspector()
             ))
         {
             UpdateTransformForGOBranch();
-            App->GetSceneModule()->AddGameObjectToUpdate(this);
         }
 
         // Casting to use ImGui to set values and at the same type keep the enum type for the variable
@@ -343,7 +342,6 @@ void GameObject::RenderEditorInspector()
                 ))
             {
                 UpdateTransformForGOBranch();
-                App->GetSceneModule()->AddGameObjectToUpdate(this);
             }
         }
     }
@@ -353,8 +351,9 @@ void GameObject::RenderEditorInspector()
     }
 }
 
-void GameObject::UpdateTransformForGOBranch() const
+void GameObject::UpdateTransformForGOBranch()
 {
+    App->GetSceneModule()->AddGameObjectToUpdate(this);
     std::stack<UID> childrenBuffer;
     childrenBuffer.push(uid);
 
@@ -364,6 +363,7 @@ void GameObject::UpdateTransformForGOBranch() const
         childrenBuffer.pop();
         if (gameObject != nullptr)
         {
+            App->GetSceneModule()->AddGameObjectToUpdate(gameObject);
             gameObject->OnAABBUpdated();
             for (UID child : gameObject->GetChildren())
                 childrenBuffer.push(child);
@@ -759,6 +759,7 @@ void GameObject::OnDrawConnectionsToggle()
 
 void GameObject::UpdateMobilityHierarchy(MobilitySettings type)
 {
+    App->GetSceneModule()->AddGameObjectToUpdate(this);
     SetMobility(type);
     std::set<UID> visitedGameObjects;
     std::stack<UID> toVisitGameObjects;
@@ -781,6 +782,7 @@ void GameObject::UpdateMobilityHierarchy(MobilitySettings type)
             GameObject* currentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentUID);
 
             currentGameObject->SetMobility(type);
+            App->GetSceneModule()->AddGameObjectToUpdate(currentGameObject);
 
             for (UID childID : currentGameObject->GetChildren())
                 toVisitGameObjects.push(childID);
@@ -801,6 +803,7 @@ void GameObject::UpdateMobilityHierarchy(MobilitySettings type)
             GameObject* currentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentUID);
 
             currentGameObject->SetMobility(type);
+            App->GetSceneModule()->AddGameObjectToUpdate(currentGameObject);
 
             for (UID childID : currentGameObject->GetChildren())
                 toVisitGameObjects.push(childID);
