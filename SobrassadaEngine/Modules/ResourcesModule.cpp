@@ -1,37 +1,41 @@
 #include "ResourcesModule.h"
 #include "Application.h"
+#include "BatchManager.h"
 #include "Importer.h"
 #include "LibraryModule.h"
 #include "MeshImporter.h"
-#include "ResourceManagement/Resources/ResourceMaterial.h"
-#include "ResourceManagement/Resources/ResourceMesh.h"
-#include "ResourceManagement/Resources/ResourceTexture.h"
-#include "Scene/Components/Standalone/MeshComponent.h"
+#include "Resource.h"
+#include "ResourceMaterial.h"
+#include "ResourceMesh.h"
+#include "ResourceTexture.h"
 #include "SceneModule.h"
 #include "ShaderModule.h"
+#include "ResourceNavmesh.h"
+#include "Standalone/MeshComponent.h"
+#include "PathfinderModule.h"
 
-#include <Algorithm/Random/LCG.h> // TODO: LCG remove includes
-
-ResourcesModule::ResourcesModule() : myNavmesh(15345456565, "defaultName")
+ResourcesModule::ResourcesModule()
 {
+    batchManager = new BatchManager();
 }
 
 ResourcesModule::~ResourcesModule()
 {
+    delete batchManager;
+    delete tmpNavmesh;
 }
 
 bool ResourcesModule::Init()
 {
+    //TODO Remove this once NavMeshImporter is done with saving and loading
+    tmpNavmesh = new ResourceNavMesh(15345456565, "defaultName");
     return true;
 }
 
 bool ResourcesModule::ShutDown()
 {
-    for (auto resource : resources)
-    {
-        delete resource.second;
-    }
-    resources.clear();
+    UnloadAllResources();
+    batchManager->UnloadAllBatches();
     return true;
 }
 
@@ -93,8 +97,8 @@ void ResourcesModule::CreateNavMesh()
 {
 
     std::vector<std::pair<const ResourceMesh*, const float4x4&>> meshes;
-    float minPos[3]                                         = {FLT_MAX, FLT_MAX, FLT_MAX };
-    float maxPos[3]                                         = { FLT_MIN, FLT_MIN, FLT_MIN };
+    float minPos[3]                                         = {FLT_MAX, FLT_MAX, FLT_MAX};
+    float maxPos[3]                                         = {FLT_MIN, FLT_MIN, FLT_MIN};
 
     const std::unordered_map<UID, GameObject*>& gameObjects = App->GetSceneModule()->GetScene()->GetAllGameObjects();
 
@@ -106,7 +110,7 @@ void ResourcesModule::CreateNavMesh()
             if (gameObject)
             {
                 const MeshComponent* meshComponent = gameObject->GetMeshComponent();
-                const float4x4 globalMatrix        = gameObject->GetGlobalTransform();
+                const float4x4& globalMatrix        = gameObject->GetGlobalTransform();
 
                 if (meshComponent)
                 {
@@ -121,10 +125,12 @@ void ResourcesModule::CreateNavMesh()
                     maxPos[1]                        = std::max(maxPos[1], aabb.maxPoint.y);
                     maxPos[2]                        = std::max(maxPos[2], aabb.maxPoint.z);
 
-                    meshes.push_back({ resourceMesh, globalMatrix });
+                    meshes.push_back({resourceMesh, globalMatrix});
                 }
             }
         }
     }
-    myNavmesh.BuildNavMesh(meshes, minPos, maxPos);
+    tmpNavmesh->BuildNavMesh(meshes, minPos, maxPos);
+    App->GetPathfinderModule()->InitQuerySystem();
+
 }

@@ -1,14 +1,13 @@
 #pragma once
 
+#include "FrustumPlanes.h"
 #include "Module.h"
-#include <FrustumPlanes.h>
 
-#include <Geometry/AABB.h>
-#include <Geometry/Frustum.h>
-#include <Math/float4x4.h>
+#include "Geometry/AABB.h"
+#include "Geometry/Frustum.h"
+#include "Geometry/LineSegment.h"
+#include "Math/float4x4.h"
 
-// REMOVE
-#include <Geometry/LineSegment.h>
 constexpr float cameraRotationAngle  = 135.f / RAD_DEGREE_CONV;
 constexpr float maximumPositivePitch = 89.f / RAD_DEGREE_CONV;
 constexpr float maximumNegativePitch = -89.f / RAD_DEGREE_CONV;

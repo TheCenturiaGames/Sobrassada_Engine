@@ -51,27 +51,26 @@ class ResourceNavMesh : public Resource
     ~ResourceNavMesh() override;
 
     bool BuildNavMesh(
-        const std::vector<std::pair<const ResourceMesh*, const float4x4&>>& meshes, float minPoint[3], float maxPoint[3]
+        const std::vector<std::pair<const ResourceMesh*, const float4x4&>>& meshes, const float minPoint[3],
+        const float maxPoint[3]
     );
-    void Render();
 
     void RenderNavmeshEditor();
     void CreateDetourData();
 
-    dtNavMesh* GetDetourNavMesh() { return navMesh; }
-    dtNavMeshQuery* GetDetourNavMeshQuery() { return navQuery; }
+    dtNavMesh* GetDetourNavMesh() const { return navMesh; }
+    dtNavMeshQuery* GetDetourNavMeshQuery() const { return navQuery; }
 
 
   private:
-    rcConfig* config;
-    rcContext* context;
-    rcHeightfield* heightfield;
-    rcCompactHeightfield* compactHeightfield;
-    rcContourSet* contourSet;
-    rcPolyMesh* polymesh;
-    rcPolyMeshDetail* polymeshDetail;
-    dtNavMesh* navMesh;
-    dtNavMeshQuery* navQuery;
+    rcConfig* config                         = nullptr;
+    rcHeightfield* heightfield               = nullptr;
+    rcCompactHeightfield* compactHeightfield = nullptr;
+    rcContourSet* contourSet                 = nullptr;
+    rcPolyMesh* polymesh                     = nullptr;
+    rcPolyMeshDetail* polymeshDetail         = nullptr;
+    dtNavMesh* navMesh                       = nullptr;
+    dtNavMeshQuery* navQuery                 = nullptr;
 
     bool m_filterLowHangingObstacles;
     bool m_filterLedgeSpans;
@@ -80,7 +79,6 @@ class ResourceNavMesh : public Resource
     float m_agentMaxClimb;
     float m_agentHeight;
     float m_agentRadius;
-    unsigned char* triAreas;
 
     int partitionType;
 };

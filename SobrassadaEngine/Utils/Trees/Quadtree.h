@@ -8,6 +8,9 @@
 
 #include <stack>
 #include <vector>
+#ifdef OPTICK
+#include "optick.h"
+#endif
 
 class GameObject;
 
@@ -73,6 +76,9 @@ class Quadtree
 template <typename AreaType>
 inline void Quadtree::QueryElements(const AreaType& queryObject, std::vector<GameObject*>& foundElements) const
 {
+#ifdef OPTICK
+    OPTICK_CATEGORY("Quadtree::QueryElements", Optick::Category::GameLogic)
+#endif
     std::vector<bool> insertedElements = std::vector<bool>(totalElements, false);
 
     std::stack<const QuadtreeNode*> nodesToVisit;

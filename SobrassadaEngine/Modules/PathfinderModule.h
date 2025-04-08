@@ -1,10 +1,14 @@
 #pragma once
 
-#include "Module.h"
 #include "Globals.h"
+#include "Module.h"
+#include <unordered_map>
 
-struct dtNavMesh;
+class dtNavMesh;
+class dtNavMeshQuery;
 class dtCrowd;
+class ResourceNavMesh;
+class AIAgentComponent;
 
 class PathfinderModule : public Module
 {
@@ -14,11 +18,28 @@ class PathfinderModule : public Module
     bool Init() override;
     update_status Update(float deltaTime) override;
 
-    std::vector<float3> FindPath(float3 start, float3 end);
-    void QueryNavmesh(UID uid);
+    int CreateAgent(float3& position, float radius, float height, float speed);
+    dtCrowd* GetCrowd() const { return crowd; }
+    dtNavMeshQuery* GetNavQuery() const { return navQuery; }
+    void RemoveAgent(int agentId);
+    void InitQuerySystem();
+    void HandleClickNavigation(); // Perform raycast and set destination
+    bool RaycastToGround(const LineSegment& ray, float3& outHitPoint);
+    void RenderCrowdEditor();
+
+    void AddAIAgentComponent(int agentId, AIAgentComponent* comp);
+    void RemoveAIAgentComponent(int agentId);
+    AIAgentComponent* GetComponentFromAgentId(int agentId);
 
   private:
-    dtNavMeshQuery* navQuery;
-    dtCrowd* crowd = nullptr;
-};
+    dtNavMeshQuery* navQuery = nullptr;
+    dtCrowd* crowd     = nullptr;
+    ResourceNavMesh* navmesh = nullptr;
+    const unsigned int maxAgents = 100;
+    const float maxAgentRadius = 0.5f;
+    bool clickNavigationEnabled  = false;
 
+    float3 outHitPoint;
+
+    std::unordered_map<int, AIAgentComponent*> agentComponentMap;
+};

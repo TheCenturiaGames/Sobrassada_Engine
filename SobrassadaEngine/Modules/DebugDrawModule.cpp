@@ -11,8 +11,10 @@
 #include "Quadtree.h"
 #include "SceneModule.h"
 #include "ResourcesModule.h"
+#include "ResourceNavmesh.h"
 #include "DetourNavMesh.h"
 #include "DetourNavMeshQuery.h"
+
 
 #include "SDL_video.h"
 #define DEBUG_DRAW_IMPLEMENTATION
@@ -765,11 +767,11 @@ void DebugDrawModule::HandleDebugRenderOptions()
     }
     if (debugOptionValues[(int)DebugOptions::RENDER_NAVMESH])
     {
-        if (App->GetResourcesModule()->GetNavMesh())
+        if (const ResourceNavMesh* navmesh = App->GetResourcesModule()->GetNavMesh())
         {
             DrawNavMesh(
-                App->GetResourcesModule()->GetNavMesh()->GetDetourNavMesh(),
-                App->GetResourcesModule()->GetNavMesh()->GetDetourNavMeshQuery(), DRAWNAVMESH_COLOR_TILES
+                navmesh->GetDetourNavMesh(),
+                navmesh->GetDetourNavMeshQuery(), DRAWNAVMESH_COLOR_TILES
             );
         }
     }
@@ -798,7 +800,7 @@ static unsigned int DetourIntToCol(int i, int a)
     return DetourRGBA(r * 63, g * 63, b * 63, a);
 }
 
-static unsigned int areaToCol(unsigned int area)
+static unsigned int AreaToCol(unsigned int area)
 {
     if (area == 0)
     {
@@ -833,7 +835,7 @@ void DebugDrawModule::DrawNavMesh(const dtNavMesh* navMesh, const dtNavMeshQuery
 
             unsigned int col;
             if (navQuery && navQuery->isInClosedList(base | (dtPolyRef)j)) col = DetourRGBA(255, 196, 0, 64);
-            else col = DetourTransCol(areaToCol(p->getArea()), 64);
+            else col = DetourTransCol(AreaToCol(p->getArea()), 64);
 
             std::vector<LineSegment> lines;
 

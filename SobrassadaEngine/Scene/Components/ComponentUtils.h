@@ -2,8 +2,8 @@
 
 #include "Globals.h"
 
-#include <Libs/rapidjson/document.h>
-#include <Math/float4x4.h>
+#include "Math/float4x4.h"
+#include "rapidjson/document.h"
 #include <cstdint>
 
 class Component;
@@ -19,10 +19,14 @@ enum ComponentType
     COMPONENT_SPOT_LIGHT,
     COMPONENT_DIRECTIONAL_LIGHT,
     COMPONENT_CHARACTER_CONTROLLER,
+    COMPONENT_TRANSFORM_2D,
+    COMPONENT_CANVAS,
+    COMPONENT_LABEL,
     COMPONENT_CAMERA,
+    COMPONENT_SCRIPT,
     COMPONENT_AIAGENT,
     FIRST = COMPONENT_NONE,
-    LAST  = COMPONENT_CAMERA
+    LAST  = COMPONENT_AIAGENT
 };
 
 class ComponentUtils

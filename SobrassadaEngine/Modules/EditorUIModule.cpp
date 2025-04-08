@@ -1,34 +1,37 @@
 #include "EditorUIModule.h"
 
+#include "Application.h"
 #include "CameraModule.h"
+#include "Component.h"
+#include "EngineEditorBase.h"
+#include "FileSystem.h"
+#include "GameTimer.h"
 #include "InputModule.h"
 #include "LibraryModule.h"
 #include "OpenGLModule.h"
+#include "PathfinderModule.h"
 #include "ProjectModule.h"
+#include "ResourceNavmesh.h"
 #include "ResourcesModule.h"
+#include "SceneImporter.h"
 #include "SceneModule.h"
+#include "ScriptModule.h"
+#include "TextureEditor.h"
+#include "TextureImporter.h"
 #include "WindowModule.h"
-#include <Application.h>
-#include <Component.h>
-#include <EngineEditorBase.h>
-#include <FileSystem.h>
-#include <GameTimer.h>
-#include <SceneImporter.h>
-#include <TextureImporter.h>
-#include <TextureLibraryEditor.h>
 
+#include "Math/Quat.h"
 #include "SDL.h"
 #include "glew.h"
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl2.h"
 #include "imgui_internal.h"
-#include <Math/Quat.h>
+// imguizmo include after imgui
+#include "ImGuizmo.h"
 #include <cstring>
 #include <filesystem>
 #include <string>
-// imguizmo include after imgui
-#include <ImGuizmo.h>
 
 EditorUIModule::EditorUIModule() : width(0), height(0)
 {
@@ -38,7 +41,12 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"Spot Light",           COMPONENT_SPOT_LIGHT          },
         {"Directional Light",    COMPONENT_DIRECTIONAL_LIGHT   },
         {"Character Controller", COMPONENT_CHARACTER_CONTROLLER},
-        {"Camera",               COMPONENT_CAMERA              }
+        {"Transform 2D",         COMPONENT_TRANSFORM_2D        },
+        {"UI Canvas",            COMPONENT_CANVAS              },
+        {"UI Label",             COMPONENT_LABEL               },
+        {"Camera",               COMPONENT_CAMERA              },
+        {"Script",               COMPONENT_SCRIPT              },
+        {"AI Agent",             COMPONENT_AIAGENT             }
     };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;
@@ -244,6 +252,8 @@ void EditorUIModule::Draw()
 
     if (navmesh) Navmesh(navmesh);
 
+    if (crowdControl) CrowdControl(crowdControl);
+
     if (editorSettingsMenu) EditorSettings(editorSettingsMenu);
 }
 
@@ -309,6 +319,7 @@ void EditorUIModule::MainMenu()
             if (ImGui::MenuItem("Inspector", "", inspectorMenu)) inspectorMenu = !inspectorMenu;
             if (ImGui::MenuItem("Lights Config", "", lightConfig)) lightConfig = !lightConfig;
             if (ImGui::MenuItem("Navmesh", "", navmesh)) navmesh = !navmesh;
+            if (ImGui::MenuItem("Crowd Control", "", crowdControl)) crowdControl = !crowdControl;
             ImGui::EndDisabled();
 
             ImGui::EndMenu();
@@ -320,8 +331,7 @@ void EditorUIModule::MainMenu()
 
             if (ImGui::MenuItem("Node Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::NODE));
 
-            if (ImGui::MenuItem("Texture Library"))
-                OpenEditor(new TextureLibraryEditor("Texture Library", GenerateUID()));
+            if (ImGui::MenuItem("Texture Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::TEXTURE));
 
             ImGui::EndMenu();
         }
@@ -408,6 +418,17 @@ void EditorUIModule::Navmesh(bool& navmesh)
     }
 
     App->GetResourcesModule()->GetNavMesh()->RenderNavmeshEditor();
+
+    ImGui::End();
+}
+
+void EditorUIModule::CrowdControl(bool& crowdControl)
+{
+    if (!crowdControl) return;
+
+    ImGui::Begin("Crowd Control", &crowdControl, ImGuiWindowFlags_None);
+
+    App->GetPathfinderModule()->RenderCrowdEditor();
 
     ImGui::End();
 }
@@ -992,6 +1013,7 @@ void EditorUIModule::About(bool& aboutMenu)
     ImGui::Text(" - UI: FreeType: v2.13.3");
     ImGui::Text(" - RecastNavigation: v1.6.0");
     ImGui::Text(" - ImNodeFlow: v1.2.2");
+    ImGui::Text(" - Bullet: v3.25");
     ImGui::Text("%s is licensed under the MIT License, see LICENSE for more information.", ENGINE_NAME);
 
     ImGui::Checkbox("Config/Build Information", &showConfigInfo);
@@ -1162,8 +1184,11 @@ EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
         return new EngineEditorBase("Base Editor " + std::to_string(uid), uid);
         break;
     case EditorType::NODE:
-        return new NodeEditor("NodeEditor" + std::to_string(uid), uid);
+        return new NodeEditor("NodeEditor_" + std::to_string(uid), uid);
 
+    case EditorType::TEXTURE:
+        return new TextureEditor("TextureEditor_" + std::to_string(uid), uid);
+        break;
     default:
         return nullptr;
     }
@@ -1187,13 +1212,14 @@ void EditorUIModule::EditorSettings(bool& editorSettingsMenu)
     if (ImGui::CollapsingHeader("Application"))
     {
         ImGui::SeparatorText("Information");
-        ImGui::InputText(
-            "App Name", const_cast<char*>(ENGINE_NAME), IM_ARRAYSIZE(ENGINE_NAME), ImGuiInputTextFlags_ReadOnly
-        );
-        ImGui::InputText(
-            "Organization", const_cast<char*>(ORGANIZATION_NAME), IM_ARRAYSIZE(ORGANIZATION_NAME),
-            ImGuiInputTextFlags_ReadOnly
-        );
+
+        std::string appName = ENGINE_NAME;
+        char* charAppName   = &appName[0];
+        ImGui::InputText("App Name", charAppName, strlen(charAppName), ImGuiInputTextFlags_ReadOnly);
+
+        std::string organizationName = ORGANIZATION_NAME;
+        char* charOrganizationName   = &organizationName[0];
+        ImGui::InputText("Organization", charOrganizationName, strlen(ORGANIZATION_NAME), ImGuiInputTextFlags_ReadOnly);
 
         ImGui::SeparatorText("Ms and Fps Graph");
         FramePlots(vsync);

@@ -1,14 +1,16 @@
-#include "ResourceNavMesh.h"
+#include "ResourceNavmesh.h"
+
 #include "Application.h"
 #include "DebugDrawModule.h"
-#include "DetourNavMeshBuilder.h"
-#include "DetourNavMeshQuery.h"
 #include "EditorUIModule.h"
 #include "FileSystem/Mesh.h"
-#include "Recast.h"
-#include "ResourceMesh.h"
-#include "ResourcesModule.h"
-#include "algorithm"
+
+#include <DetourNavMeshBuilder.h>
+#include <DetourNavMeshQuery.h>
+#include <Recast.h>
+#include <ResourceMesh.h>
+#include <ResourcesModule.h>
+#include <algorithm>
 
 ResourceNavMesh::~ResourceNavMesh()
 {
@@ -53,13 +55,13 @@ ResourceNavMesh::ResourceNavMesh(UID uid, const std::string& name) : Resource(ui
 
     // Default Walkable Options
     config->walkableSlopeAngle                          = 90.0f; // Max slope an agent can walk on
-    config->walkableClimb                               = 20;     // Max step height agent can climb
-    config->walkableHeight                              = 20;     // Min height required to pass
+    config->walkableClimb                               = 20;    // Max step height agent can climb
+    config->walkableHeight                              = 20;    // Min height required to pass
     config->walkableRadius                              = 1;     // Agent radius
 
     // Default Partition Options
     partitionType                                       = SAMPLE_PARTITION_MONOTONE;
-    config->minRegionArea                               = 70;  // Min region area (small regions will be removed)
+    config->minRegionArea                               = 70; // Min region area (small regions will be removed)
     config->mergeRegionArea                             = 20; // Merge regions smaller than this size
 
     // Default Contour Options
@@ -80,29 +82,19 @@ ResourceNavMesh::ResourceNavMesh(UID uid, const std::string& name) : Resource(ui
     m_agentMaxClimb                                     = 0.5f;
     m_agentRadius                                       = 0.5f;
 
-    context                                             = nullptr;
-    heightfield                                         = nullptr;
-    compactHeightfield                                  = nullptr;
-    triAreas                                            = nullptr;
-    contourSet                                          = nullptr;
-    polymesh                                            = nullptr;
-    polymeshDetail                                      = nullptr;
-    navMesh                                             = nullptr;
     navQuery                                            = dtAllocNavMeshQuery();
 }
 // add together all meshes to create navmesh - needs the direction to a vector of resourcemesh pointers
 bool ResourceNavMesh::BuildNavMesh(
-    const std::vector<std::pair<const ResourceMesh*, const float4x4&>>& meshes, float minPoint[3], float maxPoint[3]
+    const std::vector<std::pair<const ResourceMesh*, const float4x4&>>& meshes, const float minPoint[3],
+    const float maxPoint[3]
 )
 {
     int allVertexCount   = 0;
     int allTriangleCount = 0;
     int indexOffset      = 0;
 
-    context              = new rcContext();
-
-    std::vector<rcPolyMeshDetail*> myPolyMeshDetails;
-    std::vector<rcPolyMesh*> myPolyMeshes;
+    rcContext* context   = new rcContext();
 
     // first pass to get necessary sizes and AABB
     for (const auto& mesh : meshes)
@@ -134,7 +126,7 @@ bool ResourceNavMesh::BuildNavMesh(
         const std::vector<Vertex>& meshVerts         = mesh.first->GetLocalVertices();
         const std::vector<unsigned int>& meshIndices = mesh.first->GetIndices();
 
-        int vertexCount                              = mesh.first->GetVertexCount();
+        const int vertexCount                        = mesh.first->GetVertexCount();
 
         for (const Vertex& vertex : meshVerts)
         {
@@ -171,7 +163,7 @@ bool ResourceNavMesh::BuildNavMesh(
         return false;
     }
 
-    triAreas = new unsigned char[allTriangleCount]();
+    unsigned char* triAreas = new unsigned char[allTriangleCount]();
 
     rcMarkWalkableTriangles(
         context, config->walkableSlopeAngle, navmeshVertices.data(), allVertexCount, navmeshTriangles.data(),
@@ -308,7 +300,7 @@ bool ResourceNavMesh::BuildNavMesh(
         GLOG("buildNavigation: Could not triangulate contours.");
         return false;
     }
-   polymeshDetail = rcAllocPolyMeshDetail();
+    polymeshDetail = rcAllocPolyMeshDetail();
     if (!polymeshDetail)
     {
         GLOG("buildNavigation: Out of memory 'tempPolyMeshDetail'.");
@@ -323,12 +315,11 @@ bool ResourceNavMesh::BuildNavMesh(
         GLOG("buildNavigation: Could not build detail mesh.");
         return false;
     }
-    
 
     rcFreeCompactHeightfield(compactHeightfield);
     rcFreeContourSet(contourSet);
 
-
+    // mark areas for detour
     if (config->maxVertsPerPoly <= DT_VERTS_PER_POLYGON)
     {
 
@@ -350,7 +341,6 @@ bool ResourceNavMesh::BuildNavMesh(
                 polymesh->flags[i] = SAMPLE_POLYFLAGS_WALK | SAMPLE_POLYFLAGS_DOOR;
             }
         }
-
     }
 
     CreateDetourData();
@@ -430,40 +420,24 @@ void ResourceNavMesh::CreateDetourData()
         GLOG("Could not init Detour navmesh query");
         return;
     }
+}
 
-}
-/*
-void ResourceNavMesh::Render()
-{
-    if (!navMesh)
-    {
-        return;
-    }
-    ResourceNavMesh* rsnav   = App->GetResourcesModule()->GetNavMesh();
-    dtNavMesh* navMesh       = App->GetResourcesModule()->GetNavMesh()->GetDetourNavMesh();
-    dtNavMeshQuery* navQuery = App->GetResourcesModule()->GetNavMesh()->GetDetourNavMeshQuery();
-    // App->GetDebugDrawModule()->DrawNavMesh(navMesh, navQuery, DRAWNAVMESH_COLOR_TILES);
-}
-*/
 void ResourceNavMesh::RenderNavmeshEditor()
 {
 
-    ImGui::DragFloat("Cell Size", &config->cs, 0.1f, 0.1f, 2);
-    ImGui::DragFloat("Cell Height", &config->ch, 0.1f, 0.1f, 2);
+    ImGui::SliderFloat("Cell Size", &config->cs, 0.1f, 1.0f);
+    ImGui::SliderFloat("Cell Height", &config->ch, 0.1f, 1.0f);
 
-    ImGui::DragInt("Max Navmesh Width", &config->width, 1, 10, 10000);
-    ImGui::DragInt("Max Navmesh Height", &config->height, 1, 10, 10000);
+    ImGui::SliderFloat("Max Walkable Slope Angle", &config->walkableSlopeAngle, 0.f, 90.f);
+    ImGui::SliderInt("Max Walkable Climb", &config->walkableClimb, 1, 100);
+    ImGui::SliderInt("Max Walkable Height", &config->walkableHeight, 1, 100);
+    ImGui::SliderInt("Agent Radius", &config->walkableRadius, 1, 100);
 
-    ImGui::DragFloat("Max Walkable Slope Angle", &config->walkableSlopeAngle, 0.1f, 0.f, 90.f);
-    ImGui::DragInt("Max Walkable Climb", &config->walkableClimb, 1, 1, 100);
-    ImGui::DragInt("Max Walkable Height", &config->walkableHeight, 1, 1, 100);
-    ImGui::DragInt("Agent raidus", &config->walkableRadius, 1, 1, 100);
+    SamplePartitionType currentSelection = SamplePartitionType ::SAMPLE_PARTITION_MONOTONE;
+    int currentIndex                     = static_cast<int>(currentSelection);
 
-    static SamplePartitionType currentSelection = SamplePartitionType ::SAMPLE_PARTITION_MONOTONE;
-    int currentIndex                            = static_cast<int>(currentSelection);
-
-    const char* partitionLabels[]               = {
-        "SIMPLE_PARTITION_WATERSHED", "SAMPLE_PARTITION_MONOTONE", "SIMEPLE_PARTITION_LAYERS"
+    const char* partitionLabels[]        = {
+        "SAMPLE_PARTITION_WATERSHED", "SAMPLE_PARTITION_MONOTONE", "SAMPLE_PARTITION_LAYERS"
     };
     if (ImGui::ListBox("Partition Type", &currentIndex, partitionLabels, IM_ARRAYSIZE(partitionLabels)))
     {
@@ -471,25 +445,21 @@ void ResourceNavMesh::RenderNavmeshEditor()
         partitionType    = currentSelection;
     }
 
-    ImGui::DragInt("Minimum Region Area", &config->minRegionArea, 1, 1, 100);
-    ImGui::DragInt("Merge Region Area", &config->mergeRegionArea, 10, 10, 100);
+    ImGui::SliderInt("Minimum Region Area", &config->minRegionArea, 1, 100);
+    ImGui::SliderInt("Merge Region Area", &config->mergeRegionArea, 10, 100);
 
-    ImGui::DragFloat("Max Simplification Error", &config->maxSimplificationError, 0.1f, 0.1f, 5);
-    ImGui::DragInt("Max Edges Length", &config->maxEdgeLen, 1, 1, 100);
-    ImGui::DragInt("Max Vertices Per Polygon", &config->maxVertsPerPoly, 1, 1, 100);
+    ImGui::SliderFloat("Max Simplification Error", &config->maxSimplificationError, 0.1f, 5.0f);
+    ImGui::SliderInt("Max Edges Length", &config->maxEdgeLen, 1, 100);
+    ImGui::SliderInt("Max Vertices Per Polygon", &config->maxVertsPerPoly, 1, 100);
 
-    ImGui::DragFloat(
-        "Detail Sample Distance (hiher - more accurate but slower)", &config->detailSampleDist, 0.1f, 0.1f, 5
-    );
-    ImGui::DragFloat(
-        "Detail Sample Max Error (higher - smoother but less accurate)", &config->detailSampleMaxError, 0.1f, 0.1f, 5
-    );
+    ImGui::SliderFloat("Detail Sample Distance", &config->detailSampleDist, 0.1f, 5.0f);
+    ImGui::SliderFloat("Detail Sample Max Error", &config->detailSampleMaxError, 0.1f, 5.0f);
 
-    ImGui::Checkbox("Filter Low hanging Obstacles", &m_filterLowHangingObstacles);
+    ImGui::Checkbox("Filter Low Hanging Obstacles", &m_filterLowHangingObstacles);
     ImGui::Checkbox("Filter Ledge Spans", &m_filterLedgeSpans);
     ImGui::Checkbox("Filter Walkable Low Height Spans", &m_filterWalkableLowHeightSpans);
 
-    ImGui::DragFloat("Detour Agent Height", &m_agentHeight, 0.1f, 0.1f, 5);
-    ImGui::DragFloat("Detour Max Agent Climb", &m_agentMaxClimb, 0.1f, 0.1f, 5);
-    ImGui::DragFloat("Detour Agent Radius", &m_agentRadius, 0.1f, 0.1f, 5);
+    ImGui::SliderFloat("Detour Agent Height", &m_agentHeight, 0.1f, 5.0f);
+    ImGui::SliderFloat("Detour Max Agent Climb", &m_agentMaxClimb, 0.1f, 5.0f);
+    ImGui::SliderFloat("Detour Agent Radius", &m_agentRadius, 0.1f, 5.0f);
 }

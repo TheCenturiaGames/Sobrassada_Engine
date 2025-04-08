@@ -1,6 +1,6 @@
 #include "FileSystem.h"
 
-#include <istreamwrapper.h>
+#include "rapidjson/istreamwrapper.h"
 #include <fstream>
 #include <iostream>
 #include <sstream>
