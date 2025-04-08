@@ -50,16 +50,30 @@ bool StateMachineEditor::RenderEditor()
         ShowTriggers();
     }
     ShowTriggersPopup();
-    graph->update();
 
+    const State* activeState = resource->GetActiveState();
     for (const auto& pair : graph->getNodes())
     {
+        auto stateNode = std::dynamic_pointer_cast<StateNode>(pair.second);
+        if (!stateNode) continue;
+
+        if (activeState && stateNode->GetStateName() == activeState->name.GetString())
+        {
+            stateNode->SetColor(ImColor(0.2f, 0.8f, 0.2f)); //Verde
+        }
+        else
+        {
+            stateNode->SetColor(ImColor(0.2f, 0.4f, 0.8f)); //Azul
+        }
+
         const auto& node = pair.second;
         if (node->isSelected())
         {
             selectedNode = dynamic_cast<StateNode*>(node.get());
         }
     }
+
+    graph->update();
 
     graph->rightClickPopUpContent(
         [this](ImFlow::BaseNode* node)
@@ -168,7 +182,7 @@ void StateMachineEditor::ShowInspector()
         if (selectedNode->GetStateName() == activeState->name.GetString())
         {
             ImGui::SameLine();
-            ImGui::Text("- Active State");
+            ImGui::Text("- Active");
         }
     }
 
@@ -489,6 +503,8 @@ void StateMachineEditor::BuildGraph()
         }
     }
     GLOG("Total links in graph after adding them: %d", graph->getLinks().size());
+    resource->SetDefaultState(0);
+    resource->SetActiveState(0);
 }
 
 void StateMachineEditor::DetectNewTransitions()
@@ -740,9 +756,19 @@ void StateMachineEditor::ShowTriggersPopup()
             if (ImGui::Button(trigger.c_str()))
             {
                 GLOG("Trigger selected: %s", trigger.c_str());
-                for (const auto& transitions : resource->transitions)
+                for (const auto& transition : resource->transitions)
                 {
-                    //TODO: CAMBIAR ACTIVE STATE
+                    if (transition.triggerName == trigger && transition.fromState.GetString() == resource->GetActiveState()->name.GetString())
+                    {
+                        for (size_t i = 0; i < resource->states.size(); ++i)
+                        {
+                            if (resource->states[i].name.GetString() == transition.toState.GetString())
+                            {
+                                resource->SetActiveState(static_cast<int>(i));
+                                break; 
+                            }
+                        }
+                    }
                 }
             }
         }
