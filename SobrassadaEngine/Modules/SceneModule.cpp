@@ -10,6 +10,7 @@
 #include "ImGuizmo.h"
 #include "InputModule.h"
 #include "LibraryModule.h"
+#include "PhysicsModule.h"
 #include "ProjectModule.h"
 #include "RaycastController.h"
 #include "ResourcesModule.h"
@@ -114,6 +115,8 @@ update_status SceneModule::PostUpdate(float deltaTime)
             {
                 loadedScene->UpdateDynamicSpatialStructure();
             }
+
+            loadedScene->UpdateGameObjects();
         }
 
         if (loadedScene->GetStopPlaying()) SwitchPlayMode(false);

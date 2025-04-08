@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "CameraModule.h"
 #include "DebugDrawModule.h"
+#include "GameObject.h"
 #include "GameUIModule.h"
 #include "SceneModule.h"
 #include "Transform2DComponent.h"

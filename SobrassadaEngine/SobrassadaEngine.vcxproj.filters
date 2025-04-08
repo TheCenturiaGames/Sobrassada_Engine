@@ -417,6 +417,24 @@
     <ClCompile Include="FileSystem\Batching\GeometryBatch.cpp">
       <Filter>FileSystem\Batching</Filter>
     </ClCompile>
+    <ClCompile Include="Modules\PhysicsModule.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugDraw\BulletDebugDraw.cpp">
+      <Filter>External\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\Physics\CubeColliderComponent.cpp">
+      <Filter>Scene\Components\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\Physics\BulletMotionState.cpp">
+      <Filter>Utils\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\Physics\SphereColliderComponent.cpp">
+      <Filter>Scene\Components\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\Physics\CapsuleColliderComponent.cpp">
+      <Filter>Scene\Components\Physics</Filter>
+    </ClCompile>
     <ClCompile Include="ResourceManagement\Resources\ResourceNavmesh.cpp">
       <Filter>Resources</Filter>
     </ClCompile>
@@ -493,6 +511,12 @@
     </Filter>
     <Filter Include="FileSystem\Batching">
       <UniqueIdentifier>{bf8dc33a-6c9e-43fb-bb6c-b5055f64ed3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Components\Physics">
+      <UniqueIdentifier>{66257dd0-b9f6-4430-8450-125aa647a078}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils\Physics">
+      <UniqueIdentifier>{d73de18e-a52c-4b41-bc53-d6b11a25b7f4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -787,6 +811,27 @@
     </ClInclude>
     <ClInclude Include="FileSystem\Batching\GeometryBatch.h">
       <Filter>FileSystem\Batching</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\PhysicsModule.h">
+      <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugDraw\BulletDebugDraw.h">
+      <Filter>External\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\Physics\CubeColliderComponent.h">
+      <Filter>Scene\Components\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Physics\BulletMotionState.h">
+      <Filter>Utils\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Physics\BulletUserPointer.h">
+      <Filter>Utils\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\Physics\SphereColliderComponent.h">
+      <Filter>Scene\Components\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\Physics\CapsuleColliderComponent.h">
+      <Filter>Scene\Components\Physics</Filter>
     </ClInclude>
     <ClInclude Include="ResourceManagement\Resources\ResourceNavmesh.h">
       <Filter>Resources</Filter>

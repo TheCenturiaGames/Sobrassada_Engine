@@ -6,6 +6,7 @@
 #include "LibraryModule.h"
 #include "ResourceFont.h"
 #include "ResourcesModule.h"
+#include "GameObject.h"
 #include "Scene.h"
 #include "SceneModule.h"
 #include "ShaderModule.h"
