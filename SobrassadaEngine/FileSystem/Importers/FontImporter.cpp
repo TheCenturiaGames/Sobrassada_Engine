@@ -12,7 +12,7 @@ namespace FontImporter
     {
         // Copy font to assets folder
         const std::string relativePath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(filePath);
-        std::string copyPath           = targetFilePath + relativePath;
+        const std::string copyPath           = targetFilePath + relativePath;
         if (!FileSystem::Exists(copyPath.c_str()))
         {
             FileSystem::Copy(filePath, copyPath.c_str());
