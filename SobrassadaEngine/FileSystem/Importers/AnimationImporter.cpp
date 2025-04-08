@@ -120,7 +120,7 @@ namespace AnimationImporter
                                    std::to_string(finalAnimUID) + ANIMATION_EXTENSION;
       
         const size_t bytesWritten =
-            FileSystem::Save(saveFilePath.c_str(), buffer.data(), buffer.size(), true);
+            FileSystem::Save(saveFilePath.c_str(), buffer.data(), static_cast<unsigned int>(buffer.size()), true);
 
         if (bytesWritten == 0)
         {

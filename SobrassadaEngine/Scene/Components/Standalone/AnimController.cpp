@@ -56,10 +56,7 @@ update_status AnimController::Update(float deltaTime)
     float previousTime  = currentTime;
     currentTime        += deltaTime;
 
-    if (animation == nullptr)
-    {
-        return UPDATE_CONTINUE;
-    }
+    if (animation == nullptr) return UPDATE_CONTINUE;
 
     const float duration = animation->GetDuration();
     // GLOG("Animation time update: %f -> %f (duration: %f)", previousTime, currentTime, duration);
@@ -82,10 +79,10 @@ update_status AnimController::Update(float deltaTime)
                 App->GetResourcesModule()->ReleaseResource(animation);
                 animation = nullptr;
             }
-
-            return UPDATE_CONTINUE;
         }
     }
+
+    return UPDATE_CONTINUE;
 }
 
 void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat& rot)
