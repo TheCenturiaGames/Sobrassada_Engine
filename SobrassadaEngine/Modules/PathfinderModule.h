@@ -18,7 +18,7 @@ class PathfinderModule : public Module
     bool Init() override;
     update_status Update(float deltaTime) override;
 
-    int CreateAgent(float3& position, float radius, float height, float speed);
+    int CreateAgent(const float3& position, const float radius, const float height, const float speed);
     dtCrowd* GetCrowd() const { return crowd; }
     dtNavMeshQuery* GetNavQuery() const { return navQuery; }
     void RemoveAgent(int agentId);

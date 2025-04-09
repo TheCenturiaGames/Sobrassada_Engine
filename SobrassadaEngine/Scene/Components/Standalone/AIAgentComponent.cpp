@@ -1,38 +1,31 @@
 #include "AIAgentComponent.h"
-#include "GameObject.h"
 #include "Application.h"
-#include "PathfinderModule.h"
-#include "SceneModule.h"
 #include "EditorUIModule.h"
+#include "GameObject.h"
+#include "PathfinderModule.h"
 #include "ResourceNavmesh.h"
+#include "SceneModule.h"
 
 #include <DetourCrowd.h>
 
-AIAgentComponent::AIAgentComponent(UID uid, GameObject* parent)
-    : Component(uid, parent, "AI Agent", COMPONENT_AIAGENT)
+AIAgentComponent::AIAgentComponent(UID uid, GameObject* parent) : Component(uid, parent, "AI Agent", COMPONENT_AIAGENT)
 {
-    float4x4 transformMatrix = parent->GetGlobalTransform();
-    agentPosition            = float3(transformMatrix[0][3], transformMatrix[1][3], transformMatrix[2][3]);
-    speed                    = 3.5f;
-    radius                   = 0.6f;
-    height                   = 2.0f;
-    agentId                  = -1;
-    autoAdd                  = false;
+    speed   = 3.5f;
+    radius  = 0.6f;
+    height  = 2.0f;
+
+    RecreateAgent();
 }
 
 AIAgentComponent::AIAgentComponent(const rapidjson::Value& initialState, GameObject* parent)
     : Component(initialState, parent)
 {
-    if (initialState.HasMember("AgentPositionX")) agentPosition.x = initialState["AgentPositionX"].GetFloat();
-    if (initialState.HasMember("AgentPositionY")) agentPosition.y = initialState["AgentPositionY"].GetFloat();
-    if (initialState.HasMember("AgentPositionZ")) agentPosition.z = initialState["AgentPositionZ"].GetFloat();
 
     if (initialState.HasMember("Speed")) speed = initialState["Speed"].GetFloat();
     if (initialState.HasMember("Radius")) radius = initialState["Radius"].GetFloat();
     if (initialState.HasMember("Height")) height = initialState["Height"].GetFloat();
-    if (initialState.HasMember("AutoAdd")) autoAdd = initialState["AutoAdd"].GetBool();
 
-    if (autoAdd) AddToCrowd();
+    RecreateAgent();
 }
 
 AIAgentComponent::~AIAgentComponent()
@@ -43,7 +36,7 @@ AIAgentComponent::~AIAgentComponent()
         agentId = -1;
     }
 }
-//Updates agent position evey frame
+// Updates agent position evey frame
 void AIAgentComponent::Update(float deltaTime)
 {
     if (!enabled) return;
@@ -74,12 +67,9 @@ void AIAgentComponent::RenderEditorInspector()
 
     if (enabled)
     {
-        ImGui::DragFloat("Speed", &speed, 0.1f, 0.1f, 200.f, "%.2f");
-        ImGui::DragFloat("Radius", &radius, 0.1f, 0.1f, 200.f, "%.2f");
-        ImGui::DragFloat("Height", &height, 0.1f, 0.1f, 200.f, "%.2f");
-        ImGui::Checkbox("AutoAdd", &autoAdd);
-        
-        if (ImGui::Button("Create Agent")) RecreateAgent();
+        if (ImGui::DragFloat("Speed", &speed, 0.1f, 0.1f, 200.f, "%.2f")) RecreateAgent();
+        if (ImGui::DragFloat("Radius", &radius, 0.1f, 0.1f, 200.f, "%.2f")) RecreateAgent();
+        if (ImGui::DragFloat("Height", &height, 0.1f, 0.1f, 200.f, "%.2f")) RecreateAgent();
     }
 }
 
@@ -89,12 +79,10 @@ void AIAgentComponent::Clone(const Component* other)
     if (other->GetType() == ComponentType::COMPONENT_AIAGENT)
     {
         const AIAgentComponent* otherAIAgent = static_cast<const AIAgentComponent*>(other);
-        agentPosition                                       = otherAIAgent->agentPosition;
-        speed                                              = otherAIAgent->speed;
-        radius                                             = otherAIAgent->radius;
-        height                                             = otherAIAgent->height;
-        agentId                                            = -1;
-        autoAdd                                            = false;
+        speed                                = otherAIAgent->speed;
+        radius                               = otherAIAgent->radius;
+        height                               = otherAIAgent->height;
+        agentId                              = -1;
     }
     else
     {
@@ -107,15 +95,12 @@ void AIAgentComponent::Save(rapidjson::Value& targetState, rapidjson::Document::
 {
     Component::Save(targetState, allocator);
 
-    targetState.AddMember("AgentPositionX", agentPosition.x, allocator);
-    targetState.AddMember("AgentPositionY", agentPosition.y, allocator);
-    targetState.AddMember("AgentPositionZ", agentPosition.z, allocator);
     targetState.AddMember("Speed", speed, allocator);
     targetState.AddMember("Radius", radius, allocator);
     targetState.AddMember("Height", height, allocator);
-    targetState.AddMember("AutoAdd", autoAdd, allocator);
 }
-//finds closest navmesh walkable trianle.
+
+// finds closest navmesh walkable trianle.
 void AIAgentComponent::setPath(const float3& destination) const
 {
 
@@ -155,7 +140,7 @@ void AIAgentComponent::AddToCrowd()
         return;
     }
 
-    agentId = App->GetPathfinderModule()->CreateAgent(agentPosition, radius, height, speed);
+    agentId = App->GetPathfinderModule()->CreateAgent(parent->GetPosition(), radius, height, speed);
 
     if (agentId != -1)
     {
@@ -167,8 +152,7 @@ void AIAgentComponent::RecreateAgent()
 {
     if (agentId != -1)
     {
-        App->GetPathfinderModule()->RemoveAgent(agentId); 
-        App->GetPathfinderModule()->RemoveAIAgentComponent(agentId);
+        App->GetPathfinderModule()->RemoveAgent(agentId);
         agentId = -1;
     }
 
