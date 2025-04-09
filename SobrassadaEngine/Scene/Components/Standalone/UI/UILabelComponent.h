@@ -8,6 +8,12 @@ namespace TextManager
 {
     struct FontData;
 }
+
+namespace Math
+{
+    class float4x4;
+}
+
 class Transform2DComponent;
 class CanvasComponent;
 class ResourceFont;
@@ -26,7 +32,7 @@ class UILabelComponent : public Component
     void Render(float deltaTime) override {};
     void RenderEditorInspector() override;
     
-    void RenderUI() const;
+    void RenderUI(const float4x4& view, const float4x4 proj) const;
 
     void RemoveTransform() { transform2D = nullptr; }
 

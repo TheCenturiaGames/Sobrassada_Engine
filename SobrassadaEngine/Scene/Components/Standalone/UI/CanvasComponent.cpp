@@ -10,8 +10,10 @@
 #include "Transform2DComponent.h"
 #include "UILabelComponent.h"
 #include "WindowModule.h"
+#include "ShaderModule.h"
 
 #include "imgui.h"
+#include "glew.h"
 #include <queue>
 
 CanvasComponent::CanvasComponent(UID uid, GameObject* parent) : Component(uid, parent, "Canvas", COMPONENT_CANVAS)
@@ -117,6 +119,22 @@ void CanvasComponent::Render(float deltaTime)
 
 void CanvasComponent::RenderUI()
 {
+    const int uiProgram = App->GetShaderModule()->GetUIWidgetProgram();
+    if (uiProgram == -1)
+    {
+        GLOG("Error with UI Program");
+        return;
+    }
+    glUseProgram(uiProgram);
+
+    // Get the view and projection matrix (world space or screen space)
+    const float4x4& view = isInWorldSpaceEditor ? App->GetCameraModule()->GetViewMatrix() : float4x4::identity;
+    const float4x4& proj = isInWorldSpaceEditor ? App->GetCameraModule()->GetProjectionMatrix()
+                                                : float4x4::D3DOrthoProjLH(
+                                                      -1, 1, (float)App->GetWindowModule()->GetWidth(),
+                                                      (float)App->GetWindowModule()->GetHeight()
+                                                  );
+
     // Get all children iteratively. This way, if the children of the canvas are modified they will be properly sorted
     // when rendering
     std::queue<UID> children;
@@ -132,10 +150,10 @@ void CanvasComponent::RenderUI()
 
         // Only render UI components
         Component* uiWidget             = currentObject->GetComponentByType(COMPONENT_LABEL);
-        if (uiWidget) static_cast<const UILabelComponent*>(uiWidget)->RenderUI();
+        if (uiWidget) static_cast<const UILabelComponent*>(uiWidget)->RenderUI(view, proj);
 
         uiWidget = currentObject->GetComponentByType(COMPONENT_IMAGE);
-        if (uiWidget) static_cast<const ImageComponent*>(uiWidget)->RenderUI();
+        if (uiWidget) static_cast<const ImageComponent*>(uiWidget)->RenderUI(view, proj);
 
         children.pop();
 

@@ -133,27 +133,9 @@ void UILabelComponent::Clone(const Component* other)
     }
 }
 
-void UILabelComponent::RenderUI() const
+void UILabelComponent::RenderUI(const float4x4& view, const float4x4 proj) const
 {
     if (parentCanvas == nullptr) return;
-
-    const int uiProgram = App->GetShaderModule()->GetUIWidgetProgram();
-    if (uiProgram == -1)
-    {
-        GLOG("Error with UI Program");
-        return;
-    }
-
-    glUseProgram(uiProgram);
-
-    const float4x4& view =
-        parentCanvas->IsInWorldSpaceEditor() ? App->GetCameraModule()->GetViewMatrix() : float4x4::identity;
-    const float4x4& proj =
-        parentCanvas->IsInWorldSpaceEditor()
-            ? App->GetCameraModule()->GetProjectionMatrix()
-            : float4x4::D3DOrthoProjLH(
-                  -1, 1, (float)App->GetWindowModule()->GetWidth(), (float)App->GetWindowModule()->GetHeight()
-              );
 
     float width = 0;
     float3 startPos;

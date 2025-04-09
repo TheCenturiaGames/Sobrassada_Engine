@@ -6,6 +6,7 @@
 #include "LibraryModule.h"
 #include "ResourcesModule.h"
 #include "Transform2DComponent.h"
+#include "OpenGLModule.h"
 
 #include "glew.h"
 
@@ -20,6 +21,7 @@ ImageComponent::ImageComponent(const rapidjson::Value& initialState, GameObject*
 
 ImageComponent::~ImageComponent()
 {
+    ClearBuffers();
 }
 
 void ImageComponent::Init()
@@ -52,18 +54,60 @@ void ImageComponent::RenderEditorInspector()
 {
 }
 
-void ImageComponent::RenderUI() const
+void ImageComponent::RenderUI(const float4x4& view, const float4x4 proj) const
 {
-    //const float vertices[] = {xPos,         yPos + height, 0.0f,         0.0f, xPos, yPos,
-    //                          0.0f,         1.0f,          xPos + width, yPos, 1.0f, 1.0f,
-    //
-    //                          xPos + width, yPos + height, 1.0f,         0.0f, xPos, yPos + height,
-    //                          0.0f,         0.0f,          xPos + width, yPos, 1.0f, 1.0f};
-    //
-    //GLuint lower           = static_cast<GLuint>(character.bindlessUID & 0xFFFFFFFF);
-    //GLuint higher          = static_cast<GLuint>(character.bindlessUID >> 32);
+    if (parentCanvas == nullptr) return;
+
+    const float3 startPos =
+        float3(transform2D->GetRenderingPosition(), 0) - parent->GetGlobalTransform().TranslatePart();
+    glUniformMatrix4fv(0, 1, GL_TRUE, parent->GetGlobalTransform().ptr());
+    glUniformMatrix4fv(1, 1, GL_TRUE, view.ptr());
+    glUniformMatrix4fv(2, 1, GL_TRUE, proj.ptr());
+
+    glBindVertexArray(vao);
+
+    //glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+    const float vertices[] = {
+        startPos.x,
+        startPos.y,
+        0.0f,
+        0.0f,
+        startPos.x,
+        startPos.y - transform2D->size.y,
+        0.0f,
+        1.0f,
+        startPos.x + transform2D->size.x,
+        startPos.y - transform2D->size.y,
+        1.0f,
+        1.0f,
+
+        startPos.x + transform2D->size.x,
+        startPos.y,
+        1.0f,
+        0.0f,
+        startPos.x,
+        startPos.y,
+        0.0f,
+        0.0f,
+        startPos.x + transform2D->size.x,
+        startPos.y - transform2D->size.y,
+        1.0f,
+        1.0f
+    };
+
+    const GLuint lower  = static_cast<GLuint>(bindlessUID & 0xFFFFFFFF);
+    const GLuint higher = static_cast<GLuint>(bindlessUID >> 32);
     glUniform2ui(4, lower, higher);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+    App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 6);
+
+    glDisable(GL_BLEND);
+    //glEnable(GL_DEPTH_TEST);
 }
 
 void ImageComponent::InitBuffers()
