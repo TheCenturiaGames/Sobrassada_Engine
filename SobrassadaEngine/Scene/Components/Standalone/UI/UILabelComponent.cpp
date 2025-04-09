@@ -153,7 +153,7 @@ void UILabelComponent::RenderUI() const
             ? App->GetCameraModule()->GetProjectionMatrix()
             : float4x4::D3DOrthoProjLH(
                   -1, 1, (float)App->GetWindowModule()->GetWidth(), (float)App->GetWindowModule()->GetHeight()
-              ); // near plane. far plane, screen width, screen height
+              );
 
     float width = 0;
     if (transform2D != nullptr)
@@ -209,7 +209,6 @@ void UILabelComponent::RenderEditorInspector()
                     fontData->Init(fontType->GetFilepath().c_str(), fontSize);
                 }
 
-                // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
                 if (is_selected) ImGui::SetItemDefaultFocus();
                 ++i;
             }

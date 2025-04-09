@@ -244,8 +244,7 @@ void GameObject::RenderEditorInspector()
 
         const float4x4& parentTransform = GetParentGlobalTransform();
 
-        if (selectedComponentIndex != COMPONENT_NONE &&
-            !(GetComponentByType(COMPONENT_CANVAS) && selectedComponentIndex == COMPONENT_TRANSFORM_2D))
+        if (selectedComponentIndex != COMPONENT_NONE)
         {
             ImGui::SameLine();
             if (ImGui::Button("Remove Component"))

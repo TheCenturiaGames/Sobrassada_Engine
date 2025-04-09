@@ -11,9 +11,9 @@
 #include "OpenGLModule.h"
 #include "PhysicsModule.h"
 #include "ProjectModule.h"
-#include "SceneImporter.h"
-#include "ResourcesModule.h"
 #include "ResourceNavmesh.h"
+#include "ResourcesModule.h"
+#include "SceneImporter.h"
 #include "SceneModule.h"
 #include "ScriptModule.h"
 #include "TextureEditor.h"
@@ -48,7 +48,8 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"Cube Collider",        COMPONENT_CUBE_COLLIDER       },
         {"Sphere Collider",      COMPONENT_SPHERE_COLLIDER     },
         {"Capsule Collider",     COMPONENT_CAPSULE_COLLIDER    },
-        {"Script",               COMPONENT_SCRIPT              }
+        {"Script",               COMPONENT_SCRIPT              },
+        {"UI Image",             COMPONENT_IMAGE               },
     };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;

@@ -1,6 +1,6 @@
 #include "ImageComponent.h"
 
-ImageComponent::ImageComponent(UID uid, GameObject* parent) : Component(uid, parent, "UI Image", COMPONENT_IMAGE)
+ImageComponent::ImageComponent(UID uid, GameObject* parent) : Component(uid, parent, "Image", COMPONENT_IMAGE)
 {
 
 }

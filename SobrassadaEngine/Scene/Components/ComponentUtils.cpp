@@ -11,6 +11,7 @@
 #include "Standalone/UI/CanvasComponent.h"
 #include "Standalone/UI/Transform2DComponent.h"
 #include "Standalone/UI/UILabelComponent.h"
+#include "Standalone/UI/ImageComponent.h"
 #include "Standalone/Physics/CubeColliderComponent.h"
 #include "Standalone/Physics/SphereColliderComponent.h"
 #include "Standalone/Physics/CapsuleColliderComponent.h"
@@ -64,6 +65,9 @@ Component* ComponentUtils::CreateEmptyComponent(const ComponentType type, const 
     case COMPONENT_CAPSULE_COLLIDER:
         generatedComponent = new CapsuleColliderComponent(uid, parent);
         break;
+    case COMPONENT_IMAGE:
+        generatedComponent = new ImageComponent(uid, parent);
+        break;
     default:
         return nullptr;
     }
@@ -107,6 +111,8 @@ Component* ComponentUtils::CreateExistingComponent(const rapidjson::Value& initi
             return new SphereColliderComponent(initialState, parent);
         case COMPONENT_CAPSULE_COLLIDER:
             return new CapsuleColliderComponent(initialState, parent);
+        case COMPONENT_IMAGE:
+            return new ImageComponent(initialState, parent);
         default:
             return nullptr;
         }
