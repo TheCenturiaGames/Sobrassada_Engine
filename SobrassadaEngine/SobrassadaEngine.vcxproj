@@ -290,6 +290,7 @@
     <ClCompile Include="FileSystem\Meta\MetaFont.cpp" />
     <ClCompile Include="Scene\Components\Standalone\Physics\CapsuleColliderComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\Physics\SphereColliderComponent.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\UI\ImageComponent.cpp" />
     <ClCompile Include="Utils\Physics\BulletMotionState.cpp" />
     <ClCompile Include="Scene\Components\Standalone\Physics\CubeColliderComponent.cpp" />
     <ClCompile Include="DebugDraw\BulletDebugDraw.cpp" />
@@ -461,6 +462,7 @@
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="Scene\Components\Standalone\Physics\CapsuleColliderComponent.h" />
+    <ClInclude Include="Scene\Components\Standalone\UI\ImageComponent.h" />
     <ClInclude Include="Utils\Physics\BulletUserPointer.h" />
     <ClInclude Include="Scene\Components\Standalone\Physics\SphereColliderComponent.h" />
     <ClInclude Include="Utils\Physics\BulletMotionState.h" />

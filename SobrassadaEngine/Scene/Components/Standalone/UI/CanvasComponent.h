@@ -18,6 +18,7 @@ class CanvasComponent : public Component
     void Render(float deltaTime) override;
     void RenderEditorInspector() override;
 
+    void RenderUI();
     void OnWindowResize(const unsigned int width, const unsigned int height);
 
     bool IsInWorldSpaceEditor() const { return isInWorldSpaceEditor; }

@@ -5,8 +5,10 @@
 #include "DebugDrawModule.h"
 #include "GameObject.h"
 #include "GameUIModule.h"
+#include "ImageComponent.h"
 #include "SceneModule.h"
 #include "Transform2DComponent.h"
+#include "UILabelComponent.h"
 #include "WindowModule.h"
 
 #include "imgui.h"
@@ -111,9 +113,12 @@ void CanvasComponent::Render(float deltaTime)
         ),
         -float3::unitY, height, float3(1, 1, 1)
     );
+}
 
-    // Render all ui widgets
-
+void CanvasComponent::RenderUI()
+{
+    // Get all children iteratively. This way, if the children of the canvas are modified they will be properly sorted
+    // when rendering
     std::queue<UID> children;
 
     for (const UID child : parent->GetChildren())
@@ -125,8 +130,13 @@ void CanvasComponent::Render(float deltaTime)
     {
         const GameObject* currentObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(children.front());
 
-        // Only render 2d objects (defined by having the transform 2D component)
-        if (currentObject->GetComponentByType(COMPONENT_TRANSFORM_2D) != nullptr) currentObject->Render(deltaTime);
+        // Only render UI components
+        Component* uiWidget             = currentObject->GetComponentByType(COMPONENT_LABEL);
+        if (uiWidget) static_cast<const UILabelComponent*>(uiWidget)->RenderUI();
+
+        uiWidget = currentObject->GetComponentByType(COMPONENT_IMAGE);
+        if (uiWidget) static_cast<const ImageComponent*>(uiWidget)->RenderUI();
+
         children.pop();
 
         for (const UID child : currentObject->GetChildren())

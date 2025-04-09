@@ -133,11 +133,7 @@ void UILabelComponent::Clone(const Component* other)
     }
 }
 
-void UILabelComponent::Update(float deltaTime)
-{
-}
-
-void UILabelComponent::Render(float deltaTime)
+void UILabelComponent::RenderUI() const
 {
     if (parentCanvas == nullptr) return;
 
