@@ -177,18 +177,6 @@
     <ClCompile Include="Scene\Scene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Components\Standalone\Lights\PointLightComponent.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Components\Standalone\Lights\SpotLightComponent.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Components\Standalone\LightComponent.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Components\Standalone\Lights\DirectionalLightComponent.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
     <ClCompile Include="Utils\LightsConfig.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
@@ -384,15 +372,6 @@
     <ClCompile Include="FileSystem\StateMachineManager.cpp">
       <Filter>FileSystem</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Components\Standalone\UI\CanvasComponent.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Components\Standalone\UI\UILabelComponent.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Components\Standalone\UI\Transform2DComponent.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
     <ClCompile Include="Utils\TextManager.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
@@ -441,7 +420,30 @@
     <ClCompile Include="FileSystem\Meta\MetaFont.cpp">
       <Filter>FileSystem\Meta</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Components\Standalone\UI\ImageComponent.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\UI\Transform2DComponent.cpp">
+      <Filter>Scene\Components\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\UI\UILabelComponent.cpp">
+      <Filter>Scene\Components\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\UI\ImageComponent.cpp">
+      <Filter>Scene\Components\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\UI\CanvasComponent.cpp">
+      <Filter>Scene\Components\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\Lights\SpotLightComponent.cpp">
+      <Filter>Scene\Components\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\Lights\PointLightComponent.cpp">
+      <Filter>Scene\Components\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\LightComponent.cpp">
+      <Filter>Scene\Components\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\Lights\DirectionalLightComponent.cpp">
+      <Filter>Scene\Components\Lights</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -518,6 +520,12 @@
     </Filter>
     <Filter Include="Utils\Physics">
       <UniqueIdentifier>{d73de18e-a52c-4b41-bc53-d6b11a25b7f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Components\UI">
+      <UniqueIdentifier>{e2d47d2b-6dd7-4684-a3b5-f5b67450d977}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Components\Lights">
+      <UniqueIdentifier>{7444def4-4f96-4ca5-b5da-7202b076fdc6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -623,18 +631,6 @@
     </ClInclude>
     <ClInclude Include="Scene\Scene.h">
       <Filter>Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene\Components\Standalone\Lights\SpotLightComponent.h">
-      <Filter>Scene\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene\Components\Standalone\Lights\PointLightComponent.h">
-      <Filter>Scene\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene\Components\Standalone\LightComponent.h">
-      <Filter>Scene\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene\Components\Standalone\Lights\DirectionalLightComponent.h">
-      <Filter>Scene\Components</Filter>
     </ClInclude>
     <ClInclude Include="Scene\Components\Component.h">
       <Filter>Scene\Components</Filter>
@@ -780,15 +776,6 @@
     <ClInclude Include="Utils\TextManager.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Components\Standalone\UI\CanvasComponent.h">
-      <Filter>Scene\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene\Components\Standalone\UI\UILabelComponent.h">
-      <Filter>Scene\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene\Components\Standalone\UI\Transform2DComponent.h">
-      <Filter>Scene\Components</Filter>
-    </ClInclude>
     <ClInclude Include="Modules\GameUIModule.h">
       <Filter>Modules</Filter>
     </ClInclude>
@@ -840,7 +827,30 @@
     <ClInclude Include="FileSystem\Meta\MetaFont.h">
       <Filter>FileSystem\Meta</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Components\Standalone\UI\ImageComponent.h" />
+    <ClInclude Include="Scene\Components\Standalone\UI\UILabelComponent.h">
+      <Filter>Scene\Components\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\UI\Transform2DComponent.h">
+      <Filter>Scene\Components\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\UI\ImageComponent.h">
+      <Filter>Scene\Components\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\UI\CanvasComponent.h">
+      <Filter>Scene\Components\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\Lights\SpotLightComponent.h">
+      <Filter>Scene\Components\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\Lights\PointLightComponent.h">
+      <Filter>Scene\Components\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\LightComponent.h">
+      <Filter>Scene\Components\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\Lights\DirectionalLightComponent.h">
+      <Filter>Scene\Components\Lights</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl">
