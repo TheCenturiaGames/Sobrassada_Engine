@@ -188,7 +188,7 @@ UID ResourceMaterial::ChangeTexture(UID newTexture, TextureInfo& textureToChange
         glMakeTextureHandleNonResidentARB(textureGPU);
         glDeleteTextures(1, &textureToChange.textureID);
 
-        UID handle = glGetTextureHandleARB(texture->GetTextureID());
+        const UID handle = glGetTextureHandleARB(texture->GetTextureID());
         glMakeTextureHandleResidentARB(handle);
 
         textureToChange.textureID = texture->GetTextureID();
