@@ -415,7 +415,7 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
                     App->GetDebugDrawModule()->FlipDebugOptionValue(i);
                     if (i == (int)DebugOptions::RENDER_WIREFRAME)
                         App->GetOpenGLModule()->SetRenderWireframe(currentBitValue);
-                    else if(i == (int)DebugOptions::RENDER_PHYSICS_WORLD)
+                    else if (i == (int)DebugOptions::RENDER_PHYSICS_WORLD)
                         App->GetPhysicsModule()->SetDebugOption(currentBitValue);
                 }
             }
@@ -623,7 +623,6 @@ void Scene::UpdateGameObjects()
             gameObject->UpdateComponents();
             gameObject->SetWillUpdate(false);
         }
-
     }
     gameObjectsToUpdate.clear();
 }
@@ -743,38 +742,69 @@ void Scene::LoadModel(const UID modelUID)
         const Model& model      = newModel->GetModelData();
         const std::vector<std::vector<NodeData>>& nodesScene = model.GetNodes();
 
+        std::vector<GameObject*> gameObjectsArray;
+        std::vector<UID> gameObjectsUID;
+        std::vector<GameObject*> rootGameObjects;
+        std::vector<unsigned int> accNodes;
+
+        unsigned int accNodesSize = 0;
         for (const std::vector<NodeData>& nodes : nodesScene)
         {
             GameObject* rootObject =
                 new GameObject(GetGameObjectRootUID(), App->GetLibraryModule()->GetResourceName(modelUID));
             rootObject->SetLocalTransform(nodes[0].transform);
-
             // Add the gameObject to the rootObject
             GetGameObjectByUID(GetGameObjectRootUID())->AddGameObject(rootObject->GetUID());
             AddGameObject(rootObject->GetUID(), rootObject);
+            rootGameObjects.push_back(rootObject);
 
-            std::vector<GameObject*> gameObjectsArray;
-            gameObjectsArray.push_back(rootObject);
+            gameObjectsUID.push_back(rootObject->GetUID());
+            for (int i = 1; i < nodes.size(); ++i)
+            {
+                gameObjectsUID.push_back(GenerateUID()); // generate all uids
+            }
+            accNodes.push_back(accNodesSize);
+            accNodesSize += static_cast<unsigned int>(nodes.size());
+        }
+
+        int cont = 0;
+        for (const std::vector<NodeData>& nodes : nodesScene)
+        {
+            gameObjectsArray.push_back(rootGameObjects[cont]);
 
             for (int i = 1; i < nodes.size(); ++i)
             {
+                int idx = i + accNodes[cont];
                 GameObject* gameObject =
-                    new GameObject(gameObjectsArray[nodes[i].parentIndex]->GetUID(), nodes[i].name);
+                    new GameObject(gameObjectsUID[nodes[i].parentIndex], nodes[i].name, gameObjectsUID[idx]);
                 gameObject->SetLocalTransform(nodes[i].transform);
 
-                gameObjectsArray.emplace_back(gameObject);
-                GetGameObjectByUID(gameObjectsArray[nodes[i].parentIndex]->GetUID())
-                    ->AddGameObject(gameObject->GetUID());
-                AddGameObject(gameObject->GetUID(), gameObject);
+                gameObjectsArray.push_back(gameObject);
+            }
+            cont++;
+        }
+
+        cont = 0;
+        for (const std::vector<NodeData>& nodes : nodesScene)
+        {
+            for (int i = 1; i < nodes.size(); ++i)
+            {
+                int idx                = i + accNodes[cont];
+                GameObject* gameObject = gameObjectsArray[idx];
+                UID parentID           = gameObject->GetParent();
+
+                GetGameObjectByUID(parentID)->AddGameObject(gameObject->GetUID());
+                AddGameObject(gameObjectsArray[idx]->GetUID(), gameObjectsArray[idx]);
             }
 
             // Iterate again to add the meshes and skins. Can't be done in the same loop because the bones have
             // to be already created
             for (int i = 0; i < nodes.size(); ++i)
             {
+                int idx = i + accNodes[cont];
                 if (nodes[i].meshes.size() > 0)
                 {
-                    GameObject* currentGameObject = gameObjectsArray[i];
+                    GameObject* currentGameObject = gameObjectsArray[idx];
                     GLOG("Node %s has %d meshes", nodes[i].name.c_str(), nodes[i].meshes.size());
 
                     unsigned meshNum = 1;
@@ -830,7 +860,8 @@ void Scene::LoadModel(const UID modelUID)
                 }
             }
 
-            rootObject->UpdateTransformForGOBranch();
+            rootGameObjects[cont]->UpdateTransformForGOBranch();
+            cont++;
         }
     }
 }

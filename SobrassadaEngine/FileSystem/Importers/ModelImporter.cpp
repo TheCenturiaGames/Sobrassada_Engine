@@ -14,7 +14,6 @@
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
 #include "tiny_gltf.h"
-#include <set>
 
 namespace ModelImporter
 {
@@ -34,8 +33,8 @@ namespace ModelImporter
             for (const auto& nodeID : scene.nodes)
             {
                 std::vector<NodeData> loadNodes;
-                if (model.nodes[nodeID].camera != -1 || model.nodes[nodeID].name == "Camera") continue;
-                FillNodes(model.nodes, nodeID, 0, meshesUIDs, loadNodes, accNodesInserted); // -1 parentId for root
+                // if (model.nodes[nodeID].camera != -1 || model.nodes[nodeID].name == "Camera") continue;
+                FillNodes(model.nodes, nodeID, meshesUIDs, loadNodes, accNodesInserted);
                 orderedNodes.push_back(loadNodes);
                 accNodesInserted += static_cast<unsigned int>(loadNodes.size());
             }
@@ -43,6 +42,7 @@ namespace ModelImporter
         GLOG("Nodes filled");
 
         newModel.SetNodes(orderedNodes);
+        newModel.SetNodesSize(accNodesInserted);
 
         // Get Skins data
         std::vector<Skin> skinsData;
@@ -381,37 +381,44 @@ namespace ModelImporter
     }
 
     void FillNodes(
-        const std::vector<tinygltf::Node>& nodesList, int nodeId, int parentId,
-        const std::vector<std::vector<std::pair<UID, UID>>>& meshesUIDs, std::vector<NodeData>& outNodes, const unsigned int accNodesInserted
+        const std::vector<tinygltf::Node>& nodesList, int nodeID,
+        const std::vector<std::vector<std::pair<UID, UID>>>& meshesUIDs, std::vector<NodeData>& outNodes,
+        const unsigned int accNodesInserted
     )
     {
-        // Fill node data
-        const tinygltf::Node& nodeData = nodesList[nodeId];
+        std::vector<NodeParent> nodesToVisit;
+        nodesToVisit.push_back({nodeID, -1}); // root parentID = -1
 
-        if (nodeData.camera != -1) return;
-
-        NodeData newNode;
-        if (!nodeData.name.empty()) newNode.name = nodeData.name;
-        else newNode.name = DEFAULT_NODE_NAME;
-
-        if (nodeData.mesh != -1) newNode.transform = float4x4::identity;
-        else newNode.transform = MeshImporter::GetNodeTransform(nodeData);
-
-        if (parentId == -1) newNode.parentIndex = parentId;
-        else if (parentId < nodeId) newNode.parentIndex = parentId + accNodesInserted;
-        else newNode.parentIndex = static_cast<int>(outNodes.size() - 1) + accNodesInserted;
-
-        // Get reference to Mesh and Material UIDs
-        if (nodeData.mesh > -1) newNode.meshes = meshesUIDs[nodeData.mesh];
-
-        newNode.skinIndex = nodeData.skin;
-
-        outNodes.push_back(newNode);
-
-        // Call this function for every node child and give them their id, which their children will need
-        for (const auto& id : nodeData.children)
+        while (!nodesToVisit.empty())
         {
-            FillNodes(nodesList, id, nodeId, meshesUIDs, outNodes, accNodesInserted);
+            NodeParent currentNode = nodesToVisit.back();
+            nodesToVisit.pop_back();
+
+            const int currentNodeIndex     = currentNode.nodeID;
+            const tinygltf::Node& nodeData = nodesList[currentNodeIndex];
+
+            // if (nodeData.camera != -1) continue;
+
+            NodeData newNode;
+            if (!nodeData.name.empty()) newNode.name = nodeData.name;
+            else newNode.name = DEFAULT_NODE_NAME;
+
+            if (nodeData.mesh != -1) newNode.transform = float4x4::identity;
+            else newNode.transform = MeshImporter::GetNodeTransform(nodeData);
+
+            newNode.parentIndex = currentNode.parentID;
+
+            // Get reference to Mesh and Material UIDs
+            if (nodeData.mesh > -1) newNode.meshes = meshesUIDs[nodeData.mesh];
+
+            newNode.skinIndex = nodeData.skin;
+
+            outNodes.push_back(newNode);
+
+            for (auto it = nodeData.children.rbegin(); it != nodeData.children.rend(); ++it)
+            {
+                nodesToVisit.push_back({*it, static_cast<int>(outNodes.size() - 1 + accNodesInserted)});
+            }
         }
     }
 } // namespace ModelImporter

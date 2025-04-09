@@ -30,14 +30,17 @@ class Model
     ~Model() = default;
 
     const std::vector<std::vector<NodeData>>& GetNodes() const { return nodes; }
+    const unsigned int GetNodesSize() const { return nodesSize; }
     const Skin& GetSkin(int skinIndex) const { return skins[skinIndex]; }
 
     void SetUID(const UID uid) { this->uid = uid; }
     void SetNodes(const std::vector<std::vector<NodeData>>& nodes) { this->nodes = nodes; }
+    void SetNodesSize(const unsigned int totalNodes) { nodesSize = totalNodes; }
     void SetSkins(const std::vector<Skin>& skins) { this->skins = skins; }
 
   private:
     UID uid;
     std::vector<std::vector<NodeData>> nodes;
+    unsigned int nodesSize = 0;
     std::vector<Skin> skins;
 };

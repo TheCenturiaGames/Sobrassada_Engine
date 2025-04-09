@@ -36,6 +36,15 @@ GameObject::GameObject(UID parentUID, std::string name) : parentUID(parentUID), 
     globalAABB = AABB(globalOBB);
 }
 
+GameObject::GameObject(UID parentUID, std::string name, UID uid) : parentUID(parentUID), name(name), uid(uid)
+{
+    localAABB = AABB();
+    localAABB.SetNegativeInfinity();
+
+    globalOBB  = OBB(localAABB);
+    globalAABB = AABB(globalOBB);
+}
+
 GameObject::GameObject(UID parentUID, GameObject* refObject)
     : parentUID(parentUID), name(refObject->name), localTransform(refObject->localTransform)
 {
