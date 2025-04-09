@@ -791,19 +791,22 @@ void Scene::LoadModel(const UID modelUID)
             {
                 int idx                = i + accNodes[cont];
                 GameObject* gameObject = gameObjectsArray[idx];
-                UID parentID           = gameObject->GetParent();
-
-                GetGameObjectByUID(parentID)->AddGameObject(gameObject->GetUID());
-                AddGameObject(gameObjectsArray[idx]->GetUID(), gameObjectsArray[idx]);
+                GetGameObjectByUID(gameObject->GetParent())->AddGameObject(gameObject->GetUID());
+                AddGameObject(gameObject->GetUID(), gameObject);
             }
+            cont++;
+        }
 
-            // Iterate again to add the meshes and skins. Can't be done in the same loop because the bones have
-            // to be already created
+        cont = 0;
+        for (const std::vector<NodeData>& nodes : nodesScene)
+        {
+            // Iterate again to add the meshes and skins. 
+            // Can't be done in the same loop because the bones have to be already created
             for (int i = 0; i < nodes.size(); ++i)
             {
-                int idx = i + accNodes[cont];
                 if (nodes[i].meshes.size() > 0)
                 {
+                    int idx                       = i + accNodes[cont];
                     GameObject* currentGameObject = gameObjectsArray[idx];
                     GLOG("Node %s has %d meshes", nodes[i].name.c_str(), nodes[i].meshes.size());
 
