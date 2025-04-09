@@ -249,7 +249,7 @@ update_status Scene::Update(float deltaTime)
     return UPDATE_CONTINUE;
 }
 
-update_status Scene::Render(float deltaTime) const
+update_status Scene::Render(float deltaTime)
 {
     if (!App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_WIREFRAME))
         lightsConfig->RenderSkybox();
@@ -295,6 +295,18 @@ update_status Scene::Render(float deltaTime) const
         {
             gameObject.second->DrawGizmos();
         }
+    }
+
+    DebugDrawModule* debugDraw = App->GetDebugDrawModule();
+
+    for (auto& gameObjectIterator : selectedGameObjects)
+    {
+        GameObject* gameObject = GetGameObjectByUID(gameObjectIterator.first);
+
+        AABB aabb              = gameObject->GetHierarchyAABB();
+        
+        for (int i = 0; i < 12; ++i)
+            debugDraw->DrawLineSegment(aabb.Edge(i), float3(1.f, 1.0f, 0.5f));
     }
 
     return UPDATE_CONTINUE;
@@ -667,6 +679,7 @@ void Scene::AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
             selectedGameObject->UpdateLocalTransform(selectedGameObjectParent->GetGlobalTransform());
             selectedGameObject->UpdateTransformForGOBranch();
         }
+
         selectedGameObjects.erase(pairResult.first);
     }
 }

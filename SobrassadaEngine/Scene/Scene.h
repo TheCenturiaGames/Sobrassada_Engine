@@ -42,7 +42,7 @@ class Scene
     void OverridePrefabs(UID prefabUID);
 
     update_status Update(float deltaTime);
-    update_status Render(float deltaTime) const;
+    update_status Render(float deltaTime);
     update_status RenderEditor(float deltaTime);
 
     void RenderEditorControl(bool& editorControlMenu);

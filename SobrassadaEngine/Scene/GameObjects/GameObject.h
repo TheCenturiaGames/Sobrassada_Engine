@@ -81,6 +81,9 @@ class SOBRASADA_API_ENGINE GameObject
     // Updates the transform for this game object and all descending children
     void UpdateTransformForGOBranch();
     void UpdateMobilityHierarchy(MobilitySettings type);
+    void UpdateLocalTransform(const float4x4& parentGlobalTransform);
+
+    bool WillUpdate() const { return willUpdate; };
 
     const std::unordered_map<ComponentType, Component*>& GetComponents() const { return components; }
     Component* GetComponentByType(ComponentType type) const;
@@ -103,9 +106,7 @@ class SOBRASADA_API_ENGINE GameObject
 
     void SetPosition(const float3& newPosition) { position = newPosition; };
     void SetWillUpdate(bool willUpdate) { this->willUpdate = willUpdate; };
-    bool WillUpdate() const { return willUpdate; };
 
-    void UpdateLocalTransform(const float4x4& parentGlobalTransform);
   private:
     void DrawNodes() const;
     void OnDrawConnectionsToggle();
