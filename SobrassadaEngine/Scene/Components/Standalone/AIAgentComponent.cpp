@@ -1,5 +1,5 @@
 #include "AIAgentComponent.h"
-
+#include "GameObject.h"
 #include "Application.h"
 #include "PathfinderModule.h"
 #include "SceneModule.h"
