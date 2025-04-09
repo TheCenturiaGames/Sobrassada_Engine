@@ -4,6 +4,7 @@
 #include "CameraComponent.h"
 #include "CameraModule.h"
 #include "EditorUIModule.h"
+#include "Framebuffer.h"
 #include "LibraryModule.h"
 #include "OpenGLModule.h"
 #include "ResourcesModule.h"
@@ -142,7 +143,77 @@ void LightsConfig::LoadSkyboxTexture(UID resource)
         skyboxID           = currentTexture->GetTextureID();
         skyboxHandle       = glGetTextureHandleARB(currentTexture->GetTextureID());
         glMakeTextureHandleResidentARB(skyboxHandle);
+
+        unsigned int cubemapIrradiance = CubeMapToTexture(1024, 1024);
     }
+}
+
+unsigned int LightsConfig::CubeMapToTexture(int width, int height)
+{
+    const float3 front[6] = {float3::unitX,  -float3::unitX, float3::unitY,
+                             -float3::unitY, float3::unitZ,  -float3::unitZ};
+    float3 up[6] = {-float3::unitY, -float3::unitY, float3::unitZ, -float3::unitZ, -float3::unitY, -float3::unitY};
+    Frustum frustum;
+    frustum.type                   = FrustumType::PerspectiveFrustum;
+    frustum.pos                    = float3::zero;
+    frustum.nearPlaneDistance      = 0.1f;
+    frustum.farPlaneDistance       = 100.0f;
+    frustum.verticalFov            = PI / 2.0f;
+    frustum.horizontalFov          = PI / 2.0f;
+
+    unsigned int irradianceProgram = App->GetShaderModule()->CreateShaderProgram(
+        SKYBOX_VERTEX_SHADER_PATH, IRRADIANCE_FRAGMENT_SHADER_PATH
+    );
+    glUseProgram(irradianceProgram);
+
+    // TODO: Create and Bind Frame Buffer and Create Irradiance Cubemap
+    Framebuffer framebuffer(width, height, false);
+    framebuffer.Bind();
+
+    unsigned int irradianceCubemap;
+    glGenTextures(1, &irradianceCubemap);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceCubemap);
+    for (int i = 0; i < 6; ++i)
+    {
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    glUniformHandleui64ARB(glGetUniformLocation(irradianceProgram, "skybox"), skyboxHandle);
+
+    for (int i = 0; i < 6; ++i)
+    {
+        glFramebufferTexture2D(
+            GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, irradianceCubemap, 0
+        );
+        frustum.front       = front[i];
+        frustum.up          = up[i];
+
+        float4x4 view       = frustum.ViewMatrix();
+        float4x4 projection = frustum.ProjectionMatrix();
+        // TODO: Draw 2x2x2 Cube using frustum view and projection matrices
+
+        unsigned int viewLoc       = glGetUniformLocation(irradianceProgram, "view");
+        //glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
+        unsigned int projLoc = glGetUniformLocation(irradianceProgram, "projection");
+        //glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection[0][0]);
+
+        glUniformMatrix4fv(0, 1, GL_TRUE, projection.ptr());
+        glUniformMatrix4fv(1, 1, GL_TRUE, view.ptr());
+
+        glBindVertexArray(skyboxVao);
+        App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 36);
+        // glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+    }
+    framebuffer.Unbind();
+    glDeleteProgram(irradianceProgram);
+
+    return framebuffer.GetTextureID();
 }
 
 void LightsConfig::SaveData(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const

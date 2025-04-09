@@ -1,7 +1,7 @@
 ﻿#include "ResourceTexture.h"
 #include "Geometry/Frustum.h"
+#include "Math/float4x4.h"
 #include "glew.h"
-#include "Framebuffer.h"
 
 ResourceTexture::ResourceTexture(uint64_t uid, const std::string& name) : Resource(uid, name, ResourceType::Texture)
 {
@@ -83,31 +83,4 @@ unsigned int ResourceTexture::GetCubemapFaceID(int faceIndex) const
 {
     assert(faceIndex >= 0 && faceIndex < 6);
     return m_CubemapFaceIDs[faceIndex];
-}
-
-void ResourceTexture::CubeMapToTexture(int width, int height)
-{
-    const float3 front[6] = {float3::unitX,  -float3::unitX, float3::unitY,
-                             -float3::unitY, float3::unitZ,  -float3::unitZ};
-    float3 up[6] = {-float3::unitY, -float3::unitY, float3::unitZ, -float3::unitZ, -float3::unitY, -float3::unitY};
-    Frustum frustum;
-    frustum.type              = FrustumType::PerspectiveFrustum;
-    frustum.pos               = float3::zero;
-    frustum.nearPlaneDistance = 0.1f;
-    frustum.farPlaneDistance  = 100.0f;
-    frustum.verticalFov       = PI / 2.0f;
-    frustum.horizontalFov     = PI / 2.0f;
-    // TODO: Create and Bind Frame Buffer and Create Irradiance Cubemap
-    Framebuffer framebuffer(width, height, false);
-    framebuffer.Bind();
-    for (int i = 0; i < 6; ++i)
-    {
-        glFramebufferTexture2D(
-            GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, GetCubemapFaceID(i), 0
-        );
-        frustum.front = front[i];
-        frustum.up    = up[i];
-
-        // TODO: Draw 2x2x2 Cube using frustum view and projection matrices
-    }
 }

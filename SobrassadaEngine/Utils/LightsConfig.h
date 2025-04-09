@@ -71,6 +71,7 @@ class LightsConfig
 
     void InitSkybox();
     void RenderSkybox() const;
+    unsigned int CubeMapToTexture(int width, int height);
 
     void InitLightBuffers();
     void SetLightsShaderData() const;
