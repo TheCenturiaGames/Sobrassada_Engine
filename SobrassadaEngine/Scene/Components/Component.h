@@ -1,11 +1,11 @@
 ﻿#pragma once
 
 #include "ComponentUtils.h"
-#include "GameObject.h"
-#include "Globals.h"
 
 #include "Geometry/AABB.h"
 #include "rapidjson/document.h"
+
+class GameObject;
 
 class Component
 {
@@ -22,9 +22,11 @@ class Component
     virtual void Update(float deltaTime)       = 0;
     virtual void Render(float deltaTime)       = 0;
     virtual void RenderEditorInspector();
+    virtual void ParentUpdated() { return; };
 
     UID GetUID() const { return uid; }
-    UID GetParentUID() const { return parent->GetUID(); }
+    UID GetParentUID() const;
+    GameObject* GetParent() const { return parent; }
 
     const AABB& GetLocalAABB() const { return localComponentAABB; }
 

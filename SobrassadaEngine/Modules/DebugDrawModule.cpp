@@ -23,6 +23,7 @@
 #include "Geometry/OBB.h"
 #include "glew.h"
 #include "imgui.h"
+#include "btVector3.h"
 #include <unordered_map>
 
 class DDRenderInterfaceCoreGL final : public dd::RenderInterface
@@ -693,6 +694,14 @@ void DebugDrawModule::DrawLine(
     dd::line(origin, dir + origin, color, 0, enableDepth);
 }
 
+// TODO, CHECK IF PROPER WAY OF IMPLEMENTATION
+void DebugDrawModule::DrawLine(const btVector3& from, const btVector3& to, const btVector3& color)
+{
+    dd::line(
+        float3(from.x(), from.y(), from.z()), float3(to.x(), to.y(), to.z()), float3(color.x(), color.y(), color.z())
+    );
+}
+
 void DebugDrawModule::DrawCircle(const float3& center, const float3& upVector, const float3& color, const float radius)
 {
     dd::circle(center, upVector, color, radius, 40);
@@ -722,6 +731,28 @@ void DebugDrawModule::Draw(const float4x4& view, const float4x4& proj, unsigned 
 void DebugDrawModule::DrawAxisTriad(const float4x4& transform, bool depthEnabled)
 {
     dd::axisTriad(transform, 0.005f, 0.05f, 0, depthEnabled);
+}
+
+void DebugDrawModule::Draw3DText(const btVector3& location, const char* textString)
+{
+    CameraModule* cameraModule = App->GetCameraModule();
+
+    const float4x4& projection = cameraModule->GetProjectionMatrix();
+    const float4x4& view       = cameraModule->GetViewMatrix();
+    const float3 pos           = float3(location);
+
+    auto framebuffer           = App->GetOpenGLModule()->GetFramebuffer();
+    int width                      = framebuffer->GetTextureWidth();
+    int height                     = framebuffer->GetTextureHeight();
+
+    dd::projectedText(textString, pos, float3::zero, view * projection, 0, 0, width, height);
+}
+
+void DebugDrawModule::DrawContactPoint(
+    const btVector3& PointOnB, const btVector3& normalOnB, float distance, int lifeTime, const btVector3& color
+)
+{
+    dd::vertexNormal(float3(PointOnB), float3(normalOnB), distance, lifeTime);
 }
 
 void DebugDrawModule::HandleDebugRenderOptions()
