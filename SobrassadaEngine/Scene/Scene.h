@@ -4,10 +4,11 @@
 #include "LightsConfig.h"
 
 #include "Math/float4x4.h"
+#include <functional>
 #include <map>
-#include <vector>
 #include <tuple>
 #include <unordered_map>
+#include <vector>
 
 class GameObject;
 class Component;
@@ -61,6 +62,12 @@ class Scene
     void AddGameObjectToUpdate(GameObject* gameObject);
     void UpdateGameObjects();
 
+    void AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
+    {
+        selectedGameObjects.insert({gameObject, gameObjectParent});
+    }
+    void ClearObjectSelection();
+
     const std::string& GetSceneName() const { return sceneName; }
     UID GetSceneUID() const { return sceneUID; }
     UID GetGameObjectRootUID() const { return gameObjectRootUID; }
@@ -93,7 +100,7 @@ class Scene
 
     void SetStaticModified() { staticModified = true; }
     void SetDynamicModified() { dynamicModified = true; }
-    
+
   private:
     void CreateStaticSpatialDataStruct();
     void CreateDynamicSpatialDataStruct();
@@ -125,4 +132,7 @@ class Scene
     bool dynamicModified                         = false;
 
     std::vector<GameObject*> gameObjectsToUpdate;
+
+    GameObject* multiSelectParent = nullptr;
+    std::map<UID, UID> selectedGameObjects;
 };

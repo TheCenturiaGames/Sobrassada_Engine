@@ -89,6 +89,8 @@ Scene::~Scene()
     }
     gameObjectsContainer.clear();
 
+    selectedGameObjects.clear();
+
     delete lightsConfig;
     delete sceneOctree;
     delete dynamicTree;
@@ -626,6 +628,11 @@ void Scene::UpdateGameObjects()
 
     }
     gameObjectsToUpdate.clear();
+}
+
+void Scene::ClearObjectSelection()
+{
+    selectedGameObjects.clear();
 }
 
 const std::vector<Component*> Scene::GetAllComponents() const
