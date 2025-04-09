@@ -419,7 +419,7 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
                     App->GetDebugDrawModule()->FlipDebugOptionValue(i);
                     if (i == (int)DebugOptions::RENDER_WIREFRAME)
                         App->GetOpenGLModule()->SetRenderWireframe(currentBitValue);
-                    else if(i == (int)DebugOptions::RENDER_PHYSICS_WORLD)
+                    else if (i == (int)DebugOptions::RENDER_PHYSICS_WORLD)
                         App->GetPhysicsModule()->SetDebugOption(currentBitValue);
                 }
             }
@@ -629,7 +629,6 @@ void Scene::UpdateGameObjects()
             gameObject->UpdateComponents();
             gameObject->SetWillUpdate(false);
         }
-
     }
     gameObjectsToUpdate.clear();
 }
@@ -640,9 +639,9 @@ void Scene::AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
 
     if (pairResult.second)
     {
-        GameObject* selectedGameObject = GetGameObjectByUID(gameObject);
+        GameObject* selectedGameObject       = GetGameObjectByUID(gameObject);
         GameObject* selectedGameObjectParent = GetGameObjectByUID(gameObjectParent);
-        
+
         selectedGameObjectParent->RemoveGameObject(gameObject);
 
         multiSelectParent->AddGameObject(gameObject);
@@ -653,13 +652,30 @@ void Scene::AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
 
         selectedGameObjectUID = multiSelectParent->GetUID();
     }
+    else if (pairResult.first != selectedGameObjects.end())
+    {
+        multiSelectParent->RemoveGameObject(gameObject);
+
+        GameObject* selectedGameObject       = GetGameObjectByUID(gameObject);
+        GameObject* selectedGameObjectParent = GetGameObjectByUID(selectedGameObjects[gameObject]);
+
+        selectedGameObject->SetParent(selectedGameObjectParent->GetUID());
+        selectedGameObjectParent->AddGameObject(gameObject);
+
+        if (selectedGameObjectParent->GetUID() != gameObjectRootUID)
+        {
+            selectedGameObject->UpdateLocalTransform(selectedGameObjectParent->GetGlobalTransform());
+            selectedGameObject->UpdateTransformForGOBranch();
+        }
+        selectedGameObjects.erase(pairResult.first);
+    }
 }
 
 void Scene::ClearObjectSelection()
 {
     for (auto& pairGameObject : selectedGameObjects)
     {
-        GameObject* currentGameObject = GetGameObjectByUID(pairGameObject.first); 
+        GameObject* currentGameObject        = GetGameObjectByUID(pairGameObject.first);
         GameObject* selectedGameObjectParent = GetGameObjectByUID(pairGameObject.second);
 
         multiSelectParent->RemoveGameObject(pairGameObject.first);
@@ -687,6 +703,11 @@ const std::vector<Component*> Scene::GetAllComponents() const
         }
     }
     return collectedComponents;
+}
+
+UID Scene::GetMultiselectUID() const
+{
+    return multiSelectParent->GetUID();
 }
 
 void Scene::SetMultiselectPosition(const float3& newPosition)

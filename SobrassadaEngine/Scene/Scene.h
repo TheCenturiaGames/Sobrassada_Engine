@@ -92,6 +92,7 @@ class Scene
     const std::tuple<float, float>& GetMousePosition() const { return mousePosition; };
     Octree* GetOctree() const { return sceneOctree; }
     Quadtree* GetDynamicTree() const { return dynamicTree; }
+    UID GetMultiselectUID() const;
 
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
 

@@ -81,7 +81,9 @@ namespace RaycastController
 
             if (parentGameobject)
             {
-                while (parentGameobject && parentGameobject->GetUID() != rootGameObject && !parentGameobject->IsTopParent())
+                while (parentGameobject && parentGameobject->GetUID() != rootGameObject &&
+                       !parentGameobject->IsTopParent() &&
+                       parentGameobject->GetUID() != sceneModule->GetScene()->GetMultiselectUID())
                 {
                     selectedGameObject = parentGameobject;
                     parentGameobject   = sceneModule->GetScene()->GetGameObjectByUID(selectedGameObject->GetParent());
