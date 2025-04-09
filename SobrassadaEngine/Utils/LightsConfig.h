@@ -20,8 +20,12 @@ namespace Lights
     struct AmbientLightShaderData
     {
         float4 color;
+        UID cubemapIrradiance;
 
-        AmbientLightShaderData(const float4& color) : color(color) {}
+        AmbientLightShaderData(const float4& color, const UID cubemapIrradiance)
+            : color(color), cubemapIrradiance(cubemapIrradiance)
+        {
+        }
     };
 
     struct DirectionalLightShaderData
@@ -101,12 +105,14 @@ class LightsConfig
     void SetSpotLightsShaderData() const;
 
   private:
-    UID skyboxUID              = INVALID_UID;
-    unsigned int skyboxVbo     = 0;
-    unsigned int skyboxVao     = 0;
-    unsigned int skyboxID      = 0;
-    uint64_t skyboxHandle     = 0;
-    unsigned int skyboxProgram = 0;
+    UID skyboxUID                  = INVALID_UID;
+    unsigned int skyboxVbo         = 0;
+    unsigned int skyboxVao         = 0;
+    unsigned int skyboxID          = 0;
+    UID skyboxHandle               = 0;
+    unsigned int cubemapIrradiance = 0;
+    UID irradianceHandle           = 0;
+    unsigned int skyboxProgram     = 0;
 
     float3 ambientColor;
     float ambientIntensity;

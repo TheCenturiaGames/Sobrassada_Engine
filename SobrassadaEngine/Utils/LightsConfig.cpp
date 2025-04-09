@@ -43,6 +43,8 @@ void LightsConfig::FreeCubemap() const
 
     glMakeTextureHandleNonResidentARB(skyboxHandle);
     glDeleteTextures(1, &skyboxID);
+    glMakeTextureHandleNonResidentARB(irradianceHandle);
+    glDeleteTextures(1, &cubemapIrradiance);
 }
 
 void LightsConfig::InitSkybox()
@@ -144,7 +146,9 @@ void LightsConfig::LoadSkyboxTexture(UID resource)
         skyboxHandle       = glGetTextureHandleARB(currentTexture->GetTextureID());
         glMakeTextureHandleResidentARB(skyboxHandle);
 
-        unsigned int cubemapIrradiance = CubeMapToTexture(1024, 1024);
+        cubemapIrradiance = CubeMapToTexture(1024, 1024);
+        irradianceHandle  = glGetTextureHandleARB(cubemapIrradiance);
+        glMakeTextureHandleResidentARB(skyboxHandle);
     }
 }
 
@@ -154,16 +158,15 @@ unsigned int LightsConfig::CubeMapToTexture(int width, int height)
                              -float3::unitY, float3::unitZ,  -float3::unitZ};
     float3 up[6] = {-float3::unitY, -float3::unitY, float3::unitZ, -float3::unitZ, -float3::unitY, -float3::unitY};
     Frustum frustum;
-    frustum.type                   = FrustumType::PerspectiveFrustum;
-    frustum.pos                    = float3::zero;
-    frustum.nearPlaneDistance      = 0.1f;
-    frustum.farPlaneDistance       = 100.0f;
-    frustum.verticalFov            = PI / 2.0f;
-    frustum.horizontalFov          = PI / 2.0f;
+    frustum.type              = FrustumType::PerspectiveFrustum;
+    frustum.pos               = float3::zero;
+    frustum.nearPlaneDistance = 0.1f;
+    frustum.farPlaneDistance  = 100.0f;
+    frustum.verticalFov       = PI / 2.0f;
+    frustum.horizontalFov     = PI / 2.0f;
 
-    unsigned int irradianceProgram = App->GetShaderModule()->CreateShaderProgram(
-        SKYBOX_VERTEX_SHADER_PATH, IRRADIANCE_FRAGMENT_SHADER_PATH
-    );
+    unsigned int irradianceProgram =
+        App->GetShaderModule()->CreateShaderProgram(SKYBOX_VERTEX_SHADER_PATH, IRRADIANCE_FRAGMENT_SHADER_PATH);
     glUseProgram(irradianceProgram);
 
     // TODO: Create and Bind Frame Buffer and Create Irradiance Cubemap
@@ -190,30 +193,29 @@ unsigned int LightsConfig::CubeMapToTexture(int width, int height)
         glFramebufferTexture2D(
             GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, irradianceCubemap, 0
         );
-        frustum.front       = front[i];
-        frustum.up          = up[i];
+        frustum.front        = front[i];
+        frustum.up           = up[i];
 
-        float4x4 view       = frustum.ViewMatrix();
-        float4x4 projection = frustum.ProjectionMatrix();
+        float4x4 view        = frustum.ViewMatrix();
+        float4x4 projection  = frustum.ProjectionMatrix();
         // TODO: Draw 2x2x2 Cube using frustum view and projection matrices
 
-        unsigned int viewLoc       = glGetUniformLocation(irradianceProgram, "view");
-        //glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
+        unsigned int viewLoc = glGetUniformLocation(irradianceProgram, "view");
+        // glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
         unsigned int projLoc = glGetUniformLocation(irradianceProgram, "projection");
-        //glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection[0][0]);
+        // glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection[0][0]);
 
         glUniformMatrix4fv(0, 1, GL_TRUE, projection.ptr());
         glUniformMatrix4fv(1, 1, GL_TRUE, view.ptr());
 
         glBindVertexArray(skyboxVao);
         App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 36);
-        // glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
     framebuffer.Unbind();
     glDeleteProgram(irradianceProgram);
 
-    return framebuffer.GetTextureID();
+    return irradianceCubemap;
 }
 
 void LightsConfig::SaveData(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
@@ -284,7 +286,8 @@ void LightsConfig::InitLightBuffers()
 void LightsConfig::SetLightsShaderData() const
 {
     // Ambient light
-    Lights::AmbientLightShaderData ambient = Lights::AmbientLightShaderData(float4(ambientColor, ambientIntensity));
+    Lights::AmbientLightShaderData ambient =
+        Lights::AmbientLightShaderData(float4(ambientColor, ambientIntensity), irradianceHandle);
 
     glBindBuffer(GL_UNIFORM_BUFFER, ambientBufferId);
     glBufferData(GL_UNIFORM_BUFFER, sizeof(ambient), &ambient, GL_STATIC_DRAW);
