@@ -28,6 +28,8 @@ class UILabelComponent : public Component
     
     void RenderUI() const;
 
+    void RemoveTransform() { transform2D = nullptr; }
+
   private:
     void InitBuffers();
     void OnFontChange();

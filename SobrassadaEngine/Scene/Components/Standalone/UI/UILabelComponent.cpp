@@ -156,25 +156,20 @@ void UILabelComponent::RenderUI() const
               );
 
     float width = 0;
-    if (transform2D != nullptr)
+    float3 startPos;
+    if (transform2D)
     {
-        float4x4 transform = parent->GetGlobalTransform();
-        transform.SetTranslatePart(float3(transform2D->GetGlobalPosition(), 0));
-        glUniformMatrix4fv(0, 1, GL_TRUE, transform.ptr());
+        startPos = float3(transform2D->GetRenderingPosition(), 0) - parent->GetGlobalTransform().TranslatePart();
         width = transform2D->size.x;
     }
-    else
-    {
-        // If the transform2D component is deleted, get the common global transform
-        glUniformMatrix4fv(0, 1, GL_TRUE, parent->GetGlobalTransform().ptr());
-    }
+    glUniformMatrix4fv(0, 1, GL_TRUE, parent->GetGlobalTransform().ptr());
     glUniformMatrix4fv(1, 1, GL_TRUE, view.ptr());
     glUniformMatrix4fv(2, 1, GL_TRUE, proj.ptr());
 
     glUniform3fv(3, 1, fontColor.ptr()); // Font color
 
     glBindVertexArray(vao);
-    TextManager::RenderText(*fontData, text, vbo, width);
+    TextManager::RenderText(*fontData, text, startPos, vbo, width);
 }
 
 void UILabelComponent::RenderEditorInspector()
