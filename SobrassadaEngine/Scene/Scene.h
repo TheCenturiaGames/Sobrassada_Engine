@@ -62,10 +62,7 @@ class Scene
     void AddGameObjectToUpdate(GameObject* gameObject);
     void UpdateGameObjects();
 
-    void AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
-    {
-        selectedGameObjects.insert({gameObject, gameObjectParent});
-    }
+    void AddGameObjectToSelection(UID gameObject, UID gameObjectParent);
     void ClearObjectSelection();
 
     const std::string& GetSceneName() const { return sceneName; }

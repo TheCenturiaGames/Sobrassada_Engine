@@ -101,12 +101,12 @@ class SOBRASADA_API_ENGINE GameObject
     void UpdateComponents();
     AABB GetHierarchyAABB();
 
-    void SetPosition(float3& newPosition) { position = newPosition; };
+    void SetPosition(const float3& newPosition) { position = newPosition; };
     void SetWillUpdate(bool willUpdate) { this->willUpdate = willUpdate; };
     bool WillUpdate() const { return willUpdate; };
 
-  private:
     void UpdateLocalTransform(const float4x4& parentGlobalTransform);
+  private:
     void DrawNodes() const;
     void OnDrawConnectionsToggle();
 

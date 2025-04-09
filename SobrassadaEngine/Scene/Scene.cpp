@@ -100,7 +100,6 @@ Scene::~Scene()
     dynamicTree  = nullptr;
 
     App->GetPhysicsModule()->EmptyWorld();
-
     GLOG("%s scene closed", sceneName.c_str());
 }
 
@@ -141,6 +140,9 @@ void Scene::Init()
 
     UpdateStaticSpatialStructure();
     UpdateDynamicSpatialStructure();
+
+    multiSelectParent = new GameObject(GenerateUID(), "MULTISELECT_DUMMY");
+    gameObjectsContainer.insert({multiSelectParent->GetUID(), multiSelectParent});
 }
 
 void Scene::Save(
@@ -630,8 +632,42 @@ void Scene::UpdateGameObjects()
     gameObjectsToUpdate.clear();
 }
 
+void Scene::AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
+{
+    auto pairResult = selectedGameObjects.insert({gameObject, gameObjectParent});
+
+    if (pairResult.second)
+    {
+        GameObject* selectedGameObject = GetGameObjectByUID(gameObject);
+        GameObject* selectedGameObjectParent = GetGameObjectByUID(gameObjectParent);
+        
+        selectedGameObjectParent->RemoveGameObject(gameObject);
+
+        multiSelectParent->AddGameObject(gameObject);
+
+        selectedGameObject->SetParent(multiSelectParent->GetUID());
+        selectedGameObject->UpdateLocalTransform(multiSelectParent->GetGlobalTransform());
+        selectedGameObject->UpdateTransformForGOBranch();
+
+        selectedGameObjectUID = multiSelectParent->GetUID();
+    }
+}
+
 void Scene::ClearObjectSelection()
 {
+    for (auto& pairGameObject : selectedGameObjects)
+    {
+        GameObject* currentGameObject = GetGameObjectByUID(pairGameObject.first); 
+        GameObject* selectedGameObjectParent = GetGameObjectByUID(pairGameObject.second);
+
+        multiSelectParent->RemoveGameObject(pairGameObject.first);
+        currentGameObject->SetParent(pairGameObject.second);
+        selectedGameObjectParent->AddGameObject(pairGameObject.first);
+
+        currentGameObject->UpdateLocalTransform(selectedGameObjectParent->GetGlobalTransform());
+        currentGameObject->UpdateTransformForGOBranch();
+    }
+
     selectedGameObjects.clear();
 }
 
