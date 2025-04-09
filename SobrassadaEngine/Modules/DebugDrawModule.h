@@ -10,6 +10,7 @@ class DDRenderInterfaceCoreGL;
 class dtNavMeshQuery;
 class dtNavMesh;
 class Camera;
+class btVector3;
 
 enum class DebugOptions : uint8_t
 {
@@ -20,7 +21,8 @@ enum class DebugOptions : uint8_t
     RENDER_OCTREE,
     RENDER_DYNAMICTREE,
     RENDER_CAMERA_RAY,
-    RENDER_NAVMESH
+    RENDER_NAVMESH,
+    RENDER_PHYSICS_WORLD
 };
 
 enum DrawNavMeshFlags
@@ -31,7 +33,7 @@ enum DrawNavMeshFlags
 };
 
 constexpr const char* DebugStrings[] = {"Render Lights", "Render Wireframe", "AABB",       "OBB",
-                                        "Octree",        "Dynamic Tree",     "Camera Ray", "Navmesh"};
+                                        "Octree",        "Dynamic Tree",     "Camera Ray", "Navmesh", "Physics World" };
 
 class DebugDrawModule : public Module
 {
@@ -52,6 +54,8 @@ class DebugDrawModule : public Module
         const float3& origin, const float3& direction, const float distance, const float3& color,
         bool enableDepth = true
     );
+    void DrawLine(const btVector3& from, const btVector3& to, const btVector3& color);
+   
     void DrawFrustrum(float4x4 frustumProj, float4x4 frustumView);
     void DrawCircle(const float3& center, const float3& upVector, const float3& color, const float radius);
     void DrawSphere(const float3& center, const float3& color, const float radius);
@@ -59,6 +63,10 @@ class DebugDrawModule : public Module
     void DrawCross(const float3& center, const float length);
     void DrawPoint(const float3& center, const float size);
     void DrawCone(const float3& center, const float3& dir, const float baseRadius, const float apexRadius);
+    void Draw3DText(const btVector3& location, const char* textString);
+    void DrawContactPoint(
+        const btVector3& PointOnB, const btVector3& normalOnB, float distance, int lifeTime, const btVector3& color
+    );
 
     void DrawNavMesh(const dtNavMesh* navMesh, const dtNavMeshQuery* navQuery, unsigned char flags);
 

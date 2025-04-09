@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "CanvasComponent.h"
 #include "DebugDrawModule.h"
+#include "GameObject.h"
 #include "Scene.h"
 #include "SceneModule.h"
 #include "UILabelComponent.h"

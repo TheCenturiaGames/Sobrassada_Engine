@@ -1,16 +1,18 @@
 #include "ResourcesModule.h"
+
 #include "Application.h"
 #include "BatchManager.h"
+#include "GameObject.h"
 #include "Importer.h"
 #include "LibraryModule.h"
 #include "MeshImporter.h"
 #include "Resource.h"
 #include "ResourceMaterial.h"
 #include "ResourceMesh.h"
+#include "ResourceNavmesh.h"
 #include "ResourceTexture.h"
 #include "SceneModule.h"
 #include "ShaderModule.h"
-#include "ResourceNavmesh.h"
 #include "Standalone/MeshComponent.h"
 
 ResourcesModule::ResourcesModule()
@@ -26,7 +28,7 @@ ResourcesModule::~ResourcesModule()
 
 bool ResourcesModule::Init()
 {
-    //TODO Remove this once NavMeshImporter is done with saving and loading
+    // TODO Remove this once NavMeshImporter is done with saving and loading
     tmpNavmesh = new ResourceNavMesh(15345456565, "defaultName");
     return true;
 }
@@ -109,7 +111,7 @@ void ResourcesModule::CreateNavMesh()
             if (gameObject)
             {
                 const MeshComponent* meshComponent = gameObject->GetMeshComponent();
-                const float4x4& globalMatrix        = gameObject->GetGlobalTransform();
+                const float4x4& globalMatrix       = gameObject->GetGlobalTransform();
 
                 if (meshComponent)
                 {

@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "FileSystem.h"
+#include "FontImporter.h"
 #include "MaterialImporter.h"
 #include "MeshImporter.h"
 #include "ModelImporter.h"
@@ -29,6 +30,8 @@ namespace SceneImporter
         std::string extension = FileSystem::GetFileExtension(filePath);
 
         if (extension == ASSET_EXTENSION) ImportGLTF(filePath, App->GetProjectModule()->GetLoadedProjectPath());
+        else if (extension == FONT_EXTENSION)
+            FontImporter::ImportFont(filePath, App->GetProjectModule()->GetLoadedProjectPath());
         else TextureImporter::Import(filePath, App->GetProjectModule()->GetLoadedProjectPath());
     }
 
@@ -48,8 +51,6 @@ namespace SceneImporter
             for (const auto& primitive : srcMesh.primitives)
             {
                 std::string name = srcMesh.name + std::to_string(n);
-                UID meshUID      = MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath, targetFilePath);
-                n++;
 
                 UID matUID   = INVALID_UID;
                 matIndex = primitive.material;
@@ -66,7 +67,10 @@ namespace SceneImporter
                 {
                     matUID = matIndices[matIndex];
                 }
-
+                
+                const UID meshUID      = MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath, targetFilePath, INVALID_UID, matUID);
+                n++;
+                
                 primitives.emplace_back(meshUID, matUID);
                 GLOG("New primitive with mesh UID: %d and Material UID: %d", meshUID, matUID);
             }
@@ -178,6 +182,12 @@ namespace SceneImporter
         ModelImporter::CopyModel(filePath, targetFilePath, name, sourceUID);
     }
 
+    void
+    CopyFont(const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID)
+    {
+        FontImporter::CopyFont(filePath, targetFilePath, name, sourceUID);
+    }
+
     void CreateLibraryDirectories(const std::string& projectFilePath)
     {
         const std::string convertedAssetPath = projectFilePath + ASSETS_PATH;
@@ -276,12 +286,20 @@ namespace SceneImporter
                 GLOG("Failed to create directory: %s", convertedMaterialsPath.c_str());
             }
         }
-        const std::string convertedAssetLibraryPath = projectFilePath + PREFABS_LIB_PATH;
-        if (!FileSystem::IsDirectory(convertedAssetLibraryPath.c_str()))
+        const std::string convertedPrefabLibraryPath = projectFilePath + PREFABS_LIB_PATH;
+        if (!FileSystem::IsDirectory(convertedPrefabLibraryPath.c_str()))
         {
-            if (!FileSystem::CreateDirectories(convertedAssetLibraryPath.c_str()))
+            if (!FileSystem::CreateDirectories(convertedPrefabLibraryPath.c_str()))
             {
-                GLOG("Failed to create directory: %s", convertedAssetLibraryPath.c_str());
+                GLOG("Failed to create directory: %s", convertedPrefabLibraryPath.c_str());
+            }
+        }
+        const std::string convertedFontsPath = projectFilePath + FONTS_PATH;
+        if (!FileSystem::IsDirectory(convertedFontsPath.c_str()))
+        {
+            if (!FileSystem::CreateDirectories(convertedFontsPath.c_str()))
+            {
+                GLOG("Failed to create directory: %s", convertedFontsPath.c_str());
             }
         }
     }

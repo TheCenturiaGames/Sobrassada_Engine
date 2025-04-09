@@ -6,12 +6,14 @@
 #include "MeshImporter.h"
 #include "ModelImporter.h"
 #include "PrefabManager.h"
+#include "FontImporter.h"
 #include "Resource.h"
 #include "ResourceMaterial.h"
 #include "ResourceMesh.h"
 #include "ResourceModel.h"
 #include "ResourcePrefab.h"
 #include "ResourceTexture.h"
+#include "ResourceFont.h"
 #include "TextureImporter.h"
 
 Resource* Importer::Load(UID uid)
@@ -32,6 +34,8 @@ Resource* Importer::Load(UID uid)
         return ModelImporter::LoadModel(uid);
     case ResourceType::Prefab:
         return PrefabManager::LoadPrefab(uid);
+    case ResourceType::Font:
+        return FontImporter::LoadFont(uid);
 
     default:
         GLOG("Unknown resource type: %d", type)

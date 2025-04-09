@@ -22,7 +22,8 @@ enum class FileType
     Scene,
     Model,
     Prefab,
-    StateMachine
+    StateMachine,
+    Font
 };
 
 class LibraryModule : public Module
@@ -50,6 +51,7 @@ class LibraryModule : public Module
     void AddPrefab(UID prefabUID, const std::string& prefabPath);
     void AddModel(UID modelUID, const std::string& modelPath);
     void AddStateMachine(UID stateMachineUID, const std::string& stMachPath);
+    void AddFont(UID fontUID, const std::string& fontName);
     void AddName(const std::string& resourceName, UID resourceUID);
     void AddResource(const std::string& resourcePath, UID resourceUID);
 
@@ -69,6 +71,7 @@ class LibraryModule : public Module
     const std::unordered_map<std::string, UID>& GetModelMap() const { return modelMap; }
     const std::unordered_map<std::string, UID>& GetPrefabMap() const { return prefabMap; }
     const std::unordered_map<std::string, UID>& GetStateMachinePath() const { return stateMachineMap; }
+    const std::unordered_map<std::string, UID>& GetFontMap() const { return fontMap; }
 
   private:
     // maps for user visuals | name -> UID
@@ -78,6 +81,7 @@ class LibraryModule : public Module
     std::unordered_map<std::string, UID> prefabMap;
     std::unordered_map<std::string, UID> modelMap;
     std::unordered_map<std::string, UID> stateMachineMap;
+    std::unordered_map<std::string, UID> fontMap;
     // inversed map          | UID -> name
     std::unordered_map<UID, std::string> namesMap;
 

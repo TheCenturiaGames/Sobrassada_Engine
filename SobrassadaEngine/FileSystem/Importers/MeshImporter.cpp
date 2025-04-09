@@ -20,7 +20,7 @@ namespace MeshImporter
 
     UID ImportMesh(
         const tinygltf::Model& model, const tinygltf::Mesh& mesh, const tinygltf::Primitive& primitive,
-        const std::string& name, const char* sourceFilePath, const std::string& targetFilePath, UID sourceUID
+        const std::string& name, const char* sourceFilePath, const std::string& targetFilePath, UID sourceUID, UID defaultMatUID
     )
     {
         enum DataType dataType = UNSIGNED_CHAR;
@@ -327,7 +327,7 @@ namespace MeshImporter
             const float4x4& meshTransform = GetMeshDefaultTransform(model, nameNoExt);
 
             std::string assetPath         = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
-            MetaMesh meta(finalMeshUID, assetPath, generateTangents, meshTransform);
+            MetaMesh meta(finalMeshUID, assetPath, generateTangents, meshTransform, defaultMatUID);
             meta.Save(name, assetPath);
         }
         else finalMeshUID = sourceUID;
@@ -455,7 +455,7 @@ namespace MeshImporter
             if (indexMode == 0) // unsigned byte
             {
                 const unsigned char* bufferInd = reinterpret_cast<const unsigned char*>(cursor);
-                for (unsigned char i = 0; i < indexCount; ++i)
+                for (unsigned int i = 0; i < indexCount; ++i)
                 {
                     tmpIndices.push_back(bufferInd[i]);
                 }
@@ -465,7 +465,7 @@ namespace MeshImporter
             {
                 const unsigned short* bufferInd = reinterpret_cast<const unsigned short*>(cursor);
 
-                for (unsigned short i = 0; i < indexCount; ++i)
+                for (unsigned int i = 0; i < indexCount; ++i)
                 {
                     tmpIndices.push_back(bufferInd[i]);
                 }
