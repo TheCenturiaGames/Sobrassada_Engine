@@ -457,6 +457,8 @@ void Scene::RenderScene()
         (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseClicked(ImGuiMouseButton_Middle)))
         ImGui::SetWindowFocus();
 
+    isFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_DockHierarchy);
+
     // do inputs only if window is focused
     if (ImGui::IsWindowHovered(ImGuiFocusedFlags_DockHierarchy))
     {

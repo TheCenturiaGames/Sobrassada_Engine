@@ -53,6 +53,7 @@ class Scene
     bool IsStaticModified() const { return staticModified; };
     bool IsDynamicModified() const { return dynamicModified; };
     bool IsMultiselecting() const { return selectedGameObjects.size() > 0; };
+    bool IsSceneFocused() const { return isFocused; };
 
     void UpdateStaticSpatialStructure();
     void UpdateDynamicSpatialStructure();
@@ -115,6 +116,7 @@ class Scene
     bool doInputs      = false;
     bool doMouseInputs = false;
     bool sceneVisible  = false;
+    bool isFocused     = false;
 
     std::unordered_map<UID, GameObject*> gameObjectsContainer;
 
