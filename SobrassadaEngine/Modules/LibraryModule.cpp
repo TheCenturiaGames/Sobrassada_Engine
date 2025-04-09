@@ -186,6 +186,12 @@ bool LibraryModule::LoadLibraryMaps(const std::string& projectPath)
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 else SceneImporter::CopyPrefab(assetPath, projectPath, assetName, assetUID);
                 break;
+            case 19:
+                AddFont(assetUID, assetName);
+                AddName(assetName, assetUID);
+                libraryPath = projectPath + FONTS_PATH + std::to_string(assetUID) + FONT_EXTENSION;
+                if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
+                else SceneImporter::CopyFont(assetPath, projectPath, assetName, assetUID);
             default:
                 GLOG("Unknown UID prefix (%s) for: %s", std::to_string(prefix).c_str(), assetName.c_str());
                 continue;
@@ -255,7 +261,10 @@ UID LibraryModule::AssignFiletypeUID(UID originalUID, FileType fileType)
         prefix = 16;
         break;
     case FileType::StateMachine:
-        prefix = 17;
+        prefix = 18;
+        break;
+    case FileType::Font:
+        prefix = 19;
         break;
     default:
         GLOG("Category: Unknown File Type (10)");
@@ -296,6 +305,11 @@ void LibraryModule::AddAnimation(UID animUID, const std::string& animName)
 void LibraryModule::AddPrefab(UID prefabUID, const std::string& prefabName)
 {
     prefabMap[prefabName] = prefabUID;
+}
+
+void LibraryModule::AddFont(UID fontUID, const std::string& fontName)
+{
+    fontMap[fontName] = fontUID;
 }
 
 void LibraryModule::AddName(const std::string& resourceName, UID resourceUID)

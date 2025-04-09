@@ -607,11 +607,25 @@ void Scene::RemoveGameObjectHierarchy(UID gameObjectUID)
     }
 }
 
+void Scene::AddGameObjectToUpdate(GameObject* gameObject)
+{
+    if (!gameObject->WillUpdate())
+    {
+        gameObject->SetWillUpdate(true);
+        gameObjectsToUpdate.push_back(gameObject);
+    }
+}
+
 void Scene::UpdateGameObjects()
 {
     for (GameObject* gameObject : gameObjectsToUpdate)
     {
-        if (gameObject) gameObject->UpdateComponents();
+        if (gameObject)
+        {
+            gameObject->UpdateComponents();
+            gameObject->SetWillUpdate(false);
+        }
+
     }
     gameObjectsToUpdate.clear();
 }

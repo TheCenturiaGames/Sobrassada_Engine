@@ -95,7 +95,7 @@ class SOBRASADA_API_ENGINE GameObject
     const float3& GetScale() const { return scale; }
     AABB GetHierarchyAABB();
 
-    void SetPosition(float3& newPosition) { position = newPosition; };
+    
     void SetLocalTransform(const float4x4& newTransform);
     void DrawGizmos() const;
 
@@ -103,8 +103,11 @@ class SOBRASADA_API_ENGINE GameObject
     UID GetPrefabUID() const { return prefabUID; }
     void SetPrefabUID(const UID uid) { prefabUID = uid; }
     void UpdateComponents();
-
     void OnTransformUpdated();
+    void SetPosition(float3& newPosition) { position = newPosition; };
+    void SetWillUpdate(bool willUpdate) { this->willUpdate = willUpdate; };
+    bool WillUpdate() const { return willUpdate; };
+
 
   private:
     void UpdateLocalTransform(const float4x4& parentGlobalTransform);
@@ -145,4 +148,5 @@ class SOBRASADA_API_ENGINE GameObject
     ComponentType selectedComponentIndex = COMPONENT_NONE;
     int mobilitySettings                 = STATIC;
     bool isTopParent                     = false;
+    bool willUpdate                      = false;
 };

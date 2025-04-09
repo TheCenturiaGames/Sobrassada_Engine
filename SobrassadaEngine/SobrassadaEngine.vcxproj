@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -288,6 +288,8 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="FileSystem\Importers\AnimationImporter.cpp" />
     <ClCompile Include="FileSystem\Meta\MetaAnimation.cpp" />
+    <ClCompile Include="FileSystem\Importers\FontImporter.cpp" />
+    <ClCompile Include="FileSystem\Meta\MetaFont.cpp" />
     <ClCompile Include="Scene\Components\Standalone\Physics\CapsuleColliderComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\Physics\SphereColliderComponent.cpp" />
     <ClCompile Include="Utils\Physics\BulletMotionState.cpp" />
@@ -307,6 +309,7 @@
     <ClCompile Include="Modules\PhysicsModule.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceNavmesh.cpp" />
     <ClCompile Include="Modules\GameUIModule.cpp" />
+    <ClCompile Include="ResourceManagement\Resources\ResourceFont.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceStateMachine.cpp" />
     <ClCompile Include="Scene\Components\CameraComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\UI\CanvasComponent.cpp" />
@@ -332,47 +335,47 @@
     <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourNode.cpp" />
     <ClCompile Include="Libs\RecastDetour\Recast\Source\Recast.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastAlloc.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastArea.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastAssert.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastContour.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastFilter.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastLayers.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastMesh.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastMeshDetail.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastRasterization.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastRegion.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Modules\CameraModule.cpp" />
     <ClCompile Include="Modules\EditorUIModule.cpp" />
@@ -472,6 +475,8 @@
     <ClInclude Include="FileSystem\Config\ConfigFile.h" />
     <ClInclude Include="FileSystem\Config\EngineConfig.h" />
     <ClInclude Include="FileSystem\Config\ProjectConfig.h" />
+    <ClInclude Include="FileSystem\Importers\FontImporter.h" />
+    <ClInclude Include="FileSystem\Meta\MetaFont.h" />
     <ClInclude Include="FileSystem\Batching\GeometryBatch.h" />
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\include\ImNodeFlow.h" />
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\context_wrapper.h" />
@@ -482,6 +487,7 @@
     <ClInclude Include="Scene\Components\Standalone\AnimationComponent.h" />
     <ClInclude Include="Scene\Components\Standalone\AnimController.h" />
     <ClInclude Include="Modules\GameUIModule.h" />
+    <ClInclude Include="ResourceManagement\Resources\ResourceFont.h" />
     <ClInclude Include="Scene\Components\Standalone\UI\CanvasComponent.h" />
     <ClInclude Include="Scene\Components\Standalone\UI\UILabelComponent.h" />
     <ClInclude Include="Utils\TextManager.h" />
