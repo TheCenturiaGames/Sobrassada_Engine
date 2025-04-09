@@ -52,6 +52,7 @@ class Scene
 
     bool IsStaticModified() const { return staticModified; };
     bool IsDynamicModified() const { return dynamicModified; };
+    bool IsMultiselecting() const { return selectedGameObjects.size() > 0; };
 
     void UpdateStaticSpatialStructure();
     void UpdateDynamicSpatialStructure();
@@ -97,6 +98,7 @@ class Scene
 
     void SetStaticModified() { staticModified = true; }
     void SetDynamicModified() { dynamicModified = true; }
+    void SetMultiselectPosition(const float3& newPosition);
 
   private:
     void CreateStaticSpatialDataStruct();

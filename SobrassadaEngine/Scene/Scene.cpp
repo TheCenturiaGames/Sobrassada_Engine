@@ -687,6 +687,12 @@ const std::vector<Component*> Scene::GetAllComponents() const
     return collectedComponents;
 }
 
+void Scene::SetMultiselectPosition(const float3& newPosition)
+{
+    float4x4 localMat = float4x4::FromTRS(newPosition, float4x4::identity, float3::one);
+    multiSelectParent->SetLocalTransform(localMat);
+}
+
 void Scene::CreateStaticSpatialDataStruct()
 {
     // PARAMETRIZED IN FUTURE

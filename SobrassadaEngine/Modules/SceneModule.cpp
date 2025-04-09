@@ -94,18 +94,22 @@ update_status SceneModule::PostUpdate(float deltaTime)
                 keyboard[SDL_SCANCODE_LSHIFT])
             {
                 GameObject* selectedObject = RaycastController::GetRayIntersectionTrees<Octree, Quadtree>(
-                    App->GetCameraModule()->CastCameraRay(), loadedScene->GetOctree(), loadedScene->GetDynamicTree()
+                    App->GetCameraModule()->CastCameraRay(), loadedScene->GetOctree(),
+                    loadedScene->GetDynamicTree()
                 );
 
                 if (selectedObject != nullptr)
                 {
+                    if (!loadedScene->IsMultiselecting()) loadedScene->SetMultiselectPosition(selectedObject->GetPosition());
+
                     loadedScene->AddGameObjectToSelection(selectedObject->GetUID(), selectedObject->GetParent());
                 }
             }
             else if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_DOWN && !keyboard[SDL_SCANCODE_LALT])
             {
                 GameObject* selectedObject = RaycastController::GetRayIntersectionTrees<Octree, Quadtree>(
-                    App->GetCameraModule()->CastCameraRay(), loadedScene->GetOctree(), loadedScene->GetDynamicTree()
+                    App->GetCameraModule()->CastCameraRay(), loadedScene->GetOctree(),
+                    loadedScene->GetDynamicTree()
                 );
 
                 if (selectedObject != nullptr)
