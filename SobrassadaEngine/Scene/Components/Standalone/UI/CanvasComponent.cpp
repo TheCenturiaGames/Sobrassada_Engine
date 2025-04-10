@@ -7,13 +7,13 @@
 #include "GameUIModule.h"
 #include "ImageComponent.h"
 #include "SceneModule.h"
+#include "ShaderModule.h"
 #include "Transform2DComponent.h"
 #include "UILabelComponent.h"
 #include "WindowModule.h"
-#include "ShaderModule.h"
 
-#include "imgui.h"
 #include "glew.h"
+#include "imgui.h"
 #include <queue>
 
 CanvasComponent::CanvasComponent(UID uid, GameObject* parent) : Component(uid, parent, "Canvas", COMPONENT_CANVAS)
@@ -149,7 +149,10 @@ void CanvasComponent::RenderUI()
         const GameObject* currentObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(children.front());
 
         // Only render UI components
-        Component* uiWidget             = currentObject->GetComponentByType(COMPONENT_LABEL);
+        Component* uiWidget             = currentObject->GetComponentByType(COMPONENT_TRANSFORM_2D);
+        if (uiWidget) static_cast<const Transform2DComponent*>(uiWidget)->RenderWidgets();
+
+        uiWidget = currentObject->GetComponentByType(COMPONENT_LABEL);
         if (uiWidget) static_cast<const UILabelComponent*>(uiWidget)->RenderUI(view, proj);
 
         uiWidget = currentObject->GetComponentByType(COMPONENT_IMAGE);

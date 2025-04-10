@@ -64,9 +64,7 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
     name                   = initialState["Name"].GetString();
     selectedComponentIndex = COMPONENT_NONE;
     mobilitySettings       = initialState["Mobility"].GetInt();
-    if (initialState.HasMember("IsTopParent")) 
-        isTopParent = initialState["IsTopParent"].GetBool();
-   
+    if (initialState.HasMember("IsTopParent")) isTopParent = initialState["IsTopParent"].GetBool();
 
     if (initialState.HasMember("PrefabUID")) prefabUID = initialState["PrefabUID"].GetUint64();
 
@@ -445,7 +443,7 @@ AABB GameObject::GetHierarchyAABB()
             visitedGameObjects.insert(currentUID);
             const GameObject* currentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentUID);
 
-            const AABB& currentAABB       = currentGameObject->GetGlobalAABB();
+            const AABB& currentAABB             = currentGameObject->GetGlobalAABB();
             if (currentAABB.IsFinite() && !currentAABB.IsDegenerate())
                 returnAABB.Enclose(currentGameObject->GetGlobalAABB());
 
@@ -661,6 +659,9 @@ void GameObject::UpdateGameObjectHierarchy(UID sourceUID)
     {
         UID oldParentUID = sourceGameObject->GetParent();
         sourceGameObject->SetParent(uid);
+
+        Component* transform2D = sourceGameObject->GetComponentByType(COMPONENT_TRANSFORM_2D);
+        if (transform2D) static_cast<Transform2DComponent*>(transform2D)->OnParentChange();
 
         GameObject* oldParentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(oldParentUID);
 
