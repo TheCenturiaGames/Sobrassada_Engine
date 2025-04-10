@@ -455,7 +455,7 @@ namespace MeshImporter
             if (indexMode == 0) // unsigned byte
             {
                 const unsigned char* bufferInd = reinterpret_cast<const unsigned char*>(cursor);
-                for (unsigned char i = 0; i < indexCount; ++i)
+                for (unsigned int i = 0; i < indexCount; ++i)
                 {
                     tmpIndices.push_back(bufferInd[i]);
                 }
@@ -465,7 +465,7 @@ namespace MeshImporter
             {
                 const unsigned short* bufferInd = reinterpret_cast<const unsigned short*>(cursor);
 
-                for (unsigned short i = 0; i < indexCount; ++i)
+                for (unsigned int i = 0; i < indexCount; ++i)
                 {
                     tmpIndices.push_back(bufferInd[i]);
                 }
