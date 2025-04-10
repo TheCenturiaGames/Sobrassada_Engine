@@ -790,6 +790,8 @@ void Scene::LoadModel(const UID modelUID)
                         gameObjectsUID[currentParentIndex], currentNodeData.name, gameObjectsUID[currentNodeIndex]
                     );
                     gameObject->SetLocalTransform(currentNodeData.transform);
+                    GetGameObjectByUID(gameObject->GetParent())->AddGameObject(gameObject->GetUID());
+                    AddGameObject(gameObject->GetUID(), gameObject);
 
                     gameObjectsArray[currentNodeIndex] = gameObject;
                 }
@@ -801,6 +803,8 @@ void Scene::LoadModel(const UID modelUID)
             }
         }
 
+        // Iterate again to add the meshes and skins.
+        // Can't be done in the same loop because the bones have to be already created
         for (int rootNodeIdx : rootNodesIdx)
         {
             const NodeData& rootNode = allNodes[rootNodeIdx];
@@ -817,13 +821,6 @@ void Scene::LoadModel(const UID modelUID)
                 const int currentParentIndex    = currentNode.parentID;
 
                 const NodeData& currentNodeData = allNodes[currentNodeIndex];
-
-                if (currentParentIndex != -1)
-                {
-                    GameObject* gameObject = gameObjectsArray[currentNodeIndex];
-                    GetGameObjectByUID(gameObject->GetParent())->AddGameObject(gameObject->GetUID());
-                    AddGameObject(gameObject->GetUID(), gameObject);
-                }
 
                 if (currentNodeData.meshes.size() > 0)
                 {
