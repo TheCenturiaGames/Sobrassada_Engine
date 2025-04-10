@@ -110,8 +110,8 @@ namespace TextManager
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        int x = startPos.x;
-        int y = startPos.y - fontData.fontSize;
+        int x = (int)startPos.x;
+        int y = (int)startPos.y - fontData.fontSize;
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
         for (char c : text)
