@@ -32,7 +32,6 @@ namespace ModelImporter
     ResourceModel* LoadModel(UID modelUID);
     void FillNodes(
         const std::vector<tinygltf::Node>& nodesList, int nodeId,
-        const std::vector<std::vector<std::pair<UID, UID>>>& meshesUIDs, std::vector<NodeData>& outNodes,
-        const unsigned int accNodesInserted
+        const std::vector<std::vector<std::pair<UID, UID>>>& meshesUIDs, std::vector<NodeData>& outNodes
     );
 }; // namespace ModelImporter

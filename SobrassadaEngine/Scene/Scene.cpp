@@ -15,6 +15,7 @@
 #include "Importer.h"
 #include "InputModule.h"
 #include "LibraryModule.h"
+#include "ModelImporter.h"
 #include "Octree.h"
 #include "OpenGLModule.h"
 #include "PhysicsModule.h"
@@ -738,84 +739,103 @@ void Scene::LoadModel(const UID modelUID)
     {
         GLOG("Load model %d", modelUID);
 
-        ResourceModel* newModel = (ResourceModel*)App->GetResourcesModule()->RequestResource(modelUID);
-        const Model& model      = newModel->GetModelData();
-        const std::vector<std::vector<NodeData>>& nodesScene = model.GetNodes();
+        ResourceModel* newModel               = (ResourceModel*)App->GetResourcesModule()->RequestResource(modelUID);
+        const Model& model                    = newModel->GetModelData();
+        const std::vector<int>& rootNodesIdx  = model.GetRootNodesIdx();
+        const std::vector<NodeData>& allNodes = model.GetNodes();
 
         std::vector<GameObject*> gameObjectsArray;
+        gameObjectsArray.resize(allNodes.size());
         std::vector<UID> gameObjectsUID;
         std::vector<GameObject*> rootGameObjects;
-        std::vector<unsigned int> accNodes;
 
-        unsigned int accNodesSize = 0;
-        for (const std::vector<NodeData>& nodes : nodesScene)
+        for (unsigned int i = 0; i < allNodes.size(); ++i)
         {
-            GameObject* rootObject =
-                new GameObject(GetGameObjectRootUID(), App->GetLibraryModule()->GetResourceName(modelUID));
-            rootObject->SetLocalTransform(nodes[0].transform);
-            // Add the gameObject to the rootObject
-            GetGameObjectByUID(GetGameObjectRootUID())->AddGameObject(rootObject->GetUID());
-            AddGameObject(rootObject->GetUID(), rootObject);
-            rootGameObjects.push_back(rootObject);
-
-            gameObjectsUID.push_back(rootObject->GetUID());
-            for (int i = 1; i < nodes.size(); ++i)
-            {
-                gameObjectsUID.push_back(GenerateUID()); // generate all uids
-            }
-            accNodes.push_back(accNodesSize);
-            accNodesSize += static_cast<unsigned int>(nodes.size());
+            gameObjectsUID.push_back(GenerateUID());
         }
 
-        int cont = 0;
-        for (const std::vector<NodeData>& nodes : nodesScene)
+        for (int rootNodeIdx : rootNodesIdx)
         {
-            gameObjectsArray.push_back(rootGameObjects[cont]);
+            const NodeData& rootNode = allNodes[rootNodeIdx];
 
-            for (int i = 1; i < nodes.size(); ++i)
+            std::vector<NodeParent> nodesToVisit;
+            nodesToVisit.push_back({rootNodeIdx, rootNode.parentIndex});
+
+            while (!nodesToVisit.empty())
             {
-                int idx = i + accNodes[cont];
-                GameObject* gameObject =
-                    new GameObject(gameObjectsUID[nodes[i].parentIndex], nodes[i].name, gameObjectsUID[idx]);
-                gameObject->SetLocalTransform(nodes[i].transform);
+                NodeParent currentNode = nodesToVisit.back();
+                nodesToVisit.pop_back();
 
-                gameObjectsArray.push_back(gameObject);
-            }
-            cont++;
-        }
+                const int currentNodeIndex      = currentNode.nodeID;
+                const int currentParentIndex    = currentNode.parentID;
 
-        cont = 0;
-        for (const std::vector<NodeData>& nodes : nodesScene)
-        {
-            for (int i = 1; i < nodes.size(); ++i)
-            {
-                int idx                = i + accNodes[cont];
-                GameObject* gameObject = gameObjectsArray[idx];
-                GetGameObjectByUID(gameObject->GetParent())->AddGameObject(gameObject->GetUID());
-                AddGameObject(gameObject->GetUID(), gameObject);
-            }
-            cont++;
-        }
+                const NodeData& currentNodeData = allNodes[currentNodeIndex];
 
-        cont = 0;
-        for (const std::vector<NodeData>& nodes : nodesScene)
-        {
-            // Iterate again to add the meshes and skins. 
-            // Can't be done in the same loop because the bones have to be already created
-            for (int i = 0; i < nodes.size(); ++i)
-            {
-                if (nodes[i].meshes.size() > 0)
+                if (currentParentIndex == -1)
                 {
-                    int idx                       = i + accNodes[cont];
-                    GameObject* currentGameObject = gameObjectsArray[idx];
-                    GLOG("Node %s has %d meshes", nodes[i].name.c_str(), nodes[i].meshes.size());
+                    GameObject* rootObject = new GameObject(
+                        GetGameObjectRootUID(), App->GetLibraryModule()->GetResourceName(modelUID),
+                        gameObjectsUID[currentNodeIndex]
+                    );
+                    rootObject->SetLocalTransform(currentNodeData.transform);
+                    // Add the gameObject to the rootObject
+                    GetGameObjectByUID(GetGameObjectRootUID())->AddGameObject(rootObject->GetUID());
+                    AddGameObject(rootObject->GetUID(), rootObject);
+                    rootGameObjects.push_back(rootObject);
+                    gameObjectsArray[currentNodeIndex] = rootObject;
+                }
+                else
+                {
+                    GameObject* gameObject = new GameObject(
+                        gameObjectsUID[currentParentIndex], currentNodeData.name, gameObjectsUID[currentNodeIndex]
+                    );
+                    gameObject->SetLocalTransform(currentNodeData.transform);
+
+                    gameObjectsArray[currentNodeIndex] = gameObject;
+                }
+
+                for (auto it = currentNodeData.children.rbegin(); it != currentNodeData.children.rend(); ++it)
+                {
+                    nodesToVisit.push_back({*it, currentNodeIndex});
+                }
+            }
+        }
+
+        for (int rootNodeIdx : rootNodesIdx)
+        {
+            const NodeData& rootNode = allNodes[rootNodeIdx];
+
+            std::vector<NodeParent> nodesToVisit;
+            nodesToVisit.push_back({rootNodeIdx, rootNode.parentIndex});
+
+            while (!nodesToVisit.empty())
+            {
+                NodeParent currentNode = nodesToVisit.back();
+                nodesToVisit.pop_back();
+
+                const int currentNodeIndex      = currentNode.nodeID;
+                const int currentParentIndex    = currentNode.parentID;
+
+                const NodeData& currentNodeData = allNodes[currentNodeIndex];
+
+                if (currentParentIndex != -1)
+                {
+                    GameObject* gameObject = gameObjectsArray[currentNodeIndex];
+                    GetGameObjectByUID(gameObject->GetParent())->AddGameObject(gameObject->GetUID());
+                    AddGameObject(gameObject->GetUID(), gameObject);
+                }
+
+                if (currentNodeData.meshes.size() > 0)
+                {
+                    GameObject* currentGameObject = gameObjectsArray[currentNodeIndex];
+                    GLOG("Node %s has %d meshes", currentNodeData.name.c_str(), currentNodeData.meshes.size());
 
                     unsigned meshNum = 1;
 
-                    for (const auto& mesh : nodes[i].meshes)
+                    for (const auto& mesh : currentNodeData.meshes)
                     {
                         GameObject* meshObject = nullptr;
-                        if (nodes[i].meshes.size() > 1)
+                        if (currentNodeData.meshes.size() > 1)
                         {
                             meshObject = new GameObject(
                                 currentGameObject->GetUID(),
@@ -830,7 +850,7 @@ void Scene::LoadModel(const UID modelUID)
 
                         if (meshObject->CreateComponent(COMPONENT_MESH))
                         {
-                            if (nodes[i].meshes.size() > 1)
+                            if (currentNodeData.meshes.size() > 1)
                             {
                                 currentGameObject->AddGameObject(meshObject->GetUID());
                                 AddGameObject(meshObject->GetUID(), meshObject);
@@ -842,10 +862,13 @@ void Scene::LoadModel(const UID modelUID)
                             meshComponent->AddMaterial(mesh.second);
 
                             // Add skin to meshComponent
-                            if (nodes[i].skinIndex != -1)
+                            if (currentNodeData.skinIndex != -1)
                             {
-                                GLOG("Node %s has skin index: %d", nodes[i].name.c_str(), nodes[i].skinIndex);
-                                Skin skin = model.GetSkin(nodes[i].skinIndex);
+                                GLOG(
+                                    "Node %s has skin index: %d", currentNodeData.name.c_str(),
+                                    currentNodeData.skinIndex
+                                );
+                                Skin skin = model.GetSkin(currentNodeData.skinIndex);
 
                                 std::vector<GameObject*> bones;
                                 std::vector<UID> bonesIds;
@@ -856,15 +879,21 @@ void Scene::LoadModel(const UID modelUID)
                                 }
                                 meshComponent->SetBones(bones, bonesIds);
                                 meshComponent->SetBindMatrices(skin.inverseBindMatrices);
-                                meshComponent->SetSkinIndex(nodes[i].skinIndex);
+                                meshComponent->SetSkinIndex(currentNodeData.skinIndex);
                             }
                         }
                     }
                 }
-            }
 
-            rootGameObjects[cont]->UpdateTransformForGOBranch();
-            cont++;
+                for (auto it = currentNodeData.children.rbegin(); it != currentNodeData.children.rend(); ++it)
+                {
+                    nodesToVisit.push_back({*it, currentNodeIndex});
+                }
+            }
+        }
+        for (GameObject* rootGameObject : rootGameObjects)
+        {
+            rootGameObject->UpdateTransformForGOBranch();
         }
     }
 }
@@ -938,8 +967,8 @@ void Scene::LoadPrefab(const UID prefabUID, const ResourcePrefab* prefab, const 
         if (prefab == nullptr) App->GetResourcesModule()->ReleaseResource(resourcePrefab);
         newObjects[0]->UpdateTransformForGOBranch();
 
-        // Get all scene lights, because if the prefab has lights when creating them they won't be added to the scene,
-        // as the gameObject is still not part of the scene
+        // Get all scene lights, because if the prefab has lights when creating them they won't be added to the
+        // scene, as the gameObject is still not part of the scene
         if (lightsConfig != nullptr) lightsConfig->GetAllSceneLights();
     }
 }
