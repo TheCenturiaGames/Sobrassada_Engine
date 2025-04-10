@@ -430,7 +430,7 @@ void StateMachineEditor::ShowInspector()
 void StateMachineEditor::BuildGraph()
 {
     selectedNode = nullptr;
-    if (graph)
+    /* if (graph)
     {
         for (const auto& [uid, node] : graph->getNodes())
         {
@@ -448,7 +448,7 @@ void StateMachineEditor::BuildGraph()
             }
         }
         graph->getNodes().clear();
-    }
+    }*/
     graph = std::make_unique<ImFlow::ImNodeFlow>("StateMachineGraph_" + std::to_string(uid));
 
     std::unordered_map<std::string, std::shared_ptr<StateNode>> stateNodes;
@@ -473,7 +473,7 @@ void StateMachineEditor::BuildGraph()
         }
         stateCont++;
     }
-
+    graph->update();
     for (const auto& transition : resource->transitions)
     {
         auto itFrom = stateNodes.find(transition.fromState.GetString());
@@ -491,8 +491,10 @@ void StateMachineEditor::BuildGraph()
 
                 if (outputPin && inputPin)
                 {
-                    auto link = std::make_shared<ImFlow::Link>(outputPin.get(), inputPin.get(), graph.get());
-                    graph->addLink(link);
+                    //auto link = std::make_shared<ImFlow::Link>(outputPin.get(), inputPin.get(), graph.get());
+                    //graph->addLink(link);
+                    outputPin->createLink(inputPin.get());
+                    //inputPin->connect(link.get());
                     // resource->availableTriggers.push_back(transition.triggerName.GetString());
                 }
                 else
@@ -502,6 +504,7 @@ void StateMachineEditor::BuildGraph()
             }
         }
     }
+
     GLOG("Total links in graph after adding them: %d", graph->getLinks().size());
     resource->SetDefaultState(0);
     resource->SetActiveState(0);
@@ -652,6 +655,7 @@ void StateMachineEditor::ShowLoadPopup()
 
         if (ImGui::Button("Load") && selectedIndex >= 0)
         {
+            App->GetResourcesModule()->ReleaseResource(resource);
             std::string selectedName = allStateMachineNames[selectedIndex];
             UID selectedUID          = StateMachineManager::GetStateMachineUID(selectedName);
 
