@@ -4,10 +4,12 @@
 #include "CanvasComponent.h"
 #include "GameObject.h"
 #include "LibraryModule.h"
+#include "OpenGLModule.h"
 #include "ResourcesModule.h"
 #include "Transform2DComponent.h"
-#include "OpenGLModule.h"
+#include "EditorUIModule.h"
 
+#include "ImGui.h"
 #include "glew.h"
 
 ImageComponent::ImageComponent(UID uid, GameObject* parent) : Component(uid, parent, "Image", COMPONENT_IMAGE)
@@ -52,6 +54,24 @@ void ImageComponent::Clone(const Component* other)
 
 void ImageComponent::RenderEditorInspector()
 {
+    ImGui::SeparatorText("Image");
+
+    ImGui::Text("Source texture: ");
+    ImGui::SameLine();
+    ImGui::Text(texture->GetName().c_str());
+
+    if (ImGui::Button("Select texture"))
+    {
+        ImGui::OpenPopup(CONSTANT_TEXTURE_SELECT_DIALOG_ID);
+    }
+    if (ImGui::IsPopupOpen(CONSTANT_TEXTURE_SELECT_DIALOG_ID))
+    {
+        ChangeTexture(App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
+            CONSTANT_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetTextureMap(), INVALID_UID
+        ));
+    }
+
+    ImGui::ColorEdit3("Image color", color.ptr());
 }
 
 void ImageComponent::RenderUI(const float4x4& view, const float4x4 proj) const
@@ -64,11 +84,15 @@ void ImageComponent::RenderUI(const float4x4& view, const float4x4 proj) const
     glUniformMatrix4fv(1, 1, GL_TRUE, view.ptr());
     glUniformMatrix4fv(2, 1, GL_TRUE, proj.ptr());
 
+    glUniform3fv(3, 1, color.ptr());
+    glUniform1ui(5, 1); // Tell the shader this widget is an image = 1
+
+
     glBindVertexArray(vao);
 
     //glDisable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glEnable(GL_BLEND);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
@@ -106,8 +130,8 @@ void ImageComponent::RenderUI(const float4x4& view, const float4x4 proj) const
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
     App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 6);
 
-    glDisable(GL_BLEND);
-    //glEnable(GL_DEPTH_TEST);
+    //glDisable(GL_BLEND);
+    // glEnable(GL_DEPTH_TEST);
 }
 
 void ImageComponent::InitBuffers()
@@ -145,12 +169,19 @@ void ImageComponent::ClearBuffers()
     App->GetResourcesModule()->ReleaseResource(texture);
 }
 
-void ImageComponent::OnTextureChange()
+void ImageComponent::ChangeTexture(const UID textureUID)
 {
-    glMakeTextureHandleNonResidentARB(bindlessUID);
+    if (textureUID == INVALID_UID || (texture != nullptr && texture->GetUID() == textureUID)) return;
 
     // Change resource texture
+    Resource* newTexture = App->GetResourcesModule()->RequestResource(textureUID);
+    if (newTexture != nullptr)
+    {
+        glMakeTextureHandleNonResidentARB(bindlessUID);
+        App->GetResourcesModule()->ReleaseResource(texture);
 
-    bindlessUID = glGetTextureHandleARB(texture->GetTextureID());
-    glMakeTextureHandleResidentARB(bindlessUID);
+        texture             = static_cast<ResourceTexture*>(newTexture);
+        bindlessUID         = glGetTextureHandleARB(texture->GetTextureID());
+        glMakeTextureHandleResidentARB(bindlessUID);
+    }
 }

@@ -149,6 +149,7 @@ void UILabelComponent::RenderUI(const float4x4& view, const float4x4 proj) const
     glUniformMatrix4fv(2, 1, GL_TRUE, proj.ptr());
 
     glUniform3fv(3, 1, fontColor.ptr()); // Font color
+    glUniform1ui(5, 0);                  // Tell the shader this widget is a label = 0
 
     glBindVertexArray(vao);
     TextManager::RenderText(*fontData, text, startPos, vbo, width);
@@ -192,7 +193,7 @@ void UILabelComponent::RenderEditorInspector()
             ImGui::EndCombo();
         }
 
-        ImGui::ColorPicker3("Font Color", fontColor.ptr());
+        ImGui::ColorEdit3("Font color", fontColor.ptr());
     }
 }
 
