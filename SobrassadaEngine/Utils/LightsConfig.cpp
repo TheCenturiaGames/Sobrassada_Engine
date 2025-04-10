@@ -84,6 +84,10 @@ void LightsConfig::InitSkybox()
     // default skybox texture
     LoadSkyboxTexture(App->GetLibraryModule()->GetTextureUID("cubemap"));
 
+    cubemapIrradiance = CubeMapToTexture(1024, 1024);
+    irradianceHandle  = glGetTextureHandleARB(cubemapIrradiance);
+    glMakeTextureHandleResidentARB(skyboxHandle);
+
     // Load the skybox shaders
     skyboxProgram = App->GetShaderModule()->CreateShaderProgram(SKYBOX_VERTEX_SHADER_PATH, SKYBOX_FRAGMENT_SHADER_PATH);
 }
@@ -172,7 +176,7 @@ unsigned int LightsConfig::CubeMapToTexture(int width, int height)
     // TODO: Create and Bind Frame Buffer and Create Irradiance Cubemap
     Framebuffer framebuffer(width, height, false);
     framebuffer.Bind();
-
+    glViewport(0, 0, width, height);
     unsigned int irradianceCubemap;
     glGenTextures(1, &irradianceCubemap);
     glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceCubemap);
@@ -215,7 +219,12 @@ unsigned int LightsConfig::CubeMapToTexture(int width, int height)
     framebuffer.Unbind();
     glDeleteProgram(irradianceProgram);
 
-    return irradianceCubemap;
+    glViewport(
+        0, 0, App->GetOpenGLModule()->GetFramebuffer()->GetTextureWidth(),
+        App->GetOpenGLModule()->GetFramebuffer()->GetTextureHeight()
+    );
+
+    return framebuffer.GetTextureID();
 }
 
 void LightsConfig::SaveData(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
