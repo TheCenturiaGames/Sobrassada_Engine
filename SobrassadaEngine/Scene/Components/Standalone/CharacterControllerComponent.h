@@ -2,6 +2,10 @@
 
 #include "Component.h"
 
+class dtNavMeshQuery;
+
+using dtPolyRef = unsigned int;
+
 class CharacterControllerComponent : public Component
 {
 
@@ -35,4 +39,7 @@ class CharacterControllerComponent : public Component
     float maxAngularSpeed;
 
     bool isRadians;
+
+    dtNavMeshQuery* navMeshQuery = nullptr;
+    dtPolyRef currentPolyRef     = 0;
 };
