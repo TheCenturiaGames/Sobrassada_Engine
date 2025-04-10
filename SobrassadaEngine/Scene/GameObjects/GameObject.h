@@ -21,8 +21,9 @@ enum MobilitySettings
 class SOBRASADA_API_ENGINE GameObject
 {
   public:
-    GameObject(std::string name);
-    GameObject(UID parentUID, std::string name);
+    GameObject(const std::string& name);
+    GameObject(UID parentUID, const std::string& name);
+    GameObject(UID parentUID, const std::string& name, UID uid);
     GameObject(UID parentUID, GameObject* refObject);
 
     GameObject(const rapidjson::Value& initialState);

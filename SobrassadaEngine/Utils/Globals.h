@@ -16,6 +16,7 @@
 #pragma warning(disable: 4251)
 
 extern SOBRASADA_API_ENGINE std::vector<char*> *Logs;
+extern LCG* rng;
 
 SOBRASADA_API_ENGINE void glog(const char file[], int line, const char* format, ...);
 
@@ -158,9 +159,8 @@ constexpr float DEGREE_RAD_CONV                         = PI / 180.f;
 constexpr float MINIMUM_TREE_LEAF_SIZE                  = 5.f;
 constexpr int PALETTE_SIZE                              = 64;
 
+
 inline UID GenerateUID()
 {
-    LCG rng;
-    UID uid = static_cast<UID>(rng.IntFast()) << 32 | rng.IntFast(); // Combine two 32-bit values
-    return uid;
+    return static_cast<UID>(rng->IntFast()) << 32 | rng->IntFast(); // Combine two 32-bit values
 }
