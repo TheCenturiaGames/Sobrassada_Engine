@@ -30,9 +30,10 @@ class ImageComponent : public Component
   private:
     Transform2DComponent* transform2D;
     CanvasComponent* parentCanvas;
-    ResourceTexture* texture;
 
+    ResourceTexture* texture;
     float3 color;
+
     unsigned int vbo = 0;
     unsigned int vao = 0;
     UID bindlessUID;

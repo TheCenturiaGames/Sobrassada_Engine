@@ -117,6 +117,8 @@ void UILabelComponent::Clone(const Component* other)
     if (other->GetType() == ComponentType::COMPONENT_LABEL)
     {
         const UILabelComponent* otherLabel = static_cast<const UILabelComponent*>(other);
+        enabled                            = otherLabel->enabled;
+
         strcpy_s(text, sizeof(text), otherLabel->text);
         fontSize  = otherLabel->fontSize;
         fontColor = otherLabel->fontColor;

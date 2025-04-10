@@ -2,18 +2,22 @@
 
 #include "Application.h"
 #include "CanvasComponent.h"
+#include "EditorUIModule.h"
 #include "GameObject.h"
 #include "LibraryModule.h"
 #include "OpenGLModule.h"
 #include "ResourcesModule.h"
 #include "Transform2DComponent.h"
-#include "EditorUIModule.h"
 
 #include "ImGui.h"
 #include "glew.h"
 
 ImageComponent::ImageComponent(UID uid, GameObject* parent) : Component(uid, parent, "Image", COMPONENT_IMAGE)
 {
+    // Set default texture
+    texture = static_cast<ResourceTexture*>(
+        App->GetResourcesModule()->RequestResource(App->GetLibraryModule()->GetTextureMap().at("DefaultTexture"))
+    );
 }
 
 ImageComponent::ImageComponent(const rapidjson::Value& initialState, GameObject* parent)
@@ -47,13 +51,39 @@ void ImageComponent::Init()
 }
 void ImageComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
 {
+    Component::Save(targetState, allocator);
+
+    targetState.AddMember("TextureUID", texture->GetUID(), allocator);
+
+    rapidjson::Value valColor(rapidjson::kArrayType);
+    valColor.PushBack(color.x, allocator);
+    valColor.PushBack(color.y, allocator);
+    valColor.PushBack(color.z, allocator);
+    targetState.AddMember("Color", valColor, allocator);
 }
 void ImageComponent::Clone(const Component* other)
 {
+    // It will have to look for the canvas here probably, seems better to do that in a separate function
+    if (other->GetType() == COMPONENT_IMAGE)
+    {
+        const ImageComponent* otherImage = static_cast<const ImageComponent*>(other);
+        enabled                          = otherImage->enabled;
+
+        color                            = otherImage->color;
+        texture                          = otherImage->texture;
+        texture->AddReference();
+        bindlessUID = glGetTextureHandleARB(texture->GetTextureID());
+    }
+    else
+    {
+        GLOG("It is not possible to clone a component of a different type!");
+    }
 }
 
 void ImageComponent::RenderEditorInspector()
 {
+    Component::RenderEditorInspector();
+
     ImGui::SeparatorText("Image");
 
     ImGui::Text("Source texture: ");
@@ -87,12 +117,11 @@ void ImageComponent::RenderUI(const float4x4& view, const float4x4 proj) const
     glUniform3fv(3, 1, color.ptr());
     glUniform1ui(5, 1); // Tell the shader this widget is an image = 1
 
-
     glBindVertexArray(vao);
 
-    //glDisable(GL_DEPTH_TEST);
-    //glEnable(GL_BLEND);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_DEPTH_TEST);
+    // glEnable(GL_BLEND);
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
@@ -130,8 +159,8 @@ void ImageComponent::RenderUI(const float4x4& view, const float4x4 proj) const
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
     App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 6);
 
-    //glDisable(GL_BLEND);
-    // glEnable(GL_DEPTH_TEST);
+    // glDisable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
 }
 
 void ImageComponent::InitBuffers()
@@ -152,10 +181,6 @@ void ImageComponent::InitBuffers()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    // Set default texture
-    texture = static_cast<ResourceTexture*>(
-        App->GetResourcesModule()->RequestResource(App->GetLibraryModule()->GetTextureMap().at("DefaultTexture"))
-    );
     bindlessUID = glGetTextureHandleARB(texture->GetTextureID());
     glMakeTextureHandleResidentARB(bindlessUID);
 }
@@ -180,8 +205,8 @@ void ImageComponent::ChangeTexture(const UID textureUID)
         glMakeTextureHandleNonResidentARB(bindlessUID);
         App->GetResourcesModule()->ReleaseResource(texture);
 
-        texture             = static_cast<ResourceTexture*>(newTexture);
-        bindlessUID         = glGetTextureHandleARB(texture->GetTextureID());
+        texture     = static_cast<ResourceTexture*>(newTexture);
+        bindlessUID = glGetTextureHandleARB(texture->GetTextureID());
         glMakeTextureHandleResidentARB(bindlessUID);
     }
 }
