@@ -12,7 +12,7 @@
 
 namespace TextManager
 {
-    void GenerateFontTextures(const FT_Face face, std::map<char, Character>& outCharacters)
+    static void GenerateFontTextures(const FT_Face face, std::map<char, Character>& outCharacters)
     {
         // Disable byte-alignment restriction.
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -104,7 +104,7 @@ namespace TextManager
 
     void RenderText(FontData& fontData, const std::string& text, const float3& startPos, const unsigned vbo, const float maxWidth)
     {
-        // When deferred lightning works, this won't be needed as transparency will be properly handled
+        // When deferred lightning works, this won't be needed as transparency will be p6roperly handled
         glDisable(GL_DEPTH_TEST);
 
         glEnable(GL_BLEND);
