@@ -6,7 +6,7 @@ in vec2 TexCoords;
 
 uniform vec3 lightDir = normalize(vec3(-0.5, -1.0, -0.3));
 uniform vec3 lightColor = vec3(1.0);
-uniform vec3 objectColor = vec3(1.0); // Color multiplicador per a materials
+uniform vec3 objectColor = vec3(1.0);
 
 uniform sampler2D albedoTex;
 

@@ -19,40 +19,55 @@ class PrefabPortView
     PrefabPortView();
     ~PrefabPortView();
 
+    // < Public interface >
     void SetPrefab(ResourcePrefab* prefab); // Assign a prefab to preview
-    void RenderContent();                   // Main render function called from ImGui window
+    void RenderContent();                   // Main render call from ImGui window
+
     bool HasValidMesh() const { return loadedMesh != nullptr; }
 
-  private:
-    // Resource handling
-    void CleanupPreview(); // Deletes old GameObject and releases resources
-    GameObject* CloneGameObjectHierarchy(GameObject* original, const std::vector<GameObject*>& allObjects);
-    void ApplyInitialTransform();
+    GameObject* GetPreviewRoot() const { return previewGO; }
+    const std::vector<GameObject*>& GetPreviewObjects() const { return previewObjects; }
+
     void LoadMeshAndMaterialFromComponent(MeshComponent* mesh);
 
-    // Camera setup
+  private:
+    // Rendering pipeline
+    void PrepareRenderTarget();
+    void UpdateCameraMatrices();
+    void RenderPreviewMesh();
+    void RenderToImGui();
+    void HandleGizmo();
+
+    // Prefab loading
+    void CleanupPreview(); // Deletes previous objects and releases resources
+    GameObject* CloneGameObjectHierarchy(GameObject* original, const std::vector<GameObject*>& allObjects);
+    void UpdatePreviewTransform();
+
+    // Framebuffer and camera
     void SetupFramebuffer();
     void SetupCamera();
 
   private:
-    // Rendered objects
-    Framebuffer* framebuffer         = nullptr;
-    GameObject* previewGO            = nullptr;
+    // Scene data 
+    GameObject* previewGO = nullptr;
+    std::vector<GameObject*> previewObjects;
+
     ResourcePrefab* currentPrefab    = nullptr;
     ResourceMesh* loadedMesh         = nullptr;
     ResourceMaterial* loadedMaterial = nullptr;
+    float4x4 previewModelMatrix;
 
-    // Camera and transform data
+
+    // Rendering
+    Framebuffer* framebuffer         = nullptr;
     Frustum camera;
     CameraMatrices matrices;
     GLuint cameraUBO   = 0;
 
-    // Viewport size
+    // Viewport configuration
     int width          = 512;
     int height         = 512;
 
-    // Gizmo config
+    // Gizmo configuration
     int gizmoOperation = ImGuizmo::ROTATE;
-
-    std::vector<GameObject*> previewObjects;
 };

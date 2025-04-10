@@ -5,22 +5,18 @@
 #include "GameObject.h"
 #include "LibraryModule.h"
 #include "MetaPrefab.h"
-#include "ResourcePrefab.h"
 #include "ProjectModule.h"
 #include "ResourcePrefab.h"
-#include "GameObject.h"
 #include "SceneModule.h"
 
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
 #include <filesystem>
-#include <queue>
 #include <fstream>
+#include <queue>
 #include <sstream>
 
 #include "SceneModule.h"
-
-
 
 namespace PrefabImporter
 {
@@ -116,23 +112,35 @@ namespace PrefabImporter
         rapidjson::Value prefab(rapidjson::kObjectType);
 
         // Scene values
-        UID uid              = GenerateUID();
-        std::string savePath = PREFABS_LIB_PATH + std::string("Prefab") + PREFAB_EXTENSION;
+        UID uid = GenerateUID();
+
         UID finalPrefabUID =
             override ? gameObject->GetPrefabUID() : App->GetLibraryModule()->AssignFiletypeUID(uid, FileType::Prefab);
-        savePath = App->GetProjectModule()->GetLoadedProjectPath() + PREFABS_LIB_PATH + std::to_string(finalPrefabUID) +
-                   PREFAB_EXTENSION;
-        std::string name         = gameObject->GetName();
-        std::string originalName = name;
-        int suffix               = 1;
 
-        // Unique name in LibraryModule
-        const auto& prefabMap    = App->GetLibraryModule()->GetPrefabMap();
-        while (prefabMap.find(name) != prefabMap.end())
+        std::string name;
+        if (override)
         {
-            name = originalName + " (" + std::to_string(suffix++) + ")";
+            name = App->GetLibraryModule()->GetResourceName(finalPrefabUID);
+        }
+        else
+        {
+            name                     = gameObject->GetName();
+            std::string originalName = name;
+            int suffix               = 1;
+
+            const auto& prefabMap    = App->GetLibraryModule()->GetPrefabMap();
+            while (prefabMap.find(name) != prefabMap.end())
+            {
+                name = originalName + " (" + std::to_string(suffix++) + ")";
+            }
         }
 
+        // Paths
+        std::string savePath = App->GetProjectModule()->GetLoadedProjectPath() + PREFABS_LIB_PATH +
+                               std::to_string(finalPrefabUID) + PREFAB_EXTENSION;
+
+        std::string assetPath =
+            App->GetProjectModule()->GetLoadedProjectPath() + PREFABS_ASSETS_PATH + name + PREFAB_EXTENSION;
 
         // Create structure
         prefab.AddMember("UID", finalPrefabUID, allocator);
@@ -140,10 +148,10 @@ namespace PrefabImporter
 
         // Serialize GameObjects
         rapidjson::Value gameObjectsJSON(rapidjson::kArrayType);
-        std::queue<const GameObject*> queue; // Traverse all gameObjects using a queue to avoid recursiveness
+        std::queue<const GameObject*> queue;
         queue.push(gameObject);
 
-        while (queue.size() > 0)
+        while (!queue.empty())
         {
             const GameObject* currentGameObject = queue.front();
 
@@ -159,41 +167,36 @@ namespace PrefabImporter
             queue.pop();
         }
 
-        // Add gameObjects to scene
         prefab.AddMember("GameObjects", gameObjectsJSON, allocator);
-
         doc.AddMember("Prefab", prefab, allocator);
 
-        // Save file like JSON
+        // Save to string
         rapidjson::StringBuffer buffer;
         rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
         doc.Accept(writer);
 
-        // Create meta file
-        std::string assetPath = PREFABS_ASSETS_PATH + name + PREFAB_EXTENSION;
+        // Save asset file
         MetaPrefab meta(finalPrefabUID, assetPath);
         meta.Save(name, assetPath);
 
-        assetPath = App->GetProjectModule()->GetLoadedProjectPath() + PREFABS_ASSETS_PATH + name + PREFAB_EXTENSION;
-        // Save in assets
         unsigned int bytesWritten = (unsigned int
         )FileSystem::Save(assetPath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
         if (bytesWritten == 0)
         {
-            GLOG("Failed to save prefab file: %s", assetPath);
+            GLOG("Failed to save prefab file: %s", assetPath.c_str());
             return INVALID_UID;
         }
 
-        // Save in library
+        // Save library file
         bytesWritten =
             (unsigned int)FileSystem::Save(savePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
         if (bytesWritten == 0)
         {
-            GLOG("Failed to save prefab file: %s", savePath);
+            GLOG("Failed to save prefab file: %s", savePath.c_str());
             return INVALID_UID;
         }
 
-        // Add the prefab to the resources map
+        // Register in library
         App->GetLibraryModule()->AddPrefab(finalPrefabUID, name);
         App->GetLibraryModule()->AddName(name, finalPrefabUID);
         App->GetLibraryModule()->AddResource(savePath, finalPrefabUID);

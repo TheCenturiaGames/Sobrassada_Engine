@@ -19,6 +19,11 @@ class ResourcePrefab : public Resource
     const std::vector<int>& GetParentIndices() const { return parentIndices; }
     GameObject* FindGameObject(UID uid) const;
 
+    bool SaveToDisk() const;
+    void ReloadFromDisk();
+
+    bool SaveClonedPrefab(const std::vector<GameObject*>& clonedObjects) const;
+
 
   private:
     std::vector<GameObject*> gameObjects;

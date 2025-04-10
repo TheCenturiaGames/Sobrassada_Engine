@@ -6,6 +6,7 @@
 #include "Math/float4x4.h"
 #include "rapidjson/document.h"
 #include "ResourceMaterial.h"
+#include "ResourceMesh.h"
 #include <cstdint>
 
 class ResourceMesh;
@@ -47,7 +48,7 @@ class MeshComponent : public Component
     const float4x4& GetCombinedMatrix() const { return combinedMatrix; }
     GeometryBatch* GetBatch() const { return batch; }
     UID GetMaterialUID() const { return currentMaterial ? currentMaterial->GetUID() : INVALID_UID; }
-
+    UID GetMeshUID() const { return currentMesh ? currentMesh->GetUID() : INVALID_UID; }
 
     void SetBones(const std::vector<GameObject*>& bones, const std::vector<UID> bonesIds)
     {
