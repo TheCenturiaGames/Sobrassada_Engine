@@ -23,6 +23,28 @@ ImageComponent::ImageComponent(UID uid, GameObject* parent) : Component(uid, par
 ImageComponent::ImageComponent(const rapidjson::Value& initialState, GameObject* parent)
     : Component(initialState, parent)
 {
+    if (initialState.HasMember("TextureUID"))
+    {
+        texture =
+            static_cast<ResourceTexture*>(App->GetResourcesModule()->RequestResource(initialState["TextureUID"].GetUint64()
+            ));
+    }
+    else
+    {
+        // To prevent crashes, load the default one if there is no font saved
+        GLOG("[ERROR] No texture UID found for the UI image %s in the saved scene", name);
+        texture = static_cast<ResourceTexture*>(
+            App->GetResourcesModule()->RequestResource(App->GetLibraryModule()->GetTextureMap().at("DefaultTexture"))
+        );
+    }
+
+    if (initialState.HasMember("Color") && initialState["Color"].IsArray())
+    {
+        const rapidjson::Value& initColor = initialState["Color"];
+        color.x                           = initColor[0].GetFloat();
+        color.y                           = initColor[1].GetFloat();
+        color.z                           = initColor[2].GetFloat();
+    }
 }
 
 ImageComponent::~ImageComponent()
@@ -73,6 +95,7 @@ void ImageComponent::Clone(const Component* other)
         texture                          = otherImage->texture;
         texture->AddReference();
         bindlessUID = glGetTextureHandleARB(texture->GetTextureID());
+        // Maybe has to generate the texture
     }
     else
     {
