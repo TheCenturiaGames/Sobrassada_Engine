@@ -13,7 +13,7 @@
 #include <set>
 #include <stack>
 
-GameObject::GameObject(std::string name) : name(name)
+GameObject::GameObject(const std::string& name) : name(name)
 {
     uid       = GenerateUID();
     parentUID = INVALID_UID;
@@ -25,7 +25,7 @@ GameObject::GameObject(std::string name) : name(name)
     globalAABB = AABB(globalOBB);
 }
 
-GameObject::GameObject(UID parentUID, std::string name) : parentUID(parentUID), name(name)
+GameObject::GameObject(UID parentUID, const std::string& name) : parentUID(parentUID), name(name)
 {
     uid       = GenerateUID();
 
@@ -36,7 +36,7 @@ GameObject::GameObject(UID parentUID, std::string name) : parentUID(parentUID), 
     globalAABB = AABB(globalOBB);
 }
 
-GameObject::GameObject(UID parentUID, std::string name, UID uid) : parentUID(parentUID), name(name), uid(uid)
+GameObject::GameObject(UID parentUID, const std::string& name, UID uid) : parentUID(parentUID), name(name), uid(uid)
 {
     localAABB = AABB();
     localAABB.SetNegativeInfinity();
