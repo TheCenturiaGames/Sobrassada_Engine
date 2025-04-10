@@ -145,7 +145,7 @@ void MeshComponent::RenderEditorInspector()
         if (ImGui::IsPopupOpen(CONSTANT_MATERIAL_SELECT_DIALOG_ID))
         {
 
-            UID chosenMatUID = App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
+            const UID chosenMatUID = App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
                 CONSTANT_MATERIAL_SELECT_DIALOG_ID, App->GetLibraryModule()->GetMaterialMap(), INVALID_UID
             );
 
