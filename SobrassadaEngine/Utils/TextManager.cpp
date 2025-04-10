@@ -1,5 +1,7 @@
 #include "TextManager.h"
 
+#include "Globals.h"
+#include "FileSystem.h"
 #include "Application.h"
 #include "OpenGLModule.h"
 
@@ -80,6 +82,7 @@ namespace TextManager
         // Generate a texture per character
         GenerateFontTextures(face, characters);
         this->fontSize = fontSize;
+        this->fontName = face->family_name;
 
         FT_Done_Face(face);
         FT_Done_FreeType(library);

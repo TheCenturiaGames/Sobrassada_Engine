@@ -105,6 +105,7 @@ constexpr const char* TEXTURES_PATH                  = "Library/Textures/";
 constexpr const char* MATERIALS_PATH                 = "Library/Materials/";
 constexpr const char* STATEMACHINES_LIB_PATH         = "Library/StateMachines/";
 constexpr const char* PREFABS_LIB_PATH               = "Library/Prefabs/";
+constexpr const char* FONTS_PATH                     = "Library/Fonts/";
 
 constexpr const char* ASSET_EXTENSION                = ".gltf";
 constexpr const char* MESH_EXTENSION                 = ".sobrassada";
@@ -115,6 +116,7 @@ constexpr const char* PREFAB_EXTENSION               = ".prefab";
 constexpr const char* MODEL_EXTENSION                = ".model";
 constexpr const char* META_EXTENSION                 = ".smeta";
 constexpr const char* STATEMACHINE_EXTENSION         = ".smachine";
+constexpr const char* FONT_EXTENSION                 = ".ttf";
 
 constexpr int MAX_COMPONENT_NAME_LENGTH              = 64;
 

@@ -43,6 +43,9 @@ bool OpenGLModule::Init()
 
     framebuffer = new Framebuffer(App->GetWindowModule()->GetWidth(), App->GetWindowModule()->GetHeight(), true);
 
+    WindowModule* windowModule = App->GetWindowModule();
+    windowModule->SetVsync(windowModule->GetVsync());
+
     return true;
 }
 

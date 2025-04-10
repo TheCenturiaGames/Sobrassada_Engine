@@ -5,6 +5,7 @@
 #include "CameraComponent.h"
 #include "CameraModule.h"
 #include "EditorUIModule.h"
+#include "GameObject.h"
 #include "GeometryBatch.h"
 #include "LibraryModule.h"
 #include "MeshImporter.h"

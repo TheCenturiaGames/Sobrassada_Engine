@@ -12,7 +12,7 @@
 
 class MeshComponent;
 
-enum ComponentMobilitySettings
+enum MobilitySettings
 {
     DYNAMIC = 0,
     STATIC  = 1,
@@ -33,7 +33,8 @@ class SOBRASADA_API_ENGINE GameObject
 
     const float4x4& GetParentGlobalTransform() const;
 
-    bool IsStatic() const { return mobilitySettings == ComponentMobilitySettings::STATIC; };
+    bool IsStatic() const { return mobilitySettings == MobilitySettings::STATIC; };
+    bool IsTopParent() const { return isTopParent; };
 
     bool AddGameObject(UID gameObjectUID);
     bool RemoveGameObject(UID gameObjectUID);
@@ -78,12 +79,16 @@ class SOBRASADA_API_ENGINE GameObject
     bool RemoveComponent(ComponentType componentType);
 
     // Updates the transform for this game object and all descending children
-    void UpdateTransformForGOBranch() const;
+    void UpdateTransformForGOBranch();
+    void UpdateMobilityHierarchy(MobilitySettings type);
 
     const std::unordered_map<ComponentType, Component*>& GetComponents() const { return components; }
     Component* GetComponentByType(ComponentType type) const;
 
     MeshComponent* GetMeshComponent() const;
+    const float3& GetPosition() const { return position; }
+    const float3& GetRotation() const { return rotation; }
+    const float3& GetScale() const { return scale; }
 
     void SetLocalTransform(const float4x4& newTransform);
     void DrawGizmos() const;
@@ -91,14 +96,21 @@ class SOBRASADA_API_ENGINE GameObject
     void CreatePrefab();
     UID GetPrefabUID() const { return prefabUID; }
     void SetPrefabUID(const UID uid) { prefabUID = uid; }
-    void SetMobility(ComponentMobilitySettings newMobility) { mobilitySettings = newMobility; };
+
+    void OnTransformUpdated();
+    void UpdateComponents();
+    AABB GetHierarchyAABB();
+
+    void SetPosition(float3& newPosition) { position = newPosition; };
+    void SetWillUpdate(bool willUpdate) { this->willUpdate = willUpdate; };
+    bool WillUpdate() const { return willUpdate; };
 
   private:
-    void OnTransformUpdated();
     void UpdateLocalTransform(const float4x4& parentGlobalTransform);
     void DrawNodes() const;
     void OnDrawConnectionsToggle();
-    void UpdateMobilityHeriarchy(ComponentMobilitySettings type);
+
+    void SetMobility(MobilitySettings newMobility) { mobilitySettings = newMobility; };
 
   public:
     inline static UID currentRenamingUID = INVALID_UID;
@@ -131,4 +143,6 @@ class SOBRASADA_API_ENGINE GameObject
 
     ComponentType selectedComponentIndex = COMPONENT_NONE;
     int mobilitySettings                 = STATIC;
+    bool isTopParent                     = false;
+    bool willUpdate                      = false;
 };

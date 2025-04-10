@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -199,7 +199,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);SOBRASADA_ENGINE_API</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs;.\Libs\ImNodeFlow-1.2.2\include;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Batching;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;.\Libs\bullet\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs;.\Libs\ImNodeFlow-1.2.2\include;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Batching;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;.\Libs\bullet\include;.\Libs\bullet\include\LinearMath;.\Utils\Physics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -220,7 +220,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;GAME;%(PreprocessorDefinitions);SOBRASADA_ENGINE_API</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs;.\Libs\ImNodeFlow-1.2.2\include;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Batching;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;.\Libs\bullet\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs;.\Libs\ImNodeFlow-1.2.2\include;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Batching;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;.\Libs\bullet\include;.\Libs\bullet\include\LinearMath;.\Utils\Physics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -243,7 +243,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;OPTICK;%(PreprocessorDefinitions);SOBRASADA_ENGINE_API</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs;.\Libs\ImNodeFlow-1.2.2\include;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Batching;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs;.\Libs\ImNodeFlow-1.2.2\include;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Batching;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;.\Libs\bullet\include\LinearMath;.\Utils\Physics;.\Libs\bullet\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -268,7 +268,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;GAME;%(PreprocessorDefinitions);SOBRASADA_ENGINE_API</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs;.\Libs\ImNodeFlow-1.2.2\include;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Batching;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;.\Libs\bullet\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs;.\Libs\ImNodeFlow-1.2.2\include;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Batching;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;.\Libs\bullet\include;.\Libs\bullet\include\LinearMath;.\Utils\Physics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -286,6 +286,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="FileSystem\Importers\FontImporter.cpp" />
+    <ClCompile Include="FileSystem\Meta\MetaFont.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\Physics\CapsuleColliderComponent.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\Physics\SphereColliderComponent.cpp" />
+    <ClCompile Include="Utils\Physics\BulletMotionState.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\Physics\CubeColliderComponent.cpp" />
+    <ClCompile Include="DebugDraw\BulletDebugDraw.cpp" />
     <ClCompile Include="FileSystem\Batching\BatchManager.cpp" />
     <ClCompile Include="FileSystem\PrefabManager.cpp" />
     <ClCompile Include="FileSystem\Config\EngineConfig.cpp" />
@@ -294,8 +301,10 @@
     <ClCompile Include="FileSystem\Batching\GeometryBatch.cpp" />
     <ClCompile Include="Libs\ImNodeFlow-1.2.2\src\ImNodeFlow.cpp" />
     <ClCompile Include="FileSystem\StateMachineManager.cpp" />
+    <ClCompile Include="Modules\PhysicsModule.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceNavmesh.cpp" />
     <ClCompile Include="Modules\GameUIModule.cpp" />
+    <ClCompile Include="ResourceManagement\Resources\ResourceFont.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceStateMachine.cpp" />
     <ClCompile Include="Scene\Components\CameraComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\UI\CanvasComponent.cpp" />
@@ -321,47 +330,47 @@
     <ClCompile Include="Libs\RecastDetour\Detour\Source\DetourNode.cpp" />
     <ClCompile Include="Libs\RecastDetour\Recast\Source\Recast.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastAlloc.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastArea.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastAssert.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastContour.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastFilter.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastLayers.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastMesh.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastMeshDetail.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastRasterization.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\Recast\Source\RecastRegion.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Game|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Modules\CameraModule.cpp" />
     <ClCompile Include="Modules\EditorUIModule.cpp" />
@@ -451,10 +460,18 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="Scene\Components\Standalone\Physics\CapsuleColliderComponent.h" />
+    <ClInclude Include="Utils\Physics\BulletUserPointer.h" />
+    <ClInclude Include="Scene\Components\Standalone\Physics\SphereColliderComponent.h" />
+    <ClInclude Include="Utils\Physics\BulletMotionState.h" />
+    <ClInclude Include="Scene\Components\Standalone\Physics\CubeColliderComponent.h" />
+    <ClInclude Include="DebugDraw\BulletDebugDraw.h" />
     <ClInclude Include="FileSystem\Batching\BatchManager.h" />
     <ClInclude Include="FileSystem\Config\ConfigFile.h" />
     <ClInclude Include="FileSystem\Config\EngineConfig.h" />
     <ClInclude Include="FileSystem\Config\ProjectConfig.h" />
+    <ClInclude Include="FileSystem\Importers\FontImporter.h" />
+    <ClInclude Include="FileSystem\Meta\MetaFont.h" />
     <ClInclude Include="FileSystem\Batching\GeometryBatch.h" />
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\include\ImNodeFlow.h" />
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\context_wrapper.h" />
@@ -462,10 +479,12 @@
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_extra_math.h" />
     <ClInclude Include="FileSystem\StateMachineManager.h" />
     <ClInclude Include="Modules\GameUIModule.h" />
+    <ClInclude Include="ResourceManagement\Resources\ResourceFont.h" />
     <ClInclude Include="Scene\Components\Standalone\UI\CanvasComponent.h" />
     <ClInclude Include="Scene\Components\Standalone\UI\UILabelComponent.h" />
     <ClInclude Include="Utils\TextManager.h" />
     <ClInclude Include="Modules\ScriptModule.h" />
+    <ClInclude Include="Modules\PhysicsModule.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceNavmesh.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceStateMachine.h" />
     <ClInclude Include="Scene\Components\CameraComponent.h" />
