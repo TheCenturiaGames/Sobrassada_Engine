@@ -5,6 +5,9 @@
 #include "GameObject.h"
 #include "InputModule.h"
 #include "SceneModule.h"
+#include "DetourNavMeshQuery.h"
+#include "ResourcesModule.h"
+#include "ResourceNavMesh.h"
 
 #include "Math/float3.h"
 #include "Math/float4x4.h"
@@ -98,6 +101,21 @@ void CharacterControllerComponent::Update(float deltaTime)
     if (!App->GetSceneModule()->GetInPlayMode()) return;
 
     if (deltaTime <= 0.0f) return;
+
+    if (!navMeshQuery)
+    {
+        ResourceNavMesh* navRes = App->GetResourcesModule()->GetNavMesh();
+
+        if (navRes)
+        {
+            dtNavMeshQuery* tmpQuery = navRes->GetDetourNavMeshQuery();
+
+            if (tmpQuery)
+            {
+                //TODO: Make the rest of the process
+            }
+        }
+    }
 
     HandleInput(deltaTime);
 }
