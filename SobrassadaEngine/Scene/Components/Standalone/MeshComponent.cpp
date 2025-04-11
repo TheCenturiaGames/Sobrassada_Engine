@@ -55,12 +55,6 @@ MeshComponent::MeshComponent(const rapidjson::Value& initialState, GameObject* p
     }
 
     if (!bonesUIDs.empty() && !bindMatrices.empty()) hasBones = true;
-
-    if (currentMesh != nullptr && currentMaterial != nullptr)
-    {
-        batch = App->GetResourcesModule()->GetBatchManager()->RequestBatch(this);
-        batch->AddComponent(this);
-    }
 }
 
 MeshComponent::~MeshComponent()
@@ -69,6 +63,15 @@ MeshComponent::~MeshComponent()
     App->GetResourcesModule()->ReleaseResource(currentMesh);
 
     if (uniqueBatch) App->GetResourcesModule()->GetBatchManager()->RemoveBatch(batch);
+}
+
+void MeshComponent::Init()
+{
+    if (currentMesh != nullptr && currentMaterial != nullptr)
+    {
+        batch = App->GetResourcesModule()->GetBatchManager()->RequestBatch(this);
+        batch->AddComponent(this);
+    }
 }
 
 void MeshComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
@@ -107,6 +110,7 @@ void MeshComponent::Clone(const Component* other)
         modelUID     = otherMesh->modelUID;
         skinIndex    = otherMesh->skinIndex;
         bindMatrices = otherMesh->bindMatrices;
+        hasBones     = otherMesh->hasBones;
     }
     else
     {

@@ -78,8 +78,6 @@ Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUI
     }
 
     GLOG("%s scene loaded", sceneName.c_str());
-
-    App->GetResourcesModule()->GetBatchManager()->LoadData();
 }
 
 Scene::~Scene()
@@ -109,6 +107,7 @@ void Scene::Init()
     {
         gameObject.second->Init();
     }
+    App->GetResourcesModule()->GetBatchManager()->LoadData();
 
     // When loading a scene, overrides all gameObjects that have a prefabUID. That is because if the prefab has been
     // modified, the scene file may have not, so the prefabs need to be updated when loading the scene again
@@ -121,6 +120,7 @@ void Scene::Init()
         std::vector<UID>::iterator it = std::find(prefabs.begin(), prefabs.end(), gameObject.second->GetPrefabUID());
         if (it == prefabs.end()) prefabs.emplace_back(gameObject.second->GetPrefabUID());
     }
+
     for (const UID prefab : prefabs)
     {
         OverridePrefabs(prefab);
