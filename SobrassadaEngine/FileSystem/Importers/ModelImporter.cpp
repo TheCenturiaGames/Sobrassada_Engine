@@ -8,7 +8,7 @@
 #include "Model.h"
 #include "ProjectModule.h"
 #include "ResourceModel.h"
-
+#include "AnimationImporter.h"
 #include "Math/Quat.h"
 #include "Math/float4x4.h"
 #include "rapidjson/prettywriter.h"
@@ -96,6 +96,51 @@ namespace ModelImporter
         else finalModelUID = sourceUID;
 
         assetPath = targetFilePath + assetPath;
+        std::vector<UID> animationUIDs;
+        // Import Animations
+        if (model.animations.size() > 0)
+        {
+
+            GLOG("Number of animations in model: %zu", model.animations.size());
+
+            for (int i = 0; i < model.animations.size(); ++i)
+            {
+                const auto& anim = model.animations[i];
+
+                GLOG("Importing animation %d", i);
+                GLOG("Animation channels: %zu", anim.channels.size());
+
+                UID animUID =
+                    AnimationImporter::ImportAnimation(model, anim, anim.name, filePath, targetFilePath, sourceUID);
+
+                GLOG("Imported animation UID: %llu", animUID);
+
+                if (animUID != INVALID_UID)
+                {
+                    animationUIDs.push_back(animUID);
+
+                    GLOG("Final animation UID: %llu", animUID);
+                }
+
+                else
+                {
+                    GLOG("Failed to import animation %d", i);
+                }
+            }
+
+            if (!animationUIDs.empty())
+            {
+                newModel.SetAnimationUID(animationUIDs[0]);
+                newModel.SetAllAnimationUIDs(animationUIDs);
+
+                GLOG("Set first animation UID: %llu", animationUIDs[0]);
+                GLOG("Total animation UIDs: %zu", animationUIDs.size());
+            }
+            else
+            {
+                GLOG("No valid animation UIDs found");
+            }
+        }
 
         newModel.SetUID(finalModelUID);
 
@@ -155,7 +200,13 @@ namespace ModelImporter
         }
 
         modelJSON.AddMember("Nodes", nodesJSON, allocator);
-
+        // Serialize Animations.
+        rapidjson::Value animationsJSON(rapidjson::kArrayType);
+        for (UID animUID : animationUIDs)
+        {
+            animationsJSON.PushBack(animUID, allocator);
+        }
+        modelJSON.AddMember("Animations", animationsJSON, allocator);
         // Serialize skins
         rapidjson::Value skinsJSON(rapidjson::kArrayType);
         for (const Skin& skin : skinsData)
@@ -191,7 +242,7 @@ namespace ModelImporter
         modelJSON.AddMember("Skins", skinsJSON, allocator);
 
         doc.AddMember("Model", modelJSON, allocator);
-
+       
         // Save file like JSON
         rapidjson::StringBuffer buffer;
         rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
@@ -328,6 +379,21 @@ namespace ModelImporter
             }
         }
 
+         std::vector<UID> loadedAnimations;
+        // Deserialize Animations
+        if (modelJSON.HasMember("Animations") && modelJSON["Animations"].IsArray())
+        {
+
+            const rapidjson::Value& animJSON = modelJSON["Animations"];
+
+            for (rapidjson::SizeType i = 0; i < animJSON.Size(); ++i)
+            {
+
+                loadedAnimations.push_back(animJSON[i].GetUint64());
+            }
+        }
+
+
         // Deserialize Skins
         std::vector<Skin> loadedSkins;
         if (modelJSON.HasMember("Skins") && modelJSON["Skins"].IsArray())
@@ -382,6 +448,11 @@ namespace ModelImporter
 
         ResourceModel* resourceModel = new ResourceModel(uid, FileSystem::GetFileNameWithoutExtension(filePath));
         resourceModel->SetModelData(Model(uid, rootNodesIdx, loadedNodes, loadedSkins));
+        if (loadedAnimations.size() > 0)
+        {
+            resourceModel->SetAllAnimationUIDs(loadedAnimations);
+            resourceModel->SetAnimationUID(loadedAnimations[0]);
+        }
 
         return resourceModel;
     }
@@ -415,7 +486,7 @@ namespace ModelImporter
             // Get reference to Mesh and Material UIDs
             if (nodeData.mesh > -1) newNode.meshes = meshesUIDs[nodeData.mesh];
 
-            newNode.skinIndex = nodeData.skin;
+            newNode.skinIndex          = nodeData.skin;
 
             outNodes[currentNodeIndex] = newNode;
 

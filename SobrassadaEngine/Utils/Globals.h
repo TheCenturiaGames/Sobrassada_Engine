@@ -91,9 +91,11 @@ constexpr const char* RELEASE_DLL_PATH = "..\\SobrassadaEngine\\x64\\Release\\So
 constexpr const char* ENGINE_DEFAULT_ASSETS          = "EngineDefaults/";
 constexpr const char* ASSETS_PATH                    = "Assets/";
 constexpr const char* SCENES_PATH                    = "Assets/Scenes/";
+constexpr const char* NAVMESHES_PATH                 = "Assets/Navmeshes/";
 constexpr const char* METADATA_PATH                  = "Assets/Metadata/";
 constexpr const char* PREFABS_ASSETS_PATH            = "Assets/Prefabs/";
 constexpr const char* MODELS_ASSETS_PATH             = "Assets/Models/";
+constexpr const char* ANIMATIONS_ASSETS_PATH         = "Assets/Animations/";
 constexpr const char* STATEMACHINES_ASSETS_PATH      = "Assets/StateMachines/";
 
 constexpr const char* LIBRARY_PATH                   = "Library/";
@@ -115,9 +117,11 @@ constexpr const char* MATERIAL_EXTENSION             = ".mat";
 constexpr const char* SCENE_EXTENSION                = ".scene";
 constexpr const char* PREFAB_EXTENSION               = ".prefab";
 constexpr const char* MODEL_EXTENSION                = ".model";
+constexpr const char* ANIMATION_EXTENSION            = ".anim";
 constexpr const char* META_EXTENSION                 = ".smeta";
 constexpr const char* STATEMACHINE_EXTENSION         = ".smachine";
 constexpr const char* FONT_EXTENSION                 = ".ttf";
+constexpr const char* NAVMESH_EXTENSION              = ".nav";
 
 constexpr int MAX_COMPONENT_NAME_LENGTH              = 64;
 
