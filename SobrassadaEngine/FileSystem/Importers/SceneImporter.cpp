@@ -318,13 +318,5 @@ namespace SceneImporter
                 GLOG("Failed to create directory: %s", convertedFontsPath.c_str());
             }
         }
-        const std::string convertedStateMachinePath = projectFilePath + STATEMACHINES_LIB_PATH;
-        if (!FileSystem::IsDirectory(convertedStateMachinePath.c_str()))
-        {
-            if (!FileSystem::CreateDirectories(convertedStateMachinePath.c_str()))
-            {
-                GLOG("Failed to create directory: %s", convertedStateMachinePath.c_str());
-            }
-        }
     }
 }; // namespace SceneImporter

@@ -628,7 +628,6 @@ void StateMachineEditor::ShowSavePopup()
 void StateMachineEditor::LoadMachine()
 {
     availableClips.clear();
-    availableTriggers.clear();
     ImGui::OpenPopup("Load State Machine");
 }
 
