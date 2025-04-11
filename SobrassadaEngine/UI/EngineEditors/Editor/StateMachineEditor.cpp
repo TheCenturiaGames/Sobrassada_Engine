@@ -19,7 +19,7 @@ StateMachineEditor::StateMachineEditor(const std::string& editorName, UID uid, R
         if (newStateNode)
         {
             CreateBaseState(*newStateNode.get());
-        }
+}
     }
 }
 
@@ -628,6 +628,7 @@ void StateMachineEditor::ShowSavePopup()
 void StateMachineEditor::LoadMachine()
 {
     availableClips.clear();
+    availableTriggers.clear();
     ImGui::OpenPopup("Load State Machine");
 }
 
