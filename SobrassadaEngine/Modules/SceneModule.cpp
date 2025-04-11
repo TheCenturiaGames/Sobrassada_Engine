@@ -111,11 +111,9 @@ update_status SceneModule::PostUpdate(float deltaTime)
                     App->GetCameraModule()->CastCameraRay(), loadedScene->GetOctree(), loadedScene->GetDynamicTree()
                 );
 
-                if (selectedObject != nullptr)
-                {
-                    loadedScene->SetSelectedGameObject(selectedObject->GetUID());
-                    loadedScene->ClearObjectSelection();
-                }
+                if (selectedObject != nullptr) loadedScene->SetSelectedGameObject(selectedObject->GetUID());
+
+                loadedScene->ClearObjectSelection();
             }
         }
 
