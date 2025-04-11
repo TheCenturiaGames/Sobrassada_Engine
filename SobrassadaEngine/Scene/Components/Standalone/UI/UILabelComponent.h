@@ -26,6 +26,8 @@ class UILabelComponent : public Component
     void Render(float deltaTime) override;
     void RenderEditorInspector() override;
 
+    void RemoveTransform() { transform2D = nullptr; }
+
   private:
     void InitBuffers();
     void OnFontChange();
