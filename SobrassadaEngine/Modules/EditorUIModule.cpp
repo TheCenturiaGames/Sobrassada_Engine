@@ -14,11 +14,13 @@
 #include "SceneImporter.h"
 #include "ResourcesModule.h"
 #include "ResourceNavmesh.h"
+#include "ResourceStateMachine.h"
 #include "SceneModule.h"
 #include "ScriptModule.h"
 #include "TextureEditor.h"
 #include "TextureImporter.h"
 #include "WindowModule.h"
+#include "StateMachineEditor.h"
 
 #include "Math/Quat.h"
 #include "SDL.h"
@@ -330,6 +332,7 @@ void EditorUIModule::MainMenu()
 
             if (ImGui::MenuItem("Node Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::NODE));
 
+            if (ImGui::MenuItem("State Machine Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::ANIMATION));
             if (ImGui::MenuItem("Texture Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::TEXTURE));
 
             ImGui::EndMenu();
@@ -1165,6 +1168,7 @@ void EditorUIModule::About(bool& aboutMenu)
 EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
 {
     UID uid = GenerateUID();
+    ResourceStateMachine* stateMachine = new ResourceStateMachine(uid, "State Machine " + std::to_string(uid));
     switch (type)
     {
     case EditorType::BASE:
@@ -1173,6 +1177,9 @@ EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
         break;
     case EditorType::NODE:
         return new NodeEditor("NodeEditor_" + std::to_string(uid), uid);
+
+    case EditorType::ANIMATION:
+        return new StateMachineEditor("StateMachineEditor_" + std::to_string(uid), uid, stateMachine);
 
     case EditorType::TEXTURE:
         return new TextureEditor("TextureEditor_" + std::to_string(uid), uid);
