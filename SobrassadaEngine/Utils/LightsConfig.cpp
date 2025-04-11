@@ -47,6 +47,8 @@ void LightsConfig::FreeCubemap() const
     glDeleteTextures(1, &cubemapIrradiance);
     glMakeTextureHandleNonResidentARB(prefilteredEnvironmentMapHandle);
     glDeleteTextures(1, &prefilteredEnvironmentMap);
+    glMakeTextureHandleNonResidentARB(environmentBRDFHandle);
+    glDeleteTextures(1, &environmentBRDF);
 }
 
 void LightsConfig::InitSkybox()
@@ -88,7 +90,7 @@ void LightsConfig::InitSkybox()
 
     cubemapIrradiance = CubeMapToTexture(1024, 1024);
     irradianceHandle  = glGetTextureHandleARB(cubemapIrradiance);
-    glMakeTextureHandleResidentARB(skyboxHandle);
+    glMakeTextureHandleResidentARB(irradianceHandle);
 
     prefilteredEnvironmentMap       = PreFilteredEnvironmentMapGeneration(1024, 1024);
     prefilteredEnvironmentMapHandle = glGetTextureHandleARB(prefilteredEnvironmentMap);
@@ -341,6 +343,8 @@ unsigned int LightsConfig::PreFilteredEnvironmentMapGeneration(int width, int he
 
 unsigned int LightsConfig::EnvironmentBRDFGeneration(int width, int height)
 {
+    glDepthMask(GL_FALSE);
+
     unsigned int environmentBRDFTexture;
     glGenTextures(1, &environmentBRDFTexture);
     glBindTexture(GL_TEXTURE_2D, environmentBRDFTexture);
@@ -348,13 +352,12 @@ unsigned int LightsConfig::EnvironmentBRDFGeneration(int width, int height)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, width, height, 0, GL_RG, GL_HALF_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    unsigned int prefilteredProgram =
+    unsigned int environmentProgram =
         App->GetShaderModule()->CreateShaderProgram(LIGHTS_VERTEX_SHADER_PATH, ENVIRONMENTBRDF_FRAGMENT_SHADER_PATH);
-    glUseProgram(prefilteredProgram);
+    glUseProgram(environmentProgram);
 
     unsigned int frameBuffer;
     glGenFramebuffers(1, &frameBuffer);
@@ -365,8 +368,11 @@ unsigned int LightsConfig::EnvironmentBRDFGeneration(int width, int height)
     glViewport(0, 0, width, height);
     App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 36);
 
-    glDeleteProgram(prefilteredProgram);
+    glDeleteProgram(environmentProgram);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDeleteFramebuffers(1, &frameBuffer);
+
+    glDepthMask(GL_TRUE);
 
     return environmentBRDFTexture;
 }
