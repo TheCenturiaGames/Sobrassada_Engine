@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "FileSystem/StateMachineManager.h"
+#include "LibraryModule.h"
 #include "ResourcesModule.h"
 #include "StateNode.h"
 
@@ -241,33 +242,36 @@ void StateMachineEditor::ShowInspector()
     strncpy_s(clipBuffer, selectedNode->GetClipName().c_str(), sizeof(clipBuffer));
     clipBuffer[sizeof(clipBuffer) - 1] = '\0';
 
-    int currentClipIndex               = -1;
-    for (size_t i = 0; i < availableClips.size(); ++i)
+    const auto& animMap = App->GetLibraryModule()->GetAnimMap();
+    std::vector<std::string> animationNames;
+    animationNames.reserve(animMap.size());
+
+    for (const auto& [name, uid] : animMap)
     {
-        if (availableClips[i] == selectedNode->GetClipName())
-        {
-            currentClipIndex = static_cast<int>(i);
-            break;
-        }
+        animationNames.push_back(name);
     }
 
-    if (ImGui::Combo(
+    int currentClipIndex        = -1;
+    std::string currentClipName = selectedNode->GetClipName();
+
+   if (ImGui::Combo(
             "Associated Clip", &currentClipIndex,
             [](void* data, int idx, const char** out_text)
             {
-                auto* clips = static_cast<std::vector<std::string>*>(data);
-                if (out_text) *out_text = (*clips)[idx].c_str();
+                auto* names = static_cast<std::vector<std::string>*>(data);
+                if (out_text) *out_text = (*names)[idx].c_str();
                 return true;
             },
-            &availableClips, (int)availableClips.size()
+            &animationNames, (int)animationNames.size()
         ))
     {
-        if (currentClipIndex >= 0 && availableClips[currentClipIndex] != selectedNode->GetClipName())
+        if (currentClipIndex >= 0 && animationNames[currentClipIndex] != currentClipName)
         {
-            resource->EditState(
-                selectedNode->GetStateName(), selectedNode->GetStateName(), availableClips[currentClipIndex]
-            );
-            selectedNode->SetClipName(availableClips[currentClipIndex]);
+            const std::string& newClipName = animationNames[currentClipIndex];
+            UID newClipUID                 = App->GetLibraryModule()->GetAnimUID(newClipName);
+            resource->EditClipInfo(currentClipName, newClipUID, newClipName, false);
+            resource->EditState(selectedNode->GetStateName(), selectedNode->GetStateName(), newClipName);
+            selectedNode->SetClipName(newClipName);
         }
     }
 
