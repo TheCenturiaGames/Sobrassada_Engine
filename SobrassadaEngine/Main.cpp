@@ -27,7 +27,8 @@ enum MainState
 };
 
 Application* App         = NULL;
-std::vector<char*>* Logs = NULL;
+std::vector<char*> *Logs = NULL;
+LCG* rng;
 
 int main(int argc, char** argv)
 {
@@ -35,6 +36,7 @@ int main(int argc, char** argv)
     MainState mainState = MAIN_CREATION;
 
     Logs                = new std::vector<char*>();
+    rng                 = new LCG();
 
     while (mainState != MAIN_EXIT)
     {
@@ -117,6 +119,7 @@ int main(int argc, char** argv)
     }
     Logs->clear();
     delete Logs;
+    delete rng;
 
     return mainReturn;
 }

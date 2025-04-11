@@ -18,9 +18,14 @@ namespace SceneImporter
     void ImportMaterialFromMetadata(
         const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID
     );
+    void ImportAnimationFromMetadata(
+        const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID
+    );
     void
     CopyPrefab(const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID);
     void
     CopyModel(const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID);
+    void
+    CopyFont(const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID);
     void CreateLibraryDirectories(const std::string& projectFilePath);
 }; // namespace SceneImporter

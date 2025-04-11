@@ -11,6 +11,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXTex", "DirectXTex\DirectXTex\DirectXTex_Desktop_2022.vcxproj", "{371B9FA9-4C90-4AC6-A123-ACED756D6C77}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SobrassadaScripts", "Scripting\SobrassadaScripts\SobrassadaScripts\SobrassadaScripts.vcxproj", "{3F4C08EB-F9E4-4CD2-85F1-26E62A73E599}"
+	ProjectSection(ProjectDependencies) = postProject
+		{371B9FA9-4C90-4AC6-A123-ACED756D6C77} = {371B9FA9-4C90-4AC6-A123-ACED756D6C77}
+		{E053F624-9870-4D3A-B6B0-A97E1DB10148} = {E053F624-9870-4D3A-B6B0-A97E1DB10148}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,6 +24,8 @@ Global
 		Game Debug|x86 = Game Debug|x86
 		Game|x64 = Game|x64
 		Game|x86 = Game|x86
+		Profile|x64 = Profile|x64
+		Profile|x86 = Profile|x86
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
@@ -36,6 +42,10 @@ Global
 		{E053F624-9870-4D3A-B6B0-A97E1DB10148}.Game|x64.Build.0 = Game|x64
 		{E053F624-9870-4D3A-B6B0-A97E1DB10148}.Game|x86.ActiveCfg = Game|Win32
 		{E053F624-9870-4D3A-B6B0-A97E1DB10148}.Game|x86.Build.0 = Game|Win32
+		{E053F624-9870-4D3A-B6B0-A97E1DB10148}.Profile|x64.ActiveCfg = Profile|x64
+		{E053F624-9870-4D3A-B6B0-A97E1DB10148}.Profile|x64.Build.0 = Profile|x64
+		{E053F624-9870-4D3A-B6B0-A97E1DB10148}.Profile|x86.ActiveCfg = Profile|Win32
+		{E053F624-9870-4D3A-B6B0-A97E1DB10148}.Profile|x86.Build.0 = Profile|Win32
 		{E053F624-9870-4D3A-B6B0-A97E1DB10148}.Release|x64.ActiveCfg = Release|x64
 		{E053F624-9870-4D3A-B6B0-A97E1DB10148}.Release|x64.Build.0 = Release|x64
 		{E053F624-9870-4D3A-B6B0-A97E1DB10148}.Release|x86.ActiveCfg = Release|Win32
@@ -52,6 +62,10 @@ Global
 		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Game|x64.Build.0 = Game|x64
 		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Game|x86.ActiveCfg = Game|Win32
 		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Game|x86.Build.0 = Game|Win32
+		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Profile|x64.ActiveCfg = Profile|x64
+		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Profile|x64.Build.0 = Profile|x64
+		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Profile|x86.ActiveCfg = Profile|Win32
+		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Profile|x86.Build.0 = Profile|Win32
 		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Release|x64.ActiveCfg = Release|x64
 		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Release|x64.Build.0 = Release|x64
 		{371B9FA9-4C90-4AC6-A123-ACED756D6C77}.Release|x86.ActiveCfg = Release|Win32
@@ -60,14 +74,18 @@ Global
 		{3F4C08EB-F9E4-4CD2-85F1-26E62A73E599}.Debug|x64.Build.0 = Debug|x64
 		{3F4C08EB-F9E4-4CD2-85F1-26E62A73E599}.Debug|x86.ActiveCfg = Debug|Win32
 		{3F4C08EB-F9E4-4CD2-85F1-26E62A73E599}.Debug|x86.Build.0 = Debug|Win32
-		{3F4C08EB-F9E4-4CD2-85F1-26E62A73E599}.Game Debug|x64.ActiveCfg = Debug|x64
-		{3F4C08EB-F9E4-4CD2-85F1-26E62A73E599}.Game Debug|x64.Build.0 = Debug|x64
+		{3F4C08EB-F9E4-4CD2-85F1-26E62A73E599}.Game Debug|x64.ActiveCfg = Game Debug|x64
+		{3F4C08EB-F9E4-4CD2-85F1-26E62A73E599}.Game Debug|x64.Build.0 = Game Debug|x64
 		{3F4C08EB-F9E4-4CD2-85F1-26E62A73E599}.Game Debug|x86.ActiveCfg = Debug|Win32
 		{3F4C08EB-F9E4-4CD2-85F1-26E62A73E599}.Game Debug|x86.Build.0 = Debug|Win32
-		{3F4C08EB-F9E4-4CD2-85F1-26E62A73E599}.Game|x64.ActiveCfg = Debug|x64
-		{3F4C08EB-F9E4-4CD2-85F1-26E62A73E599}.Game|x64.Build.0 = Debug|x64
+		{3F4C08EB-F9E4-4CD2-85F1-26E62A73E599}.Game|x64.ActiveCfg = Game|x64
+		{3F4C08EB-F9E4-4CD2-85F1-26E62A73E599}.Game|x64.Build.0 = Game|x64
 		{3F4C08EB-F9E4-4CD2-85F1-26E62A73E599}.Game|x86.ActiveCfg = Debug|Win32
 		{3F4C08EB-F9E4-4CD2-85F1-26E62A73E599}.Game|x86.Build.0 = Debug|Win32
+		{3F4C08EB-F9E4-4CD2-85F1-26E62A73E599}.Profile|x64.ActiveCfg = Profile|x64
+		{3F4C08EB-F9E4-4CD2-85F1-26E62A73E599}.Profile|x64.Build.0 = Profile|x64
+		{3F4C08EB-F9E4-4CD2-85F1-26E62A73E599}.Profile|x86.ActiveCfg = Profile|Win32
+		{3F4C08EB-F9E4-4CD2-85F1-26E62A73E599}.Profile|x86.Build.0 = Profile|Win32
 		{3F4C08EB-F9E4-4CD2-85F1-26E62A73E599}.Release|x64.ActiveCfg = Release|x64
 		{3F4C08EB-F9E4-4CD2-85F1-26E62A73E599}.Release|x64.Build.0 = Release|x64
 		{3F4C08EB-F9E4-4CD2-85F1-26E62A73E599}.Release|x86.ActiveCfg = Release|Win32

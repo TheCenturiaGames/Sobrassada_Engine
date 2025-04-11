@@ -1,8 +1,8 @@
 #include "WindowModule.h"
 
 #include "Application.h"
-#include "ProjectModule.h"
 #include "GameUIModule.h"
+#include "ProjectModule.h"
 
 WindowModule::WindowModule()
 {
@@ -51,7 +51,7 @@ bool WindowModule::Init()
         else
         {
             screenSurface = SDL_GetWindowSurface(window);
-            SetVsync(VSYNC);
+            vsync         = VSYNC;
         }
     }
 

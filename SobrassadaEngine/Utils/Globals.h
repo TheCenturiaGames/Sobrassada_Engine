@@ -15,7 +15,8 @@
 
 #pragma warning(disable : 4251)
 
-extern SOBRASADA_API_ENGINE std::vector<char*>* Logs;
+extern SOBRASADA_API_ENGINE std::vector<char*> *Logs;
+extern LCG* rng;
 
 SOBRASADA_API_ENGINE void glog(const char file[], int line, const char* format, ...);
 
@@ -93,9 +94,11 @@ constexpr const wchar_t* BANKNAME_MAIN               = L"main.bnk";
 constexpr const char* ENGINE_DEFAULT_ASSETS          = "EngineDefaults/";
 constexpr const char* ASSETS_PATH                    = "Assets/";
 constexpr const char* SCENES_PATH                    = "Assets/Scenes/";
+constexpr const char* NAVMESHES_PATH                 = "Assets/Navmeshes/";
 constexpr const char* METADATA_PATH                  = "Assets/Metadata/";
 constexpr const char* PREFABS_ASSETS_PATH            = "Assets/Prefabs/";
 constexpr const char* MODELS_ASSETS_PATH             = "Assets/Models/";
+constexpr const char* ANIMATIONS_ASSETS_PATH         = "Assets/Animations/";
 constexpr const char* STATEMACHINES_ASSETS_PATH      = "Assets/StateMachines/";
 
 constexpr const char* LIBRARY_PATH                   = "Library/";
@@ -108,6 +111,7 @@ constexpr const char* TEXTURES_PATH                  = "Library/Textures/";
 constexpr const char* MATERIALS_PATH                 = "Library/Materials/";
 constexpr const char* STATEMACHINES_LIB_PATH         = "Library/StateMachines/";
 constexpr const char* PREFABS_LIB_PATH               = "Library/Prefabs/";
+constexpr const char* FONTS_PATH                     = "Library/Fonts/";
 
 constexpr const char* ASSET_EXTENSION                = ".gltf";
 constexpr const char* MESH_EXTENSION                 = ".sobrassada";
@@ -116,8 +120,11 @@ constexpr const char* MATERIAL_EXTENSION             = ".mat";
 constexpr const char* SCENE_EXTENSION                = ".scene";
 constexpr const char* PREFAB_EXTENSION               = ".prefab";
 constexpr const char* MODEL_EXTENSION                = ".model";
+constexpr const char* ANIMATION_EXTENSION            = ".anim";
 constexpr const char* META_EXTENSION                 = ".smeta";
 constexpr const char* STATEMACHINE_EXTENSION         = ".smachine";
+constexpr const char* FONT_EXTENSION                 = ".ttf";
+constexpr const char* NAVMESH_EXTENSION              = ".nav";
 
 constexpr int MAX_COMPONENT_NAME_LENGTH              = 64;
 
@@ -137,9 +144,15 @@ using UID                                            = uint64_t;
 constexpr UID INVALID_UID                            = 0;
 constexpr UID UID_PREFIX_DIVISOR                     = 100000000000000;
 constexpr UID FALLBACK_TEXTURE_UID                   = 1200000000000000;
+constexpr UID DEFAULT_MATERIAL_UID                   = 1300000000000000;
 
 constexpr const char* CONSTANT_MESH_SELECT_DIALOG_ID = "mesh-select";
+constexpr const char* CONSTANT_MATERIAL_SELECT_DIALOG_ID = "material-select";
 constexpr const char* CONSTANT_TEXTURE_SELECT_DIALOG_ID = "texture-select";
+constexpr const char* CONSTANT_DIFFUSE_TEXTURE_SELECT_DIALOG_ID = "diffuse-texture-select";
+constexpr const char* CONSTANT_METALLIC_TEXTURE_SELECT_DIALOG_ID = "metallic-texture-select";
+constexpr const char* CONSTANT_SPECULAR_TEXTURE_SELECT_DIALOG_ID = "specular-texture-select";
+constexpr const char* CONSTANT_NORMAL_TEXTURE_SELECT_DIALOG_ID = "normal-texture-select";
 constexpr const char* CONSTANT_PREFAB_SELECT_DIALOG_ID  = "prefab-select";
 constexpr const char* CONSTANT_MODEL_SELECT_DIALOG_ID   = "model-select";
 
@@ -153,9 +166,8 @@ constexpr float DEGREE_RAD_CONV                         = PI / 180.f;
 constexpr float MINIMUM_TREE_LEAF_SIZE                  = 5.f;
 constexpr int PALETTE_SIZE                              = 64;
 
+
 inline UID GenerateUID()
 {
-    LCG rng;
-    UID uid = static_cast<UID>(rng.IntFast()) << 32 | rng.IntFast(); // Combine two 32-bit values
-    return uid;
+    return static_cast<UID>(rng->IntFast()) << 32 | rng->IntFast(); // Combine two 32-bit values
 }

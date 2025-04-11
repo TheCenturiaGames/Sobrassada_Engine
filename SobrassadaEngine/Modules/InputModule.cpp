@@ -87,6 +87,7 @@ update_status InputModule::PreUpdate(float deltaTime)
             break;
         case SDL_MOUSEBUTTONDOWN:
             mouseButtons[sdlEvent.button.button - 1] = KEY_DOWN;
+
             break;
 
         case SDL_MOUSEBUTTONUP:

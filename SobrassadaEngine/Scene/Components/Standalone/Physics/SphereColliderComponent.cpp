@@ -3,10 +3,11 @@
 #include "Application.h"
 #include "GameObject.h"
 #include "PhysicsModule.h"
+#include "SceneModule.h"
 
 #include "Geometry/Sphere.h"
 #include "ImGui.h"
-#include "Libs/rapidjson/document.h"
+#include "rapidjson/document.h"
 
 SphereColliderComponent::SphereColliderComponent(UID uid, GameObject* parent)
     : Component(uid, parent, "Sphere Collider", COMPONENT_SPHERE_COLLIDER)
@@ -175,6 +176,8 @@ void SphereColliderComponent::Render(float deltaTime)
 
 void SphereColliderComponent::ParentUpdated()
 {
+    if (App->GetSceneModule()->GetInPlayMode()) return;
+
     if (fitToSize) CalculateCollider();
 
     if (parent->IsStatic() && colliderType != ColliderType::STATIC)

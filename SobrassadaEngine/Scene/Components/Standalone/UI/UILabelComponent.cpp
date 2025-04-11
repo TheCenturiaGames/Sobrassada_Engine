@@ -3,6 +3,9 @@
 #include "Application.h"
 #include "CameraModule.h"
 #include "CanvasComponent.h"
+#include "LibraryModule.h"
+#include "ResourceFont.h"
+#include "ResourcesModule.h"
 #include "GameObject.h"
 #include "Scene.h"
 #include "SceneModule.h"
@@ -18,6 +21,11 @@ UILabelComponent::UILabelComponent(UID uid, GameObject* parent)
     : text("Le Sobrassada"), Component(uid, parent, "Label", COMPONENT_LABEL)
 {
     fontData = new TextManager::FontData();
+
+    // Set the default font resource
+    fontType = static_cast<ResourceFont*>(
+        App->GetResourcesModule()->RequestResource(App->GetLibraryModule()->GetFontMap().at("Roboto-Regular"))
+    );
 }
 
 UILabelComponent::UILabelComponent(const rapidjson::Value& initialState, GameObject* parent)
@@ -28,6 +36,20 @@ UILabelComponent::UILabelComponent(const rapidjson::Value& initialState, GameObj
     const char* textPtr = initialState["Text"].GetString();
     strcpy_s(text, sizeof(text), textPtr);
     fontSize = initialState["FontSize"].GetInt();
+
+    if (initialState.HasMember("FontUID"))
+    {
+        fontType =
+            static_cast<ResourceFont*>(App->GetResourcesModule()->RequestResource(initialState["FontUID"].GetUint64()));
+    }
+    else
+    {
+        // To prevent crashes in older saved scenes, load the default one if there is no font saved
+        GLOG("[Warning] No font type found for the component %s in the saved scene", name);
+        fontType = static_cast<ResourceFont*>(
+            App->GetResourcesModule()->RequestResource(App->GetLibraryModule()->GetFontMap().at("Roboto-Regular"))
+        );
+    }
 
     if (initialState.HasMember("FontColor") && initialState["FontColor"].IsArray())
     {
@@ -42,6 +64,9 @@ UILabelComponent::~UILabelComponent()
 {
     fontData->Clean();
     delete fontData;
+
+    App->GetResourcesModule()->ReleaseResource(fontType);
+
     if (vbo != 0) glDeleteBuffers(1, &vbo);
     if (vao != 0) glDeleteVertexArrays(1, &vao);
 }
@@ -64,7 +89,8 @@ void UILabelComponent::Init()
 
     if (parentCanvas == nullptr) GLOG("[WARNING] Label has no parent canvas, it won't be rendered");
 
-    fontData->Init("./EngineDefaults/Shader/Font/Arial.ttf", fontSize);
+    fontData->Clean();
+    fontData->Init(fontType->GetFilepath().c_str(), fontSize);
     InitBuffers();
 }
 
@@ -75,6 +101,8 @@ void UILabelComponent::Save(rapidjson::Value& targetState, rapidjson::Document::
     std::string textString(text);
     targetState.AddMember("Text", rapidjson::Value(textString.c_str(), allocator), allocator);
     targetState.AddMember("FontSize", fontSize, allocator);
+
+    targetState.AddMember("FontUID", fontType->GetUID(), allocator);
 
     rapidjson::Value valFontColor(rapidjson::kArrayType);
     valFontColor.PushBack(fontColor.x, allocator);
@@ -93,8 +121,11 @@ void UILabelComponent::Clone(const Component* other)
         fontSize  = otherLabel->fontSize;
         fontColor = otherLabel->fontColor;
 
+        fontType  = otherLabel->fontType;
+        fontType->AddReference();
+
         fontData->Clean();
-        fontData->Init("./EngineDefaults/Shader/Font/Arial.ttf", fontSize);
+        fontData->Init(fontType->GetFilepath().c_str(), fontSize);
     }
     else
     {
@@ -129,25 +160,20 @@ void UILabelComponent::Render(float deltaTime)
               ); // near plane. far plane, screen width, screen height
 
     float width = 0;
-    if (transform2D != nullptr)
+    float3 startPos;
+    if (transform2D)
     {
-        float4x4 transform = parent->GetGlobalTransform();
-        transform.SetTranslatePart(float3(transform2D->GetGlobalPosition(), 0));
-        glUniformMatrix4fv(0, 1, GL_TRUE, transform.ptr());
+        startPos = float3(transform2D->GetRenderingPosition(), 0) - parent->GetGlobalTransform().TranslatePart();
         width = transform2D->size.x;
     }
-    else
-    {
-        // If the transform2D component is deleted, get the common global transform
-        glUniformMatrix4fv(0, 1, GL_TRUE, parent->GetGlobalTransform().ptr());
-    }
+    glUniformMatrix4fv(0, 1, GL_TRUE, parent->GetGlobalTransform().ptr());
     glUniformMatrix4fv(1, 1, GL_TRUE, view.ptr());
     glUniformMatrix4fv(2, 1, GL_TRUE, proj.ptr());
 
     glUniform3fv(3, 1, fontColor.ptr()); // Font color
 
     glBindVertexArray(vao);
-    TextManager::RenderText(*fontData, text, vbo, width);
+    TextManager::RenderText(*fontData, text, startPos, vbo, width);
 }
 
 void UILabelComponent::RenderEditorInspector()
@@ -166,18 +192,26 @@ void UILabelComponent::RenderEditorInspector()
         }
 
         const char* preview = "Arial";
-        if (ImGui::BeginCombo("combo 1", preview))
+        if (ImGui::BeginCombo("Font Type", fontData->fontName.c_str()))
         {
-            // TODO: Fonts could be a resource, so users can use the fonts they want and get loaded here
+            int selectedItemIndex = -1;
+            unsigned int i        = 0;
+            for (const auto& font : App->GetLibraryModule()->GetFontMap())
+            {
+                const bool is_selected = (selectedItemIndex == i);
+                if (ImGui::Selectable(font.first.c_str(), is_selected))
+                {
+                    selectedItemIndex = i;
 
-            // for (int n = 0; n < IM_ARRAYSIZE(items); n++)
-            //{
-            //     const bool is_selected = (item_selected_idx == n);
-            //     if (ImGui::Selectable(items[n], is_selected)) item_selected_idx = n;
-            //
-            //     // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-            //     if (is_selected) ImGui::SetItemDefaultFocus();
-            // }
+                    fontType = static_cast<ResourceFont*>(App->GetResourcesModule()->RequestResource(font.second));
+                    fontData->Clean();
+                    fontData->Init(fontType->GetFilepath().c_str(), fontSize);
+                }
+
+                // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+                if (is_selected) ImGui::SetItemDefaultFocus();
+                ++i;
+            }
             ImGui::EndCombo();
         }
 
@@ -207,5 +241,5 @@ void UILabelComponent::InitBuffers()
 void UILabelComponent::OnFontChange()
 {
     fontData->Clean();
-    fontData->Init("./EngineDefaults/Shader/Font/Arial.ttf", fontSize);
+    fontData->Init(fontType->GetFilepath().c_str(), fontSize);
 }

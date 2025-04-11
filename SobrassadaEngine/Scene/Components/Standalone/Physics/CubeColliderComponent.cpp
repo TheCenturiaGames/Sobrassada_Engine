@@ -3,9 +3,10 @@
 #include "Application.h"
 #include "GameObject.h"
 #include "PhysicsModule.h"
+#include "SceneModule.h"
 
 #include "ImGui.h"
-#include "Libs/rapidjson/document.h"
+#include "rapidjson/document.h"
 
 CubeColliderComponent::CubeColliderComponent(UID uid, GameObject* parent)
     : Component(uid, parent, "Cube Collider", COMPONENT_CUBE_COLLIDER)
@@ -183,6 +184,8 @@ void CubeColliderComponent::Render(float deltaTime)
 
 void CubeColliderComponent::ParentUpdated()
 {
+    if (App->GetSceneModule()->GetInPlayMode()) return;
+
     if (fitToSize) CalculateCollider();
 
     if (parent->IsStatic() && colliderType != ColliderType::STATIC)

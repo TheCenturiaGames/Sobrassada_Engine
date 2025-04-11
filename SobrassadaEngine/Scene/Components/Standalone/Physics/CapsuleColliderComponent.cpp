@@ -3,9 +3,10 @@
 #include "Application.h"
 #include "GameObject.h"
 #include "PhysicsModule.h"
+#include "SceneModule.h"
 
 #include "ImGui.h"
-#include "Libs/rapidjson/document.h"
+#include "rapidjson/document.h"
 
 CapsuleColliderComponent::CapsuleColliderComponent(UID uid, GameObject* parent)
     : Component(uid, parent, "Capsule Collider", COMPONENT_CAPSULE_COLLIDER)
@@ -177,11 +178,13 @@ void CapsuleColliderComponent::Render(float deltaTime)
 
 void CapsuleColliderComponent::ParentUpdated()
 {
+    if (App->GetSceneModule()->GetInPlayMode()) return;
+
     if (fitToSize) CalculateCollider();
 
     if (parent->IsStatic() && colliderType != ColliderType::STATIC)
     {
-        mass = 0.f;
+        mass         = 0.f;
         colliderType = ColliderType::STATIC;
     }
     else if (!parent->IsStatic() && colliderType == ColliderType::STATIC)

@@ -11,6 +11,7 @@
 #include <vector>
 
 class MeshComponent;
+class AnimationComponent;
 
 enum MobilitySettings
 {
@@ -21,8 +22,9 @@ enum MobilitySettings
 class SOBRASADA_API_ENGINE GameObject
 {
   public:
-    GameObject(std::string name);
-    GameObject(UID parentUID, std::string name);
+    GameObject(const std::string& name);
+    GameObject(UID parentUID, const std::string& name);
+    GameObject(UID parentUID, const std::string& name, UID uid);
     GameObject(UID parentUID, GameObject* refObject);
 
     GameObject(const rapidjson::Value& initialState);
@@ -86,22 +88,27 @@ class SOBRASADA_API_ENGINE GameObject
     Component* GetComponentByType(ComponentType type) const;
 
     MeshComponent* GetMeshComponent() const;
+
+   AnimationComponent* GetAnimationComponent() const;
+
     const float3& GetPosition() const { return position; }
     const float3& GetRotation() const { return rotation; }
     const float3& GetScale() const { return scale; }
+    AABB GetHierarchyAABB();
 
+    
     void SetLocalTransform(const float4x4& newTransform);
     void DrawGizmos() const;
 
     void CreatePrefab();
     UID GetPrefabUID() const { return prefabUID; }
     void SetPrefabUID(const UID uid) { prefabUID = uid; }
-
-    void OnTransformUpdated();
     void UpdateComponents();
-    AABB GetHierarchyAABB();
-
+    void OnTransformUpdated();
     void SetPosition(float3& newPosition) { position = newPosition; };
+    void SetWillUpdate(bool willUpdate) { this->willUpdate = willUpdate; };
+    bool WillUpdate() const { return willUpdate; };
+
 
   private:
     void UpdateLocalTransform(const float4x4& parentGlobalTransform);
@@ -142,4 +149,5 @@ class SOBRASADA_API_ENGINE GameObject
     ComponentType selectedComponentIndex = COMPONENT_NONE;
     int mobilitySettings                 = STATIC;
     bool isTopParent                     = false;
+    bool willUpdate                      = false;
 };
