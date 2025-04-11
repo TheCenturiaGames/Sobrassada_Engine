@@ -110,8 +110,6 @@ void Scene::Init()
         gameObject.second->Init();
     }
 
-    GetGameObjectByUID(gameObjectRootUID)->UpdateTransformForGOBranch();
-
     // When loading a scene, overrides all gameObjects that have a prefabUID. That is because if the prefab has been
     // modified, the scene file may have not, so the prefabs need to be updated when loading the scene again
     std::vector<UID> prefabs;
@@ -137,6 +135,9 @@ void Scene::Init()
 
     lightsConfig->InitSkybox();
     lightsConfig->InitLightBuffers();
+
+    // Call this after overriding the prefabs to avoid duplicates in gameObjectsToUpdate
+    GetGameObjectByUID(gameObjectRootUID)->UpdateTransformForGOBranch();
 
     UpdateStaticSpatialStructure();
     UpdateDynamicSpatialStructure();
