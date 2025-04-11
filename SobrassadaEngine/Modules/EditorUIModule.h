@@ -3,6 +3,8 @@
 #include "ComponentUtils.h"
 #include "Globals.h"
 #include "Module.h"
+#include "ComponentUtils.h"
+#include "Globals.h"
 #include "NodeEditor.h"
 
 #include "Math/float3.h"
