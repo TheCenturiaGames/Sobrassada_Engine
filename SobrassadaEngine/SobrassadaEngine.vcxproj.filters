@@ -448,7 +448,7 @@
       <Filter>External\DetourCrowd</Filter>
     </ClCompile>
     <ClCompile Include="Scene\Components\Standalone\AIAgentComponent.cpp">
-      <Filter>Scene\Components<Filter>
+      <Filter>Scene\Components</Filter>
     </ClCompile>
     <ClCompile Include="Modules\PathfinderModule.cpp">
       <Filter>Modules</Filter>
