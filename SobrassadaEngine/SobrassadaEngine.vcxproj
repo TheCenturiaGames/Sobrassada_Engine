@@ -199,7 +199,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);SOBRASADA_ENGINE_API</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs;.\Libs\ImNodeFlow-1.2.2\include;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Batching;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;.\Libs\bullet\include;.\Libs\bullet\include\LinearMath;.\Utils\Physics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs;.\Libs\ImNodeFlow-1.2.2\include;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\DetourCrowd\Include;.\Libs\RecastDetour\Recast\Include;\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Batching;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;.\Libs\bullet\include;.\Libs\bullet\include\LinearMath;.\Utils\Physics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -243,7 +243,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;OPTICK;%(PreprocessorDefinitions);SOBRASADA_ENGINE_API</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs;.\Libs\ImNodeFlow-1.2.2\include;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Batching;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;.\Libs\bullet\include\LinearMath;.\Utils\Physics;.\Libs\bullet\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\DirectXTex;.\Libs;.\Libs\ImNodeFlow-1.2.2\include;.\Libs\SDL\include;.\Libs\glew-2.1.0\include;.\Libs\MathGeoLib\include;.\Libs\ImGui;.\Libs\ImGuizmo;.\Libs\Tinygltf;.\Libs\freetype\include;.\Libs\Optick_1.4.0\include;.\Libs\RecastDetour\Detour\Include;.\Libs\RecastDetour\Recast\Include;.\Libs\RecastDetour\DetourCrowd\Include;.\Modules;.\ResourceManagement\Resources;.\UI;.\UI\EngineEditors\;.\UI\EngineEditors\Editor;.\UI\EngineEditors\Nodes;.\Utils;.\Utils\Trees;.\FileSystem;.\FileSystem\Batching;.\FileSystem\Config;.\FileSystem\Importers;.\FileSystem\Meta;.\DebugDraw;.\Scene;.\Scene\GameObjects;.\Scene\Components;.\Libs\bullet\include\LinearMath;.\Utils\Physics;.\Libs\bullet\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -304,18 +304,28 @@
     <ClCompile Include="FileSystem\Batching\GeometryBatch.cpp" />
     <ClCompile Include="Libs\ImNodeFlow-1.2.2\src\ImNodeFlow.cpp" />
     <ClCompile Include="FileSystem\StateMachineManager.cpp" />
+    <ClCompile Include="FileSystem\Importers\NavmeshImporter.cpp" />
+    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourCrowd.cpp" />
+    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourLocalBoundary.cpp" />
+    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourObstacleAvoidance.cpp" />
+    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourPathCorridor.cpp" />
+    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourPathQueue.cpp" />
+    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourProximityGrid.cpp" />
+    <ClCompile Include="Modules\PathfinderModule.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\AIAgentComponent.cpp" />
+    <ClCompile Include="Modules\ScriptModule.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceAnimation.cpp" />
     <ClCompile Include="Scene\Components\Standalone\AnimationComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\AnimController.cpp" />
     <ClCompile Include="Modules\PhysicsModule.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceNavmesh.cpp" />
+
     <ClCompile Include="Modules\GameUIModule.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceFont.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceStateMachine.cpp" />
     <ClCompile Include="Scene\Components\CameraComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\UI\CanvasComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\UI\UILabelComponent.cpp" />
-    <ClCompile Include="Modules\ScriptModule.cpp" />
     <ClCompile Include="Scene\Components\ScriptComponent.cpp" />
     <ClCompile Include="UI\EngineEditors\Editor\NodeEditor.cpp" />
     <ClCompile Include="UI\EngineEditors\Editor\StateMachineEditor.cpp" />
@@ -498,6 +508,9 @@
     <ClInclude Include="Modules\ScriptModule.h" />
     <ClInclude Include="Modules\PhysicsModule.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceNavmesh.h" />
+    <ClInclude Include="FileSystem\Importers\NavmeshImporter.h" />
+    <ClInclude Include="Modules\PathfinderModule.h" />
+    <ClInclude Include="Scene\Components\Standalone\AIAgentComponent.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceStateMachine.h" />
     <ClInclude Include="Scene\Components\CameraComponent.h" />
     <ClInclude Include="Scene\Components\ScriptComponent.h" />

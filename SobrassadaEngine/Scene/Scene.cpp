@@ -738,7 +738,7 @@ void Scene::LoadModel(const UID modelUID)
 {
     if (modelUID != INVALID_UID)
     {
-        GLOG("Load model %d", modelUID);
+        GLOG("Load model %llu", modelUID);
 
         ResourceModel* newModel               = (ResourceModel*)App->GetResourcesModule()->RequestResource(modelUID);
         const Model& model                    = newModel->GetModelData();
