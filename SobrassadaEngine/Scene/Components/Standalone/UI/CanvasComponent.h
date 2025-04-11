@@ -22,6 +22,8 @@ class CanvasComponent : public Component
 
     bool IsInWorldSpaceEditor() const { return isInWorldSpaceEditor; }
     bool IsInWorldSpaceGame() const { return isInWorldSpaceGame; }
+    float GetWidth() const { return width; }
+    float GetHeight() const { return height; }
 
   private:
     float width               = SCREEN_WIDTH;
