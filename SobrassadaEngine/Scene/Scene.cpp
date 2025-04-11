@@ -27,6 +27,7 @@
 #include "ResourcesModule.h"
 #include "SceneModule.h"
 #include "Standalone/MeshComponent.h"
+#include "Standalone/AnimationComponent.h"
 
 #include "SDL_mouse.h"
 #include "imgui.h"
@@ -748,7 +749,16 @@ void Scene::LoadModel(const UID modelUID)
         gameObjectsArray.resize(allNodes.size());
         std::vector<UID> gameObjectsUID;
         std::vector<GameObject*> rootGameObjects;
+        
+        GLOG("Model Animation UID: %llu", newModel->GetAnimationUID());
 
+        const auto& animUIDs = newModel->GetAllAnimationUIDs();
+        GLOG("Total Animation UIDs %zu ", animUIDs.size());
+
+        for (UID uid : animUIDs)
+        {
+            GLOG("Animation UID in list: %llu ", uid);
+        }
         for (unsigned int i = 0; i < allNodes.size(); ++i)
         {
             gameObjectsUID.push_back(GenerateUID());
@@ -890,6 +900,25 @@ void Scene::LoadModel(const UID modelUID)
         }
         for (GameObject* rootGameObject : rootGameObjects)
         {
+            if (!animUIDs.empty())
+            {
+                rootGameObject->CreateComponent(COMPONENT_ANIMATION);
+                AnimationComponent* animComponent = rootGameObject->GetAnimationComponent();
+
+                GLOG("Model has %zu animations", animUIDs.size());
+                for (UID uid : animUIDs)
+                {
+                    GLOG("Setting aimation resource with UID %llu ", uid);
+                    animComponent->SetAnimationResource(uid);
+
+                    GLOG("Animation UID: %d", uid);
+                }
+
+            }
+            else
+            {
+                GLOG("No animations found for this model");
+            }
             rootGameObject->UpdateTransformForGOBranch();
         }
     }

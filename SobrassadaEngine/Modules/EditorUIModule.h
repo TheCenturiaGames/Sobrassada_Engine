@@ -25,9 +25,9 @@ namespace ImGuizmo
 enum EditorType
 {
     BASE,
-    ANIMATION,
     NODE,
-    TEXTURE
+    TEXTURE, 
+    ANIMATION
 };
 
 enum class GizmoOperation

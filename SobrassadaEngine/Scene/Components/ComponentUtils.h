@@ -28,6 +28,7 @@ enum ComponentType
     COMPONENT_CUBE_COLLIDER,
     COMPONENT_SPHERE_COLLIDER,
     COMPONENT_CAPSULE_COLLIDER,
+    COMPONENT_ANIMATION,
     COMPONENT_AIAGENT,
     FIRST = COMPONENT_NONE,
     LAST = COMPONENT_AIAGENT
@@ -39,6 +40,7 @@ enum class ColliderType : uint8_t
     DYNAMIC,
     KINEMATIC,
     TRIGGER
+
 };
 
 constexpr const char* ColliderTypeStrings[] = {"Static", "Dynamic", "Kinematic", "Trigger"};
