@@ -7,6 +7,7 @@
 #include "ResourcesModule.h"
 #include "Standalone/MeshComponent.h"
 #include "imgui.h"
+#include <unordered_set>
 
 PrefabEditor::PrefabEditor(const std::string& editorName, UID uid) : EngineEditorBase(editorName, uid)
 {
@@ -27,7 +28,7 @@ bool PrefabEditor::RenderEditor()
     return true;
 }
 
-// < Draws the list of loaded prefabs and handles selection logic >
+// Draws the list of loaded prefabs and handles selection logic
 void PrefabEditor::RenderPrefabList()
 {
     const auto& prefabMap = App->GetLibraryModule()->GetPrefabMap();
@@ -44,15 +45,14 @@ void PrefabEditor::RenderPrefabList()
 
     for (const auto& [name, prefabUID] : prefabMap)
     {
-        Resource* resource = App->GetResourcesModule()->RequestResource(prefabUID);
-        if (!resource) continue;
+        ResourcePrefab* prefab = static_cast<ResourcePrefab*>(App->GetResourcesModule()->RequestResource(prefabUID));
+        bool isSelected        = (prefabUID == currentSelectedPrefabUID);
 
-        ResourcePrefab* prefab = dynamic_cast<ResourcePrefab*>(resource);
-        if (!prefab) continue;
-
-        if (ImGui::Selectable(name.c_str(), selectedPrefab == prefab))
+        if (ImGui::Selectable(name.c_str(), isSelected))
         {
-            selectedPrefab = prefab;
+            selectedPrefab           = prefab;
+            currentSelectedPrefabUID = prefabUID;
+
             if (!portView) portView = std::make_unique<PrefabPortView>();
             portView->SetPrefab(prefab);
             selectedGameObject = nullptr;
@@ -60,13 +60,12 @@ void PrefabEditor::RenderPrefabList()
     }
 }
 
-// < Manages the Prefab Viewer window and related logic >
+// Manages the Prefab Viewer window and related logic
 void PrefabEditor::HandlePrefabViewer()
 {
     if (!openPrefabViewer)
     {
         openPrefabViewer = true;
-        portView->SetPrefab(selectedPrefab);
     }
 
     if (openPrefabViewer)
@@ -98,7 +97,7 @@ void PrefabEditor::HandlePrefabViewer()
     }
 }
 
-// < Renders the visual preview of the selected prefab >
+// Renders the visual preview of the selected prefab
 void PrefabEditor::RenderPrefabPortView()
 {
     ImGui::Text("Portview");
@@ -113,7 +112,8 @@ void PrefabEditor::RenderPrefabPortView()
     }
 }
 
-// < Renders the hierarchy tree and property panel for selected GameObject >
+
+// Renders the hierarchy tree and property panel for selected GameObject
 void PrefabEditor::RenderPrefabSidePanel(float width, float height)
 {
     float hierarchyHeight = height * 0.4f;
@@ -121,6 +121,7 @@ void PrefabEditor::RenderPrefabSidePanel(float width, float height)
 
     ImGui::BeginChild("Hierarchy", ImVec2(width, hierarchyHeight), true);
     ImGui::Text("Hierarchy");
+
     treeHierarchyView();
     ImGui::EndChild();
 
@@ -197,38 +198,103 @@ void PrefabEditor::RenderPrefabSidePanel(float width, float height)
     ImGui::EndChild();
 }
 
+
 void PrefabEditor::treeHierarchyView()
 {
     if (!portView) return;
 
-    static char filterBuffer[64] = "";
     ImGui::InputTextWithHint("##filter", "Filter by name...", filterBuffer, IM_ARRAYSIZE(filterBuffer));
-    std::string filter = filterBuffer;
+    std::string filter         = filterBuffer;
 
-    GameObject* root   = portView->GetPreviewRoot();
-    if (root) DrawHierarchyRecursiveFiltered(root, filter);
+    const auto& previewObjects = portView->GetPreviewObjects();
+
+    std::unordered_set<UID> allUIDs;
+    std::unordered_map<UID, GameObject*> uidToGO;
+    std::unordered_set<UID> renderedRoots;
+
+    for (GameObject* go : previewObjects)
+    {
+        UID uid    = go->GetUID();
+        UID parent = go->GetParent();
+        allUIDs.insert(uid);
+        uidToGO[uid] = go;
+    }
+
+    for (GameObject* go : previewObjects)
+    {
+        UID uid       = go->GetUID();
+        UID parentUID = go->GetParent();
+
+        if (allUIDs.find(parentUID) == allUIDs.end())
+        {
+            if (renderedRoots.find(uid) == renderedRoots.end())
+            {
+                DrawHierarchyRecursiveFiltered(go, filter);
+                renderedRoots.insert(uid);
+            }
+        }
+        else
+        {
+            GameObject* parentGO = uidToGO[parentUID];
+            GLOG(
+                "%s (%llu) is child of %s (%llu)", go->GetName().c_str(), uid,
+                parentGO ? parentGO->GetName().c_str() : "UNKNOWN", parentUID
+            );
+        }
+    }
+
+    GLOG("treeHierarchyView - END");
 }
 
-// < Tree view it can filter by the name of prefab child >
-void PrefabEditor::DrawHierarchyRecursiveFiltered(GameObject* go, const std::string& filter)
+
+bool PrefabEditor::DrawHierarchyRecursiveFiltered(GameObject* go, const std::string& filter)
 {
-    if (!filter.empty() && go->GetName().find(filter) == std::string::npos) return;
+    const auto& previewObjects = portView->GetPreviewObjects();
+
+    // Find GameObject by its UID
+    auto findByUID             = [&previewObjects](UID uid) -> GameObject*
+    {
+        for (GameObject* obj : previewObjects)
+        {
+            if (obj->GetUID() == uid) return obj;
+        }
+        return nullptr;
+    };
+
+    bool matchesFilter = filter.empty() || go->GetName().find(filter) != std::string::npos;
+
+    if (!matchesFilter) return false;
 
     std::string label = go->GetName() + "##" + std::to_string(go->GetUID());
     bool nodeOpen     = ImGui::TreeNodeEx(label.c_str(), selectedGameObject == go ? ImGuiTreeNodeFlags_Selected : 0);
 
-    if (ImGui::IsItemClicked()) selectedGameObject = go;
+    if (ImGui::IsItemClicked())
+    {
+        selectedGameObject = go;
+    }
 
+    // If the node is open, recursively draw the children
     if (nodeOpen)
     {
         for (UID childUID : go->GetChildren())
         {
-            GameObject* child = selectedPrefab->FindGameObject(childUID);
-            if (child) DrawHierarchyRecursiveFiltered(child, filter);
+            GameObject* child = findByUID(childUID);
+            if (child)
+            {
+                // Call this function for each child of the current GameObject
+                DrawHierarchyRecursiveFiltered(child, filter);
+            }
         }
-        ImGui::TreePop();
+        ImGui::TreePop(); 
     }
+
+    return true;
 }
+
+
+
+
+
 
 void PrefabEditor::ApplyChangesToOriginalPrefab()
 {

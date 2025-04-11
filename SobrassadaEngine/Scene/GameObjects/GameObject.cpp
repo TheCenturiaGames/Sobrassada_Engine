@@ -841,3 +841,14 @@ void GameObject::RenderTransformInspector()
         UpdateTransformForGOBranch();
     }
 }
+
+void GameObject::SetParentAndRegister(UID newParentUID)
+{
+    parentUID          = newParentUID;
+
+    GameObject* parent = App->GetSceneModule()->GetScene()->GetGameObjectByUID(newParentUID);
+    if (parent)
+    {
+        parent->AddGameObject(uid);
+    }
+}

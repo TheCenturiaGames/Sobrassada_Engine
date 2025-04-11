@@ -47,7 +47,6 @@ class PrefabPortView
     void SetupFramebuffer();
     void SetupCamera();
 
-  private:
     // Scene data 
     GameObject* previewGO = nullptr;
     std::vector<GameObject*> previewObjects;

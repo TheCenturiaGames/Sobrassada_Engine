@@ -31,6 +31,7 @@ void PrefabPortView::SetPrefab(ResourcePrefab* prefab)
 {
     CleanupPreview();
     currentPrefab             = prefab;
+    GLOG("Prefab carregat a portview: %llu", prefab->GetUID());
 
     const auto& prefabObjects = currentPrefab->GetGameObjectsVector();
     if (prefabObjects.empty()) return;
@@ -162,13 +163,16 @@ GameObject* PrefabPortView::CloneGameObjectHierarchy(GameObject* original, const
 {
     std::unordered_map<UID, GameObject*> cloneMap;
 
+    // Clone all the gameobjects
     for (GameObject* go : allObjects)
     {
-        GameObject* clone      = new GameObject(*go);
+       GameObject* clone = new GameObject(INVALID_UID, go);
+
         cloneMap[go->GetUID()] = clone;
         previewObjects.push_back(clone);
     }
 
+    // Reasign hierarchy
     for (GameObject* go : allObjects)
     {
         GameObject* clone = cloneMap[go->GetUID()];
@@ -180,6 +184,7 @@ GameObject* PrefabPortView::CloneGameObjectHierarchy(GameObject* original, const
                 GameObject* parentClone = it->second;
                 clone->SetParent(parentClone->GetUID());
                 parentClone->AddGameObject(clone->GetUID());
+
             }
         }
     }

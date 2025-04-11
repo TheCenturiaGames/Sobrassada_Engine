@@ -23,7 +23,7 @@ class PrefabEditor : public EngineEditorBase
     // Hierarchy rendering
     void treeHierarchyView();
     std::vector<GameObject*> GetRootGameObjects(ResourcePrefab* prefab);
-    void DrawHierarchyRecursiveFiltered(GameObject* go, const std::string& filter);
+    bool DrawHierarchyRecursiveFiltered(GameObject* go, const std::string& filter);
     void ApplyChangesToOriginalPrefab();
 
     // State
@@ -31,6 +31,9 @@ class PrefabEditor : public EngineEditorBase
     GameObject* selectedGameObject           = nullptr;
     std::unique_ptr<PrefabPortView> portView = nullptr;
     bool openPrefabViewer                    = false;
+    UID currentSelectedPrefabUID = INVALID_UID;
+    char filterBuffer[64]                    = "";
+
 
     float appliedFeedbackTimer               = 0.0f;
     bool showAppliedFeedback                 = false;

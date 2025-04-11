@@ -94,6 +94,7 @@ class SOBRASADA_API_ENGINE GameObject
     void SetPrefabUID(const UID uid) { prefabUID = uid; }
     void SetMobility(ComponentMobilitySettings newMobility) { mobilitySettings = newMobility; };
     void RenderTransformInspector();
+    void SetParentAndRegister(UID newParentUID);
 
 
   private:
