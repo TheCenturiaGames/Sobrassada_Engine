@@ -415,6 +415,10 @@ void GameObject::OnTransformUpdated()
     globalOBB                    = globalTransform * OBB(localAABB);
     globalAABB                   = AABB(globalOBB);
 
+    position                     = globalTransform.TranslatePart();
+    rotation                     = globalTransform.RotatePart().ToEulerXYZ();
+    scale                        = globalTransform.GetScale();
+
     MeshComponent* meshComponent = GetMeshComponent();
     if (meshComponent != nullptr)
     {
@@ -449,7 +453,7 @@ AABB GameObject::GetHierarchyAABB()
     std::set<UID> visitedGameObjects;
     std::stack<UID> toVisitGameObjects;
     UID sceneRootUID = App->GetSceneModule()->GetScene()->GetGameObjectRootUID();
-    // ADD "THIS" GAME OBJECT SO WHEN ASCENDING HERIARCHY WE DON'T REVISIT OUR CHILDREN
+
     visitedGameObjects.insert(uid);
 
     // FIRST UPDATE DOWN THE HERIARCHY

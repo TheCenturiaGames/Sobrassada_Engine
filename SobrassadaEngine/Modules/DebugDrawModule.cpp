@@ -694,7 +694,7 @@ void DebugDrawModule::DrawLine(
     dd::line(origin, dir + origin, color, 0, enableDepth);
 }
 
-// TODO, CHECK IF PROPER WAY OF IMPLEMENTATION
+
 void DebugDrawModule::DrawLine(const btVector3& from, const btVector3& to, const btVector3& color)
 {
     dd::line(
