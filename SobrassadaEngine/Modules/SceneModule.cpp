@@ -14,6 +14,7 @@
 #include "ProjectModule.h"
 #include "RaycastController.h"
 #include "ResourcesModule.h"
+#include "PathfinderModule.h"
 
 #include <SDL_mouse.h>
 #ifdef OPTICK
@@ -100,6 +101,15 @@ update_status SceneModule::PostUpdate(float deltaTime)
                 {
                     loadedScene->SetSelectedGameObject(selectedObject->GetUID());
                 }
+            }
+        }
+
+        if (GetDoInputsGame())
+        {
+            const KeyState* mouseButtons = App->GetInputModule()->GetMouseButtons();
+            if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_DOWN)
+            {
+                App->GetPathfinderModule()->HandleClickNavigation();
             }
         }
 

@@ -11,9 +11,9 @@
 #include "Geometry/Plane.h"
 #include "ImGui.h"
 
-#include <DetourCrowd.h>
-#include <DetourNavMesh.h>
-#include <DetourNavMeshQuery.h>
+#include "DetourCrowd.h"
+#include "DetourNavMesh.h"
+#include "DetourNavMeshQuery.h"
 
 PathfinderModule::PathfinderModule()
 {
@@ -29,7 +29,10 @@ PathfinderModule::~PathfinderModule()
 {
     dtFreeCrowd(crowd);
     // dtFreeNavMeshQuery(navQuery); TODO when saving navmesh, re-enable this
-    if (navmesh) navmesh = nullptr;
+    if (navmesh)
+    {
+        navmesh = nullptr;
+    }
 }
 
 update_status PathfinderModule::Update(float deltaTime)
@@ -100,17 +103,15 @@ void PathfinderModule::HandleClickNavigation()
     LineSegment ray = App->GetCameraModule()->CastCameraRay();
 
     float3 hitPoint;
-    if (!RaycastToGround(ray, hitPoint))
-    {
-        GLOG("Ray did not hit ground.");
-        return;
-    }
+
+    RaycastToGround(ray, hitPoint);
 
     AIAgentComponent* comp = GetComponentFromAgentId(agentId);
     if (comp != nullptr)
     {
         comp->setPath(hitPoint);
     }
+    return;
 }
 
 bool PathfinderModule::RaycastToGround(const LineSegment& ray, float3& outHitPoint)
