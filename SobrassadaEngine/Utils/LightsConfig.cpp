@@ -14,6 +14,7 @@
 #include "Standalone/Lights/PointLightComponent.h"
 #include "Standalone/Lights/SpotLightComponent.h"
 #include "TextureImporter.h"
+#include "ResourceTexture.h"
 
 #include "glew.h"
 #include "imgui.h"
@@ -40,11 +41,12 @@ LightsConfig::~LightsConfig()
 
 void LightsConfig::FreeCubemap() const
 {
-
     glMakeTextureHandleNonResidentARB(skyboxHandle);
     glDeleteTextures(1, &skyboxID);
     glMakeTextureHandleNonResidentARB(irradianceHandle);
     glDeleteTextures(1, &cubemapIrradiance);
+    glMakeTextureHandleNonResidentARB(prefilteredEnvironmentMapHandle);
+    glDeleteTextures(1, &prefilteredEnvironmentMap);
 }
 
 void LightsConfig::InitSkybox()
@@ -84,9 +86,26 @@ void LightsConfig::InitSkybox()
     // default skybox texture
     LoadSkyboxTexture(App->GetLibraryModule()->GetTextureUID("cubemap"));
 
+    App->GetOpenGLModule()->SetDepthFunc(false);
+
     cubemapIrradiance = CubeMapToTexture(1024, 1024);
     irradianceHandle  = glGetTextureHandleARB(cubemapIrradiance);
     glMakeTextureHandleResidentARB(skyboxHandle);
+
+    prefilteredEnvironmentMap       = PreFilteredEnvironmentMapGeneration(1024, 1024);
+    prefilteredEnvironmentMapHandle = glGetTextureHandleARB(prefilteredEnvironmentMap);
+    glMakeTextureHandleResidentARB(prefilteredEnvironmentMapHandle);
+
+    environmentBRDF = EnvironmentBRDFGeneration(1024, 1024);
+    environmentBRDFHandle = glGetTextureHandleARB(environmentBRDF);
+    glMakeTextureHandleResidentARB(environmentBRDFHandle);
+
+    App->GetOpenGLModule()->SetDepthFunc(true);
+
+    glViewport(
+        0, 0, App->GetOpenGLModule()->GetFramebuffer()->GetTextureWidth(),
+        App->GetOpenGLModule()->GetFramebuffer()->GetTextureHeight()
+    );
 
     // Load the skybox shaders
     skyboxProgram = App->GetShaderModule()->CreateShaderProgram(SKYBOX_VERTEX_SHADER_PATH, SKYBOX_FRAGMENT_SHADER_PATH);
@@ -150,9 +169,26 @@ void LightsConfig::LoadSkyboxTexture(UID resource)
         skyboxHandle       = glGetTextureHandleARB(currentTexture->GetTextureID());
         glMakeTextureHandleResidentARB(skyboxHandle);
 
+        App->GetOpenGLModule()->SetDepthFunc(false);
+
         cubemapIrradiance = CubeMapToTexture(1024, 1024);
         irradianceHandle  = glGetTextureHandleARB(cubemapIrradiance);
         glMakeTextureHandleResidentARB(skyboxHandle);
+
+        prefilteredEnvironmentMap       = PreFilteredEnvironmentMapGeneration(1024, 1024);
+        prefilteredEnvironmentMapHandle = glGetTextureHandleARB(prefilteredEnvironmentMap);
+        glMakeTextureHandleResidentARB(prefilteredEnvironmentMapHandle);
+
+        environmentBRDF       = EnvironmentBRDFGeneration(1024, 1024);
+        environmentBRDFHandle = glGetTextureHandleARB(environmentBRDF);
+        glMakeTextureHandleResidentARB(environmentBRDFHandle);
+
+        App->GetOpenGLModule()->SetDepthFunc(true);
+
+        glViewport(
+            0, 0, App->GetOpenGLModule()->GetFramebuffer()->GetTextureWidth(),
+            App->GetOpenGLModule()->GetFramebuffer()->GetTextureHeight()
+        );
     }
 }
 
@@ -197,17 +233,12 @@ unsigned int LightsConfig::CubeMapToTexture(int width, int height)
         glFramebufferTexture2D(
             GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, irradianceCubemap, 0
         );
-        frustum.front        = front[i];
-        frustum.up           = up[i];
+        frustum.front       = front[i];
+        frustum.up          = up[i];
 
-        float4x4 view        = frustum.ViewMatrix();
-        float4x4 projection  = frustum.ProjectionMatrix();
+        float4x4 view       = frustum.ViewMatrix();
+        float4x4 projection = frustum.ProjectionMatrix();
         // TODO: Draw 2x2x2 Cube using frustum view and projection matrices
-
-        unsigned int viewLoc = glGetUniformLocation(irradianceProgram, "view");
-        // glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
-        unsigned int projLoc = glGetUniformLocation(irradianceProgram, "projection");
-        // glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection[0][0]);
 
         glUniformMatrix4fv(0, 1, GL_TRUE, projection.ptr());
         glUniformMatrix4fv(1, 1, GL_TRUE, view.ptr());
@@ -219,12 +250,103 @@ unsigned int LightsConfig::CubeMapToTexture(int width, int height)
     framebuffer.Unbind();
     glDeleteProgram(irradianceProgram);
 
-    glViewport(
-        0, 0, App->GetOpenGLModule()->GetFramebuffer()->GetTextureWidth(),
-        App->GetOpenGLModule()->GetFramebuffer()->GetTextureHeight()
-    );
-
     return framebuffer.GetTextureID();
+}
+
+unsigned int LightsConfig::PreFilteredEnvironmentMapGeneration(int width, int height)
+{
+    const float3 front[6] = {float3::unitX,  -float3::unitX, float3::unitY,
+                             -float3::unitY, float3::unitZ,  -float3::unitZ};
+    float3 up[6] = {-float3::unitY, -float3::unitY, float3::unitZ, -float3::unitZ, -float3::unitY, -float3::unitY};
+    Frustum frustum;
+    frustum.type              = FrustumType::PerspectiveFrustum;
+    frustum.pos               = float3::zero;
+    frustum.nearPlaneDistance = 0.1f;
+    frustum.farPlaneDistance  = 100.0f;
+    frustum.verticalFov       = PI / 2.0f;
+    frustum.horizontalFov     = PI / 2.0f;
+
+    unsigned int prefilteredtexture;
+    glGenTextures(1, &prefilteredtexture);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, prefilteredtexture);
+
+    for (int i = 0; i < 6; ++i)
+    {
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
+    }
+
+    numMipMaps = int(log(float(width)) / log(2));
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, numMipMaps);
+    glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+
+    unsigned int prefilteredProgram =
+        App->GetShaderModule()->CreateShaderProgram(SKYBOX_VERTEX_SHADER_PATH, PREFILTERED_FRAGMENT_SHADER_PATH);
+    glUseProgram(prefilteredProgram);
+
+    unsigned int roughnessLocation = glGetUniformLocation(prefilteredProgram, "roughness");
+    glUniformHandleui64ARB(glGetUniformLocation(prefilteredProgram, "skybox"), skyboxHandle);
+
+    for (int mip = 0; mip < numMipMaps; ++mip)
+    {
+        float roughness = (float)mip / (float)(numMipMaps - 1);
+        glUniform1f(roughnessLocation, roughness);
+
+        int mipWidth  = static_cast<int>(width * std::pow(0.5f, mip));
+        int mipHeight = static_cast<int>(height * std::pow(0.5f, mip));
+        glViewport(0, 0, mipWidth, mipHeight);
+
+        // Render each cube plane
+        for (unsigned int i = 0; i < 6; ++i)
+        {
+            glFramebufferTexture2D(
+                GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, prefilteredtexture, mip
+            );
+            // TODO: Draw UnitCube using prefiltered environment map shader and roughness
+
+            frustum.front       = front[i];
+            frustum.up          = up[i];
+
+            float4x4 view       = frustum.ViewMatrix();
+            float4x4 projection = frustum.ProjectionMatrix();
+
+            glUniformMatrix4fv(0, 1, GL_TRUE, projection.ptr());
+            glUniformMatrix4fv(1, 1, GL_TRUE, view.ptr());
+            glBindVertexArray(skyboxVao);
+            App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 36);
+            glBindVertexArray(0);
+        }
+    }
+
+    glDeleteProgram(prefilteredProgram);
+    return prefilteredtexture;
+}
+
+unsigned int LightsConfig::EnvironmentBRDFGeneration(int width, int height)
+{
+    unsigned int environmentBRDFTexture;
+    glGenTextures(1, &environmentBRDFTexture);
+    glBindTexture(GL_TEXTURE_2D, environmentBRDFTexture);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, width, height, 0, GL_RG, GL_HALF_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    unsigned int prefilteredProgram =
+        App->GetShaderModule()->CreateShaderProgram(LIGHTS_VERTEX_SHADER_PATH, ENVIRONMENTBRDF_FRAGMENT_SHADER_PATH);
+    glUseProgram(prefilteredProgram);
+
+    glViewport(0, 0, width, height);
+    App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 36);
+
+    glDeleteProgram(prefilteredProgram);
+
+    return environmentBRDFTexture;
 }
 
 void LightsConfig::SaveData(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
@@ -295,8 +417,13 @@ void LightsConfig::InitLightBuffers()
 void LightsConfig::SetLightsShaderData() const
 {
     // Ambient light
-    Lights::AmbientLightShaderData ambient =
-        Lights::AmbientLightShaderData(float4(ambientColor, ambientIntensity), irradianceHandle);
+    // Lights::AmbientLightShaderData ambient =
+    // Lights::AmbientLightShaderData(float4(ambientColor, ambientIntensity), irradianceHandle,
+    // prefilteredEnvironmentMapHandle, environmentBRDFHandle, numMipMaps);
+    Lights::AmbientLightShaderData ambient = Lights::AmbientLightShaderData(
+        float4(ambientColor, ambientIntensity), irradianceHandle, prefilteredEnvironmentMapHandle,
+        environmentBRDFHandle, numMipMaps
+    );
 
     glBindBuffer(GL_UNIFORM_BUFFER, ambientBufferId);
     glBufferData(GL_UNIFORM_BUFFER, sizeof(ambient), &ambient, GL_STATIC_DRAW);

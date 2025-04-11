@@ -55,6 +55,9 @@ layout(std140, binding = 2) uniform Ambient
 {
 	vec4 ambient_color;		// rbg = color & alpha = intensity
     samplerCube cubemapIrradiance;
+    samplerCube cubemapPrefiltered;
+    uvec2 environmentBRDF;
+    int numLevels;
 };
 
 layout(std140, binding = 3) uniform Directional
@@ -105,10 +108,18 @@ float SpotLightAttenuation(const int index)
 	return Fatt * Catt;
 }
 
-vec3 GetAmbientLight(in vec3 normal, in vec3 diffuseColor, in vec3 specularColor)
+vec3 GetAmbientLight(in vec3 normal, in vec3 R, float NdotV, float roughness, in vec3 diffuseColor, in vec3 specularColor)
 {
     vec3 irradiance = texture(cubemapIrradiance, normal).rgb;
-    return irradiance*(diffuseColor*(1-specularColor));
+
+    vec3 radiance = textureLod(cubemapPrefiltered, R, roughness * numLevels).rgb;
+    vec2 fab = texture(sampler2D(environmentBRDF), vec2(NdotV, roughness)).rg;
+
+    vec3 diffuse = (diffuseColor * (1 - specularColor));
+
+    return diffuse * irradiance + radiance * (specularColor * fab.x + fab.y);
+
+    //return vec3(1.0, fab);
 }
 
 float VisibilityFunction(float NdotL, float NdotV, float roughness){
@@ -198,9 +209,13 @@ void main()
     //roughness = roughness * roughness;
     float metallic = mat.metallicFactor * metallicRoughnessTexColor.z;
 
+    vec3 V = normalize(cameraPos - pos);
+    vec3 R = reflect(-V, N);
+    float NdotV = max(dot(N, V), 0.0001);
+
     // Ambient light
     //vec3 ambient = ambient_color.rgb * ambient_color.a;
-    vec3 ambient = GetAmbientLight(N, texColor, metallicRoughnessTexColor.rgb);
+    vec3 ambient = GetAmbientLight(N, R, NdotV, roughness, texColor, metallicRoughnessTexColor.rgb);
     vec3 hdr = ambient * texColor;
 
     // Point Lights

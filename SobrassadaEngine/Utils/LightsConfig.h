@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Globals.h"
-#include "ResourceTexture.h"
 
 #include "Math/float3.h"
 #include "Math/float4.h"
@@ -9,6 +8,7 @@
 #include <memory>
 
 class Component;
+class ResourceTexture;
 
 namespace Math
 {
@@ -21,11 +21,30 @@ namespace Lights
     {
         float4 color;
         UID cubemapIrradiance;
+        UID cubemapPrefiltered;
+        UID environmentBRDF;
+        int numLevels;
 
-        AmbientLightShaderData(const float4& color, const UID cubemapIrradiance)
-            : color(color), cubemapIrradiance(cubemapIrradiance)
+        AmbientLightShaderData(
+            const float4& color, const UID cubemapIrradiance, const UID cubemapPrefiltered, const UID cubemapBRDF,
+            const int numLevels
+        )
+            : color(color), cubemapIrradiance(cubemapIrradiance), cubemapPrefiltered(cubemapPrefiltered),
+              environmentBRDF(environmentBRDF), numLevels(numLevels)
         {
         }
+        /*
+
+
+
+
+        AmbientLightShaderData(const float4& color, const UID cubemapIrradiance, const UID cubemapPrefiltered, const UID
+        cubemapBRDF, const int numLevels) : color(color), cubemapIrradiance(cubemapIrradiance),
+        cubemapPrefiltered(cubemapPrefiltered), cubemapBRDF(cubemapBRDF), numLevels(numLevels)
+        {
+        }
+        int padding[3];
+        */
     };
 
     struct DirectionalLightShaderData
@@ -76,6 +95,8 @@ class LightsConfig
     void InitSkybox();
     void RenderSkybox() const;
     unsigned int CubeMapToTexture(int width, int height);
+    unsigned int PreFilteredEnvironmentMapGeneration(int width, int height);
+    unsigned int EnvironmentBRDFGeneration(int width, int height);
 
     void InitLightBuffers();
     void SetLightsShaderData() const;
@@ -105,14 +126,19 @@ class LightsConfig
     void SetSpotLightsShaderData() const;
 
   private:
-    UID skyboxUID                  = INVALID_UID;
-    unsigned int skyboxVbo         = 0;
-    unsigned int skyboxVao         = 0;
-    unsigned int skyboxID          = 0;
-    UID skyboxHandle               = 0;
-    unsigned int cubemapIrradiance = 0;
-    UID irradianceHandle           = 0;
-    unsigned int skyboxProgram     = 0;
+    UID skyboxUID                          = INVALID_UID;
+    unsigned int skyboxVbo                 = 0;
+    unsigned int skyboxVao                 = 0;
+    unsigned int skyboxID                  = 0;
+    UID skyboxHandle                       = 0;
+    unsigned int skyboxProgram             = 0;
+
+    unsigned int cubemapIrradiance         = 0;
+    UID irradianceHandle                   = 0;
+    unsigned int prefilteredEnvironmentMap = 0;
+    UID prefilteredEnvironmentMapHandle    = 0;
+    unsigned int environmentBRDF           = 0;
+    UID environmentBRDFHandle              = 0;
 
     float3 ambientColor;
     float ambientIntensity;
@@ -120,6 +146,8 @@ class LightsConfig
     unsigned int ambientBufferId                = 0;
     unsigned int pointBufferId                  = 0;
     unsigned int spotBufferId                   = 0;
+
+    int numMipMaps                              = 0;
 
     DirectionalLightComponent* directionalLight = nullptr;
     std::vector<PointLightComponent*> pointLights;

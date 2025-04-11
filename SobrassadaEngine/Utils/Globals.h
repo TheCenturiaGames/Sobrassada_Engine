@@ -133,6 +133,7 @@ constexpr const char* METALLIC_IBL_FRAGMENT_SHADER_PATH   = "./EngineDefaults/Sh
 constexpr const char* UIWIDGET_FRAGMENT_SHADER_PATH   = "./EngineDefaults/Shader/Fragment/UIWidgetFragment.glsl";
 constexpr const char* IRRADIANCE_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader/Fragment/IrradianceCubemapFragment.glsl";
 constexpr const char* PREFILTERED_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader/Fragment/PreFilteredEnvironmentFragment.glsl";
+constexpr const char* ENVIRONMENTBRDF_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader/Fragment/EnvironmentBRDFFragment.glsl";
 
 using UID                                             = uint64_t;
 
