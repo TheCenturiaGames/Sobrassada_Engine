@@ -441,6 +441,7 @@
     <ClCompile Include="FileSystem\Meta\MetaFont.cpp">
       <Filter>FileSystem\Meta</Filter>
     </ClCompile>
+    <ClCompile Include="GBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -839,6 +840,7 @@
     <ClInclude Include="FileSystem\Meta\MetaFont.h">
       <Filter>FileSystem\Meta</Filter>
     </ClInclude>
+    <ClInclude Include="GBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl">
