@@ -29,10 +29,7 @@ PathfinderModule::~PathfinderModule()
 {
     dtFreeCrowd(crowd);
     // dtFreeNavMeshQuery(navQuery); TODO when saving navmesh, re-enable this
-    if (navmesh)
-    {
-        navmesh = nullptr;
-    }
+    if (navmesh) navmesh = nullptr;
 }
 
 update_status PathfinderModule::Update(float deltaTime)
@@ -99,19 +96,17 @@ void PathfinderModule::HandleClickNavigation()
 {
     if (!clickNavigationEnabled || !App->GetSceneModule()->GetInPlayMode()) return; // from UI
 
-    int agentId     = 0; //  from UI
     LineSegment ray = App->GetCameraModule()->CastCameraRay();
 
     float3 hitPoint;
 
     RaycastToGround(ray, hitPoint);
 
-    AIAgentComponent* comp = GetComponentFromAgentId(agentId);
-    if (comp != nullptr)
+    for (auto& pair : agentComponentMap)
     {
-        comp->setPath(hitPoint);
+        AIAgentComponent* comp = pair.second;
+        if (comp != nullptr) comp->setPath(hitPoint);
     }
-    return;
 }
 
 bool PathfinderModule::RaycastToGround(const LineSegment& ray, float3& outHitPoint)
