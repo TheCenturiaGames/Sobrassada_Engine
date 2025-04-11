@@ -30,7 +30,7 @@ class SOBRASADA_API_ENGINE GameObject
 
     ~GameObject();
 
-    void Init() const;
+    void Init();
 
     const float4x4& GetParentGlobalTransform() const;
 

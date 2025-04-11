@@ -46,7 +46,8 @@ GameObject::GameObject(UID parentUID, const std::string& name, UID uid) : parent
 }
 
 GameObject::GameObject(UID parentUID, GameObject* refObject)
-    : parentUID(parentUID), name(refObject->name), localTransform(refObject->localTransform)
+    : parentUID(parentUID), name(refObject->name), localTransform(refObject->localTransform),
+      globalTransform(refObject->globalTransform)
 {
     uid       = GenerateUID();
 
@@ -73,9 +74,7 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
     name                   = initialState["Name"].GetString();
     selectedComponentIndex = COMPONENT_NONE;
     mobilitySettings       = initialState["Mobility"].GetInt();
-    if (initialState.HasMember("IsTopParent")) 
-        isTopParent = initialState["IsTopParent"].GetBool();
-   
+    if (initialState.HasMember("IsTopParent")) isTopParent = initialState["IsTopParent"].GetBool();
 
     if (initialState.HasMember("PrefabUID")) prefabUID = initialState["PrefabUID"].GetUint64();
 
@@ -136,8 +135,10 @@ GameObject::~GameObject()
     components.clear();
 }
 
-void GameObject::Init() const
+void GameObject::Init()
 {
+    globalTransform = GetParentGlobalTransform() * localTransform;
+
     for (auto& component : components)
     {
         component.second->Init();
@@ -455,7 +456,7 @@ AABB GameObject::GetHierarchyAABB()
             visitedGameObjects.insert(currentUID);
             const GameObject* currentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentUID);
 
-            const AABB& currentAABB       = currentGameObject->GetGlobalAABB();
+            const AABB& currentAABB             = currentGameObject->GetGlobalAABB();
             if (currentAABB.IsFinite() && !currentAABB.IsDegenerate())
                 returnAABB.Enclose(currentGameObject->GetGlobalAABB());
 

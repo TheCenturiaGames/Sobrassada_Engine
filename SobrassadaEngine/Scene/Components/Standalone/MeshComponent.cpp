@@ -111,6 +111,8 @@ void MeshComponent::Clone(const Component* other)
         skinIndex    = otherMesh->skinIndex;
         bindMatrices = otherMesh->bindMatrices;
         hasBones     = otherMesh->hasBones;
+
+        // Maybe it could be added to an existing batch, but probably is more costly than what is worth
     }
     else
     {
