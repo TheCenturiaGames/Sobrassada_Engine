@@ -113,6 +113,13 @@ void CharacterControllerComponent::Update(float deltaTime)
             if (tmpQuery)
             {
                 //TODO: Make the rest of the process
+                navMeshQuery = tmpQuery;
+
+                float3 startPos = parent->GetGlobalTransform().TranslatePart();
+
+                dtQueryFilter filter;
+                filter.setIncludeFlags(SAMPLE_POLYFLAGS_WALK);
+                filter.setExcludeFlags(0);
             }
         }
     }
