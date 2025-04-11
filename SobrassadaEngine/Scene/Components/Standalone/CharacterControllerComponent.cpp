@@ -231,6 +231,24 @@ void CharacterControllerComponent::Move(const float3& direction, float deltaTime
 
     float start[3] = {currentPos.x, currentPos.y, currentPos.z};
     float end[3]   = {desiredPos.x, desiredPos.y, desiredPos.z};
+
+    dtStatus status = navMeshQuery->raycast(currentPolyRef, start, end, &filter, 0, &hit, 0);
+
+    float3 finalPos = desiredPos;
+
+    if (!dtStatusFailed(status))
+    {
+        if (hit.t < 1.0f)
+        {
+            float3 fullVec = desiredPos - currentPos;
+            finalPos       = currentPos + fullVec * hit.t;
+        }
+        else
+        {
+            finalPos = currentPos;
+        }
+    }
+
 }
 
 void CharacterControllerComponent::Rotate(float rotationDirection, float deltaTime)
