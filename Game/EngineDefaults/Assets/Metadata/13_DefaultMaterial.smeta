@@ -1,10 +1,11 @@
 {
-    "UID": 1328585117198369,
+    "UID": 1300000000000000,
     "name": "DefaultMaterial",
     "assetPath": "Assets/DefaultCone.gltf",
     "lastModifiedDate": 0,
     "importOptions": {
         "shader": "1932647236901744476",
-        "useOcclusion": false
+        "useOcclusion": false,
+		"defaultTextureUID": 1290233345777347
     }
 }

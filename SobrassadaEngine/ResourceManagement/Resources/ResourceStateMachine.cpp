@@ -10,7 +10,7 @@ ResourceStateMachine::ResourceStateMachine(UID uid, const std::string& name)
 {
 }
 
-void ResourceStateMachine::AddClip(UID clipUID, const std::string& name, bool loopFlag)
+void ResourceStateMachine::AddClip(UID animationResourceUID, const std::string& name, bool loopFlag)
 {
     HashString hashName(name);
 
@@ -25,7 +25,7 @@ void ResourceStateMachine::AddClip(UID clipUID, const std::string& name, bool lo
     }
 
     Clip newClip;
-    newClip.clipUID  = clipUID;
+    newClip.animationResourceUID = animationResourceUID;
     newClip.clipName = hashName;
     newClip.loop     = loopFlag;
     clips.push_back(newClip);
@@ -56,7 +56,7 @@ bool ResourceStateMachine::EditClipInfo(
     {
         if (clip.clipName == hashOld)
         {
-            clip.clipUID = newUID;
+            clip.animationResourceUID = newUID;
             clip.loop    = newLoop;
 
             if (HashString(newName) != hashOld)
