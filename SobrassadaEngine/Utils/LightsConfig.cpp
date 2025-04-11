@@ -7,6 +7,7 @@
 #include "Framebuffer.h"
 #include "LibraryModule.h"
 #include "OpenGLModule.h"
+#include "ResourceTexture.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
 #include "ShaderModule.h"
@@ -14,7 +15,6 @@
 #include "Standalone/Lights/PointLightComponent.h"
 #include "Standalone/Lights/SpotLightComponent.h"
 #include "TextureImporter.h"
-#include "ResourceTexture.h"
 
 #include "glew.h"
 #include "imgui.h"
@@ -86,8 +86,6 @@ void LightsConfig::InitSkybox()
     // default skybox texture
     LoadSkyboxTexture(App->GetLibraryModule()->GetTextureUID("cubemap"));
 
-    App->GetOpenGLModule()->SetDepthFunc(false);
-
     cubemapIrradiance = CubeMapToTexture(1024, 1024);
     irradianceHandle  = glGetTextureHandleARB(cubemapIrradiance);
     glMakeTextureHandleResidentARB(skyboxHandle);
@@ -96,11 +94,9 @@ void LightsConfig::InitSkybox()
     prefilteredEnvironmentMapHandle = glGetTextureHandleARB(prefilteredEnvironmentMap);
     glMakeTextureHandleResidentARB(prefilteredEnvironmentMapHandle);
 
-    environmentBRDF = EnvironmentBRDFGeneration(1024, 1024);
+    environmentBRDF       = EnvironmentBRDFGeneration(1024, 1024);
     environmentBRDFHandle = glGetTextureHandleARB(environmentBRDF);
     glMakeTextureHandleResidentARB(environmentBRDFHandle);
-
-    App->GetOpenGLModule()->SetDepthFunc(true);
 
     glViewport(
         0, 0, App->GetOpenGLModule()->GetFramebuffer()->GetTextureWidth(),
@@ -212,8 +208,12 @@ unsigned int LightsConfig::CubeMapToTexture(int width, int height)
     glUseProgram(irradianceProgram);
 
     // TODO: Create and Bind Frame Buffer and Create Irradiance Cubemap
-    Framebuffer framebuffer(width, height, false);
-    framebuffer.Bind();
+    unsigned int frameBuffer;
+    glGenFramebuffers(1, &frameBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+
+    glDepthMask(GL_FALSE);
+
     glViewport(0, 0, width, height);
     unsigned int irradianceCubemap;
     glGenTextures(1, &irradianceCubemap);
@@ -249,10 +249,13 @@ unsigned int LightsConfig::CubeMapToTexture(int width, int height)
         App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
     }
-    framebuffer.Unbind();
+
+    glDeleteFramebuffers(1, &frameBuffer);
     glDeleteProgram(irradianceProgram);
 
-    return framebuffer.GetTextureID();
+    glDepthMask(GL_TRUE);
+
+    return irradianceCubemap;
 }
 
 unsigned int LightsConfig::PreFilteredEnvironmentMapGeneration(int width, int height)
@@ -268,8 +271,11 @@ unsigned int LightsConfig::PreFilteredEnvironmentMapGeneration(int width, int he
     frustum.verticalFov       = PI / 2.0f;
     frustum.horizontalFov     = PI / 2.0f;
 
-    Framebuffer framebuffer(width, height, false);
-    framebuffer.Bind();
+    unsigned int frameBuffer;
+    glGenFramebuffers(1, &frameBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+
+    glDepthMask(GL_FALSE);
 
     unsigned int prefilteredtexture;
     glGenTextures(1, &prefilteredtexture);
@@ -325,9 +331,12 @@ unsigned int LightsConfig::PreFilteredEnvironmentMapGeneration(int width, int he
         }
     }
 
-    framebuffer.Unbind();
+    glDeleteFramebuffers(1, &frameBuffer);
     glDeleteProgram(prefilteredProgram);
-    return framebuffer.GetTextureID();
+
+    glDepthMask(GL_TRUE);
+
+    return prefilteredtexture;
 }
 
 unsigned int LightsConfig::EnvironmentBRDFGeneration(int width, int height)
@@ -347,10 +356,17 @@ unsigned int LightsConfig::EnvironmentBRDFGeneration(int width, int height)
         App->GetShaderModule()->CreateShaderProgram(LIGHTS_VERTEX_SHADER_PATH, ENVIRONMENTBRDF_FRAGMENT_SHADER_PATH);
     glUseProgram(prefilteredProgram);
 
+    unsigned int frameBuffer;
+    glGenFramebuffers(1, &frameBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, environmentBRDFTexture, 0);
+
     glViewport(0, 0, width, height);
     App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 36);
 
     glDeleteProgram(prefilteredProgram);
+    glDeleteFramebuffers(1, &frameBuffer);
 
     return environmentBRDFTexture;
 }
