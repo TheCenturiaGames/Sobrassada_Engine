@@ -296,6 +296,7 @@
     <ClCompile Include="Scene\Components\Standalone\Physics\CubeColliderComponent.cpp" />
     <ClCompile Include="DebugDraw\BulletDebugDraw.cpp" />
     <ClCompile Include="FileSystem\Batching\BatchManager.cpp" />
+    <ClCompile Include="FileSystem\Meta\MetaStateMachine.cpp" />
     <ClCompile Include="FileSystem\PrefabManager.cpp" />
     <ClCompile Include="FileSystem\Config\EngineConfig.cpp" />
     <ClCompile Include="FileSystem\Config\ProjectConfig.cpp" />
@@ -317,6 +318,7 @@
     <ClCompile Include="Modules\ScriptModule.cpp" />
     <ClCompile Include="Scene\Components\ScriptComponent.cpp" />
     <ClCompile Include="UI\EngineEditors\Editor\NodeEditor.cpp" />
+    <ClCompile Include="UI\EngineEditors\Editor\StateMachineEditor.cpp" />
     <ClCompile Include="UI\EngineEditors\Editor\TextureEditor.cpp" />
     <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp" />
     <ClCompile Include="FileSystem\Importers\ModelImporter.cpp" />
@@ -383,6 +385,7 @@
     <ClCompile Include="Modules\ProjectModule.cpp" />
     <ClCompile Include="Scene\Components\Standalone\CharacterControllerComponent.cpp" />
     <ClCompile Include="UI\EngineEditors\Nodes\CustomNode.cpp" />
+    <ClCompile Include="UI\EngineEditors\Nodes\StateNode.cpp" />
     <ClCompile Include="Scene\Components\Standalone\UI\Transform2DComponent.cpp" />
     <ClCompile Include="Utils\EngineTimer.cpp" />
     <ClCompile Include="FileSystem\Importers\Importer.cpp" />
@@ -478,6 +481,7 @@
     <ClInclude Include="FileSystem\Importers\FontImporter.h" />
     <ClInclude Include="FileSystem\Meta\MetaFont.h" />
     <ClInclude Include="FileSystem\Batching\GeometryBatch.h" />
+    <ClInclude Include="FileSystem\Meta\MetaStateMachine.h" />
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\include\ImNodeFlow.h" />
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\context_wrapper.h" />
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_bezier_math.h" />
@@ -498,6 +502,7 @@
     <ClInclude Include="Scene\Components\CameraComponent.h" />
     <ClInclude Include="Scene\Components\ScriptComponent.h" />
     <ClInclude Include="UI\EngineEditors\Editor\NodeEditor.h" />
+    <ClInclude Include="UI\EngineEditors\Editor\StateMachineEditor.h" />
     <ClInclude Include="UI\EngineEditors\Editor\TextureEditor.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -520,7 +525,8 @@
     <ClInclude Include="Modules\ResourcesModule.h" />
     <ClInclude Include="Modules\SceneModule.h" />
     <ClInclude Include="FileSystem\Importers\ModelImporter.h" />
-       <ClInclude Include="FileSystem\Importers\AnimationImporter.h" />
+    <ClInclude Include="FileSystem\Importers\AnimationImporter.h" />
+    <ClInclude Include="UI\EngineEditors\Nodes\StateNode.h" />
     <ClInclude Include="Scene\Components\Standalone\UI\Transform2DComponent.h" />
     <ClInclude Include="Utils\Delegate.h" />
     <ClInclude Include="Utils\EventDispatcher.h" />

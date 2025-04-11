@@ -62,7 +62,8 @@ class LibraryModule : public Module
     UID GetMaterialUID(const std::string& materialPath) const;
     UID GetModelUID(const std::string& modelPath) const;
     UID GetAnimUID(const std::string& animPath) const;
-    UID GetStateMachinelUID(const std::string& stMachPath) const;
+    UID GetStateMachineUID(const std::string& stMachPath) const;
+
 
     const std::string& GetResourceName(UID resourceID) const;
 
