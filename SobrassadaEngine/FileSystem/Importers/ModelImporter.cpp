@@ -9,8 +9,6 @@
 #include "ProjectModule.h"
 #include "ResourceModel.h"
 #include "AnimationImporter.h"
-#include "MetaAnimation.h"
-
 #include "Math/Quat.h"
 #include "Math/float4x4.h"
 #include "rapidjson/prettywriter.h"
@@ -98,13 +96,11 @@ namespace ModelImporter
         else finalModelUID = sourceUID;
 
         assetPath = targetFilePath + assetPath;
-
-        newModel.SetUID(finalModelUID);
         std::vector<UID> animationUIDs;
-        //Import Animations
+        // Import Animations
         if (model.animations.size() > 0)
         {
-          
+
             GLOG("Number of animations in model: %zu", model.animations.size());
 
             for (int i = 0; i < model.animations.size(); ++i)
@@ -114,8 +110,9 @@ namespace ModelImporter
                 GLOG("Importing animation %d", i);
                 GLOG("Animation channels: %zu", anim.channels.size());
 
-                UID animUID = AnimationImporter::ImportAnimation(model, anim, anim.name, filePath, targetFilePath, sourceUID);
-                
+                UID animUID =
+                    AnimationImporter::ImportAnimation(model, anim, anim.name, filePath, targetFilePath, sourceUID);
+
                 GLOG("Imported animation UID: %llu", animUID);
 
                 if (animUID != INVALID_UID)
@@ -124,7 +121,7 @@ namespace ModelImporter
 
                     GLOG("Final animation UID: %llu", animUID);
                 }
-                  
+
                 else
                 {
                     GLOG("Failed to import animation %d", i);
@@ -144,6 +141,9 @@ namespace ModelImporter
                 GLOG("No valid animation UIDs found");
             }
         }
+
+        newModel.SetUID(finalModelUID);
+
         // Create structure
         modelJSON.AddMember("UID", finalModelUID, allocator);
 
@@ -199,28 +199,14 @@ namespace ModelImporter
             nodesJSON.PushBack(nodeDataJSON, allocator);
         }
 
-
-        //Serialize anims
+        modelJSON.AddMember("Nodes", nodesJSON, allocator);
+        // Serialize Animations.
         rapidjson::Value animationsJSON(rapidjson::kArrayType);
         for (UID animUID : animationUIDs)
         {
             animationsJSON.PushBack(animUID, allocator);
         }
         modelJSON.AddMember("Animations", animationsJSON, allocator);
-        rapidjson::Value scenesJSON(rapidjson::kArrayType);
-        std::size_t accNodes = 0;
-        for (const std::vector<NodeData>& nodes : orderedNodes)
-        {
-            rapidjson::Value nodePair(rapidjson::kObjectType);
-            nodePair.AddMember("rootNode", accNodes, allocator);
-            nodePair.AddMember("sceneSize", nodes.size(), allocator);
-            scenesJSON.PushBack(nodePair, allocator);
-            accNodes += nodes.size();
-        }
-        modelJSON.AddMember("Scenes", scenesJSON, allocator);
-        modelJSON.AddMember("Nodes", nodesJSON, allocator);
-
-
         // Serialize skins
         rapidjson::Value skinsJSON(rapidjson::kArrayType);
         for (const Skin& skin : skinsData)
@@ -256,15 +242,16 @@ namespace ModelImporter
         modelJSON.AddMember("Skins", skinsJSON, allocator);
 
         doc.AddMember("Model", modelJSON, allocator);
-
+       
         // Save file like JSON
         rapidjson::StringBuffer buffer;
         rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
         doc.Accept(writer);
 
-        const std::string saveFilePath = App->GetProjectModule()->GetLoadedProjectPath() + MODELS_LIB_PATH +
+        std::string saveFilePath = App->GetProjectModule()->GetLoadedProjectPath() + MODELS_LIB_PATH +
                                    std::to_string(finalModelUID) + MODEL_EXTENSION;
-        const size_t bytesWritten = FileSystem::Save(saveFilePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
+        unsigned int bytesWritten = (unsigned int
+        )FileSystem::Save(saveFilePath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
         if (bytesWritten == 0)
         {
             GLOG("Failed to save model file: %s", saveFilePath);
@@ -273,7 +260,8 @@ namespace ModelImporter
 
         if (sourceUID == INVALID_UID)
         {
-            size_t bytesWritten = FileSystem::Save(assetPath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
+            unsigned int bytesWritten = (unsigned int
+            )FileSystem::Save(assetPath.c_str(), buffer.GetString(), (unsigned int)buffer.GetSize(), false);
             if (bytesWritten == 0)
             {
                 GLOG("Failed to save model file: %s", assetPath);
@@ -390,19 +378,21 @@ namespace ModelImporter
                 loadedNodes.push_back(newNode);
             }
         }
-        
+
          std::vector<UID> loadedAnimations;
-        //Deserialize Animations
+        // Deserialize Animations
         if (modelJSON.HasMember("Animations") && modelJSON["Animations"].IsArray())
         {
-           
-            const rapidjson::Value& animUIDs = modelJSON["Animations"];
 
-            for (rapidjson::SizeType i = 0; i < animUIDs.Size(); ++i)
+            const rapidjson::Value& animJSON = modelJSON["Animations"];
+
+            for (rapidjson::SizeType i = 0; i < animJSON.Size(); ++i)
             {
-                loadedAnimations.push_back(animUIDs[i].GetUint64());
+
+                loadedAnimations.push_back(animJSON[i].GetUint64());
             }
         }
+
 
         // Deserialize Skins
         std::vector<Skin> loadedSkins;
@@ -457,15 +447,12 @@ namespace ModelImporter
         }
 
         ResourceModel* resourceModel = new ResourceModel(uid, FileSystem::GetFileNameWithoutExtension(filePath));
-
-        resourceModel->SetModelData(Model(uid, loadedNodes, loadedSkins));
+        resourceModel->SetModelData(Model(uid, rootNodesIdx, loadedNodes, loadedSkins));
         if (loadedAnimations.size() > 0)
         {
             resourceModel->SetAllAnimationUIDs(loadedAnimations);
             resourceModel->SetAnimationUID(loadedAnimations[0]);
         }
-       
-
 
         return resourceModel;
     }
@@ -499,7 +486,7 @@ namespace ModelImporter
             // Get reference to Mesh and Material UIDs
             if (nodeData.mesh > -1) newNode.meshes = meshesUIDs[nodeData.mesh];
 
-            newNode.skinIndex = nodeData.skin;
+            newNode.skinIndex          = nodeData.skin;
 
             outNodes[currentNodeIndex] = newNode;
 

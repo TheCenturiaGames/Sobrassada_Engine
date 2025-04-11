@@ -36,8 +36,6 @@ class Model
     const std::vector<int>& GetRootNodesIdx() const { return rootNodesIdx; }
     const std::vector<NodeData>& GetNodes() const { return nodes; }
     const Skin& GetSkin(int skinIndex) const { return skins[skinIndex]; }
-    const UID GetAnimationUID() const { return animUID; }
-    const std::vector<UID>& GetAllAnimationUIDs() const { return allAnimUIDs; }
 
     void SetUID(const UID uid) { this->uid = uid; }
     void SetRootNodesIdx(const std::vector<int>& rootNodes) { this->rootNodesIdx = rootNodes; }
@@ -45,7 +43,6 @@ class Model
     void SetSkins(const std::vector<Skin>& skins) { this->skins = skins; }
     void SetAnimationUID(UID animationUID) { animUID = animationUID; }
     void SetAllAnimationUIDs(std::vector<UID> animUids) { allAnimUIDs = animUids; }
-
   private:
     UID uid;
     std::vector<int> rootNodesIdx;
