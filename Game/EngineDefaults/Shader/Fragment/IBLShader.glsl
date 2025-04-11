@@ -118,8 +118,6 @@ vec3 GetAmbientLight(in vec3 normal, in vec3 R, float NdotV, float roughness, in
     vec3 diffuse = (diffuseColor * (1 - specularColor));
 
     return diffuse * irradiance + radiance * (specularColor * fab.x + fab.y);
-
-    //return vec3(1.0, fab);
 }
 
 float VisibilityFunction(float NdotL, float NdotV, float roughness){

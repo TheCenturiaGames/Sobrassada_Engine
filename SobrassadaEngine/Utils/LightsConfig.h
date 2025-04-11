@@ -33,18 +33,6 @@ namespace Lights
               environmentBRDF(environmentBRDF), numLevels(numLevels)
         {
         }
-        /*
-
-
-
-
-        AmbientLightShaderData(const float4& color, const UID cubemapIrradiance, const UID cubemapPrefiltered, const UID
-        cubemapBRDF, const int numLevels) : color(color), cubemapIrradiance(cubemapIrradiance),
-        cubemapPrefiltered(cubemapPrefiltered), cubemapBRDF(cubemapBRDF), numLevels(numLevels)
-        {
-        }
-        int padding[3];
-        */
     };
 
     struct DirectionalLightShaderData

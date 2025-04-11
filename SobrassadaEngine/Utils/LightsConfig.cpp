@@ -171,6 +171,7 @@ void LightsConfig::LoadSkyboxTexture(UID resource)
 
         App->GetOpenGLModule()->SetDepthFunc(false);
 
+        /*Im not changing cubemaps right now
         cubemapIrradiance = CubeMapToTexture(1024, 1024);
         irradianceHandle  = glGetTextureHandleARB(cubemapIrradiance);
         glMakeTextureHandleResidentARB(skyboxHandle);
@@ -182,6 +183,7 @@ void LightsConfig::LoadSkyboxTexture(UID resource)
         environmentBRDF       = EnvironmentBRDFGeneration(1024, 1024);
         environmentBRDFHandle = glGetTextureHandleARB(environmentBRDF);
         glMakeTextureHandleResidentARB(environmentBRDFHandle);
+        */
 
         App->GetOpenGLModule()->SetDepthFunc(true);
 
@@ -266,6 +268,9 @@ unsigned int LightsConfig::PreFilteredEnvironmentMapGeneration(int width, int he
     frustum.verticalFov       = PI / 2.0f;
     frustum.horizontalFov     = PI / 2.0f;
 
+    Framebuffer framebuffer(width, height, false);
+    framebuffer.Bind();
+
     unsigned int prefilteredtexture;
     glGenTextures(1, &prefilteredtexture);
     glBindTexture(GL_TEXTURE_CUBE_MAP, prefilteredtexture);
@@ -320,8 +325,9 @@ unsigned int LightsConfig::PreFilteredEnvironmentMapGeneration(int width, int he
         }
     }
 
+    framebuffer.Unbind();
     glDeleteProgram(prefilteredProgram);
-    return prefilteredtexture;
+    return framebuffer.GetTextureID();
 }
 
 unsigned int LightsConfig::EnvironmentBRDFGeneration(int width, int height)
