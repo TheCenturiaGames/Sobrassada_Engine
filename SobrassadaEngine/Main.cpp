@@ -9,9 +9,6 @@
 #include "optick.h"
 #endif
 
-#include <AK/SoundEngine/Common/AkSoundEngine.h>
-#include <AK/IBytes.h>
-
 #include <memory>
 
 extern "C"
@@ -30,7 +27,7 @@ enum MainState
 };
 
 Application* App         = NULL;
-std::vector<char*> *Logs = NULL;
+std::vector<char*>* Logs = NULL;
 
 int main(int argc, char** argv)
 {
