@@ -112,19 +112,38 @@ void CharacterControllerComponent::Update(float deltaTime)
 
             if (tmpQuery)
             {
-                //TODO: Make the rest of the process
-                navMeshQuery = tmpQuery;
+                if (currentPolyRef == 0)
+                {
+                    // TODO: Make the rest of the process
+                    navMeshQuery    = tmpQuery;
 
-                float3 startPos = parent->GetGlobalTransform().TranslatePart();
+                    float3 startPos = parent->GetGlobalTransform().TranslatePart();
 
-                dtQueryFilter filter;
-                filter.setIncludeFlags(SAMPLE_POLYFLAGS_WALK);
-                filter.setExcludeFlags(0);
+                    dtQueryFilter filter;
+                    filter.setIncludeFlags(SAMPLE_POLYFLAGS_WALK);
+                    filter.setExcludeFlags(0);
+
+                    float extents[3] = {0.5f, 1.0f, 0.5f};
+                    float nearestPoint[3];
+                    dtPolyRef targetRef = 0;
+
+                    dtStatus status =
+                        navMeshQuery->findNearestPoly(&startPos.x, extents, &filter, &targetRef, nearestPoint);
+
+                    if (dtStatusFailed(status) || targetRef == 0)
+                    {
+                        GLOG("Failed to find valid target poly for movement.");
+                        return;
+                    }
+
+                    currentPolyRef = targetRef;
+                }
             }
         }
     }
+    
+    if (navMeshQuery && currentPolyRef != 0) HandleInput(deltaTime);
 
-    HandleInput(deltaTime);
 }
 
 void CharacterControllerComponent::Render(float deltaTime)
