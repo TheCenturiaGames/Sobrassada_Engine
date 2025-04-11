@@ -112,11 +112,12 @@ void CharacterControllerComponent::Update(float deltaTime)
 
             if (tmpQuery)
             {
+                navMeshQuery = tmpQuery;
+
                 if (currentPolyRef == 0)
                 {
                     // TODO: Make the rest of the process
-                    navMeshQuery    = tmpQuery;
-
+                    
                     float3 startPos = parent->GetGlobalTransform().TranslatePart();
 
                     dtQueryFilter filter;
@@ -128,7 +129,7 @@ void CharacterControllerComponent::Update(float deltaTime)
                     dtPolyRef targetRef = 0;
 
                     dtStatus status =
-                        navMeshQuery->findNearestPoly(&startPos.x, extents, &filter, &targetRef, nearestPoint);
+                        navMeshQuery->findNearestPoly(startPos.ptr(), extents, &filter, &targetRef, nearestPoint);
 
                     if (dtStatusFailed(status) || targetRef == 0)
                     {
@@ -198,58 +199,115 @@ void CharacterControllerComponent::RenderEditorInspector()
 
 void CharacterControllerComponent::Move(const float3& direction, float deltaTime)
 {
-    if (!navMeshQuery || currentPolyRef == 0)
+    //if (!navMeshQuery || currentPolyRef == 0)
+    //{
+    //    /*float finalSpeed           = std::min(speed, maxLinearSpeed);
+
+    //    float3 movementOffset      = direction * finalSpeed * deltaTime;
+
+    //    float4x4 localTr           = parent->GetLocalTransform();
+    //    float4x4 translationMatrix = float4x4::FromTRS(movementOffset, float4x4::identity.RotatePart(), float3::one);
+
+    //    localTr                    = localTr * translationMatrix;
+
+    //    parent->SetLocalTransform(localTr);
+    //    parent->UpdateTransformForGOBranch();*/
+    //    return;
+    //}
+
+    verticalSpeed     += (gravity * deltaTime);
+
+    float maxFallSpeed  = -20.0f;
+    if (verticalSpeed < maxFallSpeed)
     {
-        /*float finalSpeed           = std::min(speed, maxLinearSpeed);
-
-        float3 movementOffset      = direction * finalSpeed * deltaTime;
-
-        float4x4 localTr           = parent->GetLocalTransform();
-        float4x4 translationMatrix = float4x4::FromTRS(movementOffset, float4x4::identity.RotatePart(), float3::one);
-
-        localTr                    = localTr * translationMatrix;
-
-        parent->SetLocalTransform(localTr);
-        parent->UpdateTransformForGOBranch();*/
-        return;
+        verticalSpeed = maxFallSpeed;
     }
+
+    float4x4 globalTr  = parent->GetGlobalTransform();
+    float3 currentPos  = globalTr.TranslatePart();
 
     float finalSpeed = std::min(speed, maxLinearSpeed);
+    float3 offsetXZ    = direction * finalSpeed * deltaTime;
     
-    float4x4 globalTr = parent->GetGlobalTransform();
-    float3 currentPos = globalTr.TranslatePart();
+    float3 desiredPos;
+    desiredPos.x = currentPos.x + offsetXZ.x;
+    desiredPos.z = currentPos.z + offsetXZ.z;
+    desiredPos.y = currentPos.y + (verticalSpeed * deltaTime);
 
-    float3 offset     = direction * finalSpeed * deltaTime;
-    float3 desiredPos = currentPos + offset;
-
-    dtRaycastHit hit;
-    memset(&hit, 0, sizeof(hit));
-
-    dtQueryFilter filter;
-    filter.setIncludeFlags(SAMPLE_POLYFLAGS_WALK);
-    filter.setExcludeFlags(0);
-
-    float start[3] = {currentPos.x, currentPos.y, currentPos.z};
-    float end[3]   = {desiredPos.x, desiredPos.y, desiredPos.z};
-
-    dtStatus status = navMeshQuery->raycast(currentPolyRef, start, end, &filter, 0, &hit, 0);
-
-    float3 finalPos = desiredPos;
-
-    if (!dtStatusFailed(status))
+    if (navMeshQuery && currentPolyRef != 0)
     {
-        if (hit.t < 1.0f)
+        //Horizontal raycast to limit xz
         {
-            float3 fullVec = desiredPos - currentPos;
-            finalPos       = currentPos + fullVec * hit.t;
+            dtRaycastHit hit;
+            memset(&hit, 0, sizeof(hit));
+
+            dtQueryFilter filter;
+            filter.setIncludeFlags(SAMPLE_POLYFLAGS_WALK);
+            filter.setExcludeFlags(0);
+
+            float start[3]  = {currentPos.x, currentPos.y, currentPos.z};
+            float end[3]    = {desiredPos.x, desiredPos.y, desiredPos.z};
+
+            dtStatus status = navMeshQuery->raycast(currentPolyRef, start, end, &filter, 0, &hit, 0);
+
+            if (dtStatusSucceed(status))
+            {
+                if (hit.t < 1.0f)
+                {
+                    float3 fullVec;
+                    fullVec.x      = end[0] - start[0];
+                    fullVec.y      = end[1] - start[1];
+                    fullVec.z      = end[2] - start[2];
+
+                    float3 clampXZ = float3(start[0], start[1], start[2]) + fullVec * hit.t;
+                    desiredPos.x   = clampXZ.x;
+                    desiredPos.z   = clampXZ.z;
+                }
+            }
+
+            float halfExt[3] = {0.5f, 1.0f, 0.5f};
+            float nearest[3];
+
+            dtPolyRef newRef = 0;
+            dtStatus st2     = navMeshQuery->findNearestPoly(desiredPos.ptr(), halfExt, &filter, &newRef, nearest);
+
+            if (dtStatusSucceed(st2) && newRef != 0)
+            {
+                currentPolyRef = newRef;
+            }
         }
-        else
+
+        //adjust height is navmesh is higher
         {
-            finalPos = currentPos;
+            dtQueryFilter filter;
+            filter.setIncludeFlags(SAMPLE_POLYFLAGS_WALK);
+            filter.setExcludeFlags(0);
+
+            float halfExt[3] = {2.0f, 4.0f, 2.0f};
+            float nearest[3];
+            dtPolyRef polyRef = 0;
+
+            dtStatus st3      = navMeshQuery->findNearestPoly(desiredPos.ptr(), halfExt, &filter, &polyRef, nearest);
+
+            if (dtStatusSucceed(st3) && polyRef)
+            {
+                float polyHeight = 0.0f;
+                dtStatus stH     = navMeshQuery->getPolyHeight(polyRef, nearest, &polyHeight);
+                if (dtStatusSucceed(stH))
+                {
+                    float distToFloor = polyHeight - desiredPos.y;
+
+                    if (distToFloor >= 0.0f)
+                    {
+                        desiredPos.y  = polyHeight;
+                        verticalSpeed = 0.0f;
+                    }
+                }
+            }
         }
     }
 
-    globalTr.SetTranslatePart(finalPos);
+    globalTr.SetTranslatePart(desiredPos);
 
     float4x4 finalLocal = parent->GetParentGlobalTransform().Transposed() * globalTr;
 
@@ -305,7 +363,7 @@ void CharacterControllerComponent::HandleInput(float deltaTime)
         // TODO: Handle rotation of gameObject when changing directions (target direction will be used in this part)
         Move(direction, deltaTime);
     }
-
+    
     if (fabs(rotationDir) > 0.0001f)
     {
         Rotate(rotationDir, deltaTime);

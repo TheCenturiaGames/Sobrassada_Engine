@@ -42,4 +42,7 @@ class CharacterControllerComponent : public Component
 
     dtNavMeshQuery* navMeshQuery = nullptr;
     dtPolyRef currentPolyRef     = 0;
+
+    float gravity                = -9.81f;
+    float verticalSpeed          = 0.0f;
 };
