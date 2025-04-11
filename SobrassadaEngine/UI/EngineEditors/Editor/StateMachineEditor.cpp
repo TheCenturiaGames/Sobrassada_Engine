@@ -19,7 +19,7 @@ StateMachineEditor::StateMachineEditor(const std::string& editorName, UID uid, R
         if (newStateNode)
         {
             CreateBaseState(*newStateNode.get());
-        }
+}
     }
 }
 

@@ -44,6 +44,7 @@ namespace StateMachineManager
             triggerValue.SetString(trigger.c_str(), static_cast<rapidjson::SizeType>(trigger.length()), allocator);
             triggersArray.PushBack(triggerValue, allocator);
         }
+        stateMachineJSON.AddMember("Clips", clipsArray, allocator);
 
         stateMachineJSON.AddMember("Triggers", triggersArray, allocator);
 
@@ -51,16 +52,16 @@ namespace StateMachineManager
          //Clips
         rapidjson::Value clipsArray(rapidjson::kArrayType);
         for (const auto& clip : resource->clips)
-        {
+
             rapidjson::Value clipJSON(rapidjson::kObjectType);
             clipJSON.AddMember("ClipUID", clip.animationResourceUID, allocator);
             clipJSON.AddMember("ClipName", rapidjson::Value(clip.clipName.GetString().c_str(), allocator), allocator);
             clipJSON.AddMember("Loop", clip.loop, allocator);
-
+            );
             clipsArray.PushBack(clipJSON, allocator);
-        }
-        stateMachineJSON.AddMember("Clips", clipsArray, allocator);
 
+        stateMachineJSON.AddMember("Clips", clipsArray, allocator);
+            uint32_t clipNameSize = static_cast<uint32_t>(state.clipName.GetString().size());
         //States
         rapidjson::Value statesArray(rapidjson::kArrayType);
         for (const auto& state : resource->states)
@@ -80,6 +81,13 @@ namespace StateMachineManager
         //Transitions
         rapidjson::Value transitionsArray(rapidjson::kArrayType);
         for (const auto& transition : resource->transitions)
+        uint32_t numTransitions = static_cast<uint32_t>(transitions.size());
+        buffer.insert(
+            buffer.end(), reinterpret_cast<const char*>(&numTransitions),
+            reinterpret_cast<const char*>(&numTransitions) + sizeof(uint32_t)
+        );
+
+        for (const auto& t : transitions)
         {
             rapidjson::Value transitionJSON(rapidjson::kObjectType);
             transitionJSON.AddMember(
@@ -156,13 +164,6 @@ namespace StateMachineManager
         }
 
         rapidjson::Document doc;
-        bool loaded = FileSystem::LoadJSON(path.c_str(), doc);
-        if (!loaded || !doc.HasMember("StateMachine"))
-        {
-            GLOG("Failed to parse StateMachine JSON: %s", path.c_str());
-            return nullptr;
-        }
-
         const rapidjson::Value& stateMachineJSON = doc["StateMachine"];
 
         UID uid                                  = stateMachineJSON["UID"].GetUint64();
@@ -170,12 +171,12 @@ namespace StateMachineManager
 
 
         ResourceStateMachine* stateMachine = new ResourceStateMachine(uid, name);
-
+        if (!loaded || !doc.HasMember("StateMachine"))
         if (stateMachineJSON.HasMember("Triggers") && stateMachineJSON["Triggers"].IsArray())
         {
             stateMachine->availableTriggers.clear(); 
             const rapidjson::Value& triggersArray = stateMachineJSON["Triggers"];
-
+            return nullptr;
             for (rapidjson::SizeType i = 0; i < triggersArray.Size(); ++i)
             {
                 if (triggersArray[i].IsString())
@@ -184,6 +185,13 @@ namespace StateMachineManager
                 }
             }
         }
+        ResourceStateMachine* stateMachine =
+            new ResourceStateMachine(stateMachineUID, FileSystem::GetFileNameWithoutExtension(path));
+
+        // --- Load Clips ---
+        uint32_t numClips = 0;
+        memcpy(&numClips, cursor, sizeof(uint32_t));
+        cursor += sizeof(uint32_t);
 
         //Clips
         if (stateMachineJSON.HasMember("Clips") && stateMachineJSON["Clips"].IsArray())
