@@ -192,20 +192,8 @@
     <ClCompile Include="Utils\LightsConfig.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Components\Component.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\GameObjects\GameObject.cpp">
-      <Filter>Scene\GameObjects</Filter>
-    </ClCompile>
     <ClCompile Include="Modules\SceneModule.cpp">
       <Filter>Modules</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Components\Standalone\MeshComponent.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Components\Component.cpp">
-      <Filter>Scene\Components</Filter>
     </ClCompile>
     <ClCompile Include="Scene\Components\ComponentUtils.cpp">
       <Filter>Scene\Components</Filter>
@@ -317,12 +305,6 @@
     </ClCompile>
     <ClCompile Include="Scene\Components\CameraComponent.cpp">
       <Filter>Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
-      <Filter>UI\EngineEditors</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
-      <Filter>UI\EngineEditors</Filter>
     </ClCompile>
     <ClCompile Include="FileSystem\PrefabManager.cpp">
       <Filter>FileSystem</Filter>
@@ -450,12 +432,24 @@
     <ClCompile Include="FileSystem\Importers\NavmeshImporter.cpp">
       <Filter>FileSystem\Importers</Filter>
     </ClCompile>
-    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourCrowd.cpp" />
-    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourLocalBoundary.cpp" />
-    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourObstacleAvoidance.cpp" />
-    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourPathCorridor.cpp" />
-    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourPathQueue.cpp" />
-    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourProximityGrid.cpp" />
+    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourCrowd.cpp">
+      <Filter>External\DetourCrowd</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourLocalBoundary.cpp">
+      <Filter>External\DetourCrowd</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourObstacleAvoidance.cpp">
+      <Filter>External\DetourCrowd</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourPathCorridor.cpp">
+      <Filter>External\DetourCrowd</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourPathQueue.cpp">
+      <Filter>External\DetourCrowd</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourProximityGrid.cpp">
+      <Filter>External\DetourCrowd</Filter>
+    </ClCompile>
     <ClCompile Include="Scene\Components\Standalone\AIAgentComponent.cpp">
       <Filter>Scene\Components<Filter>
     </ClInclude>
@@ -691,9 +685,6 @@
     </ClInclude>
     <ClInclude Include="FileSystem\PrefabManager.h">
       <Filter>FileSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\EngineEditors\EngineEditorBase.h">
-      <Filter>UI\EngineEditors</Filter>
     </ClInclude>
     <ClInclude Include="FileSystem\Meta\MetaFile.h">
       <Filter>FileSystem\Meta</Filter>
