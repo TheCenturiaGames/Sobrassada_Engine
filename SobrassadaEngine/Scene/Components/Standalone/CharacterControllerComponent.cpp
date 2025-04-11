@@ -196,19 +196,41 @@ void CharacterControllerComponent::RenderEditorInspector()
     }
 }
 
-void CharacterControllerComponent::Move(const float3& direction, float deltaTime) const
+void CharacterControllerComponent::Move(const float3& direction, float deltaTime)
 {
-    float finalSpeed           = std::min(speed, maxLinearSpeed);
+    if (!navMeshQuery || currentPolyRef == 0)
+    {
+        /*float finalSpeed           = std::min(speed, maxLinearSpeed);
 
-    float3 movementOffset      = direction * finalSpeed * deltaTime;
+        float3 movementOffset      = direction * finalSpeed * deltaTime;
 
-    float4x4 localTr           = parent->GetLocalTransform();
-    float4x4 translationMatrix = float4x4::FromTRS(movementOffset, float4x4::identity.RotatePart(), float3::one);
+        float4x4 localTr           = parent->GetLocalTransform();
+        float4x4 translationMatrix = float4x4::FromTRS(movementOffset, float4x4::identity.RotatePart(), float3::one);
 
-    localTr                    = localTr * translationMatrix;
+        localTr                    = localTr * translationMatrix;
 
-    parent->SetLocalTransform(localTr);
-    parent->UpdateTransformForGOBranch();
+        parent->SetLocalTransform(localTr);
+        parent->UpdateTransformForGOBranch();*/
+        return;
+    }
+
+    float finalSpeed = std::min(speed, maxLinearSpeed);
+    
+    float4x4 globalTr = parent->GetGlobalTransform();
+    float3 currentPos = globalTr.TranslatePart();
+
+    float3 offset     = direction * finalSpeed * deltaTime;
+    float3 desiredPos = currentPos + offset;
+
+    dtRaycastHit hit;
+    memset(&hit, 0, sizeof(hit));
+
+    dtQueryFilter filter;
+    filter.setIncludeFlags(SAMPLE_POLYFLAGS_WALK);
+    filter.setExcludeFlags(0);
+
+    float start[3] = {currentPos.x, currentPos.y, currentPos.z};
+    float end[3]   = {desiredPos.x, desiredPos.y, desiredPos.z};
 }
 
 void CharacterControllerComponent::Rotate(float rotationDirection, float deltaTime)
