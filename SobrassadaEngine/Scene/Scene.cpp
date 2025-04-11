@@ -303,7 +303,7 @@ update_status Scene::Render(float deltaTime)
     {
         GameObject* gameObject = GetGameObjectByUID(gameObjectIterator.first);
 
-        AABB aabb              = gameObject->GetHierarchyAABB();
+        const AABB aabb              = gameObject->GetHierarchyAABB();
         
         for (int i = 0; i < 12; ++i)
             debugDraw->DrawLineSegment(aabb.Edge(i), float3(1.f, 1.0f, 0.5f));
@@ -725,7 +725,7 @@ UID Scene::GetMultiselectUID() const
 
 void Scene::SetMultiselectPosition(const float3& newPosition)
 {
-    float4x4 localMat = float4x4::FromTRS(newPosition, float4x4::identity, float3::one);
+    const float4x4 localMat = float4x4::FromTRS(newPosition, float4x4::identity, float3::one);
     multiSelectParent->SetLocalTransform(localMat);
 }
 
