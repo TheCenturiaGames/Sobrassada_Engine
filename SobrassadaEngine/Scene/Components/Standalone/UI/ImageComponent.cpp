@@ -12,7 +12,7 @@
 #include "ImGui.h"
 #include "glew.h"
 
-ImageComponent::ImageComponent(UID uid, GameObject* parent) : Component(uid, parent, "Image", COMPONENT_IMAGE)
+ImageComponent::ImageComponent(UID uid, GameObject* parent) : color(float3(1.0f, 1.0f, 1.0f)), Component(uid, parent, "Image", COMPONENT_IMAGE)
 {
     // Set default texture
     texture = static_cast<ResourceTexture*>(
@@ -31,8 +31,8 @@ ImageComponent::ImageComponent(const rapidjson::Value& initialState, GameObject*
     }
     else
     {
-        // To prevent crashes, load the default one if there is no font saved
-        GLOG("[ERROR] No texture UID found for the UI image %s in the saved scene", name);
+        // To prevent crashes, load the default one if there is no texture saved
+        GLOG("[WARNING] No texture UID found for the UI image %s in the saved scene", name);
         texture = static_cast<ResourceTexture*>(
             App->GetResourcesModule()->RequestResource(App->GetLibraryModule()->GetTextureMap().at("DefaultTexture"))
         );
@@ -95,7 +95,6 @@ void ImageComponent::Clone(const Component* other)
         texture                          = otherImage->texture;
         texture->AddReference();
         bindlessUID = glGetTextureHandleARB(texture->GetTextureID());
-        // Maybe has to generate the texture
     }
     else
     {
