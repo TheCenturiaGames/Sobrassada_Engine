@@ -44,6 +44,7 @@ namespace StateMachineManager
             triggerValue.SetString(trigger.c_str(), static_cast<rapidjson::SizeType>(trigger.length()), allocator);
             triggersArray.PushBack(triggerValue, allocator);
         }
+        stateMachineJSON.AddMember("Clips", clipsArray, allocator);
 
         stateMachineJSON.AddMember("Triggers", triggersArray, allocator);
 

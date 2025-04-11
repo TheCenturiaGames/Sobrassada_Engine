@@ -10,6 +10,7 @@ struct NodeData
     std::string name;
     float4x4 transform;
     int parentIndex;
+    std::vector<int> children;
     int skinIndex;
     std::vector<std::pair<UID, UID>> meshes;
 };
@@ -25,19 +26,25 @@ class Model
 {
   public:
     Model() = default;
-    Model(const UID id, const std::vector<std::vector<NodeData>>& nodes, const std::vector<Skin>& skins)
-        : uid(id), nodes(nodes), skins(skins) {};
+    Model(
+        const UID id, const std::vector<int>& rootNodesIdx, const std::vector<NodeData>& nodes,
+        const std::vector<Skin>& skins
+    )
+        : uid(id), rootNodesIdx(rootNodesIdx), nodes(nodes), skins(skins) {};
     ~Model() = default;
 
-    const std::vector<std::vector<NodeData>>& GetNodes() const { return nodes; }
+    const std::vector<int>& GetRootNodesIdx() const { return rootNodesIdx; }
+    const std::vector<NodeData>& GetNodes() const { return nodes; }
     const Skin& GetSkin(int skinIndex) const { return skins[skinIndex]; }
 
     void SetUID(const UID uid) { this->uid = uid; }
-    void SetNodes(const std::vector<std::vector<NodeData>>& nodes) { this->nodes = nodes; }
+    void SetRootNodesIdx(const std::vector<int>& rootNodes) { this->rootNodesIdx = rootNodes; }
+    void SetNodes(const std::vector<NodeData>& nodes) { this->nodes = nodes; }
     void SetSkins(const std::vector<Skin>& skins) { this->skins = skins; }
 
   private:
     UID uid;
-    std::vector<std::vector<NodeData>> nodes;
+    std::vector<int> rootNodesIdx;
+    std::vector<NodeData> nodes;
     std::vector<Skin> skins;
 };
