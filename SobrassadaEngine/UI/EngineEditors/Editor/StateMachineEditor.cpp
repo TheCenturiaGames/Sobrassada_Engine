@@ -431,7 +431,7 @@ void StateMachineEditor::ShowInspector()
 void StateMachineEditor::BuildGraph()
 {
     selectedNode = nullptr;
-    /* if (graph)
+    if (graph)
     {
         for (const auto& [uid, node] : graph->getNodes())
         {
@@ -449,7 +449,7 @@ void StateMachineEditor::BuildGraph()
             }
         }
         graph->getNodes().clear();
-    }*/
+    }
     graph = std::make_unique<ImFlow::ImNodeFlow>("StateMachineGraph_" + std::to_string(uid));
 
     std::unordered_map<std::string, std::shared_ptr<StateNode>> stateNodes;
