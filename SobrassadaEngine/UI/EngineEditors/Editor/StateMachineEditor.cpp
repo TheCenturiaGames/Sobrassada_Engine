@@ -127,9 +127,10 @@ bool StateMachineEditor::RenderEditor()
                             sourceNode->GetStateName(), inputPinRaw->GetStateName(), "Trigger", 200
                         );
                         // availableTriggers.push_back("Trigger");
-                        auto newLink =
-                            std::make_shared<ImFlow::Link>(dragged, inputPinRaw->getInputPin().get(), graph.get());
-                        graph->addLink(newLink);
+                        //auto newLink =
+                          //  std::make_shared<ImFlow::Link>(dragged, inputPinRaw->getInputPin().get(), graph.get());
+                       // graph->addLink(newLink);
+                        dragged->createLink(inputPinRaw->getInputPin().get());
                     }
                 }
             }
@@ -534,6 +535,7 @@ void StateMachineEditor::DetectNewTransitions()
                     GLOG("Creating transition from %s to %s", fromState.c_str(), toState.c_str());
                     resource->AddTransition(fromState, toState, "Trigger", 200);
                     // availableTriggers.push_back("Trigger");
+
                 }
             }
         }
