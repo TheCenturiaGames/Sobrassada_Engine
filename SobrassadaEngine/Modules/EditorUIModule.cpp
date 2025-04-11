@@ -43,6 +43,7 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"Spot Light",           COMPONENT_SPOT_LIGHT          },
         {"Directional Light",    COMPONENT_DIRECTIONAL_LIGHT   },
         {"Character Controller", COMPONENT_CHARACTER_CONTROLLER},
+        {"Animation",            COMPONENT_ANIMATION           },
         {"Transform 2D",         COMPONENT_TRANSFORM_2D        },
         {"UI Canvas",            COMPONENT_CANVAS              },
         {"UI Label",             COMPONENT_LABEL               },
@@ -330,7 +331,7 @@ void EditorUIModule::MainMenu()
         {
             if (ImGui::MenuItem("Mockup Base Engine Editor", "")) OpenEditor(CreateEditor(EditorType::BASE));
 
-            if (ImGui::MenuItem("Node Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::NODE));
+            if (ImGui::MenuItem("Node Editor", "")) OpenEditor(CreateEditor(EditorType::NODE));
 
             if (ImGui::MenuItem("State Machine Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::ANIMATION));
             if (ImGui::MenuItem("Texture Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::TEXTURE));

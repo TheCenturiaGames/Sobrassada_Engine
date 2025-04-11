@@ -41,10 +41,13 @@ class Model
     void SetRootNodesIdx(const std::vector<int>& rootNodes) { this->rootNodesIdx = rootNodes; }
     void SetNodes(const std::vector<NodeData>& nodes) { this->nodes = nodes; }
     void SetSkins(const std::vector<Skin>& skins) { this->skins = skins; }
-
+    void SetAnimationUID(UID animationUID) { animUID = animationUID; }
+    void SetAllAnimationUIDs(std::vector<UID> animUids) { allAnimUIDs = animUids; }
   private:
     UID uid;
     std::vector<int> rootNodesIdx;
     std::vector<NodeData> nodes;
     std::vector<Skin> skins;
+    UID animUID = INVALID_UID;
+    std::vector<UID> allAnimUIDs;
 };

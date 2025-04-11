@@ -286,6 +286,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="FileSystem\Importers\AnimationImporter.cpp" />
+    <ClCompile Include="FileSystem\Meta\MetaAnimation.cpp" />
     <ClCompile Include="FileSystem\Importers\FontImporter.cpp" />
     <ClCompile Include="FileSystem\Meta\MetaFont.cpp" />
     <ClCompile Include="Scene\Components\Standalone\Physics\CapsuleColliderComponent.cpp" />
@@ -302,6 +304,9 @@
     <ClCompile Include="FileSystem\Batching\GeometryBatch.cpp" />
     <ClCompile Include="Libs\ImNodeFlow-1.2.2\src\ImNodeFlow.cpp" />
     <ClCompile Include="FileSystem\StateMachineManager.cpp" />
+    <ClCompile Include="ResourceManagement\Resources\ResourceAnimation.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\AnimationComponent.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\AnimController.cpp" />
     <ClCompile Include="Modules\PhysicsModule.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceNavmesh.cpp" />
     <ClCompile Include="Modules\GameUIModule.cpp" />
@@ -482,6 +487,9 @@
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_bezier_math.h" />
     <ClInclude Include="Libs\ImNodeFlow-1.2.2\src\imgui_extra_math.h" />
     <ClInclude Include="FileSystem\StateMachineManager.h" />
+    <ClInclude Include="ResourceManagement\Resources\ResourceAnimation.h" />
+    <ClInclude Include="Scene\Components\Standalone\AnimationComponent.h" />
+    <ClInclude Include="Scene\Components\Standalone\AnimController.h" />
     <ClInclude Include="Modules\GameUIModule.h" />
     <ClInclude Include="ResourceManagement\Resources\ResourceFont.h" />
     <ClInclude Include="Scene\Components\Standalone\UI\CanvasComponent.h" />
@@ -510,12 +518,14 @@
     <ClInclude Include="FileSystem\Meta\MetaMaterial.h" />
     <ClInclude Include="FileSystem\Meta\MetaMesh.h" />
     <ClInclude Include="FileSystem\Meta\MetaTexture.h" />
+     <ClInclude Include="FileSystem\Meta\MetaAnimation.h" />
     <ClInclude Include="Modules\CameraModule.h" />
     <ClInclude Include="Modules\EditorUIModule.h" />
     <ClInclude Include="Modules\ProjectModule.h" />
     <ClInclude Include="Modules\ResourcesModule.h" />
     <ClInclude Include="Modules\SceneModule.h" />
     <ClInclude Include="FileSystem\Importers\ModelImporter.h" />
+    <ClInclude Include="FileSystem\Importers\AnimationImporter.h" />
     <ClInclude Include="UI\EngineEditors\Nodes\StateNode.h" />
     <ClInclude Include="Scene\Components\Standalone\UI\Transform2DComponent.h" />
     <ClInclude Include="Utils\Delegate.h" />
