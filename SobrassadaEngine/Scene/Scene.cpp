@@ -654,7 +654,7 @@ void Scene::AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
         GameObject* selectedGameObject       = GetGameObjectByUID(gameObject);
         GameObject* selectedGameObjectParent = GetGameObjectByUID(gameObjectParent);
 
-        selectedGameObjectParent->RemoveGameObject(gameObject);
+        //selectedGameObjectParent->RemoveGameObject(gameObject);
 
         multiSelectParent->AddGameObject(gameObject);
 
