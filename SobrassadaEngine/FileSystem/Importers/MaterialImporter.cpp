@@ -14,7 +14,7 @@
 
 UID MaterialImporter::ImportMaterial(
     const tinygltf::Model& model, int materialIndex, const char* sourceFilePath, const std::string& targetFilePath,
-    UID sourceUID
+    UID sourceUID, UID defaultTextureUID
 )
 {
     // If it has no materials exit
@@ -182,7 +182,7 @@ UID MaterialImporter::ImportMaterial(
         std::string tmpNameString = std::to_string(tmpName);
 
         std::string assetPath     = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
-        MetaMaterial meta(finalMaterialUID, assetPath, tmpNameString, useOcclusion);
+        MetaMaterial meta(finalMaterialUID, assetPath, tmpNameString, useOcclusion, defaultTextureUID);
         meta.Save(materialName, assetPath);
     }
     else finalMaterialUID = sourceUID;
@@ -233,10 +233,14 @@ ResourceMaterial* MaterialImporter::LoadMaterial(UID materialUID)
 
     char* cursor               = buffer;
 
+    rapidjson::Document doc;
+    rapidjson::Value importOptions;
+    App->GetLibraryModule()->GetImportOptions(materialUID, doc, importOptions);
+
     // Create Mesh
     Material mat               = *reinterpret_cast<Material*>(cursor);
 
-    ResourceMaterial* material = new ResourceMaterial(materialUID, name);
+    ResourceMaterial* material = new ResourceMaterial(materialUID, name, importOptions);
 
     material->LoadMaterialData(mat);
 

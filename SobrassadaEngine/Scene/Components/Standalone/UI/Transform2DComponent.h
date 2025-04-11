@@ -2,6 +2,7 @@
 
 #include "Component.h"
 #include "Math/float2.h"
+#include "Math/float4.h"
 
 class CanvasComponent;
 
@@ -20,21 +21,46 @@ class Transform2DComponent : public Component
     void Render(float deltaTime) override;
     void RenderEditorInspector() override;
 
-    void UpdateParentTransform();
+    void UpdateParent3DTransform();
     void OnTransform3DUpdated(const float4x4& transform3D);
 
+    float2 GetRenderingPosition() const;
     float2 GetGlobalPosition() const;
-
+    void AddChildTransform(Transform2DComponent* newChild) { childTransforms.push_back(newChild); }
+    void RemoveChild(Transform2DComponent* child);
     CanvasComponent* GetParentCanvas() const { return parentCanvas; }
 
   private:
     void GetCanvas();
+    bool IsRootTransform2D() const;
+
+    float GetAnchorXPos(const float anchor) const;
+    float GetAnchorYPos(const float anchor) const;
+
+    void OnAnchorsUpdated();
+    void OnSizeChanged();
+    void UpdateHorizontalMargins();
+    void UpdateVerticalMargins();
+
+    void OnLeftMarginChanged();
+    void OnRightMarginChanged();
+    void OnTopMarginChanged();
+    void OnBottomMarginChanged();
 
   public:
     float2 position;
     float2 size;
     float2 pivot;
+    float2 anchorsX;
+    float2 anchorsY;
 
   private:
     CanvasComponent* parentCanvas;
+    Transform2DComponent* parentTransform;
+    std::vector<Transform2DComponent*> childTransforms;
+
+    bool transform2DUpdated;
+    float2 previousPosition;
+    float4 previousMargins;
+    float4 margins;
 };
