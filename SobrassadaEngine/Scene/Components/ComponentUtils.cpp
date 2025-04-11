@@ -15,7 +15,7 @@
 #include "Standalone/UI/CanvasComponent.h"
 #include "Standalone/UI/Transform2DComponent.h"
 #include "Standalone/UI/UILabelComponent.h"
-
+#include "Standalone/AIAgentComponent.h"
 #include <cstdint>
 
 Component* ComponentUtils::CreateEmptyComponent(const ComponentType type, const UID uid, GameObject* parent)
