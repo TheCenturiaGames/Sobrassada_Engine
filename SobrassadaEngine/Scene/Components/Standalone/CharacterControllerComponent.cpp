@@ -249,6 +249,13 @@ void CharacterControllerComponent::Move(const float3& direction, float deltaTime
         }
     }
 
+    globalTr.SetTranslatePart(finalPos);
+
+    float4x4 finalLocal = parent->GetParentGlobalTransform().Transposed() * globalTr;
+
+    parent->SetLocalTransform(finalLocal);
+    parent->UpdateTransformForGOBranch();
+
 }
 
 void CharacterControllerComponent::Rotate(float rotationDirection, float deltaTime)
