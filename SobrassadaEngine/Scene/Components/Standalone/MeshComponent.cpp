@@ -140,14 +140,17 @@ void MeshComponent::RenderEditorInspector()
         ImGui::SameLine();
         if (ImGui::Button("Select material"))
         {
-            ImGui::OpenPopup(CONSTANT_TEXTURE_SELECT_DIALOG_ID);
+            ImGui::OpenPopup(CONSTANT_MATERIAL_SELECT_DIALOG_ID);
         }
 
-        if (ImGui::IsPopupOpen(CONSTANT_TEXTURE_SELECT_DIALOG_ID))
+        if (ImGui::IsPopupOpen(CONSTANT_MATERIAL_SELECT_DIALOG_ID))
         {
-            AddMaterial(App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
-                CONSTANT_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetMaterialMap(), INVALID_UID
-            ));
+
+            const UID chosenMatUID = App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
+                CONSTANT_MATERIAL_SELECT_DIALOG_ID, App->GetLibraryModule()->GetMaterialMap(), INVALID_UID
+            );
+
+            if (chosenMatUID != INVALID_UID) AddMaterial(chosenMatUID);
         }
 
         if (currentMaterial != nullptr) currentMaterial->OnEditorUpdate();
@@ -191,7 +194,7 @@ void MeshComponent::AddMesh(UID resource, bool updateParent)
         if (currentMaterial == nullptr)
         {
             const UID defaultMat = newMesh->GetDefaultMaterialUID();
-            if (defaultMat != INVALID_UID) AddMaterial(defaultMat);
+            AddMaterial(defaultMat);
         }
 
         localComponentAABB = AABB(currentMesh->GetAABB());
@@ -203,7 +206,13 @@ void MeshComponent::AddMesh(UID resource, bool updateParent)
 
 void MeshComponent::AddMaterial(UID resource)
 {
-    if (resource == INVALID_UID) return;
+    bool isMaterialInvalid = false;
+
+    if (resource == INVALID_UID || App->GetResourcesModule()->RequestResource(resource) == nullptr)
+    {
+        resource = DEFAULT_MATERIAL_UID;
+        isMaterialInvalid = true;
+    }
 
     if (currentMaterial != nullptr && currentMaterial->GetUID() == resource) return;
 
@@ -214,6 +223,8 @@ void MeshComponent::AddMaterial(UID resource)
         App->GetResourcesModule()->ReleaseResource(currentMaterial);
         currentMaterial     = newMaterial;
         currentMaterialName = currentMaterial->GetName();
+
+        if (isMaterialInvalid) newMaterial->ChangeFallBackTexture();
 
         if (batch) BatchEditorMode();
     }

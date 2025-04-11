@@ -61,6 +61,7 @@ class ResourceNavMesh : public Resource
     dtNavMesh* GetDetourNavMesh() const { return navMesh; }
     dtNavMeshQuery* GetDetourNavMeshQuery() const { return navQuery; }
 
+
   private:
     rcConfig* config                         = nullptr;
     rcHeightfield* heightfield               = nullptr;

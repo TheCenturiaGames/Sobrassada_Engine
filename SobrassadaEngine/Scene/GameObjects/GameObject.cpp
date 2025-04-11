@@ -7,13 +7,14 @@
 #include "PrefabManager.h"
 #include "SceneModule.h"
 #include "Standalone/MeshComponent.h"
+#include "Standalone/AnimationComponent.h"
 #include "Standalone/UI/Transform2DComponent.h"
 
 #include "imgui.h"
 #include <set>
 #include <stack>
 
-GameObject::GameObject(std::string name) : name(name)
+GameObject::GameObject(const std::string& name) : name(name)
 {
     uid       = GenerateUID();
     parentUID = INVALID_UID;
@@ -25,10 +26,19 @@ GameObject::GameObject(std::string name) : name(name)
     globalAABB = AABB(globalOBB);
 }
 
-GameObject::GameObject(UID parentUID, std::string name) : parentUID(parentUID), name(name)
+GameObject::GameObject(UID parentUID, const std::string& name) : parentUID(parentUID), name(name)
 {
     uid       = GenerateUID();
 
+    localAABB = AABB();
+    localAABB.SetNegativeInfinity();
+
+    globalOBB  = OBB(localAABB);
+    globalAABB = AABB(globalOBB);
+}
+
+GameObject::GameObject(UID parentUID, const std::string& name, UID uid) : parentUID(parentUID), name(name), uid(uid)
+{
     localAABB = AABB();
     localAABB.SetNegativeInfinity();
 
@@ -385,6 +395,15 @@ MeshComponent* GameObject::GetMeshComponent() const
     if (components.find(COMPONENT_MESH) != components.end())
     {
         return dynamic_cast<MeshComponent*>(components.at(COMPONENT_MESH));
+    }
+    return nullptr;
+}
+
+AnimationComponent* GameObject::GetAnimationComponent() const
+{
+    if (components.find(COMPONENT_ANIMATION) != components.end())
+    {
+        return dynamic_cast<AnimationComponent*>(components.at(COMPONENT_ANIMATION));
     }
     return nullptr;
 }

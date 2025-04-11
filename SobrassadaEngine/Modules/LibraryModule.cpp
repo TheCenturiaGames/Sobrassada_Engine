@@ -9,6 +9,7 @@
 #include "SceneImporter.h"
 #include "SceneModule.h"
 #include "TextureImporter.h"
+#include "FileSystem/StateMachineManager.h"
 
 #include "rapidjson/writer.h"
 #include "rapidjson/document.h"
@@ -171,12 +172,27 @@ bool LibraryModule::LoadLibraryMaps(const std::string& projectPath)
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 else SceneImporter::CopyModel(assetPath, projectPath, assetName, assetUID);
                 break;
+            case 15:
+                AddAnimation(assetUID, assetName);
+                AddName(assetName, assetUID);
+                libraryPath = projectPath + ANIMATIONS_PATH+ std::to_string(assetUID) + ANIMATION_EXTENSION;
+                if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
+                else SceneImporter::CopyModel(assetPath, projectPath, assetName, assetUID);
+                break;
+
             case 16:
                 AddPrefab(assetUID, assetName);
                 AddName(assetName, assetUID);
                 libraryPath = projectPath + PREFABS_LIB_PATH + std::to_string(assetUID) + PREFAB_EXTENSION;
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 else SceneImporter::CopyPrefab(assetPath, projectPath, assetName, assetUID);
+                break;
+            case 17:
+                AddStateMachine(assetUID, assetName);
+                AddName(assetName, assetUID);
+                libraryPath = projectPath + STATEMACHINES_LIB_PATH + std::to_string(assetUID) + STATEMACHINE_EXTENSION;
+                if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
+                else StateMachineManager::CopyMachine(assetPath, projectPath, assetName, assetUID);
                 break;
             case 19:
                 AddFont(assetUID, assetName);
@@ -246,11 +262,14 @@ UID LibraryModule::AssignFiletypeUID(UID originalUID, FileType fileType)
     case FileType::Model:
         prefix = 14;
         break;
+    case FileType::Animation:
+        prefix = 15;
+        break;
     case FileType::Prefab:
         prefix = 16;
         break;
     case FileType::StateMachine:
-        prefix = 18;
+        prefix = 17;
         break;
     case FileType::Font:
         prefix = 19;
@@ -284,6 +303,11 @@ void LibraryModule::AddMaterial(UID materialUID, const std::string& matName)
 void LibraryModule::AddModel(UID modelUID, const std::string& modelName)
 {
     modelMap[modelName] = modelUID;
+}
+
+void LibraryModule::AddAnimation(UID animUID, const std::string& animName)
+{
+    animMap[animName] = animUID;
 }
 
 void LibraryModule::AddPrefab(UID prefabUID, const std::string& prefabName)
@@ -350,7 +374,20 @@ UID LibraryModule::GetModelUID(const std::string& modelPath) const
     return INVALID_UID;
 }
 
-UID LibraryModule::GetStateMachinelUID(const std::string& stMachPath) const
+
+UID LibraryModule::GetAnimUID(const std::string& animPath) const
+{
+    auto it = animMap.find(animPath);
+    if (it != animMap.end())
+    {
+        return it->second;
+    }
+
+    return INVALID_UID;
+}
+
+UID LibraryModule::GetStateMachineUID(const std::string& stMachPath) const
+
 {
     auto it = stateMachineMap.find(stMachPath);
     if (it != stateMachineMap.end())
