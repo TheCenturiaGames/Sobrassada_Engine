@@ -87,7 +87,14 @@ void UILabelComponent::Init()
 
     parentCanvas = transform2D->GetParentCanvas();
 
-    if (parentCanvas == nullptr) GLOG("[WARNING] Label has no parent canvas, it won't be rendered");
+    if (parentCanvas == nullptr)
+    {
+        // Try to get it again, just in case the transform was created later
+        transform2D->GetCanvas();
+        parentCanvas = transform2D->GetParentCanvas();
+
+        if (parentCanvas == nullptr) GLOG("[WARNING] Label has no parent canvas, it won't be rendered");
+    }
 
     fontData->Clean();
     fontData->Init(fontType->GetFilepath().c_str(), fontSize);
