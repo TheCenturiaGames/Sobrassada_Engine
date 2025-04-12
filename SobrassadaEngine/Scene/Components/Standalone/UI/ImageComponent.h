@@ -20,11 +20,11 @@ class ImageComponent : public Component
     void Render(float deltaTime) override {};
     void RenderEditorInspector() override;
 
-    void RenderUI(const float4x4& view, const float4x4 proj) const;
+    void RenderUI(const float4x4& view, const float4x4& proj) const;
 
   private:
     void InitBuffers();
-    void ClearBuffers();
+    void ClearBuffers() const;
     void ChangeTexture(const UID textureUID);
 
   private:

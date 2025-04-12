@@ -128,7 +128,7 @@ void ImageComponent::RenderEditorInspector()
     ImGui::ColorEdit3("Image color", color.ptr());
 }
 
-void ImageComponent::RenderUI(const float4x4& view, const float4x4 proj) const
+void ImageComponent::RenderUI(const float4x4& view, const float4x4& proj) const
 {
     if (parentCanvas == nullptr) return;
 
@@ -209,7 +209,7 @@ void ImageComponent::InitBuffers()
     glMakeTextureHandleResidentARB(bindlessUID);
 }
 
-void ImageComponent::ClearBuffers()
+void ImageComponent::ClearBuffers() const
 {
     if (vbo != 0) glDeleteBuffers(1, &vbo);
     if (vao != 0) glDeleteVertexArrays(1, &vao);
