@@ -8,6 +8,7 @@
 #include "LibraryModule.h"
 #include "Resource.h"
 #include "ResourceAnimation.h"
+#include "ResourceModel.h"
 #include "ResourceStateMachine.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
@@ -316,6 +317,7 @@ void AnimationComponent::Update(float deltaTime)
     animController->Update(deltaTime);
     
     //Blending en la animacion individual
+    auto nodes = static_cast<ResourceModel*>(App->GetResourcesModule()->RequestResource())->GetModelData().GetNodes();
     for (auto& channel : currentAnimResource->channels)
     {
         const std::string& boneName = channel.first;
@@ -324,8 +326,16 @@ void AnimationComponent::Update(float deltaTime)
         if (boneIt != boneMapping.end())
         {
             GameObject* bone = boneIt->second;
-            float3 position  = bone->GetLocalTransform().TranslatePart();
-            Quat rotation    = Quat(bone->GetLocalTransform().RotatePart());
+            float4x4 boneTransform = bone->GetLocalTransform();
+            for (const auto & node : nodes)
+            {
+                if (node.name.compare(boneName) == 0)
+                {
+                    boneTransform = node.transform;
+                }
+            }
+            float3 position  = boneTransform.TranslatePart();
+            Quat rotation    = Quat(boneTransform.RotatePart());
 
             animController->GetTransform(boneName, position, rotation);
 
