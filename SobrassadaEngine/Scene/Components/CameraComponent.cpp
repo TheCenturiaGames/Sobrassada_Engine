@@ -51,7 +51,7 @@ CameraComponent::CameraComponent(UID uid, GameObject* parent) : Component(uid, p
         App->GetSceneModule()->GetScene()->SetMainCamera(this);
     }
 
-    previewFramebuffer = new Framebuffer(previewWidth, previewHeight, false);
+    previewFramebuffer = new Framebuffer(previewWidth, previewHeight, true);
 }
 
 CameraComponent::CameraComponent(const rapidjson::Value& initialState, GameObject* parent)
@@ -135,7 +135,7 @@ CameraComponent::CameraComponent(const rapidjson::Value& initialState, GameObjec
     glBufferData(GL_UNIFORM_BUFFER, sizeof(CameraMatrices), nullptr, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-    previewFramebuffer = new Framebuffer(previewWidth, previewHeight, false);
+    previewFramebuffer = new Framebuffer(previewWidth, previewHeight, true);
 }
 
 CameraComponent::~CameraComponent()
@@ -336,6 +336,7 @@ void CameraComponent::RenderCameraPreview(float deltaTime)
     }
 
     static bool open = true;
+    //TODO: tener en cuenta el tamaño del framebuffer grande para la posicion y la escala del framebuffer pequeño
     ImVec2 pos(
         static_cast<float>(App->GetOpenGLModule()->GetFramebuffer()->GetTextureWidth() - 45),
         static_cast<float>(App->GetOpenGLModule()->GetFramebuffer()->GetTextureHeight() - 105)
