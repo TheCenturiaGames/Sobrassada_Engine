@@ -5,12 +5,21 @@
 
 #include "rapidjson/document.h"
 #include <cstdint>
+#include <list>
 #include <unordered_map>
 
 class ResourceAnimation;
 class ResourceStateMachine;
 class AnimController;
 class GameObject;
+
+struct ActiveAnimInfo
+{
+    ResourceAnimation* animation = nullptr;
+    float currentTime            = 0.0f;
+    float fadeTime               = 0.0f;
+    bool looping                 = false;
+};
 
 class AnimationComponent : public Component
 {
@@ -40,22 +49,29 @@ class AnimationComponent : public Component
     void SetAnimationResource(UID animResource);
     bool IsPlaying();
 
+    void BlendAnimations();
+    void PlayAnimation(ResourceAnimation* anim, bool loop);
+
   private:
     void SetBoneMapping();
 
   private:
-    UID resource                           = INVALID_UID;
-    std::string currentAnimName            = "None";
-    AnimationComponent* currentAnimComp    = nullptr;
+    UID resource                               = INVALID_UID;
+    std::string currentAnimName                = "None";
+    AnimationComponent* currentAnimComp        = nullptr;
 
-    AnimController* animController         = nullptr;
-    ResourceAnimation* currentAnimResource = nullptr;
+    AnimController* animController             = nullptr;
+    ResourceAnimation* currentAnimResource     = nullptr;
     ResourceStateMachine* resourceStateMachine = nullptr;
 
-    GameObject* owner                      = nullptr;
+    std::list<ActiveAnimInfo> activeAnimations;
+
+    GameObject* owner = nullptr;
     std::unordered_map<std::string, GameObject*> boneMapping;
 
     float animationDuration = 0.0f;
     bool playing            = false;
     float currentTime       = 0.0f;
+    float transitionTime    = 250;
+    float fadeTime          = 0;
 };

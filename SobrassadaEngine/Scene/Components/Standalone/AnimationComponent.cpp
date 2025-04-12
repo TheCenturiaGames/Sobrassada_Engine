@@ -13,8 +13,8 @@
 #include "SceneModule.h"
 #include "StateMachineEditor.h"
 
-#include "imgui.h"
 #include "Math/Quat.h"
+#include "imgui.h"
 
 AnimationComponent::AnimationComponent(const UID uid, GameObject* parent)
     : Component(uid, parent, "Animation", COMPONENT_ANIMATION)
@@ -51,10 +51,10 @@ void AnimationComponent::OnPlay()
     StateMachineEditor* stateMachine = nullptr;
     if (animController != nullptr && resource != 0)
     {
-        //animController->Play(resource, true);
+        // animController->Play(resource, true);
         stateMachine = App->GetEditorUIModule()->GetStateMachine();
         stateMachine->SetAnimComponent(this);
-        resourceStateMachine = stateMachine->GetLoadedStateMachine();
+        resourceStateMachine     = stateMachine->GetLoadedStateMachine();
         const State* activeState = resourceStateMachine->GetActiveState();
         for (const auto& state : resourceStateMachine->states)
         {
@@ -64,7 +64,14 @@ void AnimationComponent::OnPlay()
                 {
                     if (clip.clipName.GetString() == activeState->clipName.GetString())
                     {
-                        animController->Play(clip.animationResourceUID, true);
+                         ResourceAnimation* anim = static_cast<ResourceAnimation*>(
+                            App->GetResourcesModule()->RequestResource(clip.animationResourceUID)
+                        );
+                        PlayAnimation(anim, true);
+                        if (activeAnimations.size() < 2)
+                        {
+                            animController->Play(clip.animationResourceUID, true);
+                        }
                     }
                 }
             }
@@ -312,25 +319,50 @@ void AnimationComponent::Update(float deltaTime)
 
     animController->Update(deltaTime);
 
-    for (auto& channel : currentAnimResource->channels)
+    for (auto it = activeAnimations.begin(); it != activeAnimations.end();)
     {
-        const std::string& boneName = channel.first;
+        it->fadeTime    += deltaTime;
+        it->currentTime += deltaTime;
 
-        auto boneIt                 = boneMapping.find(boneName);
-
-        if (boneIt != boneMapping.end())
+        // Verifica si la animación ha completado su transición
+        if (it->fadeTime >= transitionTime)
         {
-            GameObject* bone = boneIt->second;
-            float3 position  = bone->GetLocalTransform().TranslatePart();
-            Quat rotation    = Quat(bone->GetLocalTransform().RotatePart());
-
-            animController->GetTransform(boneName, position, rotation);
-
-            float4x4 transformMatrix = float4x4::FromTRS(position, rotation, float3(1.0, 1.0, 1.0));
-            bone->SetLocalTransform(transformMatrix);
-            bone->OnTransformUpdated();
+            it = activeAnimations.erase(it); // Elimina la animación si la transición terminó
+        }
+        else
+        {
+            ++it;
         }
     }
+
+    if (activeAnimations.size() >= 2)
+    {
+        BlendAnimations(); 
+    }
+    else
+    {
+        //Blending en la animacion individual
+        for (auto& channel : currentAnimResource->channels)
+        {
+            const std::string& boneName = channel.first;
+
+            auto boneIt                 = boneMapping.find(boneName);
+            if (boneIt != boneMapping.end())
+            {
+                GameObject* bone = boneIt->second;
+                float3 position  = bone->GetLocalTransform().TranslatePart();
+                Quat rotation    = Quat(bone->GetLocalTransform().RotatePart());
+
+                animController->GetTransform(boneName, position, rotation);
+
+                float4x4 transformMatrix = float4x4::FromTRS(position, rotation, float3(1.0f, 1.0f, 1.0f));
+                bone->SetLocalTransform(transformMatrix);
+                bone->OnTransformUpdated();
+            }
+        }
+    }
+
+    
 }
 
 void AnimationComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
@@ -402,4 +434,66 @@ void AnimationComponent::RenderEditorInspector()
 bool AnimationComponent::IsPlaying()
 {
     return animController->IsPlaying();
+}
+
+void AnimationComponent::BlendAnimations()
+{
+    for (auto& channel : currentAnimResource->channels)
+    {
+        const std::string& boneName = channel.first;
+
+        auto boneIt                 = boneMapping.find(boneName);
+
+        if (boneIt != boneMapping.end())
+        {
+            GameObject* bone  = boneIt->second;
+            float3 position   = bone->GetLocalTransform().TranslatePart();
+            Quat rotation     = Quat(bone->GetLocalTransform().RotatePart());
+
+            float totalWeight = 0.0f;
+            float3 blendedPos = float3::zero;
+            Quat blendedRot   = Quat::identity;
+
+            for (const auto& animInfo : activeAnimations)
+            {
+                float weight = animInfo.fadeTime / transitionTime;
+
+                animController->SetAnimationResource(animInfo.animation);
+                animController->SetTime(animInfo.currentTime);
+
+                float3 animPos;
+                Quat animRot;
+                animController->GetTransform(boneName, animPos, animRot);
+
+                blendedPos += animPos * weight;
+
+                if (totalWeight > 0.0f)
+                {
+                    blendedRot = Quat::Slerp(blendedRot, animRot, weight / totalWeight);
+                }
+                else
+                {
+                    blendedRot = animRot;
+                }
+            }
+
+            float4x4 transformMatrix = float4x4::FromTRS(blendedPos, blendedRot, float3(1.0f, 1.0f, 1.0f));
+            bone->SetLocalTransform(transformMatrix);
+            bone->OnTransformUpdated();
+        }
+    }
+
+}
+
+void AnimationComponent::PlayAnimation(ResourceAnimation* anim, bool loop)
+{
+    if (!anim) return;
+
+    ActiveAnimInfo newAnim;
+    newAnim.animation   = anim;
+    newAnim.currentTime = 0.0f;
+    newAnim.fadeTime    = 0.0f;
+    newAnim.looping     = loop;
+
+    activeAnimations.push_back(newAnim);
 }

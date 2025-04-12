@@ -217,43 +217,50 @@ void StateMachineEditor::ShowInspector()
 
     if (ImGui::InputText("State Name", nameBuffer, sizeof(nameBuffer)))
     {
-        std::string newName(nameBuffer);
-
-        if (newName != stateName)
+        if (ImGui::IsItemDeactivatedAfterEdit())
         {
-            const State* existingState = resource->GetState(newName);
-            if (existingState != nullptr)
-            {
-                ImGui::TextColored(
-                    ImVec4(1, 0.5f, 0.5f, 1.0f), "A state with the name \"%s\" already exists!", nameBuffer
-                );
-            }
-            else
-            {
-                resource->EditState(stateName, newName, selectedNode->GetClipName());
-                selectedNode->SetStateName(newName);
-                auto transitionsCopy = resource->transitions;
+            std::string newName(nameBuffer);
 
-                for (const auto& transition : transitionsCopy)
+            if (newName != stateName)
+            {
+                const State* existingState = resource->GetState(newName);
+                if (existingState != nullptr)
                 {
-                    if (transition.fromState.GetString() == stateName)
+                    ImGui::TextColored(
+                        ImVec4(1, 0.5f, 0.5f, 1.0f), "A state with the name \"%s\" already exists!", nameBuffer
+                    );
+                }
+                else
+                {
+                    auto transitionsCopy = resource->transitions;
+
+                    for (const auto& transition : transitionsCopy)
                     {
-                        std::string prevTrigger    = transition.triggerName.GetString();
-                        uint32_t prevInterpolation = transition.interpolationTime;
-                        resource->RemoveTransition(transition.fromState.GetString(), transition.toState.GetString());
-                        resource->AddTransition(
-                            newName, transition.toState.GetString(), prevTrigger, prevInterpolation
-                        );
+                        if (transition.fromState.GetString() == stateName)
+                        {
+                            std::string prevTrigger    = transition.triggerName.GetString();
+                            uint32_t prevInterpolation = transition.interpolationTime;
+                            resource->RemoveTransition(
+                                transition.fromState.GetString(), transition.toState.GetString()
+                            );
+                            resource->AddTransition(
+                                newName, transition.toState.GetString(), prevTrigger, prevInterpolation
+                            );
+                        }
+                        if (transition.toState.GetString() == stateName)
+                        {
+                            std::string prevTrigger    = transition.triggerName.GetString();
+                            uint32_t prevInterpolation = transition.interpolationTime;
+                            resource->RemoveTransition(
+                                transition.toState.GetString(), transition.fromState.GetString()
+                            );
+                            resource->AddTransition(
+                                transition.fromState.GetString(), newName, prevTrigger, prevInterpolation
+                            );
+                        }
                     }
-                    else if (transition.toState.GetString() == stateName)
-                    {
-                        std::string prevTrigger    = transition.triggerName.GetString();
-                        uint32_t prevInterpolation = transition.interpolationTime;
-                        resource->RemoveTransition(transition.toState.GetString(), transition.fromState.GetString());
-                        resource->AddTransition(
-                            transition.fromState.GetString(), newName, prevTrigger, prevInterpolation
-                        );
-                    }
+                    resource->EditState(stateName, newName, selectedNode->GetClipName());
+                    selectedNode->SetStateName(newName);
                 }
             }
         }
