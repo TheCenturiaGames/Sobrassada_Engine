@@ -124,7 +124,7 @@ void CharacterControllerComponent::Update(float deltaTime)
                     filter.setIncludeFlags(SAMPLE_POLYFLAGS_WALK);
                     filter.setExcludeFlags(0);
 
-                    float extents[3] = {0.5f, 1.0f, 0.5f};
+                    float extents[3] = {2.0f, 4.0f, 2.0f};
                     float nearestPoint[3];
                     dtPolyRef targetRef = 0;
 
@@ -199,121 +199,69 @@ void CharacterControllerComponent::RenderEditorInspector()
 
 void CharacterControllerComponent::Move(const float3& direction, float deltaTime)
 {
-    //if (!navMeshQuery || currentPolyRef == 0)
-    //{
-    //    /*float finalSpeed           = std::min(speed, maxLinearSpeed);
+    if (!navMeshQuery || currentPolyRef == 0) return;
 
-    //    float3 movementOffset      = direction * finalSpeed * deltaTime;
-
-    //    float4x4 localTr           = parent->GetLocalTransform();
-    //    float4x4 translationMatrix = float4x4::FromTRS(movementOffset, float4x4::identity.RotatePart(), float3::one);
-
-    //    localTr                    = localTr * translationMatrix;
-
-    //    parent->SetLocalTransform(localTr);
-    //    parent->UpdateTransformForGOBranch();*/
-    //    return;
-    //}
-
-    verticalSpeed     += (gravity * deltaTime);
-
-    float maxFallSpeed  = -20.0f;
-    if (verticalSpeed < maxFallSpeed)
-    {
-        verticalSpeed = maxFallSpeed;
-    }
+    verticalSpeed     += gravity * deltaTime;
+    verticalSpeed      = std::max(verticalSpeed, -20.0f); // Clamp fall speed
 
     float4x4 globalTr  = parent->GetGlobalTransform();
     float3 currentPos  = globalTr.TranslatePart();
 
-    float finalSpeed = std::min(speed, maxLinearSpeed);
+    float finalSpeed   = std::min(speed, maxLinearSpeed);
     float3 offsetXZ    = direction * finalSpeed * deltaTime;
-    
-    float3 desiredPos;
-    desiredPos.x = currentPos.x + offsetXZ.x;
-    desiredPos.z = currentPos.z + offsetXZ.z;
-    desiredPos.y = currentPos.y + (verticalSpeed * deltaTime);
 
-    if (navMeshQuery && currentPolyRef != 0)
+    float3 desiredPos  = currentPos;
+    desiredPos.x      += offsetXZ.x;
+    desiredPos.z      += offsetXZ.z;
+    desiredPos.y      += verticalSpeed * deltaTime;
+
+    dtQueryFilter filter;
+    filter.setIncludeFlags(SAMPLE_POLYFLAGS_WALK);
+    filter.setExcludeFlags(0);
+
+    float halfExt[3] = {0.5f, 1.0f, 0.5f};
+    float nearest[3] = {};
+    dtPolyRef newRef = 0;
+
+    dtStatus status  = navMeshQuery->findNearestPoly(desiredPos.ptr(), halfExt, &filter, &newRef, nearest);
+
+    if (!dtStatusSucceed(status) || newRef == 0) return;
+
+    float closest[3] = {};
+    bool posOverPoly = false;
+
+    status           = navMeshQuery->closestPointOnPoly(newRef, desiredPos.ptr(), closest, &posOverPoly);
+
+    if (!dtStatusSucceed(status) || !posOverPoly)
     {
-        //Horizontal raycast to limit xz
+        return;
+    }
+
+    currentPolyRef = newRef;
+
+    desiredPos.x   = nearest[0];
+    desiredPos.z   = nearest[2];
+
+    {
+        float polyHeight = 0.0f;
+        if (dtStatusSucceed(navMeshQuery->getPolyHeight(newRef, nearest, &polyHeight)))
         {
-            dtRaycastHit hit;
-            memset(&hit, 0, sizeof(hit));
+            float distToFloor         = polyHeight - desiredPos.y;
+            const float maxStepHeight = 0.5f;
 
-            dtQueryFilter filter;
-            filter.setIncludeFlags(SAMPLE_POLYFLAGS_WALK);
-            filter.setExcludeFlags(0);
-
-            float start[3]  = {currentPos.x, currentPos.y, currentPos.z};
-            float end[3]    = {desiredPos.x, desiredPos.y, desiredPos.z};
-
-            dtStatus status = navMeshQuery->raycast(currentPolyRef, start, end, &filter, 0, &hit, 0);
-
-            if (dtStatusSucceed(status))
+            if (fabs(distToFloor) <= maxStepHeight)
             {
-                if (hit.t < 1.0f)
-                {
-                    float3 fullVec;
-                    fullVec.x      = end[0] - start[0];
-                    fullVec.y      = end[1] - start[1];
-                    fullVec.z      = end[2] - start[2];
-
-                    float3 clampXZ = float3(start[0], start[1], start[2]) + fullVec * hit.t;
-                    desiredPos.x   = clampXZ.x;
-                    desiredPos.z   = clampXZ.z;
-                }
-            }
-
-            float halfExt[3] = {0.5f, 1.0f, 0.5f};
-            float nearest[3];
-
-            dtPolyRef newRef = 0;
-            dtStatus st2     = navMeshQuery->findNearestPoly(desiredPos.ptr(), halfExt, &filter, &newRef, nearest);
-
-            if (dtStatusSucceed(st2) && newRef != 0)
-            {
-                currentPolyRef = newRef;
-            }
-        }
-
-        //adjust height is navmesh is higher
-        {
-            dtQueryFilter filter;
-            filter.setIncludeFlags(SAMPLE_POLYFLAGS_WALK);
-            filter.setExcludeFlags(0);
-
-            float halfExt[3] = {2.0f, 4.0f, 2.0f};
-            float nearest[3];
-            dtPolyRef polyRef = 0;
-
-            dtStatus st3      = navMeshQuery->findNearestPoly(desiredPos.ptr(), halfExt, &filter, &polyRef, nearest);
-
-            if (dtStatusSucceed(st3) && polyRef)
-            {
-                float polyHeight = 0.0f;
-                dtStatus stH     = navMeshQuery->getPolyHeight(polyRef, nearest, &polyHeight);
-                if (dtStatusSucceed(stH))
-                {
-                    float distToFloor = polyHeight - desiredPos.y;
-
-                    if (distToFloor >= 0.0f)
-                    {
-                        desiredPos.y  = polyHeight;
-                        verticalSpeed = 0.0f;
-                    }
-                }
+                desiredPos.y  = polyHeight;
+                verticalSpeed = 0.0f;
             }
         }
     }
 
     globalTr.SetTranslatePart(desiredPos);
-
     float4x4 finalLocal = parent->GetParentGlobalTransform().Transposed() * globalTr;
 
     parent->SetLocalTransform(finalLocal);
     parent->UpdateTransformForGOBranch();
-
 }
 
 void CharacterControllerComponent::Rotate(float rotationDirection, float deltaTime)
