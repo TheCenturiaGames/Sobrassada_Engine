@@ -16,6 +16,11 @@
 
 AudioModule::AudioModule()
 {
+    g_envMAP[0] = 0; // hardcode environment 0 to id=0
+    for (int i = 1; i < 255; i++)
+    {
+        g_envMAP[i] = -1;
+    }
 }
 
 AudioModule::~AudioModule()
@@ -99,26 +104,22 @@ bool AudioModule::Init()
     AkBankID bankID;
     AKRESULT retValue;
     retValue = AK::SoundEngine::LoadBank(BANKNAME_INIT, bankID);
-    //if (retValue != AK_Success)
-    //{
-    //    GLOG("Cannot initialize Init.bnk soundbank");
-    //    return false;
-    //}
+    if (retValue != AK_Success)
+    {
+        GLOG("Cannot initialize Init.bnk soundbank");
+        //return false;
+    }
     retValue = AK::SoundEngine::LoadBank(BANKNAME_MAIN, bankID);
-    //if (retValue != AK_Success)
-    //{
-    //    GLOG("Cannot initialize main.bnk soundbank");
-    //    return false;
-    //}
-    // initialize volume parameters to sensible default values
+    if (retValue != AK_Success)
+    {
+        GLOG("Cannot initialize main.bnk soundbank");
+        //return false;
+    }
+
+    //  initialize volume parameters to sensible default values
     musicvol(255);
     soundvol(255);
     voicevol(255);
-    g_envMAP[0] = 0; // hardcode environment 0 to id=0
-    for (int i = 1; i < 255; i++)
-    {
-        g_envMAP[i] = -1;
-    }
 
     return true;
 }
