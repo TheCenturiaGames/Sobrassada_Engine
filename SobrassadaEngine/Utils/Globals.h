@@ -129,7 +129,8 @@ constexpr int MAX_COMPONENT_NAME_LENGTH               = 64;
 constexpr const char* LIGHTS_VERTEX_SHADER_PATH       = "./EngineDefaults/Shader/Vertex/VertexShader.glsl";
 constexpr const char* SKYBOX_VERTEX_SHADER_PATH       = "./EngineDefaults/Shader/Vertex/SkyboxVertex.glsl";
 constexpr const char* UIWIDGET_VERTEX_SHADER_PATH     = "./EngineDefaults/Shader/Vertex/UIWidgetVertex.glsl";
-
+constexpr const char* QUAD_VERTEX_SHADER_PATH         = "./EngineDefaults/Shader/Vertex/QuadVertexShader.glsl";
+ 
 constexpr const char* UNLIT_FRAGMENT_SHADER_PATH      = "./EngineDefaults/Shader/Fragment/UnlitFragmentShader.glsl";
 constexpr const char* SKYBOX_FRAGMENT_SHADER_PATH     = "./EngineDefaults/Shader/Fragment/SkyboxFragment.glsl";
 constexpr const char* SPECULAR_FRAGMENT_SHADER_PATH   = "./EngineDefaults/Shader/Fragment/BRDFPhongFragmentShader.glsl";

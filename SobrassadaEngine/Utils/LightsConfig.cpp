@@ -356,7 +356,7 @@ unsigned int LightsConfig::EnvironmentBRDFGeneration(int width, int height)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     unsigned int environmentProgram =
-        App->GetShaderModule()->CreateShaderProgram(LIGHTS_VERTEX_SHADER_PATH, ENVIRONMENTBRDF_FRAGMENT_SHADER_PATH);
+        App->GetShaderModule()->CreateShaderProgram(QUAD_VERTEX_SHADER_PATH, ENVIRONMENTBRDF_FRAGMENT_SHADER_PATH);
     glUseProgram(environmentProgram);
 
     unsigned int frameBuffer;
@@ -366,7 +366,8 @@ unsigned int LightsConfig::EnvironmentBRDFGeneration(int width, int height)
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, environmentBRDFTexture, 0);
 
     glViewport(0, 0, width, height);
-    App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 36);
+    glBindVertexArray(skyboxVao);
+    App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 3);
 
     glDeleteProgram(environmentProgram);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
