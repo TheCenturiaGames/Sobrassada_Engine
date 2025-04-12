@@ -132,6 +132,11 @@ void ResourcesModule::CreateNavMesh()
             }
         }
     }
+    if (meshes.size() == 0)
+    {
+        GLOG("[WARNING] Trying to create NavMesh but no meshes are found in the scene");
+        return;
+    }
     tmpNavmesh->BuildNavMesh(meshes, minPos, maxPos);
     App->GetPathfinderModule()->InitQuerySystem();
 
