@@ -5,8 +5,13 @@
 #include "CameraModule.h"
 #include "InputModule.h"
 #include "Scene/Components/Standalone/UI/CanvasComponent.h"
+#include "SceneModule.h"
+#include "Scene.h"
+#include "OpenGLModule.h"
+#include "Framebuffer.h"
 
 #include "glew.h"
+#include "MathGeoLib.h"
 
 GameUIModule::GameUIModule()
 {
@@ -25,11 +30,37 @@ update_status GameUIModule::Update(float deltaTime)
 {
     InputModule* inputs = App->GetInputModule();
 
-    for (CanvasComponent* canvas : canvases)
+    if (canvases.size() > 0)
     {
-        canvas->UpdateChildren();
-        canvas->UpdateMousePosition(inputs->GetMousePosition());
+        float2 mousePosition;
+
+#ifndef GAME
+        // Must get the framebuffer size of the window and multiply by the Lerped values
+        auto& windowPosition = App->GetSceneModule()->GetScene()->GetWindowPosition();
+        auto& windowSize     = App->GetSceneModule()->GetScene()->GetWindowSize();
+        auto& mousePos       = App->GetSceneModule()->GetScene()->GetMousePosition();
+
+        float windowMinX     = std::get<0>(windowPosition);
+        float windowMaxX     = std::get<0>(windowPosition) + std::get<0>(windowSize);
+
+        float windowMinY     = std::get<1>(windowPosition);
+        float windowMaxY     = std::get<1>(windowPosition) + std::get<1>(windowSize);
+
+        float percentageX    = (std::get<0>(mousePos) - windowMinX) / (windowMaxX - windowMinX);
+        float percentageY    = (std::get<1>(mousePos) - windowMinY) / (windowMaxY - windowMinY);
+
+        mousePosition.x      = Lerp(-1, 1, percentageX);
+        mousePosition.y      = Lerp(1, -1, percentageY);
+#else
+        mousePos = inputs->GetMousePosition();
+#endif
+        for (CanvasComponent* canvas : canvases)
+        {
+            canvas->UpdateChildren();
+            canvas->UpdateMousePosition(mousePosition);
+        }
     }
+   
 
     if (inputs->GetMouseButtonDown(1) == KEY_DOWN)
     {

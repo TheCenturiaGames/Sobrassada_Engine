@@ -9,7 +9,8 @@
 #include "imgui.h"
 
 ButtonComponent::ButtonComponent(UID uid, GameObject* parent)
-    : defaultColor(float3(1.0f, 1.0f, 1.0f)), hoverColor(float3(0.0f, 1.0f, 1.0f)), Component(uid, parent, "Button", COMPONENT_BUTTON)
+    : defaultColor(float3(1.0f, 1.0f, 1.0f)), hoverColor(float3(0.0f, 1.0f, 1.0f)),
+      Component(uid, parent, "Button", COMPONENT_BUTTON)
 {
 }
 
@@ -89,24 +90,7 @@ void ButtonComponent::RenderEditorInspector()
 
 void ButtonComponent::UpdateMousePosition(const float2& mousePos)
 {
-}
-
-void ButtonComponent::OnClick()
-{
-    if (!isHovered) return;
-}
-
-bool ButtonComponent::IsWithinBounds(const float2& pos)
-{
-    if (transform2D == nullptr) return false;
-
-    const float2 screenPos = float2(
-        transform2D->GetGlobalPosition().x + (parentCanvas->GetWidth() / 2),
-        transform2D->GetGlobalPosition().y + (parentCanvas->GetHeight() / 2)
-    );
-
-    if (pos.x < screenPos.x + transform2D->size.x && pos.x > screenPos.x - transform2D->size.x &&
-        pos.y < screenPos.y + transform2D->size.y && pos.y > screenPos.y - transform2D->size.x)
+    if (IsWithinBounds(mousePos))
     {
         GLOG("Mouse is in");
 
@@ -125,4 +109,25 @@ bool ButtonComponent::IsWithinBounds(const float2& pos)
             image->SetColor(defaultColor);
         }
     }
+}
+
+void ButtonComponent::OnClick()
+{
+    if (!isHovered) return;
+}
+
+bool ButtonComponent::IsWithinBounds(const float2& pos)
+{
+    if (transform2D == nullptr) return false;
+
+    const float2 screenPos = float2(
+        transform2D->GetGlobalPosition().x + (parentCanvas->GetWidth() / 2),
+        transform2D->GetGlobalPosition().y + (parentCanvas->GetHeight() / 2)
+    );
+
+    if (pos.x < screenPos.x + transform2D->size.x && pos.x > screenPos.x - transform2D->size.x &&
+        pos.y < screenPos.y + transform2D->size.y && pos.y > screenPos.y - transform2D->size.x)
+        return true;
+
+    else return false;
 }

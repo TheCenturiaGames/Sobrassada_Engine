@@ -209,6 +209,7 @@ void CanvasComponent::UpdateChildren()
 
 void CanvasComponent::UpdateMousePosition(const float2& mousePos)
 {
+    GLOG("Mouse pos: %f, %f", mousePos.x, mousePos.y);
     for (const GameObject* child : sortedChildren)
     {
         // Update all buttons
