@@ -318,6 +318,7 @@ void CameraComponent::RenderCameraPreview(float deltaTime)
         previewHeight = static_cast<int>(previewWidth / camera.AspectRatio());
 
         previewFramebuffer->Resize(previewWidth, previewHeight);
+        previewFramebuffer->CheckResize();
 
         glViewport(0, 0, previewWidth, previewHeight);
 
@@ -335,8 +336,16 @@ void CameraComponent::RenderCameraPreview(float deltaTime)
     }
 
     static bool open = true;
-    ImGui::SetNextWindowSize(ImVec2((float)previewWidth + 16, (float)previewHeight + 48));
-    if (ImGui::Begin("Camera Preview", &open, ImGuiWindowFlags_NoResize))
+    ImVec2 pos(
+        static_cast<float>(App->GetOpenGLModule()->GetFramebuffer()->GetTextureWidth() - 45),
+        static_cast<float>(App->GetOpenGLModule()->GetFramebuffer()->GetTextureHeight() - 105)
+    );
+    ImGui::SetNextWindowSize(ImVec2((float)previewWidth + 16, (float)previewHeight + 16));
+    ImGui::SetNextWindowPos(pos);
+    if (ImGui::Begin(
+            "Camera Preview", &open,
+            ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse
+        ))
     {
         ImTextureID texID = (ImTextureID)(intptr_t)previewFramebuffer->GetTextureID();
         ImVec2 size((float)previewWidth, (float)previewHeight);
