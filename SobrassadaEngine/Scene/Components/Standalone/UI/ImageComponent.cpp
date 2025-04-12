@@ -12,7 +12,8 @@
 #include "ImGui.h"
 #include "glew.h"
 
-ImageComponent::ImageComponent(UID uid, GameObject* parent) : color(float3(1.0f, 1.0f, 1.0f)), Component(uid, parent, "Image", COMPONENT_IMAGE)
+ImageComponent::ImageComponent(UID uid, GameObject* parent)
+    : color(float3(1.0f, 1.0f, 1.0f)), Component(uid, parent, "Image", COMPONENT_IMAGE)
 {
     // Set default texture
     texture = static_cast<ResourceTexture*>(
@@ -25,9 +26,9 @@ ImageComponent::ImageComponent(const rapidjson::Value& initialState, GameObject*
 {
     if (initialState.HasMember("TextureUID"))
     {
-        texture =
-            static_cast<ResourceTexture*>(App->GetResourcesModule()->RequestResource(initialState["TextureUID"].GetUint64()
-            ));
+        texture = static_cast<ResourceTexture*>(
+            App->GetResourcesModule()->RequestResource(initialState["TextureUID"].GetUint64())
+        );
     }
     else
     {

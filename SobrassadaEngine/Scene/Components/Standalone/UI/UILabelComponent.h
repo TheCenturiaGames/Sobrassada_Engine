@@ -36,8 +36,6 @@ class UILabelComponent : public Component
 
     void RemoveTransform() { transform2D = nullptr; }
 
-    void RemoveTransform() { transform2D = nullptr; }
-
   private:
     void InitBuffers();
     void OnFontChange();
