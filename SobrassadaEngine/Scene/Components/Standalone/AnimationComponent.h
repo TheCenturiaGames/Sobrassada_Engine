@@ -4,8 +4,6 @@
 #include "Globals.h"
 
 #include "rapidjson/document.h"
-#include <cstdint>
-#include <list>
 #include <unordered_map>
 
 class ResourceAnimation;
@@ -15,10 +13,8 @@ class GameObject;
 
 struct ActiveAnimInfo
 {
-    ResourceAnimation* animation = nullptr;
     float currentTime            = 0.0f;
     float fadeTime               = 0.0f;
-    bool looping                 = false;
 };
 
 class AnimationComponent : public Component
@@ -34,7 +30,7 @@ class AnimationComponent : public Component
     void RenderEditorInspector() override;
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
 
-    void OnPlay();
+    void OnPlay(bool isTransition);
     void OnStop();
     void OnPause();
     void OnResume();
@@ -43,14 +39,11 @@ class AnimationComponent : public Component
 
     UID GetAnimationResource() const { GLOG("Resource AnimUID  is: %d", resource) return resource; }
     ResourceAnimation* GetCurrentAnimation() const { return currentAnimResource; }
-    AnimController* GetAnimationController() { return animController; }
+    AnimController* GetAnimationController() const { return animController; }
     std::unordered_map<std::string, GameObject*> GetBoneMapping() const { return boneMapping; }
 
     void SetAnimationResource(UID animResource);
-    bool IsPlaying();
-
-    void BlendAnimations();
-    void PlayAnimation(ResourceAnimation* anim, bool loop);
+    bool IsPlaying() const;
 
   private:
     void SetBoneMapping();
@@ -64,14 +57,10 @@ class AnimationComponent : public Component
     ResourceAnimation* currentAnimResource     = nullptr;
     ResourceStateMachine* resourceStateMachine = nullptr;
 
-    std::list<ActiveAnimInfo> activeAnimations;
-
-    GameObject* owner = nullptr;
     std::unordered_map<std::string, GameObject*> boneMapping;
 
     float animationDuration = 0.0f;
     bool playing            = false;
     float currentTime       = 0.0f;
-    float transitionTime    = 250;
     float fadeTime          = 0;
 };

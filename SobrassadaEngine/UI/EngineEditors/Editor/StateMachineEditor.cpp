@@ -819,7 +819,7 @@ void StateMachineEditor::ShowTriggersPopup()
                                     if (resource->states[i].name.GetString() == transition.toState.GetString())
                                     {
                                         resource->SetActiveState(static_cast<int>(i));
-                                        animComponent->OnPlay();
+                                        animComponent->OnPlay(true);
                                         break;
                                     }
                                 }

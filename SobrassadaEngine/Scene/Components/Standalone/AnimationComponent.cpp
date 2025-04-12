@@ -46,7 +46,7 @@ AnimationComponent::~AnimationComponent()
     App->GetResourcesModule()->ReleaseResource(currentAnimResource);
 }
 
-void AnimationComponent::OnPlay()
+void AnimationComponent::OnPlay(bool isTransition)
 {
     StateMachineEditor* stateMachine = nullptr;
     if (animController != nullptr && resource != 0)
@@ -64,14 +64,10 @@ void AnimationComponent::OnPlay()
                 {
                     if (clip.clipName.GetString() == activeState->clipName.GetString())
                     {
-                         ResourceAnimation* anim = static_cast<ResourceAnimation*>(
-                            App->GetResourcesModule()->RequestResource(clip.animationResourceUID)
-                        );
-                        PlayAnimation(anim, true);
-                        if (activeAnimations.size() < 2)
-                        {
+                        if (isTransition)
+                            animController->SetTargetAnimationResource(clip.animationResourceUID);
+                        else
                             animController->Play(clip.animationResourceUID, true);
-                        }
                     }
                 }
             }
@@ -185,7 +181,7 @@ void AnimationComponent::OnInspector()
                     if (ImGui::Button("Play"))
                     {
                         playing = true;
-                        currentAnimComp->OnPlay();
+                        currentAnimComp->OnPlay(false);
                     }
 
                     ImGui::SameLine();
@@ -318,51 +314,26 @@ void AnimationComponent::Update(float deltaTime)
     }
 
     animController->Update(deltaTime);
-
-    for (auto it = activeAnimations.begin(); it != activeAnimations.end();)
-    {
-        it->fadeTime    += deltaTime;
-        it->currentTime += deltaTime;
-
-        // Verifica si la animación ha completado su transición
-        if (it->fadeTime >= transitionTime)
-        {
-            it = activeAnimations.erase(it); // Elimina la animación si la transición terminó
-        }
-        else
-        {
-            ++it;
-        }
-    }
-
-    if (activeAnimations.size() >= 2)
-    {
-        BlendAnimations(); 
-    }
-    else
-    {
-        //Blending en la animacion individual
-        for (auto& channel : currentAnimResource->channels)
-        {
-            const std::string& boneName = channel.first;
-
-            auto boneIt                 = boneMapping.find(boneName);
-            if (boneIt != boneMapping.end())
-            {
-                GameObject* bone = boneIt->second;
-                float3 position  = bone->GetLocalTransform().TranslatePart();
-                Quat rotation    = Quat(bone->GetLocalTransform().RotatePart());
-
-                animController->GetTransform(boneName, position, rotation);
-
-                float4x4 transformMatrix = float4x4::FromTRS(position, rotation, float3(1.0f, 1.0f, 1.0f));
-                bone->SetLocalTransform(transformMatrix);
-                bone->OnTransformUpdated();
-            }
-        }
-    }
-
     
+    //Blending en la animacion individual
+    for (auto& channel : currentAnimResource->channels)
+    {
+        const std::string& boneName = channel.first;
+
+        auto boneIt                 = boneMapping.find(boneName);
+        if (boneIt != boneMapping.end())
+        {
+            GameObject* bone = boneIt->second;
+            float3 position  = bone->GetLocalTransform().TranslatePart();
+            Quat rotation    = Quat(bone->GetLocalTransform().RotatePart());
+
+            animController->GetTransform(boneName, position, rotation);
+
+            float4x4 transformMatrix = float4x4::FromTRS(position, rotation, float3(1.0f, 1.0f, 1.0f));
+            bone->SetLocalTransform(transformMatrix);
+            bone->OnTransformUpdated();
+        }
+    }
 }
 
 void AnimationComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
@@ -431,69 +402,7 @@ void AnimationComponent::RenderEditorInspector()
     }
 }
 
-bool AnimationComponent::IsPlaying()
+bool AnimationComponent::IsPlaying() const
 {
     return animController->IsPlaying();
-}
-
-void AnimationComponent::BlendAnimations()
-{
-    for (auto& channel : currentAnimResource->channels)
-    {
-        const std::string& boneName = channel.first;
-
-        auto boneIt                 = boneMapping.find(boneName);
-
-        if (boneIt != boneMapping.end())
-        {
-            GameObject* bone  = boneIt->second;
-            float3 position   = bone->GetLocalTransform().TranslatePart();
-            Quat rotation     = Quat(bone->GetLocalTransform().RotatePart());
-
-            float totalWeight = 0.0f;
-            float3 blendedPos = float3::zero;
-            Quat blendedRot   = Quat::identity;
-
-            for (const auto& animInfo : activeAnimations)
-            {
-                float weight = animInfo.fadeTime / transitionTime;
-
-                animController->SetAnimationResource(animInfo.animation);
-                animController->SetTime(animInfo.currentTime);
-
-                float3 animPos;
-                Quat animRot;
-                animController->GetTransform(boneName, animPos, animRot);
-
-                blendedPos += animPos * weight;
-
-                if (totalWeight > 0.0f)
-                {
-                    blendedRot = Quat::Slerp(blendedRot, animRot, weight / totalWeight);
-                }
-                else
-                {
-                    blendedRot = animRot;
-                }
-            }
-
-            float4x4 transformMatrix = float4x4::FromTRS(blendedPos, blendedRot, float3(1.0f, 1.0f, 1.0f));
-            bone->SetLocalTransform(transformMatrix);
-            bone->OnTransformUpdated();
-        }
-    }
-
-}
-
-void AnimationComponent::PlayAnimation(ResourceAnimation* anim, bool loop)
-{
-    if (!anim) return;
-
-    ActiveAnimInfo newAnim;
-    newAnim.animation   = anim;
-    newAnim.currentTime = 0.0f;
-    newAnim.fadeTime    = 0.0f;
-    newAnim.looping     = loop;
-
-    activeAnimations.push_back(newAnim);
 }

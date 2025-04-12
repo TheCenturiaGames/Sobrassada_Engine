@@ -6,21 +6,22 @@
 #include "ResourcesModule.h"
 
 AnimController::AnimController()
-    : resource(0), currentTime(0), loop(false), playAnimation(false), playbackSpeed(1.0f), animation(nullptr)
+    : resource(0), currentTime(0), loop(false), playAnimation(false), playbackSpeed(1.0f), currentAnimation(nullptr)
 {
 }
 
 AnimController::~AnimController()
 {
-    App->GetResourcesModule()->ReleaseResource(animation);
+    App->GetResourcesModule()->ReleaseResource(currentAnimation);
 }
 
 void AnimController::Play(UID newResource, bool shouldLoop)
 {
+    Stop();
     resource      = newResource;
     currentTime   = 0;
     loop          = shouldLoop;
-    animation     = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
+    currentAnimation     = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
     playAnimation = true;
 }
 
@@ -29,10 +30,10 @@ void AnimController::Stop()
     playAnimation = false;
     currentTime   = 0.0f;
 
-    if (animation != nullptr)
+    if (currentAnimation != nullptr)
     {
-        App->GetResourcesModule()->ReleaseResource(animation);
-        animation = nullptr;
+        App->GetResourcesModule()->ReleaseResource(currentAnimation);
+        currentAnimation = nullptr;
     }
 }
 
@@ -56,9 +57,9 @@ update_status AnimController::Update(float deltaTime)
     float previousTime  = currentTime;
     currentTime        += deltaTime;
 
-    if (animation == nullptr) return UPDATE_CONTINUE;
+    if (currentAnimation == nullptr) return UPDATE_CONTINUE;
 
-    const float duration = animation->GetDuration();
+    const float duration = currentAnimation->GetDuration();
     // GLOG("Animation time update: %f -> %f (duration: %f)", previousTime, currentTime, duration);
 
     if (currentTime > duration)
@@ -74,12 +75,22 @@ update_status AnimController::Update(float deltaTime)
             // GLOG("Animation reached end: time = %f", currentTime);
             playAnimation = false;
 
-            if (animation != nullptr)
+            if (currentAnimation != nullptr)
             {
-                App->GetResourcesModule()->ReleaseResource(animation);
-                animation = nullptr;
+                App->GetResourcesModule()->ReleaseResource(currentAnimation);
+                currentAnimation = nullptr;
             }
         }
+    }
+
+    animInfo.fadeTime += deltaTime;
+    animInfo.currentTime += deltaTime;
+
+    if (animInfo.fadeTime >= transitionTime)
+    {
+        App->GetResourcesModule()->ReleaseResource(currentAnimation);
+        currentAnimation = targetAnimation;
+        targetAnimation = nullptr;
     }
 
     return UPDATE_CONTINUE;
@@ -87,14 +98,48 @@ update_status AnimController::Update(float deltaTime)
 
 void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat& rot)
 {
-    if (!playAnimation || resource == 0 || animation == nullptr) return;
+    if (!playAnimation || resource == 0 || currentAnimation == nullptr) return;
 
-    Channel* animChannel = animation->GetChannel(nodeName);
-    if (animChannel == nullptr) return;
+    if (targetAnimation == nullptr)
+    {
+        Channel* animChannel = currentAnimation->GetChannel(nodeName);
+        if (animChannel == nullptr) return;
 
-    float animDuration = animation->GetDuration();
-    // GLOG("Animation duration: %f, Current time: %f", animDuration, currentTime);
+        GetChannelPosition(animChannel, pos);
+        GetChannelRotation(animChannel, rot);
+    } else
+    {
+        float weight = transitionTime != 0 ? animInfo.fadeTime / transitionTime : 1;
+        
+        Channel* animChannel = currentAnimation->GetChannel(nodeName);
+        Channel* targetAnimChannel = targetAnimation->GetChannel(nodeName);
+        if (animChannel == nullptr || targetAnimChannel == nullptr) return;
 
+        float3 animPos = float3(pos);
+        Quat animQuat = Quat(rot);
+        GetChannelPosition(animChannel, animPos);
+        GetChannelRotation(animChannel, animQuat);
+        
+        float3 targetAnimPos = float3(pos);
+        Quat targetAnimQuat = Quat(rot);
+        GetChannelPosition(animChannel, targetAnimPos);
+        GetChannelRotation(animChannel, targetAnimQuat);
+
+        pos = animPos.Lerp(targetAnimPos, weight);
+        rot = Quat::Slerp(animQuat, targetAnimQuat, weight);
+    }
+    
+    // TODO Implement piecewise interpolation to support lerp between more than two animations
+    // TODO https://stackoverflow.com/questions/66522629/given-3-or-more-numbers-or-vectors-how-do-i-interpolate-between-them-based-on-a
+}
+
+void AnimController::SetTargetAnimationResource(UID uid)
+{
+    targetAnimation = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(uid));
+}
+
+void AnimController::GetChannelPosition(const Channel* animChannel, float3& pos) const
+{
     if (animChannel->numPositions > 0)
     {
         if (animChannel->numPositions == 1)
@@ -140,7 +185,10 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
             }
         }
     }
+}
 
+void AnimController::GetChannelRotation(Channel* animChannel, Quat& rot)
+{
     if (animChannel->numRotations > 0)
     {
         if (animChannel->numRotations == 1)
