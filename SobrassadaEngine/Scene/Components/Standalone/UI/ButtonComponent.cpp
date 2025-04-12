@@ -1,23 +1,21 @@
 #include "ButtonComponent.h"
 
-#include "GameObject.h"
 #include "Application.h"
 #include "CanvasComponent.h"
+#include "GameObject.h"
 #include "ImageComponent.h"
 #include "Transform2DComponent.h"
 
 #include "imgui.h"
 
 ButtonComponent::ButtonComponent(UID uid, GameObject* parent)
-    : Component(uid, parent, "Button", COMPONENT_BUTTON)
+    : defaultColor(float3(1.0f, 1.0f, 1.0f)), hoverColor(float3(0.0f, 1.0f, 1.0f)), Component(uid, parent, "Button", COMPONENT_BUTTON)
 {
-
 }
 
 ButtonComponent::ButtonComponent(const rapidjson::Value& initialState, GameObject* parent)
     : Component(initialState, parent)
 {
-   
 }
 
 ButtonComponent::~ButtonComponent()
@@ -85,4 +83,46 @@ void ButtonComponent::RenderEditorInspector()
     Component::RenderEditorInspector();
 
     ImGui::SeparatorText("Button");
+
+    ImGui::ColorEdit3("Hover color", hoverColor.ptr());
+}
+
+void ButtonComponent::UpdateMousePosition(const float2& mousePos)
+{
+}
+
+void ButtonComponent::OnClick()
+{
+    if (!isHovered) return;
+}
+
+bool ButtonComponent::IsWithinBounds(const float2& pos)
+{
+    if (transform2D == nullptr) return false;
+
+    const float2 screenPos = float2(
+        transform2D->GetGlobalPosition().x + (parentCanvas->GetWidth() / 2),
+        transform2D->GetGlobalPosition().y + (parentCanvas->GetHeight() / 2)
+    );
+
+    if (pos.x < screenPos.x + transform2D->size.x && pos.x > screenPos.x - transform2D->size.x &&
+        pos.y < screenPos.y + transform2D->size.y && pos.y > screenPos.y - transform2D->size.x)
+    {
+        GLOG("Mouse is in");
+
+        if (!isHovered)
+        {
+            // On mouse enter
+            image->SetColor(hoverColor);
+            isHovered = true;
+        }
+    }
+    else
+    {
+        if (isHovered)
+        {
+            // On mouse exit
+            image->SetColor(defaultColor);
+        }
+    }
 }

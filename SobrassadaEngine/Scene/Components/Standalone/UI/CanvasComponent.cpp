@@ -11,6 +11,7 @@
 #include "Transform2DComponent.h"
 #include "UILabelComponent.h"
 #include "WindowModule.h"
+#include "ButtonComponent.h"
 
 #include "glew.h"
 #include "imgui.h"
@@ -135,18 +136,16 @@ void CanvasComponent::RenderUI()
                                                       (float)App->GetWindowModule()->GetHeight()
                                                   );
 
-    for (UID child : sortedChildren)
+    for (const GameObject* child : sortedChildren)
     {
-        const GameObject* currentObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(child);
-
         // Only render UI components
-        Component* uiWidget             = currentObject->GetComponentByType(COMPONENT_TRANSFORM_2D);
+        Component* uiWidget = child->GetComponentByType(COMPONENT_TRANSFORM_2D);
         if (uiWidget) static_cast<const Transform2DComponent*>(uiWidget)->RenderWidgets();
 
-        uiWidget = currentObject->GetComponentByType(COMPONENT_LABEL);
+        uiWidget = child->GetComponentByType(COMPONENT_LABEL);
         if (uiWidget) static_cast<const UILabelComponent*>(uiWidget)->RenderUI(view, proj);
 
-        uiWidget = currentObject->GetComponentByType(COMPONENT_IMAGE);
+        uiWidget = child->GetComponentByType(COMPONENT_IMAGE);
         if (uiWidget) static_cast<const ImageComponent*>(uiWidget)->RenderUI(view, proj);
     }
 }
@@ -184,7 +183,7 @@ void CanvasComponent::OnWindowResize(const unsigned int width, const unsigned in
 
 void CanvasComponent::UpdateChildren()
 {
-    // Update the children list every frame in case they are reorderen in hierarchy. In the future to be more optimal 
+    // Update the children list every frame in case they are reorderen in hierarchy. In the future to be more optimal
     // maybe this can be called only when a gameObject is dragged around the hierarchy
     sortedChildren.clear();
 
@@ -198,8 +197,7 @@ void CanvasComponent::UpdateChildren()
     while (!children.empty())
     {
         const GameObject* currentObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(children.front());
-
-        sortedChildren.push_back(currentObject->GetUID());
+        sortedChildren.push_back(currentObject);
         children.pop();
 
         for (const UID child : currentObject->GetChildren())
@@ -211,10 +209,14 @@ void CanvasComponent::UpdateChildren()
 
 void CanvasComponent::UpdateMousePosition(const float2& mousePos)
 {
-
+    for (const GameObject* child : sortedChildren)
+    {
+        // Update all buttons
+        Component* button = child->GetComponentByType(COMPONENT_BUTTON);
+        if (button) static_cast<ButtonComponent*>(button)->UpdateMousePosition(mousePos);
+    }
 }
 
 void CanvasComponent::OnMouseButtonPressed()
 {
-
 }

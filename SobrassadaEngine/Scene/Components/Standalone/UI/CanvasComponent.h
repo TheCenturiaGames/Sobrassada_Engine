@@ -10,6 +10,7 @@ namespace Math
 }
 
 class Transform2DComponent;
+class GameObject;
 
 class CanvasComponent : public Component
 {
@@ -43,5 +44,5 @@ class CanvasComponent : public Component
     bool isInWorldSpaceEditor = false;
     bool isInWorldSpaceGame   = true;
 
-    std::vector<UID> sortedChildren;
+    std::vector<const GameObject*> sortedChildren;
 };

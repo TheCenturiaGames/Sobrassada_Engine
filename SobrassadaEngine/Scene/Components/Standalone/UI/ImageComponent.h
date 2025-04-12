@@ -22,6 +22,8 @@ class ImageComponent : public Component
 
     void RenderUI(const float4x4& view, const float4x4& proj) const;
 
+    void SetColor(const float3& newColor) { color = newColor; }
+
   private:
     void InitBuffers();
     void ClearBuffers() const;

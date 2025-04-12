@@ -31,7 +31,7 @@ update_status GameUIModule::Update(float deltaTime)
         canvas->UpdateMousePosition(inputs->GetMousePosition());
     }
 
-    if (inputs->GetMouseButtonDown(1))
+    if (inputs->GetMouseButtonDown(1) == KEY_DOWN)
     {
         GLOG("Mouse button pressed");
         for (CanvasComponent* canvas : canvases)

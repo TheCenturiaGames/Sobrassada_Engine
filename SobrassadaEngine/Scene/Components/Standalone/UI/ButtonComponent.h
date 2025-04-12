@@ -2,6 +2,8 @@
 
 #include "Component.h"
 
+#include "Math/float3.h"
+
 class Transform2DComponent;
 class CanvasComponent;
 class ImageComponent;
@@ -20,10 +22,19 @@ class ButtonComponent : public Component
     void Render(float deltaTime) override {};
     void RenderEditorInspector() override;
 
+    void UpdateMousePosition(const float2& mousePos);
+    void OnClick();
+
   private:
+    bool IsWithinBounds(const float2& pos);
 
   private:
     Transform2DComponent* transform2D;
     CanvasComponent* parentCanvas;
     ImageComponent* image;
+
+    float3 defaultColor;
+    float3 hoverColor;
+
+    bool isHovered;
 };
