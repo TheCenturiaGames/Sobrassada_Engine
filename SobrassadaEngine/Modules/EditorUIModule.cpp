@@ -10,11 +10,14 @@
 #include "LibraryModule.h"
 #include "OpenGLModule.h"
 #include "PhysicsModule.h"
+#include "PathfinderModule.h"
 #include "ProjectModule.h"
 #include "ResourceNavmesh.h"
+
 #include "ResourcesModule.h"
 #include "SceneImporter.h"
 #include "ResourceStateMachine.h"
+
 #include "SceneModule.h"
 #include "ScriptModule.h"
 #include "TextureEditor.h"
@@ -43,6 +46,7 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"Spot Light",           COMPONENT_SPOT_LIGHT          },
         {"Directional Light",    COMPONENT_DIRECTIONAL_LIGHT   },
         {"Character Controller", COMPONENT_CHARACTER_CONTROLLER},
+        {"Animation",            COMPONENT_ANIMATION           },
         {"Transform 2D",         COMPONENT_TRANSFORM_2D        },
         {"UI Canvas",            COMPONENT_CANVAS              },
         {"UI Label",             COMPONENT_LABEL               },
@@ -51,7 +55,8 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"Sphere Collider",      COMPONENT_SPHERE_COLLIDER     },
         {"Capsule Collider",     COMPONENT_CAPSULE_COLLIDER    },
         {"Script",               COMPONENT_SCRIPT              },
-        {"UI Image",             COMPONENT_IMAGE               },
+        {"AI Agent",             COMPONENT_AIAGENT             },
+        {"UI Image",             COMPONENT_IMAGE               }
     };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;
@@ -257,6 +262,8 @@ void EditorUIModule::Draw()
 
     if (navmesh) Navmesh(navmesh);
 
+    if (crowdControl) CrowdControl(crowdControl);
+
     if (editorSettingsMenu) EditorSettings(editorSettingsMenu);
 }
 
@@ -322,6 +329,7 @@ void EditorUIModule::MainMenu()
             if (ImGui::MenuItem("Inspector", "", inspectorMenu)) inspectorMenu = !inspectorMenu;
             if (ImGui::MenuItem("Lights Config", "", lightConfig)) lightConfig = !lightConfig;
             if (ImGui::MenuItem("Navmesh", "", navmesh)) navmesh = !navmesh;
+            if (ImGui::MenuItem("Crowd Control", "", crowdControl)) crowdControl = !crowdControl;
             ImGui::EndDisabled();
 
             ImGui::EndMenu();
@@ -331,7 +339,7 @@ void EditorUIModule::MainMenu()
         {
             if (ImGui::MenuItem("Mockup Base Engine Editor", "")) OpenEditor(CreateEditor(EditorType::BASE));
 
-            if (ImGui::MenuItem("Node Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::NODE));
+            if (ImGui::MenuItem("Node Editor", "")) OpenEditor(CreateEditor(EditorType::NODE));
 
             if (ImGui::MenuItem("State Machine Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::ANIMATION));
             if (ImGui::MenuItem("Texture Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::TEXTURE));
@@ -421,6 +429,17 @@ void EditorUIModule::Navmesh(bool& navmesh)
     }
 
     App->GetResourcesModule()->GetNavMesh()->RenderNavmeshEditor();
+
+    ImGui::End();
+}
+
+void EditorUIModule::CrowdControl(bool& crowdControl)
+{
+    if (!crowdControl) return;
+
+    ImGui::Begin("Crowd Control", &crowdControl, ImGuiWindowFlags_None);
+
+    App->GetPathfinderModule()->RenderCrowdEditor();
 
     ImGui::End();
 }

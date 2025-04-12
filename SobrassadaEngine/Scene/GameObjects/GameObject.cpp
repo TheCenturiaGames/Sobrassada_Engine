@@ -7,6 +7,7 @@
 #include "PrefabManager.h"
 #include "SceneModule.h"
 #include "Standalone/MeshComponent.h"
+#include "Standalone/AnimationComponent.h"
 #include "Standalone/UI/Transform2DComponent.h"
 
 #include "imgui.h"
@@ -395,11 +396,24 @@ MeshComponent* GameObject::GetMeshComponent() const
     return nullptr;
 }
 
+AnimationComponent* GameObject::GetAnimationComponent() const
+{
+    if (components.find(COMPONENT_ANIMATION) != components.end())
+    {
+        return dynamic_cast<AnimationComponent*>(components.at(COMPONENT_ANIMATION));
+    }
+    return nullptr;
+}
+
 void GameObject::OnTransformUpdated()
 {
     globalTransform              = GetParentGlobalTransform() * localTransform;
     globalOBB                    = globalTransform * OBB(localAABB);
     globalAABB                   = AABB(globalOBB);
+
+    position                     = globalTransform.TranslatePart();
+    rotation                     = globalTransform.RotatePart().ToEulerXYZ();
+    scale                        = globalTransform.GetScale();
 
     MeshComponent* meshComponent = GetMeshComponent();
     if (meshComponent != nullptr)
@@ -435,7 +449,7 @@ AABB GameObject::GetHierarchyAABB()
     std::set<UID> visitedGameObjects;
     std::stack<UID> toVisitGameObjects;
     UID sceneRootUID = App->GetSceneModule()->GetScene()->GetGameObjectRootUID();
-    // ADD "THIS" GAME OBJECT SO WHEN ASCENDING HERIARCHY WE DON'T REVISIT OUR CHILDREN
+
     visitedGameObjects.insert(uid);
 
     // FIRST UPDATE DOWN THE HERIARCHY
