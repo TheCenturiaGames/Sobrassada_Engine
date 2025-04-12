@@ -312,29 +312,42 @@ void CameraComponent::Update(float deltaTime)
 
 void CameraComponent::RenderCameraPreview(float deltaTime)
 {
-    previewFramebuffer->Bind();
-
-    glViewport(0, 0, previewWidth, previewHeight);
-
     if (!autorendering)
     {
+        previewWidth  = 250;
+        previewHeight = static_cast<int>(previewWidth / camera.AspectRatio());
+
+        previewFramebuffer->Resize(previewWidth, previewHeight);
+
+        glViewport(0, 0, previewWidth, previewHeight);
+
+        previewFramebuffer->Bind();
         autorendering = true;
         App->GetSceneModule()->GetScene()->RenderScene(deltaTime, this);
-        DebugDrawModule* debug = App->GetDebugDrawModule();
-        debug->DrawFrustrum(camera.ProjectionMatrix(), camera.ViewMatrix());
         autorendering = false;
+
+        App->GetOpenGLModule()->GetFramebuffer()->Bind();
+
+        glViewport(
+            0, 0, App->GetOpenGLModule()->GetFramebuffer()->GetTextureWidth(),
+            App->GetOpenGLModule()->GetFramebuffer()->GetTextureHeight()
+        );
     }
 
     static bool open = true;
+    ImGui::SetNextWindowSize(ImVec2((float)previewWidth + 16, (float)previewHeight + 48));
     if (ImGui::Begin("Camera Preview", &open, ImGuiWindowFlags_NoResize))
     {
         ImTextureID texID = (ImTextureID)(intptr_t)previewFramebuffer->GetTextureID();
         ImVec2 size((float)previewWidth, (float)previewHeight);
-        ImGui::Image(texID, size, ImVec2(0, 1), ImVec2(1, 0));
+        ImVec2 uv0 = ImVec2(0, 1);
+        ImVec2 uv1 = ImVec2(
+            (float)previewWidth / previewFramebuffer->GetTextureWidth(),
+            1.0f - ((float)previewHeight / previewFramebuffer->GetTextureHeight())
+        );
+        ImGui::Image(texID, size, uv0, uv1);
     }
     ImGui::End();
-
-    // App->GetOpenGLModule()->GetFramebuffer()->Bind();
 }
 
 void CameraComponent::Render(float deltaTime)
