@@ -24,68 +24,54 @@ the specific language governing permissions and limitations under the License.
   Copyright (c) 2025 Audiokinetic Inc.
 *******************************************************************************/
 
-// AkLock.h
+#ifndef _AKLOCK_H_
+#define _AKLOCK_H_
 
-/// \file 
-/// Platform independent synchronization services for plug-ins.
+#include <AK/SoundEngine/Common/AkTypes.h>
+#include <windows.h>	//For CRITICAL_SECTION
 
-#ifndef _AK_TOOLS_COMMON_AKLOCK_H
-#define _AK_TOOLS_COMMON_AKLOCK_H
-
-#include <AK/AkPlatforms.h>
-
-#if defined(AK_NULL_PLATFORM)
-// null platform can just rely on std::mutex for locking
-#include <mutex>
+//-----------------------------------------------------------------------------
+// CAkLock class
+//-----------------------------------------------------------------------------
 class CAkLock
 {
 public:
-    inline AKRESULT Lock(void)
+    /// Constructor
+	CAkLock() 
     {
-        m_lock.lock();
-        return AK_Success;
+        ::InitializeCriticalSection( &m_csLock );
     }
-    inline AKRESULT Unlock(void)
+
+	/// Destructor
+	~CAkLock()
     {
-        m_lock.unlock();
-        return AK_Success;
+        ::DeleteCriticalSection( &m_csLock );
     }
+
+    /// Lock 
+    inline AKRESULT Lock( void )
+	{
+	    ::EnterCriticalSection( &m_csLock );
+		return AK_Success;
+	}
+
+	/// Unlock
+    inline AKRESULT Unlock( void )
+	{
+	    ::LeaveCriticalSection( &m_csLock );
+		return AK_Success;
+	}
+
+/*  // Returns AK_Success if lock aquired, AK_Fail otherwise.
+	inline AKRESULT Trylock( void )
+    {
+        if ( ::TryEnterCriticalSection( &m_csLock ) )
+            return AK_Success;
+        return AK_Fail;
+    } */
+
 private:
-    std::mutex m_lock;
+    CRITICAL_SECTION  m_csLock; ///< Platform specific lock
 };
 
-#elif defined(AK_WIN) || defined(AK_XBOX)
-#include <AK/Tools/IO/AkLock.h>
-
-#elif defined (AK_APPLE) 
-#include <AK/Tools/POSIX/AkLock.h>
-
-#elif defined (AK_ANDROID)
-#include <AK/Tools/POSIX/AkLock.h>
-
-#elif defined (AK_HARMONY)
-#include <AK/Tools/POSIX/AkLock.h>
-
-#elif defined (AK_PS4)
-#include <AK/Tools/PS4/AkLock.h>
-
-#elif defined (AK_PS5)
-#include <AK/Tools/PS5/AkLock.h>
-
-#elif defined (AK_LINUX)
-#include <AK/Tools/POSIX/AkLock.h>
-
-#elif defined (AK_EMSCRIPTEN)
-#include <AK/Tools/POSIX/AkLock.h>
-
-#elif defined (AK_QNX)
-#include <AK/Tools/POSIX/AkLock.h>
-
-#elif defined (AK_NX)
-#include <AK/Tools/NX/AkLock.h>
-
-#else
-#error AkLock.h: Undefined platform
-#endif
-
-#endif // _AK_TOOLS_COMMON_AKLOCK_H
+#endif // _AKLOCK_H_

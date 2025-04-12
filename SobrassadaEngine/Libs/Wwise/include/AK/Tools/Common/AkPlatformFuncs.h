@@ -42,7 +42,7 @@ the specific language governing permissions and limitations under the License.
 // null platform has no funcs
 struct AkThreadProperties {};
 #elif defined(AK_WIN)
-#include <AK/Tools/Win32/AkPlatformFuncs.h>
+#include <AK/Tools/IO/AkPlatformFuncs.h>
 
 #elif defined (AK_XBOX)
 #include <AK/Tools/XboxGC/AkPlatformFuncs.h>
