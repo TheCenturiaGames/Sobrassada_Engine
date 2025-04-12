@@ -117,7 +117,9 @@ void ResourcesModule::CreateNavMesh()
                 if (meshComponent)
                 {
                     const ResourceMesh* resourceMesh = meshComponent->GetResourceMesh();
-                    AABB aabb                        = gameObject->GetGlobalAABB();
+                    if (resourceMesh == nullptr) continue; // If a meshComponent has no mesh attached, ignore it
+
+                    const AABB aabb                        = gameObject->GetGlobalAABB();
 
                     minPos[0]                        = std::min(minPos[0], aabb.minPoint.x);
                     minPos[1]                        = std::min(minPos[1], aabb.minPoint.y);
@@ -131,6 +133,11 @@ void ResourcesModule::CreateNavMesh()
                 }
             }
         }
+    }
+    if (meshes.size() == 0)
+    {
+        GLOG("[WARNING] Trying to create NavMesh but no meshes are found in the scene");
+        return;
     }
     tmpNavmesh->BuildNavMesh(meshes, minPos, maxPos);
     App->GetPathfinderModule()->InitQuerySystem();
