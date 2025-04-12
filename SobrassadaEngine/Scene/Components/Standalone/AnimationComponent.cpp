@@ -10,6 +10,7 @@
 #include "ResourceAnimation.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
+#include "StateMachineEditor.h"
 
 #include "imgui.h"
 #include "Math/Quat.h"
@@ -46,9 +47,12 @@ AnimationComponent::~AnimationComponent()
 
 void AnimationComponent::OnPlay()
 {
+    StateMachineEditor* stateMachine = nullptr;
     if (animController != nullptr && resource != 0)
     {
-        animController->Play(resource, true);
+        //animController->Play(resource, true);
+        stateMachine = App->GetEditorUIModule()->GetStateMachine();
+        stateMachine->PlayDefaultState(animController);
     }
 }
 

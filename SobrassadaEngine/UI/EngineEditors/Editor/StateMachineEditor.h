@@ -6,12 +6,16 @@
 
 class ResourceStateMachine;
 class StateNode;
+class AnimController;
 
 class StateMachineEditor : public EngineEditorBase
 {
   public:
     StateMachineEditor(const std::string& editorName, UID uid, ResourceStateMachine* stateMachine);
     ~StateMachineEditor() override;
+    void PlayDefaultState(AnimController* animController);
+    void PlayActiveState();
+    void StopStateMachine(AnimController* animController);
 
   private:
     bool RenderEditor() override;
@@ -33,6 +37,7 @@ class StateMachineEditor : public EngineEditorBase
     UID uid;
     int stateCont                  = 0;
     ResourceStateMachine* resource = nullptr;
+    AnimController* animController = nullptr;
     std::unique_ptr<ImFlow::ImNodeFlow> graph;
     std::vector<std::string> availableClips;
     std::vector<std::shared_ptr<StateNode>> nodes;
@@ -43,4 +48,5 @@ class StateMachineEditor : public EngineEditorBase
     int selectedIndex = -1;
     std::vector<std::string> allStateMachineNames;
     char newTriggerName[64] = "";
+
 };
