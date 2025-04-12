@@ -39,16 +39,19 @@ void PrefabPortView::SetPrefab(ResourcePrefab* prefab)
     GameObject* originalRoot = prefabObjects[0];
     previewGO                = CloneGameObjectHierarchy(originalRoot, prefabObjects);
 
-    MeshComponent* mesh      = previewGO->GetMeshComponent();
-    if (mesh)
+    for (GameObject* go : previewObjects)
     {
-        GLOG("Preview mesh UID: %llu", mesh->GetMeshUID());
-        GLOG("Preview material UID: %llu", mesh->GetMaterialUID());
+        MeshComponent* mesh = go->GetMeshComponent();
+        if (mesh)
+        {
+            GLOG("Found MeshComponent at GO: %s", go->GetName().c_str());
+            GLOG("Preview mesh UID: %llu", mesh->GetMeshUID());
+            GLOG("Preview material UID: %llu", mesh->GetMaterialUID());
+
+            LoadMeshAndMaterialFromComponent(mesh);
+        }
     }
 
-    if (!mesh) return;
-
-    LoadMeshAndMaterialFromComponent(mesh);
     UpdatePreviewTransform();
     SetupCamera();
 }
@@ -101,17 +104,43 @@ void PrefabPortView::UpdateCameraMatrices()
 
 void PrefabPortView::RenderPreviewMesh()
 {
-    float4x4 transform = previewGO->GetLocalTransform();
-    float3 pos, scale;
-    Quat rot;
-    transform.Decompose(pos, rot, scale);
+    int shader = App->GetShaderModule()->GetPrefabProgram();
 
-    float3 offset      = float3(0, 0, -1.0f);
-    Quat extraRotation = Quat::RotateY(15.0f * DEGREE_RAD_CONV);
-    float4x4 model     = float4x4::FromTRS(offset, extraRotation * rot, scale * 0.05f);
+    for (GameObject* go : previewObjects)
+    {
+        MeshComponent* mesh = go->GetMeshComponent();
+        if (!mesh) continue;
 
-    int shader         = App->GetShaderModule()->GetPrefabProgram();
-    loadedMesh->RenderSimple(shader, model, cameraUBO, loadedMaterial);
+        const ResourceMesh* resMesh = mesh->GetResourceMesh();
+        if (!resMesh) continue;
+
+        ResourceMesh* loadedMesh =
+            static_cast<ResourceMesh*>(App->GetResourcesModule()->RequestResource(resMesh->GetUID()));
+        if (!loadedMesh) continue;
+
+        if (loadedMesh->GetVAO() == 0)
+        {
+            loadedMesh->UploadToVRAM();
+        }
+
+        ResourceMaterial* loadedMat = nullptr;
+        UID matUID                  = mesh->GetMaterialUID();
+        if (matUID != INVALID_UID)
+        {
+            loadedMat = static_cast<ResourceMaterial*>(App->GetResourcesModule()->RequestResource(matUID));
+        }
+
+        float4x4 transform = go->GetLocalTransform();
+        float3 pos, scale;
+        Quat rot;
+        transform.Decompose(pos, rot, scale);
+
+        float3 offset      = float3(0, 0, -1.0f);
+        Quat extraRotation = Quat::RotateY(15.0f * DEGREE_RAD_CONV);
+        float4x4 model     = float4x4::FromTRS(offset, extraRotation * rot, scale * 0.05f);
+
+        loadedMesh->RenderSimple(shader, model, cameraUBO, loadedMat);
+    }
 
     framebuffer->Unbind();
 }
@@ -130,10 +159,12 @@ void PrefabPortView::RenderToImGui()
 
 void PrefabPortView::HandleGizmo()
 {
+    if (!selectedGameObject) return;
+
     float* view = (float*)matrices.viewMatrix.Transposed().v;
     float* proj = (float*)matrices.projectionMatrix.Transposed().v;
     float matrix[16];
-    memcpy(matrix, previewGO->GetLocalTransform().v, sizeof(matrix));
+    memcpy(matrix, selectedGameObject->GetLocalTransform().v, sizeof(matrix));
 
     ImGuizmo::Manipulate(view, proj, (ImGuizmo::OPERATION)gizmoOperation, ImGuizmo::LOCAL, matrix);
 
@@ -149,15 +180,16 @@ void PrefabPortView::HandleGizmo()
 
         float3 oldPos, oldScale;
         Quat oldRot;
-        previewGO->GetLocalTransform().Decompose(oldPos, oldRot, oldScale);
+        selectedGameObject->GetLocalTransform().Decompose(oldPos, oldRot, oldScale);
 
         float3 finalPos   = (gizmoOperation == ImGuizmo::TRANSLATE) ? newPos : oldPos;
         Quat finalRot     = (gizmoOperation == ImGuizmo::ROTATE) ? newRot : oldRot;
         float3 finalScale = (gizmoOperation == ImGuizmo::SCALE) ? newScale : oldScale;
 
-        previewGO->SetLocalTransform(float4x4::FromTRS(finalPos, finalRot, finalScale));
+        selectedGameObject->SetLocalTransform(float4x4::FromTRS(finalPos, finalRot, finalScale));
     }
 }
+
 
 GameObject* PrefabPortView::CloneGameObjectHierarchy(GameObject* original, const std::vector<GameObject*>& allObjects)
 {
@@ -270,4 +302,10 @@ void PrefabPortView::CleanupPreview()
     }
 
     currentPrefab = nullptr;
+}
+
+
+void PrefabPortView::SetSelectedGameObject(GameObject* go)
+{
+    selectedGameObject = go;
 }

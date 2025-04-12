@@ -29,6 +29,8 @@ class PrefabPortView
     const std::vector<GameObject*>& GetPreviewObjects() const { return previewObjects; }
 
     void LoadMeshAndMaterialFromComponent(MeshComponent* mesh);
+    void SetSelectedGameObject(GameObject* go);
+
 
   private:
     // Rendering pipeline
@@ -69,4 +71,5 @@ class PrefabPortView
 
     // Gizmo configuration
     int gizmoOperation = ImGuizmo::ROTATE;
+    GameObject* selectedGameObject = nullptr;
 };

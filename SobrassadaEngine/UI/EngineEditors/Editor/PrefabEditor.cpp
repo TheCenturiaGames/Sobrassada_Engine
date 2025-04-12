@@ -112,7 +112,6 @@ void PrefabEditor::RenderPrefabPortView()
     }
 }
 
-
 // Renders the hierarchy tree and property panel for selected GameObject
 void PrefabEditor::RenderPrefabSidePanel(float width, float height)
 {
@@ -198,7 +197,6 @@ void PrefabEditor::RenderPrefabSidePanel(float width, float height)
     ImGui::EndChild();
 }
 
-
 void PrefabEditor::treeHierarchyView()
 {
     if (!portView) return;
@@ -246,7 +244,6 @@ void PrefabEditor::treeHierarchyView()
     GLOG("treeHierarchyView - END");
 }
 
-
 bool PrefabEditor::DrawHierarchyRecursiveFiltered(GameObject* go, const std::string& filter)
 {
     const auto& previewObjects = portView->GetPreviewObjects();
@@ -271,6 +268,7 @@ bool PrefabEditor::DrawHierarchyRecursiveFiltered(GameObject* go, const std::str
     if (ImGui::IsItemClicked())
     {
         selectedGameObject = go;
+        if (portView) portView->SetSelectedGameObject(go);
     }
 
     // If the node is open, recursively draw the children
@@ -285,16 +283,11 @@ bool PrefabEditor::DrawHierarchyRecursiveFiltered(GameObject* go, const std::str
                 DrawHierarchyRecursiveFiltered(child, filter);
             }
         }
-        ImGui::TreePop(); 
+        ImGui::TreePop();
     }
 
     return true;
 }
-
-
-
-
-
 
 void PrefabEditor::ApplyChangesToOriginalPrefab()
 {
@@ -328,7 +321,6 @@ void PrefabEditor::ApplyChangesToOriginalPrefab()
                 {
                     originalMesh->AddMesh(clonedMesh->GetMeshUID());
                     originalMesh->AddMaterial(clonedMesh->GetMaterialUID());
-
                 }
             }
         }
@@ -340,12 +332,9 @@ void PrefabEditor::ApplyChangesToOriginalPrefab()
     App->GetResourcesModule()->ReleaseResource(selectedPrefab);
     selectedPrefab = static_cast<ResourcePrefab*>(App->GetResourcesModule()->RequestResource(selectedPrefab->GetUID()));
 
-
     selectedGameObject = nullptr;
     portView           = std::make_unique<PrefabPortView>();
     portView->SetPrefab(selectedPrefab);
-
-
 }
 
 std::vector<GameObject*> PrefabEditor::GetRootGameObjects(ResourcePrefab* prefab)
