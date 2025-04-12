@@ -115,9 +115,7 @@ void CharacterControllerComponent::Update(float deltaTime)
                 navMeshQuery = tmpQuery;
 
                 if (currentPolyRef == 0)
-                {
-                    // TODO: Make the rest of the process
-                    
+                {                    
                     float3 startPos = parent->GetGlobalTransform().TranslatePart();
 
                     dtQueryFilter filter;
@@ -143,7 +141,27 @@ void CharacterControllerComponent::Update(float deltaTime)
         }
     }
     
-    if (navMeshQuery && currentPolyRef != 0) HandleInput(deltaTime);
+    if (navMeshQuery && currentPolyRef != 0)
+    {
+        verticalSpeed += gravity * deltaTime;
+        
+        verticalSpeed      = std::max(verticalSpeed, maxFallSpeed); // Clamp fall speed
+
+        float4x4 globalTr = parent->GetGlobalTransform();
+        float3 currentPos = globalTr.TranslatePart();
+
+        currentPos.y      += (verticalSpeed * deltaTime);
+
+        AdjustHeightToNavMesh(currentPos);
+
+        globalTr.SetTranslatePart(currentPos);
+        float4x4 finalLocal = parent->GetParentGlobalTransform().Transposed() * globalTr;
+
+        parent->SetLocalTransform(finalLocal);
+        parent->UpdateTransformForGOBranch();
+
+        HandleInput(deltaTime);
+    }
 
 }
 
@@ -197,12 +215,45 @@ void CharacterControllerComponent::RenderEditorInspector()
     }
 }
 
-void CharacterControllerComponent::Move(const float3& direction, float deltaTime)
+void CharacterControllerComponent::AdjustHeightToNavMesh(float3& currentPos)
 {
     if (!navMeshQuery || currentPolyRef == 0) return;
 
-    verticalSpeed     += gravity * deltaTime;
-    verticalSpeed      = std::max(verticalSpeed, -20.0f); // Clamp fall speed
+    dtQueryFilter filter;
+    filter.setIncludeFlags(SAMPLE_POLYFLAGS_WALK);
+    filter.setExcludeFlags(0);
+
+    float halfExt[3] = {0.5f, 1.0f, 0.5f};
+    float nearest[3];
+    dtPolyRef newRef = 0;
+
+    dtStatus st      = navMeshQuery->findNearestPoly(currentPos.ptr(), halfExt, &filter, &newRef, nearest);
+    if (!dtStatusSucceed(st) || newRef == 0) return;
+
+    bool posOverPoly = false;
+    float closest[3];
+    dtStatus st2 = navMeshQuery->closestPointOnPoly(newRef, currentPos.ptr(), closest, &posOverPoly);
+    if (!dtStatusSucceed(st2) || !posOverPoly) return;
+
+    currentPolyRef   = newRef; 
+
+    float polyHeight = 0.0f;
+    dtStatus stH     = navMeshQuery->getPolyHeight(newRef, closest, &polyHeight);
+    if (dtStatusSucceed(stH))
+    {
+        float distToFloor         = polyHeight - currentPos.y;
+        const float maxStepHeight = 0.5f;
+        if (distToFloor >= 0.0f && distToFloor <= maxStepHeight)
+        {
+            currentPos.y  = polyHeight;
+            verticalSpeed = 0.0f;
+        }
+    }
+}
+
+void CharacterControllerComponent::Move(const float3& direction, float deltaTime)
+{
+    if (!navMeshQuery || currentPolyRef == 0) return;
 
     float4x4 globalTr  = parent->GetGlobalTransform();
     float3 currentPos  = globalTr.TranslatePart();
@@ -213,7 +264,6 @@ void CharacterControllerComponent::Move(const float3& direction, float deltaTime
     float3 desiredPos  = currentPos;
     desiredPos.x      += offsetXZ.x;
     desiredPos.z      += offsetXZ.z;
-    desiredPos.y      += verticalSpeed * deltaTime;
 
     dtQueryFilter filter;
     filter.setIncludeFlags(SAMPLE_POLYFLAGS_WALK);
@@ -232,30 +282,12 @@ void CharacterControllerComponent::Move(const float3& direction, float deltaTime
 
     status           = navMeshQuery->closestPointOnPoly(newRef, desiredPos.ptr(), closest, &posOverPoly);
 
-    if (!dtStatusSucceed(status) || !posOverPoly)
-    {
-        return;
-    }
+    if (!dtStatusSucceed(status) || !posOverPoly) return;
 
     currentPolyRef = newRef;
 
     desiredPos.x   = nearest[0];
     desiredPos.z   = nearest[2];
-
-    {
-        float polyHeight = 0.0f;
-        if (dtStatusSucceed(navMeshQuery->getPolyHeight(newRef, nearest, &polyHeight)))
-        {
-            float distToFloor         = polyHeight - desiredPos.y;
-            const float maxStepHeight = 0.5f;
-
-            if (fabs(distToFloor) <= maxStepHeight)
-            {
-                desiredPos.y  = polyHeight;
-                verticalSpeed = 0.0f;
-            }
-        }
-    }
 
     globalTr.SetTranslatePart(desiredPos);
     float4x4 finalLocal = parent->GetParentGlobalTransform().Transposed() * globalTr;
@@ -308,7 +340,6 @@ void CharacterControllerComponent::HandleInput(float deltaTime)
         direction.Normalize();
         targetDirection = direction;
 
-        // TODO: Handle rotation of gameObject when changing directions (target direction will be used in this part)
         Move(direction, deltaTime);
     }
     
