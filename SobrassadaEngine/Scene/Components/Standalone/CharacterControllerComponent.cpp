@@ -102,66 +102,61 @@ void CharacterControllerComponent::Update(float deltaTime)
 
     if (deltaTime <= 0.0f) return;
 
+    ResourceNavMesh* navRes = App->GetResourcesModule()->GetNavMesh();
+    if (!navRes) return;
+
+    dtNavMesh* dtNav         = navRes->GetDetourNavMesh();
+    dtNavMeshQuery* tmpQuery = navRes->GetDetourNavMeshQuery();
+    if (!tmpQuery || !dtNav) return;
+
     if (!navMeshQuery)
     {
-        ResourceNavMesh* navRes = App->GetResourcesModule()->GetNavMesh();
+        navMeshQuery = tmpQuery;
 
-        if (navRes)
-        {
-            dtNavMeshQuery* tmpQuery = navRes->GetDetourNavMeshQuery();
+        if (currentPolyRef == 0)
+        {                    
+            float3 startPos = parent->GetGlobalTransform().TranslatePart();
 
-            if (tmpQuery)
+            dtQueryFilter filter;
+            filter.setIncludeFlags(SAMPLE_POLYFLAGS_WALK);
+            filter.setExcludeFlags(0);
+
+            float extents[3] = {2.0f, 4.0f, 2.0f};
+            float nearestPoint[3];
+            dtPolyRef targetRef = 0;
+
+            dtStatus status =
+                navMeshQuery->findNearestPoly(startPos.ptr(), extents, &filter, &targetRef, nearestPoint);
+
+            if (dtStatusFailed(status) || targetRef == 0)
             {
-                navMeshQuery = tmpQuery;
-
-                if (currentPolyRef == 0)
-                {                    
-                    float3 startPos = parent->GetGlobalTransform().TranslatePart();
-
-                    dtQueryFilter filter;
-                    filter.setIncludeFlags(SAMPLE_POLYFLAGS_WALK);
-                    filter.setExcludeFlags(0);
-
-                    float extents[3] = {2.0f, 4.0f, 2.0f};
-                    float nearestPoint[3];
-                    dtPolyRef targetRef = 0;
-
-                    dtStatus status =
-                        navMeshQuery->findNearestPoly(startPos.ptr(), extents, &filter, &targetRef, nearestPoint);
-
-                    if (dtStatusFailed(status) || targetRef == 0)
-                    {
-                        GLOG("Failed to find valid target poly for movement.");
-                        return;
-                    }
-
-                    currentPolyRef = targetRef;
-                }
+                GLOG("Failed to find valid target poly for movement.");
+                return;
             }
+
+            currentPolyRef = targetRef;
         }
     }
     
-    if (navMeshQuery && currentPolyRef != 0)
-    {
-        verticalSpeed += gravity * deltaTime;
-        
-        verticalSpeed      = std::max(verticalSpeed, maxFallSpeed); // Clamp fall speed
+    if (!navMeshQuery || currentPolyRef == 0) return;
+    
+    verticalSpeed += gravity * deltaTime; 
+    verticalSpeed      = std::max(verticalSpeed, maxFallSpeed); // Clamp fall speed
 
-        float4x4 globalTr = parent->GetGlobalTransform();
-        float3 currentPos = globalTr.TranslatePart();
+    float4x4 globalTr = parent->GetGlobalTransform();
+    float3 currentPos = globalTr.TranslatePart();
 
-        currentPos.y      += (verticalSpeed * deltaTime);
+    currentPos.y      += (verticalSpeed * deltaTime);
 
-        AdjustHeightToNavMesh(currentPos);
+    AdjustHeightToNavMesh(currentPos);
 
-        globalTr.SetTranslatePart(currentPos);
-        float4x4 finalLocal = parent->GetParentGlobalTransform().Transposed() * globalTr;
+    globalTr.SetTranslatePart(currentPos);
+    float4x4 finalLocal = parent->GetParentGlobalTransform().Transposed() * globalTr;
 
-        parent->SetLocalTransform(finalLocal);
-        parent->UpdateTransformForGOBranch();
+    parent->SetLocalTransform(finalLocal);
+    parent->UpdateTransformForGOBranch();
 
-        HandleInput(deltaTime);
-    }
+    HandleInput(deltaTime);
 
 }
 
