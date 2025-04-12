@@ -135,18 +135,9 @@ void CanvasComponent::RenderUI()
                                                       (float)App->GetWindowModule()->GetHeight()
                                                   );
 
-    // Get all children iteratively. This way, if the children of the canvas are modified they will be properly sorted
-    // when rendering
-    std::queue<UID> children;
-
-    for (const UID child : parent->GetChildren())
+    for (UID child : sortedChildren)
     {
-        children.push(child);
-    }
-
-    while (!children.empty())
-    {
-        const GameObject* currentObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(children.front());
+        const GameObject* currentObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(child);
 
         // Only render UI components
         Component* uiWidget             = currentObject->GetComponentByType(COMPONENT_TRANSFORM_2D);
@@ -157,13 +148,6 @@ void CanvasComponent::RenderUI()
 
         uiWidget = currentObject->GetComponentByType(COMPONENT_IMAGE);
         if (uiWidget) static_cast<const ImageComponent*>(uiWidget)->RenderUI(view, proj);
-
-        children.pop();
-
-        for (const UID child : currentObject->GetChildren())
-        {
-            children.push(child);
-        }
     }
 }
 
@@ -196,4 +180,41 @@ void CanvasComponent::OnWindowResize(const unsigned int width, const unsigned in
     );
 
     parent->UpdateTransformForGOBranch();
+}
+
+void CanvasComponent::UpdateChildren()
+{
+    // Update the children list every frame in case they are reorderen in hierarchy. In the future to be more optimal 
+    // maybe this can be called only when a gameObject is dragged around the hierarchy
+    sortedChildren.clear();
+
+    std::queue<UID> children;
+
+    for (const UID child : parent->GetChildren())
+    {
+        children.push(child);
+    }
+
+    while (!children.empty())
+    {
+        const GameObject* currentObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(children.front());
+
+        sortedChildren.push_back(currentObject->GetUID());
+        children.pop();
+
+        for (const UID child : currentObject->GetChildren())
+        {
+            children.push(child);
+        }
+    }
+}
+
+void CanvasComponent::UpdateMousePosition(const float2& mousePos)
+{
+
+}
+
+void CanvasComponent::OnMouseButtonPressed()
+{
+
 }

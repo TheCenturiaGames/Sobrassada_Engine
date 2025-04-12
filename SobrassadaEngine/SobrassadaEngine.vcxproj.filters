@@ -474,7 +474,9 @@
     <ClCompile Include="Scene\Components\Standalone\Lights\DirectionalLightComponent.cpp">
       <Filter>Scene\Components\Lights</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Components\Standalone\UI\ButtonComponent.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\UI\ButtonComponent.cpp">
+      <Filter>Scene\Components\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -912,7 +914,9 @@
     <ClInclude Include="Scene\Components\Standalone\Lights\DirectionalLightComponent.h">
       <Filter>Scene\Components\Lights</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Components\Standalone\UI\ButtonComponent.h" />
+    <ClInclude Include="Scene\Components\Standalone\UI\ButtonComponent.h">
+      <Filter>Scene\Components\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl">

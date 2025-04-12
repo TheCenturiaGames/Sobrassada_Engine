@@ -2,6 +2,13 @@
 
 #include "Component.h"
 
+#include <vector>
+
+namespace Math
+{
+    class float2;
+}
+
 class Transform2DComponent;
 
 class CanvasComponent : public Component
@@ -21,6 +28,10 @@ class CanvasComponent : public Component
     void RenderUI();
     void OnWindowResize(const unsigned int width, const unsigned int height);
 
+    void UpdateChildren();
+    void UpdateMousePosition(const float2& mousePos);
+    void OnMouseButtonPressed();
+
     bool IsInWorldSpaceEditor() const { return isInWorldSpaceEditor; }
     bool IsInWorldSpaceGame() const { return isInWorldSpaceGame; }
     float GetWidth() const { return width; }
@@ -31,4 +42,6 @@ class CanvasComponent : public Component
     float height              = SCREEN_HEIGHT;
     bool isInWorldSpaceEditor = false;
     bool isInWorldSpaceGame   = true;
+
+    std::vector<UID> sortedChildren;
 };

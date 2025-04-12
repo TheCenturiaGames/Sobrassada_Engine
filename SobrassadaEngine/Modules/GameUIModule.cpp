@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "TextManager.h"
 #include "CameraModule.h"
+#include "InputModule.h"
 #include "Scene/Components/Standalone/UI/CanvasComponent.h"
 
 #include "glew.h"
@@ -22,6 +23,23 @@ bool GameUIModule::Init()
 
 update_status GameUIModule::Update(float deltaTime)
 {
+    InputModule* inputs = App->GetInputModule();
+
+    for (CanvasComponent* canvas : canvases)
+    {
+        canvas->UpdateChildren();
+        canvas->UpdateMousePosition(inputs->GetMousePosition());
+    }
+
+    if (inputs->GetMouseButtonDown(1))
+    {
+        GLOG("Mouse button pressed");
+        for (CanvasComponent* canvas : canvases)
+        {
+            canvas->OnMouseButtonPressed();
+        }
+    }
+
     return UPDATE_CONTINUE;
 }
 
