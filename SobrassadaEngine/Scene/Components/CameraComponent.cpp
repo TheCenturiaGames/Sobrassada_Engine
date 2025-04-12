@@ -50,6 +50,8 @@ CameraComponent::CameraComponent(UID uid, GameObject* parent) : Component(uid, p
         isMainCamera = true;
         App->GetSceneModule()->GetScene()->SetMainCamera(this);
     }
+
+    previewFramebuffer = new Framebuffer(previewWidth, previewHeight, false);
 }
 
 CameraComponent::CameraComponent(const rapidjson::Value& initialState, GameObject* parent)
@@ -132,6 +134,8 @@ CameraComponent::CameraComponent(const rapidjson::Value& initialState, GameObjec
     glBindBuffer(GL_UNIFORM_BUFFER, ubo);
     glBufferData(GL_UNIFORM_BUFFER, sizeof(CameraMatrices), nullptr, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    previewFramebuffer = new Framebuffer(previewWidth, previewHeight, false);
 }
 
 CameraComponent::~CameraComponent()
@@ -141,6 +145,8 @@ CameraComponent::~CameraComponent()
         App->GetSceneModule()->GetScene()->SetMainCamera(nullptr);
     }
     glDeleteBuffers(1, &ubo);
+    delete previewFramebuffer;
+    previewFramebuffer = nullptr;
 }
 
 void CameraComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
@@ -281,6 +287,7 @@ void CameraComponent::Update(float deltaTime)
 {
     if (isMainCamera && App->GetSceneModule()->GetScene()->GetMainCamera() == nullptr)
         App->GetSceneModule()->GetScene()->SetMainCamera(this);
+
     float4x4 globalTransform = GetGlobalTransform();
     camera.pos               = float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
     camera.front     = -float3(globalTransform[0][2], globalTransform[1][2], globalTransform[2][2]).Normalized();
@@ -299,6 +306,35 @@ void CameraComponent::Update(float deltaTime)
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     frustumPlanes.UpdateFrustumPlanes(camera.ViewMatrix(), camera.ProjectionMatrix());
+
+    if (App->GetSceneModule()->GetScene()->GetSelectedGameObject() == parent) previewEnabled = true;
+}
+
+void CameraComponent::RenderCameraPreview(float deltaTime)
+{
+    previewFramebuffer->Bind();
+
+    glViewport(0, 0, previewWidth, previewHeight);
+
+    if (!autorendering)
+    {
+        autorendering = true;
+        App->GetSceneModule()->GetScene()->RenderScene(deltaTime, this);
+        DebugDrawModule* debug = App->GetDebugDrawModule();
+        debug->DrawFrustrum(camera.ProjectionMatrix(), camera.ViewMatrix());
+        autorendering = false;
+    }
+
+    static bool open = true;
+    if (ImGui::Begin("Camera Preview", &open, ImGuiWindowFlags_NoResize))
+    {
+        ImTextureID texID = (ImTextureID)(intptr_t)previewFramebuffer->GetTextureID();
+        ImVec2 size((float)previewWidth, (float)previewHeight);
+        ImGui::Image(texID, size, ImVec2(0, 1), ImVec2(1, 0));
+    }
+    ImGui::End();
+
+    // App->GetOpenGLModule()->GetFramebuffer()->Bind();
 }
 
 void CameraComponent::Render(float deltaTime)
@@ -306,6 +342,7 @@ void CameraComponent::Render(float deltaTime)
     if (!enabled || !drawGizmos || App->GetSceneModule()->GetInPlayMode()) return;
     DebugDrawModule* debug = App->GetDebugDrawModule();
     debug->DrawFrustrum(camera.ProjectionMatrix(), camera.ViewMatrix());
+    if (previewEnabled) RenderCameraPreview(deltaTime);
 }
 
 void CameraComponent::SetAspectRatio(float newAspectRatio)
