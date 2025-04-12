@@ -18,11 +18,6 @@ struct NodeParent
 {
     int nodeID;
     int parentID;
-
-    bool operator<(const NodeParent& other) const
-    {
-        return (parentID < other.parentID) || (parentID == other.parentID && nodeID < other.nodeID);
-    }
 };
 
 namespace ModelImporter
@@ -36,8 +31,7 @@ namespace ModelImporter
     );
     ResourceModel* LoadModel(UID modelUID);
     void FillNodes(
-        const std::vector<tinygltf::Node>& nodesList, int nodeId, int parentId,
-        const std::vector<std::vector<std::pair<UID, UID>>>& meshesUIDs, std::vector<NodeData>& outNodes,
-        const unsigned int accNodesInserted
+        const std::vector<tinygltf::Node>& nodesList, int nodeId,
+        const std::vector<std::vector<std::pair<UID, UID>>>& meshesUIDs, std::vector<NodeData>& outNodes
     );
 }; // namespace ModelImporter

@@ -16,6 +16,7 @@
 #pragma warning(disable: 4251)
 
 extern SOBRASADA_API_ENGINE std::vector<char*> *Logs;
+extern LCG* rng;
 
 SOBRASADA_API_ENGINE void glog(const char file[], int line, const char* format, ...);
 
@@ -138,9 +139,15 @@ using UID                                            = uint64_t;
 constexpr UID INVALID_UID                            = 0;
 constexpr UID UID_PREFIX_DIVISOR                     = 100000000000000;
 constexpr UID FALLBACK_TEXTURE_UID                   = 1200000000000000;
+constexpr UID DEFAULT_MATERIAL_UID                   = 1300000000000000;
 
 constexpr const char* CONSTANT_MESH_SELECT_DIALOG_ID = "mesh-select";
+constexpr const char* CONSTANT_MATERIAL_SELECT_DIALOG_ID = "material-select";
 constexpr const char* CONSTANT_TEXTURE_SELECT_DIALOG_ID = "texture-select";
+constexpr const char* CONSTANT_DIFFUSE_TEXTURE_SELECT_DIALOG_ID = "diffuse-texture-select";
+constexpr const char* CONSTANT_METALLIC_TEXTURE_SELECT_DIALOG_ID = "metallic-texture-select";
+constexpr const char* CONSTANT_SPECULAR_TEXTURE_SELECT_DIALOG_ID = "specular-texture-select";
+constexpr const char* CONSTANT_NORMAL_TEXTURE_SELECT_DIALOG_ID = "normal-texture-select";
 constexpr const char* CONSTANT_PREFAB_SELECT_DIALOG_ID  = "prefab-select";
 constexpr const char* CONSTANT_MODEL_SELECT_DIALOG_ID   = "model-select";
 
@@ -154,9 +161,8 @@ constexpr float DEGREE_RAD_CONV                         = PI / 180.f;
 constexpr float MINIMUM_TREE_LEAF_SIZE                  = 5.f;
 constexpr int PALETTE_SIZE                              = 64;
 
+
 inline UID GenerateUID()
 {
-    LCG rng;
-    UID uid = static_cast<UID>(rng.IntFast()) << 32 | rng.IntFast(); // Combine two 32-bit values
-    return uid;
+    return static_cast<UID>(rng->IntFast()) << 32 | rng->IntFast(); // Combine two 32-bit values
 }

@@ -192,21 +192,6 @@
     <ClCompile Include="Utils\LightsConfig.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Components\Component.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\GameObjects\GameObject.cpp">
-      <Filter>Scene\GameObjects</Filter>
-    </ClCompile>
-    <ClCompile Include="Modules\SceneModule.cpp">
-      <Filter>Modules</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Components\Standalone\MeshComponent.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Components\Component.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\Components\ComponentUtils.cpp">
       <Filter>Scene\Components</Filter>
     </ClCompile>
@@ -317,12 +302,6 @@
     </ClCompile>
     <ClCompile Include="Scene\Components\CameraComponent.cpp">
       <Filter>Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
-      <Filter>UI\EngineEditors</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\EngineEditors\EngineEditorBase.cpp">
-      <Filter>UI\EngineEditors</Filter>
     </ClCompile>
     <ClCompile Include="FileSystem\PrefabManager.cpp">
       <Filter>FileSystem</Filter>
@@ -435,21 +414,42 @@
     <ClCompile Include="Scene\Components\Standalone\Physics\CapsuleColliderComponent.cpp">
       <Filter>Scene\Components\Physics</Filter>
     </ClCompile>
+    <ClCompile Include="UI\EngineEditors\Editor\StateMachineEditor.cpp">
+      <Filter>UI\EngineEditors</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\EngineEditors\Nodes\StateNode.cpp">
+      <Filter>UI\EngineEditors</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\Meta\MetaStateMachine.cpp">
+      <Filter>FileSystem\Meta</Filter>
+    </ClCompile>
     <ClCompile Include="ResourceManagement\Resources\ResourceNavmesh.cpp">
       <Filter>Resources</Filter>
     </ClCompile>
     <ClCompile Include="FileSystem\Importers\NavmeshImporter.cpp">
       <Filter>FileSystem\Importers</Filter>
     </ClCompile>
-    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourCrowd.cpp" />
-    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourLocalBoundary.cpp" />
-    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourObstacleAvoidance.cpp" />
-    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourPathCorridor.cpp" />
-    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourPathQueue.cpp" />
-    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourProximityGrid.cpp" />
+    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourCrowd.cpp">
+      <Filter>External\DetourCrowd</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourLocalBoundary.cpp">
+      <Filter>External\DetourCrowd</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourObstacleAvoidance.cpp">
+      <Filter>External\DetourCrowd</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourPathCorridor.cpp">
+      <Filter>External\DetourCrowd</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourPathQueue.cpp">
+      <Filter>External\DetourCrowd</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourProximityGrid.cpp">
+      <Filter>External\DetourCrowd</Filter>
+    </ClCompile>
     <ClCompile Include="Scene\Components\Standalone\AIAgentComponent.cpp">
-      <Filter>Scene\Components<Filter>
-    </ClInclude>
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
     <ClCompile Include="Modules\PathfinderModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
@@ -503,11 +503,11 @@
     <Filter Include="UI">
       <UniqueIdentifier>{9096db94-8011-467c-8549-ccc0382ca11f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="UI\EngineEditors">
-      <UniqueIdentifier>{db4cb5a0-8fe4-429c-9895-ea191f1f3f3e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="External\Detour">
       <UniqueIdentifier>{2caa9ea7-72e8-450d-adad-4b1805c68bb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\DetourCrowd">
+      <UniqueIdentifier>{a34d0f6a-0b38-4a5e-b1a1-8e985fd2543f}</UniqueIdentifier>
     </Filter>
     <Filter Include="External\Recast">
       <UniqueIdentifier>{da958ebe-ba34-4c0a-9248-41019fc9f888}</UniqueIdentifier>
@@ -686,9 +686,6 @@
     <ClInclude Include="FileSystem\PrefabManager.h">
       <Filter>FileSystem</Filter>
     </ClInclude>
-    <ClInclude Include="UI\EngineEditors\EngineEditorBase.h">
-      <Filter>UI\EngineEditors</Filter>
-    </ClInclude>
     <ClInclude Include="FileSystem\Meta\MetaFile.h">
       <Filter>FileSystem\Meta</Filter>
     </ClInclude>
@@ -848,6 +845,15 @@
     <ClInclude Include="Scene\Components\Standalone\Physics\CapsuleColliderComponent.h">
       <Filter>Scene\Components\Physics</Filter>
     </ClInclude>
+    <ClInclude Include="UI\EngineEditors\Editor\StateMachineEditor.h">
+      <Filter>UI\EngineEditors</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\EngineEditors\Nodes\StateNode.h">
+      <Filter>UI\EngineEditors</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\Meta\MetaStateMachine.h">
+      <Filter>FileSystem\Meta</Filter>
+    </ClInclude>
     <ClInclude Include="ResourceManagement\Resources\ResourceNavmesh.h">
       <Filter>Resources</Filter>
     </ClInclude>
@@ -855,7 +861,7 @@
       <Filter>FileSystem\Importers</Filter>
     </ClInclude>
     <ClInclude Include="Scene\Components\Standalone\AIAgentComponent.h">
-      <Filter>Scene\Components<Filter>
+      <Filter>Scene\Components</Filter>
     </ClInclude>
     <ClInclude Include="Modules\PathfinderModule.h">
       <Filter>Modules</Filter>

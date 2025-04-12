@@ -6,7 +6,7 @@
 #include "ResourceNavmesh.h"
 #include "SceneModule.h"
 
-#include <DetourCrowd.h>
+#include "DetourCrowd.h"
 
 AIAgentComponent::AIAgentComponent(UID uid, GameObject* parent) : Component(uid, parent, "AI Agent", COMPONENT_AIAGENT)
 {
@@ -42,8 +42,6 @@ void AIAgentComponent::Update(float deltaTime)
     if (!enabled) return;
 
     if (!App->GetSceneModule()->GetInPlayMode()) return;
-
-    if (deltaTime <= 0.0f) return;
 
     if (agentId == -1) return;
 
@@ -110,15 +108,13 @@ void AIAgentComponent::setPath(const float3& destination) const
     dtNavMeshQuery* navQuery     = pathfinder->GetNavQuery();
     if (!navQuery) return;
 
-    float pos[3] = {destination.x, destination.y, destination.z};
-
     // Prepare for finding the nearest poly
     dtQueryFilter filter;
     float extents[3] = {2.0f, 4.0f, 2.0f}; // bounding box for the search area
     float nearestPoint[3];
     dtPolyRef targetRef;
 
-    dtStatus status = navQuery->findNearestPoly(pos, extents, &filter, &targetRef, nearestPoint);
+    dtStatus status = navQuery->findNearestPoly(destination.ptr(), extents, &filter, &targetRef, nearestPoint);
     if (dtStatusFailed(status) || targetRef == 0)
     {
         GLOG("Failed to find valid target poly for movement.");
@@ -126,7 +122,7 @@ void AIAgentComponent::setPath(const float3& destination) const
     }
 
     // Request move to destination
-    bool result = pathfinder->GetCrowd()->requestMoveTarget(agentId, targetRef, pos);
+    bool result = pathfinder->GetCrowd()->requestMoveTarget(agentId, targetRef, destination.ptr());
     if (!result)
     {
         GLOG("Crowd agent failed to request movement.");

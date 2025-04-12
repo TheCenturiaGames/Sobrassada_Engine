@@ -11,9 +11,9 @@
 #include "Geometry/Plane.h"
 #include "ImGui.h"
 
-#include <DetourCrowd.h>
-#include <DetourNavMesh.h>
-#include <DetourNavMeshQuery.h>
+#include "DetourCrowd.h"
+#include "DetourNavMesh.h"
+#include "DetourNavMeshQuery.h"
 
 PathfinderModule::PathfinderModule()
 {
@@ -96,20 +96,16 @@ void PathfinderModule::HandleClickNavigation()
 {
     if (!clickNavigationEnabled || !App->GetSceneModule()->GetInPlayMode()) return; // from UI
 
-    int agentId     = 0; //  from UI
     LineSegment ray = App->GetCameraModule()->CastCameraRay();
 
     float3 hitPoint;
-    if (!RaycastToGround(ray, hitPoint))
-    {
-        GLOG("Ray did not hit ground.");
-        return;
-    }
 
-    AIAgentComponent* comp = GetComponentFromAgentId(agentId);
-    if (comp != nullptr)
+    RaycastToGround(ray, hitPoint);
+
+    for (auto& pair : agentComponentMap)
     {
-        comp->setPath(hitPoint);
+        AIAgentComponent* comp = pair.second;
+        if (comp != nullptr) comp->setPath(hitPoint);
     }
 }
 

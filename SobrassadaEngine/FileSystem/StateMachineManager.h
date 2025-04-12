@@ -6,17 +6,13 @@
 #include <vector>
 
 class ResourceStateMachine;
-struct Clip;
-struct State;
-struct Transition;
 
 namespace StateMachineManager
 {
-    void Save(
-        const std::vector<Clip>& clips, const std::vector<State>& states, const std::vector<Transition>& transitions,
-        const std::string& path, const UID sourceUID
-    );
-    void CopyMachine(const std::string& filePath, const std::string& name, const UID sourceUID);
-    ResourceStateMachine* Load(UID stateMachineUID);
+    UID SaveStateMachine(const ResourceStateMachine* stateMachine, bool override);
+    void CopyMachine(const std::string& filePath, const std::string& targetFilePath, const std::string& name, const UID sourceUID);
+    ResourceStateMachine* LoadStateMachine(UID stateMachineUID);
+    std::vector<std::string> GetAllStateMachineNames();
+    UID GetStateMachineUID(const std::string& stateMachineName);
 
 }; // namespace StateMachineManager
