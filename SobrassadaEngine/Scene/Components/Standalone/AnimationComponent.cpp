@@ -8,6 +8,7 @@
 #include "LibraryModule.h"
 #include "Resource.h"
 #include "ResourceAnimation.h"
+#include "ResourceStateMachine.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
 #include "StateMachineEditor.h"
@@ -52,7 +53,22 @@ void AnimationComponent::OnPlay()
     {
         //animController->Play(resource, true);
         stateMachine = App->GetEditorUIModule()->GetStateMachine();
-        stateMachine->PlayDefaultState(animController);
+        stateMachine->SetAnimComponent(this);
+        resourceStateMachine = stateMachine->GetLoadedStateMachine();
+        const State* activeState = resourceStateMachine->GetActiveState();
+        for (const auto& state : resourceStateMachine->states)
+        {
+            if (state.name.GetString() == activeState->name.GetString())
+            {
+                for (const auto& clip : resourceStateMachine->clips)
+                {
+                    if (clip.clipName.GetString() == activeState->clipName.GetString())
+                    {
+                        animController->Play(clip.animationResourceUID, true);
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -381,4 +397,9 @@ void AnimationComponent::RenderEditorInspector()
     {
         OnInspector();
     }
+}
+
+bool AnimationComponent::IsPlaying()
+{
+    return animController->IsPlaying();
 }

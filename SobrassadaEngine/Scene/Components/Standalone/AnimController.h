@@ -3,6 +3,7 @@
 
 class ResourceAnimation;
 
+
 class AnimController
 {
   public:

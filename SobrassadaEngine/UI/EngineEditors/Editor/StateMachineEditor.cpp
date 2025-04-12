@@ -5,7 +5,7 @@
 #include "LibraryModule.h"
 #include "ResourcesModule.h"
 #include "StateNode.h"
-#include "Components/Standalone/AnimController.h"
+#include "Components/Standalone/AnimationComponent.h"
 
 StateMachineEditor::StateMachineEditor(const std::string& editorName, UID uid, ResourceStateMachine* stateMachine)
     : EngineEditorBase(editorName, uid), uid(uid), resource(stateMachine)
@@ -27,6 +27,25 @@ StateMachineEditor::StateMachineEditor(const std::string& editorName, UID uid, R
 
 StateMachineEditor::~StateMachineEditor()
 {
+    if (graph)
+    {
+        for (const auto& [uid, node] : graph->getNodes())
+        {
+            if (node)
+            {
+                for (const auto& pin : node->getIns())
+                {
+                    pin->deleteLink();
+                }
+
+                for (const auto& pin : node->getOuts())
+                {
+                    pin->deleteLink();
+                }
+            }
+        }
+        graph->getNodes().clear();
+    }
 }
 
 bool StateMachineEditor::RenderEditor()
@@ -778,9 +797,9 @@ void StateMachineEditor::ShowTriggersPopup()
         {
             if (ImGui::Button(trigger.c_str()))
             {
-                if (animController)
+                if (animComponent)
                 {
-                    if (animController->IsPlaying())
+                    if (animComponent->IsPlaying())
                     {
                         GLOG("Trigger selected: %s", trigger.c_str());
                         for (const auto& transition : resource->transitions)
@@ -793,7 +812,7 @@ void StateMachineEditor::ShowTriggersPopup()
                                     if (resource->states[i].name.GetString() == transition.toState.GetString())
                                     {
                                         resource->SetActiveState(static_cast<int>(i));
-                                        PlayActiveState();
+                                        animComponent->OnPlay();
                                         break;
                                     }
                                 }
@@ -815,44 +834,6 @@ void StateMachineEditor::ShowTriggersPopup()
     }
 }
 
-void StateMachineEditor::PlayDefaultState(AnimController* animController)
-{
-    const State* defaultState = resource->GetDefaultState();
-    for (const auto& state : resource->states)
-    {
-        if (state.name.GetString() == defaultState->name.GetString())
-        {
-            for (const auto& clip : resource->clips)
-            {
-                if (clip.clipName.GetString() == defaultState->clipName.GetString())
-                {
-                    animController->Play(clip.animationResourceUID, true);
-                }
-                
-            } 
-        }
-    }
 
-    this->animController = animController;
-}
-
-void StateMachineEditor::PlayActiveState()
-{
-    const State* activeState = resource->GetActiveState();
-    for (const auto& state : resource->states)
-    {
-        if (state.name.GetString() == activeState->name.GetString())
-        {
-            for (const auto& clip : resource->clips)
-            {
-                if (clip.clipName.GetString() == activeState->clipName.GetString())
-                {
-                    animController->Play(clip.animationResourceUID, true);
-                }
-            }
-        }
-    }
-
-}
 
 

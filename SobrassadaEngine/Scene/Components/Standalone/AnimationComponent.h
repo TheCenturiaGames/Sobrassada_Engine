@@ -8,6 +8,7 @@
 #include <unordered_map>
 
 class ResourceAnimation;
+class ResourceStateMachine;
 class AnimController;
 class GameObject;
 
@@ -37,6 +38,7 @@ class AnimationComponent : public Component
     std::unordered_map<std::string, GameObject*> GetBoneMapping() const { return boneMapping; }
 
     void SetAnimationResource(UID animResource);
+    bool IsPlaying();
 
   private:
     void SetBoneMapping();
@@ -48,6 +50,7 @@ class AnimationComponent : public Component
 
     AnimController* animController         = nullptr;
     ResourceAnimation* currentAnimResource = nullptr;
+    ResourceStateMachine* resourceStateMachine = nullptr;
 
     GameObject* owner                      = nullptr;
     std::unordered_map<std::string, GameObject*> boneMapping;

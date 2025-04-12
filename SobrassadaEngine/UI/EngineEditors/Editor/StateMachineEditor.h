@@ -6,16 +6,15 @@
 
 class ResourceStateMachine;
 class StateNode;
-class AnimController;
+class AnimationComponent;
 
 class StateMachineEditor : public EngineEditorBase
 {
   public:
     StateMachineEditor(const std::string& editorName, UID uid, ResourceStateMachine* stateMachine);
     ~StateMachineEditor() override;
-    void PlayDefaultState(AnimController* animController);
-    void PlayActiveState();
-    void StopStateMachine(AnimController* animController);
+    ResourceStateMachine* GetLoadedStateMachine() { return resource; }
+    void SetAnimComponent(AnimationComponent* animComponent) { this->animComponent = animComponent; }
 
   private:
     bool RenderEditor() override;
@@ -37,7 +36,7 @@ class StateMachineEditor : public EngineEditorBase
     UID uid;
     int stateCont                  = 0;
     ResourceStateMachine* resource = nullptr;
-    AnimController* animController = nullptr;
+    AnimationComponent* animComponent = nullptr;
     std::unique_ptr<ImFlow::ImNodeFlow> graph;
     std::vector<std::string> availableClips;
     std::vector<std::shared_ptr<StateNode>> nodes;
