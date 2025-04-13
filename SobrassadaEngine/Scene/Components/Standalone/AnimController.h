@@ -42,7 +42,7 @@ class AnimController
     bool loop                    = false;
     bool playAnimation           = false;
     float playbackSpeed          = 1.0f;
-    float transitionTime         = 5000;
+    float transitionTime         = 10;
     
     ResourceAnimation* currentAnimation = nullptr;
     ResourceAnimation* targetAnimation = nullptr;

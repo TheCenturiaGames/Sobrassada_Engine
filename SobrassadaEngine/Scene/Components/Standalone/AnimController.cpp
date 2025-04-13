@@ -88,9 +88,10 @@ update_status AnimController::Update(float deltaTime)
 
     if (animInfo.fadeTime >= transitionTime)
     {
-        App->GetResourcesModule()->ReleaseResource(currentAnimation);
+        //App->GetResourcesModule()->ReleaseResource(currentAnimation);
         currentAnimation = targetAnimation;
         targetAnimation = nullptr;
+        animInfo.fadeTime = 0;
     }
 
     return UPDATE_CONTINUE;
@@ -124,6 +125,12 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
         Quat targetAnimQuat = Quat(rot);
         GetChannelPosition(animChannel, targetAnimPos);
         GetChannelRotation(animChannel, targetAnimQuat);
+
+        if (nodeName == "Hat2")
+        {
+
+            targetAnimPos += float3(0, 3, 0);
+        }
 
         pos = animPos.Lerp(targetAnimPos, weight);
         rot = Quat::Slerp(animQuat, targetAnimQuat, weight);

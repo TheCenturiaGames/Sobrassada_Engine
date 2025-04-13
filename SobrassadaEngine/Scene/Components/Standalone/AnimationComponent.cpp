@@ -317,7 +317,6 @@ void AnimationComponent::Update(float deltaTime)
     animController->Update(deltaTime);
     
     //Blending en la animacion individual
-    auto nodes = static_cast<ResourceModel*>(App->GetResourcesModule()->RequestResource())->GetModelData().GetNodes();
     for (auto& channel : currentAnimResource->channels)
     {
         const std::string& boneName = channel.first;
@@ -327,13 +326,7 @@ void AnimationComponent::Update(float deltaTime)
         {
             GameObject* bone = boneIt->second;
             float4x4 boneTransform = bone->GetLocalTransform();
-            for (const auto & node : nodes)
-            {
-                if (node.name.compare(boneName) == 0)
-                {
-                    boneTransform = node.transform;
-                }
-            }
+           
             float3 position  = boneTransform.TranslatePart();
             Quat rotation    = Quat(boneTransform.RotatePart());
 
