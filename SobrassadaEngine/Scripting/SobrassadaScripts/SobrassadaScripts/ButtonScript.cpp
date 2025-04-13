@@ -1,9 +1,9 @@
+#include "pch.h"
+#include "ButtonScript.h"
 #include "GameObject.h"
 #include "Component.h"
 #include "Scene/Components/Standalone/UI/ButtonComponent.h"
-#include "ButtonScript.h"
 #include "Utils/Delegate.h"
-#include "pch.h"
 
 bool ButtonScript::Init()
 {

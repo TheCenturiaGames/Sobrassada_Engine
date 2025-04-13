@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "Globals.h"
 #include "ComponentUtils.h"
 
 #include "Geometry/AABB.h"
@@ -7,7 +8,7 @@
 
 class GameObject;
 
-class Component
+class SOBRASADA_API_ENGINE Component
 {
   public:
     Component(UID uid, GameObject* parent, const char* initName, ComponentType type);

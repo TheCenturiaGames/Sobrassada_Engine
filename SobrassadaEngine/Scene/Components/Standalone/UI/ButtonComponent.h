@@ -2,6 +2,7 @@
 
 #include "Component.h"
 #include "Utils/EventDispatcher.h"
+#include "Globals.h"
 
 #include "Math/float3.h"
 
@@ -9,7 +10,7 @@ class Transform2DComponent;
 class CanvasComponent;
 class ImageComponent;
 
-class ButtonComponent : public Component
+class SOBRASADA_API_ENGINE ButtonComponent : public Component
 {
   public:
     ButtonComponent(UID uid, GameObject* parent);
