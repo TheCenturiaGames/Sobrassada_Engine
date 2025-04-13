@@ -315,6 +315,7 @@ void CameraComponent::Update(float deltaTime)
     frustumPlanes.UpdateFrustumPlanes(camera.ViewMatrix(), camera.ProjectionMatrix());
 
     if (App->GetSceneModule()->GetScene()->GetSelectedGameObject() == parent && seePreview) previewEnabled = true;
+    else previewEnabled = false;
 }
 
 void CameraComponent::RenderCameraPreview(float deltaTime)
