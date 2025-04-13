@@ -91,6 +91,8 @@ Scene::~Scene()
     }
     gameObjectsContainer.clear();
 
+    selectedGameObjects.clear();
+
     delete lightsConfig;
     delete sceneOctree;
     delete dynamicTree;
@@ -100,7 +102,6 @@ Scene::~Scene()
     dynamicTree  = nullptr;
 
     App->GetPhysicsModule()->EmptyWorld();
-
     GLOG("%s scene closed", sceneName.c_str());
 }
 
@@ -141,6 +142,9 @@ void Scene::Init()
 
     UpdateStaticSpatialStructure();
     UpdateDynamicSpatialStructure();
+
+    multiSelectParent = new GameObject(GenerateUID(), "MULTISELECT_DUMMY");
+    gameObjectsContainer.insert({multiSelectParent->GetUID(), multiSelectParent});
 }
 
 void Scene::Save(
@@ -247,7 +251,7 @@ update_status Scene::Update(float deltaTime)
     return UPDATE_CONTINUE;
 }
 
-update_status Scene::Render(float deltaTime) const
+update_status Scene::Render(float deltaTime)
 {
     if (!App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_WIREFRAME))
         lightsConfig->RenderSkybox();
@@ -293,6 +297,18 @@ update_status Scene::Render(float deltaTime) const
         {
             gameObject.second->DrawGizmos();
         }
+    }
+
+    DebugDrawModule* debugDraw = App->GetDebugDrawModule();
+
+    for (auto& gameObjectIterator : selectedGameObjects)
+    {
+        GameObject* gameObject = GetGameObjectByUID(gameObjectIterator.first);
+
+        const AABB aabb              = gameObject->GetHierarchyAABB();
+        
+        for (int i = 0; i < 12; ++i)
+            debugDraw->DrawLineSegment(aabb.Edge(i), float3(1.f, 1.0f, 0.5f));
     }
 
     return UPDATE_CONTINUE;
@@ -454,6 +470,8 @@ void Scene::RenderScene()
     if (ImGui::IsWindowHovered() &&
         (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseClicked(ImGuiMouseButton_Middle)))
         ImGui::SetWindowFocus();
+
+    isFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_DockHierarchy);
 
     // do inputs only if window is focused
     if (ImGui::IsWindowHovered(ImGuiFocusedFlags_DockHierarchy))
@@ -629,6 +647,63 @@ void Scene::UpdateGameObjects()
     gameObjectsToUpdate.clear();
 }
 
+void Scene::AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
+{
+    auto pairResult = selectedGameObjects.insert({gameObject, gameObjectParent});
+
+    if (pairResult.second)
+    {
+        GameObject* selectedGameObject       = GetGameObjectByUID(gameObject);
+        GameObject* selectedGameObjectParent = GetGameObjectByUID(gameObjectParent);
+
+        //selectedGameObjectParent->RemoveGameObject(gameObject);
+
+        multiSelectParent->AddGameObject(gameObject);
+
+        selectedGameObject->SetParent(multiSelectParent->GetUID());
+        selectedGameObject->UpdateLocalTransform(multiSelectParent->GetGlobalTransform());
+        selectedGameObject->UpdateTransformForGOBranch();
+
+        selectedGameObjectUID = multiSelectParent->GetUID();
+    }
+    else if (pairResult.first != selectedGameObjects.end())
+    {
+        multiSelectParent->RemoveGameObject(gameObject);
+
+        GameObject* selectedGameObject       = GetGameObjectByUID(gameObject);
+        GameObject* selectedGameObjectParent = GetGameObjectByUID(selectedGameObjects[gameObject]);
+
+        selectedGameObject->SetParent(selectedGameObjectParent->GetUID());
+        selectedGameObjectParent->AddGameObject(gameObject);
+
+        if (selectedGameObjectParent->GetUID() != gameObjectRootUID)
+        {
+            selectedGameObject->UpdateLocalTransform(selectedGameObjectParent->GetGlobalTransform());
+            selectedGameObject->UpdateTransformForGOBranch();
+        }
+
+        selectedGameObjects.erase(pairResult.first);
+    }
+}
+
+void Scene::ClearObjectSelection()
+{
+    for (auto& pairGameObject : selectedGameObjects)
+    {
+        GameObject* currentGameObject        = GetGameObjectByUID(pairGameObject.first);
+        GameObject* selectedGameObjectParent = GetGameObjectByUID(pairGameObject.second);
+
+        multiSelectParent->RemoveGameObject(pairGameObject.first);
+        currentGameObject->SetParent(pairGameObject.second);
+        selectedGameObjectParent->AddGameObject(pairGameObject.first);
+
+        currentGameObject->UpdateLocalTransform(selectedGameObjectParent->GetGlobalTransform());
+        currentGameObject->UpdateTransformForGOBranch();
+    }
+
+    selectedGameObjects.clear();
+}
+
 const std::vector<Component*> Scene::GetAllComponents() const
 {
     std::vector<Component*> collectedComponents;
@@ -643,6 +718,17 @@ const std::vector<Component*> Scene::GetAllComponents() const
         }
     }
     return collectedComponents;
+}
+
+UID Scene::GetMultiselectUID() const
+{
+    return multiSelectParent->GetUID();
+}
+
+void Scene::SetMultiselectPosition(const float3& newPosition)
+{
+    const float4x4 localMat = float4x4::FromTRS(newPosition, float4x4::identity, float3::one);
+    multiSelectParent->SetLocalTransform(localMat);
 }
 
 void Scene::CreateStaticSpatialDataStruct()

@@ -96,9 +96,7 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
     name                   = initialState["Name"].GetString();
     selectedComponentIndex = COMPONENT_NONE;
     mobilitySettings       = initialState["Mobility"].GetInt();
-    if (initialState.HasMember("IsTopParent")) 
-        isTopParent = initialState["IsTopParent"].GetBool();
-   
+    if (initialState.HasMember("IsTopParent")) isTopParent = initialState["IsTopParent"].GetBool();
 
     if (initialState.HasMember("PrefabUID")) prefabUID = initialState["PrefabUID"].GetUint64();
 
@@ -436,6 +434,10 @@ void GameObject::OnTransformUpdated()
     globalOBB                    = globalTransform * OBB(localAABB);
     globalAABB                   = AABB(globalOBB);
 
+    position                     = globalTransform.TranslatePart();
+    rotation                     = globalTransform.RotatePart().ToEulerXYZ();
+    scale                        = globalTransform.GetScale();
+
     MeshComponent* meshComponent = GetMeshComponent();
     if (meshComponent != nullptr)
     {
@@ -470,7 +472,7 @@ AABB GameObject::GetHierarchyAABB()
     std::set<UID> visitedGameObjects;
     std::stack<UID> toVisitGameObjects;
     UID sceneRootUID = App->GetSceneModule()->GetScene()->GetGameObjectRootUID();
-    // ADD "THIS" GAME OBJECT SO WHEN ASCENDING HERIARCHY WE DON'T REVISIT OUR CHILDREN
+
     visitedGameObjects.insert(uid);
 
     // FIRST UPDATE DOWN THE HERIARCHY
@@ -487,7 +489,7 @@ AABB GameObject::GetHierarchyAABB()
             visitedGameObjects.insert(currentUID);
             const GameObject* currentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentUID);
 
-            const AABB& currentAABB       = currentGameObject->GetGlobalAABB();
+            const AABB& currentAABB             = currentGameObject->GetGlobalAABB();
             if (currentAABB.IsFinite() && !currentAABB.IsDegenerate())
                 returnAABB.Enclose(currentGameObject->GetGlobalAABB());
 
