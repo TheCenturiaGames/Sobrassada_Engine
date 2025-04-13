@@ -1,4 +1,4 @@
-#include "ResourceNavMesh.h"
+#include "ResourceNavmesh.h"
 
 #include "Application.h"
 #include "DebugDrawModule.h"

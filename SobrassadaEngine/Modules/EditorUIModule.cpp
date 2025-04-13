@@ -10,11 +10,14 @@
 #include "LibraryModule.h"
 #include "OpenGLModule.h"
 #include "PhysicsModule.h"
+#include "PathfinderModule.h"
 #include "ProjectModule.h"
-#include "SceneImporter.h"
-#include "ResourcesModule.h"
 #include "ResourceNavmesh.h"
+
+#include "ResourcesModule.h"
+#include "SceneImporter.h"
 #include "ResourceStateMachine.h"
+
 #include "SceneModule.h"
 #include "ScriptModule.h"
 #include "TextureEditor.h"
@@ -51,7 +54,8 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"Cube Collider",        COMPONENT_CUBE_COLLIDER       },
         {"Sphere Collider",      COMPONENT_SPHERE_COLLIDER     },
         {"Capsule Collider",     COMPONENT_CAPSULE_COLLIDER    },
-        {"Script",               COMPONENT_SCRIPT              }
+        {"Script",               COMPONENT_SCRIPT              },
+        {"AI Agent",             COMPONENT_AIAGENT             }
     };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;
@@ -257,6 +261,8 @@ void EditorUIModule::Draw()
 
     if (navmesh) Navmesh(navmesh);
 
+    if (crowdControl) CrowdControl(crowdControl);
+
     if (editorSettingsMenu) EditorSettings(editorSettingsMenu);
 }
 
@@ -322,6 +328,7 @@ void EditorUIModule::MainMenu()
             if (ImGui::MenuItem("Inspector", "", inspectorMenu)) inspectorMenu = !inspectorMenu;
             if (ImGui::MenuItem("Lights Config", "", lightConfig)) lightConfig = !lightConfig;
             if (ImGui::MenuItem("Navmesh", "", navmesh)) navmesh = !navmesh;
+            if (ImGui::MenuItem("Crowd Control", "", crowdControl)) crowdControl = !crowdControl;
             ImGui::EndDisabled();
 
             ImGui::EndMenu();
@@ -421,6 +428,17 @@ void EditorUIModule::Navmesh(bool& navmesh)
     }
 
     App->GetResourcesModule()->GetNavMesh()->RenderNavmeshEditor();
+
+    ImGui::End();
+}
+
+void EditorUIModule::CrowdControl(bool& crowdControl)
+{
+    if (!crowdControl) return;
+
+    ImGui::Begin("Crowd Control", &crowdControl, ImGuiWindowFlags_None);
+
+    App->GetPathfinderModule()->RenderCrowdEditor();
 
     ImGui::End();
 }

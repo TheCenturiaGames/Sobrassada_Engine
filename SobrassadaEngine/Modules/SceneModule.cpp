@@ -14,6 +14,7 @@
 #include "ProjectModule.h"
 #include "RaycastController.h"
 #include "ResourcesModule.h"
+#include "PathfinderModule.h"
 
 #include <SDL_mouse.h>
 #ifdef OPTICK
@@ -90,7 +91,8 @@ update_status SceneModule::PostUpdate(float deltaTime)
         {
             const KeyState* mouseButtons = App->GetInputModule()->GetMouseButtons();
             const KeyState* keyboard     = App->GetInputModule()->GetKeyboard();
-            if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_DOWN && !keyboard[SDL_SCANCODE_LALT])
+            if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_DOWN && !keyboard[SDL_SCANCODE_LALT] &&
+                keyboard[SDL_SCANCODE_LSHIFT])
             {
                 GameObject* selectedObject = RaycastController::GetRayIntersectionTrees<Octree, Quadtree>(
                     App->GetCameraModule()->CastCameraRay(), loadedScene->GetOctree(), loadedScene->GetDynamicTree()
@@ -98,8 +100,30 @@ update_status SceneModule::PostUpdate(float deltaTime)
 
                 if (selectedObject != nullptr)
                 {
-                    loadedScene->SetSelectedGameObject(selectedObject->GetUID());
+                    if (!loadedScene->IsMultiselecting())
+                        loadedScene->SetMultiselectPosition(selectedObject->GetPosition());
+
+                    loadedScene->AddGameObjectToSelection(selectedObject->GetUID(), selectedObject->GetParent());
                 }
+            }
+            else if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_DOWN && !keyboard[SDL_SCANCODE_LALT])
+            {
+                GameObject* selectedObject = RaycastController::GetRayIntersectionTrees<Octree, Quadtree>(
+                    App->GetCameraModule()->CastCameraRay(), loadedScene->GetOctree(), loadedScene->GetDynamicTree()
+                );
+
+                if (selectedObject != nullptr) loadedScene->SetSelectedGameObject(selectedObject->GetUID());
+
+                loadedScene->ClearObjectSelection();
+            }
+        }
+
+        if (GetDoInputsGame())
+        {
+            const KeyState* mouseButtons = App->GetInputModule()->GetMouseButtons();
+            if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_DOWN)
+            {
+                App->GetPathfinderModule()->HandleClickNavigation();
             }
         }
 
@@ -118,6 +142,9 @@ update_status SceneModule::PostUpdate(float deltaTime)
 
             loadedScene->UpdateGameObjects();
         }
+
+        // IF SCENE NOT FOCUSED AND WAS MULTISELECTING RELEASE
+        if (loadedScene->IsMultiselecting() && !loadedScene->IsSceneFocused()) loadedScene->ClearObjectSelection();
 
         if (loadedScene->GetStopPlaying()) SwitchPlayMode(false);
     }

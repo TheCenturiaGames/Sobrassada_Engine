@@ -24,7 +24,8 @@ enum class FileType
     Animation,
     Prefab,
     StateMachine,
-    Font
+    Font,
+    Navmesh
 };
 
 class LibraryModule : public Module

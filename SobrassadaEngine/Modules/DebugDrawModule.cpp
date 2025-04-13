@@ -694,7 +694,7 @@ void DebugDrawModule::DrawLine(
     dd::line(origin, dir + origin, color, 0, enableDepth);
 }
 
-// TODO, CHECK IF PROPER WAY OF IMPLEMENTATION
+
 void DebugDrawModule::DrawLine(const btVector3& from, const btVector3& to, const btVector3& color)
 {
     dd::line(
@@ -731,6 +731,21 @@ void DebugDrawModule::Draw(const float4x4& view, const float4x4& proj, unsigned 
 void DebugDrawModule::DrawAxisTriad(const float4x4& transform, bool depthEnabled)
 {
     dd::axisTriad(transform, 0.005f, 0.05f, 0, depthEnabled);
+}
+
+void DebugDrawModule::DrawCross(const float3& position, const float length)
+{
+    dd::cross(position, length);
+}
+
+void DebugDrawModule::DrawPoint(const float3& position, const float size)
+{
+    dd::point(position, float3(1, 1, 1), size);
+}
+
+void DebugDrawModule::DrawCone(const float3& center, const float3& dir, const float baseRadius, const float apexRadius)
+{
+    dd::cone(center, dir, float3(1, 1, 1), baseRadius, apexRadius);
 }
 
 void DebugDrawModule::Draw3DText(const btVector3& location, const char* textString)

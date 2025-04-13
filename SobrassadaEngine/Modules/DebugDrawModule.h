@@ -60,6 +60,9 @@ class DebugDrawModule : public Module
     void DrawCircle(const float3& center, const float3& upVector, const float3& color, const float radius);
     void DrawSphere(const float3& center, const float3& color, const float radius);
     void DrawAxisTriad(const float4x4& transform, bool depthEnabled = true);
+    void DrawCross(const float3& center, const float length);
+    void DrawPoint(const float3& center, const float size);
+    void DrawCone(const float3& center, const float3& dir, const float baseRadius, const float apexRadius);
     void Draw3DText(const btVector3& location, const char* textString);
     void DrawContactPoint(
         const btVector3& PointOnB, const btVector3& normalOnB, float distance, int lifeTime, const btVector3& color

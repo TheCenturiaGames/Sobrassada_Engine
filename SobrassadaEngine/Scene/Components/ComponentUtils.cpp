@@ -15,7 +15,7 @@
 #include "Standalone/UI/CanvasComponent.h"
 #include "Standalone/UI/Transform2DComponent.h"
 #include "Standalone/UI/UILabelComponent.h"
-
+#include "Standalone/AIAgentComponent.h"
 #include <cstdint>
 
 Component* ComponentUtils::CreateEmptyComponent(const ComponentType type, const UID uid, GameObject* parent)
@@ -67,6 +67,9 @@ Component* ComponentUtils::CreateEmptyComponent(const ComponentType type, const 
     case COMPONENT_ANIMATION:
         generatedComponent = new AnimationComponent(uid, parent);
         break;
+    case COMPONENT_AIAGENT:
+        generatedComponent = new AIAgentComponent(uid, parent);
+        break;
     default:
         return nullptr;
     }
@@ -112,6 +115,8 @@ Component* ComponentUtils::CreateExistingComponent(const rapidjson::Value& initi
             return new CapsuleColliderComponent(initialState, parent);
         case COMPONENT_ANIMATION:
             return new AnimationComponent(initialState, parent);
+        case COMPONENT_AIAGENT:
+            return new AIAgentComponent(initialState, parent);
         default:
             return nullptr;
         }
