@@ -11,11 +11,6 @@ class ResourceStateMachine;
 class AnimController;
 class GameObject;
 
-struct ActiveAnimInfo
-{
-    float currentTime            = 0.0f;
-    float fadeTime               = 0.0f;
-};
 
 class AnimationComponent : public Component
 {

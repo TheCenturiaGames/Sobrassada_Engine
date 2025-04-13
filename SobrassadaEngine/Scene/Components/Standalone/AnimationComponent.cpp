@@ -50,28 +50,42 @@ AnimationComponent::~AnimationComponent()
 void AnimationComponent::OnPlay(bool isTransition)
 {
     StateMachineEditor* stateMachine = nullptr;
+    float transitionTime = 0;
     if (animController != nullptr && resource != 0)
     {
         // animController->Play(resource, true);
         stateMachine = App->GetEditorUIModule()->GetStateMachine();
-        stateMachine->SetAnimComponent(this);
-        resourceStateMachine     = stateMachine->GetLoadedStateMachine();
-        const State* activeState = resourceStateMachine->GetActiveState();
-        for (const auto& state : resourceStateMachine->states)
+        if (stateMachine)
         {
-            if (state.name.GetString() == activeState->name.GetString())
+            stateMachine->SetAnimComponent(this);
+            resourceStateMachine     = stateMachine->GetLoadedStateMachine();
+            const State* activeState = resourceStateMachine->GetActiveState();
+            for (const auto& state : resourceStateMachine->states)
             {
-                for (const auto& clip : resourceStateMachine->clips)
+                if (state.name.GetString() == activeState->name.GetString())
                 {
-                    if (clip.clipName.GetString() == activeState->clipName.GetString())
+                    for (const auto& transition : resourceStateMachine->transitions)
                     {
-                        if (isTransition)
-                            animController->SetTargetAnimationResource(clip.animationResourceUID);
-                        else
-                            animController->Play(clip.animationResourceUID, true);
+                        if (state.name.GetString() == transition.toState.GetString())
+                        {
+                            transitionTime = transition.interpolationTime;
+                        }
+                    }
+                    for (const auto& clip : resourceStateMachine->clips)
+                    {
+                        if (clip.clipName.GetString() == activeState->clipName.GetString())
+                        {
+                            GLOG("TransitionTime: %f", transitionTime);
+                            if (isTransition) animController->SetTargetAnimationResource(clip.animationResourceUID, 10);
+                            else animController->Play(clip.animationResourceUID, true);
+                        }
                     }
                 }
             }
+        }
+        else
+        {
+            animController->Play(resource, true);
         }
     }
 }
@@ -315,8 +329,8 @@ void AnimationComponent::Update(float deltaTime)
     }
 
     animController->Update(deltaTime);
-    
-    //Blending en la animacion individual
+
+    // Blending en la animacion individual
     for (auto& channel : currentAnimResource->channels)
     {
         const std::string& boneName = channel.first;
@@ -324,11 +338,11 @@ void AnimationComponent::Update(float deltaTime)
         auto boneIt                 = boneMapping.find(boneName);
         if (boneIt != boneMapping.end())
         {
-            GameObject* bone = boneIt->second;
+            GameObject* bone       = boneIt->second;
             float4x4 boneTransform = bone->GetLocalTransform();
-           
-            float3 position  = boneTransform.TranslatePart();
-            Quat rotation    = Quat(boneTransform.RotatePart());
+
+            float3 position        = boneTransform.TranslatePart();
+            Quat rotation          = Quat(boneTransform.RotatePart());
 
             animController->GetTransform(boneName, position, rotation);
 

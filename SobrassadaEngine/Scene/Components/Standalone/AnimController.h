@@ -5,6 +5,12 @@
 class ResourceAnimation;
 class Channel;
 
+struct ActiveAnimInfo
+{
+    float currentTime = 0.0f;
+    float fadeTime    = 0.0f;
+};
+
 class AnimController
 {
   public:
@@ -21,7 +27,7 @@ class AnimController
     ResourceAnimation* GetCurrentAnimation() const { return currentAnimation; }
     float GetTime() const { return currentTime; }
 
-    void SetTargetAnimationResource(UID uid);
+    void SetTargetAnimationResource(UID uid, float transitionTime);
     void SetPlaybackSpeed(float speed) { playbackSpeed = speed; }
     void SetTime(float time) { currentTime = time; }
 
@@ -42,7 +48,7 @@ class AnimController
     bool loop                    = false;
     bool playAnimation           = false;
     float playbackSpeed          = 1.0f;
-    float transitionTime         = 10;
+    unsigned transitionTime         = 0;
     
     ResourceAnimation* currentAnimation = nullptr;
     ResourceAnimation* targetAnimation = nullptr;

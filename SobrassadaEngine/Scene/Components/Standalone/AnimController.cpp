@@ -83,15 +83,20 @@ update_status AnimController::Update(float deltaTime)
         }
     }
 
-    animInfo.fadeTime += deltaTime;
-    animInfo.currentTime += deltaTime;
 
-    if (animInfo.fadeTime >= transitionTime)
+    if (targetAnimation != nullptr)
     {
-        //App->GetResourcesModule()->ReleaseResource(currentAnimation);
-        currentAnimation = targetAnimation;
-        targetAnimation = nullptr;
-        animInfo.fadeTime = 0;
+
+        animInfo.fadeTime    += deltaTime;
+        animInfo.currentTime += deltaTime;
+
+        if (animInfo.fadeTime >= static_cast<float>(transitionTime))
+        {
+            // App->GetResourcesModule()->ReleaseResource(currentAnimation);
+            currentAnimation  = targetAnimation;
+            targetAnimation   = nullptr;
+            animInfo.fadeTime = 0;
+        }
     }
 
     return UPDATE_CONTINUE;
@@ -140,9 +145,10 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
     // TODO https://stackoverflow.com/questions/66522629/given-3-or-more-numbers-or-vectors-how-do-i-interpolate-between-them-based-on-a
 }
 
-void AnimController::SetTargetAnimationResource(UID uid)
+void AnimController::SetTargetAnimationResource(UID uid, float timeTransition)
 {
     targetAnimation = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(uid));
+    transitionTime  = timeTransition;
 }
 
 void AnimController::GetChannelPosition(const Channel* animChannel, float3& pos) const

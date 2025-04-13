@@ -305,7 +305,8 @@ void StateMachineEditor::ShowInspector()
         {
             const std::string& newClipName = animationNames[currentClipIndex];
             UID newClipUID                 = App->GetLibraryModule()->GetAnimUID(newClipName);
-            resource->EditClipInfo(currentClipName, newClipUID, newClipName, false);
+            //resource->EditClipInfo(currentClipName, newClipUID, newClipName, false);
+            resource->AddClip(newClipUID, newClipName, false);
             resource->EditState(selectedNode->GetStateName(), selectedNode->GetStateName(), newClipName);
             selectedNode->SetClipName(newClipName);
 
