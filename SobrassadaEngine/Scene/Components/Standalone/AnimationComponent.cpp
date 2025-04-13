@@ -254,12 +254,9 @@ void AnimationComponent::OnInspector()
     if (ImGui::CollapsingHeader("Animation Library"))
     {
         std::string selectedZombunnyAnim = "";
-        UID selectedZombunnyUID          = 0;
 
         ImGui::Text("Available Animations:");
         const std::unordered_map<std::string, UID>& animationMap = App->GetLibraryModule()->GetAnimMap();
-
-        std::unordered_map<std::string, std::vector<std::string>> groupedAnimations;
 
         for (const auto& pair : animationMap)
         {
