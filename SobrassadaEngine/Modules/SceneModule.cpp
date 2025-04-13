@@ -17,6 +17,7 @@
 #include "ResourcesModule.h"
 
 #include <SDL_mouse.h>
+#include <queue>
 #ifdef OPTICK
 #include "optick.h"
 #endif
@@ -138,9 +139,39 @@ update_status SceneModule::PostUpdate(float deltaTime)
             GameObject* gameObjectToCloneParent = loadedScene->GetGameObjectByUID(gameObjectToClone->GetParent());
 
             GameObject* clonedGameObject        = new GameObject(gameObjectToClone->GetParent(), gameObjectToClone);
+            GameObject* firstClone = clonedGameObject;
 
             gameObjectToCloneParent->AddChildren(clonedGameObject->GetUID());
             loadedScene->AddGameObject(clonedGameObject->GetUID(), clonedGameObject);
+           
+            // CREATE DOWARDS HIERARCHY, FIRST ADD ALL CHILDREN (Parent, ChildrenUID)
+            std::queue<std::pair<UID, UID>> gameObjectsToClone;
+
+            for (UID child : gameObjectToClone->GetChildren())
+            {
+                gameObjectsToClone.push(std::make_pair(clonedGameObject->GetUID(), child));
+            }
+
+            Scene* scene = App->GetSceneModule()->GetScene();
+
+            while (!gameObjectsToClone.empty())
+            {
+                std::pair<UID, UID> currentGameObjectPair = gameObjectsToClone.front();
+                gameObjectsToClone.pop();
+
+                gameObjectToClone = loadedScene->GetGameObjectByUID(currentGameObjectPair.second);
+                gameObjectToCloneParent = loadedScene->GetGameObjectByUID(currentGameObjectPair.first);
+
+                for (UID child : gameObjectToClone->GetChildren())
+                {
+                    gameObjectsToClone.push(std::make_pair(gameObjectToClone->GetUID(), child));
+                }
+
+                clonedGameObject = new GameObject(currentGameObjectPair.first, gameObjectToClone);
+
+                gameObjectToCloneParent->AddChildren(clonedGameObject->GetUID());
+                loadedScene->AddGameObject(clonedGameObject->GetUID(), clonedGameObject);
+            }
         }
 
         // Delete -> Delete selected game object

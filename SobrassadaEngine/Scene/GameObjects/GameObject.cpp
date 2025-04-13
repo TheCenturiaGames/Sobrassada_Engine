@@ -11,7 +11,6 @@
 #include "Standalone/UI/Transform2DComponent.h"
 
 #include "imgui.h"
-#include <queue>
 #include <set>
 #include <stack>
 
@@ -55,8 +54,14 @@ GameObject::GameObject(UID parentUID, GameObject* refObject)
     localAABB = AABB();
     localAABB.SetNegativeInfinity();
 
-    globalOBB  = OBB(localAABB);
-    globalAABB = AABB(globalOBB);
+    globalOBB        = OBB(localAABB);
+    globalAABB       = AABB(globalOBB);
+    isTopParent      = refObject->isTopParent;
+    mobilitySettings = refObject->mobilitySettings;
+
+    position         = refObject->position;
+    rotation         = refObject->rotation;
+    scale            = refObject->scale;
 
     // Must make a copy of each manually
     for (const auto& component : refObject->components)
@@ -64,28 +69,6 @@ GameObject::GameObject(UID parentUID, GameObject* refObject)
         CreateComponent(component.first);
         Component* newComponent = GetComponentByType(component.first);
         newComponent->Clone(component.second);
-    }
-
-    // CREATE DOWARDS HIERARCHY, FIRST ADD ALL CHILDREN (Parent, ChildrenUID)
-    std::queue<std::pair<UID, UID>> gameObjectsToClone;
-
-    for (UID child : refObject->GetChildren())
-    {
-        gameObjectsToClone.push(std::make_pair(uid, child));
-    }
-
-    Scene* scene = App->GetSceneModule()->GetScene();
-
-    while (!gameObjectsToClone.empty())
-    {
-        std::pair<UID, UID> currentGameObjectPair = gameObjectsToClone.front();
-        gameObjectsToClone.pop();
-
-        GameObject* otherGameObject = scene->GetGameObjectByUID(currentGameObjectPair.second);
-
-        GameObject* newClone        = new GameObject(currentGameObjectPair.first, otherGameObject);
-        AddChildren(newClone->uid);
-        scene->AddGameObject(newClone->GetUID(), newClone);
     }
 
     OnAABBUpdated();
