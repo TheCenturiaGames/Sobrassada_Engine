@@ -344,7 +344,6 @@ void CameraComponent::RenderCameraPreview(float deltaTime)
     }
 
     static bool open          = true;
-    // Position the preview at the bottom right of the main framebuffer
     ImVec2 pos(
         static_cast<float>(mainFramebufferWidth - previewWidth + 200),
         static_cast<float>(mainFramebufferHeight - previewHeight + 50)
@@ -373,7 +372,6 @@ void CameraComponent::RenderCameraPreview(float deltaTime)
 
 void CameraComponent::Render(float deltaTime)
 {
-    //There's a bug where we need to move the camera to see the camera (also in VS2)
     if (!enabled || !drawGizmos || App->GetSceneModule()->GetInPlayMode()) return;
     DebugDrawModule* debug = App->GetDebugDrawModule();
     debug->DrawFrustrum(camera.ProjectionMatrix(), camera.ViewMatrix());
