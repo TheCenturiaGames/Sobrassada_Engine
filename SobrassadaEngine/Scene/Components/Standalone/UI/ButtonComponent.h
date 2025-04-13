@@ -32,6 +32,7 @@ class SOBRASADA_API_ENGINE ButtonComponent : public Component
 
   private:
     bool IsWithinBounds(const float2& pos);
+    void OnInteractionChange();
 
   private:
     Transform2DComponent* transform2D;
@@ -40,7 +41,9 @@ class SOBRASADA_API_ENGINE ButtonComponent : public Component
 
     float3 defaultColor;
     float3 hoverColor;
+    float3 disabledColor;
 
     bool isHovered;
+    bool isInteractable;
     EventDispatcher<void> onClickDispatcher;
 };
