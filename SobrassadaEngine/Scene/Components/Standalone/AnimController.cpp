@@ -126,11 +126,11 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
         GetChannelPosition(animChannel, targetAnimPos);
         GetChannelRotation(animChannel, targetAnimQuat);
 
-        if (nodeName == "Hat2")
+       /* if (nodeName == "Hat2")
         {
 
             targetAnimPos += float3(0, 3, 0);
-        }
+        }*/
 
         pos = animPos.Lerp(targetAnimPos, weight);
         rot = Quat::Slerp(animQuat, targetAnimQuat, weight);
