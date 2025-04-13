@@ -65,6 +65,10 @@ CameraComponent::CameraComponent(const rapidjson::Value& initialState, GameObjec
     {
         drawGizmos = initialState["DrawGizmos"].GetBool();
     }
+    if (initialState.HasMember("SeePreview"))
+    {
+        seePreview = initialState["SeePreview"].GetBool();
+    }
 
     if (initialState.HasMember("CameraType"))
     {
@@ -155,6 +159,7 @@ void CameraComponent::Save(rapidjson::Value& targetState, rapidjson::Document::A
 
     targetState.AddMember("MainCamera", isMainCamera, allocator);
     targetState.AddMember("DrawGizmos", drawGizmos, allocator);
+    targetState.AddMember("SeePreview", seePreview, allocator);
     targetState.AddMember("CameraType", (camera.type == OrthographicFrustum) ? 1 : 0, allocator);
 
     rapidjson::Value cameraPos(rapidjson::kArrayType);
@@ -211,6 +216,7 @@ void CameraComponent::Clone(const Component* other)
         ortographicFarPlane                = otherCamera->ortographicFarPlane;
 
         firstTime                          = otherCamera->firstTime;
+        seePreview                         = otherCamera->seePreview;
     }
     else
     {
@@ -235,6 +241,7 @@ void CameraComponent::RenderEditorInspector()
             }
         }
         ImGui::Checkbox("Draw gizmos", &drawGizmos);
+        ImGui::Checkbox("See Preview", &seePreview);
 
         if (ImGui::DragFloat("Near Plane", &camera.nearPlaneDistance, 0.01f, 0.01f, camera.farPlaneDistance, "%.2f"))
         {
@@ -307,16 +314,20 @@ void CameraComponent::Update(float deltaTime)
 
     frustumPlanes.UpdateFrustumPlanes(camera.ViewMatrix(), camera.ProjectionMatrix());
 
-    if (App->GetSceneModule()->GetScene()->GetSelectedGameObject() == parent) previewEnabled = true;
+    if (App->GetSceneModule()->GetScene()->GetSelectedGameObject() == parent && seePreview) previewEnabled = true;
 }
 
 void CameraComponent::RenderCameraPreview(float deltaTime)
 {
+    int mainFramebufferWidth  = App->GetOpenGLModule()->GetFramebuffer()->GetTextureWidth();
+    int mainFramebufferHeight = App->GetOpenGLModule()->GetFramebuffer()->GetTextureHeight();
+
+    float scaleFactor         = 0.2f;
+    previewWidth  = static_cast<int>(mainFramebufferWidth * scaleFactor);
+    previewHeight = static_cast<int>(previewWidth / camera.AspectRatio());
+
     if (!autorendering)
     {
-        previewWidth  = 250;
-        previewHeight = static_cast<int>(previewWidth / camera.AspectRatio());
-
         previewFramebuffer->Resize(previewWidth, previewHeight);
         previewFramebuffer->CheckResize();
 
@@ -329,20 +340,20 @@ void CameraComponent::RenderCameraPreview(float deltaTime)
 
         App->GetOpenGLModule()->GetFramebuffer()->Bind();
 
-        glViewport(
-            0, 0, App->GetOpenGLModule()->GetFramebuffer()->GetTextureWidth(),
-            App->GetOpenGLModule()->GetFramebuffer()->GetTextureHeight()
-        );
+        glViewport(0, 0, mainFramebufferWidth, mainFramebufferHeight);
     }
 
-    static bool open = true;
-    //TODO: tener en cuenta el tamaño del framebuffer grande para la posicion y la escala del framebuffer pequeño
+    static bool open          = true;
+    // Position the preview at the bottom right of the main framebuffer
     ImVec2 pos(
-        static_cast<float>(App->GetOpenGLModule()->GetFramebuffer()->GetTextureWidth() - 45),
-        static_cast<float>(App->GetOpenGLModule()->GetFramebuffer()->GetTextureHeight() - 105)
+        static_cast<float>(mainFramebufferWidth - previewWidth + 200),
+        static_cast<float>(mainFramebufferHeight - previewHeight + 50)
     );
-    ImGui::SetNextWindowSize(ImVec2((float)previewWidth + 16, (float)previewHeight + 16));
+
+    // Set the size of the preview window
+    ImGui::SetNextWindowSize(ImVec2(static_cast<float>(previewWidth + 16), static_cast<float>(previewHeight + 16)));
     ImGui::SetNextWindowPos(pos);
+
     if (ImGui::Begin(
             "Camera Preview", &open,
             ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse
@@ -362,6 +373,7 @@ void CameraComponent::RenderCameraPreview(float deltaTime)
 
 void CameraComponent::Render(float deltaTime)
 {
+    //There's a bug where we need to move the camera to see the camera (also in VS2)
     if (!enabled || !drawGizmos || App->GetSceneModule()->GetInPlayMode()) return;
     DebugDrawModule* debug = App->GetDebugDrawModule();
     debug->DrawFrustrum(camera.ProjectionMatrix(), camera.ViewMatrix());

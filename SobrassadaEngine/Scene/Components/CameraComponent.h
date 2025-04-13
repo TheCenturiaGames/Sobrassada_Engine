@@ -53,16 +53,17 @@ class CameraComponent : public Component
 
     float orthographicWidth;
     float orthographicHeight;
-    float ortographicNearPlane = 25.10f;
-    float ortographicFarPlane  = 50.0f;
+    float ortographicNearPlane      = 25.10f;
+    float ortographicFarPlane       = 50.0f;
 
-    bool firstTime             = true;
+    bool firstTime                  = true;
 
-    bool previewEnabled = false;
+    bool previewEnabled             = false;
+    bool seePreview                 = true;
 
     Framebuffer* previewFramebuffer = nullptr;
-    int previewWidth = 256;
-    int previewHeight = 256;
+    int previewWidth                = 256;
+    int previewHeight               = 256;
 
     bool autorendering              = false;
 };
