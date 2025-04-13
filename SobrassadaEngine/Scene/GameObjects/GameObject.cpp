@@ -13,6 +13,7 @@
 #include "imgui.h"
 #include <set>
 #include <stack>
+#include <queue>
 
 GameObject::GameObject(const std::string& name) : name(name)
 {
@@ -63,6 +64,27 @@ GameObject::GameObject(UID parentUID, GameObject* refObject)
         CreateComponent(component.first);
         Component* newComponent = GetComponentByType(component.first);
         newComponent->Clone(component.second);
+    }
+
+    // CREATE DOWARDS HIERARCHY, FIRST ADD ALL CHILDREN (Parent, ChildrenUID)
+    std::queue<std::pair<UID, UID>> gameObjectsToClone;
+
+    for (UID child : refObject->GetChildren())
+    {
+        gameObjectsToClone.push(std::make_pair(uid, child));
+    }
+
+    Scene* scene = App->GetSceneModule()->GetScene();
+
+    while (!gameObjectsToClone.empty())
+    {
+        std::pair<UID, UID> currentGameObjectPair = gameObjectsToClone.front();
+        gameObjectsToClone.pop();
+
+        GameObject* otherGameObject = scene->GetGameObjectByUID(currentGameObjectPair.second);
+
+        GameObject* newClone        = new GameObject(uid ,otherGameObject);
+        scene->AddGameObject(newClone->GetUID(), newClone);
     }
 
     OnAABBUpdated();

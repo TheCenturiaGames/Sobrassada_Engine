@@ -10,11 +10,11 @@
 #include "ImGuizmo.h"
 #include "InputModule.h"
 #include "LibraryModule.h"
+#include "PathfinderModule.h"
 #include "PhysicsModule.h"
 #include "ProjectModule.h"
 #include "RaycastController.h"
 #include "ResourcesModule.h"
-#include "PathfinderModule.h"
 
 #include <SDL_mouse.h>
 #ifdef OPTICK
@@ -86,11 +86,14 @@ update_status SceneModule::PostUpdate(float deltaTime)
 {
     if (App->GetProjectModule()->IsProjectLoaded())
     {
+
+        const KeyState* mouseButtons = App->GetInputModule()->GetMouseButtons();
+        const KeyState* keyboard     = App->GetInputModule()->GetKeyboard();
+
         // CAST RAY WHEN LEFT CLICK IS RELEASED
         if (GetDoMouseInputsScene() && !ImGuizmo::IsUsingAny())
         {
-            const KeyState* mouseButtons = App->GetInputModule()->GetMouseButtons();
-            const KeyState* keyboard     = App->GetInputModule()->GetKeyboard();
+
             if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_DOWN && !keyboard[SDL_SCANCODE_LALT])
             {
                 GameObject* selectedObject = RaycastController::GetRayIntersectionTrees<Octree, Quadtree>(
@@ -106,11 +109,16 @@ update_status SceneModule::PostUpdate(float deltaTime)
 
         if (GetDoInputsGame())
         {
-            const KeyState* mouseButtons = App->GetInputModule()->GetMouseButtons();
             if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_DOWN)
             {
                 App->GetPathfinderModule()->HandleClickNavigation();
             }
+        }
+
+        // CTRL+D -> Duplicate selected game object
+        if (keyboard[SDL_SCANCODE_LCTRL] && keyboard[SDL_SCANCODE_D] == KeyState::KEY_DOWN)
+        {
+            // GameObject* clonedGameObject = new GameObject()
         }
 
         // CHECKING FOR UPDATED STATIC AND DYNAMIC OBJECTS
