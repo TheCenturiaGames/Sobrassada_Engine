@@ -26,6 +26,7 @@ class Transform2DComponent : public Component
     void OnTransform3DUpdated(const float4x4& transform3D);
     void OnParentChange();
     void GetCanvas();
+    void AdaptToParentChanges();
 
     float2 GetRenderingPosition() const;
     float2 GetGlobalPosition() const;

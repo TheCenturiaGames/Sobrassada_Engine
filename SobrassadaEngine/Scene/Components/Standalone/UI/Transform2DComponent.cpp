@@ -401,36 +401,41 @@ void Transform2DComponent::OnSizeChanged()
     // When the size is changed, update the children anchors and margins as well
     for (const auto& child : childTransforms)
     {
-        child->OnAnchorsUpdated();
-
-        if (child->anchorsX.x == child->anchorsX.y)
-        {
-            child->position.x = child->previousPosition.x;
-        }
-        else
-        {
-            child->margins.x = child->previousMargins.x;
-            child->OnLeftMarginChanged();
-
-            child->margins.y = child->previousMargins.y;
-            child->OnRightMarginChanged();
-        }
-
-        if (child->anchorsY.x == child->anchorsY.y)
-        {
-            child->position.y = child->previousPosition.y;
-        }
-        else
-        {
-            child->margins.z = child->previousMargins.z;
-            child->OnTopMarginChanged();
-
-            child->margins.w = child->previousMargins.w;
-            child->OnBottomMarginChanged();
-        }
-
-        child->UpdateParent3DTransform();
+        child->AdaptToParentChanges();
     }
+}
+
+void Transform2DComponent::AdaptToParentChanges()
+{
+    OnAnchorsUpdated();
+
+    if (anchorsX.x == anchorsX.y)
+    {
+        position.x = previousPosition.x;
+    }
+    else
+    {
+        margins.x = previousMargins.x;
+        OnLeftMarginChanged();
+
+        margins.y = previousMargins.y;
+        OnRightMarginChanged();
+    }
+
+    if (anchorsY.x == anchorsY.y)
+    {
+        position.y = previousPosition.y;
+    }
+    else
+    {
+        margins.z = previousMargins.z;
+        OnTopMarginChanged();
+
+        margins.w = previousMargins.w;
+        OnBottomMarginChanged();
+    }
+
+    UpdateParent3DTransform();
 }
 
 void Transform2DComponent::OnLeftMarginChanged()

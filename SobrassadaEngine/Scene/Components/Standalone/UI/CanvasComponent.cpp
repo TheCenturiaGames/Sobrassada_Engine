@@ -82,9 +82,11 @@ void CanvasComponent::Clone(const Component* other)
 
 void CanvasComponent::Update(float deltaTime)
 {
-    //const auto& size = App->GetSceneModule()->GetScene()->GetWindowSize();
-    //width            = std::get<0>(size);
-    //height           = std::get<1>(size);
+    const auto& size = App->GetSceneModule()->GetScene()->GetWindowSize();
+    if (width != std::get<0>(size) || height != std::get<1>(size))
+    {
+        OnWindowResize(std::get<0>(size), std::get<1>(size));
+    }
 }
 
 void CanvasComponent::Render(float deltaTime)
@@ -134,10 +136,7 @@ void CanvasComponent::RenderUI()
     // Get the view and projection matrix (world space or screen space)
     const float4x4& view = isInWorldSpaceEditor ? App->GetCameraModule()->GetViewMatrix() : float4x4::identity;
     const float4x4& proj = isInWorldSpaceEditor ? App->GetCameraModule()->GetProjectionMatrix()
-                                                : float4x4::D3DOrthoProjLH(
-                                                      -1, 1, (float)App->GetWindowModule()->GetWidth(),
-                                                      (float)App->GetWindowModule()->GetHeight()
-                                                  );
+                                                : float4x4::D3DOrthoProjLH(-1, 1, width, height);
 
     for (const GameObject* child : sortedChildren)
     {
@@ -181,7 +180,14 @@ void CanvasComponent::OnWindowResize(const unsigned int width, const unsigned in
         )
     );
 
-    parent->UpdateTransformForGOBranch();
+    // parent->UpdateTransformForGOBranch();
+
+    for (const GameObject* child : sortedChildren)
+    {
+        // Only render UI components
+        Component* transform2D = child->GetComponentByType(COMPONENT_TRANSFORM_2D);
+        if (transform2D) static_cast<Transform2DComponent*>(transform2D)->AdaptToParentChanges();
+    }
 }
 
 void CanvasComponent::UpdateChildren()
@@ -212,7 +218,7 @@ void CanvasComponent::UpdateChildren()
 
 void CanvasComponent::UpdateMousePosition(const float2& mousePos)
 {
-    //GLOG("Mouse pos: %f, %f", mousePos.x, mousePos.y);
+    // GLOG("Mouse pos: %f, %f", mousePos.x, mousePos.y);
     hoveredButton    = nullptr;
     bool buttonFound = false;
 
