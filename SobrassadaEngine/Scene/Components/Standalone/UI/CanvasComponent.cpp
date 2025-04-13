@@ -212,8 +212,8 @@ void CanvasComponent::UpdateChildren()
 
 void CanvasComponent::UpdateMousePosition(const float2& mousePos)
 {
-    GLOG("Mouse pos: %f, %f", mousePos.x, mousePos.y);
-
+    //GLOG("Mouse pos: %f, %f", mousePos.x, mousePos.y);
+    hoveredButton    = nullptr;
     bool buttonFound = false;
 
     for (int i = sortedChildren.size() - 1; i >= 0; --i)
@@ -234,5 +234,5 @@ void CanvasComponent::UpdateMousePosition(const float2& mousePos)
 
 void CanvasComponent::OnMouseButtonPressed()
 {
-    hoveredButton->OnClick();
+    if (hoveredButton) hoveredButton->OnClick();
 }

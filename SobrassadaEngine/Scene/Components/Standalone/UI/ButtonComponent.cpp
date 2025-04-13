@@ -120,7 +120,7 @@ bool ButtonComponent::UpdateMousePosition(const float2& mousePos, bool dismiss)
 {
     if (!dismiss && IsWithinBounds(mousePos))
     {
-        GLOG("Mouse is in");
+        //GLOG("Mouse is in");
 
         if (!isHovered)
         {
@@ -145,26 +145,37 @@ bool ButtonComponent::UpdateMousePosition(const float2& mousePos, bool dismiss)
 void ButtonComponent::OnClick()
 {
     GLOG("Clicked button!");
+    onClickDispatcher.Call();
 }
 
 bool ButtonComponent::IsWithinBounds(const float2& pos)
 {
     if (transform2D == nullptr) return false;
 
-    GLOG("Mouse pos: %f, %f", pos.x, pos.y);
+    //GLOG("Mouse pos: %f, %f", pos.x, pos.y);
     const float2 screenPos = float2(
         transform2D->GetGlobalPosition().x + (parentCanvas->GetWidth() / 2),
         transform2D->GetGlobalPosition().y + (parentCanvas->GetHeight() / 2)
     );
-    GLOG(
-        "Max x: %f. Min x: %f. Max y: %f. Min y: %f", screenPos.x + (transform2D->size.x / 2),
-        screenPos.x - (transform2D->size.x / 2), screenPos.y - (transform2D->size.y / 2),
-        screenPos.y + (transform2D->size.y / 2)
-    )
+    //GLOG(
+    //    "Max x: %f. Min x: %f. Max y: %f. Min y: %f", screenPos.x + (transform2D->size.x / 2),
+    //    screenPos.x - (transform2D->size.x / 2), screenPos.y - (transform2D->size.y / 2),
+    //    screenPos.y + (transform2D->size.y / 2)
+    //)
 
     if (pos.x < screenPos.x + (transform2D->size.x / 2) && pos.x > screenPos.x - (transform2D->size.x / 2) &&
         pos.y < screenPos.y + (transform2D->size.y / 2) && pos.y > screenPos.y - (transform2D->size.y / 2))
         return true;
 
     else return false;
+}
+
+void ButtonComponent::AddOnClickCallback(Delegate<void>& newDelegate)
+{
+    onClickDispatcher.SubscribeCallback(std::move(newDelegate));
+}
+
+void ButtonComponent::RemoveOnClickCallback()
+{
+    //onClickDispatcher.RemoveCallbacks()
 }

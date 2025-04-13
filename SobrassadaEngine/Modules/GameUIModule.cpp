@@ -36,7 +36,7 @@ update_status GameUIModule::Update(float deltaTime)
 
 #if defined(GAME) || defined(GAMEDEBUG)
         // In game, just get the mouse position
-        mousePos = inputs->GetMousePosition();
+        mousePosition = inputs->GetMousePosition();
 #else
         // Get the mouse position depending on the window size and position
         auto& windowPosition = App->GetSceneModule()->GetScene()->GetWindowPosition();

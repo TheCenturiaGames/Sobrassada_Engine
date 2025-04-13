@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Component.h"
+#include "Utils/EventDispatcher.h"
 
 #include "Math/float3.h"
 
@@ -25,6 +26,9 @@ class ButtonComponent : public Component
     bool UpdateMousePosition(const float2& mousePos, bool dismiss = false);
     void OnClick();
 
+    void AddOnClickCallback(Delegate<void>& newDelegate);
+    void RemoveOnClickCallback();
+
   private:
     bool IsWithinBounds(const float2& pos);
 
@@ -37,4 +41,5 @@ class ButtonComponent : public Component
     float3 hoverColor;
 
     bool isHovered;
+    EventDispatcher<void> onClickDispatcher;
 };
