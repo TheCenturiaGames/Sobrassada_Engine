@@ -21,6 +21,7 @@ class GameUIModule;
 class ScriptModule;
 class PhysicsModule;
 class PathfinderModule;
+class AudioModule;
 
 class EngineTimer;
 class GameTimer;
@@ -51,6 +52,8 @@ class Application
     ScriptModule* GetScriptModule() { return scriptModule; }
     PhysicsModule* GetPhysicsModule() { return physicsModule; }
     PathfinderModule* GetPathfinderModule() { return pathModule; }
+    AudioModule* GetAudioModule() { return audioModule; }
+
     EngineTimer* GetEngineTimer() { return engineTimer; }
     GameTimer* GetGameTimer() { return gameTimer; }
 
@@ -74,6 +77,7 @@ class Application
     ScriptModule* scriptModule       = nullptr;
     PhysicsModule* physicsModule     = nullptr;
     PathfinderModule* pathModule     = nullptr;
+    AudioModule* audioModule         = nullptr;
 
     EngineTimer* engineTimer         = nullptr;
     GameTimer* gameTimer             = nullptr;
