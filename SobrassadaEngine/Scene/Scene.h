@@ -46,7 +46,7 @@ class Scene
     update_status RenderEditor(float deltaTime);
 
     void RenderEditorControl(bool& editorControlMenu);
-    void RenderScene(float deltaTime, CameraComponent* camera) const;
+    void RenderScene(float deltaTime, CameraComponent* camera);
     void RenderSceneToFrameBuffer();
     void RenderSelectedGameObjectUI();
     void RenderHierarchyUI(bool& hierarchyMenu);

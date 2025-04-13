@@ -259,7 +259,7 @@ update_status Scene::Render(float deltaTime)
     return UPDATE_CONTINUE;
 }
 
-void Scene::RenderScene(float deltaTime, CameraComponent* camera) const
+void Scene::RenderScene(float deltaTime, CameraComponent* camera)
 {
     if (!App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_WIREFRAME))
     {
@@ -339,8 +339,6 @@ void Scene::RenderScene(float deltaTime, CameraComponent* camera) const
         for (int i = 0; i < 12; ++i)
             debugDraw->DrawLineSegment(aabb.Edge(i), float3(1.f, 1.0f, 0.5f));
     }
-
-    return UPDATE_CONTINUE;
 }
 
 update_status Scene::RenderEditor(float deltaTime)
