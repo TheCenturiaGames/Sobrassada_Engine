@@ -22,7 +22,7 @@ class ButtonComponent : public Component
     void Render(float deltaTime) override {};
     void RenderEditorInspector() override;
 
-    void UpdateMousePosition(const float2& mousePos);
+    bool UpdateMousePosition(const float2& mousePos, bool dismiss = false);
     void OnClick();
 
   private:

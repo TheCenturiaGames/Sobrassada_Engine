@@ -17,6 +17,21 @@ ButtonComponent::ButtonComponent(UID uid, GameObject* parent)
 ButtonComponent::ButtonComponent(const rapidjson::Value& initialState, GameObject* parent)
     : Component(initialState, parent)
 {
+    if (initialState.HasMember("DefaultColor") && initialState["DefaultColor"].IsArray())
+    {
+        const rapidjson::Value& initColor = initialState["DefaultColor"];
+        defaultColor.x                    = initColor[0].GetFloat();
+        defaultColor.y                    = initColor[1].GetFloat();
+        defaultColor.z                    = initColor[2].GetFloat();
+    }
+
+    if (initialState.HasMember("HoverColor") && initialState["HoverColor"].IsArray())
+    {
+        const rapidjson::Value& initColor = initialState["HoverColor"];
+        hoverColor.x                      = initColor[0].GetFloat();
+        hoverColor.y                      = initColor[1].GetFloat();
+        hoverColor.z                      = initColor[2].GetFloat();
+    }
 }
 
 ButtonComponent::~ButtonComponent()
@@ -48,21 +63,33 @@ void ButtonComponent::Init()
     }
 
     // Get the image
-    Component* parentImage = parent->GetComponentByType(COMPONENT_IMAGE);
-    if (parentImage == nullptr)
+    Component* linkedImage = parent->GetComponentByType(COMPONENT_IMAGE);
+    if (linkedImage == nullptr)
     {
         parent->CreateComponent(COMPONENT_IMAGE);
         image = static_cast<ImageComponent*>(parent->GetComponentByType(COMPONENT_IMAGE));
     }
     else
     {
-        transform2D = static_cast<Transform2DComponent*>(parentImage);
+        image = static_cast<ImageComponent*>(linkedImage);
     }
 }
 
 void ButtonComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
 {
     Component::Save(targetState, allocator);
+
+    rapidjson::Value valColorDefault(rapidjson::kArrayType);
+    valColorDefault.PushBack(defaultColor.x, allocator);
+    valColorDefault.PushBack(defaultColor.y, allocator);
+    valColorDefault.PushBack(defaultColor.z, allocator);
+    targetState.AddMember("DefaultColor", valColorDefault, allocator);
+
+    rapidjson::Value valColorHover(rapidjson::kArrayType);
+    valColorHover.PushBack(hoverColor.x, allocator);
+    valColorHover.PushBack(hoverColor.y, allocator);
+    valColorHover.PushBack(hoverColor.z, allocator);
+    targetState.AddMember("HoverColor", valColorHover, allocator);
 }
 
 void ButtonComponent::Clone(const Component* other)
@@ -85,12 +112,13 @@ void ButtonComponent::RenderEditorInspector()
 
     ImGui::SeparatorText("Button");
 
+    ImGui::ColorEdit3("Default color", defaultColor.ptr());
     ImGui::ColorEdit3("Hover color", hoverColor.ptr());
 }
 
-void ButtonComponent::UpdateMousePosition(const float2& mousePos)
+bool ButtonComponent::UpdateMousePosition(const float2& mousePos, bool dismiss)
 {
-    if (IsWithinBounds(mousePos))
+    if (!dismiss && IsWithinBounds(mousePos))
     {
         GLOG("Mouse is in");
 
@@ -100,6 +128,7 @@ void ButtonComponent::UpdateMousePosition(const float2& mousePos)
             image->SetColor(hoverColor);
             isHovered = true;
         }
+        return true;
     }
     else
     {
@@ -107,26 +136,34 @@ void ButtonComponent::UpdateMousePosition(const float2& mousePos)
         {
             // On mouse exit
             image->SetColor(defaultColor);
+            isHovered = false;
         }
+        return false;
     }
 }
 
 void ButtonComponent::OnClick()
 {
-    if (!isHovered) return;
+    GLOG("Clicked button!");
 }
 
 bool ButtonComponent::IsWithinBounds(const float2& pos)
 {
     if (transform2D == nullptr) return false;
 
+    GLOG("Mouse pos: %f, %f", pos.x, pos.y);
     const float2 screenPos = float2(
         transform2D->GetGlobalPosition().x + (parentCanvas->GetWidth() / 2),
         transform2D->GetGlobalPosition().y + (parentCanvas->GetHeight() / 2)
     );
+    GLOG(
+        "Max x: %f. Min x: %f. Max y: %f. Min y: %f", screenPos.x + (transform2D->size.x / 2),
+        screenPos.x - (transform2D->size.x / 2), screenPos.y - (transform2D->size.y / 2),
+        screenPos.y + (transform2D->size.y / 2)
+    )
 
-    if (pos.x < screenPos.x + transform2D->size.x && pos.x > screenPos.x - transform2D->size.x &&
-        pos.y < screenPos.y + transform2D->size.y && pos.y > screenPos.y - transform2D->size.x)
+    if (pos.x < screenPos.x + (transform2D->size.x / 2) && pos.x > screenPos.x - (transform2D->size.x / 2) &&
+        pos.y < screenPos.y + (transform2D->size.y / 2) && pos.y > screenPos.y - (transform2D->size.y / 2))
         return true;
 
     else return false;

@@ -11,6 +11,7 @@ namespace Math
 
 class Transform2DComponent;
 class GameObject;
+class ButtonComponent;
 
 class CanvasComponent : public Component
 {
@@ -45,4 +46,5 @@ class CanvasComponent : public Component
     bool isInWorldSpaceGame   = true;
 
     std::vector<const GameObject*> sortedChildren;
+    ButtonComponent* hoveredButton = nullptr;
 };

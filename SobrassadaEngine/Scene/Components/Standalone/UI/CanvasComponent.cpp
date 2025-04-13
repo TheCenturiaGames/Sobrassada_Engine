@@ -1,6 +1,7 @@
 #include "CanvasComponent.h"
 
 #include "Application.h"
+#include "ButtonComponent.h"
 #include "CameraModule.h"
 #include "DebugDrawModule.h"
 #include "GameObject.h"
@@ -11,7 +12,6 @@
 #include "Transform2DComponent.h"
 #include "UILabelComponent.h"
 #include "WindowModule.h"
-#include "ButtonComponent.h"
 
 #include "glew.h"
 #include "imgui.h"
@@ -82,6 +82,9 @@ void CanvasComponent::Clone(const Component* other)
 
 void CanvasComponent::Update(float deltaTime)
 {
+    //const auto& size = App->GetSceneModule()->GetScene()->GetWindowSize();
+    //width            = std::get<0>(size);
+    //height           = std::get<1>(size);
 }
 
 void CanvasComponent::Render(float deltaTime)
@@ -210,14 +213,26 @@ void CanvasComponent::UpdateChildren()
 void CanvasComponent::UpdateMousePosition(const float2& mousePos)
 {
     GLOG("Mouse pos: %f, %f", mousePos.x, mousePos.y);
-    for (const GameObject* child : sortedChildren)
+
+    bool buttonFound = false;
+
+    for (int i = sortedChildren.size() - 1; i >= 0; --i)
     {
         // Update all buttons
-        Component* button = child->GetComponentByType(COMPONENT_BUTTON);
-        if (button) static_cast<ButtonComponent*>(button)->UpdateMousePosition(mousePos);
+        Component* button = sortedChildren[i]->GetComponentByType(COMPONENT_BUTTON);
+        if (button)
+        {
+            ButtonComponent* currentButton = static_cast<ButtonComponent*>(button);
+            if (currentButton->UpdateMousePosition(mousePos, buttonFound))
+            {
+                hoveredButton = currentButton;
+                buttonFound   = true;
+            }
+        }
     }
 }
 
 void CanvasComponent::OnMouseButtonPressed()
 {
+    hoveredButton->OnClick();
 }
