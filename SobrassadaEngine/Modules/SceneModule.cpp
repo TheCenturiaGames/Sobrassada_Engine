@@ -131,15 +131,26 @@ update_status SceneModule::PostUpdate(float deltaTime)
 
         // CTRL+D -> Duplicate selected game object
         if (keyboard[SDL_SCANCODE_LCTRL] && keyboard[SDL_SCANCODE_D] == KeyState::KEY_DOWN &&
-            !loadedScene->IsMultiselecting() && loadedScene->GetGameObjectRootUID() != loadedScene->GetSelectedGameObjectUID())
+            !loadedScene->IsMultiselecting() &&
+            loadedScene->GetGameObjectRootUID() != loadedScene->GetSelectedGameObjectUID())
         {
-            GameObject* gameObjectToClone = loadedScene->GetSelectedGameObject();
+            GameObject* gameObjectToClone       = loadedScene->GetSelectedGameObject();
             GameObject* gameObjectToCloneParent = loadedScene->GetGameObjectByUID(gameObjectToClone->GetParent());
 
-            GameObject* clonedGameObject  = new GameObject(gameObjectToClone->GetParent(), gameObjectToClone);
+            GameObject* clonedGameObject        = new GameObject(gameObjectToClone->GetParent(), gameObjectToClone);
 
             gameObjectToCloneParent->AddChildren(clonedGameObject->GetUID());
             loadedScene->AddGameObject(clonedGameObject->GetUID(), clonedGameObject);
+        }
+
+        // Delete -> Delete selected game object
+        if (keyboard[SDL_SCANCODE_DELETE] == KeyState::KEY_DOWN &&
+            loadedScene->GetGameObjectRootUID() != loadedScene->GetSelectedGameObjectUID())
+        {
+            if (loadedScene->IsMultiselecting()) loadedScene->DeleteMultiselection();
+            else loadedScene->RemoveGameObjectHierarchy(loadedScene->GetSelectedGameObjectUID());
+
+            loadedScene->SetSelectedGameObject(loadedScene->GetGameObjectRootUID());
         }
 
         // CHECKING FOR UPDATED STATIC AND DYNAMIC OBJECTS

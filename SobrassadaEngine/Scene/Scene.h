@@ -66,6 +66,7 @@ class Scene
 
     void AddGameObjectToSelection(UID gameObject, UID gameObjectParent);
     void ClearObjectSelection();
+    void DeleteMultiselection();
 
     const std::string& GetSceneName() const { return sceneName; }
     UID GetSceneUID() const { return sceneUID; }
@@ -94,6 +95,7 @@ class Scene
     Octree* GetOctree() const { return sceneOctree; }
     Quadtree* GetDynamicTree() const { return dynamicTree; }
     UID GetMultiselectUID() const;
+    GameObject* GetMultiselectParent() { return multiSelectParent; }
 
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
 

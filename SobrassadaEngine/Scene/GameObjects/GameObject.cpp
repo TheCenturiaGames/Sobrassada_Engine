@@ -6,14 +6,14 @@
 #include "EditorUIModule.h"
 #include "PrefabManager.h"
 #include "SceneModule.h"
-#include "Standalone/MeshComponent.h"
 #include "Standalone/AnimationComponent.h"
+#include "Standalone/MeshComponent.h"
 #include "Standalone/UI/Transform2DComponent.h"
 
 #include "imgui.h"
+#include <queue>
 #include <set>
 #include <stack>
-#include <queue>
 
 GameObject::GameObject(const std::string& name) : name(name)
 {

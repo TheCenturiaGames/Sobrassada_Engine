@@ -26,8 +26,8 @@
 #include "ResourcePrefab.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
-#include "Standalone/MeshComponent.h"
 #include "Standalone/AnimationComponent.h"
+#include "Standalone/MeshComponent.h"
 
 #include "SDL_mouse.h"
 #include "imgui.h"
@@ -305,8 +305,8 @@ update_status Scene::Render(float deltaTime)
     {
         GameObject* gameObject = GetGameObjectByUID(gameObjectIterator.first);
 
-        const AABB aabb              = gameObject->GetHierarchyAABB();
-        
+        const AABB aabb        = gameObject->GetHierarchyAABB();
+
         for (int i = 0; i < 12; ++i)
             debugDraw->DrawLineSegment(aabb.Edge(i), float3(1.f, 1.0f, 0.5f));
     }
@@ -595,6 +595,10 @@ void Scene::RemoveGameObjectHierarchy(UID gameObjectUID)
         toDelete.pop();
 
         GameObject* gameObject = GetGameObjectByUID(currentUID);
+
+        if (gameObject->IsStatic()) SetStaticModified();
+        else SetDynamicModified();
+
         if (gameObject == nullptr) continue;
 
         collectedUIDs.push_back(currentUID);
@@ -656,7 +660,7 @@ void Scene::AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
         GameObject* selectedGameObject       = GetGameObjectByUID(gameObject);
         GameObject* selectedGameObjectParent = GetGameObjectByUID(gameObjectParent);
 
-        //selectedGameObjectParent->RemoveGameObject(gameObject);
+        // selectedGameObjectParent->RemoveGameObject(gameObject);
 
         multiSelectParent->AddGameObject(gameObject);
 
@@ -694,11 +698,30 @@ void Scene::ClearObjectSelection()
         GameObject* selectedGameObjectParent = GetGameObjectByUID(pairGameObject.second);
 
         multiSelectParent->RemoveGameObject(pairGameObject.first);
+
         currentGameObject->SetParent(pairGameObject.second);
         selectedGameObjectParent->AddGameObject(pairGameObject.first);
 
         currentGameObject->UpdateLocalTransform(selectedGameObjectParent->GetGlobalTransform());
         currentGameObject->UpdateTransformForGOBranch();
+    }
+
+    selectedGameObjects.clear();
+}
+
+void Scene::DeleteMultiselection()
+{
+    for (auto& pairGameObject : selectedGameObjects)
+    {
+        GameObject* currentGameObject        = GetGameObjectByUID(pairGameObject.first);
+        GameObject* selectedGameObjectParent = GetGameObjectByUID(pairGameObject.second);
+
+        multiSelectParent->RemoveGameObject(pairGameObject.first);
+
+        selectedGameObjectParent->RemoveGameObject(pairGameObject.first);
+        selectedGameObjectParent->UpdateTransformForGOBranch();
+        
+        RemoveGameObjectHierarchy(pairGameObject.first);
     }
 
     selectedGameObjects.clear();
@@ -835,7 +858,7 @@ void Scene::LoadModel(const UID modelUID)
         gameObjectsArray.resize(allNodes.size());
         std::vector<UID> gameObjectsUID;
         std::vector<GameObject*> rootGameObjects;
-        
+
         GLOG("Model Animation UID: %llu", newModel->GetAnimationUID());
 
         const auto& animUIDs = newModel->GetAllAnimationUIDs();
@@ -999,7 +1022,6 @@ void Scene::LoadModel(const UID modelUID)
 
                     GLOG("Animation UID: %d", uid);
                 }
-
             }
             else
             {
