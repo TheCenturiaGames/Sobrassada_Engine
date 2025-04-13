@@ -94,7 +94,8 @@ update_status SceneModule::PostUpdate(float deltaTime)
         if (GetDoMouseInputsScene() && !ImGuizmo::IsUsingAny())
         {
 
-            if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_DOWN && !keyboard[SDL_SCANCODE_LALT])
+            if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_DOWN && !keyboard[SDL_SCANCODE_LALT] &&
+                keyboard[SDL_SCANCODE_LSHIFT])
             {
                 GameObject* selectedObject = RaycastController::GetRayIntersectionTrees<Octree, Quadtree>(
                     App->GetCameraModule()->CastCameraRay(), loadedScene->GetOctree(), loadedScene->GetDynamicTree()
@@ -129,9 +130,16 @@ update_status SceneModule::PostUpdate(float deltaTime)
         }
 
         // CTRL+D -> Duplicate selected game object
-        if (keyboard[SDL_SCANCODE_LCTRL] && keyboard[SDL_SCANCODE_D] == KeyState::KEY_DOWN)
+        if (keyboard[SDL_SCANCODE_LCTRL] && keyboard[SDL_SCANCODE_D] == KeyState::KEY_DOWN &&
+            !loadedScene->IsMultiselecting() && loadedScene->GetGameObjectRootUID() != loadedScene->GetSelectedGameObjectUID())
         {
-            // GameObject* clonedGameObject = new GameObject()
+            GameObject* gameObjectToClone = loadedScene->GetSelectedGameObject();
+            GameObject* gameObjectToCloneParent = loadedScene->GetGameObjectByUID(gameObjectToClone->GetParent());
+
+            GameObject* clonedGameObject  = new GameObject(gameObjectToClone->GetParent(), gameObjectToClone);
+
+            gameObjectToCloneParent->AddChildren(clonedGameObject->GetUID());
+            loadedScene->AddGameObject(clonedGameObject->GetUID(), clonedGameObject);
         }
 
         // CHECKING FOR UPDATED STATIC AND DYNAMIC OBJECTS

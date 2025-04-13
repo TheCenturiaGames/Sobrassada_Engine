@@ -71,6 +71,7 @@ class Scene
     UID GetSceneUID() const { return sceneUID; }
     UID GetGameObjectRootUID() const { return gameObjectRootUID; }
     GameObject* GetSelectedGameObject() { return GetGameObjectByUID(selectedGameObjectUID); }
+    UID GetSelectedGameObjectUID() const { return selectedGameObjectUID; }
 
     const std::unordered_map<UID, GameObject*>& GetAllGameObjects() const { return gameObjectsContainer; }
     const std::vector<Component*> GetAllComponents() const;

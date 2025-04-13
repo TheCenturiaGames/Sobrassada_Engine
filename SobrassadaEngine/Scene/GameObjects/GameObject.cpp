@@ -83,7 +83,8 @@ GameObject::GameObject(UID parentUID, GameObject* refObject)
 
         GameObject* otherGameObject = scene->GetGameObjectByUID(currentGameObjectPair.second);
 
-        GameObject* newClone        = new GameObject(uid ,otherGameObject);
+        GameObject* newClone        = new GameObject(currentGameObjectPair.first, otherGameObject);
+        AddChildren(newClone->uid);
         scene->AddGameObject(newClone->GetUID(), newClone);
     }
 
