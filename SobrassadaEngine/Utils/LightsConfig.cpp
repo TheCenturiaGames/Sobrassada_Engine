@@ -109,6 +109,12 @@ void LightsConfig::InitSkybox()
     skyboxProgram = App->GetShaderModule()->CreateShaderProgram(SKYBOX_VERTEX_SHADER_PATH, SKYBOX_FRAGMENT_SHADER_PATH);
 }
 
+void LightsConfig::IsHDRTexture(const std::string& name)
+{
+    if (name.find("_HDR") != std::string::npos) isHDRTexture = true;
+    else isHDRTexture = false;
+}
+
 void LightsConfig::RenderSkybox() const
 {
     App->GetOpenGLModule()->SetDepthFunc(false);
@@ -136,7 +142,11 @@ void LightsConfig::RenderSkybox() const
     glUniformMatrix4fv(0, 1, GL_TRUE, projection.ptr());
     glUniformMatrix4fv(1, 1, GL_TRUE, view.ptr());
 
-    glUniformHandleui64ARB(glGetUniformLocation(skyboxProgram, "skybox"), skyboxHandle);
+    if (isHDRTexture) glUniformHandleui64ARB(glGetUniformLocation(skyboxProgram, "hdrSkybox"), skyboxHandle);
+    else glUniformHandleui64ARB(glGetUniformLocation(skyboxProgram, "skybox"), skyboxHandle);
+
+    GLint isHDRLoc = glGetUniformLocation(skyboxProgram, "isHDR");
+    glUniform1i(isHDRLoc, isHDRTexture);
 
     glBindVertexArray(skyboxVao);
     App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 36);
@@ -169,7 +179,7 @@ void LightsConfig::LoadSkyboxTexture(UID resource)
 
         App->GetOpenGLModule()->SetDepthFunc(false);
 
-        /*Im not changing cubemaps right now
+        // Im not changing cubemaps right now
         cubemapIrradiance = CubeMapToTexture(1024, 1024);
         irradianceHandle  = glGetTextureHandleARB(cubemapIrradiance);
         glMakeTextureHandleResidentARB(skyboxHandle);
@@ -181,7 +191,6 @@ void LightsConfig::LoadSkyboxTexture(UID resource)
         environmentBRDF       = EnvironmentBRDFGeneration(1024, 1024);
         environmentBRDFHandle = glGetTextureHandleARB(environmentBRDF);
         glMakeTextureHandleResidentARB(environmentBRDFHandle);
-        */
 
         App->GetOpenGLModule()->SetDepthFunc(true);
 
@@ -189,6 +198,8 @@ void LightsConfig::LoadSkyboxTexture(UID resource)
             0, 0, App->GetOpenGLModule()->GetFramebuffer()->GetTextureWidth(),
             App->GetOpenGLModule()->GetFramebuffer()->GetTextureHeight()
         );
+
+        IsHDRTexture(newCubemap->GetName());
     }
 }
 

@@ -74,6 +74,11 @@ void ResourceTexture::ConvertMetadata(const DirectX::TexMetadata& metadata, Open
         outMetadata.format         = GL_DEPTH_STENCIL;
         outMetadata.type           = GL_UNSIGNED_INT_24_8;
         break;
+    case DXGI_FORMAT_R32G32B32A32_FLOAT:
+        outMetadata.internalFormat = GL_RGBA32F;
+        outMetadata.format         = GL_RGBA;
+        outMetadata.type           = GL_FLOAT;
+        break;
     default:
         assert(false && "Unsupported format");
     }

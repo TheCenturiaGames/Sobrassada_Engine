@@ -30,7 +30,7 @@ namespace Lights
             const int numLevels
         )
             : color(color), cubemapIrradiance(cubemapIrradiance), cubemapPrefiltered(cubemapPrefiltered),
-              environmentBRDF(environmentBRDF), numLevels(numLevels)
+              environmentBRDF(cubemapBRDF), numLevels(numLevels)
         {
         }
     };
@@ -101,6 +101,8 @@ class LightsConfig
     void SaveData(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const;
     void LoadData(const rapidjson::Value& lights);
 
+    void IsHDRTexture(const std::string& name);
+
   private:
     void LoadSkyboxTexture(UID cubemapUID);
     void FreeCubemap() const;
@@ -127,6 +129,8 @@ class LightsConfig
     UID prefilteredEnvironmentMapHandle    = 0;
     unsigned int environmentBRDF           = 0;
     UID environmentBRDFHandle              = 0;
+
+    bool isHDRTexture                      = false;
 
     float3 ambientColor;
     float ambientIntensity;
