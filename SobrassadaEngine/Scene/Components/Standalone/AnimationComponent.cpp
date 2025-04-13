@@ -84,11 +84,8 @@ void AnimationComponent::OnInspector()
         currentAnimResource = dynamic_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
         const std::string animationName = App->GetLibraryModule()->GetResourceName(resource);
         
-        size_t underscorePos            = animationName.find('_');
-        if (underscorePos != std::string::npos)
-        {
-            originAnimation = animationName.substr(0, underscorePos);
-        }
+        const size_t underscorePos            = animationName.find('_');
+        if (underscorePos != std::string::npos) originAnimation = animationName.substr(0, underscorePos);
         if (currentAnimResource != nullptr)
         {
             ImGui::Text("Animation: %s", animationName.c_str());
@@ -264,7 +261,7 @@ void AnimationComponent::OnInspector()
 
             if (animationName.rfind(originAnimation, 0) == 0)
             {
-                bool isSelected = (selectedZombunnyAnim == animationName);
+                const bool isSelected = (selectedZombunnyAnim == animationName);
 
                 if (ImGui::Selectable(animationName.c_str(), isSelected))
                 {
