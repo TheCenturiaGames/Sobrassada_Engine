@@ -898,7 +898,7 @@ void Scene::LoadModel(const UID modelUID)
                 if (currentParentIndex == -1)
                 {
                     GameObject* rootObject = new GameObject(
-                        GetGameObjectRootUID(), App->GetLibraryModule()->GetResourceName(modelUID),
+                        GetGameObjectRootUID(), currentNodeData.name,
                         gameObjectsUID[currentNodeIndex]
                     );
                     rootObject->SetLocalTransform(currentNodeData.transform);
