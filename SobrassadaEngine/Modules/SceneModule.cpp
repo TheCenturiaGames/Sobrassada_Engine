@@ -15,10 +15,12 @@
 #include "ProjectModule.h"
 #include "RaycastController.h"
 #include "ResourcesModule.h"
-#include "Standalone/MeshComponent.h"
 #include "Standalone/AnimationComponent.h"
+#include "Standalone/MeshComponent.h"
 
 #include <SDL_mouse.h>
+#include <map>
+#include <tuple>
 #include <queue>
 #ifdef OPTICK
 #include "optick.h"
@@ -134,82 +136,103 @@ update_status SceneModule::PostUpdate(float deltaTime)
 
         // CTRL+D -> Duplicate selected game object
         if (keyboard[SDL_SCANCODE_LCTRL] && keyboard[SDL_SCANCODE_D] == KeyState::KEY_DOWN &&
-            !loadedScene->IsMultiselecting() &&
             loadedScene->GetGameObjectRootUID() != loadedScene->GetSelectedGameObjectUID())
         {
-            std::map<UID, UID> remappingTable; // Reference UID | New GameObject UID
-            std::vector<GameObject*> createdGameObjects;
-            std::vector<GameObject*> originalGameObjects;
 
-            GameObject* gameObjectToClone       = loadedScene->GetSelectedGameObject();
-            GameObject* gameObjectToCloneParent = loadedScene->GetGameObjectByUID(gameObjectToClone->GetParent());
+            std::vector<std::pair<UID, UID>> objectsToDuplicate; // GAME OBJECT | GAME OBJECT PARENT
 
-            GameObject* clonedGameObject        = new GameObject(gameObjectToClone->GetParent(), gameObjectToClone);
-
-            remappingTable.insert({gameObjectToClone->GetUID(), clonedGameObject->GetUID()});
-            createdGameObjects.push_back(clonedGameObject);
-            originalGameObjects.push_back(gameObjectToClone);
-
-            gameObjectToCloneParent->AddChildren(clonedGameObject->GetUID());
-            loadedScene->AddGameObject(clonedGameObject->GetUID(), clonedGameObject);
-
-            // CREATE DOWARDS HIERARCHY, FIRST ADD ALL CHILDREN (Parent, ChildrenUID)
-            std::queue<std::pair<UID, UID>> gameObjectsToClone;
-
-            for (UID child : gameObjectToClone->GetChildren())
+            if (loadedScene->IsMultiselecting())
             {
-                gameObjectsToClone.push(std::make_pair(clonedGameObject->GetUID(), child));
+                const std::map<UID, UID> selectedGameObjects = loadedScene->GetMultiselectedObjects();
+
+                for (auto& childToDuplicate : selectedGameObjects)
+                    objectsToDuplicate.push_back(childToDuplicate);
+            }
+            else
+            {
+                objectsToDuplicate.push_back(
+                    {loadedScene->GetSelectedGameObject()->GetUID(), loadedScene->GetSelectedGameObject()->GetParent()}
+                );
             }
 
-            Scene* scene = App->GetSceneModule()->GetScene();
-
-            while (!gameObjectsToClone.empty())
+            for (int indexToDuplicate = 0; indexToDuplicate < objectsToDuplicate.size(); ++indexToDuplicate)
             {
-                std::pair<UID, UID> currentGameObjectPair = gameObjectsToClone.front();
-                gameObjectsToClone.pop();
+                std::map<UID, UID> remappingTable; // Reference UID | New GameObject UID
+                std::vector<GameObject*> createdGameObjects;
+                std::vector<GameObject*> originalGameObjects;
 
-                gameObjectToClone       = loadedScene->GetGameObjectByUID(currentGameObjectPair.second);
-                gameObjectToCloneParent = loadedScene->GetGameObjectByUID(currentGameObjectPair.first);
+                GameObject* gameObjectToClone =
+                    loadedScene->GetGameObjectByUID(objectsToDuplicate[indexToDuplicate].first);
+                GameObject* gameObjectToCloneParent =
+                    loadedScene->GetGameObjectByUID(objectsToDuplicate[indexToDuplicate].second);
 
-                clonedGameObject        = new GameObject(currentGameObjectPair.first, gameObjectToClone);
+                GameObject* clonedGameObject = new GameObject(gameObjectToClone->GetParent(), gameObjectToClone);
 
                 remappingTable.insert({gameObjectToClone->GetUID(), clonedGameObject->GetUID()});
                 createdGameObjects.push_back(clonedGameObject);
                 originalGameObjects.push_back(gameObjectToClone);
+
+                gameObjectToCloneParent->AddChildren(clonedGameObject->GetUID());
+                loadedScene->AddGameObject(clonedGameObject->GetUID(), clonedGameObject);
+
+                // CREATE DOWARDS HIERARCHY, FIRST ADD ALL CHILDREN (Parent, ChildrenUID)
+                std::queue<std::pair<UID, UID>> gameObjectsToClone;
 
                 for (UID child : gameObjectToClone->GetChildren())
                 {
                     gameObjectsToClone.push(std::make_pair(clonedGameObject->GetUID(), child));
                 }
 
-                gameObjectToCloneParent->AddChildren(clonedGameObject->GetUID());
-                loadedScene->AddGameObject(clonedGameObject->GetUID(), clonedGameObject);
-            }
+                Scene* scene = App->GetSceneModule()->GetScene();
 
-            // ITERATE OVER ALL GAME OBJECTS TO CHECK IF ANY REMAPING IS NEEDED
-            for (int i = 0; i < createdGameObjects.size(); ++i)
-            {
-                MeshComponent* originalMeshComp = originalGameObjects[i]->GetMeshComponent();
-                if (originalMeshComp && originalMeshComp->GetHasBones())
+                while (!gameObjectsToClone.empty())
                 {
-                    // Remap the bones references
-                    const std::vector<UID>& bones = originalMeshComp->GetBones();
-                    std::vector<UID> newBonesUIDs;
-                    std::vector<GameObject*> newBonesObjects;
+                    std::pair<UID, UID> currentGameObjectPair = gameObjectsToClone.front();
+                    gameObjectsToClone.pop();
 
-                    for (const UID bone : bones)
+                    gameObjectToClone       = loadedScene->GetGameObjectByUID(currentGameObjectPair.second);
+                    gameObjectToCloneParent = loadedScene->GetGameObjectByUID(currentGameObjectPair.first);
+
+                    clonedGameObject        = new GameObject(currentGameObjectPair.first, gameObjectToClone);
+
+                    remappingTable.insert({gameObjectToClone->GetUID(), clonedGameObject->GetUID()});
+                    createdGameObjects.push_back(clonedGameObject);
+                    originalGameObjects.push_back(gameObjectToClone);
+
+                    for (UID child : gameObjectToClone->GetChildren())
                     {
-                        const UID uid = remappingTable.find(bone)->second;
-                        newBonesUIDs.push_back(uid);
-                        newBonesObjects.push_back(loadedScene->GetGameObjectByUID(uid));
+                        gameObjectsToClone.push(std::make_pair(clonedGameObject->GetUID(), child));
                     }
 
-                    MeshComponent* newMesh = createdGameObjects[i]->GetMeshComponent();
-                    newMesh->SetBones(newBonesObjects, newBonesUIDs);
+                    gameObjectToCloneParent->AddChildren(clonedGameObject->GetUID());
+                    loadedScene->AddGameObject(clonedGameObject->GetUID(), clonedGameObject);
                 }
 
-                AnimationComponent* animComp = createdGameObjects[i]->GetAnimationComponent();
-                if (animComp) animComp->SetBoneMapping();
+                // ITERATE OVER ALL GAME OBJECTS TO CHECK IF ANY REMAPING IS NEEDED
+                for (int i = 0; i < createdGameObjects.size(); ++i)
+                {
+                    MeshComponent* originalMeshComp = originalGameObjects[i]->GetMeshComponent();
+                    if (originalMeshComp && originalMeshComp->GetHasBones())
+                    {
+                        // Remap the bones references
+                        const std::vector<UID>& bones = originalMeshComp->GetBones();
+                        std::vector<UID> newBonesUIDs;
+                        std::vector<GameObject*> newBonesObjects;
+
+                        for (const UID bone : bones)
+                        {
+                            const UID uid = remappingTable.find(bone)->second;
+                            newBonesUIDs.push_back(uid);
+                            newBonesObjects.push_back(loadedScene->GetGameObjectByUID(uid));
+                        }
+
+                        MeshComponent* newMesh = createdGameObjects[i]->GetMeshComponent();
+                        newMesh->SetBones(newBonesObjects, newBonesUIDs);
+                    }
+
+                    AnimationComponent* animComp = createdGameObjects[i]->GetAnimationComponent();
+                    if (animComp) animComp->SetBoneMapping();
+                }
             }
         }
 

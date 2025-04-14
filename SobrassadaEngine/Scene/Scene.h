@@ -97,6 +97,7 @@ class Scene
     Quadtree* GetDynamicTree() const { return dynamicTree; }
     UID GetMultiselectUID() const;
     GameObject* GetMultiselectParent() { return multiSelectParent; }
+    const std::map<UID, UID>& GetMultiselectedObjects() const { return selectedGameObjects; }
 
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
 
