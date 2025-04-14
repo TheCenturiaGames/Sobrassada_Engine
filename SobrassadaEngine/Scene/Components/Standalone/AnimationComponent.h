@@ -38,8 +38,8 @@ class AnimationComponent : public Component
 
     void SetAnimationResource(UID animResource);
 
-  private:
     void SetBoneMapping();
+  private:
 
   private:
     UID resource                           = INVALID_UID;
