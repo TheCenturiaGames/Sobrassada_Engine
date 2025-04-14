@@ -387,8 +387,10 @@
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="RotateGameObject.h" />
     <ClInclude Include="Script.h" />
+    <ClInclude Include="ToggleMenu.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Algorithm\Random\LCG.cpp">
@@ -630,6 +632,10 @@
     </ClCompile>
     <ClCompile Include="RotateGameObject.cpp" />
     <ClCompile Include="ScriptExport.cpp" />
+    <ClCompile Include="ToggleMenu.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SobrassadaScripts.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

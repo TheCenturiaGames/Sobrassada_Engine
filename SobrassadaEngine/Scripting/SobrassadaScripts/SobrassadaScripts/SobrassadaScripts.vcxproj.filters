@@ -33,6 +33,12 @@
     <ClInclude Include="RotateGameObject.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="ToggleMenu.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -143,5 +149,13 @@
     <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Algorithm\Random\LCG.cpp">
       <Filter>External</Filter>
     </ClCompile>
+    <ClCompile Include="ToggleMenu.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SobrassadaScripts.rc">
+      <Filter>Archivos de recursos</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
