@@ -8,7 +8,8 @@
 #include <AK/SoundEngine/Common/AkMemoryMgrModule.h> // Default memory manager
 #include <AK/SoundEngine/Common/AkSoundEngine.h>
 #include <AK/SoundEngine/Common/AkStreamMgrModule.h>
-#include <AK/SoundEngine/Common/IAkStreamMgr.h> // Streaming Manager
+#include <AK/SoundEngine/Common/IAkStreamMgr.h>    // Streaming Manager
+#include <AK/SpatialAudio/Common/AkSpatialAudio.h> // Spatial Audio
 
 #ifndef AK_OPTIMIZED
 #include <AK/Comm/AkCommunication.h>
@@ -51,6 +52,8 @@ bool AudioModule::Init()
     AkMusicSettings musicInit;
     AK::MusicEngine::GetDefaultInitSettings(musicInit);
 
+    AkSpatialAudioInitSettings settings;
+
     // Create and initialise an instance of our memory manager.
     if (AK::MemoryMgr::Init(&memSettings) != AK_Success)
     {
@@ -81,6 +84,11 @@ bool AudioModule::Init()
         GLOG("Cannot initialize music engine");
         return false;
     }
+    if (AK::SpatialAudio::Init(settings) != AK_Success)
+    {
+        GLOG("Could not initialize the Spatial Audio.");
+        return false;
+    }
 
     // load initialization and main soundbanks
 #ifdef AK_WIN
@@ -107,13 +115,13 @@ bool AudioModule::Init()
     if (retValue != AK_Success)
     {
         GLOG("Cannot initialize Init.bnk soundbank");
-        //return false;
+        // return false;
     }
     retValue = AK::SoundEngine::LoadBank(BANKNAME_MAIN, bankID);
     if (retValue != AK_Success)
     {
         GLOG("Cannot initialize main.bnk soundbank");
-        //return false;
+        // return false;
     }
 
     //  initialize volume parameters to sensible default values
