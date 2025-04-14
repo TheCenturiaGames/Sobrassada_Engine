@@ -81,6 +81,10 @@ void CanvasComponent::Update(float deltaTime)
 
 void CanvasComponent::Render(float deltaTime)
 {
+    // If the canvas' GameObject is not globally enabled (it or any of its parents are disabled), skip rendering
+    if (!parent->IsGloballyEnabled()) return;
+
+    // Draw the canvas debug lines (borders)
     App->GetDebugDrawModule()->DrawLine(
         float3(
             parent->GetGlobalTransform().TranslatePart().x - width / 2,
@@ -112,8 +116,7 @@ void CanvasComponent::Render(float deltaTime)
         -float3::unitY, height, float3(1, 1, 1)
     );
 
-    // Render all ui widgets
-
+    // Render all UI widgets in the hierarchy using a queue
     std::queue<UID> children;
 
     for (const UID child : parent->GetChildren())
@@ -125,8 +128,13 @@ void CanvasComponent::Render(float deltaTime)
     {
         const GameObject* currentObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(children.front());
 
-        // Only render 2d objects (defined by having the transform 2D component)
-        if (currentObject->GetComponentByType(COMPONENT_TRANSFORM_2D) != nullptr) currentObject->Render(deltaTime);
+        // Only render 2D UI elements that are globally enabled and have a Transform2D component.
+        // This ensures that deactivated UI elements (or their parents) are not rendered.
+        if (currentObject->IsGloballyEnabled() && currentObject->GetComponentByType(COMPONENT_TRANSFORM_2D) != nullptr)
+        {
+            currentObject->Render(deltaTime);
+        }
+
         children.pop();
 
         for (const UID child : currentObject->GetChildren())
@@ -135,6 +143,7 @@ void CanvasComponent::Render(float deltaTime)
         }
     }
 }
+
 
 void CanvasComponent::RenderEditorInspector()
 {

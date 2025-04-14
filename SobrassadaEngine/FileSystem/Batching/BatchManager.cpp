@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "CameraComponent.h"
 #include "CameraModule.h"
+#include "GameObject.h"
 #include "GeometryBatch.h"
 #include "OpenGLModule.h"
 #include "ResourceMaterial.h"
@@ -77,6 +78,9 @@ void BatchManager::Render(const std::vector<MeshComponent*>& meshesToRender)
         std::vector<MeshComponent*> batchMeshes;
         for (MeshComponent* mesh : meshesToRender)
         {
+            GameObject* owner = mesh->GetParent();
+            if (!owner || !owner->IsGloballyEnabled()) continue;
+
             if (mesh->GetBatch() == it) batchMeshes.push_back(mesh);
         }
 

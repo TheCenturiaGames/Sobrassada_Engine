@@ -140,6 +140,7 @@ void UILabelComponent::Update(float deltaTime)
 void UILabelComponent::Render(float deltaTime)
 {
     if (parentCanvas == nullptr) return;
+    if (!parent->IsGloballyEnabled()) return;
 
     const int uiProgram = App->GetShaderModule()->GetUIWidgetProgram();
     if (uiProgram == -1)

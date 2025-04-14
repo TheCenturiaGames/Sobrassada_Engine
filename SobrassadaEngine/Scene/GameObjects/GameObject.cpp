@@ -6,8 +6,8 @@
 #include "EditorUIModule.h"
 #include "PrefabManager.h"
 #include "SceneModule.h"
-#include "Standalone/MeshComponent.h"
 #include "Standalone/AnimationComponent.h"
+#include "Standalone/MeshComponent.h"
 #include "Standalone/UI/Transform2DComponent.h"
 
 #include "imgui.h"
@@ -74,6 +74,9 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
     name                   = initialState["Name"].GetString();
     selectedComponentIndex = COMPONENT_NONE;
     mobilitySettings       = initialState["Mobility"].GetInt();
+
+    if (initialState.HasMember("Enabled")) enabled = initialState["Enabled"].GetBool();
+
     if (initialState.HasMember("IsTopParent")) isTopParent = initialState["IsTopParent"].GetBool();
 
     if (initialState.HasMember("PrefabUID")) prefabUID = initialState["PrefabUID"].GetUint64();
@@ -170,6 +173,7 @@ void GameObject::Save(rapidjson::Value& targetState, rapidjson::Document::Alloca
     targetState.AddMember("Name", rapidjson::Value(name.c_str(), allocator), allocator);
     targetState.AddMember("Mobility", mobilitySettings, allocator);
     targetState.AddMember("IsTopParent", isTopParent, allocator);
+    targetState.AddMember("Enabled", enabled, allocator);
 
     if (prefabUID != INVALID_UID) targetState.AddMember("PrefabUID", prefabUID, allocator);
 
@@ -230,6 +234,9 @@ void GameObject::RenderEditorInspector()
     }
 
     ImGui::Text(name.c_str());
+
+    ImGui::SameLine();
+    ImGui::Checkbox("Enabled", &enabled);
 
     if (uid != App->GetSceneModule()->GetScene()->GetGameObjectRootUID())
     {
@@ -361,6 +368,7 @@ void GameObject::RenderEditorInspector()
 
 void GameObject::UpdateTransformForGOBranch()
 {
+    if (!IsGloballyEnabled()) return;
     App->GetSceneModule()->AddGameObjectToUpdate(this);
     std::stack<UID> childrenBuffer;
     childrenBuffer.push(uid);
@@ -435,6 +443,7 @@ void GameObject::OnTransformUpdated()
 
 void GameObject::UpdateComponents()
 {
+    if (!IsGloballyEnabled()) return;
     for (const auto& component : components)
     {
         if (component.second) component.second->ParentUpdated();
@@ -509,7 +518,18 @@ void GameObject::RenderHierarchyNode(UID& selectedGameObjectUUID)
         {
             objectName += "(prefab " + std::to_string(prefabUID) + ')';
         }
+
+        if (!IsGloballyEnabled())
+        {
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
+        }
+
         nodeOpen = ImGui::TreeNodeEx(objectName.c_str(), flags);
+
+        if (!IsGloballyEnabled())
+        {
+            ImGui::PopStyleColor();
+        }
     }
 
     HandleNodeClick(selectedGameObjectUUID);
@@ -741,6 +761,7 @@ void GameObject::SetLocalTransform(const float4x4& newTransform)
 
 void GameObject::DrawGizmos() const
 {
+    if (!IsGloballyEnabled()) return;
     if (drawNodes) DrawNodes();
 }
 
@@ -874,4 +895,11 @@ void GameObject::CreatePrefab()
         // Update all prefabs
         App->GetSceneModule()->GetScene()->OverridePrefabs(prefabUID);
     }
+}
+
+bool GameObject::IsGloballyEnabled() const
+{
+    if (!enabled) return false;
+    GameObject* parent = App->GetSceneModule()->GetScene()->GetGameObjectByUID(parentUID);
+    return parent ? parent->IsGloballyEnabled() : true;
 }
