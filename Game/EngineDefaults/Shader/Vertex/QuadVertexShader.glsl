@@ -12,6 +12,6 @@ void main() {
     else
         pos = vec2(-1.0, 3.0);
 
-    uv0 = (pos + 1.0) * 0.5; // De [-1,1] a [0,1]
+    uv0 = (pos + 1.0) * 0.5;
     gl_Position = vec4(pos, 0.0, 1.0);
 }

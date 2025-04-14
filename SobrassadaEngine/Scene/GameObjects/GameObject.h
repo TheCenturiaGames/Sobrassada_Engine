@@ -89,7 +89,7 @@ class SOBRASADA_API_ENGINE GameObject
 
     MeshComponent* GetMeshComponent() const;
 
-   AnimationComponent* GetAnimationComponent() const;
+    AnimationComponent* GetAnimationComponent() const;
 
     const float3& GetPosition() const { return position; }
     const float3& GetRotation() const { return rotation; }

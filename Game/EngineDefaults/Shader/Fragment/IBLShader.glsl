@@ -112,7 +112,8 @@ vec3 GetAmbientLight(in vec3 normal, in vec3 R, float NdotV, float roughness, in
 {
     vec3 irradiance = texture(cubemapIrradiance, normal).rgb;
 
-    vec3 radiance = textureLod(cubemapPrefiltered, R, roughness * numLevels).rgb;
+    //vec3 radiance = texture(cubemapPrefiltered, R).rgb;
+    vec3 radiance = textureLod(cubemapPrefiltered, R, roughness * (numLevels - 1)).rgb;
     vec2 fab = texture(sampler2D(environmentBRDF), vec2(NdotV, roughness)).rg;
 
     vec3 diffuse = (diffuseColor * (1 - specularColor));
@@ -134,17 +135,13 @@ float GGXNormalDistribution(float NdotH, float roughness){
     return roughness2/denominator;
 }
 
-vec3 RenderLight(vec3 L, vec3 N, vec3 texColor, vec3 Li, float NdotL, float alpha, float roughness, float metalness)
+vec3 RenderLight(vec3 L, vec3 N, vec3 Cd, vec3 Li, float NdotL, float alpha, float roughness, vec3 RF0)
  {
     vec3 V = normalize(cameraPos - pos);
     vec3 H = normalize(V + L);
 
     float NdotV = max(dot(N, V), 0.0001);
     float NdotH = max(dot(N, H), 0.0001);
-
-    vec3 BaseColor = materials[instance_index].diffColor.rgb * texColor;
-    vec3 Cd = BaseColor * (1 - metalness);
-    vec3 RF0 = mix(vec3(0.04), BaseColor, metalness);
     
     float cosTheta = max(dot(L, H), 0.0001);
     vec3 fresnel = RF0 + (1 - RF0) * pow(1 - cosTheta, 5);
@@ -157,25 +154,25 @@ vec3 RenderLight(vec3 L, vec3 N, vec3 texColor, vec3 Li, float NdotL, float alph
     return diffspec;
 }
 
-vec3 RenderPointLight(const int index, const vec3 N, const vec3 texColor, const float alpha, float roughness, float metalness)
+vec3 RenderPointLight(const int index, const vec3 N, const vec3 Cd, const float alpha, float roughness, vec3 RF0)
 {
 	float attenuation = PointLightAttenuation(index);
 	vec3 L = -normalize(pos - pointLights[index].position.xyz);
 	vec3 Li = pointLights[index].color.rgb * pointLights[index].color.a * attenuation;
 	float NdotL = dot(N, L);
 
-	if (NdotL > 0 && attenuation > 0) return RenderLight(L, N, texColor, Li, NdotL, alpha, roughness, metalness);
+	if (NdotL > 0 && attenuation > 0) return RenderLight(L, N, Cd, Li, NdotL, alpha, roughness, RF0);
 	else return vec3(0);	
 }
 
-vec3 RenderSpotLight(const int index, const vec3 N, const vec3 texColor, const float alpha, float roughness, float metalness)
+vec3 RenderSpotLight(const int index, const vec3 N, const vec3 Cd, const float alpha, float roughness, vec3 RF0)
 {
 	float attenuation = SpotLightAttenuation(index);
 	vec3 L = -normalize(pos - spotLights[index].position.xyz);
 	vec3 Li = spotLights[index].color.rgb * spotLights[index].color.a * attenuation;
 	float NdotL = dot(N, L);
 
-	if (NdotL > 0 && attenuation > 0) return RenderLight(L, N, texColor, Li, NdotL, alpha, roughness, metalness);
+	if (NdotL > 0 && attenuation > 0) return RenderLight(L, N, Cd, Li, NdotL, alpha, roughness, RF0);
 	else return vec3(0);
 }
 
@@ -212,20 +209,24 @@ void main()
     float NdotV = max(dot(N, V), 0.0001);
 
     // Ambient light
+    vec3 BaseColor = materials[instance_index].diffColor.rgb * texColor;
+    vec3 Cd = BaseColor * (1 - metallic);
+    vec3 RF0 = mix(vec3(0.04), BaseColor, metallic);
+
     //vec3 ambient = ambient_color.rgb * ambient_color.a;
-    vec3 ambient = GetAmbientLight(N, R, NdotV, roughness, texColor, metallicRoughnessTexColor.rgb);
-    vec3 hdr = ambient * texColor;
+    vec3 ambient = GetAmbientLight(N, R, NdotV, roughness, Cd, RF0);
+    vec3 hdr = ambient;
 
     // Point Lights
     for (int i = 0; i < pointLightsCount; ++i)
 	{
-		hdr += RenderPointLight(i, N, texColor, alpha, roughness, metallic);
+		hdr += RenderPointLight(i, N, Cd, alpha, roughness, RF0);
 	}
 
     //Spot Lights
     for (int i = 0; i < spotLightsCount; ++i)
 	{
-		hdr += RenderSpotLight(i, N, texColor, alpha, roughness, metallic);
+		hdr += RenderSpotLight(i, N, Cd, alpha, roughness, RF0);
 	}
 
     // Directional light
@@ -234,7 +235,7 @@ void main()
     float NdotL = max(dot(N, L), 0.001f);
     if (NdotL > 0)
     {
-		hdr += RenderLight(L, N, texColor, lightColor, NdotL, alpha, roughness, metallic);
+		hdr += RenderLight(L, N, Cd, lightColor, NdotL, alpha, roughness, RF0);
     }
 
     vec3 ldr = hdr.rgb / (hdr.rgb + vec3(1.0));

@@ -41,6 +41,11 @@ mat3 computeTangetSpace(in vec3 normal)
     return mat3(right, up, normal);
 }
 
+float computeLod(float pdf, int numSamples, uint width)
+{
+	return max(0.5 * log2(6.0 * float(width) * float(width) / (float(numSamples) * pdf)), 0.0);
+}
+
 void main()
 {
     vec3 irradiance = vec3(0.0);
@@ -50,8 +55,12 @@ void main()
     for(int i=0; i< NUM_SAMPLES; ++i)
     {
         vec2 rand_value = hammersley2D(i, NUM_SAMPLES);
-        vec3 L = tangentSpace* hemisphereSample(rand_value[0], rand_value[1]);
-        vec3 Li = texture(skybox, L).rgb;
+        vec3 L = hemisphereSample(rand_value[0], rand_value[1]);
+        float cosTheta = L.z;
+		float pdf = cosTheta / PI;
+		float lod = computeLod(pdf, NUM_SAMPLES, 512);
+        L = tangentSpace * L;
+        vec3 Li = textureLod(skybox, L, lod).rgb;
         irradiance += Li;
     }
 
