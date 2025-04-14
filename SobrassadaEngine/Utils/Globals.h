@@ -84,9 +84,12 @@ constexpr float DEFAULT_CAMERA_DRAG_SENSITIVITY       = 0.05f;
 constexpr float DEFAULT_CAMERA_WHEEL_SENSITIVITY      = 2.f;
 constexpr float DEFAULT_CAMERA_ZOOM_SENSITIVITY       = 0.5f;
 
-constexpr const char* GAME_PATH                       = "..\\Game";
-constexpr const char* DEBUG_DLL_PATH                  = "..\\SobrassadaEngine\\x64\\Debug\\SobrassadaScripts.dll";
-constexpr const char* RELEASE_DLL_PATH                = "..\\SobrassadaEngine\\x64\\Release\\SobrassadaScripts.dll";
+constexpr const char* GAME_PATH                      = "..\\Game";
+constexpr const char* DEBUG_DLL_PATH                 = "..\\SobrassadaEngine\\x64\\Debug\\SobrassadaScripts.dll";
+constexpr const char* RELEASE_DLL_PATH               = "..\\SobrassadaEngine\\x64\\Release\\SobrassadaScripts.dll";
+
+constexpr const wchar_t* BANKNAME_INIT               = L"Init.bnk";
+constexpr const wchar_t* BANKNAME_MAIN               = L"main.bnk";
 
 constexpr const char* ENGINE_DEFAULT_ASSETS          = "EngineDefaults/";
 constexpr const char* ASSETS_PATH                    = "Assets/";

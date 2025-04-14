@@ -74,9 +74,7 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
     name                   = initialState["Name"].GetString();
     selectedComponentIndex = COMPONENT_NONE;
     mobilitySettings       = initialState["Mobility"].GetInt();
-    if (initialState.HasMember("IsTopParent")) 
-        isTopParent = initialState["IsTopParent"].GetBool();
-   
+    if (initialState.HasMember("IsTopParent")) isTopParent = initialState["IsTopParent"].GetBool();
 
     if (initialState.HasMember("PrefabUID")) prefabUID = initialState["PrefabUID"].GetUint64();
 
@@ -254,8 +252,7 @@ void GameObject::RenderEditorInspector()
 
         const float4x4& parentTransform = GetParentGlobalTransform();
 
-        if (selectedComponentIndex != COMPONENT_NONE &&
-            !(GetComponentByType(COMPONENT_CANVAS) && selectedComponentIndex == COMPONENT_TRANSFORM_2D))
+        if (selectedComponentIndex != COMPONENT_NONE)
         {
             ImGui::SameLine();
             if (ImGui::Button("Remove Component"))
@@ -414,6 +411,10 @@ void GameObject::OnTransformUpdated()
     globalOBB                    = globalTransform * OBB(localAABB);
     globalAABB                   = AABB(globalOBB);
 
+    position                     = globalTransform.TranslatePart();
+    rotation                     = globalTransform.RotatePart().ToEulerXYZ();
+    scale                        = globalTransform.GetScale();
+
     MeshComponent* meshComponent = GetMeshComponent();
     if (meshComponent != nullptr)
     {
@@ -424,7 +425,7 @@ void GameObject::OnTransformUpdated()
     if (components.find(COMPONENT_TRANSFORM_2D) != components.end())
     {
         Transform2DComponent* transform2D = static_cast<Transform2DComponent*>(components.at(COMPONENT_TRANSFORM_2D));
-        transform2D->OnTransform3DUpdated(localTransform);
+        transform2D->OnTransform3DUpdated(globalTransform);
     }
 
     if (mobilitySettings == STATIC) App->GetSceneModule()->GetScene()->SetStaticModified();
@@ -448,7 +449,7 @@ AABB GameObject::GetHierarchyAABB()
     std::set<UID> visitedGameObjects;
     std::stack<UID> toVisitGameObjects;
     UID sceneRootUID = App->GetSceneModule()->GetScene()->GetGameObjectRootUID();
-    // ADD "THIS" GAME OBJECT SO WHEN ASCENDING HERIARCHY WE DON'T REVISIT OUR CHILDREN
+
     visitedGameObjects.insert(uid);
 
     // FIRST UPDATE DOWN THE HERIARCHY
@@ -465,7 +466,7 @@ AABB GameObject::GetHierarchyAABB()
             visitedGameObjects.insert(currentUID);
             const GameObject* currentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentUID);
 
-            const AABB& currentAABB       = currentGameObject->GetGlobalAABB();
+            const AABB& currentAABB             = currentGameObject->GetGlobalAABB();
             if (currentAABB.IsFinite() && !currentAABB.IsDegenerate())
                 returnAABB.Enclose(currentGameObject->GetGlobalAABB());
 
@@ -681,6 +682,9 @@ void GameObject::UpdateGameObjectHierarchy(UID sourceUID)
     {
         UID oldParentUID = sourceGameObject->GetParent();
         sourceGameObject->SetParent(uid);
+
+        Component* transform2D = sourceGameObject->GetComponentByType(COMPONENT_TRANSFORM_2D);
+        if (transform2D) static_cast<Transform2DComponent*>(transform2D)->OnParentChange();
 
         GameObject* oldParentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(oldParentUID);
 

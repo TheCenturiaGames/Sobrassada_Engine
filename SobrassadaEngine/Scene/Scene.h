@@ -4,10 +4,11 @@
 #include "LightsConfig.h"
 
 #include "Math/float4x4.h"
+#include <functional>
 #include <map>
-#include <vector>
 #include <tuple>
 #include <unordered_map>
+#include <vector>
 
 class GameObject;
 class Component;
@@ -41,7 +42,7 @@ class Scene
     void OverridePrefabs(UID prefabUID);
 
     update_status Update(float deltaTime);
-    update_status Render(float deltaTime) const;
+    update_status Render(float deltaTime);
     update_status RenderEditor(float deltaTime);
 
     void RenderEditorControl(bool& editorControlMenu);
@@ -51,6 +52,8 @@ class Scene
 
     bool IsStaticModified() const { return staticModified; };
     bool IsDynamicModified() const { return dynamicModified; };
+    bool IsMultiselecting() const { return selectedGameObjects.size() > 0; };
+    bool IsSceneFocused() const { return isFocused; };
 
     void UpdateStaticSpatialStructure();
     void UpdateDynamicSpatialStructure();
@@ -60,6 +63,9 @@ class Scene
 
     void AddGameObjectToUpdate(GameObject* gameObject);
     void UpdateGameObjects();
+
+    void AddGameObjectToSelection(UID gameObject, UID gameObjectParent);
+    void ClearObjectSelection();
 
     const std::string& GetSceneName() const { return sceneName; }
     UID GetSceneUID() const { return sceneUID; }
@@ -86,6 +92,7 @@ class Scene
     const std::tuple<float, float>& GetMousePosition() const { return mousePosition; };
     Octree* GetOctree() const { return sceneOctree; }
     Quadtree* GetDynamicTree() const { return dynamicTree; }
+    UID GetMultiselectUID() const;
 
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
 
@@ -93,7 +100,8 @@ class Scene
 
     void SetStaticModified() { staticModified = true; }
     void SetDynamicModified() { dynamicModified = true; }
-    
+    void SetMultiselectPosition(const float3& newPosition);
+
   private:
     void CreateStaticSpatialDataStruct();
     void CreateDynamicSpatialDataStruct();
@@ -109,6 +117,7 @@ class Scene
     bool doInputs      = false;
     bool doMouseInputs = false;
     bool sceneVisible  = false;
+    bool isFocused     = false;
 
     std::unordered_map<UID, GameObject*> gameObjectsContainer;
 
@@ -125,4 +134,7 @@ class Scene
     bool dynamicModified                         = false;
 
     std::vector<GameObject*> gameObjectsToUpdate;
+
+    GameObject* multiSelectParent = nullptr;
+    std::map<UID, UID> selectedGameObjects;
 };
