@@ -13,7 +13,7 @@ uniform samplerCube skybox;
 
 out vec4 fragColor;
 
-vec2 CartesianToEquirectangular(in vec3 dir)
+vec2 CartesianToEquirectangular(const in vec3 dir)
 {
     float phi;
     phi = atan(dir.z, dir.x);
@@ -27,8 +27,8 @@ vec2 CartesianToEquirectangular(in vec3 dir)
 void main()
 {   
     if(isHDR == true){
-        vec3 dir = normalize(texCoords);
-        vec2 uv = CartesianToEquirectangular(dir);
+        const vec3 dir = normalize(texCoords);
+        const vec2 uv = CartesianToEquirectangular(dir);
         fragColor = texture(sampler2D(hdrSkybox), uv);
     }
     else {

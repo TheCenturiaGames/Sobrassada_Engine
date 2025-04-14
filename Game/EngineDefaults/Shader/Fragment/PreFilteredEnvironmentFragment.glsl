@@ -22,17 +22,17 @@ float radicalInverse_VdC(uint bits)
     return float(bits) * 2.3283064365386963e-10; // / 0x100000000
 }
 
-vec2 hammersley2D(uint i, uint N)
+vec2 hammersley2D(const uint i, const uint N)
 {
     return vec2(float(i)/float(N), radicalInverse_VdC(i));
 }
 
-vec3 hemisphereSampleGGX(float u1, float u2, float rough )
+vec3 hemisphereSampleGGX(const float u1, const float u2, const float rough)
 {
-    float a = rough * rough;
-    float phi = 2.0 * PI * u1;
-    float cos_theta = sqrt((1.0 - u2)/(u2 * (a * a - 1) + 1));
-    float sin_theta = sqrt(1 - cos_theta * cos_theta);
+    const float a = rough * rough;
+    const float phi = 2.0 * PI * u1;
+    const float cos_theta = sqrt((1.0 - u2)/(u2 * (a * a - 1) + 1));
+    const float sin_theta = sqrt(1 - cos_theta * cos_theta);
     
     // spherical to cartesian conversion
     vec3 dir;
@@ -42,39 +42,39 @@ vec3 hemisphereSampleGGX(float u1, float u2, float rough )
     return dir;
 }
 
-mat3 computeTangetSpace(in vec3 normal)
+mat3 computeTangetSpace(const in vec3 normal)
 {
     vec3 up = abs(normal.y) > 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(0.0, 1.0, 0.0);
-    vec3 right = normalize(cross(up, normal));
+    const vec3 right = normalize(cross(up, normal));
     up = cross(normal, right);
     return mat3(right, up, normal);
 }
 
-float computeLod(float pdf, int numSamples, uint width)
+float computeLod(const float pdf, const int numSamples, const uint width)
 {
 	return max(0.5 * log2(6.0 * float(width) * float(width) / (float(numSamples) * pdf)), 0.0);
 }
 
 void main()
 {
-    vec3 R = normalize(texCoords);
-    vec3 N = R, V = R;
+    const vec3 R = normalize(texCoords);
+    const vec3 N = R, V = R;
     vec3 color = vec3(0.0);
     float weight = 0.0f;
-    mat3 tangentSpace = computeTangetSpace(N);
+    const mat3 tangentSpace = computeTangetSpace(N);
 
     for( int i = 0; i < NUM_SAMPLES; ++i)
     {
-        vec2 rand_value = hammersley2D(i, NUM_SAMPLES);
+        const vec2 rand_value = hammersley2D(i, NUM_SAMPLES);
         vec3 H = hemisphereSampleGGX(rand_value[0], rand_value[1], roughness);
-        float cosTheta = H.z;
-		float ggxDenominator = cosTheta * cosTheta * (roughness * roughness - 1) + 1;
-		float ggx = (roughness * roughness) / (PI * ggxDenominator * ggxDenominator);
-		float pdf = ggx / 4.0;
-		float lod = computeLod(pdf, NUM_SAMPLES, 512);
+        const float cosTheta = H.z;
+		const float ggxDenominator = cosTheta * cosTheta * (roughness * roughness - 1) + 1;
+		const float ggx = (roughness * roughness) / (PI * ggxDenominator * ggxDenominator);
+		const float pdf = ggx / 4.0;
+		const float lod = computeLod(pdf, NUM_SAMPLES, 512);
         H = tangentSpace * H;
-        vec3 L = reflect(-V, H);
-        float NdotL = max(dot( N, L ), 0.0);
+        const vec3 L = reflect(-V, H);
+        const float NdotL = max(dot(N, L), 0.0);
         if( NdotL > 0 )
         {
             color += textureLod(skybox , L, lod).rgb * NdotL;

@@ -19,19 +19,19 @@ float radicalInverse_VdC(uint bits)
     return float(bits) * 2.3283064365386963e-10; // / 0x100000000
 }
 
-vec2 hammersley2D(uint i, uint N)
+vec2 hammersley2D(const uint i, const uint N)
 {
     return vec2(float(i)/float(N), radicalInverse_VdC(i));
 }
 
-vec3 hemisphereSampleGGX(float u1, float u2, float rough )
+vec3 hemisphereSampleGGX(const float u1, const float u2, const float rough )
 {
-    float a = rough * rough;
-    float phi = 2.0 * PI * u1;
-    float cos_theta = sqrt((1.0-u2)/(u2*(a*a-1)+1));
-    float sin_theta = sqrt(1-cos_theta*cos_theta);
+    const float a = rough * rough;
+    const float phi = 2.0 * PI * u1;
+    const float cos_theta = sqrt((1.0-u2)/(u2*(a*a-1)+1));
+    const float sin_theta = sqrt(1-cos_theta*cos_theta);
     
-    // spherical to cartesian conversion
+    //spherical to cartesian conversion
     vec3 dir;
     dir.x = cos(phi) * sin_theta;
     dir.y = sin(phi) * sin_theta;
@@ -39,17 +39,17 @@ vec3 hemisphereSampleGGX(float u1, float u2, float rough )
     return dir;
 }
 
-float VisibilityFunction(float NdotL, float NdotV, float roughness){
-    float G1 = NdotL * (NdotV * (1 - roughness) + roughness);
-    float G2 = NdotV * (NdotL * (1 - roughness) + roughness);
+float VisibilityFunction(const float NdotL, const float NdotV, const float roughness){
+    const float G1 = NdotL * (NdotV * (1 - roughness) + roughness);
+    const float G2 = NdotV * (NdotL * (1 - roughness) + roughness);
     return 0.5/(G1 + G2);
 }
 
 void main()
 {
-    float NdotV = uv0.x, roughness = uv0.y;
-    vec3 V = vec3(sqrt(1.0 - NdotV * NdotV), 0.0, NdotV);
-    vec3 N = vec3(0.0, 0.0, 1.0);
+    const float NdotV = uv0.x, roughness = uv0.y;
+    const vec3 V = vec3(sqrt(1.0 - NdotV * NdotV), 0.0, NdotV);
+    const vec3 N = vec3(0.0, 0.0, 1.0);
     float fa = 0.0;
     float fb = 0.0;
 
@@ -64,8 +64,8 @@ void main()
         
         if (NdotL > 0.0)
         {
-            float V_pdf = VisibilityFunction(NdotL, NdotV, roughness) * VdotH * NdotL / NdotH;
-            float Fc = pow(1.0 - VdotH, 5.0); // note: VdotH = LdotH
+            const float V_pdf = VisibilityFunction(NdotL, NdotV, roughness) * VdotH * NdotL / NdotH;
+            const float Fc = pow(1.0 - VdotH, 5.0);
             fa += (1.0 - Fc) * V_pdf;
             fb += Fc * V_pdf;
         }
