@@ -477,6 +477,39 @@
     <ClCompile Include="Scene\Components\Standalone\UI\ButtonComponent.cpp">
       <Filter>Scene\Components\UI</Filter>
     </ClCompile>
+    <ClCompile Include="Modules\AudioModule.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\Wwise\samples\SoundEngine\Common\AkDefaultLowLevelIODispatcher.cpp">
+      <Filter>External\Wwise</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\Wwise\samples\SoundEngine\Common\AkFileLocationBase.cpp">
+      <Filter>External\Wwise</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\Wwise\samples\SoundEngine\Common\AkFilePackage.cpp">
+      <Filter>External\Wwise</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\Wwise\samples\SoundEngine\Common\AkFilePackageLUT.cpp">
+      <Filter>External\Wwise</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\Wwise\samples\SoundEngine\Common\AkGeneratedSoundBanksResolver.cpp">
+      <Filter>External\Wwise</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\Wwise\samples\SoundEngine\Common\AkJobWorkerMgr.cpp">
+      <Filter>External\Wwise</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\Wwise\samples\SoundEngine\Common\AkMultipleFileLocation.cpp">
+      <Filter>External\Wwise</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\Wwise\samples\SoundEngine\Common\AkPlatformProfilerHookStubs.cpp">
+      <Filter>External\Wwise</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\Wwise\samples\SoundEngine\IO\AkDefaultIOHookDeferred.cpp">
+      <Filter>External\Wwise</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\Wwise\samples\SoundEngine\IO\stdafx.cpp">
+      <Filter>External\Wwise</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -559,6 +592,9 @@
     </Filter>
     <Filter Include="Scene\Components\Lights">
       <UniqueIdentifier>{7444def4-4f96-4ca5-b5da-7202b076fdc6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\Wwise">
+      <UniqueIdentifier>{6e4f8d0d-c331-4d88-ace9-d3f3ce3e6c2b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -917,6 +953,48 @@
     <ClInclude Include="Scene\Components\Standalone\UI\ButtonComponent.h">
       <Filter>Scene\Components\UI</Filter>
     </ClInclude>
+    <ClInclude Include="Modules\AudioModule.h">
+      <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\Wwise\samples\SoundEngine\Common\AkDefaultLowLevelIODispatcher.h">
+      <Filter>External\Wwise</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\Wwise\samples\SoundEngine\Common\AkFileHelpersBase.h">
+      <Filter>External\Wwise</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\Wwise\samples\SoundEngine\Common\AkFileLocationBase.h">
+      <Filter>External\Wwise</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\Wwise\samples\SoundEngine\Common\AkFilePackage.h">
+      <Filter>External\Wwise</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\Wwise\samples\SoundEngine\Common\AkFilePackageLowLevelIO.h">
+      <Filter>External\Wwise</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\Wwise\samples\SoundEngine\Common\AkFilePackageLowLevelIODeferred.h">
+      <Filter>External\Wwise</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\Wwise\samples\SoundEngine\Common\AkFilePackageLUT.h">
+      <Filter>External\Wwise</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\Wwise\samples\SoundEngine\Common\AkGeneratedSoundBanksResolver.h">
+      <Filter>External\Wwise</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\Wwise\samples\SoundEngine\Common\AkJobWorkerMgr.h">
+      <Filter>External\Wwise</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\Wwise\samples\SoundEngine\Common\AkMultipleFileLocation.h">
+      <Filter>External\Wwise</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\Wwise\samples\SoundEngine\IO\AkDefaultIOHookDeferred.h">
+      <Filter>External\Wwise</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\Wwise\samples\SoundEngine\IO\AkFileHelpers.h">
+      <Filter>External\Wwise</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\Wwise\samples\SoundEngine\IO\stdafx.h">
+      <Filter>External\Wwise</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl">
@@ -931,6 +1009,9 @@
     </None>
     <None Include="Libs\ImNodeFlow-1.2.2\src\ImNodeFlow.inl">
       <Filter>External\ImNodeFlow</Filter>
+    </None>
+    <None Include="Libs\Wwise\samples\SoundEngine\Common\AkFilePackageLowLevelIO.inl">
+      <Filter>External\Wwise</Filter>
     </None>
   </ItemGroup>
 </Project>

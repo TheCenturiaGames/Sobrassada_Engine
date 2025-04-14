@@ -1023,10 +1023,11 @@ void EditorUIModule::About(bool& aboutMenu)
     ImGui::Text(" - Geometry loader: TinyGLTF v2.9.3");
     ImGui::Text(" - Math: MathGeoLib v1.5");
     ImGui::Text(" - JSON: rapidjson v1.1");
-    ImGui::Text(" - UI: FreeType: v2.13.3");
-    ImGui::Text(" - RecastNavigation: v1.6.0");
-    ImGui::Text(" - ImNodeFlow: v1.2.2");
-    ImGui::Text(" - Bullet: v3.25");
+    ImGui::Text(" - UI: FreeType v2.13.3");
+    ImGui::Text(" - NavMesh: RecastNavigation v1.6.0");
+    ImGui::Text(" - StateMachine: ImNodeFlow v1.2.2");
+    ImGui::Text(" - Physics: Bullet v3.25");
+    ImGui::Text(" - Audio: Wwise v2024.1.3.8749");
     ImGui::Text("%s is licensed under the MIT License, see LICENSE for more information.", ENGINE_NAME);
 
     ImGui::Checkbox("Config/Build Information", &showConfigInfo);
