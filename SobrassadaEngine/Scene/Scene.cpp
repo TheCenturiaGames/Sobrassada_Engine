@@ -651,6 +651,11 @@ void Scene::UpdateGameObjects()
     gameObjectsToUpdate.clear();
 }
 
+void Scene::ClearGameObjectsToUpdate()
+{
+    gameObjectsToUpdate.clear();
+}
+
 void Scene::AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
 {
     auto pairResult = selectedGameObjects.insert({gameObject, gameObjectParent});
@@ -723,8 +728,8 @@ void Scene::DeleteMultiselection()
         
         RemoveGameObjectHierarchy(pairGameObject.first);
     }
-
     selectedGameObjects.clear();
+    ClearGameObjectsToUpdate();
 }
 
 const std::vector<Component*> Scene::GetAllComponents() const

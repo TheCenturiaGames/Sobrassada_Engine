@@ -63,6 +63,7 @@ class Scene
 
     void AddGameObjectToUpdate(GameObject* gameObject);
     void UpdateGameObjects();
+    void ClearGameObjectsToUpdate();
 
     void AddGameObjectToSelection(UID gameObject, UID gameObjectParent);
     void ClearObjectSelection();

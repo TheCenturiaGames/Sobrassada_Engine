@@ -162,12 +162,13 @@ update_status SceneModule::PostUpdate(float deltaTime)
                 gameObjectToClone = loadedScene->GetGameObjectByUID(currentGameObjectPair.second);
                 gameObjectToCloneParent = loadedScene->GetGameObjectByUID(currentGameObjectPair.first);
 
+                clonedGameObject = new GameObject(currentGameObjectPair.first, gameObjectToClone);
+                
                 for (UID child : gameObjectToClone->GetChildren())
                 {
-                    gameObjectsToClone.push(std::make_pair(gameObjectToClone->GetUID(), child));
+                    gameObjectsToClone.push(std::make_pair(clonedGameObject->GetUID(), child));
                 }
 
-                clonedGameObject = new GameObject(currentGameObjectPair.first, gameObjectToClone);
 
                 gameObjectToCloneParent->AddChildren(clonedGameObject->GetUID());
                 loadedScene->AddGameObject(clonedGameObject->GetUID(), clonedGameObject);
@@ -179,7 +180,8 @@ update_status SceneModule::PostUpdate(float deltaTime)
             loadedScene->GetGameObjectRootUID() != loadedScene->GetSelectedGameObjectUID())
         {
             if (loadedScene->IsMultiselecting()) loadedScene->DeleteMultiselection();
-            else loadedScene->RemoveGameObjectHierarchy(loadedScene->GetSelectedGameObjectUID());
+            else 
+                loadedScene->RemoveGameObjectHierarchy(loadedScene->GetSelectedGameObjectUID());
 
             loadedScene->SetSelectedGameObject(loadedScene->GetGameObjectRootUID());
         }
