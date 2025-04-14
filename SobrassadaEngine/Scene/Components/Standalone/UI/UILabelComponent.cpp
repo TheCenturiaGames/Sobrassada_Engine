@@ -87,7 +87,14 @@ void UILabelComponent::Init()
 
     parentCanvas = transform2D->GetParentCanvas();
 
-    if (parentCanvas == nullptr) GLOG("[WARNING] Label has no parent canvas, it won't be rendered");
+    if (parentCanvas == nullptr)
+    {
+        // Try to get it again, just in case the transform was created later
+        transform2D->GetCanvas();
+        parentCanvas = transform2D->GetParentCanvas();
+
+        if (parentCanvas == nullptr) GLOG("[WARNING] Label has no parent canvas, it won't be rendered");
+    }
 
     fontData->Clean();
     fontData->Init(fontType->GetFilepath().c_str(), fontSize);
@@ -117,6 +124,8 @@ void UILabelComponent::Clone(const Component* other)
     if (other->GetType() == ComponentType::COMPONENT_LABEL)
     {
         const UILabelComponent* otherLabel = static_cast<const UILabelComponent*>(other);
+        enabled                            = otherLabel->enabled;
+
         strcpy_s(text, sizeof(text), otherLabel->text);
         fontSize  = otherLabel->fontSize;
         fontColor = otherLabel->fontColor;
@@ -133,32 +142,10 @@ void UILabelComponent::Clone(const Component* other)
     }
 }
 
-void UILabelComponent::Update(float deltaTime)
-{
-}
-
-void UILabelComponent::Render(float deltaTime)
+void UILabelComponent::RenderUI(const float4x4& view, const float4x4 proj) const
 {
     if (parentCanvas == nullptr) return;
     if (!parent->IsGloballyEnabled()) return;
-
-    const int uiProgram = App->GetShaderModule()->GetUIWidgetProgram();
-    if (uiProgram == -1)
-    {
-        GLOG("Error with UI Program");
-        return;
-    }
-
-    glUseProgram(uiProgram);
-
-    const float4x4& view =
-        parentCanvas->IsInWorldSpaceEditor() ? App->GetCameraModule()->GetViewMatrix() : float4x4::identity;
-    const float4x4& proj =
-        parentCanvas->IsInWorldSpaceEditor()
-            ? App->GetCameraModule()->GetProjectionMatrix()
-            : float4x4::D3DOrthoProjLH(
-                  -1, 1, (float)App->GetWindowModule()->GetWidth(), (float)App->GetWindowModule()->GetHeight()
-              ); // near plane. far plane, screen width, screen height
 
     float width = 0;
     float3 startPos;
@@ -172,6 +159,7 @@ void UILabelComponent::Render(float deltaTime)
     glUniformMatrix4fv(2, 1, GL_TRUE, proj.ptr());
 
     glUniform3fv(3, 1, fontColor.ptr()); // Font color
+    glUniform1ui(5, 0);                  // Tell the shader this widget is a label = 0
 
     glBindVertexArray(vao);
     TextManager::RenderText(*fontData, text, startPos, vbo, width);
@@ -209,14 +197,13 @@ void UILabelComponent::RenderEditorInspector()
                     fontData->Init(fontType->GetFilepath().c_str(), fontSize);
                 }
 
-                // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
                 if (is_selected) ImGui::SetItemDefaultFocus();
                 ++i;
             }
             ImGui::EndCombo();
         }
 
-        ImGui::ColorPicker3("Font Color", fontColor.ptr());
+        ImGui::ColorEdit3("Font color", fontColor.ptr());
     }
 }
 

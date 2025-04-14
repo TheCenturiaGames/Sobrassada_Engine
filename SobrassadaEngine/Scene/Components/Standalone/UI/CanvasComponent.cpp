@@ -5,10 +5,14 @@
 #include "DebugDrawModule.h"
 #include "GameObject.h"
 #include "GameUIModule.h"
+#include "ImageComponent.h"
 #include "SceneModule.h"
+#include "ShaderModule.h"
 #include "Transform2DComponent.h"
+#include "UILabelComponent.h"
 #include "WindowModule.h"
 
+#include "glew.h"
 #include "imgui.h"
 #include <queue>
 
@@ -81,7 +85,7 @@ void CanvasComponent::Update(float deltaTime)
 
 void CanvasComponent::Render(float deltaTime)
 {
-    // If the canvas' GameObject is not globally enabled (it or any of its parents are disabled), skip rendering
+    // Skip rendering if the canvas' GameObject or any of its parents are disabled
     if (!parent->IsGloballyEnabled()) return;
 
     // Draw the canvas debug lines (borders)
@@ -115,8 +119,27 @@ void CanvasComponent::Render(float deltaTime)
         ),
         -float3::unitY, height, float3(1, 1, 1)
     );
+}
 
-    // Render all UI widgets in the hierarchy using a queue
+void CanvasComponent::RenderUI()
+{
+    if (!parent->IsGloballyEnabled()) return;
+
+    const int uiProgram = App->GetShaderModule()->GetUIWidgetProgram();
+    if (uiProgram == -1)
+    {
+        GLOG("Error with UI Program");
+        return;
+    }
+    glUseProgram(uiProgram);
+
+    const float4x4& view = isInWorldSpaceEditor ? App->GetCameraModule()->GetViewMatrix() : float4x4::identity;
+    const float4x4& proj = isInWorldSpaceEditor ? App->GetCameraModule()->GetProjectionMatrix()
+                                                : float4x4::D3DOrthoProjLH(
+                                                      -1, 1, (float)App->GetWindowModule()->GetWidth(),
+                                                      (float)App->GetWindowModule()->GetHeight()
+                                                  );
+
     std::queue<UID> children;
 
     for (const UID child : parent->GetChildren())
@@ -127,15 +150,26 @@ void CanvasComponent::Render(float deltaTime)
     while (!children.empty())
     {
         const GameObject* currentObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(children.front());
-
-        // Only render 2D UI elements that are globally enabled and have a Transform2D component.
-        // This ensures that deactivated UI elements (or their parents) are not rendered.
-        if (currentObject->IsGloballyEnabled() && currentObject->GetComponentByType(COMPONENT_TRANSFORM_2D) != nullptr)
-        {
-            currentObject->Render(deltaTime);
-        }
-
         children.pop();
+
+        // Only process GameObjects that are globally enabled
+        if (!currentObject->IsGloballyEnabled()) continue;
+
+        // If the object has a Transform2D, it's part of the UI hierarchy
+        if (currentObject->GetComponentByType(COMPONENT_TRANSFORM_2D))
+        {
+            // Render all supported UI components
+            Component* component = nullptr;
+
+            component = currentObject->GetComponentByType(COMPONENT_TRANSFORM_2D);
+            if (component) static_cast<const Transform2DComponent*>(component)->RenderWidgets();
+
+            component = currentObject->GetComponentByType(COMPONENT_LABEL);
+            if (component) static_cast<const UILabelComponent*>(component)->RenderUI(view, proj);
+
+            component = currentObject->GetComponentByType(COMPONENT_IMAGE);
+            if (component) static_cast<const ImageComponent*>(component)->RenderUI(view, proj);
+        }
 
         for (const UID child : currentObject->GetChildren())
         {
@@ -143,7 +177,6 @@ void CanvasComponent::Render(float deltaTime)
         }
     }
 }
-
 
 void CanvasComponent::RenderEditorInspector()
 {
