@@ -4,6 +4,7 @@
 #include "DetourNavMesh.h"
 #include "FileSystem.h"
 #include "LibraryModule.h"
+#include "MetaNavmesh.h"
 
 struct NavMeshSetHeader
 {
@@ -90,16 +91,22 @@ UID NavmeshImporter::SaveNavmesh(const char* name, const dtNavMesh& navmesh)
 
     std::string navpath       = NAVMESHES_PATH + std::string(name) + NAVMESH_EXTENSION; 
 
+
+    MetaNavmesh meta(navmeshUID, navpath);
+    meta.Save(name, navpath);
+
+
+
     unsigned int bytesWritten = (unsigned int)FileSystem::Save(navpath.c_str(), fileBuffer, size, true);
 
     delete[] fileBuffer;
 
     // added navmesh to resources
+    // Optional: navmesh map
     App->GetLibraryModule()->AddResource(navpath, navmeshUID);
-
+    App->GetLibraryModule()->AddName(name, navmeshUID);
+    
     GLOG("%s saved as binary", name);
-
-    FileSystem::Save(navpath.c_str(), fileBuffer, size);
 
     return navmeshUID;
 
@@ -108,5 +115,6 @@ UID NavmeshImporter::SaveNavmesh(const char* name, const dtNavMesh& navmesh)
 
 ResourceNavmesh* NavmeshImporter::LoadNavmesh(UID navmeshUID)
 {
+
     return nullptr;
 }
