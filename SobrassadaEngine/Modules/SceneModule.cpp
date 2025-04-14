@@ -186,7 +186,7 @@ update_status SceneModule::PostUpdate(float deltaTime)
                 loadedScene->AddGameObject(clonedGameObject->GetUID(), clonedGameObject);
             }
 
-            // ITERATE OVER ALL GAME OBJECTS TO CHECK IF ANY REMMAPING IS NEEDED
+            // ITERATE OVER ALL GAME OBJECTS TO CHECK IF ANY REMAPING IS NEEDED
             for (int i = 0; i < createdGameObjects.size(); ++i)
             {
                 MeshComponent* originalMeshComp = originalGameObjects[i]->GetMeshComponent();
@@ -211,8 +211,6 @@ update_status SceneModule::PostUpdate(float deltaTime)
                 AnimationComponent* animComp = createdGameObjects[i]->GetAnimationComponent();
                 if (animComp) animComp->SetBoneMapping();
             }
-
-            int x = 0;
         }
 
         // Delete -> Delete selected game object

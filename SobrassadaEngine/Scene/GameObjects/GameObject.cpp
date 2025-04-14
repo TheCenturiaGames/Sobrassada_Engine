@@ -62,6 +62,7 @@ GameObject::GameObject(UID parentUID, GameObject* refObject)
     position         = refObject->position;
     rotation         = refObject->rotation;
     scale            = refObject->scale;
+    prefabUID        = refObject->prefabUID;
 
     // Must make a copy of each manually
     for (const auto& component : refObject->components)
@@ -838,6 +839,9 @@ void GameObject::UpdateMobilityHierarchy(MobilitySettings type)
             if (currentGameObject->GetParent() != sceneRootUID) toVisitGameObjects.push(currentGameObject->GetParent());
         }
     }
+
+    App->GetSceneModule()->GetScene()->SetStaticModified();
+    App->GetSceneModule()->GetScene()->SetDynamicModified();
 }
 
 bool GameObject::CreateComponent(const ComponentType componentType)

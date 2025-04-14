@@ -173,7 +173,7 @@ void Scene::Save(
 
     for (auto it = gameObjectsContainer.begin(); it != gameObjectsContainer.end(); ++it)
     {
-        if (it->second != nullptr)
+        if (it->second != nullptr && it->second != multiSelectParent)
         {
             rapidjson::Value goJSON(rapidjson::kObjectType);
 
@@ -773,7 +773,7 @@ void Scene::CreateStaticSpatialDataStruct()
 
         if (!objectIterator.second->IsStatic()) continue;
         if (objectIterator.second->GetUID() == gameObjectRootUID) continue;
-        if (!objectBB.IsFinite() || objectBB.IsDegenerate()) continue;
+        if (!objectBB.IsFinite() || objectBB.IsDegenerate() || objectBB.Size().IsZero()) continue;
 
         sceneOctree->InsertElement(objectIterator.second);
     }
@@ -793,7 +793,7 @@ void Scene::CreateDynamicSpatialDataStruct()
 
         if (objectIterator.second->IsStatic()) continue;
         if (objectIterator.second->GetUID() == gameObjectRootUID) continue;
-        if (!objectBB.IsFinite() || objectBB.IsDegenerate()) continue;
+        if (!objectBB.IsFinite() || objectBB.IsDegenerate() || objectBB.Size().IsZero()) continue;
 
         dynamicTree->InsertElement(objectIterator.second);
     }
