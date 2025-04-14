@@ -6,6 +6,7 @@
 #include "rapidjson/document.h"
 
 class GameObject;
+enum KeyState;
 
 class SceneModule : public Module
 {
@@ -41,6 +42,12 @@ class SceneModule : public Module
     bool GetInPlayMode() const { return inPlayMode; }
 
     void AddGameObjectToUpdate(GameObject* gameObject) { loadedScene->AddGameObjectToUpdate(gameObject); };
+
+  private:
+    void HandleRaycast(const KeyState* mouseButtons, const KeyState* keyboard);
+    void HandleObjectDuplication();
+    void HandleObjectDeletion();
+    void HandleTreesUpdates();
 
   private:
     Scene* loadedScene = nullptr;
