@@ -371,6 +371,7 @@
     <ClCompile Include="FileSystem\Meta\MetaAnimation.cpp" />
     <ClCompile Include="FileSystem\Importers\FontImporter.cpp" />
     <ClCompile Include="FileSystem\Meta\MetaFont.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\Audio\AudioSourceComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\Physics\CapsuleColliderComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\Physics\SphereColliderComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\UI\ImageComponent.cpp" />
@@ -584,6 +585,7 @@
     <ClInclude Include="Libs\Wwise\samples\SoundEngine\IO\AkFileHelpers.h" />
     <ClInclude Include="Libs\Wwise\samples\SoundEngine\IO\stdafx.h" />
     <ClInclude Include="Modules\AudioModule.h" />
+    <ClInclude Include="Scene\Components\Standalone\Audio\AudioSourceComponent.h" />
     <ClInclude Include="Scene\Components\Standalone\Physics\CapsuleColliderComponent.h" />
     <ClInclude Include="Scene\Components\Standalone\UI\ImageComponent.h" />
     <ClInclude Include="Utils\Physics\BulletUserPointer.h" />

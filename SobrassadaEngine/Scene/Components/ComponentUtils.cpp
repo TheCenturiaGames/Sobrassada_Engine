@@ -17,6 +17,7 @@
 #include "Standalone/UI/UILabelComponent.h"
 #include "Standalone/UI/ImageComponent.h"
 #include "Standalone/AIAgentComponent.h"
+#include "Standalone/Audio/AudioSourceComponent.h"
 #include <cstdint>
 
 Component* ComponentUtils::CreateEmptyComponent(const ComponentType type, const UID uid, GameObject* parent)
@@ -74,6 +75,9 @@ Component* ComponentUtils::CreateEmptyComponent(const ComponentType type, const 
     case COMPONENT_IMAGE:
         generatedComponent = new ImageComponent(uid, parent);
         break;
+    case COMPONENT_AUDIO_SOURCE:
+        generatedComponent = new AudioSourceComponent(uid, parent);
+        break;
     default:
         return nullptr;
     }
@@ -123,6 +127,8 @@ Component* ComponentUtils::CreateExistingComponent(const rapidjson::Value& initi
             return new AIAgentComponent(initialState, parent);
         case COMPONENT_IMAGE:
             return new ImageComponent(initialState, parent);
+        case COMPONENT_AUDIO_SOURCE:
+            return new AudioSourceComponent(initialState, parent);
         default:
             return nullptr;
         }
