@@ -36,9 +36,10 @@ update_status GameUIModule::Update(float deltaTime)
 
 #if defined(GAME) || defined(GAMEDEBUG)
         // In game, just get the mouse position
+        // If there is a windowed game version, then it should probably be the same for all versions
         mousePosition = inputs->GetMousePosition();
 #else
-        // Get the mouse position depending on the window size and position
+        // Get the mouse position depending on the scene buffer size and position
         auto& windowPosition = App->GetSceneModule()->GetScene()->GetWindowPosition();
         auto& mousePos       = App->GetSceneModule()->GetScene()->GetMousePosition();
         auto& windowSize     = App->GetSceneModule()->GetScene()->GetWindowSize();
@@ -55,7 +56,6 @@ update_status GameUIModule::Update(float deltaTime)
 
     if (inputs->GetMouseButtonDown(1) == KEY_DOWN)
     {
-        GLOG("Mouse button pressed");
         for (CanvasComponent* canvas : canvases)
         {
             canvas->OnMouseButtonPressed();

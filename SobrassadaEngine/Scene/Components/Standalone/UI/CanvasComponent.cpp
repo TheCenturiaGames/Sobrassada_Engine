@@ -218,7 +218,9 @@ void CanvasComponent::UpdateChildren()
 
 void CanvasComponent::UpdateMousePosition(const float2& mousePos)
 {
-    // GLOG("Mouse pos: %f, %f", mousePos.x, mousePos.y);
+    // Only interact with elements if canvas is in screen mode
+    if (isInWorldSpaceEditor) return;
+
     hoveredButton    = nullptr;
     bool buttonFound = false;
 

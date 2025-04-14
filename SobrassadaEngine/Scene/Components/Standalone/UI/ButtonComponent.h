@@ -46,4 +46,5 @@ class SOBRASADA_API_ENGINE ButtonComponent : public Component
     bool isHovered;
     bool isInteractable;
     EventDispatcher<void> onClickDispatcher;
+    std::list<Delegate<void>>::iterator delegateID;
 };
