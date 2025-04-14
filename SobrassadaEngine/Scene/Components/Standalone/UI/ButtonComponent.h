@@ -29,6 +29,7 @@ class SOBRASADA_API_ENGINE ButtonComponent : public Component
 
     void AddOnClickCallback(Delegate<void>& newDelegate);
     void RemoveOnClickCallback();
+    void RemoveTransform() { transform2D = nullptr; }
 
   private:
     bool IsWithinBounds(const float2& pos);

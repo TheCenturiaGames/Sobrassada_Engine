@@ -32,6 +32,7 @@ class Transform2DComponent : public Component
     float2 GetGlobalPosition() const;
     void AddChildTransform(Transform2DComponent* newChild) { childTransforms.push_back(newChild); }
     void RemoveChild(Transform2DComponent* child);
+    void RemoveParent() { parentTransform = nullptr; }
     CanvasComponent* GetParentCanvas() const { return parentCanvas; }
 
   private:

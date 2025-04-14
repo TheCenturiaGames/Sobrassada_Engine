@@ -137,7 +137,7 @@ void ImageComponent::RenderEditorInspector()
 
 void ImageComponent::RenderUI(const float4x4& view, const float4x4& proj) const
 {
-    if (parentCanvas == nullptr) return;
+    if (parentCanvas == nullptr || transform2D == nullptr) return;
 
     const float3 startPos =
         float3(transform2D->GetRenderingPosition(), 0) - parent->GetGlobalTransform().TranslatePart();
