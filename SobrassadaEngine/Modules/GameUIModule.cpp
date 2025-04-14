@@ -29,7 +29,7 @@ update_status GameUIModule::Render(float deltaTime)
 {
     for (CanvasComponent* canvas : canvases)
     {
-        canvas->Render(deltaTime);
+        canvas->RenderUI();
     }
 
     return UPDATE_CONTINUE;
