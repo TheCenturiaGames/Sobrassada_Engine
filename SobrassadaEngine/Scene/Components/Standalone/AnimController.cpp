@@ -87,15 +87,15 @@ update_status AnimController::Update(float deltaTime)
     if (targetAnimation != nullptr)
     {
 
-        animInfo.fadeTime    += deltaTime;
-        animInfo.currentTime += deltaTime;
+        fadeTime    += deltaTime;
 
-        if (animInfo.fadeTime >= static_cast<float>(transitionTime))
+        if (fadeTime >= static_cast<float>(transitionTime))
         {
             // App->GetResourcesModule()->ReleaseResource(currentAnimation);
             currentAnimation  = targetAnimation;
             targetAnimation   = nullptr;
-            animInfo.fadeTime = 0;
+            currentTime       = fadeTime;
+            fadeTime = 0;
         }
     }
 
@@ -115,7 +115,7 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
         GetChannelRotation(animChannel, rot);
     } else
     {
-        float weight = transitionTime != 0 ? animInfo.fadeTime / transitionTime : 1;
+        float weight = transitionTime != 0 ? fadeTime / transitionTime : 1;
         
         Channel* animChannel = currentAnimation->GetChannel(nodeName);
         Channel* targetAnimChannel = targetAnimation->GetChannel(nodeName);

@@ -46,6 +46,8 @@ StateMachineEditor::~StateMachineEditor()
         }
         graph->getNodes().clear();
     }
+    resource->SetActiveState(-1);
+    resource->SetDefaultState(-1);
 }
 
 bool StateMachineEditor::RenderEditor()

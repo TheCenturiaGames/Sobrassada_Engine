@@ -35,6 +35,16 @@ AnimationComponent::AnimationComponent(const rapidjson::Value& initialState, Gam
     {
         resource = 0;
     }
+
+    if (initialState.HasMember("StateMachine") && initialState["StateMachine"].IsUint64())
+    {
+        UID smUID            = initialState["StateMachine"].GetUint64();
+        resourceStateMachine = static_cast<ResourceStateMachine*>(App->GetResourcesModule()->RequestResource(smUID));
+    }
+    else
+    {
+        resourceStateMachine = nullptr;
+    }
 }
 
 AnimationComponent::~AnimationComponent()
@@ -50,15 +60,11 @@ AnimationComponent::~AnimationComponent()
 void AnimationComponent::OnPlay(bool isTransition)
 {
     StateMachineEditor* stateMachine = nullptr;
-    float transitionTime = 0;
+    float transitionTime             = 0;
     if (animController != nullptr && resource != 0)
     {
-        // animController->Play(resource, true);
-        stateMachine = App->GetEditorUIModule()->GetStateMachine();
-        if (stateMachine)
+        if (resourceStateMachine)
         {
-            stateMachine->SetAnimComponent(this);
-            resourceStateMachine     = stateMachine->GetLoadedStateMachine();
             const State* activeState = resourceStateMachine->GetActiveState();
             for (const auto& state : resourceStateMachine->states)
             {
@@ -76,17 +82,16 @@ void AnimationComponent::OnPlay(bool isTransition)
                         if (clip.clipName.GetString() == activeState->clipName.GetString())
                         {
                             GLOG("TransitionTime: %f", transitionTime);
-                            if (isTransition) animController->SetTargetAnimationResource(clip.animationResourceUID, 10);
+                            if (isTransition)
+                                animController->SetTargetAnimationResource(clip.animationResourceUID, transitionTime);
                             else animController->Play(clip.animationResourceUID, true);
+                            resource = clip.animationResourceUID;
                         }
                     }
                 }
             }
         }
-        else
-        {
-            animController->Play(resource, true);
-        }
+        else animController->Play(resource, true);
     }
 }
 
@@ -121,8 +126,8 @@ void AnimationComponent::OnInspector()
     {
         currentAnimResource = dynamic_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
         const std::string animationName = App->GetLibraryModule()->GetResourceName(resource);
-        
-        const size_t underscorePos            = animationName.find('_');
+
+        const size_t underscorePos      = animationName.find('_');
         if (underscorePos != std::string::npos) originAnimation = animationName.substr(0, underscorePos);
         if (currentAnimResource != nullptr)
         {
@@ -317,7 +322,64 @@ void AnimationComponent::OnInspector()
                 }
             }
         }
+    }
 
+    ImGui::Separator();
+    ImGui::Text("Associated State Machine");
+
+    const std::unordered_map<std::string, UID>& stateMap = App->GetLibraryModule()->GetStateMachineMap();
+
+    std::string currentName                              = "None";
+    if (resourceStateMachine) currentName = resourceStateMachine->GetName();
+
+    if (ImGui::BeginCombo("##StateMachineCombo", currentName.c_str()))
+    {
+        for (const auto& [name, uid] : stateMap)
+        {
+            const bool isSelected = (resourceStateMachine && resourceStateMachine->GetUID() == uid);
+            if (ImGui::Selectable(name.c_str(), isSelected))
+            {
+                if (resourceStateMachine) App->GetResourcesModule()->ReleaseResource(resourceStateMachine);
+                resourceStateMachine =
+                    static_cast<ResourceStateMachine*>(App->GetResourcesModule()->RequestResource(uid));
+            }
+            if (isSelected) ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndCombo();
+    }
+
+    if (resourceStateMachine)
+    {
+        ImGui::Separator();
+        ImGui::Text("Available Triggers:");
+
+        for (const std::string& triggerName : resourceStateMachine->availableTriggers)
+        {
+            if (ImGui::Button(triggerName.c_str()))
+            {
+                if (IsPlaying())
+                {
+                    GLOG("Trigger selected: %s", triggerName.c_str());
+                    for (const auto& transition : resourceStateMachine->transitions)
+                    {
+                        if (transition.triggerName == triggerName &&
+                            transition.fromState.GetString() ==
+                                resourceStateMachine->GetActiveState()->name.GetString())
+                        {
+                            for (size_t i = 0; i < resourceStateMachine->states.size(); ++i)
+                            {
+                                if (resourceStateMachine->states[i].name.GetString() == transition.toState.GetString())
+                                {
+                                    resourceStateMachine->SetActiveState(static_cast<int>(i));
+                                    OnPlay(true);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     if (playing && currentAnimComp && currentAnimComp->GetAnimationController())
@@ -352,6 +414,7 @@ void AnimationComponent::Clone(const Component* other)
 
 void AnimationComponent::Update(float deltaTime)
 {
+
     if (!animController->IsPlaying()) return;
 
     if (boneMapping.empty())
@@ -361,7 +424,6 @@ void AnimationComponent::Update(float deltaTime)
 
     animController->Update(deltaTime);
 
-    // Blending en la animacion individual
     for (auto& channel : currentAnimResource->channels)
     {
         const std::string& boneName = channel.first;
@@ -390,6 +452,9 @@ void AnimationComponent::Save(rapidjson::Value& targetState, rapidjson::Document
 
     targetState.AddMember(
         "Animations", currentAnimResource != nullptr ? currentAnimResource->GetUID() : INVALID_UID, allocator
+    );
+    targetState.AddMember(
+        "StateMachine", resourceStateMachine != nullptr ? resourceStateMachine->GetUID() : INVALID_UID, allocator
     );
 }
 

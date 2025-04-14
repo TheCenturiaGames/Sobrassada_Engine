@@ -5,11 +5,6 @@
 class ResourceAnimation;
 class Channel;
 
-struct ActiveAnimInfo
-{
-    float currentTime = 0.0f;
-    float fadeTime    = 0.0f;
-};
 
 class AnimController
 {
@@ -49,9 +44,8 @@ class AnimController
     bool playAnimation           = false;
     float playbackSpeed          = 1.0f;
     unsigned transitionTime         = 0;
+    float fadeTime                      = 0;
     
     ResourceAnimation* currentAnimation = nullptr;
     ResourceAnimation* targetAnimation = nullptr;
-    
-    ActiveAnimInfo animInfo;
 };

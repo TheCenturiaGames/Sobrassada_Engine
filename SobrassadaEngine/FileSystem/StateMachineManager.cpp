@@ -228,6 +228,8 @@ namespace StateMachineManager
             }
         }
 
+        stateMachine->SetDefaultState(0);
+        stateMachine->SetActiveState(0);
         GLOG("StateMachine %llu loaded successfully from: %s", stateMachineUID, path.c_str());
 
         return stateMachine;
@@ -238,7 +240,7 @@ namespace StateMachineManager
 std::vector<std::string> StateMachineManager::GetAllStateMachineNames()
 {
     std::vector<std::string> names;
-    const auto& stateMachineMap = App->GetLibraryModule()->GetStateMachinePath();
+    const auto& stateMachineMap = App->GetLibraryModule()->GetStateMachineMap();
 
     for (const auto& pair : stateMachineMap)
     {
@@ -250,7 +252,7 @@ std::vector<std::string> StateMachineManager::GetAllStateMachineNames()
 
 UID StateMachineManager::GetStateMachineUID(const std::string& stateMachineName)
 {
-    const auto& stateMachineMap = App->GetLibraryModule()->GetStateMachinePath();
+    const auto& stateMachineMap = App->GetLibraryModule()->GetStateMachineMap();
 
     auto it                     = stateMachineMap.find(stateMachineName);
     if (it != stateMachineMap.end())
