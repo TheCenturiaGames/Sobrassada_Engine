@@ -366,6 +366,7 @@
     <ClCompile Include="Libs\Wwise\samples\SoundEngine\Common\AkPlatformProfilerHookStubs.cpp" />
     <ClCompile Include="Libs\Wwise\samples\SoundEngine\IO\AkDefaultIOHookDeferred.cpp" />
     <ClCompile Include="Libs\Wwise\samples\SoundEngine\IO\stdafx.cpp" />
+    <ClCompile Include="FileSystem\Meta\MetaNavmesh.cpp" />
     <ClCompile Include="Modules\AudioModule.cpp" />
     <ClCompile Include="FileSystem\Importers\AnimationImporter.cpp" />
     <ClCompile Include="FileSystem\Meta\MetaAnimation.cpp" />
@@ -582,6 +583,7 @@
     <ClInclude Include="Libs\Wwise\samples\SoundEngine\IO\AkDefaultIOHookDeferred.h" />
     <ClInclude Include="Libs\Wwise\samples\SoundEngine\IO\AkFileHelpers.h" />
     <ClInclude Include="Libs\Wwise\samples\SoundEngine\IO\stdafx.h" />
+    <ClInclude Include="FileSystem\Meta\MetaNavmesh.h" />
     <ClInclude Include="Modules\AudioModule.h" />
     <ClInclude Include="Scene\Components\Standalone\Physics\CapsuleColliderComponent.h" />
     <ClInclude Include="Utils\Physics\BulletUserPointer.h" />
