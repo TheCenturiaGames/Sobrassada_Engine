@@ -55,7 +55,8 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"Sphere Collider",      COMPONENT_SPHERE_COLLIDER     },
         {"Capsule Collider",     COMPONENT_CAPSULE_COLLIDER    },
         {"Script",               COMPONENT_SCRIPT              },
-        {"AI Agent",             COMPONENT_AIAGENT             }
+        {"AI Agent",             COMPONENT_AIAGENT             },
+        {"UI Image",             COMPONENT_IMAGE               }
     };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;
