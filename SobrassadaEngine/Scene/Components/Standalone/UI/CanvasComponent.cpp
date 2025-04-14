@@ -85,10 +85,8 @@ void CanvasComponent::Update(float deltaTime)
 
 void CanvasComponent::Render(float deltaTime)
 {
-    // Skip rendering if the canvas' GameObject or any of its parents are disabled
     if (!parent->IsGloballyEnabled()) return;
 
-    // Draw the canvas debug lines (borders)
     App->GetDebugDrawModule()->DrawLine(
         float3(
             parent->GetGlobalTransform().TranslatePart().x - width / 2,
@@ -152,13 +150,10 @@ void CanvasComponent::RenderUI()
         const GameObject* currentObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(children.front());
         children.pop();
 
-        // Only process GameObjects that are globally enabled
         if (!currentObject->IsGloballyEnabled()) continue;
 
-        // If the object has a Transform2D, it's part of the UI hierarchy
         if (currentObject->GetComponentByType(COMPONENT_TRANSFORM_2D))
         {
-            // Render all supported UI components
             Component* component = nullptr;
 
             component = currentObject->GetComponentByType(COMPONENT_TRANSFORM_2D);
