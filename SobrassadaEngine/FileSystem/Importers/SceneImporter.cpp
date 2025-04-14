@@ -42,39 +42,47 @@ namespace SceneImporter
 
         std::vector<std::vector<std::pair<UID, UID>>> gltfMeshes;
         std::unordered_map<int, UID> matIndices;
-
-        for (const auto& srcMesh : model.meshes)
+        
+        for (const tinygltf::Node& srcNode : model.nodes)
         {
             int n = 0;
             int matIndex = -1;
             std::vector<std::pair<UID, UID>> primitives;
 
-            for (const auto& primitive : srcMesh.primitives)
+            if (srcNode.mesh >= 0 && srcNode.mesh < model.meshes.size())
             {
-                std::string name = srcMesh.name + std::to_string(n);
+                const tinygltf::Mesh& srcMesh = model.meshes[srcNode.mesh];
+                const float4x4& defaultTransform = MeshImporter::GetNodeTransform(srcNode);
 
-                UID matUID   = INVALID_UID;
-                matIndex = primitive.material;
-                if (matIndex == -1)
+                for (const auto& primitive : srcMesh.primitives)
                 {
-                    GLOG("Material index invalid for mesh: %s", name.c_str());
-                }
-                else if (matIndices.find(matIndex) == matIndices.end())
-                {
-                    matUID = MaterialImporter::ImportMaterial(model, matIndex, filePath, targetFilePath);
-                    matIndices[matIndex] = matUID;
-                }
-                else
-                {
-                    matUID = matIndices[matIndex];
-                }
+                    std::string name = srcNode.name + "_" + srcMesh.name;
+
+                    UID matUID   = INVALID_UID;
+                    matIndex = primitive.material;
+                    if (matIndex == -1)
+                    {
+                        GLOG("Material index invalid for mesh: %s", name.c_str());
+                    }
+                    else if (matIndices.find(matIndex) == matIndices.end())
+                    {
+                        matUID = MaterialImporter::ImportMaterial(model, matIndex, filePath, targetFilePath);
+                        matIndices[matIndex] = matUID;
+                    }
+                    else
+                    {
+                        matUID = matIndices[matIndex];
+                    }
                 
-                const UID meshUID      = MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath, targetFilePath, INVALID_UID, matUID);
-                n++;
+                    const UID meshUID      = MeshImporter::ImportMesh(model, srcMesh, primitive, name, defaultTransform,
+                        filePath, targetFilePath, INVALID_UID, matUID);
+                    n++;
                 
-                primitives.emplace_back(meshUID, matUID);
-                GLOG("New primitive with mesh UID: %d and Material UID: %d", meshUID, matUID);
+                    primitives.emplace_back(meshUID, matUID);
+                    GLOG("New primitive with mesh UID: %d and Material UID: %d", meshUID, matUID);
+                }
             }
+            
             gltfMeshes.push_back(primitives);
         }
 
@@ -146,7 +154,7 @@ namespace SceneImporter
                 for (const auto& primitive : srcMesh.primitives)
                 {
                     MeshImporter::ImportMesh(
-                        model, srcMesh, primitive, name, filePath.c_str(), targetFilePath, sourceUID
+                        model, srcMesh, primitive, name, float4x4::identity, filePath.c_str(), targetFilePath, sourceUID
                     );
                     return; // only one mesh with the same name
                 }
