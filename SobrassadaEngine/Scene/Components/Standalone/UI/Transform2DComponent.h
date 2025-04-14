@@ -17,12 +17,15 @@ class Transform2DComponent : public Component
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
     void Clone(const Component* other) override;
 
-    void Update(float deltaTime) override;
-    void Render(float deltaTime) override;
+    void Update(float deltaTime) override {};
+    void Render(float deltaTime) override {};
     void RenderEditorInspector() override;
 
+    void RenderWidgets() const;
     void UpdateParent3DTransform();
     void OnTransform3DUpdated(const float4x4& transform3D);
+    void OnParentChange();
+    void GetCanvas();
 
     float2 GetRenderingPosition() const;
     float2 GetGlobalPosition() const;
@@ -31,7 +34,6 @@ class Transform2DComponent : public Component
     CanvasComponent* GetParentCanvas() const { return parentCanvas; }
 
   private:
-    void GetCanvas();
     bool IsRootTransform2D() const;
 
     float GetAnchorXPos(const float anchor) const;

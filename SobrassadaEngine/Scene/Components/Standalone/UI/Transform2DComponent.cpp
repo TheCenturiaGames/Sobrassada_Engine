@@ -129,53 +129,6 @@ void Transform2DComponent::Clone(const Component* other)
     }
 }
 
-void Transform2DComponent::Update(float deltaTime)
-{
-}
-
-void Transform2DComponent::Render(float deltaTime)
-{
-    if (parentCanvas == nullptr) return;
-
-    // Draw a square to show the width and height
-    DebugDrawModule* debugDraw = App->GetDebugDrawModule();
-    debugDraw->DrawLine(
-        float3(GetRenderingPosition().x, GetRenderingPosition().y, 0), float3::unitX, size.x, float3(1, 1, 1)
-    );
-
-    debugDraw->DrawLine(
-        float3(GetRenderingPosition().x + size.x, GetRenderingPosition().y, 0), -float3::unitY, size.y, float3(1, 1, 1)
-    );
-
-    debugDraw->DrawLine(
-        float3(GetRenderingPosition().x, GetRenderingPosition().y - size.y, 0), float3::unitX, size.x, float3(1, 1, 1)
-    );
-
-    debugDraw->DrawLine(
-        float3(GetRenderingPosition().x, GetRenderingPosition().y, 0), -float3::unitY, size.y, float3(1, 1, 1)
-    );
-
-    // Draw anchor points when selected
-    if (App->GetSceneModule()->GetScene()->GetSelectedGameObject()->GetUID() == parent->GetUID())
-    {
-        // Top-left
-        const float3 x1 = float3(GetAnchorXPos(anchorsX.x), GetAnchorYPos(anchorsY.y), 0);
-        debugDraw->DrawCone(x1, float3(-10, 10, 0), 5, 1);
-
-        // Top-right
-        const float3 x2 = float3(GetAnchorXPos(anchorsX.y), GetAnchorYPos(anchorsY.y), 0);
-        debugDraw->DrawCone(x2, float3(10, 10, 0), 5, 1);
-
-        // Bottom-left
-        const float3 y1 = float3(GetAnchorXPos(anchorsX.x), GetAnchorYPos(anchorsY.x), 0);
-        debugDraw->DrawCone(y1, float3(-10, -10, 0), 5, 1);
-
-        // Bottom-right
-        const float3 y2 = float3(GetAnchorXPos(anchorsX.y), GetAnchorYPos(anchorsY.x), 0);
-        debugDraw->DrawCone(y2, float3(10, -10, 0), 5, 1);
-    }
-}
-
 void Transform2DComponent::RenderEditorInspector()
 {
     Component::RenderEditorInspector();
@@ -251,6 +204,47 @@ void Transform2DComponent::RenderEditorInspector()
         ImGui::Separator();
         ImGui::InputFloat2("Debug pos", &position.x);
         ImGui::InputFloat2("Debug size", &size.x);
+    }
+}
+
+void Transform2DComponent::RenderWidgets() const
+{
+    // Draw a square to show the width and height
+    DebugDrawModule* debugDraw = App->GetDebugDrawModule();
+    debugDraw->DrawLine(
+        float3(GetRenderingPosition().x - 1, GetRenderingPosition().y + 1, 0), float3::unitX, size.x + 2, float3(1, 1, 1)
+    );
+
+    debugDraw->DrawLine(
+        float3(GetRenderingPosition().x + size.x + 1, GetRenderingPosition().y + 1, 0), -float3::unitY, size.y + 2, float3(1, 1, 1)
+    );
+
+    debugDraw->DrawLine(
+        float3(GetRenderingPosition().x - 1, GetRenderingPosition().y - size.y - 1, 0), float3::unitX, size.x + 2, float3(1, 1, 1)
+    );
+
+    debugDraw->DrawLine(
+        float3(GetRenderingPosition().x - 1, GetRenderingPosition().y + 1, 0), -float3::unitY, size.y + 2, float3(1, 1, 1)
+    );
+
+    // Draw anchor points when selected
+    if (App->GetSceneModule()->GetScene()->GetSelectedGameObject()->GetUID() == parent->GetUID())
+    {
+        // Top-left
+        const float3 x1 = float3(GetAnchorXPos(anchorsX.x), GetAnchorYPos(anchorsY.y), 0);
+        debugDraw->DrawCone(x1, float3(-10, 10, 0), 5, 1);
+
+        // Top-right
+        const float3 x2 = float3(GetAnchorXPos(anchorsX.y), GetAnchorYPos(anchorsY.y), 0);
+        debugDraw->DrawCone(x2, float3(10, 10, 0), 5, 1);
+
+        // Bottom-left
+        const float3 y1 = float3(GetAnchorXPos(anchorsX.x), GetAnchorYPos(anchorsY.x), 0);
+        debugDraw->DrawCone(y1, float3(-10, -10, 0), 5, 1);
+
+        // Bottom-right
+        const float3 y2 = float3(GetAnchorXPos(anchorsX.y), GetAnchorYPos(anchorsY.x), 0);
+        debugDraw->DrawCone(y2, float3(10, -10, 0), 5, 1);
     }
 }
 
@@ -517,4 +511,18 @@ void Transform2DComponent::RemoveChild(Transform2DComponent* child)
 {
     const auto& it = std::find(childTransforms.begin(), childTransforms.end(), child);
     if (it != childTransforms.end()) childTransforms.erase(it);
+}
+
+void Transform2DComponent::OnParentChange()
+{
+    if (parentTransform) parentTransform->RemoveChild(this);
+    
+    if (!IsRootTransform2D())
+    {
+        parentTransform = static_cast<Transform2DComponent*>(App->GetSceneModule()
+                                                                 ->GetScene()
+                                                                 ->GetGameObjectByUID(parent->GetParent())
+                                                                 ->GetComponentByType(COMPONENT_TRANSFORM_2D));
+        parentTransform->AddChildTransform(this);
+    }
 }
