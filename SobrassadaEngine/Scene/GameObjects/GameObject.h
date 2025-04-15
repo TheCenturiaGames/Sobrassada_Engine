@@ -113,7 +113,6 @@ class SOBRASADA_API_ENGINE GameObject
     bool IsEnabled() const { return enabled; }
     void SetEnabled(bool state) { enabled = state; }
 
-
   private:
     void DrawNodes() const;
     void OnDrawConnectionsToggle();

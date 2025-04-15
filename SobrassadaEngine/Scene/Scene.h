@@ -18,6 +18,7 @@ class ResourcePrefab;
 class Quadtree;
 class CameraComponent;
 enum class SaveMode;
+enum MobilitySettings;
 
 class Scene
 {
@@ -99,6 +100,10 @@ class Scene
     UID GetMultiselectUID() const;
     GameObject* GetMultiselectParent() { return multiSelectParent; }
     const std::map<UID, UID>& GetMultiselectedObjects() const { return selectedGameObjects; }
+    const std::map<UID, MobilitySettings>& GetMultiselectedObjectsMobility() const
+    {
+        return selectedGameObjectsMobility;
+    }
 
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
 
@@ -108,7 +113,6 @@ class Scene
     void SetDynamicModified() { dynamicModified = true; }
     void SetMultiselectPosition(const float3& newPosition);
     template <typename T> std::vector<T*> GetEnabledComponentsOfType() const;
-
 
   private:
     void CreateStaticSpatialDataStruct();
@@ -145,4 +149,5 @@ class Scene
 
     GameObject* multiSelectParent = nullptr;
     std::map<UID, UID> selectedGameObjects;
+    std::map<UID, MobilitySettings> selectedGameObjectsMobility;
 };

@@ -27,10 +27,10 @@
 #include "ResourcesModule.h"
 #include "SceneModule.h"
 #include "Standalone/AnimationComponent.h"
-#include "Standalone/MeshComponent.h"
-#include "Standalone/Lights/SpotLightComponent.h"
-#include "Standalone/Lights/PointLightComponent.h"
 #include "Standalone/Lights/DirectionalLightComponent.h"
+#include "Standalone/Lights/PointLightComponent.h"
+#include "Standalone/Lights/SpotLightComponent.h"
+#include "Standalone/MeshComponent.h"
 
 #include "SDL_mouse.h"
 #include "imgui.h"
@@ -691,11 +691,16 @@ void Scene::ClearGameObjectsToUpdate()
 
 void Scene::AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
 {
-    auto pairResult = selectedGameObjects.insert({gameObject, gameObjectParent});
+    GameObject* selectedGameObject = GetGameObjectByUID(gameObject);
+    auto pairResult                = selectedGameObjects.insert({gameObject, gameObjectParent});
+
+    MobilitySettings gameObjectMobility =
+        selectedGameObject->IsStatic() ? MobilitySettings::STATIC : MobilitySettings::DYNAMIC;
+
+    auto pairResultMobility = selectedGameObjectsMobility.insert({gameObject, gameObjectMobility});
 
     if (pairResult.second)
     {
-        GameObject* selectedGameObject       = GetGameObjectByUID(gameObject);
         GameObject* selectedGameObjectParent = GetGameObjectByUID(gameObjectParent);
 
         // selectedGameObjectParent->RemoveGameObject(gameObject);
@@ -712,7 +717,6 @@ void Scene::AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
     {
         multiSelectParent->RemoveGameObject(gameObject);
 
-        GameObject* selectedGameObject       = GetGameObjectByUID(gameObject);
         GameObject* selectedGameObjectParent = GetGameObjectByUID(selectedGameObjects[gameObject]);
 
         selectedGameObject->SetParent(selectedGameObjectParent->GetUID());
@@ -725,6 +729,7 @@ void Scene::AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
         }
 
         selectedGameObjects.erase(pairResult.first);
+        selectedGameObjectsMobility.erase(pairResultMobility.first);
     }
 }
 
@@ -744,7 +749,15 @@ void Scene::ClearObjectSelection()
         currentGameObject->UpdateTransformForGOBranch();
     }
 
+    // UPDATE TO LET ORIGINAL GAME OBJECTS WITH THEIR ORIGINAL MOBILITY
+    for (auto& pairGameObject : selectedGameObjectsMobility)
+    {
+        GameObject* currentGameObject        = GetGameObjectByUID(pairGameObject.first);
+        currentGameObject->UpdateMobilityHierarchy(pairGameObject.second);
+    }
+
     selectedGameObjects.clear();
+    selectedGameObjectsMobility.clear();
 }
 
 void Scene::DeleteMultiselection()
@@ -1187,7 +1200,6 @@ void Scene::OverridePrefabs(const UID prefabUID)
     App->GetResourcesModule()->ReleaseResource(prefab);
 }
 
-
 template <typename T> std::vector<T*> Scene::GetEnabledComponentsOfType() const
 {
     std::vector<T*> result;
@@ -1205,7 +1217,6 @@ template <typename T> std::vector<T*> Scene::GetEnabledComponentsOfType() const
 
     return result;
 }
-
 
 template std::vector<DirectionalLightComponent*> Scene::GetEnabledComponentsOfType<DirectionalLightComponent>() const;
 template std::vector<PointLightComponent*> Scene::GetEnabledComponentsOfType<PointLightComponent>() const;
