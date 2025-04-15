@@ -160,6 +160,7 @@ void MeshComponent::RenderEditorInspector()
 
 void MeshComponent::Update(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
     if (batch == nullptr && currentMesh != nullptr && currentMaterial != nullptr)
     {
         BatchEditorMode();
@@ -168,6 +169,7 @@ void MeshComponent::Update(float deltaTime)
 
 void MeshComponent::Render(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
 }
 
 void MeshComponent::InitSkin()

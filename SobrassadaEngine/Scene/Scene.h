@@ -107,6 +107,8 @@ class Scene
     void SetStaticModified() { staticModified = true; }
     void SetDynamicModified() { dynamicModified = true; }
     void SetMultiselectPosition(const float3& newPosition);
+    template <typename T> std::vector<T*> GetEnabledComponentsOfType() const;
+
 
   private:
     void CreateStaticSpatialDataStruct();

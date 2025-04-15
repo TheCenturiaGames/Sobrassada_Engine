@@ -7,6 +7,8 @@ class Transform2DComponent;
 class CanvasComponent : public Component
 {
   public:
+    static const ComponentType STATIC_TYPE = ComponentType::COMPONENT_CANVAS;
+
     CanvasComponent(UID uid, GameObject* parent);
     CanvasComponent(const rapidjson::Value& initialState, GameObject* parent);
     ~CanvasComponent() override;

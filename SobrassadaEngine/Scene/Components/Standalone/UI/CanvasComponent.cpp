@@ -81,10 +81,13 @@ void CanvasComponent::Clone(const Component* other)
 
 void CanvasComponent::Update(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
 }
 
 void CanvasComponent::Render(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
+
     App->GetDebugDrawModule()->DrawLine(
         float3(
             parent->GetGlobalTransform().TranslatePart().x - width / 2,
@@ -119,6 +122,8 @@ void CanvasComponent::Render(float deltaTime)
 
 void CanvasComponent::RenderUI()
 {
+    if (!parent->IsGloballyEnabled()) return;
+
     const int uiProgram = App->GetShaderModule()->GetUIWidgetProgram();
     if (uiProgram == -1)
     {
@@ -127,7 +132,6 @@ void CanvasComponent::RenderUI()
     }
     glUseProgram(uiProgram);
 
-    // Get the view and projection matrix (world space or screen space)
     const float4x4& view = isInWorldSpaceEditor ? App->GetCameraModule()->GetViewMatrix() : float4x4::identity;
     const float4x4& proj = isInWorldSpaceEditor ? App->GetCameraModule()->GetProjectionMatrix()
                                                 : float4x4::D3DOrthoProjLH(
@@ -135,8 +139,6 @@ void CanvasComponent::RenderUI()
                                                       (float)App->GetWindowModule()->GetHeight()
                                                   );
 
-    // Get all children iteratively. This way, if the children of the canvas are modified they will be properly sorted
-    // when rendering
     std::queue<UID> children;
 
     for (const UID child : parent->GetChildren())
@@ -147,18 +149,23 @@ void CanvasComponent::RenderUI()
     while (!children.empty())
     {
         const GameObject* currentObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(children.front());
-
-        // Only render UI components
-        Component* uiWidget             = currentObject->GetComponentByType(COMPONENT_TRANSFORM_2D);
-        if (uiWidget) static_cast<const Transform2DComponent*>(uiWidget)->RenderWidgets();
-
-        uiWidget = currentObject->GetComponentByType(COMPONENT_LABEL);
-        if (uiWidget) static_cast<const UILabelComponent*>(uiWidget)->RenderUI(view, proj);
-
-        uiWidget = currentObject->GetComponentByType(COMPONENT_IMAGE);
-        if (uiWidget) static_cast<const ImageComponent*>(uiWidget)->RenderUI(view, proj);
-
         children.pop();
+
+        if (!currentObject->IsGloballyEnabled()) continue;
+
+        if (currentObject->GetComponentByType(COMPONENT_TRANSFORM_2D))
+        {
+            Component* component = nullptr;
+
+            component = currentObject->GetComponentByType(COMPONENT_TRANSFORM_2D);
+            if (component) static_cast<const Transform2DComponent*>(component)->RenderWidgets();
+
+            component = currentObject->GetComponentByType(COMPONENT_LABEL);
+            if (component) static_cast<const UILabelComponent*>(component)->RenderUI(view, proj);
+
+            component = currentObject->GetComponentByType(COMPONENT_IMAGE);
+            if (component) static_cast<const ImageComponent*>(component)->RenderUI(view, proj);
+        }
 
         for (const UID child : currentObject->GetChildren())
         {

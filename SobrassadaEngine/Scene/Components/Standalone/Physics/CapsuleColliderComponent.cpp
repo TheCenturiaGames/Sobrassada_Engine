@@ -188,10 +188,12 @@ void CapsuleColliderComponent::RenderEditorInspector()
 
 void CapsuleColliderComponent::Update(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
 }
 
 void CapsuleColliderComponent::Render(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
 }
 
 void CapsuleColliderComponent::ParentUpdated()

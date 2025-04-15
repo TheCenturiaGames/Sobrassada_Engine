@@ -185,10 +185,12 @@ void SphereColliderComponent::RenderEditorInspector()
 
 void SphereColliderComponent::Update(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
 }
 
 void SphereColliderComponent::Render(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
 }
 
 void SphereColliderComponent::ParentUpdated()

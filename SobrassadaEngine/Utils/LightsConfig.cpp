@@ -456,7 +456,7 @@ void LightsConfig::SetLightsShaderData() const
 
 void LightsConfig::SetDirectionalLightShaderData() const
 {
-    if (directionalLight)
+    if (directionalLight && directionalLight->IsEffectivelyEnabled())
     {
         Lights::DirectionalLightShaderData dirLightData(
             float4(directionalLight->GetDirection(), 0.0f),
@@ -474,9 +474,8 @@ void LightsConfig::SetPointLightsShaderData() const
     std::vector<Lights::PointLightShaderData> points;
     for (int i = 0; i < pointLights.size(); ++i)
     {
-        if (pointLights[i] != nullptr)
+        if (pointLights[i] && pointLights[i]->IsEffectivelyEnabled())
         {
-            // Fill struct data
             points.emplace_back(Lights::PointLightShaderData(
                 float4(pointLights[i]->GetGlobalTransform().TranslatePart(), pointLights[i]->GetRange()),
                 float4(pointLights[i]->GetColor(), pointLights[i]->GetIntensity())
@@ -503,12 +502,14 @@ void LightsConfig::SetSpotLightsShaderData() const
     std::vector<Lights::SpotLightShaderData> spots;
     for (int i = 0; i < spotLights.size(); ++i)
     {
-        // Fill struct data
-        spots.emplace_back(Lights::SpotLightShaderData(
-            float4(spotLights[i]->GetGlobalTransform().TranslatePart(), spotLights[i]->GetRange()),
-            float4(spotLights[i]->GetColor(), spotLights[i]->GetIntensity()), float3(spotLights[i]->GetDirection()),
-            spotLights[i]->GetInnerAngle(), spotLights[i]->GetOuterAngle()
-        ));
+        if (spotLights[i] && spotLights[i]->IsEffectivelyEnabled())
+        {
+            spots.emplace_back(Lights::SpotLightShaderData(
+                float4(spotLights[i]->GetGlobalTransform().TranslatePart(), spotLights[i]->GetRange()),
+                float4(spotLights[i]->GetColor(), spotLights[i]->GetIntensity()), float3(spotLights[i]->GetDirection()),
+                spotLights[i]->GetInnerAngle(), spotLights[i]->GetOuterAngle()
+            ));
+        }
     }
 
     // This only works whith a constant number of lights. If a new light is added, the buffer must be resized
@@ -656,10 +657,31 @@ void LightsConfig::GetAllSceneLights()
 {
     if (App->GetSceneModule()->GetScene() != nullptr)
     {
-        const std::vector<Component*>& components = App->GetSceneModule()->GetScene()->GetAllComponents();
-        GetDirectionalLight(components);
-        GetAllPointLights(components);
-        GetAllSpotLights(components);
+        Scene* scene          = App->GetSceneModule()->GetScene();
+
+        // Directional
+        const auto& dirLights = scene->GetEnabledComponentsOfType<DirectionalLightComponent>();
+        directionalLight      = dirLights.empty() ? nullptr : dirLights[0];
+
+        // Point
+        pointLights           = scene->GetEnabledComponentsOfType<PointLightComponent>();
+        GLOG("Point lights count: %d", pointLights.size());
+
+        // Spot
+        spotLights = scene->GetEnabledComponentsOfType<SpotLightComponent>();
+        GLOG("Spot lights count: %d", spotLights.size());
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, pointBufferId);
+        size_t pointBufferSize = sizeof(Lights::PointLightShaderData) * pointLights.size() + 16;
+        glBufferData(GL_SHADER_STORAGE_BUFFER, pointBufferSize, nullptr, GL_STATIC_DRAW);
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, spotBufferId);
+        size_t spotBufferSize =
+            (sizeof(Lights::SpotLightShaderData) + 12) * spotLights.size() + 16; // 12 bytes offset between spotlights
+        glBufferData(GL_SHADER_STORAGE_BUFFER, spotBufferSize, nullptr, GL_STATIC_DRAW);
+
+        glBindBuffer(GL_UNIFORM_BUFFER, directionalBufferId);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(Lights::DirectionalLightShaderData), nullptr, GL_STATIC_DRAW);
     }
 }
 
