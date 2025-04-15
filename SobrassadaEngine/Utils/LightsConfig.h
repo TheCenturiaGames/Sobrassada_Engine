@@ -81,7 +81,7 @@ class LightsConfig
     void EditorParams(bool& lightConfig);
 
     void InitSkybox();
-    void RenderSkybox() const;
+    void RenderSkybox(const float4x4& projection, const float4x4& view) const;
     unsigned int CubeMapToTexture(int width, int height);
     unsigned int PreFilteredEnvironmentMapGeneration(int width, int height);
     unsigned int EnvironmentBRDFGeneration(int width, int height);

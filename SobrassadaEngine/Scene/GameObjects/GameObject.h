@@ -99,7 +99,6 @@ class SOBRASADA_API_ENGINE GameObject
     const float3& GetScale() const { return scale; }
     AABB GetHierarchyAABB();
 
-    
     void SetLocalTransform(const float4x4& newTransform);
     void DrawGizmos() const;
 
@@ -110,7 +109,6 @@ class SOBRASADA_API_ENGINE GameObject
     void OnTransformUpdated();
     void SetPosition(float3& newPosition) { position = newPosition; };
     void SetWillUpdate(bool willUpdate) { this->willUpdate = willUpdate; };
-
 
   private:
     void DrawNodes() const;
