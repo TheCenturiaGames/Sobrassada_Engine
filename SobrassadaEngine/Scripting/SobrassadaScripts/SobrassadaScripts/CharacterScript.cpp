@@ -14,5 +14,5 @@ bool CharacterScript::Init()
 
 void CharacterScript::Update(float deltaTime)
 {
-    AnimationComponent* animComponent = parent
+   // AnimationComponent* animComponent = parent
 }
