@@ -604,7 +604,9 @@ void Scene::RenderHierarchyUI(bool& hierarchyMenu)
 void Scene::RemoveGameObjectHierarchy(UID gameObjectUID)
 {
     // TODO: Change when filesystem defined
-    if (!gameObjectsContainer.count(gameObjectUID) || gameObjectUID == gameObjectRootUID || gameObjectUID == multiSelectParent->GetUID()) return;
+    if (!gameObjectsContainer.count(gameObjectUID) || gameObjectUID == gameObjectRootUID ||
+        (multiSelectParent && gameObjectUID == multiSelectParent->GetUID()))
+        return;
 
     std::stack<UID> toDelete;
     toDelete.push(gameObjectUID);

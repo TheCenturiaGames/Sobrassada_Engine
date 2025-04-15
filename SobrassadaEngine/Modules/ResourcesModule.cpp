@@ -6,6 +6,7 @@
 #include "Importer.h"
 #include "LibraryModule.h"
 #include "MeshImporter.h"
+#include "PathfinderModule.h"
 #include "Resource.h"
 #include "ResourceMaterial.h"
 #include "ResourceMesh.h"
@@ -14,7 +15,6 @@
 #include "SceneModule.h"
 #include "ShaderModule.h"
 #include "Standalone/MeshComponent.h"
-#include "PathfinderModule.h"
 
 ResourcesModule::ResourcesModule()
 {
@@ -119,15 +119,15 @@ void ResourcesModule::CreateNavMesh()
                     const ResourceMesh* resourceMesh = meshComponent->GetResourceMesh();
                     if (resourceMesh == nullptr) continue; // If a meshComponent has no mesh attached, ignore it
 
-                    const AABB aabb                        = gameObject->GetGlobalAABB();
+                    const AABB& aabb = gameObject->GetGlobalAABB();
 
-                    minPos[0]                        = std::min(minPos[0], aabb.minPoint.x);
-                    minPos[1]                        = std::min(minPos[1], aabb.minPoint.y);
-                    minPos[2]                        = std::min(minPos[2], aabb.minPoint.z);
+                    minPos[0]        = std::min(minPos[0], aabb.minPoint.x);
+                    minPos[1]        = std::min(minPos[1], aabb.minPoint.y);
+                    minPos[2]        = std::min(minPos[2], aabb.minPoint.z);
 
-                    maxPos[0]                        = std::max(maxPos[0], aabb.maxPoint.x);
-                    maxPos[1]                        = std::max(maxPos[1], aabb.maxPoint.y);
-                    maxPos[2]                        = std::max(maxPos[2], aabb.maxPoint.z);
+                    maxPos[0]        = std::max(maxPos[0], aabb.maxPoint.x);
+                    maxPos[1]        = std::max(maxPos[1], aabb.maxPoint.y);
+                    maxPos[2]        = std::max(maxPos[2], aabb.maxPoint.z);
 
                     meshes.push_back({resourceMesh, globalMatrix});
                 }
@@ -141,5 +141,4 @@ void ResourcesModule::CreateNavMesh()
     }
     tmpNavmesh->BuildNavMesh(meshes, minPos, maxPos);
     App->GetPathfinderModule()->InitQuerySystem();
-
 }
