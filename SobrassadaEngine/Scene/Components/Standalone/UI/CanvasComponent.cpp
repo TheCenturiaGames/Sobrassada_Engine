@@ -129,7 +129,7 @@ void CanvasComponent::Render(float deltaTime)
 
 void CanvasComponent::RenderUI()
 {
-    if (!parent->IsGloballyEnabled()) return;
+    if (!IsEffectivelyEnabled()) return;
 
     const int uiProgram = App->GetShaderModule()->GetUIWidgetProgram();
     if (uiProgram == -1)
@@ -197,6 +197,8 @@ void CanvasComponent::OnWindowResize(const float width, const float height)
 
 void CanvasComponent::UpdateChildren()
 {
+    if (!IsEffectivelyEnabled()) return;
+
     // TODO: Right now this updates the children list every frame in case they are reordered in hierarchy.
     // To be more optimal, this could be called only when a gameObject is dragged around the hierarchy
     sortedChildren.clear();
@@ -223,6 +225,8 @@ void CanvasComponent::UpdateChildren()
 
 void CanvasComponent::UpdateMousePosition(const float2& mousePos)
 {
+    if (!IsEffectivelyEnabled()) return;
+
     // Only interact with elements if canvas is in screen mode
     if (isInWorldSpaceEditor) return;
 

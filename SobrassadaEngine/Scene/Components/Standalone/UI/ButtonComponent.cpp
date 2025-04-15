@@ -163,7 +163,7 @@ void ButtonComponent::RenderEditorInspector()
 
 bool ButtonComponent::UpdateMousePosition(const float2& mousePos, bool dismiss)
 {
-    if (!isInteractable) return false;
+    if (!isInteractable || !IsEffectivelyEnabled()) return false;
 
     if (!dismiss && IsWithinBounds(mousePos))
     {
