@@ -33,6 +33,9 @@
     <ClInclude Include="RotateGameObject.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="CharacterScript.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -142,6 +145,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Algorithm\Random\LCG.cpp">
       <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="CharacterScript.cpp">
+      <Filter>Archivos de origen</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
