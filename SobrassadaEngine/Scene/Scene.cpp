@@ -207,32 +207,6 @@ void Scene::Save(
     if (saveMode != SaveMode::SavePlayMode) App->GetProjectModule()->SetAsStartupScene(sceneName);
 }
 
-void Scene::LoadComponents() const
-{
-    lightsConfig->InitSkybox();
-    lightsConfig->InitLightBuffers();
-}
-
-void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects)
-{
-    for (auto it = gameObjectsContainer.begin(); it != gameObjectsContainer.end(); ++it)
-    {
-        delete it->second;
-    }
-    gameObjectsContainer.clear();
-    gameObjectsContainer.insert(loadedGameObjects.begin(), loadedGameObjects.end());
-
-    GameObject* root = GetGameObjectByUID(gameObjectRootUID);
-    if (root != nullptr)
-    {
-        GLOG("Init transform and AABB calculation");
-        root->UpdateTransformForGOBranch();
-    }
-
-    UpdateStaticSpatialStructure();
-    UpdateDynamicSpatialStructure();
-}
-
 update_status Scene::Update(float deltaTime)
 {
 #ifdef OPTICK

@@ -1,13 +1,13 @@
 #include "CharacterControllerComponent.h"
 
 #include "Application.h"
+#include "DetourNavMeshQuery.h"
 #include "EditorUIModule.h"
 #include "GameObject.h"
 #include "InputModule.h"
-#include "SceneModule.h"
-#include "DetourNavMeshQuery.h"
-#include "ResourcesModule.h"
 #include "ResourceNavMesh.h"
+#include "ResourcesModule.h"
+#include "SceneModule.h"
 
 #include "Math/float3.h"
 #include "Math/float4x4.h"
@@ -22,6 +22,8 @@ CharacterControllerComponent::CharacterControllerComponent(UID uid, GameObject* 
     maxAngularSpeed = 90 / RAD_DEGREE_CONV;
     isRadians       = true;
     targetDirection.Set(0.0f, 0.0f, 1.0f);
+
+    App->GetSceneModule()->GetScene()->SetMainCharacter(this);
 }
 
 CharacterControllerComponent::CharacterControllerComponent(const rapidjson::Value& initialState, GameObject* parent)
@@ -55,6 +57,8 @@ CharacterControllerComponent::CharacterControllerComponent(const rapidjson::Valu
     {
         isRadians = initialState["isRadians"].GetBool();
     }
+
+    App->GetSceneModule()->GetScene()->SetMainCharacter(this);
 }
 
 CharacterControllerComponent::~CharacterControllerComponent()
@@ -115,7 +119,7 @@ void CharacterControllerComponent::Update(float deltaTime)
         navMeshQuery = tmpQuery;
 
         if (currentPolyRef == 0)
-        {                    
+        {
             float3 startPos = parent->GetGlobalTransform().TranslatePart();
 
             dtQueryFilter filter;
@@ -126,8 +130,7 @@ void CharacterControllerComponent::Update(float deltaTime)
             float nearestPoint[3];
             dtPolyRef targetRef = 0;
 
-            dtStatus status =
-                navMeshQuery->findNearestPoly(startPos.ptr(), extents, &filter, &targetRef, nearestPoint);
+            dtStatus status = navMeshQuery->findNearestPoly(startPos.ptr(), extents, &filter, &targetRef, nearestPoint);
 
             if (dtStatusFailed(status) || targetRef == 0)
             {
@@ -138,14 +141,14 @@ void CharacterControllerComponent::Update(float deltaTime)
             currentPolyRef = targetRef;
         }
     }
-    
+
     if (!navMeshQuery || currentPolyRef == 0) return;
-    
-    verticalSpeed += gravity * deltaTime; 
+
+    verticalSpeed     += gravity * deltaTime;
     verticalSpeed      = std::max(verticalSpeed, maxFallSpeed); // Clamp fall speed
 
-    float4x4 globalTr = parent->GetGlobalTransform();
-    float3 currentPos = globalTr.TranslatePart();
+    float4x4 globalTr  = parent->GetGlobalTransform();
+    float3 currentPos  = globalTr.TranslatePart();
 
     currentPos.y      += (verticalSpeed * deltaTime);
 
@@ -158,7 +161,6 @@ void CharacterControllerComponent::Update(float deltaTime)
     parent->UpdateTransformForGOBranch();
 
     HandleInput(deltaTime);
-
 }
 
 void CharacterControllerComponent::Render(float deltaTime)
@@ -232,7 +234,7 @@ void CharacterControllerComponent::AdjustHeightToNavMesh(float3& currentPos)
     dtStatus st2 = navMeshQuery->closestPointOnPoly(newRef, currentPos.ptr(), closest, &posOverPoly);
     if (!dtStatusSucceed(st2) || !posOverPoly) return;
 
-    currentPolyRef   = newRef; 
+    currentPolyRef   = newRef;
 
     float polyHeight = 0.0f;
     dtStatus stH     = navMeshQuery->getPolyHeight(newRef, closest, &polyHeight);
@@ -339,7 +341,7 @@ void CharacterControllerComponent::HandleInput(float deltaTime)
 
         Move(direction, deltaTime);
     }
-    
+
     if (fabs(rotationDir) > 0.0001f)
     {
         Rotate(rotationDir, deltaTime);
