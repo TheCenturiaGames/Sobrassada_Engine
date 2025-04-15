@@ -4,6 +4,7 @@
 #include "FileSystem.h"
 #include "FontImporter.h"
 #include "MaterialImporter.h"
+#include "AnimationImporter.h"
 #include "MeshImporter.h"
 #include "ModelImporter.h"
 #include "PrefabManager.h"
@@ -41,40 +42,51 @@ namespace SceneImporter
 
         std::vector<std::vector<std::pair<UID, UID>>> gltfMeshes;
         std::unordered_map<int, UID> matIndices;
-
-        for (const auto& srcMesh : model.meshes)
+        
+        for (const tinygltf::Node& srcNode : model.nodes)
         {
-            int n = 0;
             int matIndex = -1;
-            std::vector<std::pair<UID, UID>> primitives;
 
-            for (const auto& primitive : srcMesh.primitives)
+            if (srcNode.mesh >= 0 && srcNode.mesh < model.meshes.size())
             {
-                std::string name = srcMesh.name + std::to_string(n);
+                std::vector<std::pair<UID, UID>> primitives;
+                
+                const tinygltf::Mesh& srcMesh = model.meshes[srcNode.mesh];
+                const float4x4& defaultTransform = MeshImporter::GetNodeTransform(srcNode);
+                int primitiveCounter = 0;
 
-                UID matUID   = INVALID_UID;
-                matIndex = primitive.material;
-                if (matIndex == -1)
+                for (const auto& primitive : srcMesh.primitives)
                 {
-                    GLOG("Material index invalid for mesh: %s", name.c_str());
-                }
-                else if (matIndices.find(matIndex) == matIndices.end())
-                {
-                    matUID = MaterialImporter::ImportMaterial(model, matIndex, filePath, targetFilePath);
-                    matIndices[matIndex] = matUID;
-                }
-                else
-                {
-                    matUID = matIndices[matIndex];
+                    std::string name = srcNode.name + "_" + srcMesh.name;
+                    if (primitiveCounter > 0) name += "_" + std::to_string(primitiveCounter);
+
+                    UID matUID   = INVALID_UID;
+                    matIndex = primitive.material;
+                    if (matIndex == -1)
+                    {
+                        GLOG("Material index invalid for mesh: %s. Using default material.", name.c_str());
+                        matUID = DEFAULT_MATERIAL_UID;
+                    }
+                    else if (matIndices.find(matIndex) == matIndices.end())
+                    {
+                        matUID = MaterialImporter::ImportMaterial(model, matIndex, filePath, targetFilePath);
+                        matIndices[matIndex] = matUID;
+                    }
+                    else
+                    {
+                        matUID = matIndices[matIndex];
+                    }
+                
+                    const UID meshUID      = MeshImporter::ImportMesh(model, srcMesh, primitive, name, defaultTransform,
+                        filePath, targetFilePath, INVALID_UID, matUID);
+                    primitiveCounter++;
+                
+                    primitives.emplace_back(meshUID, matUID);
+                    GLOG("New primitive with mesh UID: %d and Material UID: %d", meshUID, matUID);
                 }
                 
-                const UID meshUID      = MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath, targetFilePath, INVALID_UID, matUID);
-                n++;
-                
-                primitives.emplace_back(meshUID, matUID);
-                GLOG("New primitive with mesh UID: %d and Material UID: %d", meshUID, matUID);
+                gltfMeshes.push_back(primitives);
             }
-            gltfMeshes.push_back(primitives);
         }
 
         GLOG("Total .gltf meshes: %d", gltfMeshes.size());
@@ -145,7 +157,7 @@ namespace SceneImporter
                 for (const auto& primitive : srcMesh.primitives)
                 {
                     MeshImporter::ImportMesh(
-                        model, srcMesh, primitive, name, filePath.c_str(), targetFilePath, sourceUID
+                        model, srcMesh, primitive, name, float4x4::identity, filePath.c_str(), targetFilePath, sourceUID
                     );
                     return; // only one mesh with the same name
                 }
@@ -170,6 +182,23 @@ namespace SceneImporter
         }
     }
 
+    void ImportAnimationFromMetadata(
+        const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID
+    )
+    {
+        tinygltf::Model model = LoadModelGLTF(filePath.c_str(), targetFilePath);
+
+        // find material name that equals to name
+        for (int i = 0; i < model.animations.size(); i++)
+        {
+            if (model.animations[i].name == name)
+            {
+               AnimationImporter::ImportAnimation(model, model.animations[i], name, filePath.c_str(), targetFilePath, sourceUID);
+                return; // only one animation with the same name 
+            }
+        }
+    }
+
     void
     CopyPrefab(const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID)
     {
@@ -181,12 +210,14 @@ namespace SceneImporter
     {
         ModelImporter::CopyModel(filePath, targetFilePath, name, sourceUID);
     }
+ 
 
     void
     CopyFont(const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID)
     {
         FontImporter::CopyFont(filePath, targetFilePath, name, sourceUID);
     }
+
 
     void CreateLibraryDirectories(const std::string& projectFilePath)
     {
@@ -228,6 +259,14 @@ namespace SceneImporter
             if (!FileSystem::CreateDirectories(convertedPrefabAssetsPath.c_str()))
             {
                 GLOG("Failed to create directory: %s", convertedPrefabAssetsPath.c_str());
+            }
+        }
+        const std::string convertedStateMachinePath = projectFilePath + STATEMACHINES_ASSETS_PATH;
+        if (!FileSystem::IsDirectory(convertedStateMachinePath.c_str()))
+        {
+            if (!FileSystem::CreateDirectories(convertedStateMachinePath.c_str()))
+            {
+                GLOG("Failed to create directory: %s", convertedStateMachinePath.c_str());
             }
         }
         const std::string convertedAnimationsPath = projectFilePath + ANIMATIONS_PATH;
@@ -292,6 +331,14 @@ namespace SceneImporter
             if (!FileSystem::CreateDirectories(convertedPrefabLibraryPath.c_str()))
             {
                 GLOG("Failed to create directory: %s", convertedPrefabLibraryPath.c_str());
+            }
+        }
+        const std::string convertedStateMachineLibraryPath = projectFilePath + STATEMACHINES_LIB_PATH;
+        if (!FileSystem::IsDirectory(convertedStateMachineLibraryPath.c_str()))
+        {
+            if (!FileSystem::CreateDirectories(convertedStateMachineLibraryPath.c_str()))
+            {
+                GLOG("Failed to create directory: %s", convertedStateMachineLibraryPath.c_str());
             }
         }
         const std::string convertedFontsPath = projectFilePath + FONTS_PATH;

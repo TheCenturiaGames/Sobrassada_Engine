@@ -11,6 +11,7 @@
 #include <vector>
 
 class MeshComponent;
+class AnimationComponent;
 
 enum MobilitySettings
 {
@@ -21,15 +22,16 @@ enum MobilitySettings
 class SOBRASADA_API_ENGINE GameObject
 {
   public:
-    GameObject(std::string name);
-    GameObject(UID parentUID, std::string name);
+    GameObject(const std::string& name);
+    GameObject(UID parentUID, const std::string& name);
+    GameObject(UID parentUID, const std::string& name, UID uid);
     GameObject(UID parentUID, GameObject* refObject);
 
     GameObject(const rapidjson::Value& initialState);
 
     ~GameObject();
 
-    void Init() const;
+    void Init();
 
     const float4x4& GetParentGlobalTransform() const;
 
@@ -81,32 +83,37 @@ class SOBRASADA_API_ENGINE GameObject
     // Updates the transform for this game object and all descending children
     void UpdateTransformForGOBranch();
     void UpdateMobilityHierarchy(MobilitySettings type);
+    void UpdateLocalTransform(const float4x4& parentGlobalTransform);
+
+    bool WillUpdate() const { return willUpdate; };
 
     const std::unordered_map<ComponentType, Component*>& GetComponents() const { return components; }
     Component* GetComponentByType(ComponentType type) const;
 
     MeshComponent* GetMeshComponent() const;
+
+    AnimationComponent* GetAnimationComponent() const;
+
     const float3& GetPosition() const { return position; }
     const float3& GetRotation() const { return rotation; }
     const float3& GetScale() const { return scale; }
+    AABB GetHierarchyAABB();
 
     void SetLocalTransform(const float4x4& newTransform);
     void DrawGizmos() const;
 
     void CreatePrefab();
+    bool IsGloballyEnabled() const;
     UID GetPrefabUID() const { return prefabUID; }
     void SetPrefabUID(const UID uid) { prefabUID = uid; }
-
-    void OnTransformUpdated();
     void UpdateComponents();
-    AABB GetHierarchyAABB();
-
+    void OnTransformUpdated();
     void SetPosition(float3& newPosition) { position = newPosition; };
     void SetWillUpdate(bool willUpdate) { this->willUpdate = willUpdate; };
-    bool WillUpdate() const { return willUpdate; };
+    bool IsEnabled() const { return enabled; }
+    void SetEnabled(bool state) { enabled = state; }
 
   private:
-    void UpdateLocalTransform(const float4x4& parentGlobalTransform);
     void DrawNodes() const;
     void OnDrawConnectionsToggle();
 
@@ -145,4 +152,5 @@ class SOBRASADA_API_ENGINE GameObject
     int mobilitySettings                 = STATIC;
     bool isTopParent                     = false;
     bool willUpdate                      = false;
+    bool enabled                         = true;
 };

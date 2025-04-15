@@ -9,13 +9,18 @@
 #include "InputModule.h"
 #include "LibraryModule.h"
 #include "OpenGLModule.h"
+#include "PathfinderModule.h"
 #include "PhysicsModule.h"
 #include "ProjectModule.h"
-#include "SceneImporter.h"
-#include "ResourcesModule.h"
 #include "ResourceNavmesh.h"
+
+#include "ResourceStateMachine.h"
+#include "ResourcesModule.h"
+#include "SceneImporter.h"
+
 #include "SceneModule.h"
 #include "ScriptModule.h"
+#include "StateMachineEditor.h"
 #include "TextureEditor.h"
 #include "TextureImporter.h"
 #include "WindowModule.h"
@@ -41,6 +46,7 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"Spot Light",           COMPONENT_SPOT_LIGHT          },
         {"Directional Light",    COMPONENT_DIRECTIONAL_LIGHT   },
         {"Character Controller", COMPONENT_CHARACTER_CONTROLLER},
+        {"Animation",            COMPONENT_ANIMATION           },
         {"Transform 2D",         COMPONENT_TRANSFORM_2D        },
         {"UI Canvas",            COMPONENT_CANVAS              },
         {"UI Label",             COMPONENT_LABEL               },
@@ -48,7 +54,10 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"Cube Collider",        COMPONENT_CUBE_COLLIDER       },
         {"Sphere Collider",      COMPONENT_SPHERE_COLLIDER     },
         {"Capsule Collider",     COMPONENT_CAPSULE_COLLIDER    },
-        {"Script",               COMPONENT_SCRIPT              }
+        {"Script",               COMPONENT_SCRIPT              },
+        {"AI Agent",             COMPONENT_AIAGENT             },
+        {"UI Image",             COMPONENT_IMAGE               },
+        {"UI Button",            COMPONENT_BUTTON              },
     };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;
@@ -254,6 +263,8 @@ void EditorUIModule::Draw()
 
     if (navmesh) Navmesh(navmesh);
 
+    if (crowdControl) CrowdControl(crowdControl);
+
     if (editorSettingsMenu) EditorSettings(editorSettingsMenu);
 }
 
@@ -319,6 +330,7 @@ void EditorUIModule::MainMenu()
             if (ImGui::MenuItem("Inspector", "", inspectorMenu)) inspectorMenu = !inspectorMenu;
             if (ImGui::MenuItem("Lights Config", "", lightConfig)) lightConfig = !lightConfig;
             if (ImGui::MenuItem("Navmesh", "", navmesh)) navmesh = !navmesh;
+            if (ImGui::MenuItem("Crowd Control", "", crowdControl)) crowdControl = !crowdControl;
             ImGui::EndDisabled();
 
             ImGui::EndMenu();
@@ -328,8 +340,10 @@ void EditorUIModule::MainMenu()
         {
             if (ImGui::MenuItem("Mockup Base Engine Editor", "")) OpenEditor(CreateEditor(EditorType::BASE));
 
-            if (ImGui::MenuItem("Node Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::NODE));
+            if (ImGui::MenuItem("Node Editor", "")) OpenEditor(CreateEditor(EditorType::NODE));
 
+            if (ImGui::MenuItem("State Machine Editor Engine Editor", ""))
+                OpenEditor(CreateEditor(EditorType::ANIMATION));
             if (ImGui::MenuItem("Texture Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::TEXTURE));
 
             ImGui::EndMenu();
@@ -417,6 +431,17 @@ void EditorUIModule::Navmesh(bool& navmesh)
     }
 
     App->GetResourcesModule()->GetNavMesh()->RenderNavmeshEditor();
+
+    ImGui::End();
+}
+
+void EditorUIModule::CrowdControl(bool& crowdControl)
+{
+    if (!crowdControl) return;
+
+    ImGui::Begin("Crowd Control", &crowdControl, ImGuiWindowFlags_None);
+
+    App->GetPathfinderModule()->RenderCrowdEditor();
 
     ImGui::End();
 }
@@ -809,6 +834,19 @@ bool EditorUIModule::RenderTransformWidget(
     std::string transformName = std::string(transformType == GizmoTransform::LOCAL ? "Local " : "World ") + "Transform";
     ImGui::SeparatorText(transformName.c_str());
 
+    if (transformType == GizmoTransform::LOCAL && !pos.Equals(localTransform.TranslatePart()))
+    {
+        pos   = localTransform.TranslatePart();
+        rot   = localTransform.RotatePart().ToEulerXYZ();
+        scale = localTransform.GetScale();
+    }
+    else if (transformType == GizmoTransform::WORLD && !pos.Equals(globalTransform.TranslatePart()))
+    {
+        pos   = globalTransform.TranslatePart();
+        rot   = globalTransform.RotatePart().ToEulerXYZ();
+        scale = globalTransform.GetScale();
+    }
+
     RenderBasicTransformModifiers(
         pos, rot, scale, lockScaleAxis, positionValueChanged, rotationValueChanged, scaleValueChanged
     );
@@ -947,6 +985,7 @@ T EditorUIModule::RenderResourceSelectDialog(
                         if (ImGui::Selectable(valuePair.first.c_str(), false))
                         {
                             result = valuePair.second;
+                            memset(searchTextResource, 0, sizeof searchTextResource);
                             ImGui::CloseCurrentPopup();
                         }
                     }
@@ -998,10 +1037,11 @@ void EditorUIModule::About(bool& aboutMenu)
     ImGui::Text(" - Geometry loader: TinyGLTF v2.9.3");
     ImGui::Text(" - Math: MathGeoLib v1.5");
     ImGui::Text(" - JSON: rapidjson v1.1");
-    ImGui::Text(" - UI: FreeType: v2.13.3");
-    ImGui::Text(" - RecastNavigation: v1.6.0");
-    ImGui::Text(" - ImNodeFlow: v1.2.2");
-    ImGui::Text(" - Bullet: v3.25");
+    ImGui::Text(" - UI: FreeType v2.13.3");
+    ImGui::Text(" - NavMesh: RecastNavigation v1.6.0");
+    ImGui::Text(" - StateMachine: ImNodeFlow v1.2.2");
+    ImGui::Text(" - Physics: Bullet v3.25");
+    ImGui::Text(" - Audio: Wwise v2024.1.3.8749");
     ImGui::Text("%s is licensed under the MIT License, see LICENSE for more information.", ENGINE_NAME);
 
     ImGui::Checkbox("Config/Build Information", &showConfigInfo);
@@ -1164,7 +1204,8 @@ void EditorUIModule::About(bool& aboutMenu)
 
 EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
 {
-    UID uid = GenerateUID();
+    UID uid                            = GenerateUID();
+    ResourceStateMachine* stateMachine = new ResourceStateMachine(uid, "State Machine " + std::to_string(uid));
     switch (type)
     {
     case EditorType::BASE:
@@ -1173,6 +1214,9 @@ EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
         break;
     case EditorType::NODE:
         return new NodeEditor("NodeEditor_" + std::to_string(uid), uid);
+
+    case EditorType::ANIMATION:
+        return new StateMachineEditor("StateMachineEditor_" + std::to_string(uid), uid, stateMachine);
 
     case EditorType::TEXTURE:
         return new TextureEditor("TextureEditor_" + std::to_string(uid), uid);

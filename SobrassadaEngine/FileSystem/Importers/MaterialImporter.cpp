@@ -14,7 +14,7 @@
 
 UID MaterialImporter::ImportMaterial(
     const tinygltf::Model& model, int materialIndex, const char* sourceFilePath, const std::string& targetFilePath,
-    UID sourceUID
+    UID sourceUID, UID defaultTextureUID
 )
 {
     // If it has no materials exit
@@ -23,7 +23,8 @@ UID MaterialImporter::ImportMaterial(
     std::string path                       = FileSystem::GetFilePath(sourceFilePath);
     bool useOcclusion                      = false;
     const tinygltf::Material& gltfMaterial = model.materials[materialIndex];
-    const std::string materialName         = gltfMaterial.name;
+    std::string materialName         = gltfMaterial.name;
+
     int sizeofStrings                      = 0;
     auto it                                = gltfMaterial.extensions.find("KHR_materials_pbrSpecularGlossiness");
     // ADD OLD LOADING
@@ -181,8 +182,10 @@ UID MaterialImporter::ImportMaterial(
         UID tmpName               = GenerateUID();
         std::string tmpNameString = std::to_string(tmpName);
 
+        if (materialName.empty()) materialName = "MaterialType_" + std::to_string(finalMaterialUID);
+
         std::string assetPath     = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
-        MetaMaterial meta(finalMaterialUID, assetPath, tmpNameString, useOcclusion);
+        MetaMaterial meta(finalMaterialUID, assetPath, tmpNameString, useOcclusion, defaultTextureUID);
         meta.Save(materialName, assetPath);
     }
     else finalMaterialUID = sourceUID;
@@ -233,10 +236,14 @@ ResourceMaterial* MaterialImporter::LoadMaterial(UID materialUID)
 
     char* cursor               = buffer;
 
+    rapidjson::Document doc;
+    rapidjson::Value importOptions;
+    App->GetLibraryModule()->GetImportOptions(materialUID, doc, importOptions);
+
     // Create Mesh
     Material mat               = *reinterpret_cast<Material*>(cursor);
 
-    ResourceMaterial* material = new ResourceMaterial(materialUID, name);
+    ResourceMaterial* material = new ResourceMaterial(materialUID, name, importOptions);
 
     material->LoadMaterialData(mat);
 

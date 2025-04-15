@@ -79,13 +79,18 @@ namespace RaycastController
             UID rootGameObject           = sceneModule->GetScene()->GetGameObjectRootUID();
             GameObject* parentGameobject = sceneModule->GetScene()->GetGameObjectByUID(selectedGameObject->GetParent());
 
-            while (parentGameobject->GetUID() != rootGameObject && !parentGameobject->IsTopParent())
+            if (parentGameobject)
             {
-                selectedGameObject = parentGameobject;
-                parentGameobject   = sceneModule->GetScene()->GetGameObjectByUID(selectedGameObject->GetParent());
-            }
+                while (parentGameobject && parentGameobject->GetUID() != rootGameObject &&
+                       !parentGameobject->IsTopParent() &&
+                       parentGameobject->GetUID() != sceneModule->GetScene()->GetMultiselectUID())
+                {
+                    selectedGameObject = parentGameobject;
+                    parentGameobject   = sceneModule->GetScene()->GetGameObjectByUID(selectedGameObject->GetParent());
+                }
 
-            if (parentGameobject->IsTopParent()) selectedGameObject = parentGameobject;
+                if (parentGameobject && parentGameobject->IsTopParent()) selectedGameObject = parentGameobject;
+            }
         }
 
         return selectedGameObject;

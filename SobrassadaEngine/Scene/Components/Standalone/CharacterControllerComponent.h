@@ -2,6 +2,10 @@
 
 #include "Component.h"
 
+class dtNavMeshQuery;
+
+using dtPolyRef = unsigned int;
+
 class CharacterControllerComponent : public Component
 {
 
@@ -17,7 +21,8 @@ class CharacterControllerComponent : public Component
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
     void Clone(const Component* other) override;
 
-    void Move(const float3& direction, float deltaTime) const;
+    void AdjustHeightToNavMesh(float3& currentPos);
+    void Move(const float3& direction, float deltaTime);
     void Rotate(float rotationDirection, float deltaTime);
     void HandleInput(float deltaTime);
 
@@ -35,4 +40,11 @@ class CharacterControllerComponent : public Component
     float maxAngularSpeed;
 
     bool isRadians;
+
+    dtNavMeshQuery* navMeshQuery = nullptr;
+    dtPolyRef currentPolyRef     = 0;
+
+    float gravity                = -9.81f;
+    float verticalSpeed          = 0.0f;
+    float maxFallSpeed           = -20.0f;
 };

@@ -55,12 +55,6 @@ MeshComponent::MeshComponent(const rapidjson::Value& initialState, GameObject* p
     }
 
     if (!bonesUIDs.empty() && !bindMatrices.empty()) hasBones = true;
-
-    if (currentMesh != nullptr && currentMaterial != nullptr)
-    {
-        batch = App->GetResourcesModule()->GetBatchManager()->RequestBatch(this);
-        batch->AddComponent(this);
-    }
 }
 
 MeshComponent::~MeshComponent()
@@ -69,6 +63,15 @@ MeshComponent::~MeshComponent()
     App->GetResourcesModule()->ReleaseResource(currentMesh);
 
     if (uniqueBatch) App->GetResourcesModule()->GetBatchManager()->RemoveBatch(batch);
+}
+
+void MeshComponent::Init()
+{
+    if (currentMesh != nullptr && currentMaterial != nullptr)
+    {
+        batch = App->GetResourcesModule()->GetBatchManager()->RequestBatch(this);
+        batch->AddComponent(this);
+    }
 }
 
 void MeshComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
@@ -107,6 +110,9 @@ void MeshComponent::Clone(const Component* other)
         modelUID     = otherMesh->modelUID;
         skinIndex    = otherMesh->skinIndex;
         bindMatrices = otherMesh->bindMatrices;
+        hasBones     = otherMesh->hasBones;
+
+        // Maybe it could be added to an existing batch, but probably is more costly than what is worth
     }
     else
     {
@@ -140,14 +146,17 @@ void MeshComponent::RenderEditorInspector()
         ImGui::SameLine();
         if (ImGui::Button("Select material"))
         {
-            ImGui::OpenPopup(CONSTANT_TEXTURE_SELECT_DIALOG_ID);
+            ImGui::OpenPopup(CONSTANT_MATERIAL_SELECT_DIALOG_ID);
         }
 
-        if (ImGui::IsPopupOpen(CONSTANT_TEXTURE_SELECT_DIALOG_ID))
+        if (ImGui::IsPopupOpen(CONSTANT_MATERIAL_SELECT_DIALOG_ID))
         {
-            AddMaterial(App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
-                CONSTANT_TEXTURE_SELECT_DIALOG_ID, App->GetLibraryModule()->GetMaterialMap(), INVALID_UID
-            ));
+
+            const UID chosenMatUID = App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
+                CONSTANT_MATERIAL_SELECT_DIALOG_ID, App->GetLibraryModule()->GetMaterialMap(), INVALID_UID
+            );
+
+            if (chosenMatUID != INVALID_UID) AddMaterial(chosenMatUID);
         }
 
         if (currentMaterial != nullptr) currentMaterial->OnEditorUpdate();
@@ -156,6 +165,7 @@ void MeshComponent::RenderEditorInspector()
 
 void MeshComponent::Update(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
     if (batch == nullptr && currentMesh != nullptr && currentMaterial != nullptr)
     {
         BatchEditorMode();
@@ -164,6 +174,7 @@ void MeshComponent::Update(float deltaTime)
 
 void MeshComponent::Render(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
 }
 
 void MeshComponent::InitSkin()
@@ -191,7 +202,7 @@ void MeshComponent::AddMesh(UID resource, bool updateParent)
         if (currentMaterial == nullptr)
         {
             const UID defaultMat = newMesh->GetDefaultMaterialUID();
-            if (defaultMat != INVALID_UID) AddMaterial(defaultMat);
+            AddMaterial(defaultMat);
         }
 
         localComponentAABB = AABB(currentMesh->GetAABB());
@@ -203,7 +214,11 @@ void MeshComponent::AddMesh(UID resource, bool updateParent)
 
 void MeshComponent::AddMaterial(UID resource)
 {
-    if (resource == INVALID_UID) return;
+
+    if (resource == INVALID_UID || App->GetResourcesModule()->RequestResource(resource) == nullptr)
+    {
+        resource = DEFAULT_MATERIAL_UID;
+    }
 
     if (currentMaterial != nullptr && currentMaterial->GetUID() == resource) return;
 

@@ -87,6 +87,7 @@ update_status InputModule::PreUpdate(float deltaTime)
             break;
         case SDL_MOUSEBUTTONDOWN:
             mouseButtons[sdlEvent.button.button - 1] = KEY_DOWN;
+
             break;
 
         case SDL_MOUSEBUTTONUP:
@@ -96,8 +97,8 @@ update_status InputModule::PreUpdate(float deltaTime)
             mouseMotion.x = sdlEvent.motion.xrel / 2.f;
             mouseMotion.y = sdlEvent.motion.yrel / 2.f;
 
-            mouse.x       = sdlEvent.motion.x / 2.f;
-            mouse.y       = sdlEvent.motion.y / 2.f;
+            mouse.x       = sdlEvent.motion.x;
+            mouse.y       = sdlEvent.motion.y;
             break;
         case SDL_MOUSEWHEEL:
             mouseWheel = sdlEvent.wheel.y;

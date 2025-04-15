@@ -4,8 +4,8 @@
 #include "Algorithm/Random/LCG.h"
 #include <Geometry/AABB.h>
 #include <stdio.h>
-#include <windows.h>
 #include <vector>
+#include <windows.h>
 
 #ifdef SOBRASADA_ENGINE_API
 #define SOBRASADA_API_ENGINE __declspec(dllexport)
@@ -13,9 +13,10 @@
 #define SOBRASADA_API_ENGINE __declspec(dllimport)
 #endif
 
-#pragma warning(disable: 4251)
+#pragma warning(disable : 4251)
 
 extern SOBRASADA_API_ENGINE std::vector<char*> *Logs;
+extern LCG* rng;
 
 SOBRASADA_API_ENGINE void glog(const char file[], int line, const char* format, ...);
 
@@ -67,45 +68,50 @@ constexpr char DELIMITER = '\\';
 constexpr char DELIMITER = '/';
 #endif
 
-constexpr const char* FILENAME_SEPARATOR             = "_";
-constexpr const char* DEFAULT_SCENE_NAME             = "New Scene";
-constexpr const char* DEFAULT_NODE_NAME              = "Unnamed Node";
+constexpr const char* FILENAME_SEPARATOR              = "_";
+constexpr const char* DEFAULT_SCENE_NAME              = "New Scene";
+constexpr const char* DEFAULT_NODE_NAME               = "Unnamed Node";
 
-constexpr float DEFAULT_GL_CLEAR_COLOR_RED           = 0.5f;
-constexpr float DEFAULT_GL_CLEAR_COLOR_GREEN         = 0.5f;
-constexpr float DEFAULT_GL_CLEAR_COLOR_BLUE          = 0.5f;
+constexpr float DEFAULT_GL_CLEAR_COLOR_RED            = 0.5f;
+constexpr float DEFAULT_GL_CLEAR_COLOR_GREEN          = 0.5f;
+constexpr float DEFAULT_GL_CLEAR_COLOR_BLUE           = 0.5f;
 
-constexpr float DEFAULT_CAMERA_MOVEMENT_SCALE_FACTOR = 1.f;
-constexpr float DEFAULT_CAMERA_MOVEMENT_SPEED        = 7.5f;
-constexpr float DEFAULT_CAMERA_MOUSE_SENSITIVITY     = 0.1f;
-constexpr float DEFAULT_CAMERA_ROTATE_SENSITIVITY    = 0.006f;
-constexpr float DEFAULT_CAMERA_DRAG_SENSITIVITY      = 0.05f;
-constexpr float DEFAULT_CAMERA_WHEEL_SENSITIVITY     = 2.f;
-constexpr float DEFAULT_CAMERA_ZOOM_SENSITIVITY      = 0.5f;
+constexpr float DEFAULT_CAMERA_MOVEMENT_SCALE_FACTOR  = 1.f;
+constexpr float DEFAULT_CAMERA_MOVEMENT_SPEED         = 7.5f;
+constexpr float DEFAULT_CAMERA_MOUSE_SENSITIVITY      = 0.1f;
+constexpr float DEFAULT_CAMERA_ROTATE_SENSITIVITY     = 0.006f;
+constexpr float DEFAULT_CAMERA_DRAG_SENSITIVITY       = 0.05f;
+constexpr float DEFAULT_CAMERA_WHEEL_SENSITIVITY      = 2.f;
+constexpr float DEFAULT_CAMERA_ZOOM_SENSITIVITY       = 0.5f;
 
-constexpr const char* GAME_PATH  = "..\\Game";
-constexpr const char* DEBUG_DLL_PATH = "..\\SobrassadaEngine\\x64\\Debug\\SobrassadaScripts.dll";
-constexpr const char* RELEASE_DLL_PATH = "..\\SobrassadaEngine\\x64\\Release\\SobrassadaScripts.dll";
+constexpr const char* GAME_PATH                      = "..\\Game";
+constexpr const char* DEBUG_DLL_PATH                 = "..\\SobrassadaEngine\\x64\\Debug\\SobrassadaScripts.dll";
+constexpr const char* RELEASE_DLL_PATH               = "..\\SobrassadaEngine\\x64\\Release\\SobrassadaScripts.dll";
+
+constexpr const wchar_t* BANKNAME_INIT               = L"Init.bnk";
+constexpr const wchar_t* BANKNAME_MAIN               = L"main.bnk";
 
 constexpr const char* ENGINE_DEFAULT_ASSETS          = "EngineDefaults/";
 constexpr const char* ASSETS_PATH                    = "Assets/";
 constexpr const char* SCENES_PATH                    = "Assets/Scenes/";
+constexpr const char* NAVMESHES_PATH                 = "Assets/Navmeshes/";
 constexpr const char* METADATA_PATH                  = "Assets/Metadata/";
 constexpr const char* PREFABS_ASSETS_PATH            = "Assets/Prefabs/";
 constexpr const char* MODELS_ASSETS_PATH             = "Assets/Models/";
+constexpr const char* ANIMATIONS_ASSETS_PATH         = "Assets/Animations/";
 constexpr const char* STATEMACHINES_ASSETS_PATH      = "Assets/StateMachines/";
 
-constexpr const char* LIBRARY_PATH                   = "Library/";
-constexpr const char* ANIMATIONS_PATH                = "Library/Animations/";
-constexpr const char* AUDIO_PATH                     = "Library/Audio/";
-constexpr const char* MODELS_LIB_PATH                = "Library/Models/";
-constexpr const char* MESHES_PATH                    = "Library/Meshes/";
-constexpr const char* SCENES_PLAY_PATH               = "Library/Scenes/";
-constexpr const char* TEXTURES_PATH                  = "Library/Textures/";
-constexpr const char* MATERIALS_PATH                 = "Library/Materials/";
-constexpr const char* STATEMACHINES_LIB_PATH         = "Library/StateMachines/";
-constexpr const char* PREFABS_LIB_PATH               = "Library/Prefabs/";
-constexpr const char* FONTS_PATH                     = "Library/Fonts/";
+constexpr const char* LIBRARY_PATH                    = "Library/";
+constexpr const char* ANIMATIONS_PATH                 = "Library/Animations/";
+constexpr const char* AUDIO_PATH                      = "Library/Audio/";
+constexpr const char* MODELS_LIB_PATH                 = "Library/Models/";
+constexpr const char* MESHES_PATH                     = "Library/Meshes/";
+constexpr const char* SCENES_PLAY_PATH                = "Library/Scenes/";
+constexpr const char* TEXTURES_PATH                   = "Library/Textures/";
+constexpr const char* MATERIALS_PATH                  = "Library/Materials/";
+constexpr const char* STATEMACHINES_LIB_PATH          = "Library/StateMachines/";
+constexpr const char* PREFABS_LIB_PATH                = "Library/Prefabs/";
+constexpr const char* FONTS_PATH                      = "Library/Fonts/";
 
 constexpr const char* ASSET_EXTENSION                = ".gltf";
 constexpr const char* MESH_EXTENSION                 = ".sobrassada";
@@ -114,31 +120,44 @@ constexpr const char* MATERIAL_EXTENSION             = ".mat";
 constexpr const char* SCENE_EXTENSION                = ".scene";
 constexpr const char* PREFAB_EXTENSION               = ".prefab";
 constexpr const char* MODEL_EXTENSION                = ".model";
+constexpr const char* ANIMATION_EXTENSION            = ".anim";
 constexpr const char* META_EXTENSION                 = ".smeta";
 constexpr const char* STATEMACHINE_EXTENSION         = ".smachine";
 constexpr const char* FONT_EXTENSION                 = ".ttf";
+constexpr const char* NAVMESH_EXTENSION              = ".nav";
 
-constexpr int MAX_COMPONENT_NAME_LENGTH              = 64;
+constexpr int MAX_COMPONENT_NAME_LENGTH               = 64;
 
 // SHADER PATHS
-constexpr const char* LIGHTS_VERTEX_SHADER_PATH      = "./EngineDefaults/Shader/Vertex/VertexShader.glsl";
-constexpr const char* SKYBOX_VERTEX_SHADER_PATH      = "./EngineDefaults/Shader/Vertex/SkyboxVertex.glsl";
-constexpr const char* UIWIDGET_VERTEX_SHADER_PATH    = "./EngineDefaults/Shader/Vertex/UIWidgetVertex.glsl";
+constexpr const char* LIGHTS_VERTEX_SHADER_PATH       = "./EngineDefaults/Shader/Vertex/VertexShader.glsl";
+constexpr const char* SKYBOX_VERTEX_SHADER_PATH       = "./EngineDefaults/Shader/Vertex/SkyboxVertex.glsl";
+constexpr const char* UIWIDGET_VERTEX_SHADER_PATH     = "./EngineDefaults/Shader/Vertex/UIWidgetVertex.glsl";
+constexpr const char* QUAD_VERTEX_SHADER_PATH         = "./EngineDefaults/Shader/Vertex/QuadVertexShader.glsl";
+ 
+constexpr const char* UNLIT_FRAGMENT_SHADER_PATH      = "./EngineDefaults/Shader/Fragment/UnlitFragmentShader.glsl";
+constexpr const char* SKYBOX_FRAGMENT_SHADER_PATH     = "./EngineDefaults/Shader/Fragment/SkyboxFragment.glsl";
+constexpr const char* SPECULAR_FRAGMENT_SHADER_PATH   = "./EngineDefaults/Shader/Fragment/BRDFPhongFragmentShader.glsl";
+constexpr const char* METALLIC_FRAGMENT_SHADER_PATH   = "./EngineDefaults/Shader/Fragment/BRDFCookTorranceShader.glsl";
+constexpr const char* METALLIC_IBL_FRAGMENT_SHADER_PATH   = "./EngineDefaults/Shader/Fragment/IBLShader.glsl";
+constexpr const char* UIWIDGET_FRAGMENT_SHADER_PATH   = "./EngineDefaults/Shader/Fragment/UIWidgetFragment.glsl";
+constexpr const char* IRRADIANCE_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader/Fragment/IrradianceCubemapFragment.glsl";
+constexpr const char* PREFILTERED_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader/Fragment/PreFilteredEnvironmentFragment.glsl";
+constexpr const char* ENVIRONMENTBRDF_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader/Fragment/EnvironmentBRDFFragment.glsl";
 
-constexpr const char* UNLIT_FRAGMENT_SHADER_PATH     = "./EngineDefaults/Shader/Fragment/UnlitFragmentShader.glsl";
-constexpr const char* SKYBOX_FRAGMENT_SHADER_PATH    = "./EngineDefaults/Shader/Fragment/SkyboxFragment.glsl";
-constexpr const char* SPECULAR_FRAGMENT_SHADER_PATH  = "./EngineDefaults/Shader/Fragment/BRDFPhongFragmentShader.glsl";
-constexpr const char* METALLIC_FRAGMENT_SHADER_PATH  = "./EngineDefaults/Shader/Fragment/BRDFCookTorranceShader.glsl";
-constexpr const char* UIWIDGET_FRAGMENT_SHADER_PATH  = "./EngineDefaults/Shader/Fragment/UIWidgetFragment.glsl";
-
-using UID                                            = uint64_t;
+using UID                                             = uint64_t;
 
 constexpr UID INVALID_UID                            = 0;
 constexpr UID UID_PREFIX_DIVISOR                     = 100000000000000;
 constexpr UID FALLBACK_TEXTURE_UID                   = 1200000000000000;
+constexpr UID DEFAULT_MATERIAL_UID                   = 1300000000000000;
 
 constexpr const char* CONSTANT_MESH_SELECT_DIALOG_ID = "mesh-select";
+constexpr const char* CONSTANT_MATERIAL_SELECT_DIALOG_ID = "material-select";
 constexpr const char* CONSTANT_TEXTURE_SELECT_DIALOG_ID = "texture-select";
+constexpr const char* CONSTANT_DIFFUSE_TEXTURE_SELECT_DIALOG_ID = "diffuse-texture-select";
+constexpr const char* CONSTANT_METALLIC_TEXTURE_SELECT_DIALOG_ID = "metallic-texture-select";
+constexpr const char* CONSTANT_SPECULAR_TEXTURE_SELECT_DIALOG_ID = "specular-texture-select";
+constexpr const char* CONSTANT_NORMAL_TEXTURE_SELECT_DIALOG_ID = "normal-texture-select";
 constexpr const char* CONSTANT_PREFAB_SELECT_DIALOG_ID  = "prefab-select";
 constexpr const char* CONSTANT_MODEL_SELECT_DIALOG_ID   = "model-select";
 
@@ -152,9 +171,8 @@ constexpr float DEGREE_RAD_CONV                         = PI / 180.f;
 constexpr float MINIMUM_TREE_LEAF_SIZE                  = 5.f;
 constexpr int PALETTE_SIZE                              = 64;
 
+
 inline UID GenerateUID()
 {
-    LCG rng;
-    UID uid = static_cast<UID>(rng.IntFast()) << 32 | rng.IntFast(); // Combine two 32-bit values
-    return uid;
+    return static_cast<UID>(rng->IntFast()) << 32 | rng->IntFast(); // Combine two 32-bit values
 }
