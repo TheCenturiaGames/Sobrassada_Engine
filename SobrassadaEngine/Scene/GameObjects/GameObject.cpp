@@ -850,15 +850,19 @@ void GameObject::UpdateMobilityHierarchy(MobilitySettings type)
         if (visitedGameObjects.find(currentUID) == visitedGameObjects.end())
         {
             visitedGameObjects.insert(currentUID);
+
             GameObject* currentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentUID);
+            if (currentGameObject)
+            {
+                currentGameObject->SetMobility(type);
+                App->GetSceneModule()->AddGameObjectToUpdate(currentGameObject);
 
-            currentGameObject->SetMobility(type);
-            App->GetSceneModule()->AddGameObjectToUpdate(currentGameObject);
+                for (UID childID : currentGameObject->GetChildren())
+                    toVisitGameObjects.push(childID);
 
-            for (UID childID : currentGameObject->GetChildren())
-                toVisitGameObjects.push(childID);
-
-            if (currentGameObject->GetParent() != sceneRootUID) toVisitGameObjects.push(currentGameObject->GetParent());
+                if (currentGameObject->GetParent() != sceneRootUID)
+                    toVisitGameObjects.push(currentGameObject->GetParent());
+            }
         }
     }
 
