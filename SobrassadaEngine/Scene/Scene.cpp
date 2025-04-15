@@ -26,8 +26,8 @@
 #include "ResourcePrefab.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
-#include "Standalone/MeshComponent.h"
 #include "Standalone/AnimationComponent.h"
+#include "Standalone/MeshComponent.h"
 
 #include "SDL_mouse.h"
 #include "imgui.h"
@@ -253,12 +253,41 @@ update_status Scene::Update(float deltaTime)
 
 update_status Scene::Render(float deltaTime)
 {
+    if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
+        RenderScene(deltaTime, App->GetSceneModule()->GetScene()->GetMainCamera());
+    else RenderScene(deltaTime, nullptr);
+    return UPDATE_CONTINUE;
+}
+
+void Scene::RenderScene(float deltaTime, CameraComponent* camera)
+{
     if (!App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_WIREFRAME))
-        lightsConfig->RenderSkybox();
+    {
+        float4x4 projection;
+        float4x4 view;
+
+        if (camera == nullptr)
+            lightsConfig->RenderSkybox(
+                App->GetCameraModule()->GetProjectionMatrix(), App->GetCameraModule()->GetViewMatrix()
+            );
+        else
+        {
+            bool change = false;
+            // Cubemap does not support Ortographic projection
+            if (camera->GetType() == 1)
+            {
+                change = true;
+                camera->ChangeToPerspective();
+            }
+            lightsConfig->RenderSkybox(camera->GetProjectionMatrix(), camera->GetViewMatrix());
+            if (change) camera->ChangeToOrtographic();
+        }
+    }
+
     lightsConfig->SetLightsShaderData();
 
     std::vector<GameObject*> objectsToRender;
-    CheckObjectsToRender(objectsToRender);
+    CheckObjectsToRender(objectsToRender, camera);
 
     {
 #ifdef OPTICK
@@ -273,7 +302,7 @@ update_status Scene::Render(float deltaTime)
             if (mesh != nullptr && mesh->GetEnabled() && mesh->GetBatch() != nullptr) meshesToRender.push_back(mesh);
         }
 
-        batchManager->Render(meshesToRender);
+        batchManager->Render(meshesToRender, camera);
     }
 
     {
@@ -310,8 +339,6 @@ update_status Scene::Render(float deltaTime)
         for (int i = 0; i < 12; ++i)
             debugDraw->DrawLineSegment(aabb.Edge(i), float3(1.f, 1.0f, 0.5f));
     }
-
-    return UPDATE_CONTINUE;
 }
 
 update_status Scene::RenderEditor(float deltaTime)
@@ -319,7 +346,7 @@ update_status Scene::RenderEditor(float deltaTime)
     EditorUIModule* editor = App->GetEditorUIModule();
     if (editor->editorControlMenu) RenderEditorControl(editor->editorControlMenu);
 
-    RenderScene();
+    RenderSceneToFrameBuffer();
 
     RenderSelectedGameObjectUI();
     if (editor->lightConfig) lightsConfig->EditorParams(editor->lightConfig);
@@ -458,7 +485,7 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
     ImGui::End();
 }
 
-void Scene::RenderScene()
+void Scene::RenderSceneToFrameBuffer()
 {
     if (!ImGui::Begin(sceneName.c_str(), nullptr, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar))
     {
@@ -789,15 +816,16 @@ void Scene::UpdateDynamicSpatialStructure()
     CreateDynamicSpatialDataStruct();
 }
 
-void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects) const
+void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects, CameraComponent* camera) const
 {
 #ifdef OPTICK
     OPTICK_CATEGORY("Scene::CheckObjectsToRender", Optick::Category::GameLogic)
 #endif
     std::vector<GameObject*> queriedObjects;
-    FrustumPlanes frustumPlanes = App->GetCameraModule()->GetFrustrumPlanes();
-    if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
-        frustumPlanes = App->GetSceneModule()->GetScene()->GetMainCamera()->GetFrustrumPlanes();
+
+    FrustumPlanes frustumPlanes;
+    if (camera == nullptr) frustumPlanes = App->GetCameraModule()->GetFrustrumPlanes();
+    else frustumPlanes = camera->GetFrustrumPlanes();
 
     sceneOctree->QueryElements<FrustumPlanes>(frustumPlanes, queriedObjects);
 
@@ -835,7 +863,7 @@ void Scene::LoadModel(const UID modelUID)
         gameObjectsArray.resize(allNodes.size());
         std::vector<UID> gameObjectsUID;
         std::vector<GameObject*> rootGameObjects;
-        
+
         GLOG("Model Animation UID: %llu", newModel->GetAnimationUID());
 
         const auto& animUIDs = newModel->GetAllAnimationUIDs();
@@ -999,7 +1027,6 @@ void Scene::LoadModel(const UID modelUID)
 
                     GLOG("Animation UID: %d", uid);
                 }
-
             }
             else
             {

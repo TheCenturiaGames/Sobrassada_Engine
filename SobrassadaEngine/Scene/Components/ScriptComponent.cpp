@@ -33,7 +33,7 @@ void ScriptComponent::Save(rapidjson::Value& targetState, rapidjson::Document::A
 
 void ScriptComponent::Clone(const Component* other)
 {
-    if (other->GetType() == ComponentType::COMPONENT_CAMERA)
+    if (other->GetType() == ComponentType::COMPONENT_SCRIPT)
     {
         const ScriptComponent* otherScript = static_cast<const ScriptComponent*>(other);
         enabled                            = otherScript->enabled;

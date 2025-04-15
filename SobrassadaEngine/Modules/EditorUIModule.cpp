@@ -55,7 +55,8 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"Sphere Collider",      COMPONENT_SPHERE_COLLIDER     },
         {"Capsule Collider",     COMPONENT_CAPSULE_COLLIDER    },
         {"Script",               COMPONENT_SCRIPT              },
-        {"AI Agent",             COMPONENT_AIAGENT             }
+        {"AI Agent",             COMPONENT_AIAGENT             },
+        {"UI Image",             COMPONENT_IMAGE               }
     };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;
@@ -830,6 +831,19 @@ bool EditorUIModule::RenderTransformWidget(
 
     std::string transformName = std::string(transformType == GizmoTransform::LOCAL ? "Local " : "World ") + "Transform";
     ImGui::SeparatorText(transformName.c_str());
+
+    if (transformType == GizmoTransform::LOCAL && !pos.Equals(localTransform.TranslatePart()))
+    {
+        pos   = localTransform.TranslatePart();
+        rot   = localTransform.RotatePart().ToEulerXYZ();
+        scale = localTransform.GetScale();
+    }
+    else if (transformType == GizmoTransform::WORLD && !pos.Equals(globalTransform.TranslatePart()))
+    {
+        pos   = globalTransform.TranslatePart();
+        rot   = globalTransform.RotatePart().ToEulerXYZ();
+        scale = globalTransform.GetScale();
+    }
 
     RenderBasicTransformModifiers(
         pos, rot, scale, lockScaleAxis, positionValueChanged, rotationValueChanged, scaleValueChanged
