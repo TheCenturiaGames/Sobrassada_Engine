@@ -181,3 +181,26 @@ void AudioModule::RemoveAudioSource(AudioSourceComponent* sourceToRemove)
     const auto& it = std::find(sources.begin(), sources.end(), sourceToRemove);
     if (it != sources.end()) sources.erase(it);
 }
+
+bool AudioModule::AddAudioListener(AudioListenerComponent* newListener)
+{
+    if (listener) return false;
+
+    listener = newListener;
+
+    const AkGameObjectID listenerID = (AkGameObjectID)newListener->GetParentUID();
+    if (AK::SoundEngine::RegisterGameObj(listenerID) != AK_Success)
+        GLOG("[ERROR] Audio source could not be registered");
+    AK::SoundEngine::SetDefaultListeners(&listenerID, 1);
+    return true;
+}
+
+void AudioModule::RemoveAudioListener(AudioListenerComponent* listenerToRemove)
+{
+    if (listener != listenerToRemove) return;
+
+    if (AK::SoundEngine::UnregisterGameObj((AkGameObjectID)listenerToRemove->GetParentUID()) != AK_Success)
+        GLOG("[ERROR] Audio listener could not be unregistered");
+
+    listener = nullptr;
+}

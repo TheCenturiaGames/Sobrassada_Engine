@@ -2,8 +2,12 @@
 
 #include "AudioModule.h"
 #include "Application.h"
+#include "GameObject.h"
+#include "InputModule.h" // TODO: DELETE THIS
 
 #include "ImGui.h"
+#include <AK/SoundEngine/Common/AkSoundEngine.h>
+
 
 AudioSourceComponent::AudioSourceComponent(UID uid, GameObject* parent) : Component(uid, parent, "Audio Source", COMPONENT_AUDIO_SOURCE)
 {
@@ -39,6 +43,15 @@ void AudioSourceComponent::Clone(const Component* other)
     else
     {
         GLOG("It is not possible to clone a component of a different type!");
+    }
+}
+
+void AudioSourceComponent::Update(float deltaTime)
+{
+    if (App->GetInputModule()->GetMouseButtonDown(1) == KEY_DOWN)
+    {
+        GLOG("Play audio");
+        AK::SoundEngine::PostEvent("Test", (AkGameObjectID)parent->GetUID());
     }
 }
 

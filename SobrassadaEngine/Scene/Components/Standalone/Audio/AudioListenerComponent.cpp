@@ -17,10 +17,12 @@ AudioListenerComponent::AudioListenerComponent(const rapidjson::Value& initialSt
 
 AudioListenerComponent::~AudioListenerComponent()
 {
+    App->GetAudioModule()->RemoveAudioListener(this);
 }
 
 void AudioListenerComponent::Init()
 {
+    if (App->GetAudioModule()->AddAudioListener(this)) isActiveListener = true;
 }
 
 void AudioListenerComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
@@ -47,5 +49,11 @@ void AudioListenerComponent::RenderEditorInspector()
 
     if (enabled)
     {
+        if (!isActiveListener)
+        {
+            ImGui::Text("There is already an active Audio Listener in the scene.\n In order to use a new one, you must "
+                        "delete the existing one before!");
+            return;
+        }
     }
 }

@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Module.h"
-#include "Scene/Components/Standalone/Audio/AudioSourceComponent.h"
+#include "Standalone/Audio/AudioSourceComponent.h"
+#include "Standalone/Audio/AudioListenerComponent.h"
 
 #include <AkFilePackageLowLevelIODeferred.h>
 #include <vector>
@@ -23,6 +24,9 @@ class AudioModule : public Module
     void AddAudioSource(AudioSourceComponent* newSource);
     void RemoveAudioSource(AudioSourceComponent* newSource);
 
+    bool AddAudioListener(AudioListenerComponent* newListener);
+    void RemoveAudioListener(AudioListenerComponent* newListener);
+
   private:
     CAkFilePackageLowLevelIODeferred g_lowLevelIO;
     int music = 0;
@@ -31,4 +35,5 @@ class AudioModule : public Module
     int g_envMAP[255];
 
     std::vector<AudioSourceComponent*> sources;
+    AudioListenerComponent* listener;
 };

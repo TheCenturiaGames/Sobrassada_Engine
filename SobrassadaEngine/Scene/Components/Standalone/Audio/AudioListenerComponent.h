@@ -18,4 +18,6 @@ class AudioListenerComponent : public Component
     void Render(float deltaTime) override {};
     void RenderEditorInspector() override;
 
+  private:
+    bool isActiveListener;
 };
