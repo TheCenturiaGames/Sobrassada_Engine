@@ -64,8 +64,10 @@ void LightComponent::RenderEditorInspector()
 
 void LightComponent::Update(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
 }
 
 void LightComponent::Render(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
 }

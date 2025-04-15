@@ -28,6 +28,10 @@
 #include "SceneModule.h"
 #include "Standalone/MeshComponent.h"
 #include "Standalone/AnimationComponent.h"
+#include "Standalone/Lights/SpotLightComponent.h"
+#include "Standalone/Lights/PointLightComponent.h"
+#include "Standalone/Lights/DirectionalLightComponent.h"
+
 
 #include "SDL_mouse.h"
 #include "imgui.h"
@@ -1127,3 +1131,27 @@ void Scene::OverridePrefabs(const UID prefabUID)
 
     App->GetResourcesModule()->ReleaseResource(prefab);
 }
+
+
+template <typename T> std::vector<T*> Scene::GetEnabledComponentsOfType() const
+{
+    std::vector<T*> result;
+
+    for (const auto& [uid, go] : gameObjectsContainer)
+    {
+        if (!go || !go->IsGloballyEnabled()) continue;
+
+        Component* comp = go->GetComponentByType(T::STATIC_TYPE);
+        if (comp && comp->GetEnabled())
+        {
+            result.push_back(static_cast<T*>(comp));
+        }
+    }
+
+    return result;
+}
+
+
+template std::vector<DirectionalLightComponent*> Scene::GetEnabledComponentsOfType<DirectionalLightComponent>() const;
+template std::vector<PointLightComponent*> Scene::GetEnabledComponentsOfType<PointLightComponent>() const;
+template std::vector<SpotLightComponent*> Scene::GetEnabledComponentsOfType<SpotLightComponent>() const;

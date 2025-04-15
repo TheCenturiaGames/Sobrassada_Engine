@@ -48,3 +48,8 @@ const float4x4& Component::GetGlobalTransform() const
 {
     return parent->GetGlobalTransform();
 }
+
+bool Component::IsEffectivelyEnabled() const
+{
+    return enabled && parent->IsGloballyEnabled();
+}

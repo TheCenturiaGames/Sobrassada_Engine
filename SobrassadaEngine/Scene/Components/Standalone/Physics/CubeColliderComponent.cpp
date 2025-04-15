@@ -176,10 +176,12 @@ void CubeColliderComponent::RenderEditorInspector()
 
 void CubeColliderComponent::Update(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
 }
 
 void CubeColliderComponent::Render(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
 }
 
 void CubeColliderComponent::ParentUpdated()

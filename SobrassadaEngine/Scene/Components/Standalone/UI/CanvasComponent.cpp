@@ -81,11 +81,12 @@ void CanvasComponent::Clone(const Component* other)
 
 void CanvasComponent::Update(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
 }
 
 void CanvasComponent::Render(float deltaTime)
 {
-    if (!parent->IsGloballyEnabled()) return;
+    if (!IsEffectivelyEnabled()) return;
 
     App->GetDebugDrawModule()->DrawLine(
         float3(
