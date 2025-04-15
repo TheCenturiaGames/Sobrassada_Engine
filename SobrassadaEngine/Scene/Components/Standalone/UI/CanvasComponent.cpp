@@ -164,10 +164,10 @@ void CanvasComponent::RenderEditorInspector()
     }
 }
 
-void CanvasComponent::OnWindowResize(const unsigned int width, const unsigned int height)
+void CanvasComponent::OnWindowResize(const float width, const float height)
 {
-    this->width        = (float)width;
-    this->height       = (float)height;
+    this->width        = width;
+    this->height       = height;
 
     localComponentAABB = AABB(
         float3(
@@ -224,7 +224,7 @@ void CanvasComponent::UpdateMousePosition(const float2& mousePos)
     hoveredButton    = nullptr;
     bool buttonFound = false;
 
-    for (int i = sortedChildren.size() - 1; i >= 0; --i)
+    for (int i = (int)sortedChildren.size() - 1; i >= 0; --i)
     {
         // Update all buttons
         Component* button = sortedChildren[i]->GetComponentByType(COMPONENT_BUTTON);
@@ -240,7 +240,12 @@ void CanvasComponent::UpdateMousePosition(const float2& mousePos)
     }
 }
 
-void CanvasComponent::OnMouseButtonPressed()
+void CanvasComponent::OnMouseButtonPressed() const
 {
     if (hoveredButton) hoveredButton->OnClick();
+}
+
+void CanvasComponent::OnMouseButtonReleased() const
+{
+    if (hoveredButton) hoveredButton->OnRelease();
 }

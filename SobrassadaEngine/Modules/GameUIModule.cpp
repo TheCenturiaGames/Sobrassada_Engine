@@ -61,6 +61,13 @@ update_status GameUIModule::Update(float deltaTime)
             canvas->OnMouseButtonPressed();
         }
     }
+    if (inputs->GetMouseButtonDown(1) == KEY_UP)
+    {
+        for (CanvasComponent* canvas : canvases)
+        {
+            canvas->OnMouseButtonReleased();
+        }
+    }
 
     return UPDATE_CONTINUE;
 }
@@ -84,7 +91,7 @@ void GameUIModule::OnWindowResize(const unsigned int width, const unsigned int h
 {
     for (CanvasComponent* canvas : canvases)
     {
-        canvas->OnWindowResize(width, height);
+        canvas->OnWindowResize((float)width, (float)height);
     }
 }
 

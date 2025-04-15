@@ -28,11 +28,12 @@ class CanvasComponent : public Component
     void RenderEditorInspector() override;
 
     void RenderUI();
-    void OnWindowResize(const unsigned int width, const unsigned int height);
+    void OnWindowResize(const float width, const float height);
 
     void UpdateChildren();
     void UpdateMousePosition(const float2& mousePos);
-    void OnMouseButtonPressed();
+    void OnMouseButtonPressed() const;
+    void OnMouseButtonReleased() const;
 
     bool IsInWorldSpaceEditor() const { return isInWorldSpaceEditor; }
     bool IsInWorldSpaceGame() const { return isInWorldSpaceGame; }

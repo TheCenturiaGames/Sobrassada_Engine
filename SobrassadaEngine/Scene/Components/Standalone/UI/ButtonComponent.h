@@ -25,6 +25,7 @@ class SOBRASADA_API_ENGINE ButtonComponent : public Component
 
     bool UpdateMousePosition(const float2& mousePos, bool dismiss = false);
     void OnClick();
+    void OnRelease() const;
 
     void AddOnClickCallback(Delegate<void>& newDelegate);
     void RemoveOnClickCallback();
@@ -41,6 +42,7 @@ class SOBRASADA_API_ENGINE ButtonComponent : public Component
 
     float3 defaultColor;
     float3 hoverColor;
+    float3 clickedColor;
     float3 disabledColor;
 
     bool isHovered;

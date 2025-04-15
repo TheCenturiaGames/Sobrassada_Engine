@@ -10,7 +10,8 @@
 
 ButtonComponent::ButtonComponent(UID uid, GameObject* parent)
     : defaultColor(float3(1.0f, 1.0f, 1.0f)), hoverColor(float3(0.0f, 1.0f, 1.0f)),
-      disabledColor(float3(0.5f, 0.5f, 0.5f)), isInteractable(true), Component(uid, parent, "Button", COMPONENT_BUTTON)
+      clickedColor(float3(1.0f, 1.0f, 0.0f)), disabledColor(float3(0.5f, 0.5f, 0.5f)), isInteractable(true),
+      Component(uid, parent, "Button", COMPONENT_BUTTON)
 {
 }
 
@@ -36,6 +37,14 @@ ButtonComponent::ButtonComponent(const rapidjson::Value& initialState, GameObjec
         hoverColor.x                      = initColor[0].GetFloat();
         hoverColor.y                      = initColor[1].GetFloat();
         hoverColor.z                      = initColor[2].GetFloat();
+    }
+
+    if (initialState.HasMember("ClickedColor") && initialState["ClickedColor"].IsArray())
+    {
+        const rapidjson::Value& initColor = initialState["ClickedColor"];
+        clickedColor.x                    = initColor[0].GetFloat();
+        clickedColor.y                    = initColor[1].GetFloat();
+        clickedColor.z                    = initColor[2].GetFloat();
     }
 
     if (initialState.HasMember("DisabledColor") && initialState["DisabledColor"].IsArray())
@@ -106,6 +115,12 @@ void ButtonComponent::Save(rapidjson::Value& targetState, rapidjson::Document::A
     valColorHover.PushBack(hoverColor.z, allocator);
     targetState.AddMember("HoverColor", valColorHover, allocator);
 
+    rapidjson::Value valColorClicked(rapidjson::kArrayType);
+    valColorClicked.PushBack(clickedColor.x, allocator);
+    valColorClicked.PushBack(clickedColor.y, allocator);
+    valColorClicked.PushBack(clickedColor.z, allocator);
+    targetState.AddMember("ClickedColor", valColorClicked, allocator);
+
     rapidjson::Value valColorDisabled(rapidjson::kArrayType);
     valColorDisabled.PushBack(disabledColor.x, allocator);
     valColorDisabled.PushBack(disabledColor.y, allocator);
@@ -124,6 +139,7 @@ void ButtonComponent::Clone(const Component* other)
 
         defaultColor                       = otherButton->defaultColor;
         hoverColor                         = otherButton->hoverColor;
+        clickedColor                       = otherButton->clickedColor;
         disabledColor                      = otherButton->disabledColor;
     }
     else
@@ -141,6 +157,7 @@ void ButtonComponent::RenderEditorInspector()
     if (ImGui::Checkbox("Interactable", &isInteractable)) OnInteractionChange();
     if (ImGui::ColorEdit3("Default color", defaultColor.ptr())) image->SetColor(defaultColor);
     ImGui::ColorEdit3("Hover color", hoverColor.ptr());
+    ImGui::ColorEdit3("Clicked color", clickedColor.ptr());
     ImGui::ColorEdit3("Disabled color", disabledColor.ptr());
 }
 
@@ -174,6 +191,12 @@ void ButtonComponent::OnClick()
 {
     GLOG("Clicked button!");
     onClickDispatcher.Call();
+    if (image) image->SetColor(clickedColor);
+}
+
+void ButtonComponent::OnRelease() const
+{
+    if (image) image->SetColor(hoverColor);
 }
 
 bool ButtonComponent::IsWithinBounds(const float2& pos) const
