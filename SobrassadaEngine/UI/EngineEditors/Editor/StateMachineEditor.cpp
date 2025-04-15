@@ -461,7 +461,7 @@ void StateMachineEditor::ShowInspector()
             if (modified)
             {
                 resource->EditTransition(
-                    transition.toState.GetString(), transition.fromState.GetString(),
+                    transition.fromState.GetString(), transition.toState.GetString(),
                     transition.triggerName.GetString(), transition.interpolationTime
                 );
             }

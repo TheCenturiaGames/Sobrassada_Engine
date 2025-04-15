@@ -116,7 +116,9 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
     } else
     {
         float weight = transitionTime != 0 ? fadeTime / transitionTime : 1;
-        
+        GLOG("Comparing anims [%s]:", nodeName.c_str());
+        GLOG("  - Current UID: %llu", currentAnimation->GetUID());
+        GLOG("  - Target UID:  %llu", targetAnimation->GetUID());
         Channel* animChannel = currentAnimation->GetChannel(nodeName);
         Channel* targetAnimChannel = targetAnimation->GetChannel(nodeName);
         if (animChannel == nullptr || targetAnimChannel == nullptr) return;
