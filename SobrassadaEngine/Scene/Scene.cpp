@@ -576,7 +576,7 @@ void Scene::RenderHierarchyUI(bool& hierarchyMenu)
 void Scene::RemoveGameObjectHierarchy(UID gameObjectUID)
 {
     // TODO: Change when filesystem defined
-    if (!gameObjectsContainer.count(gameObjectUID) || gameObjectUID == gameObjectRootUID) return;
+    if (!gameObjectsContainer.count(gameObjectUID) || gameObjectUID == gameObjectRootUID || gameObjectUID == multiSelectParent->GetUID()) return;
 
     std::stack<UID> toDelete;
     toDelete.push(gameObjectUID);
@@ -725,7 +725,7 @@ void Scene::DeleteMultiselection()
 
         selectedGameObjectParent->RemoveGameObject(pairGameObject.first);
         selectedGameObjectParent->UpdateTransformForGOBranch();
-        
+
         RemoveGameObjectHierarchy(pairGameObject.first);
     }
     selectedGameObjects.clear();
@@ -897,10 +897,8 @@ void Scene::LoadModel(const UID modelUID)
 
                 if (currentParentIndex == -1)
                 {
-                    GameObject* rootObject = new GameObject(
-                        GetGameObjectRootUID(), currentNodeData.name,
-                        gameObjectsUID[currentNodeIndex]
-                    );
+                    GameObject* rootObject =
+                        new GameObject(GetGameObjectRootUID(), currentNodeData.name, gameObjectsUID[currentNodeIndex]);
                     rootObject->SetLocalTransform(currentNodeData.transform);
                     // Add the gameObject to the rootObject
                     GetGameObjectByUID(GetGameObjectRootUID())->AddGameObject(rootObject->GetUID());
