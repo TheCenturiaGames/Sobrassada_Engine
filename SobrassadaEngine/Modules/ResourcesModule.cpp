@@ -109,12 +109,12 @@ void ResourcesModule::CreateNavMesh()
         for (const auto& pair : gameObjects)
         {
             GameObject* gameObject = pair.second;
-            if (gameObject)
+            if (!gameObject || !gameObject->IsGloballyEnabled()) continue;
             {
                 const MeshComponent* meshComponent = gameObject->GetMeshComponent();
                 const float4x4& globalMatrix       = gameObject->GetGlobalTransform();
 
-                if (meshComponent)
+                if (meshComponent && meshComponent->GetEnabled())
                 {
                     const ResourceMesh* resourceMesh = meshComponent->GetResourceMesh();
                     AABB aabb                        = gameObject->GetGlobalAABB();
