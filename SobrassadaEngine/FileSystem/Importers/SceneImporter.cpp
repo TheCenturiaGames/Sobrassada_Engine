@@ -64,7 +64,8 @@ namespace SceneImporter
                     matIndex = primitive.material;
                     if (matIndex == -1)
                     {
-                        GLOG("Material index invalid for mesh: %s", name.c_str());
+                        GLOG("Material index invalid for mesh: %s. Using default material.", name.c_str());
+                        matUID = DEFAULT_MATERIAL_UID;
                     }
                     else if (matIndices.find(matIndex) == matIndices.end())
                     {

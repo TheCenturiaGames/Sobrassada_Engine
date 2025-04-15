@@ -92,14 +92,13 @@ class SOBRASADA_API_ENGINE GameObject
 
     MeshComponent* GetMeshComponent() const;
 
-   AnimationComponent* GetAnimationComponent() const;
+    AnimationComponent* GetAnimationComponent() const;
 
     const float3& GetPosition() const { return position; }
     const float3& GetRotation() const { return rotation; }
     const float3& GetScale() const { return scale; }
     AABB GetHierarchyAABB();
 
-    
     void SetLocalTransform(const float4x4& newTransform);
     void DrawGizmos() const;
 
@@ -110,7 +109,6 @@ class SOBRASADA_API_ENGINE GameObject
     void OnTransformUpdated();
     void SetPosition(float3& newPosition) { position = newPosition; };
     void SetWillUpdate(bool willUpdate) { this->willUpdate = willUpdate; };
-
 
   private:
     void DrawNodes() const;

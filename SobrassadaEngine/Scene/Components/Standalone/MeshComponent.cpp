@@ -107,6 +107,7 @@ void MeshComponent::Clone(const Component* other)
         modelUID     = otherMesh->modelUID;
         skinIndex    = otherMesh->skinIndex;
         bindMatrices = otherMesh->bindMatrices;
+        hasBones     = otherMesh->hasBones;
     }
     else
     {

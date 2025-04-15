@@ -96,6 +96,24 @@ void CapsuleColliderComponent::Save(rapidjson::Value& targetState, rapidjson::Do
 
 void CapsuleColliderComponent::Clone(const Component* other)
 {
+    if (other->GetType() == COMPONENT_CAPSULE_COLLIDER)
+    {
+        const CapsuleColliderComponent* capsule = static_cast<const CapsuleColliderComponent*>(other);
+
+        generateCallback                        = capsule->generateCallback;
+        freezeRotation                          = capsule->freezeRotation;
+        fitToSize                               = capsule->fitToSize;
+        mass                                    = capsule->mass;
+        centerOffset                            = capsule->centerOffset;
+        centerRotation                          = capsule->centerRotation;
+        radius                                  = capsule->radius;
+        length                                  = capsule->length;
+        colliderType                            = capsule->colliderType;
+        layer                                   = capsule->layer;
+
+        if (rigidBody) App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
+        else App->GetPhysicsModule()->CreateCapsuleRigidBody(this);
+    }
 }
 
 void CapsuleColliderComponent::RenderEditorInspector()

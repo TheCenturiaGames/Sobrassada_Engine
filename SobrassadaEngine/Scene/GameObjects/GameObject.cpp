@@ -6,8 +6,8 @@
 #include "EditorUIModule.h"
 #include "PrefabManager.h"
 #include "SceneModule.h"
-#include "Standalone/MeshComponent.h"
 #include "Standalone/AnimationComponent.h"
+#include "Standalone/MeshComponent.h"
 #include "Standalone/UI/Transform2DComponent.h"
 
 #include "imgui.h"
@@ -54,8 +54,15 @@ GameObject::GameObject(UID parentUID, GameObject* refObject)
     localAABB = AABB();
     localAABB.SetNegativeInfinity();
 
-    globalOBB  = OBB(localAABB);
-    globalAABB = AABB(globalOBB);
+    globalOBB        = OBB(localAABB);
+    globalAABB       = AABB(globalOBB);
+    isTopParent      = refObject->isTopParent;
+    mobilitySettings = refObject->mobilitySettings;
+
+    position         = refObject->position;
+    rotation         = refObject->rotation;
+    scale            = refObject->scale;
+    prefabUID        = refObject->prefabUID;
 
     // Must make a copy of each manually
     for (const auto& component : refObject->components)
@@ -830,6 +837,9 @@ void GameObject::UpdateMobilityHierarchy(MobilitySettings type)
             if (currentGameObject->GetParent() != sceneRootUID) toVisitGameObjects.push(currentGameObject->GetParent());
         }
     }
+
+    App->GetSceneModule()->GetScene()->SetStaticModified();
+    App->GetSceneModule()->GetScene()->SetDynamicModified();
 }
 
 bool GameObject::CreateComponent(const ComponentType componentType)
