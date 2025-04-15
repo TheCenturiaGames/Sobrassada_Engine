@@ -154,10 +154,30 @@ bool AudioModule::ShutDown()
 #ifndef AK_OPTIMIZED
     AK::Comm::Term();
 #endif
+    // Unload banks
+    AK::SoundEngine::UnloadBank(BANKNAME_MAIN, NULL);
+    AK::SoundEngine::UnloadBank(BANKNAME_INIT, NULL);
+
     AK::MusicEngine::Term();
     AK::SoundEngine::Term();
     g_lowLevelIO.Term();
     if (AK::IAkStreamMgr::Get()) AK::IAkStreamMgr::Get()->Destroy();
     AK::MemoryMgr::Term();
     return true;
+}
+
+void AudioModule::AddAudioSource(AudioSourceComponent* newSource)
+{
+    sources.push_back(newSource);
+    if (AK::SoundEngine::RegisterGameObj((AkGameObjectID)newSource->GetParentUID()) != AK_Success)
+        GLOG("[ERROR] Audio source could not be registered");
+}
+
+void AudioModule::RemoveAudioSource(AudioSourceComponent* sourceToRemove)
+{
+    if (AK::SoundEngine::UnregisterGameObj((AkGameObjectID)sourceToRemove->GetParentUID()) != AK_Success)
+        GLOG("[ERROR] Audio source could not be unregistered");
+
+    const auto& it = std::find(sources.begin(), sources.end(), sourceToRemove);
+    if (it != sources.end()) sources.erase(it);
 }

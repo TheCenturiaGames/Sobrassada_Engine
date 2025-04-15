@@ -1,6 +1,7 @@
 #include "AudioSourceComponent.h"
 
 #include "AudioModule.h"
+#include "Application.h"
 
 #include "ImGui.h"
 
@@ -11,6 +12,16 @@ AudioSourceComponent::AudioSourceComponent(UID uid, GameObject* parent) : Compon
 AudioSourceComponent::AudioSourceComponent(const rapidjson::Value& initialState, GameObject* parent)
     : Component(initialState, parent)
 {
+}
+
+AudioSourceComponent::~AudioSourceComponent()
+{
+    App->GetAudioModule()->RemoveAudioSource(this);
+}
+
+void AudioSourceComponent::Init()
+{
+    App->GetAudioModule()->AddAudioSource(this);
 }
 
 void AudioSourceComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const

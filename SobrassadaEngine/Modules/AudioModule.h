@@ -1,8 +1,10 @@
 #pragma once
 
 #include "Module.h"
+#include "Scene/Components/Standalone/Audio/AudioSourceComponent.h"
 
 #include <AkFilePackageLowLevelIODeferred.h>
+#include <vector>
 
 class AudioModule : public Module
 {
@@ -18,10 +20,15 @@ class AudioModule : public Module
     void soundvol(int volume) { sound = volume; };
     void voicevol(int volume) { voice = volume; };
 
+    void AddAudioSource(AudioSourceComponent* newSource);
+    void RemoveAudioSource(AudioSourceComponent* newSource);
+
   private:
     CAkFilePackageLowLevelIODeferred g_lowLevelIO;
     int music = 0;
     int sound = 0;
     int voice = 0;
     int g_envMAP[255];
+
+    std::vector<AudioSourceComponent*> sources;
 };
