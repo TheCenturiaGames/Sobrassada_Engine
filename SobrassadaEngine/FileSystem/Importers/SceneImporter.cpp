@@ -81,9 +81,9 @@ namespace SceneImporter
                     primitives.emplace_back(meshUID, matUID);
                     GLOG("New primitive with mesh UID: %d and Material UID: %d", meshUID, matUID);
                 }
+                
+                gltfMeshes.push_back(primitives);
             }
-            
-            gltfMeshes.push_back(primitives);
         }
 
         GLOG("Total .gltf meshes: %d", gltfMeshes.size());
