@@ -96,6 +96,7 @@ void CharacterControllerComponent::Clone(const Component* other)
 
 void CharacterControllerComponent::Update(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
     if (!enabled) return;
 
     if (!App->GetSceneModule()->GetInPlayMode()) return;
@@ -162,6 +163,7 @@ void CharacterControllerComponent::Update(float deltaTime)
 
 void CharacterControllerComponent::Render(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
 }
 
 void CharacterControllerComponent::RenderEditorInspector()

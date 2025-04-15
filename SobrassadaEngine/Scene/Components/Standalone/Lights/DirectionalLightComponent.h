@@ -7,6 +7,8 @@
 class DirectionalLightComponent : public LightComponent
 {
   public:
+    static const ComponentType STATIC_TYPE = ComponentType::COMPONENT_DIRECTIONAL_LIGHT;
+
     DirectionalLightComponent(UID uid, GameObject* parent);
     DirectionalLightComponent(const rapidjson::Value& initialState, GameObject* parent);
     ~DirectionalLightComponent() override;

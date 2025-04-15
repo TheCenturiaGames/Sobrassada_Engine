@@ -36,6 +36,7 @@ class SOBRASADA_API_ENGINE Component
     const bool GetEnabled() const { return enabled; }
 
     const float4x4& GetGlobalTransform() const;
+    bool IsEffectivelyEnabled() const;
 
   protected:
     const UID uid;

@@ -92,24 +92,26 @@ class SOBRASADA_API_ENGINE GameObject
 
     MeshComponent* GetMeshComponent() const;
 
-   AnimationComponent* GetAnimationComponent() const;
+    AnimationComponent* GetAnimationComponent() const;
 
     const float3& GetPosition() const { return position; }
     const float3& GetRotation() const { return rotation; }
     const float3& GetScale() const { return scale; }
     AABB GetHierarchyAABB();
 
-    
     void SetLocalTransform(const float4x4& newTransform);
     void DrawGizmos() const;
 
     void CreatePrefab();
+    bool IsGloballyEnabled() const;
     UID GetPrefabUID() const { return prefabUID; }
     void SetPrefabUID(const UID uid) { prefabUID = uid; }
     void UpdateComponents();
     void OnTransformUpdated();
     void SetPosition(float3& newPosition) { position = newPosition; };
     void SetWillUpdate(bool willUpdate) { this->willUpdate = willUpdate; };
+    bool IsEnabled() const { return enabled; }
+    void SetEnabled(bool state) { enabled = state; }
 
 
   private:
@@ -151,4 +153,5 @@ class SOBRASADA_API_ENGINE GameObject
     int mobilitySettings                 = STATIC;
     bool isTopParent                     = false;
     bool willUpdate                      = false;
+    bool enabled                         = true;
 };

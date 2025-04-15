@@ -82,6 +82,8 @@ void CanvasComponent::Clone(const Component* other)
 
 void CanvasComponent::Update(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
+
     const auto& size = App->GetSceneModule()->GetScene()->GetWindowSize();
     if (width != std::get<0>(size) || height != std::get<1>(size))
     {
@@ -91,6 +93,8 @@ void CanvasComponent::Update(float deltaTime)
 
 void CanvasComponent::Render(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
+
     App->GetDebugDrawModule()->DrawLine(
         float3(
             parent->GetGlobalTransform().TranslatePart().x - width / 2,
@@ -125,6 +129,8 @@ void CanvasComponent::Render(float deltaTime)
 
 void CanvasComponent::RenderUI()
 {
+    if (!parent->IsGloballyEnabled()) return;
+
     const int uiProgram = App->GetShaderModule()->GetUIWidgetProgram();
     if (uiProgram == -1)
     {
@@ -133,7 +139,6 @@ void CanvasComponent::RenderUI()
     }
     glUseProgram(uiProgram);
 
-    // Get the view and projection matrix (world space or screen space)
     const float4x4& view = isInWorldSpaceEditor ? App->GetCameraModule()->GetViewMatrix() : float4x4::identity;
     const float4x4& proj = isInWorldSpaceEditor ? App->GetCameraModule()->GetProjectionMatrix()
                                                 : float4x4::D3DOrthoProjLH(-1, 1, width, height);

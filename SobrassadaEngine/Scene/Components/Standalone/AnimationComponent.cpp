@@ -296,6 +296,7 @@ void AnimationComponent::OnInspector()
 
 void AnimationComponent::Render(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
 }
 
 void AnimationComponent::Clone(const Component* other)
@@ -314,6 +315,7 @@ void AnimationComponent::Clone(const Component* other)
 
 void AnimationComponent::Update(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
     if (!animController->IsPlaying()) return;
 
     if (boneMapping.empty())

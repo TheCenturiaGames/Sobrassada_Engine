@@ -145,6 +145,7 @@ void UILabelComponent::Clone(const Component* other)
 void UILabelComponent::RenderUI(const float4x4& view, const float4x4 proj) const
 {
     if (parentCanvas == nullptr) return;
+    if (!IsEffectivelyEnabled()) return;
 
     float width = 0;
     float3 startPos;
