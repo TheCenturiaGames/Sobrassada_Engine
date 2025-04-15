@@ -28,6 +28,8 @@ namespace TextureImporter
         DirectX::ScratchImage image;
         HRESULT hr = DirectX::LoadFromWICFile(wPath.c_str(), DirectX::WIC_FLAGS_NONE, nullptr, image);
 
+        bool isTextureHDR = false;
+
         if (FAILED(hr))
         {
             hr = DirectX::LoadFromTGAFile(wPath.c_str(), DirectX::TGA_FLAGS_NONE, nullptr, image);
@@ -36,8 +38,13 @@ namespace TextureImporter
                 hr = DirectX::LoadFromDDSFile(wPath.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, image);
                 if (FAILED(hr))
                 {
-                    GLOG("Failed to load texture: %s", sourceFilePath);
-                    return 0;
+                    hr = DirectX::LoadFromHDRFile(wPath.c_str(), nullptr, image);
+                    isTextureHDR = true;
+                    if (FAILED(hr))
+                    {
+                        GLOG("Failed to load texture: %s", sourceFilePath);
+                        return 0;
+                    }
                 }
             }
         }
@@ -54,6 +61,10 @@ namespace TextureImporter
         }
 
         std::string fileName = FileSystem::GetFileNameWithoutExtension(sourceFilePath);
+        if (isTextureHDR)
+        {
+            fileName += "_HDR";
+        }
 
         UID finalTextureUID;
         if (sourceUID == INVALID_UID)
@@ -153,12 +164,12 @@ namespace TextureImporter
 
     ResourceTexture* LoadCubemap(UID textureUID)
     {
-        const std::string& path       = App->GetLibraryModule()->GetResourcePath(textureUID);
+        const std::string& path     = App->GetLibraryModule()->GetResourcePath(textureUID);
 
-        const std::string& filename   = App->GetLibraryModule()->GetResourceName(textureUID);
+        const std::string& filename = App->GetLibraryModule()->GetResourceName(textureUID);
 
-        unsigned int textureID = 0;
-        const std::wstring& wPath     = std::wstring(path.begin(), path.end());
+        unsigned int textureID      = 0;
+        const std::wstring& wPath   = std::wstring(path.begin(), path.end());
 
         DirectX::ScratchImage scratchImage;
         DirectX::TexMetadata texMetadata;
