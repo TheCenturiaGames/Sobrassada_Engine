@@ -33,8 +33,8 @@ class AnimController
     
     Quat Interpolate(Quat& first, Quat& second, float lambda);
 
-    void GetChannelPosition(const Channel* animChannel, float3& pos) const;
-    void GetChannelRotation(Channel* animChannel, Quat& rot);
+    void GetChannelPosition(const Channel* animChannel, float3& pos, float time) const;
+    void GetChannelRotation(Channel* animChannel, Quat& rot, float time);
 
   private: 
 
@@ -43,8 +43,9 @@ class AnimController
     bool loop                    = false;
     bool playAnimation           = false;
     float playbackSpeed          = 1.0f;
-    unsigned transitionTime         = 0;
-    float fadeTime                      = 0;
+    unsigned transitionTime      = 0;
+    float fadeTime               = 0;
+    float currentTargetTime      = 0;
     
     ResourceAnimation* currentAnimation = nullptr;
     ResourceAnimation* targetAnimation = nullptr;
