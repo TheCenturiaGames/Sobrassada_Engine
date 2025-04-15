@@ -26,8 +26,8 @@ namespace PrefabManager
         rapidjson::Value prefab(rapidjson::kObjectType);
 
         // Scene values
-        UID uid = GenerateUID();
-        UID finalPrefabUID =
+        const UID uid = GenerateUID();
+        const UID finalPrefabUID =
             override ? gameObject->GetPrefabUID() : App->GetLibraryModule()->AssignFiletypeUID(uid, FileType::Prefab);
         const std::string& savePath = App->GetProjectModule()->GetLoadedProjectPath() + PREFABS_LIB_PATH +
                                       std::to_string(finalPrefabUID) + PREFAB_EXTENSION;
