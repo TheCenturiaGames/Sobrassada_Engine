@@ -40,7 +40,6 @@ AIAgentComponent::~AIAgentComponent()
 void AIAgentComponent::Update(float deltaTime)
 {
     if (!IsEffectivelyEnabled()) return;
-    if (!enabled) return;
 
     if (!App->GetSceneModule()->GetInPlayMode()) return;
 
