@@ -2,7 +2,6 @@
 
 #include "Component.h"
 #include "Utils/EventDispatcher.h"
-#include "Globals.h"
 
 #include "Math/float3.h"
 
@@ -32,8 +31,8 @@ class SOBRASADA_API_ENGINE ButtonComponent : public Component
     void RemoveTransform() { transform2D = nullptr; }
 
   private:
-    bool IsWithinBounds(const float2& pos);
-    void OnInteractionChange();
+    bool IsWithinBounds(const float2& pos) const;
+    void OnInteractionChange() const;
 
   private:
     Transform2DComponent* transform2D;

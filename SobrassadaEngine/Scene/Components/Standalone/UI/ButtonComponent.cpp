@@ -176,7 +176,7 @@ void ButtonComponent::OnClick()
     onClickDispatcher.Call();
 }
 
-bool ButtonComponent::IsWithinBounds(const float2& pos)
+bool ButtonComponent::IsWithinBounds(const float2& pos) const
 {
     if (transform2D == nullptr) return false;
 
@@ -202,7 +202,7 @@ void ButtonComponent::RemoveOnClickCallback()
     onClickDispatcher.RemoveCallback(delegateID);
 }
 
-void ButtonComponent::OnInteractionChange()
+void ButtonComponent::OnInteractionChange() const
 {
     if (image == nullptr) return;
 

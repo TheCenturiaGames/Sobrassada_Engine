@@ -192,8 +192,8 @@ void CanvasComponent::OnWindowResize(const unsigned int width, const unsigned in
 
 void CanvasComponent::UpdateChildren()
 {
-    // Update the children list every frame in case they are reorderen in hierarchy. In the future to be more optimal
-    // maybe this can be called only when a gameObject is dragged around the hierarchy
+    // TODO: Right now this updates the children list every frame in case they are reordered in hierarchy.
+    // To be more optimal, this could be called only when a gameObject is dragged around the hierarchy
     sortedChildren.clear();
 
     std::queue<UID> children;
