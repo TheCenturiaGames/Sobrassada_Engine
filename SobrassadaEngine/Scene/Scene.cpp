@@ -173,7 +173,7 @@ void Scene::Save(
 
     for (auto it = gameObjectsContainer.begin(); it != gameObjectsContainer.end(); ++it)
     {
-        if (it->second != nullptr)
+        if (it->second != nullptr && it->second != multiSelectParent)
         {
             rapidjson::Value goJSON(rapidjson::kObjectType);
 
@@ -334,8 +334,8 @@ void Scene::RenderScene(float deltaTime, CameraComponent* camera)
     {
         GameObject* gameObject = GetGameObjectByUID(gameObjectIterator.first);
 
-        const AABB aabb              = gameObject->GetHierarchyAABB();
-        
+        const AABB aabb        = gameObject->GetHierarchyAABB();
+
         for (int i = 0; i < 12; ++i)
             debugDraw->DrawLineSegment(aabb.Edge(i), float3(1.f, 1.0f, 0.5f));
     }
@@ -603,7 +603,7 @@ void Scene::RenderHierarchyUI(bool& hierarchyMenu)
 void Scene::RemoveGameObjectHierarchy(UID gameObjectUID)
 {
     // TODO: Change when filesystem defined
-    if (!gameObjectsContainer.count(gameObjectUID) || gameObjectUID == gameObjectRootUID) return;
+    if (!gameObjectsContainer.count(gameObjectUID) || gameObjectUID == gameObjectRootUID || gameObjectUID == multiSelectParent->GetUID()) return;
 
     std::stack<UID> toDelete;
     toDelete.push(gameObjectUID);
@@ -622,6 +622,10 @@ void Scene::RemoveGameObjectHierarchy(UID gameObjectUID)
         toDelete.pop();
 
         GameObject* gameObject = GetGameObjectByUID(currentUID);
+
+        if (gameObject->IsStatic()) SetStaticModified();
+        else SetDynamicModified();
+
         if (gameObject == nullptr) continue;
 
         collectedUIDs.push_back(currentUID);
@@ -674,6 +678,11 @@ void Scene::UpdateGameObjects()
     gameObjectsToUpdate.clear();
 }
 
+void Scene::ClearGameObjectsToUpdate()
+{
+    gameObjectsToUpdate.clear();
+}
+
 void Scene::AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
 {
     auto pairResult = selectedGameObjects.insert({gameObject, gameObjectParent});
@@ -683,7 +692,7 @@ void Scene::AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
         GameObject* selectedGameObject       = GetGameObjectByUID(gameObject);
         GameObject* selectedGameObjectParent = GetGameObjectByUID(gameObjectParent);
 
-        //selectedGameObjectParent->RemoveGameObject(gameObject);
+        // selectedGameObjectParent->RemoveGameObject(gameObject);
 
         multiSelectParent->AddGameObject(gameObject);
 
@@ -721,6 +730,7 @@ void Scene::ClearObjectSelection()
         GameObject* selectedGameObjectParent = GetGameObjectByUID(pairGameObject.second);
 
         multiSelectParent->RemoveGameObject(pairGameObject.first);
+
         currentGameObject->SetParent(pairGameObject.second);
         selectedGameObjectParent->AddGameObject(pairGameObject.first);
 
@@ -729,6 +739,24 @@ void Scene::ClearObjectSelection()
     }
 
     selectedGameObjects.clear();
+}
+
+void Scene::DeleteMultiselection()
+{
+    for (auto& pairGameObject : selectedGameObjects)
+    {
+        GameObject* currentGameObject        = GetGameObjectByUID(pairGameObject.first);
+        GameObject* selectedGameObjectParent = GetGameObjectByUID(pairGameObject.second);
+
+        multiSelectParent->RemoveGameObject(pairGameObject.first);
+
+        selectedGameObjectParent->RemoveGameObject(pairGameObject.first);
+        selectedGameObjectParent->UpdateTransformForGOBranch();
+
+        RemoveGameObjectHierarchy(pairGameObject.first);
+    }
+    selectedGameObjects.clear();
+    ClearGameObjectsToUpdate();
 }
 
 const std::vector<Component*> Scene::GetAllComponents() const
@@ -772,7 +800,7 @@ void Scene::CreateStaticSpatialDataStruct()
 
         if (!objectIterator.second->IsStatic()) continue;
         if (objectIterator.second->GetUID() == gameObjectRootUID) continue;
-        if (!objectBB.IsFinite() || objectBB.IsDegenerate()) continue;
+        if (!objectBB.IsFinite() || objectBB.IsDegenerate() || objectBB.Size().IsZero()) continue;
 
         sceneOctree->InsertElement(objectIterator.second);
     }
@@ -792,7 +820,7 @@ void Scene::CreateDynamicSpatialDataStruct()
 
         if (objectIterator.second->IsStatic()) continue;
         if (objectIterator.second->GetUID() == gameObjectRootUID) continue;
-        if (!objectBB.IsFinite() || objectBB.IsDegenerate()) continue;
+        if (!objectBB.IsFinite() || objectBB.IsDegenerate() || objectBB.Size().IsZero()) continue;
 
         dynamicTree->InsertElement(objectIterator.second);
     }
@@ -897,10 +925,8 @@ void Scene::LoadModel(const UID modelUID)
 
                 if (currentParentIndex == -1)
                 {
-                    GameObject* rootObject = new GameObject(
-                        GetGameObjectRootUID(), App->GetLibraryModule()->GetResourceName(modelUID),
-                        gameObjectsUID[currentNodeIndex]
-                    );
+                    GameObject* rootObject =
+                        new GameObject(GetGameObjectRootUID(), currentNodeData.name, gameObjectsUID[currentNodeIndex]);
                     rootObject->SetLocalTransform(currentNodeData.transform);
                     // Add the gameObject to the rootObject
                     GetGameObjectByUID(GetGameObjectRootUID())->AddGameObject(rootObject->GetUID());
