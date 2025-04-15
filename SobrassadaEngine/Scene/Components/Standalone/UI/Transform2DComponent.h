@@ -28,11 +28,14 @@ class Transform2DComponent : public Component
     void OnTransform3DUpdated(const float4x4& transform3D);
     void OnParentChange();
     void GetCanvas();
+    void AdaptToParentChanges();
 
     float2 GetRenderingPosition() const;
     float2 GetGlobalPosition() const;
+    float2 GetCenterPosition() const;
     void AddChildTransform(Transform2DComponent* newChild) { childTransforms.push_back(newChild); }
     void RemoveChild(Transform2DComponent* child);
+    void RemoveParent() { parentTransform = nullptr; }
     CanvasComponent* GetParentCanvas() const { return parentCanvas; }
 
   private:
