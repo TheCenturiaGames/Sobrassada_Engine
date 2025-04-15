@@ -775,6 +775,7 @@ void Scene::DeleteMultiselection()
         RemoveGameObjectHierarchy(pairGameObject.first);
     }
     selectedGameObjects.clear();
+    selectedGameObjectsMobility.clear();
     ClearGameObjectsToUpdate();
 }
 
