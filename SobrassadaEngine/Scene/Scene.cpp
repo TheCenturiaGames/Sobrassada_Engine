@@ -15,6 +15,7 @@
 #include "Importer.h"
 #include "InputModule.h"
 #include "LibraryModule.h"
+#include "ModelImporter.h"
 #include "Octree.h"
 #include "OpenGLModule.h"
 #include "PhysicsModule.h"
@@ -25,6 +26,7 @@
 #include "ResourcePrefab.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
+#include "Standalone/AnimationComponent.h"
 #include "Standalone/MeshComponent.h"
 
 #include "SDL_mouse.h"
@@ -89,6 +91,8 @@ Scene::~Scene()
     }
     gameObjectsContainer.clear();
 
+    selectedGameObjects.clear();
+
     delete lightsConfig;
     delete sceneOctree;
     delete dynamicTree;
@@ -98,7 +102,6 @@ Scene::~Scene()
     dynamicTree  = nullptr;
 
     App->GetPhysicsModule()->EmptyWorld();
-
     GLOG("%s scene closed", sceneName.c_str());
 }
 
@@ -139,6 +142,9 @@ void Scene::Init()
 
     UpdateStaticSpatialStructure();
     UpdateDynamicSpatialStructure();
+
+    multiSelectParent = new GameObject(GenerateUID(), "MULTISELECT_DUMMY");
+    gameObjectsContainer.insert({multiSelectParent->GetUID(), multiSelectParent});
 }
 
 void Scene::Save(
@@ -245,14 +251,43 @@ update_status Scene::Update(float deltaTime)
     return UPDATE_CONTINUE;
 }
 
-update_status Scene::Render(float deltaTime) const
+update_status Scene::Render(float deltaTime)
+{
+    if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
+        RenderScene(deltaTime, App->GetSceneModule()->GetScene()->GetMainCamera());
+    else RenderScene(deltaTime, nullptr);
+    return UPDATE_CONTINUE;
+}
+
+void Scene::RenderScene(float deltaTime, CameraComponent* camera)
 {
     if (!App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_WIREFRAME))
-        lightsConfig->RenderSkybox();
+    {
+        float4x4 projection;
+        float4x4 view;
+
+        if (camera == nullptr)
+            lightsConfig->RenderSkybox(
+                App->GetCameraModule()->GetProjectionMatrix(), App->GetCameraModule()->GetViewMatrix()
+            );
+        else
+        {
+            bool change = false;
+            // Cubemap does not support Ortographic projection
+            if (camera->GetType() == 1)
+            {
+                change = true;
+                camera->ChangeToPerspective();
+            }
+            lightsConfig->RenderSkybox(camera->GetProjectionMatrix(), camera->GetViewMatrix());
+            if (change) camera->ChangeToOrtographic();
+        }
+    }
+
     lightsConfig->SetLightsShaderData();
 
     std::vector<GameObject*> objectsToRender;
-    CheckObjectsToRender(objectsToRender);
+    CheckObjectsToRender(objectsToRender, camera);
 
     {
 #ifdef OPTICK
@@ -267,7 +302,7 @@ update_status Scene::Render(float deltaTime) const
             if (mesh != nullptr && mesh->GetEnabled() && mesh->GetBatch() != nullptr) meshesToRender.push_back(mesh);
         }
 
-        batchManager->Render(meshesToRender);
+        batchManager->Render(meshesToRender, camera);
     }
 
     {
@@ -293,7 +328,17 @@ update_status Scene::Render(float deltaTime) const
         }
     }
 
-    return UPDATE_CONTINUE;
+    DebugDrawModule* debugDraw = App->GetDebugDrawModule();
+
+    for (auto& gameObjectIterator : selectedGameObjects)
+    {
+        GameObject* gameObject = GetGameObjectByUID(gameObjectIterator.first);
+
+        const AABB aabb              = gameObject->GetHierarchyAABB();
+        
+        for (int i = 0; i < 12; ++i)
+            debugDraw->DrawLineSegment(aabb.Edge(i), float3(1.f, 1.0f, 0.5f));
+    }
 }
 
 update_status Scene::RenderEditor(float deltaTime)
@@ -301,7 +346,7 @@ update_status Scene::RenderEditor(float deltaTime)
     EditorUIModule* editor = App->GetEditorUIModule();
     if (editor->editorControlMenu) RenderEditorControl(editor->editorControlMenu);
 
-    RenderScene();
+    RenderSceneToFrameBuffer();
 
     RenderSelectedGameObjectUI();
     if (editor->lightConfig) lightsConfig->EditorParams(editor->lightConfig);
@@ -415,7 +460,7 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
                     App->GetDebugDrawModule()->FlipDebugOptionValue(i);
                     if (i == (int)DebugOptions::RENDER_WIREFRAME)
                         App->GetOpenGLModule()->SetRenderWireframe(currentBitValue);
-                    else if(i == (int)DebugOptions::RENDER_PHYSICS_WORLD)
+                    else if (i == (int)DebugOptions::RENDER_PHYSICS_WORLD)
                         App->GetPhysicsModule()->SetDebugOption(currentBitValue);
                 }
             }
@@ -440,7 +485,7 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
     ImGui::End();
 }
 
-void Scene::RenderScene()
+void Scene::RenderSceneToFrameBuffer()
 {
     if (!ImGui::Begin(sceneName.c_str(), nullptr, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar))
     {
@@ -452,6 +497,8 @@ void Scene::RenderScene()
     if (ImGui::IsWindowHovered() &&
         (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseClicked(ImGuiMouseButton_Middle)))
         ImGui::SetWindowFocus();
+
+    isFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_DockHierarchy);
 
     // do inputs only if window is focused
     if (ImGui::IsWindowHovered(ImGuiFocusedFlags_DockHierarchy))
@@ -623,9 +670,65 @@ void Scene::UpdateGameObjects()
             gameObject->UpdateComponents();
             gameObject->SetWillUpdate(false);
         }
-
     }
     gameObjectsToUpdate.clear();
+}
+
+void Scene::AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
+{
+    auto pairResult = selectedGameObjects.insert({gameObject, gameObjectParent});
+
+    if (pairResult.second)
+    {
+        GameObject* selectedGameObject       = GetGameObjectByUID(gameObject);
+        GameObject* selectedGameObjectParent = GetGameObjectByUID(gameObjectParent);
+
+        //selectedGameObjectParent->RemoveGameObject(gameObject);
+
+        multiSelectParent->AddGameObject(gameObject);
+
+        selectedGameObject->SetParent(multiSelectParent->GetUID());
+        selectedGameObject->UpdateLocalTransform(multiSelectParent->GetGlobalTransform());
+        selectedGameObject->UpdateTransformForGOBranch();
+
+        selectedGameObjectUID = multiSelectParent->GetUID();
+    }
+    else if (pairResult.first != selectedGameObjects.end())
+    {
+        multiSelectParent->RemoveGameObject(gameObject);
+
+        GameObject* selectedGameObject       = GetGameObjectByUID(gameObject);
+        GameObject* selectedGameObjectParent = GetGameObjectByUID(selectedGameObjects[gameObject]);
+
+        selectedGameObject->SetParent(selectedGameObjectParent->GetUID());
+        selectedGameObjectParent->AddGameObject(gameObject);
+
+        if (selectedGameObjectParent->GetUID() != gameObjectRootUID)
+        {
+            selectedGameObject->UpdateLocalTransform(selectedGameObjectParent->GetGlobalTransform());
+            selectedGameObject->UpdateTransformForGOBranch();
+        }
+
+        selectedGameObjects.erase(pairResult.first);
+    }
+}
+
+void Scene::ClearObjectSelection()
+{
+    for (auto& pairGameObject : selectedGameObjects)
+    {
+        GameObject* currentGameObject        = GetGameObjectByUID(pairGameObject.first);
+        GameObject* selectedGameObjectParent = GetGameObjectByUID(pairGameObject.second);
+
+        multiSelectParent->RemoveGameObject(pairGameObject.first);
+        currentGameObject->SetParent(pairGameObject.second);
+        selectedGameObjectParent->AddGameObject(pairGameObject.first);
+
+        currentGameObject->UpdateLocalTransform(selectedGameObjectParent->GetGlobalTransform());
+        currentGameObject->UpdateTransformForGOBranch();
+    }
+
+    selectedGameObjects.clear();
 }
 
 const std::vector<Component*> Scene::GetAllComponents() const
@@ -642,6 +745,17 @@ const std::vector<Component*> Scene::GetAllComponents() const
         }
     }
     return collectedComponents;
+}
+
+UID Scene::GetMultiselectUID() const
+{
+    return multiSelectParent->GetUID();
+}
+
+void Scene::SetMultiselectPosition(const float3& newPosition)
+{
+    const float4x4 localMat = float4x4::FromTRS(newPosition, float4x4::identity, float3::one);
+    multiSelectParent->SetLocalTransform(localMat);
 }
 
 void Scene::CreateStaticSpatialDataStruct()
@@ -702,15 +816,16 @@ void Scene::UpdateDynamicSpatialStructure()
     CreateDynamicSpatialDataStruct();
 }
 
-void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects) const
+void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects, CameraComponent* camera) const
 {
 #ifdef OPTICK
     OPTICK_CATEGORY("Scene::CheckObjectsToRender", Optick::Category::GameLogic)
 #endif
     std::vector<GameObject*> queriedObjects;
-    FrustumPlanes frustumPlanes = App->GetCameraModule()->GetFrustrumPlanes();
-    if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
-        frustumPlanes = App->GetSceneModule()->GetScene()->GetMainCamera()->GetFrustrumPlanes();
+
+    FrustumPlanes frustumPlanes;
+    if (camera == nullptr) frustumPlanes = App->GetCameraModule()->GetFrustrumPlanes();
+    else frustumPlanes = camera->GetFrustrumPlanes();
 
     sceneOctree->QueryElements<FrustumPlanes>(frustumPlanes, queriedObjects);
 
@@ -737,52 +852,111 @@ void Scene::LoadModel(const UID modelUID)
 {
     if (modelUID != INVALID_UID)
     {
-        GLOG("Load model %d", modelUID);
+        GLOG("Load model %llu", modelUID);
 
-        ResourceModel* newModel = (ResourceModel*)App->GetResourcesModule()->RequestResource(modelUID);
-        const Model& model      = newModel->GetModelData();
-        const std::vector<std::vector<NodeData>>& nodesScene = model.GetNodes();
+        ResourceModel* newModel               = (ResourceModel*)App->GetResourcesModule()->RequestResource(modelUID);
+        const Model& model                    = newModel->GetModelData();
+        const std::vector<int>& rootNodesIdx  = model.GetRootNodesIdx();
+        const std::vector<NodeData>& allNodes = model.GetNodes();
 
-        for (const std::vector<NodeData>& nodes : nodesScene)
+        std::vector<GameObject*> gameObjectsArray;
+        gameObjectsArray.resize(allNodes.size());
+        std::vector<UID> gameObjectsUID;
+        std::vector<GameObject*> rootGameObjects;
+
+        GLOG("Model Animation UID: %llu", newModel->GetAnimationUID());
+
+        const auto& animUIDs = newModel->GetAllAnimationUIDs();
+        GLOG("Total Animation UIDs %zu ", animUIDs.size());
+
+        for (UID uid : animUIDs)
         {
-            GameObject* rootObject =
-                new GameObject(GetGameObjectRootUID(), App->GetLibraryModule()->GetResourceName(modelUID));
-            rootObject->SetLocalTransform(nodes[0].transform);
+            GLOG("Animation UID in list: %llu ", uid);
+        }
+        for (unsigned int i = 0; i < allNodes.size(); ++i)
+        {
+            gameObjectsUID.push_back(GenerateUID());
+        }
 
-            // Add the gameObject to the rootObject
-            GetGameObjectByUID(GetGameObjectRootUID())->AddGameObject(rootObject->GetUID());
-            AddGameObject(rootObject->GetUID(), rootObject);
+        for (int rootNodeIdx : rootNodesIdx)
+        {
+            const NodeData& rootNode = allNodes[rootNodeIdx];
 
-            std::vector<GameObject*> gameObjectsArray;
-            gameObjectsArray.push_back(rootObject);
+            std::vector<NodeParent> nodesToVisit;
+            nodesToVisit.push_back({rootNodeIdx, rootNode.parentIndex});
 
-            for (int i = 1; i < nodes.size(); ++i)
+            while (!nodesToVisit.empty())
             {
-                GameObject* gameObject =
-                    new GameObject(gameObjectsArray[nodes[i].parentIndex]->GetUID(), nodes[i].name);
-                gameObject->SetLocalTransform(nodes[i].transform);
+                NodeParent currentNode = nodesToVisit.back();
+                nodesToVisit.pop_back();
 
-                gameObjectsArray.emplace_back(gameObject);
-                GetGameObjectByUID(gameObjectsArray[nodes[i].parentIndex]->GetUID())
-                    ->AddGameObject(gameObject->GetUID());
-                AddGameObject(gameObject->GetUID(), gameObject);
-            }
+                const int currentNodeIndex      = currentNode.nodeID;
+                const int currentParentIndex    = currentNode.parentID;
 
-            // Iterate again to add the meshes and skins. Can't be done in the same loop because the bones have
-            // to be already created
-            for (int i = 0; i < nodes.size(); ++i)
-            {
-                if (nodes[i].meshes.size() > 0)
+                const NodeData& currentNodeData = allNodes[currentNodeIndex];
+
+                if (currentParentIndex == -1)
                 {
-                    GameObject* currentGameObject = gameObjectsArray[i];
-                    GLOG("Node %s has %d meshes", nodes[i].name.c_str(), nodes[i].meshes.size());
+                    GameObject* rootObject = new GameObject(
+                        GetGameObjectRootUID(), App->GetLibraryModule()->GetResourceName(modelUID),
+                        gameObjectsUID[currentNodeIndex]
+                    );
+                    rootObject->SetLocalTransform(currentNodeData.transform);
+                    // Add the gameObject to the rootObject
+                    GetGameObjectByUID(GetGameObjectRootUID())->AddGameObject(rootObject->GetUID());
+                    AddGameObject(rootObject->GetUID(), rootObject);
+                    rootGameObjects.push_back(rootObject);
+                    gameObjectsArray[currentNodeIndex] = rootObject;
+                }
+                else
+                {
+                    GameObject* gameObject = new GameObject(
+                        gameObjectsUID[currentParentIndex], currentNodeData.name, gameObjectsUID[currentNodeIndex]
+                    );
+                    gameObject->SetLocalTransform(currentNodeData.transform);
+                    GetGameObjectByUID(gameObject->GetParent())->AddGameObject(gameObject->GetUID());
+                    AddGameObject(gameObject->GetUID(), gameObject);
+
+                    gameObjectsArray[currentNodeIndex] = gameObject;
+                }
+
+                for (auto it = currentNodeData.children.rbegin(); it != currentNodeData.children.rend(); ++it)
+                {
+                    nodesToVisit.push_back({*it, currentNodeIndex});
+                }
+            }
+        }
+
+        // Iterate again to add the meshes and skins.
+        // Can't be done in the same loop because the bones have to be already created
+        for (int rootNodeIdx : rootNodesIdx)
+        {
+            const NodeData& rootNode = allNodes[rootNodeIdx];
+
+            std::vector<NodeParent> nodesToVisit;
+            nodesToVisit.push_back({rootNodeIdx, rootNode.parentIndex});
+
+            while (!nodesToVisit.empty())
+            {
+                NodeParent currentNode = nodesToVisit.back();
+                nodesToVisit.pop_back();
+
+                const int currentNodeIndex      = currentNode.nodeID;
+                const int currentParentIndex    = currentNode.parentID;
+
+                const NodeData& currentNodeData = allNodes[currentNodeIndex];
+
+                if (currentNodeData.meshes.size() > 0)
+                {
+                    GameObject* currentGameObject = gameObjectsArray[currentNodeIndex];
+                    GLOG("Node %s has %d meshes", currentNodeData.name.c_str(), currentNodeData.meshes.size());
 
                     unsigned meshNum = 1;
 
-                    for (const auto& mesh : nodes[i].meshes)
+                    for (const auto& mesh : currentNodeData.meshes)
                     {
                         GameObject* meshObject = nullptr;
-                        if (nodes[i].meshes.size() > 1)
+                        if (currentNodeData.meshes.size() > 1)
                         {
                             meshObject = new GameObject(
                                 currentGameObject->GetUID(),
@@ -797,7 +971,7 @@ void Scene::LoadModel(const UID modelUID)
 
                         if (meshObject->CreateComponent(COMPONENT_MESH))
                         {
-                            if (nodes[i].meshes.size() > 1)
+                            if (currentNodeData.meshes.size() > 1)
                             {
                                 currentGameObject->AddGameObject(meshObject->GetUID());
                                 AddGameObject(meshObject->GetUID(), meshObject);
@@ -809,10 +983,13 @@ void Scene::LoadModel(const UID modelUID)
                             meshComponent->AddMaterial(mesh.second);
 
                             // Add skin to meshComponent
-                            if (nodes[i].skinIndex != -1)
+                            if (currentNodeData.skinIndex != -1)
                             {
-                                GLOG("Node %s has skin index: %d", nodes[i].name.c_str(), nodes[i].skinIndex);
-                                Skin skin = model.GetSkin(nodes[i].skinIndex);
+                                GLOG(
+                                    "Node %s has skin index: %d", currentNodeData.name.c_str(),
+                                    currentNodeData.skinIndex
+                                );
+                                Skin skin = model.GetSkin(currentNodeData.skinIndex);
 
                                 std::vector<GameObject*> bones;
                                 std::vector<UID> bonesIds;
@@ -823,14 +1000,39 @@ void Scene::LoadModel(const UID modelUID)
                                 }
                                 meshComponent->SetBones(bones, bonesIds);
                                 meshComponent->SetBindMatrices(skin.inverseBindMatrices);
-                                meshComponent->SetSkinIndex(nodes[i].skinIndex);
+                                meshComponent->SetSkinIndex(currentNodeData.skinIndex);
                             }
                         }
                     }
                 }
-            }
 
-            rootObject->UpdateTransformForGOBranch();
+                for (auto it = currentNodeData.children.rbegin(); it != currentNodeData.children.rend(); ++it)
+                {
+                    nodesToVisit.push_back({*it, currentNodeIndex});
+                }
+            }
+        }
+        for (GameObject* rootGameObject : rootGameObjects)
+        {
+            if (!animUIDs.empty())
+            {
+                rootGameObject->CreateComponent(COMPONENT_ANIMATION);
+                AnimationComponent* animComponent = rootGameObject->GetAnimationComponent();
+
+                GLOG("Model has %zu animations", animUIDs.size());
+                for (UID uid : animUIDs)
+                {
+                    GLOG("Setting aimation resource with UID %llu ", uid);
+                    animComponent->SetAnimationResource(uid);
+
+                    GLOG("Animation UID: %d", uid);
+                }
+            }
+            else
+            {
+                GLOG("No animations found for this model");
+            }
+            rootGameObject->UpdateTransformForGOBranch();
         }
     }
 }
@@ -904,8 +1106,8 @@ void Scene::LoadPrefab(const UID prefabUID, const ResourcePrefab* prefab, const 
         if (prefab == nullptr) App->GetResourcesModule()->ReleaseResource(resourcePrefab);
         newObjects[0]->UpdateTransformForGOBranch();
 
-        // Get all scene lights, because if the prefab has lights when creating them they won't be added to the scene,
-        // as the gameObject is still not part of the scene
+        // Get all scene lights, because if the prefab has lights when creating them they won't be added to the
+        // scene, as the gameObject is still not part of the scene
         if (lightsConfig != nullptr) lightsConfig->GetAllSceneLights();
     }
 }

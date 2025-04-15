@@ -9,14 +9,14 @@
 enum class ResourceType
 {
     Unknown = 10,
-    Mesh,         // 11
-    Texture,      // 12
-    Material,     // 13
-    Model,        // 14
-    Animation,    // 15
-    Prefab,       // 16
-    Navmesh,      // 17
-    StateMachine, // 18
+    Mesh,      // 11
+    Texture,   // 12
+    Material,  // 13
+    Model,     // 14
+    Animation, // 15
+    Prefab,    // 16
+    StateMachine,//17
+    Navmesh,   // 18
     Font,         // 19
 };
 
@@ -31,6 +31,7 @@ class Resource
 
     UID GetUID() const { return uid; }
     const std::string& GetName() const { return name; }
+    void SetName(std::string newName) { name = newName; }
     ResourceType GetType() const { return type; }
     unsigned int GetReferenceCount() const { return referenceCount; }
     static ResourceType GetResourceTypeForUID(UID uid) { return static_cast<ResourceType>(uid / UID_PREFIX_DIVISOR); }

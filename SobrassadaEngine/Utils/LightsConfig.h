@@ -70,7 +70,7 @@ class LightsConfig
     void EditorParams(bool& lightConfig);
 
     void InitSkybox();
-    void RenderSkybox() const;
+    void RenderSkybox(const float4x4& projection, const float4x4& view) const;
 
     void InitLightBuffers();
     void SetLightsShaderData() const;
