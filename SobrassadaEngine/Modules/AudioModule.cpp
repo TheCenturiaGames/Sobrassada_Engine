@@ -1,6 +1,8 @@
 #include "AudioModule.h"
 
+#include "Application.h"
 #include "Globals.h"
+#include "ProjectModule.h"
 
 #include <AK/IBytes.h>
 #include <AK/MusicEngine/Common/AkMusicEngine.h>
@@ -10,6 +12,9 @@
 #include <AK/SoundEngine/Common/AkStreamMgrModule.h>
 #include <AK/SoundEngine/Common/IAkStreamMgr.h>    // Streaming Manager
 #include <AK/SpatialAudio/Common/AkSpatialAudio.h> // Spatial Audio
+
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
 
 #ifndef AK_OPTIMIZED
 #include <AK/Comm/AkCommunication.h>
@@ -91,13 +96,18 @@ bool AudioModule::Init()
     }
 
     // load initialization and main soundbanks
+    const std::string soundbanksPath = App->GetProjectModule()->GetLoadedProjectPath() + "Soundbanks\\Windows\\";
+
+    const int size                   = MultiByteToWideChar(CP_UTF8, 0, soundbanksPath.c_str(), -1, nullptr, 0);
+    std::wstring wSoundbanksPath(size, 0);
+    MultiByteToWideChar(CP_UTF8, 0, soundbanksPath.c_str(), -1, &wSoundbanksPath[0], size);
+
 #ifdef AK_WIN
-    g_lowLevelIO.SetBasePath(L"soundbanks\\Windows\\");
+    g_lowLevelIO.SetBasePath(wSoundbanksPath.c_str());
 #else
     g_lowLevelIO.SetBasePath(AKTEXT("soundbanks/Mac/"));
 #endif
     AK::StreamMgr::SetCurrentLanguage(AKTEXT("English(US)"));
-
 #ifndef AK_OPTIMIZED
     // Initialize communications (not in release build!)
     AkCommSettings commSettings;
