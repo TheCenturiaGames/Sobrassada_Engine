@@ -19,7 +19,7 @@ class AIAgentComponent : public Component
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
     void AddToCrowd();
     void RecreateAgent();
-    void setPath(const float3& destination) const;
+    void SetPath(const float3& destination) const;
 
   private:
     float speed  = 0.f;

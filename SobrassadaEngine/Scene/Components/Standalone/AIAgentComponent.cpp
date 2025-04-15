@@ -20,7 +20,6 @@ AIAgentComponent::AIAgentComponent(UID uid, GameObject* parent) : Component(uid,
 AIAgentComponent::AIAgentComponent(const rapidjson::Value& initialState, GameObject* parent)
     : Component(initialState, parent)
 {
-
     if (initialState.HasMember("Speed")) speed = initialState["Speed"].GetFloat();
     if (initialState.HasMember("Radius")) radius = initialState["Radius"].GetFloat();
     if (initialState.HasMember("Height")) height = initialState["Height"].GetFloat();
@@ -54,6 +53,8 @@ void AIAgentComponent::Update(float deltaTime)
         transform.SetTranslatePart(newPos);
         parent->SetLocalTransform(transform); // Change parent position
     }
+
+
 }
 
 void AIAgentComponent::Render(float deltaTime)
@@ -100,8 +101,8 @@ void AIAgentComponent::Save(rapidjson::Value& targetState, rapidjson::Document::
     targetState.AddMember("Height", height, allocator);
 }
 
-// finds closest navmesh walkable trianle.
-void AIAgentComponent::setPath(const float3& destination) const
+// finds closest navmesh walkable triangle.
+void AIAgentComponent::SetPath(const float3& destination) const
 {
 
     if (agentId == -1) return;
