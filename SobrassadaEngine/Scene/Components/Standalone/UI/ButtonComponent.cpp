@@ -201,18 +201,16 @@ void ButtonComponent::OnRelease() const
 
 bool ButtonComponent::IsWithinBounds(const float2& pos) const
 {
-    if (transform2D == nullptr) return false;
+    if (transform2D == nullptr || parentCanvas == nullptr) return false;
 
-    const float2 screenPos = float2(
-        transform2D->GetGlobalPosition().x + (parentCanvas->GetWidth() / 2),
-        transform2D->GetGlobalPosition().y + (parentCanvas->GetHeight() / 2)
-    );
+    // Get the position in button local space
+    const float2 canvasCenter = float2(parentCanvas->GetWidth(), parentCanvas->GetHeight()) * 0.5f;
+    const float2 localPos     = pos - (transform2D->GetCenterPosition() + canvasCenter);
+    const float3 localRotated =
+        parent->GetGlobalTransform().RotatePart().Inverted() * float3(localPos.x, localPos.y, 0.0f);
 
-    if (pos.x < screenPos.x + (transform2D->size.x / 2) && pos.x > screenPos.x - (transform2D->size.x / 2) &&
-        pos.y < screenPos.y + (transform2D->size.y / 2) && pos.y > screenPos.y - (transform2D->size.y / 2))
-        return true;
-
-    else return false;
+    // Check if it is inside the button's AABB in local space
+    return abs(localRotated.x) <= transform2D->size.x * 0.5f && abs(localRotated.y) <= transform2D->size.y * 0.5f;
 }
 
 void ButtonComponent::AddOnClickCallback(Delegate<void>& newDelegate)

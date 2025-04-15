@@ -331,6 +331,11 @@ float2 Transform2DComponent::GetGlobalPosition() const
     return float2(parent->GetGlobalTransform().TranslatePart().x, parent->GetGlobalTransform().TranslatePart().y);
 };
 
+float2 Transform2DComponent::GetCenterPosition() const
+{
+    return float2(GetGlobalPosition().x + (size.x * (0.5f - pivot.x)), GetGlobalPosition().y + (size.y * (0.5f - pivot.y)));
+};
+
 void Transform2DComponent::GetCanvas()
 {
     // Search for a parent canvas iteratively
