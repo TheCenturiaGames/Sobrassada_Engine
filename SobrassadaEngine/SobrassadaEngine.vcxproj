@@ -356,6 +356,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\Audio\AudioListenerComponent.cpp" />
     <ClCompile Include="Libs\Wwise\samples\SoundEngine\Common\AkDefaultLowLevelIODispatcher.cpp" />
     <ClCompile Include="Libs\Wwise\samples\SoundEngine\Common\AkFileLocationBase.cpp" />
     <ClCompile Include="Libs\Wwise\samples\SoundEngine\Common\AkFilePackage.cpp" />
@@ -571,6 +572,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="Scene\Components\Standalone\Audio\AudioListenerComponent.h" />
     <ClInclude Include="Libs\Wwise\samples\SoundEngine\Common\AkDefaultLowLevelIODispatcher.h" />
     <ClInclude Include="Libs\Wwise\samples\SoundEngine\Common\AkFileHelpersBase.h" />
     <ClInclude Include="Libs\Wwise\samples\SoundEngine\Common\AkFileLocationBase.h" />

@@ -510,6 +510,9 @@
     <ClCompile Include="Scene\Components\Standalone\Audio\AudioSourceComponent.cpp">
       <Filter>Scene\Components\Audio</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\Audio\AudioListenerComponent.cpp">
+      <Filter>Scene\Components\Audio</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -996,6 +999,9 @@
       <Filter>External\Wwise</Filter>
     </ClInclude>
     <ClInclude Include="Scene\Components\Standalone\Audio\AudioSourceComponent.h">
+      <Filter>Scene\Components\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\Audio\AudioListenerComponent.h">
       <Filter>Scene\Components\Audio</Filter>
     </ClInclude>
   </ItemGroup>

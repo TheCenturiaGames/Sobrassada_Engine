@@ -3,12 +3,12 @@
 #include "Application.h"
 #include "Component.h"
 
-class AudioSourceComponent : public Component
+class AudioListenerComponent : public Component
 {
   public:
-    AudioSourceComponent(UID uid, GameObject* parent);
-    AudioSourceComponent(const rapidjson::Value& initialState, GameObject* parent);
-    ~AudioSourceComponent() override;
+    AudioListenerComponent(UID uid, GameObject* parent);
+    AudioListenerComponent(const rapidjson::Value& initialState, GameObject* parent);
+    ~AudioListenerComponent() override;
 
     void Init() override;
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;

@@ -58,6 +58,7 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"AI Agent",             COMPONENT_AIAGENT             },
         {"UI Image",             COMPONENT_IMAGE               },
         {"Audio Source",         COMPONENT_AUDIO_SOURCE        },
+        {"Audio Listener",       COMPONENT_AUDIO_LISTENER      },
     };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;

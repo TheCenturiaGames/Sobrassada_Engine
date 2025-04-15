@@ -3,7 +3,10 @@
 #include "CameraComponent.h"
 #include "Component.h"
 #include "ScriptComponent.h"
+#include "Standalone/AIAgentComponent.h"
 #include "Standalone/AnimationComponent.h"
+#include "Standalone/Audio/AudioListenerComponent.h"
+#include "Standalone/Audio/AudioSourceComponent.h"
 #include "Standalone/CharacterControllerComponent.h"
 #include "Standalone/Lights/DirectionalLightComponent.h"
 #include "Standalone/Lights/PointLightComponent.h"
@@ -13,11 +16,9 @@
 #include "Standalone/Physics/CubeColliderComponent.h"
 #include "Standalone/Physics/SphereColliderComponent.h"
 #include "Standalone/UI/CanvasComponent.h"
+#include "Standalone/UI/ImageComponent.h"
 #include "Standalone/UI/Transform2DComponent.h"
 #include "Standalone/UI/UILabelComponent.h"
-#include "Standalone/UI/ImageComponent.h"
-#include "Standalone/AIAgentComponent.h"
-#include "Standalone/Audio/AudioSourceComponent.h"
 #include <cstdint>
 
 Component* ComponentUtils::CreateEmptyComponent(const ComponentType type, const UID uid, GameObject* parent)
@@ -78,6 +79,9 @@ Component* ComponentUtils::CreateEmptyComponent(const ComponentType type, const 
     case COMPONENT_AUDIO_SOURCE:
         generatedComponent = new AudioSourceComponent(uid, parent);
         break;
+    case COMPONENT_AUDIO_LISTENER:
+        generatedComponent = new AudioListenerComponent(uid, parent);
+        break;
     default:
         return nullptr;
     }
@@ -129,6 +133,8 @@ Component* ComponentUtils::CreateExistingComponent(const rapidjson::Value& initi
             return new ImageComponent(initialState, parent);
         case COMPONENT_AUDIO_SOURCE:
             return new AudioSourceComponent(initialState, parent);
+        case COMPONENT_AUDIO_LISTENER:
+            return new AudioListenerComponent(initialState, parent);
         default:
             return nullptr;
         }
