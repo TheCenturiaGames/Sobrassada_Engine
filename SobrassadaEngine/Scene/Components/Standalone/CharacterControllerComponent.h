@@ -27,19 +27,21 @@ class CharacterControllerComponent : public Component
     void HandleInput(float deltaTime);
 
     const float3& GetTargetDirection() const { return targetDirection; }
+    const float3& GetLastPosition() const { return lastPosition; }
     const float& GetSpeed() const { return speed; }
 
     void SetTargetDirection(float3 newTargetDirection) { targetDirection = newTargetDirection; }
     void SetSpeed(float newSpeed) { speed = newSpeed; }
 
   private:
-    float3 targetDirection;
+    float3 targetDirection       = float3::zero;
+    float3 lastPosition          = float3::zero;
 
-    float speed;
-    float maxLinearSpeed;
-    float maxAngularSpeed;
+    float speed                  = 0.0f;
+    float maxLinearSpeed         = 0.0f;
+    float maxAngularSpeed        = 0.0f;
 
-    bool isRadians;
+    bool isRadians               = false;
 
     dtNavMeshQuery* navMeshQuery = nullptr;
     dtPolyRef currentPolyRef     = 0;

@@ -57,12 +57,11 @@ CharacterControllerComponent::CharacterControllerComponent(const rapidjson::Valu
     {
         isRadians = initialState["isRadians"].GetBool();
     }
-
-    App->GetSceneModule()->GetScene()->SetMainCharacter(this);
 }
 
 CharacterControllerComponent::~CharacterControllerComponent()
 {
+    App->GetSceneModule()->GetScene()->SetMainCharacter(nullptr);
 }
 
 void CharacterControllerComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator)
@@ -101,7 +100,9 @@ void CharacterControllerComponent::Clone(const Component* other)
 void CharacterControllerComponent::Update(float deltaTime)
 {
     if (!IsEffectivelyEnabled()) return;
-    if (!enabled) return;
+
+    if (App->GetSceneModule()->GetScene()->GetMainCharacter() == nullptr)
+        App->GetSceneModule()->GetScene()->SetMainCharacter(this);
 
     if (!App->GetSceneModule()->GetInPlayMode()) return;
 
@@ -153,6 +154,8 @@ void CharacterControllerComponent::Update(float deltaTime)
     currentPos.y      += (verticalSpeed * deltaTime);
 
     AdjustHeightToNavMesh(currentPos);
+
+    lastPosition = currentPos;
 
     globalTr.SetTranslatePart(currentPos);
     float4x4 finalLocal = parent->GetParentGlobalTransform().Transposed() * globalTr;

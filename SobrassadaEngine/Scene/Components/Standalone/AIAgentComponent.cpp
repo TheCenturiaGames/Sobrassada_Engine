@@ -5,14 +5,15 @@
 #include "PathfinderModule.h"
 #include "ResourceNavmesh.h"
 #include "SceneModule.h"
+#include "Standalone/CharacterControllerComponent.h"
 
 #include "DetourCrowd.h"
 
 AIAgentComponent::AIAgentComponent(UID uid, GameObject* parent) : Component(uid, parent, "AI Agent", COMPONENT_AIAGENT)
 {
-    speed   = 3.5f;
-    radius  = 0.6f;
-    height  = 2.0f;
+    speed  = 3.5f;
+    radius = 0.6f;
+    height = 2.0f;
 
     RecreateAgent();
 }
@@ -54,7 +55,7 @@ void AIAgentComponent::Update(float deltaTime)
         parent->SetLocalTransform(transform); // Change parent position
     }
 
-
+    SetPath(App->GetSceneModule()->GetScene()->GetMainCharacter()->GetLastPosition());
 }
 
 void AIAgentComponent::Render(float deltaTime)
