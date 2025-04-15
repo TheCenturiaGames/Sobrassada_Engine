@@ -4,6 +4,7 @@
 
 class GeometryBatch;
 class MeshComponent;
+class CameraComponent;
 
 class BatchManager
 {
@@ -15,7 +16,7 @@ class BatchManager
     void RemoveBatch(GeometryBatch* batch);
 
     void LoadData();
-    void Render(const std::vector<MeshComponent*>& meshesToRender);
+    void Render(const std::vector<MeshComponent*>& meshesToRender, CameraComponent* camera);
 
     GeometryBatch* RequestBatch(const MeshComponent* mesh);
 

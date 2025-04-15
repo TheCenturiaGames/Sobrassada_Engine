@@ -46,7 +46,8 @@ class Scene
     update_status RenderEditor(float deltaTime);
 
     void RenderEditorControl(bool& editorControlMenu);
-    void RenderScene();
+    void RenderScene(float deltaTime, CameraComponent* camera);
+    void RenderSceneToFrameBuffer();
     void RenderSelectedGameObjectUI();
     void RenderHierarchyUI(bool& hierarchyMenu);
 
@@ -105,7 +106,7 @@ class Scene
   private:
     void CreateStaticSpatialDataStruct();
     void CreateDynamicSpatialDataStruct();
-    void CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects) const;
+    void CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects, CameraComponent* camera) const;
 
   private:
     std::string sceneName;
