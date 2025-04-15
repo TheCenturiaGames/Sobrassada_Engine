@@ -411,10 +411,6 @@ void GameObject::OnTransformUpdated()
     globalOBB                    = globalTransform * OBB(localAABB);
     globalAABB                   = AABB(globalOBB);
 
-    position                     = globalTransform.TranslatePart();
-    rotation                     = globalTransform.RotatePart().ToEulerXYZ();
-    scale                        = globalTransform.GetScale();
-
     MeshComponent* meshComponent = GetMeshComponent();
     if (meshComponent != nullptr)
     {

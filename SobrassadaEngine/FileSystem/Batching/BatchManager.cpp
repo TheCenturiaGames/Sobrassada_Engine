@@ -57,20 +57,23 @@ void BatchManager::LoadData()
         it->LoadData();
 }
 
-void BatchManager::Render(const std::vector<MeshComponent*>& meshesToRender)
+void BatchManager::Render(const std::vector<MeshComponent*>& meshesToRender, CameraComponent* camera)
 {
 #ifdef OPTICK
     OPTICK_CATEGORY("BatchManager::Render", Optick::Category::Rendering)
 #endif
-    unsigned int cameraUBO = App->GetCameraModule()->GetUbo();
 
-    if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
-        cameraUBO = App->GetSceneModule()->GetScene()->GetMainCamera()->GetUbo();
-
+    unsigned int cameraUBO;
     float3 cameraPos;
-    if (App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr && App->GetSceneModule()->GetInPlayMode())
-        cameraPos = App->GetSceneModule()->GetScene()->GetMainCamera()->GetCameraPosition();
-    else cameraPos = App->GetCameraModule()->GetCameraPosition();
+    if (camera == nullptr)
+    {
+        cameraUBO = App->GetCameraModule()->GetUbo();
+        cameraPos = App->GetCameraModule()->GetCameraPosition();
+    }
+    else  {
+        cameraUBO = camera->GetUbo();
+        cameraPos = camera->GetCameraPosition();
+    }
 
     for (GeometryBatch* it : batches)
     {
