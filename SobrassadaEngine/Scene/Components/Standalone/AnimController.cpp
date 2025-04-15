@@ -128,14 +128,19 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
         
         float3 targetAnimPos = float3(pos);
         Quat targetAnimQuat = Quat(rot);
-        GetChannelPosition(animChannel, targetAnimPos);
-        GetChannelRotation(animChannel, targetAnimQuat);
+        GetChannelPosition(targetAnimChannel, targetAnimPos);
+        GetChannelRotation(targetAnimChannel, targetAnimQuat);
 
        /* if (nodeName == "Hat2")
         {
 
             targetAnimPos += float3(0, 3, 0);
         }*/
+
+        GLOG(
+            "Blending node [%s]: animPos = (%.2f, %.2f, %.2f), targetAnimPos = (%.2f, %.2f, %.2f), weight = %.2f",
+            nodeName.c_str(), animPos.x, animPos.y, animPos.z, targetAnimPos.x, targetAnimPos.y, targetAnimPos.z, weight
+        );
 
         pos = animPos.Lerp(targetAnimPos, weight);
         rot = Quat::Slerp(animQuat, targetAnimQuat, weight);
@@ -148,6 +153,7 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
 void AnimController::SetTargetAnimationResource(UID uid, float timeTransition)
 {
     targetAnimation = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(uid));
+    GLOG("nAME: %s", targetAnimation->GetName().c_str());
     transitionTime  = timeTransition;
 }
 
