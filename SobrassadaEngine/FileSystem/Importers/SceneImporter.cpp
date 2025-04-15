@@ -45,18 +45,20 @@ namespace SceneImporter
         
         for (const tinygltf::Node& srcNode : model.nodes)
         {
-            int n = 0;
             int matIndex = -1;
-            std::vector<std::pair<UID, UID>> primitives;
 
             if (srcNode.mesh >= 0 && srcNode.mesh < model.meshes.size())
             {
+                std::vector<std::pair<UID, UID>> primitives;
+                
                 const tinygltf::Mesh& srcMesh = model.meshes[srcNode.mesh];
                 const float4x4& defaultTransform = MeshImporter::GetNodeTransform(srcNode);
+                int primitiveCounter = 0;
 
                 for (const auto& primitive : srcMesh.primitives)
                 {
                     std::string name = srcNode.name + "_" + srcMesh.name;
+                    if (primitiveCounter > 0) name += "_" + std::to_string(primitiveCounter);
 
                     UID matUID   = INVALID_UID;
                     matIndex = primitive.material;
@@ -76,7 +78,7 @@ namespace SceneImporter
                 
                     const UID meshUID      = MeshImporter::ImportMesh(model, srcMesh, primitive, name, defaultTransform,
                         filePath, targetFilePath, INVALID_UID, matUID);
-                    n++;
+                    primitiveCounter++;
                 
                     primitives.emplace_back(meshUID, matUID);
                     GLOG("New primitive with mesh UID: %d and Material UID: %d", meshUID, matUID);
