@@ -82,8 +82,6 @@ Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUI
     }
 
     GLOG("%s scene loaded", sceneName.c_str());
-
-    App->GetResourcesModule()->GetBatchManager()->LoadData();
 }
 
 Scene::~Scene()
@@ -114,8 +112,7 @@ void Scene::Init()
     {
         gameObject.second->Init();
     }
-
-    GetGameObjectByUID(gameObjectRootUID)->UpdateTransformForGOBranch();
+    App->GetResourcesModule()->GetBatchManager()->LoadData();
 
     // When loading a scene, overrides all gameObjects that have a prefabUID. That is because if the prefab has been
     // modified, the scene file may have not, so the prefabs need to be updated when loading the scene again
@@ -128,6 +125,7 @@ void Scene::Init()
         std::vector<UID>::iterator it = std::find(prefabs.begin(), prefabs.end(), gameObject.second->GetPrefabUID());
         if (it == prefabs.end()) prefabs.emplace_back(gameObject.second->GetPrefabUID());
     }
+
     for (const UID prefab : prefabs)
     {
         OverridePrefabs(prefab);
@@ -142,6 +140,9 @@ void Scene::Init()
 
     lightsConfig->InitSkybox();
     lightsConfig->InitLightBuffers();
+
+    // Call this after overriding the prefabs to avoid duplicates in gameObjectsToUpdate
+    GetGameObjectByUID(gameObjectRootUID)->UpdateTransformForGOBranch();
 
     UpdateStaticSpatialStructure();
     UpdateDynamicSpatialStructure();
@@ -606,7 +607,9 @@ void Scene::RenderHierarchyUI(bool& hierarchyMenu)
 void Scene::RemoveGameObjectHierarchy(UID gameObjectUID)
 {
     // TODO: Change when filesystem defined
-    if (!gameObjectsContainer.count(gameObjectUID) || gameObjectUID == gameObjectRootUID || gameObjectUID == multiSelectParent->GetUID()) return;
+    if (!gameObjectsContainer.count(gameObjectUID) || gameObjectUID == gameObjectRootUID ||
+        (multiSelectParent && gameObjectUID == multiSelectParent->GetUID()))
+        return;
 
     std::stack<UID> toDelete;
     toDelete.push(gameObjectUID);

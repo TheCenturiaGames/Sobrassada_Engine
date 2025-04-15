@@ -47,7 +47,8 @@ GameObject::GameObject(UID parentUID, const std::string& name, UID uid) : parent
 }
 
 GameObject::GameObject(UID parentUID, GameObject* refObject)
-    : parentUID(parentUID), name(refObject->name), localTransform(refObject->localTransform)
+    : parentUID(parentUID), name(refObject->name), localTransform(refObject->localTransform),
+      globalTransform(refObject->globalTransform)
 {
     uid       = GenerateUID();
 
@@ -145,8 +146,10 @@ GameObject::~GameObject()
     components.clear();
 }
 
-void GameObject::Init() const
+void GameObject::Init()
 {
+    globalTransform = GetParentGlobalTransform() * localTransform;
+
     for (auto& component : components)
     {
         component.second->Init();

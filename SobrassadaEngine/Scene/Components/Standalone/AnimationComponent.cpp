@@ -305,7 +305,7 @@ void AnimationComponent::Clone(const Component* other)
     {
         const AnimationComponent* otherAnimation = static_cast<const AnimationComponent*>(other);
 
-        AddAnimation(otherAnimation->currentAnimResource->GetUID());
+        if (otherAnimation->currentAnimResource) AddAnimation(otherAnimation->currentAnimResource->GetUID());
     }
     else
     {
