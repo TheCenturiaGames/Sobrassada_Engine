@@ -101,6 +101,23 @@ void CubeColliderComponent::Save(rapidjson::Value& targetState, rapidjson::Docum
 
 void CubeColliderComponent::Clone(const Component* other)
 {
+    if (other->GetType() == COMPONENT_CUBE_COLLIDER)
+    {
+        const CubeColliderComponent* cube = static_cast<const CubeColliderComponent*>(other);
+
+        generateCallback                  = cube->generateCallback;
+        freezeRotation                    = cube->freezeRotation;
+        fitToSize                         = cube->fitToSize;
+        mass                              = cube->mass;
+        centerOffset                      = cube->centerOffset;
+        centerRotation                    = cube->centerRotation;
+        size                              = cube->size;
+        colliderType                      = cube->colliderType;
+        layer                             = cube->layer;
+
+        if (rigidBody) App->GetPhysicsModule()->UpdateCubeRigidBody(this);
+        else App->GetPhysicsModule()->CreateCubeRigidBody(this);
+    }
 }
 
 void CubeColliderComponent::RenderEditorInspector()

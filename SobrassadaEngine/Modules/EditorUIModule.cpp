@@ -832,6 +832,19 @@ bool EditorUIModule::RenderTransformWidget(
     std::string transformName = std::string(transformType == GizmoTransform::LOCAL ? "Local " : "World ") + "Transform";
     ImGui::SeparatorText(transformName.c_str());
 
+    if (transformType == GizmoTransform::LOCAL && !pos.Equals(localTransform.TranslatePart()))
+    {
+        pos   = localTransform.TranslatePart();
+        rot   = localTransform.RotatePart().ToEulerXYZ();
+        scale = localTransform.GetScale();
+    }
+    else if (transformType == GizmoTransform::WORLD && !pos.Equals(globalTransform.TranslatePart()))
+    {
+        pos   = globalTransform.TranslatePart();
+        rot   = globalTransform.RotatePart().ToEulerXYZ();
+        scale = globalTransform.GetScale();
+    }
+
     RenderBasicTransformModifiers(
         pos, rot, scale, lockScaleAxis, positionValueChanged, rotationValueChanged, scaleValueChanged
     );
@@ -970,6 +983,7 @@ T EditorUIModule::RenderResourceSelectDialog(
                         if (ImGui::Selectable(valuePair.first.c_str(), false))
                         {
                             result = valuePair.second;
+                            memset(searchTextResource, 0, sizeof searchTextResource);
                             ImGui::CloseCurrentPopup();
                         }
                     }

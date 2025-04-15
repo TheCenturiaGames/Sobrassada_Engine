@@ -54,8 +54,15 @@ GameObject::GameObject(UID parentUID, GameObject* refObject)
     localAABB = AABB();
     localAABB.SetNegativeInfinity();
 
-    globalOBB  = OBB(localAABB);
-    globalAABB = AABB(globalOBB);
+    globalOBB        = OBB(localAABB);
+    globalAABB       = AABB(globalOBB);
+    isTopParent      = refObject->isTopParent;
+    mobilitySettings = refObject->mobilitySettings;
+
+    position         = refObject->position;
+    rotation         = refObject->rotation;
+    scale            = refObject->scale;
+    prefabUID        = refObject->prefabUID;
 
     // Must make a copy of each manually
     for (const auto& component : refObject->components)
@@ -418,10 +425,6 @@ void GameObject::OnTransformUpdated()
     globalTransform              = GetParentGlobalTransform() * localTransform;
     globalOBB                    = globalTransform * OBB(localAABB);
     globalAABB                   = AABB(globalOBB);
-
-    position                     = globalTransform.TranslatePart();
-    rotation                     = globalTransform.RotatePart().ToEulerXYZ();
-    scale                        = globalTransform.GetScale();
 
     MeshComponent* meshComponent = GetMeshComponent();
     if (meshComponent != nullptr)
@@ -855,6 +858,9 @@ void GameObject::UpdateMobilityHierarchy(MobilitySettings type)
             if (currentGameObject->GetParent() != sceneRootUID) toVisitGameObjects.push(currentGameObject->GetParent());
         }
     }
+
+    App->GetSceneModule()->GetScene()->SetStaticModified();
+    App->GetSceneModule()->GetScene()->SetDynamicModified();
 }
 
 bool GameObject::CreateComponent(const ComponentType componentType)

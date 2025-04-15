@@ -34,11 +34,10 @@ class AnimationComponent : public Component
     UID GetAnimationResource() const { GLOG("Resource AnimUID  is: %d", resource) return resource; }
     ResourceAnimation* GetCurrentAnimation() const { return currentAnimResource; }
     AnimController* GetAnimationController() { return animController; }
-    std::unordered_map<std::string, GameObject*> GetBoneMapping() const { return boneMapping; }
+    const std::unordered_map<std::string, GameObject*>& GetBoneMapping() const { return boneMapping; }
 
     void SetAnimationResource(UID animResource);
 
-  private:
     void SetBoneMapping();
 
   private:
