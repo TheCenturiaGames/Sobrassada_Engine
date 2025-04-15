@@ -5,10 +5,14 @@
 #include "DebugDrawModule.h"
 #include "GameObject.h"
 #include "GameUIModule.h"
+#include "ImageComponent.h"
 #include "SceneModule.h"
+#include "ShaderModule.h"
 #include "Transform2DComponent.h"
+#include "UILabelComponent.h"
 #include "WindowModule.h"
 
+#include "glew.h"
 #include "imgui.h"
 #include <queue>
 
@@ -111,9 +115,28 @@ void CanvasComponent::Render(float deltaTime)
         ),
         -float3::unitY, height, float3(1, 1, 1)
     );
+}
 
-    // Render all ui widgets
+void CanvasComponent::RenderUI()
+{
+    const int uiProgram = App->GetShaderModule()->GetUIWidgetProgram();
+    if (uiProgram == -1)
+    {
+        GLOG("Error with UI Program");
+        return;
+    }
+    glUseProgram(uiProgram);
 
+    // Get the view and projection matrix (world space or screen space)
+    const float4x4& view = isInWorldSpaceEditor ? App->GetCameraModule()->GetViewMatrix() : float4x4::identity;
+    const float4x4& proj = isInWorldSpaceEditor ? App->GetCameraModule()->GetProjectionMatrix()
+                                                : float4x4::D3DOrthoProjLH(
+                                                      -1, 1, (float)App->GetWindowModule()->GetWidth(),
+                                                      (float)App->GetWindowModule()->GetHeight()
+                                                  );
+
+    // Get all children iteratively. This way, if the children of the canvas are modified they will be properly sorted
+    // when rendering
     std::queue<UID> children;
 
     for (const UID child : parent->GetChildren())
@@ -125,8 +148,16 @@ void CanvasComponent::Render(float deltaTime)
     {
         const GameObject* currentObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(children.front());
 
-        // Only render 2d objects (defined by having the transform 2D component)
-        if (currentObject->GetComponentByType(COMPONENT_TRANSFORM_2D) != nullptr) currentObject->Render(deltaTime);
+        // Only render UI components
+        Component* uiWidget             = currentObject->GetComponentByType(COMPONENT_TRANSFORM_2D);
+        if (uiWidget) static_cast<const Transform2DComponent*>(uiWidget)->RenderWidgets();
+
+        uiWidget = currentObject->GetComponentByType(COMPONENT_LABEL);
+        if (uiWidget) static_cast<const UILabelComponent*>(uiWidget)->RenderUI(view, proj);
+
+        uiWidget = currentObject->GetComponentByType(COMPONENT_IMAGE);
+        if (uiWidget) static_cast<const ImageComponent*>(uiWidget)->RenderUI(view, proj);
+
         children.pop();
 
         for (const UID child : currentObject->GetChildren())

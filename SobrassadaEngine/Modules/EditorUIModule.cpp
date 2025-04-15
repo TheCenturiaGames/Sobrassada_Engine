@@ -55,7 +55,8 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"Sphere Collider",      COMPONENT_SPHERE_COLLIDER     },
         {"Capsule Collider",     COMPONENT_CAPSULE_COLLIDER    },
         {"Script",               COMPONENT_SCRIPT              },
-        {"AI Agent",             COMPONENT_AIAGENT             }
+        {"AI Agent",             COMPONENT_AIAGENT             },
+        {"UI Image",             COMPONENT_IMAGE               }
     };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;
@@ -831,6 +832,19 @@ bool EditorUIModule::RenderTransformWidget(
     std::string transformName = std::string(transformType == GizmoTransform::LOCAL ? "Local " : "World ") + "Transform";
     ImGui::SeparatorText(transformName.c_str());
 
+    if (transformType == GizmoTransform::LOCAL && !pos.Equals(localTransform.TranslatePart()))
+    {
+        pos   = localTransform.TranslatePart();
+        rot   = localTransform.RotatePart().ToEulerXYZ();
+        scale = localTransform.GetScale();
+    }
+    else if (transformType == GizmoTransform::WORLD && !pos.Equals(globalTransform.TranslatePart()))
+    {
+        pos   = globalTransform.TranslatePart();
+        rot   = globalTransform.RotatePart().ToEulerXYZ();
+        scale = globalTransform.GetScale();
+    }
+
     RenderBasicTransformModifiers(
         pos, rot, scale, lockScaleAxis, positionValueChanged, rotationValueChanged, scaleValueChanged
     );
@@ -1020,10 +1034,11 @@ void EditorUIModule::About(bool& aboutMenu)
     ImGui::Text(" - Geometry loader: TinyGLTF v2.9.3");
     ImGui::Text(" - Math: MathGeoLib v1.5");
     ImGui::Text(" - JSON: rapidjson v1.1");
-    ImGui::Text(" - UI: FreeType: v2.13.3");
-    ImGui::Text(" - RecastNavigation: v1.6.0");
-    ImGui::Text(" - ImNodeFlow: v1.2.2");
-    ImGui::Text(" - Bullet: v3.25");
+    ImGui::Text(" - UI: FreeType v2.13.3");
+    ImGui::Text(" - NavMesh: RecastNavigation v1.6.0");
+    ImGui::Text(" - StateMachine: ImNodeFlow v1.2.2");
+    ImGui::Text(" - Physics: Bullet v3.25");
+    ImGui::Text(" - Audio: Wwise v2024.1.3.8749");
     ImGui::Text("%s is licensed under the MIT License, see LICENSE for more information.", ENGINE_NAME);
 
     ImGui::Checkbox("Config/Build Information", &showConfigInfo);

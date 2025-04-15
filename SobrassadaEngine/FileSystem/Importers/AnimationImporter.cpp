@@ -95,7 +95,7 @@ namespace AnimationImporter
         }
 
         // Handle UID
-        const std::string fileName = FileSystem::GetFileNameWithoutExtension(sourceFilePath);
+        const std::string fileName = FileSystem::GetFileNameWithoutExtension(sourceFilePath) + "_" + animation.name;
         UID finalAnimUID;
         if (sourceUID == INVALID_UID)
         {
@@ -128,12 +128,12 @@ namespace AnimationImporter
             return 0;
         }
 
-      
+        
         App->GetLibraryModule()->AddAnimation(finalAnimUID, fileName);
         App->GetLibraryModule()->AddName(fileName, finalAnimUID);
         App->GetLibraryModule()->AddResource(saveFilePath, finalAnimUID);
 
-        GLOG("%s saved as binary", FileSystem::GetFileNameWithoutExtension(sourceFilePath).c_str());
+        GLOG("%s saved as binary",  fileName.c_str());
 
         return finalAnimUID;
     }

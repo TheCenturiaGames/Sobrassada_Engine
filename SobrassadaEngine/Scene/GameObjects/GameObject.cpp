@@ -6,8 +6,8 @@
 #include "EditorUIModule.h"
 #include "PrefabManager.h"
 #include "SceneModule.h"
-#include "Standalone/MeshComponent.h"
 #include "Standalone/AnimationComponent.h"
+#include "Standalone/MeshComponent.h"
 #include "Standalone/UI/Transform2DComponent.h"
 
 #include "imgui.h"
@@ -55,8 +55,15 @@ GameObject::GameObject(UID parentUID, GameObject* refObject)
     localAABB = AABB();
     localAABB.SetNegativeInfinity();
 
-    globalOBB  = OBB(localAABB);
-    globalAABB = AABB(globalOBB);
+    globalOBB        = OBB(localAABB);
+    globalAABB       = AABB(globalOBB);
+    isTopParent      = refObject->isTopParent;
+    mobilitySettings = refObject->mobilitySettings;
+
+    position         = refObject->position;
+    rotation         = refObject->rotation;
+    scale            = refObject->scale;
+    prefabUID        = refObject->prefabUID;
 
     // Must make a copy of each manually
     for (const auto& component : refObject->components)
@@ -255,8 +262,7 @@ void GameObject::RenderEditorInspector()
 
         const float4x4& parentTransform = GetParentGlobalTransform();
 
-        if (selectedComponentIndex != COMPONENT_NONE &&
-            !(GetComponentByType(COMPONENT_CANVAS) && selectedComponentIndex == COMPONENT_TRANSFORM_2D))
+        if (selectedComponentIndex != COMPONENT_NONE)
         {
             ImGui::SameLine();
             if (ImGui::Button("Remove Component"))
@@ -414,10 +420,6 @@ void GameObject::OnTransformUpdated()
     globalTransform              = GetParentGlobalTransform() * localTransform;
     globalOBB                    = globalTransform * OBB(localAABB);
     globalAABB                   = AABB(globalOBB);
-
-    position                     = globalTransform.TranslatePart();
-    rotation                     = globalTransform.RotatePart().ToEulerXYZ();
-    scale                        = globalTransform.GetScale();
 
     MeshComponent* meshComponent = GetMeshComponent();
     if (meshComponent != nullptr)
@@ -687,6 +689,9 @@ void GameObject::UpdateGameObjectHierarchy(UID sourceUID)
         UID oldParentUID = sourceGameObject->GetParent();
         sourceGameObject->SetParent(uid);
 
+        Component* transform2D = sourceGameObject->GetComponentByType(COMPONENT_TRANSFORM_2D);
+        if (transform2D) static_cast<Transform2DComponent*>(transform2D)->OnParentChange();
+
         GameObject* oldParentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(oldParentUID);
 
         if (oldParentGameObject)
@@ -835,6 +840,9 @@ void GameObject::UpdateMobilityHierarchy(MobilitySettings type)
             if (currentGameObject->GetParent() != sceneRootUID) toVisitGameObjects.push(currentGameObject->GetParent());
         }
     }
+
+    App->GetSceneModule()->GetScene()->SetStaticModified();
+    App->GetSceneModule()->GetScene()->SetDynamicModified();
 }
 
 bool GameObject::CreateComponent(const ComponentType componentType)

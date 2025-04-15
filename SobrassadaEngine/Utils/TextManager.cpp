@@ -142,8 +142,8 @@ namespace TextManager
                                          xPos + width, yPos + height, 1.0f,         0.0f, xPos, yPos + height,
                                          0.0f,         0.0f,          xPos + width, yPos, 1.0f, 1.0f};
 
-            GLuint lower = static_cast<GLuint>(character.bindlessUID & 0xFFFFFFFF);
-            GLuint higher = static_cast<GLuint>(character.bindlessUID >> 32);
+            const GLuint lower = static_cast<GLuint>(character.bindlessUID & 0xFFFFFFFF);
+            const GLuint higher = static_cast<GLuint>(character.bindlessUID >> 32);
             glUniform2ui(4, lower, higher);
             glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
             App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 6);
