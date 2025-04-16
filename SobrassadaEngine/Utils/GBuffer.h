@@ -23,11 +23,11 @@ class GBuffer
 
     unsigned int gBufferObject   = 0;
 
-    unsigned int positionTexture = 0;
-    unsigned int normalTexture   = 0;
     unsigned int diffuseTexture  = 0;
     unsigned int specularTexture = 0;
+    unsigned int positionTexture = 0;
+    unsigned int normalTexture   = 0;
     unsigned int depthTexture    = 0;
 
-    std::vector<unsigned int> colorAttachments;
+    unsigned int colorAttachments[4] = {};
 };
