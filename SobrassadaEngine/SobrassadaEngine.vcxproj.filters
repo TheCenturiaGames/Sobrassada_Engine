@@ -519,7 +519,9 @@
     <ClCompile Include="Libs\Wwise\samples\SoundEngine\IO\stdafx.cpp">
       <Filter>External\Wwise</Filter>
     </ClCompile>
-    <ClCompile Include="FileSystem\Meta\MetaNavmesh.cpp" />
+    <ClCompile Include="FileSystem\Meta\MetaNavmesh.cpp">
+	  <Filter>FileSystem\Meta</Filter>
+	</ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -1005,7 +1007,9 @@
     <ClInclude Include="Libs\Wwise\samples\SoundEngine\IO\stdafx.h">
       <Filter>External\Wwise</Filter>
     </ClInclude>
-    <ClInclude Include="FileSystem\Meta\MetaNavmesh.h" />
+    <ClInclude Include="FileSystem\Meta\MetaNavmesh.h">
+	<Filter>FileSystem\Meta</Filter>
+	</ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl">

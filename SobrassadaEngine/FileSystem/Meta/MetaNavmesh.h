@@ -2,7 +2,7 @@
 
 #include "MetaFile.h"
 
-class MetaModel : public MetaFile
+class MetaNavmesh : public MetaFile
 {
   public:
     MetaNavmesh(UID uid, const std::string& assetPath);
