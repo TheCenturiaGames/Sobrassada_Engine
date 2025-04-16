@@ -16,6 +16,9 @@ class GBuffer
   private:
     void InitializeGBuffer();
 
+  public:
+    unsigned int colorAttachments[4] = {};
+
   private:
     bool shouldResize            = false;
     int screenHeight             = 0;
@@ -28,6 +31,4 @@ class GBuffer
     unsigned int positionTexture = 0;
     unsigned int normalTexture   = 0;
     unsigned int depthTexture    = 0;
-
-    unsigned int colorAttachments[4] = {};
 };

@@ -3,6 +3,7 @@
 #include "Module.h"
 
 class Framebuffer;
+class GBuffer;
 typedef unsigned int GLenum;
 typedef int GLsizei;
 typedef int GLint;
@@ -31,6 +32,7 @@ class OpenGLModule : public Module
     float GetClearGreen() const { return clearColorGreen; }
     float GetClearBlue() const { return clearColorBlue; }
     Framebuffer* GetFramebuffer() const { return framebuffer; }
+    GBuffer* GetGBuffer() const { return gBuffer; }
     int GetDrawCallsCount() const { return drawCallsCount; }
     float GetTrianglesPerSecond() const { return trianglesPerSecond; }
     int GetVerticesCount() const { return verticesCount; }
@@ -47,6 +49,7 @@ class OpenGLModule : public Module
   private:
     void* context            = nullptr;
     Framebuffer* framebuffer = nullptr;
+    GBuffer* gBuffer         = nullptr;
     float clearColorRed      = DEFAULT_GL_CLEAR_COLOR_RED;
     float clearColorGreen    = DEFAULT_GL_CLEAR_COLOR_GREEN;
     float clearColorBlue     = DEFAULT_GL_CLEAR_COLOR_BLUE;

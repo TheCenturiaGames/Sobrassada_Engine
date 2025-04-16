@@ -21,6 +21,8 @@ bool ShaderModule::Init()
     metallicRoughnessProgramUnlit  = CreateShaderProgram(LIGHTS_VERTEX_SHADER_PATH, UNLIT_FRAGMENT_SHADER_PATH);
 
     uiWidgetProgram                = CreateShaderProgram(UIWIDGET_VERTEX_SHADER_PATH, UIWIDGET_FRAGMENT_SHADER_PATH);
+
+    gBufferProgram                 = CreateShaderProgram(LIGHTS_VERTEX_SHADER_PATH, GBUFFER_FRAGMENT_SHADER_PATH);
     return true;
 }
 
@@ -153,4 +155,10 @@ int ShaderModule::GetMetallicRoughnessProgram() const
     return App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_LIGTHS)
              ? metallicRoughnessProgram
              : metallicRoughnessProgramUnlit;
+}
+
+int ShaderModule::GetGBufferProgram() const
+{
+    return App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_LIGTHS) ? gBufferProgram
+                                                                                            : gBufferProgram;
 }

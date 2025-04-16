@@ -72,9 +72,9 @@ constexpr const char* FILENAME_SEPARATOR              = "_";
 constexpr const char* DEFAULT_SCENE_NAME              = "New Scene";
 constexpr const char* DEFAULT_NODE_NAME               = "Unnamed Node";
 
-constexpr float DEFAULT_GL_CLEAR_COLOR_RED            = 0.5f;
-constexpr float DEFAULT_GL_CLEAR_COLOR_GREEN          = 0.5f;
-constexpr float DEFAULT_GL_CLEAR_COLOR_BLUE           = 0.5f;
+constexpr float DEFAULT_GL_CLEAR_COLOR_RED            = 0.f;
+constexpr float DEFAULT_GL_CLEAR_COLOR_GREEN          = 0.f;
+constexpr float DEFAULT_GL_CLEAR_COLOR_BLUE           = 0.f;
 
 constexpr float DEFAULT_CAMERA_MOVEMENT_SCALE_FACTOR  = 1.f;
 constexpr float DEFAULT_CAMERA_MOVEMENT_SPEED         = 7.5f;
@@ -143,6 +143,7 @@ constexpr const char* UIWIDGET_FRAGMENT_SHADER_PATH   = "./EngineDefaults/Shader
 constexpr const char* IRRADIANCE_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader/Fragment/IrradianceCubemapFragment.glsl";
 constexpr const char* PREFILTERED_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader/Fragment/PreFilteredEnvironmentFragment.glsl";
 constexpr const char* ENVIRONMENTBRDF_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader/Fragment/EnvironmentBRDFFragment.glsl";
+constexpr const char* GBUFFER_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader/Fragment/gBufferFragment.glsl";
 
 using UID                                             = uint64_t;
 

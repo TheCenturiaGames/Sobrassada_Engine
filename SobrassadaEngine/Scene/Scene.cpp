@@ -9,6 +9,7 @@
 #include "DebugDrawModule.h"
 #include "EditorUIModule.h"
 #include "Framebuffer.h"
+#include "GBuffer.h"
 #include "GameObject.h"
 #include "GameTimer.h"
 #include "GeometryBatch.h"
@@ -265,6 +266,9 @@ update_status Scene::Render(float deltaTime)
 
 void Scene::RenderScene(float deltaTime, CameraComponent* camera)
 {
+    GBuffer* gbuffer         = App->GetOpenGLModule()->GetGBuffer();
+    Framebuffer* framebuffer = App->GetOpenGLModule()->GetFramebuffer();
+
     if (!App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_WIREFRAME))
     {
         float4x4 projection;
@@ -288,6 +292,7 @@ void Scene::RenderScene(float deltaTime, CameraComponent* camera)
         }
     }
 
+    gbuffer->Bind();
     lightsConfig->SetLightsShaderData();
 
     std::vector<GameObject*> objectsToRender;
@@ -309,6 +314,9 @@ void Scene::RenderScene(float deltaTime, CameraComponent* camera)
         batchManager->Render(meshesToRender, camera);
     }
 
+    gbuffer->Unbind();
+
+    framebuffer->Bind();
     {
 #ifdef OPTICK
         OPTICK_CATEGORY("Scene::GameObject::Render", Optick::Category::Rendering)
@@ -343,6 +351,7 @@ void Scene::RenderScene(float deltaTime, CameraComponent* camera)
         for (int i = 0; i < 12; ++i)
             debugDraw->DrawLineSegment(aabb.Edge(i), float3(1.f, 1.0f, 0.5f));
     }
+
 }
 
 update_status Scene::RenderEditor(float deltaTime)
@@ -543,6 +552,7 @@ void Scene::RenderSceneToFrameBuffer()
         }
         else App->GetCameraModule()->SetAspectRatio(aspectRatio);
         framebuffer->Resize((int)windowSize.x, (int)windowSize.y);
+        App->GetOpenGLModule()->GetGBuffer()->Resize((int)windowSize.x, (int)windowSize.y);
     }
 
     ImVec2 windowPosition     = ImGui::GetWindowPos();
@@ -752,7 +762,7 @@ void Scene::ClearObjectSelection()
     // UPDATE TO LET ORIGINAL GAME OBJECTS WITH THEIR ORIGINAL MOBILITY
     for (auto& pairGameObject : selectedGameObjectsMobility)
     {
-        GameObject* currentGameObject        = GetGameObjectByUID(pairGameObject.first);
+        GameObject* currentGameObject = GetGameObjectByUID(pairGameObject.first);
         currentGameObject->UpdateMobilityHierarchy(pairGameObject.second);
     }
 

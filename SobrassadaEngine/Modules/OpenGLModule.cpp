@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "Framebuffer.h"
+#include "GBuffer.h"
 #include "WindowModule.h"
 
 #include "glew.h"
@@ -43,6 +44,7 @@ bool OpenGLModule::Init()
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // Enable seamless cubemap 
 
     framebuffer = new Framebuffer(App->GetWindowModule()->GetWidth(), App->GetWindowModule()->GetHeight(), true);
+    gBuffer     = new GBuffer(App->GetWindowModule()->GetWidth(), App->GetWindowModule()->GetHeight());
 
     WindowModule* windowModule = App->GetWindowModule();
     windowModule->SetVsync(windowModule->GetVsync());
@@ -88,6 +90,7 @@ update_status OpenGLModule::PostUpdate(float deltaTime)
 {
 #ifndef GAME
     framebuffer->CheckResize();
+    gBuffer->CheckResize();
 #endif
 
     SDL_GL_SwapWindow(App->GetWindowModule()->window);

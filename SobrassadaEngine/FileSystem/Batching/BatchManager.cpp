@@ -94,15 +94,18 @@ void BatchManager::Render(const std::vector<MeshComponent*>& meshesToRender, Cam
 
         const auto start           = std::chrono::high_resolution_clock::now();
 
-        glUseProgram(program);
+        // TODO REMOVE JUST TEST FOR GBUFFER
+        unsigned int program2        = App->GetShaderModule()->GetGBufferProgram();
+        glUseProgram(program2);
+        glDisable(GL_BLEND);
 
         glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
-        unsigned int blockIdx = glGetUniformBlockIndex(program, "CameraMatrices");
-        glUniformBlockBinding(program, blockIdx, 0);
+        unsigned int blockIdx = glGetUniformBlockIndex(program2, "CameraMatrices");
+        glUniformBlockBinding(program2, blockIdx, 0);
         glBindBufferBase(GL_UNIFORM_BUFFER, 0, cameraUBO);
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-        glUniform3fv(glGetUniformLocation(program, "cameraPos"), 1, &cameraPos[0]);
+        glUniform3fv(glGetUniformLocation(program2, "cameraPos"), 1, &cameraPos[0]);
 
         it->ResetUpdatedOnce();
         it->Render(batchMeshes);
