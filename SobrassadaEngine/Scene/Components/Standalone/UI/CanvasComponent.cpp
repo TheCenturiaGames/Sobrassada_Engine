@@ -94,6 +94,11 @@ void CanvasComponent::Update(float deltaTime)
 void CanvasComponent::Render(float deltaTime)
 {
     if (!IsEffectivelyEnabled()) return;
+}
+
+void CanvasComponent::RenderDebug(float deltaTime)
+{
+    if (!IsEffectivelyEnabled()) return;
 
     App->GetDebugDrawModule()->DrawLine(
         float3(

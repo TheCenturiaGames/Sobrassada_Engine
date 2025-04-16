@@ -177,6 +177,10 @@ void MeshComponent::Render(float deltaTime)
     if (!IsEffectivelyEnabled()) return;
 }
 
+void MeshComponent::RenderDebug(float deltaTime)
+{
+}
+
 void MeshComponent::InitSkin()
 {
     if (bones.size() > 0) return;

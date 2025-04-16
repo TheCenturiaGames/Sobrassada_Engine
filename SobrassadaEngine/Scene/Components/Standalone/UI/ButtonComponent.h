@@ -21,6 +21,7 @@ class SOBRASADA_API_ENGINE ButtonComponent : public Component
     void Clone(const Component* other) override;
     void Update(float deltaTime) override {};
     void Render(float deltaTime) override {};
+    void RenderDebug(float deltaTime) override;
     void RenderEditorInspector() override;
 
     bool UpdateMousePosition(const float2& mousePos, bool dismiss = false);

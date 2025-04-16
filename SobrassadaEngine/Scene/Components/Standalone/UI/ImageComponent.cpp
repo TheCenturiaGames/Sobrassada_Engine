@@ -111,6 +111,11 @@ void ImageComponent::Clone(const Component* other)
     }
 }
 
+void ImageComponent::RenderDebug(float deltaTime)
+{
+
+}
+
 void ImageComponent::RenderEditorInspector()
 {
     Component::RenderEditorInspector();

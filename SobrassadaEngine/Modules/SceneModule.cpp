@@ -244,7 +244,6 @@ void SceneModule::HandleObjectDuplication()
             {loadedScene->GetSelectedGameObject()->GetUID(), loadedScene->GetSelectedGameObject()->GetParent()}
         );
     }
-
     for (int indexToDuplicate = 0; indexToDuplicate < objectsToDuplicate.size(); ++indexToDuplicate)
     {
         std::vector<GameObject*> createdGameObjects;
@@ -254,7 +253,7 @@ void SceneModule::HandleObjectDuplication()
         GameObject* gameObjectToCloneParent =
             loadedScene->GetGameObjectByUID(objectsToDuplicate[indexToDuplicate].second);
 
-        GameObject* clonedGameObject = new GameObject(gameObjectToClone->GetParent(), gameObjectToClone);
+        GameObject* clonedGameObject = new GameObject(objectsToDuplicate[indexToDuplicate].second, gameObjectToClone);
 
         remappingTable.insert({gameObjectToClone->GetUID(), clonedGameObject->GetUID()});
         createdGameObjects.push_back(clonedGameObject);
