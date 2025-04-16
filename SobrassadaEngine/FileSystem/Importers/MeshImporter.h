@@ -25,8 +25,9 @@ enum DataType
 namespace MeshImporter
 {
     UID ImportMesh(
-        const tinygltf::Model& model, uint32_t meshIndex, uint32_t primitiveIndex,
-        const std::string& name, const float4x4& meshTransform, const char* filePath, const std::string& targetFilePath, UID sourceUID = INVALID_UID, UID defaultMatUID = INVALID_UID
+        const tinygltf::Model& model, uint32_t meshIndex, uint32_t primitiveIndex, const std::string& name,
+        const float4x4& meshTransform, const char* filePath, const std::string& targetFilePath,
+        UID sourceUID = INVALID_UID, UID defaultMatUID = INVALID_UID
     );
     const float4x4 GetMeshDefaultTransform(const tinygltf::Model& model, const std::string& name);
     const float4x4 GetNodeTransform(const tinygltf::Node& node);

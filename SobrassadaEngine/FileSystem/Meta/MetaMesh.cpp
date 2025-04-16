@@ -1,6 +1,9 @@
 #include "MetaMesh.h"
 
-MetaMesh::MetaMesh(UID uid, const std::string& assetPath, bool generateTangents, const float4x4& transform, UID defaultMaterialUID, uint32_t gltfMeshIndex, uint32_t gltfPrimitiveIndex)
+MetaMesh::MetaMesh(
+    UID uid, const std::string& assetPath, bool generateTangents, const float4x4& transform, UID defaultMaterialUID,
+    uint32_t gltfMeshIndex, uint32_t gltfPrimitiveIndex
+)
     : MetaFile(uid, assetPath), generateTangents(generateTangents), transform(transform),
       defaultMaterialUID(defaultMaterialUID), gltfMeshIndex(gltfMeshIndex), gltfPrimitiveIndex(gltfPrimitiveIndex)
 {
@@ -34,5 +37,4 @@ void MetaMesh::AddImportOptions(rapidjson::Document& doc, rapidjson::Document::A
     importOptions.AddMember("gltfPrimitiveIndex", gltfPrimitiveIndex, allocator);
 
     doc.AddMember("importOptions", importOptions, allocator);
-    
 }

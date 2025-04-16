@@ -7,25 +7,19 @@
 class MetaMesh : public MetaFile
 {
   public:
-    MetaMesh(UID uid, const std::string& assetPath, bool generateTangents, const float4x4& transform, UID defaultMaterialUID, uint32_t gltfMeshIndex, uint32_t gltfPrimitiveIndex);
+    MetaMesh(
+        UID uid, const std::string& assetPath, bool generateTangents, const float4x4& transform, UID defaultMaterialUID,
+        uint32_t gltfMeshIndex, uint32_t gltfPrimitiveIndex
+    );
     void AddImportOptions(rapidjson::Document& doc, rapidjson::Document::AllocatorType& allocator) const override;
 
-    uint32_t GetGltfMeshIndex() const
-    {
-        return gltfMeshIndex;
-    }
+    uint32_t GetGltfMeshIndex() const { return gltfMeshIndex; }
 
-    uint32_t GetGltfPrimitiveIndex() const
-    {
-        return gltfPrimitiveIndex;
-    }
+    uint32_t GetGltfPrimitiveIndex() const { return gltfPrimitiveIndex; }
 
-    const float4x4& GetTransform() const
-    {
-        return transform;
-    }
+    const float4x4& GetTransform() const { return transform; }
 
-private:
+  private:
     uint32_t gltfMeshIndex;
     uint32_t gltfPrimitiveIndex;
     bool generateTangents;

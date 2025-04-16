@@ -79,7 +79,8 @@ namespace SceneImporter
                     }
 
                     const UID meshUID = MeshImporter::ImportMesh(
-                        model, srcNode.mesh, primitiveCounter, name, defaultTransform, filePath, targetFilePath, INVALID_UID, matUID
+                        model, srcNode.mesh, primitiveCounter, name, defaultTransform, filePath, targetFilePath,
+                        INVALID_UID, matUID
                     );
                     primitiveCounter++;
 
@@ -143,12 +144,13 @@ namespace SceneImporter
     }
 
     void ImportMeshFromMetadata(
-        const std::string& filePath, const std::string& targetFilePath, const std::string& name, const rapidjson::Value& importOptions, UID sourceUID
+        const std::string& filePath, const std::string& targetFilePath, const std::string& name,
+        const rapidjson::Value& importOptions, UID sourceUID
     )
     {
-        tinygltf::Model model = LoadModelGLTF(filePath.c_str(), targetFilePath);
+        tinygltf::Model model             = LoadModelGLTF(filePath.c_str(), targetFilePath);
 
-        const uint32_t gltfMeshIndex = importOptions["gltfMeshIndex"].GetInt();
+        const uint32_t gltfMeshIndex      = importOptions["gltfMeshIndex"].GetInt();
         const uint32_t gltfPrimitiveIndex = importOptions["gltfPrimitiveIndex"].GetInt();
 
         MeshImporter::ImportMesh(

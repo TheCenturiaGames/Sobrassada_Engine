@@ -17,8 +17,8 @@ namespace MeshImporter
 {
 
     UID ImportMesh(
-        const tinygltf::Model& model, const uint32_t meshIndex, const uint32_t primitiveIndex,
-        const std::string& name, const float4x4& meshTransform, const char* sourceFilePath, const std::string& targetFilePath, UID sourceUID,
+        const tinygltf::Model& model, const uint32_t meshIndex, const uint32_t primitiveIndex, const std::string& name,
+        const float4x4& meshTransform, const char* sourceFilePath, const std::string& targetFilePath, UID sourceUID,
         UID defaultMatUID
     )
     {
@@ -29,14 +29,14 @@ namespace MeshImporter
         std::vector<unsigned short> indexBufferShort;
         std::vector<unsigned int> indexBufferInt;
         size_t posStride = 0, tanStride = 0, texStride = 0, normStride = 0, jointStride = 0, weightsStride = 0;
-        float3 minPos         = {0.0f, 0.0f, 0.0f};
-        float3 maxPos         = {0.0f, 0.0f, 0.0f};
-        bool generateTangents = false;
+        float3 minPos                        = {0.0f, 0.0f, 0.0f};
+        float3 maxPos                        = {0.0f, 0.0f, 0.0f};
+        bool generateTangents                = false;
 
         const tinygltf::Primitive& primitive = model.meshes[meshIndex].primitives[primitiveIndex];
 
         // First get the indices, the type is needed for the joints later
-        const auto& itIndices = primitive.indices;
+        const auto& itIndices                = primitive.indices;
         if (itIndices != -1)
         {
             const tinygltf::Accessor& indexAcc      = model.accessors[itIndices];
@@ -317,9 +317,11 @@ namespace MeshImporter
         {
             UID meshUID           = GenerateUID();
             finalMeshUID          = App->GetLibraryModule()->AssignFiletypeUID(meshUID, FileType::Mesh);
-            
-            std::string assetPath         = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
-            MetaMesh meta(finalMeshUID, assetPath, generateTangents, meshTransform, defaultMatUID, meshIndex, primitiveIndex);
+
+            std::string assetPath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
+            MetaMesh meta(
+                finalMeshUID, assetPath, generateTangents, meshTransform, defaultMatUID, meshIndex, primitiveIndex
+            );
             meta.Save(name, assetPath);
         }
         else finalMeshUID = sourceUID;
