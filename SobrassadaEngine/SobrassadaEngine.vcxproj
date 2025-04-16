@@ -371,7 +371,7 @@
     <ClCompile Include="FileSystem\Meta\MetaAnimation.cpp" />
     <ClCompile Include="FileSystem\Importers\FontImporter.cpp" />
     <ClCompile Include="FileSystem\Meta\MetaFont.cpp" />
-    <ClCompile Include="GBuffer.cpp" />
+    <ClCompile Include="Utils\GBuffer.cpp" />
     <ClCompile Include="Scene\Components\Standalone\Physics\CapsuleColliderComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\Physics\SphereColliderComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\UI\ButtonComponent.cpp" />
@@ -586,7 +586,7 @@
     <ClInclude Include="Libs\Wwise\samples\SoundEngine\IO\AkFileHelpers.h" />
     <ClInclude Include="Libs\Wwise\samples\SoundEngine\IO\stdafx.h" />
     <ClInclude Include="Modules\AudioModule.h" />
-    <ClInclude Include="GBuffer.h" />
+    <ClInclude Include="Utils\GBuffer.h" />
     <ClInclude Include="Scene\Components\Standalone\Physics\CapsuleColliderComponent.h" />
     <ClInclude Include="Scene\Components\Standalone\UI\ButtonComponent.h" />
     <ClInclude Include="Scene\Components\Standalone\UI\ImageComponent.h" />

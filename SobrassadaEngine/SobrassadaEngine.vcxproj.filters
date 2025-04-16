@@ -510,7 +510,9 @@
     <ClCompile Include="Libs\Wwise\samples\SoundEngine\IO\stdafx.cpp">
       <Filter>External\Wwise</Filter>
     </ClCompile>
-    <ClCompile Include="GBuffer.cpp" />
+    <ClCompile Include="Utils\GBuffer.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -996,7 +998,9 @@
     <ClInclude Include="Libs\Wwise\samples\SoundEngine\IO\stdafx.h">
       <Filter>External\Wwise</Filter>
     </ClInclude>
-    <ClInclude Include="GBuffer.h" />
+    <ClInclude Include="Utils\GBuffer.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl">
