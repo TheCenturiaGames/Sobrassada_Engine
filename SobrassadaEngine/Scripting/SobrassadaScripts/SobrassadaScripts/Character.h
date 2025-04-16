@@ -3,6 +3,7 @@
 #include "Script.h"
 
 class GameObject;
+class CharacterControllerComponent;
 
 class Character : public Script
 {
@@ -10,7 +11,7 @@ class Character : public Script
     Character(GameObject* parent, int maxHealth, int damage, float speed, float cooldown, float range)
         : Script(parent) {};
 
-    virtual bool Init() override                  = 0;
+    virtual bool Init() override = 0;
     virtual void Update(float deltaTime) override;
 
     void CanAttack();
@@ -19,13 +20,17 @@ class Character : public Script
     void Heal(int amount);
     void Kill();
 
+  protected:
+    void SetMainCharacter(CharacterControllerComponent* mainCharacter) { cuChulainn = mainCharacter; };
+
   private:
     virtual void OnDeath() {};
     virtual void OnDamageTaken(int amount) {};
     virtual void OnHealed(int amount) {};
     virtual void PerformAttack() {};
 
-  private:
+  protected:
+    CharacterControllerComponent* cuChulainn = nullptr;
     int maxHealth        = 0;
     int currentHealth    = 0;
     bool isInvulnerable  = false;

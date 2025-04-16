@@ -1,10 +1,8 @@
 #include "pch.h"
 
-#include "Application.h"
 #include "Component.h"
+#include "CuChulainn.h"
 #include "GameObject.h"
-#include "Scene.h"
-#include "SceneModule.h"
 #include "Soldier.h"
 #include "Standalone/AIAgentComponent.h"
 #include "Standalone/CharacterControllerComponent.h"
@@ -31,7 +29,10 @@ bool Soldier::Init()
 
 void Soldier::Update(float deltaTime)
 {
-    agentAI->SetPathNavigation(App->GetSceneModule()->GetScene()->GetMainCharacter()->GetLastPosition());
+    if (cuChulainn != nullptr) 
+        agentAI->SetPathNavigation(this->cuChulainn->GetLastPosition());
+    else 
+        GLOG("NULLPTR");
 }
 
 void Soldier::OnDeath()
