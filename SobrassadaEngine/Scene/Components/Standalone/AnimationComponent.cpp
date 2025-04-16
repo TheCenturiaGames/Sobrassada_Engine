@@ -83,8 +83,8 @@ void AnimationComponent::OnPlay(bool isTransition)
                         {
                             GLOG("TransitionTime: %f", transitionTime);
                             if (isTransition)
-                                animController->SetTargetAnimationResource(clip.animationResourceUID, transitionTime);
-                            else animController->Play(clip.animationResourceUID, true);
+                                animController->SetTargetAnimationResource(clip.animationResourceUID, transitionTime, clip.loop);
+                            else animController->Play(clip.animationResourceUID, clip.loop);
                             resource = clip.animationResourceUID;
                         }
                     }

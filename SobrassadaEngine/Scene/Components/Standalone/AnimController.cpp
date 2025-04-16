@@ -145,10 +145,11 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
     // TODO https://stackoverflow.com/questions/66522629/given-3-or-more-numbers-or-vectors-how-do-i-interpolate-between-them-based-on-a
 }
 
-void AnimController::SetTargetAnimationResource(UID uid, unsigned timeTransition)
+void AnimController::SetTargetAnimationResource(UID uid, unsigned timeTransition, bool shouldLoop)
 {
     targetAnimation = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(uid));
     transitionTime  = static_cast<float>(timeTransition) / 1000;
+    loop            = shouldLoop;
 }
 
 void AnimController::GetChannelPosition(const Channel* animChannel, float3& pos, const float time) const
