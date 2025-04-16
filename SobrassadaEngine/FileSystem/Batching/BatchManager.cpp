@@ -71,7 +71,8 @@ void BatchManager::Render(const std::vector<MeshComponent*>& meshesToRender, Cam
         cameraUBO = App->GetCameraModule()->GetUbo();
         cameraPos = App->GetCameraModule()->GetCameraPosition();
     }
-    else  {
+    else
+    {
         cameraUBO = camera->GetUbo();
         cameraPos = camera->GetCameraPosition();
     }

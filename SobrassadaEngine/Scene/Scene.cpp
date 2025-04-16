@@ -1012,7 +1012,7 @@ void Scene::LoadModel(const UID modelUID)
 
                             MeshComponent* meshComponent = meshObject->GetMeshComponent();
                             meshComponent->SetModelUID(modelUID);
-                            meshComponent->AddMesh(mesh.first);
+                            meshComponent->AddMesh(mesh.first, false);
                             meshComponent->AddMaterial(mesh.second);
 
                             // Add skin to meshComponent
@@ -1058,7 +1058,7 @@ void Scene::LoadModel(const UID modelUID)
                     GLOG("Setting aimation resource with UID %llu ", uid);
                     animComponent->SetAnimationResource(uid);
 
-                    GLOG("Animation UID: %d", uid);
+                    GLOG("Animation UID: %llu", uid);
                 }
             }
             else

@@ -455,7 +455,6 @@ AnimationComponent* GameObject::GetAnimationComponent() const
 
 void GameObject::OnTransformUpdated()
 {
-    if (name == "CH_MC_Chu_V02") int x = 0;
     globalTransform = GetParentGlobalTransform() * localTransform;
     globalOBB       = globalTransform * OBB(localAABB);
     globalAABB      = AABB(globalOBB);

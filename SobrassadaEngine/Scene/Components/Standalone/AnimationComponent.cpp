@@ -30,17 +30,14 @@ AnimationComponent::AnimationComponent(const rapidjson::Value& initialState, Gam
     }
     else
     {
-        resource = 0;
+        resource = INVALID_UID;
     }
 }
 
 AnimationComponent::~AnimationComponent()
 {
-    if (animController != nullptr)
-    {
-        delete animController;
-        animController = nullptr;
-    }
+
+    delete animController;
     App->GetResourcesModule()->ReleaseResource(currentAnimResource);
 }
 
@@ -83,8 +80,8 @@ void AnimationComponent::OnInspector()
     {
         currentAnimResource = dynamic_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
         const std::string animationName = App->GetLibraryModule()->GetResourceName(resource);
-        
-        const size_t underscorePos            = animationName.find('_');
+
+        const size_t underscorePos      = animationName.find('_');
         if (underscorePos != std::string::npos) originAnimation = animationName.substr(0, underscorePos);
         if (currentAnimResource != nullptr)
         {
@@ -279,7 +276,6 @@ void AnimationComponent::OnInspector()
                 }
             }
         }
-
     }
 
     if (playing && currentAnimComp && currentAnimComp->GetAnimationController())
