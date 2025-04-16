@@ -144,7 +144,49 @@ bool AudioModule::Init()
 
 update_status AudioModule::Update(float deltaTime)
 {
-    // more things here needed
+    if (listener)
+    {
+        // Set the listener position
+        AkSoundPosition listenerPos;
+        auto xd  = listener->GetGlobalTransform().TranslatePart();
+        auto xd2 = listener->GetGlobalTransform().RotatePart();
+        AkVector vector;
+        vector.X = xd2.Col(2).x;
+        vector.Y = xd2.Col(2).y;
+        vector.Z = xd2.Col(2).z;
+
+        AkVector vector2;
+        vector2.X = xd2.Col(1).x;
+        vector2.Y = xd2.Col(1).y;
+        vector2.Z = xd2.Col(1).z;
+
+        listenerPos.SetPosition({xd.x, xd.y, xd.z});
+        listenerPos.SetOrientation(vector, vector2);
+
+        AK::SoundEngine::SetPosition(listener->GetParentUID(), listenerPos);
+    }
+
+    // Set the sources position
+    for (const auto source : sources)
+    {
+        AkSoundPosition sourcePos;
+        auto xd3  = source->GetGlobalTransform().TranslatePart();
+        AkVector vector3;
+        vector3.X = 0;
+        vector3.Y = 0;
+        vector3.Z = 1;
+
+        AkVector vector4;
+        vector4.X = 0;
+        vector4.Y = 1;
+        vector4.Z = 0;
+
+        sourcePos.SetPosition({xd3.x, xd3.y, xd3.z});
+        sourcePos.SetOrientation(vector3, vector4);
+
+        AK::SoundEngine::SetPosition(source->GetParentUID(), sourcePos);
+    }
+
     AK::SoundEngine::RenderAudio();
     return UPDATE_CONTINUE;
 }
