@@ -14,9 +14,9 @@ class PathfinderModule : public Module
   public:
     PathfinderModule();
     ~PathfinderModule();
-    bool Init() override;
     update_status Update(float deltaTime) override;
 
+    bool Init() override;
     void CreateNavMesh();
     int CreateAgent(const float3& position, const float radius, const float height, const float speed);
     dtCrowd* GetCrowd() const { return crowd; }

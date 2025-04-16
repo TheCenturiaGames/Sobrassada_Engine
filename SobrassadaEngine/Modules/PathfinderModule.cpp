@@ -81,7 +81,7 @@ void PathfinderModule::RemoveAgent(int agentId)
 void PathfinderModule::InitQuerySystem()
 {
 
-    tmpNavmesh  = App->GetResourcesModule()->GetNavMesh();
+    tmpNavmesh  = GetNavMesh();
     navQuery = tmpNavmesh->GetDetourNavMeshQuery();
 
     if (tmpNavmesh != nullptr)

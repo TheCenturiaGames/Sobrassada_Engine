@@ -4,6 +4,7 @@
 #include "DebugDrawModule.h"
 #include "EditorUIModule.h"
 #include "FileSystem/Mesh.h"
+#include "NavmeshImporter.h"
 
 #include <DetourNavMeshBuilder.h>
 #include <DetourNavMeshQuery.h>
@@ -342,6 +343,7 @@ bool ResourceNavMesh::BuildNavMesh(
             }
         }
     }
+
 
     CreateDetourData();
 

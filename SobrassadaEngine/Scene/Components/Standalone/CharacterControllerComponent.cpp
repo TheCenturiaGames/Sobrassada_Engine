@@ -6,7 +6,7 @@
 #include "InputModule.h"
 #include "SceneModule.h"
 #include "DetourNavMeshQuery.h"
-#include "ResourcesModule.h"
+#include "PathfinderModule.h"
 #include "ResourceNavMesh.h"
 
 #include "Math/float3.h"
@@ -94,7 +94,7 @@ void CharacterControllerComponent::Clone(const Component* other)
     }
 }
 
-void CharacterControllerComponent::Update(float deltaTime)
+void CharacterControllerComponent::Update(float deltaTime) //SO many navmesh getters!!!! Memo to rethink this
 {
     if (!IsEffectivelyEnabled()) return;
     if (!enabled) return;
@@ -103,7 +103,7 @@ void CharacterControllerComponent::Update(float deltaTime)
 
     if (deltaTime <= 0.0f) return;
 
-    ResourceNavMesh* navRes = App->GetResourcesModule()->GetNavMesh();
+    ResourceNavMesh* navRes = App->GetPathfinderModule()->GetNavMesh();
     if (!navRes) return;
 
     dtNavMesh* dtNav         = navRes->GetDetourNavMesh();

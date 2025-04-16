@@ -426,11 +426,11 @@ void EditorUIModule::Navmesh(bool& navmesh)
 
     if (ImGui::Button("Create NavMesh"))
     {
-        App->GetResourcesModule()->CreateNavMesh();
+        App->GetPathfinderModule()->CreateNavMesh();
         ImGui::Text("NavMesh created!");
     }
 
-    App->GetResourcesModule()->GetNavMesh()->RenderNavmeshEditor();
+    App->GetPathfinderModule()->GetNavMesh()->RenderNavmeshEditor();
 
     ImGui::End();
 }
