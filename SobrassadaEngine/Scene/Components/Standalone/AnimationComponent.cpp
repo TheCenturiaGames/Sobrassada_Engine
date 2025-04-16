@@ -299,6 +299,11 @@ void AnimationComponent::Render(float deltaTime)
     if (!IsEffectivelyEnabled()) return;
 }
 
+void AnimationComponent::RenderDebug(float deltaTime)
+{
+
+}
+
 void AnimationComponent::Clone(const Component* other)
 {
     if (other->GetType() == ComponentType::COMPONENT_ANIMATION)

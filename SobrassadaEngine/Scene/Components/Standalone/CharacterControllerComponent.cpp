@@ -166,6 +166,11 @@ void CharacterControllerComponent::Render(float deltaTime)
     if (!IsEffectivelyEnabled()) return;
 }
 
+void CharacterControllerComponent::RenderDebug(float deltaTime)
+{
+
+}
+
 void CharacterControllerComponent::RenderEditorInspector()
 {
     Component::RenderEditorInspector();

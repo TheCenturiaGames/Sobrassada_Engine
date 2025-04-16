@@ -196,6 +196,11 @@ void CapsuleColliderComponent::Render(float deltaTime)
     if (!IsEffectivelyEnabled()) return;
 }
 
+void CapsuleColliderComponent::RenderDebug(float deltaTime)
+{
+
+}
+
 void CapsuleColliderComponent::ParentUpdated()
 {
     if (App->GetSceneModule()->GetInPlayMode()) return;

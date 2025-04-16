@@ -21,6 +21,7 @@ class CameraComponent : public Component
 
     void Update(float deltaTime) override;
     void Render(float deltaTime) override;
+    void RenderDebug(float deltaTime) override;
     void RenderEditorInspector() override;
 
     void ChangeToPerspective();
@@ -66,4 +67,5 @@ class CameraComponent : public Component
     int previewHeight               = 256;
 
     bool autorendering              = false;
+    bool firstFrame                 = false;
 };
