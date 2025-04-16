@@ -7,6 +7,8 @@
 class SpotLightComponent : public LightComponent
 {
   public:
+    static const ComponentType STATIC_TYPE = ComponentType::COMPONENT_SPOT_LIGHT;
+
     SpotLightComponent(UID uid, GameObject* parent);
     SpotLightComponent(const rapidjson::Value& initialState, GameObject* parent);
     ~SpotLightComponent() override;

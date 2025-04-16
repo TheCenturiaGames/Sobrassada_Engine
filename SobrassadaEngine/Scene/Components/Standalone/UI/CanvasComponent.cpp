@@ -1,6 +1,7 @@
 #include "CanvasComponent.h"
 
 #include "Application.h"
+#include "ButtonComponent.h"
 #include "CameraModule.h"
 #include "DebugDrawModule.h"
 #include "GameObject.h"
@@ -81,10 +82,19 @@ void CanvasComponent::Clone(const Component* other)
 
 void CanvasComponent::Update(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
+
+    const auto& size = App->GetSceneModule()->GetScene()->GetWindowSize();
+    if (width != std::get<0>(size) || height != std::get<1>(size))
+    {
+        OnWindowResize(std::get<0>(size), std::get<1>(size));
+    }
 }
 
 void CanvasComponent::Render(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
+
     App->GetDebugDrawModule()->DrawLine(
         float3(
             parent->GetGlobalTransform().TranslatePart().x - width / 2,
@@ -119,6 +129,8 @@ void CanvasComponent::Render(float deltaTime)
 
 void CanvasComponent::RenderUI()
 {
+    if (!IsEffectivelyEnabled()) return;
+
     const int uiProgram = App->GetShaderModule()->GetUIWidgetProgram();
     if (uiProgram == -1)
     {
@@ -127,43 +139,21 @@ void CanvasComponent::RenderUI()
     }
     glUseProgram(uiProgram);
 
-    // Get the view and projection matrix (world space or screen space)
     const float4x4& view = isInWorldSpaceEditor ? App->GetCameraModule()->GetViewMatrix() : float4x4::identity;
     const float4x4& proj = isInWorldSpaceEditor ? App->GetCameraModule()->GetProjectionMatrix()
-                                                : float4x4::D3DOrthoProjLH(
-                                                      -1, 1, (float)App->GetWindowModule()->GetWidth(),
-                                                      (float)App->GetWindowModule()->GetHeight()
-                                                  );
+                                                : float4x4::D3DOrthoProjLH(-1, 1, width, height);
 
-    // Get all children iteratively. This way, if the children of the canvas are modified they will be properly sorted
-    // when rendering
-    std::queue<UID> children;
-
-    for (const UID child : parent->GetChildren())
+    for (const GameObject* child : sortedChildren)
     {
-        children.push(child);
-    }
-
-    while (!children.empty())
-    {
-        const GameObject* currentObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(children.front());
-
         // Only render UI components
-        Component* uiWidget             = currentObject->GetComponentByType(COMPONENT_TRANSFORM_2D);
+        Component* uiWidget = child->GetComponentByType(COMPONENT_TRANSFORM_2D);
         if (uiWidget) static_cast<const Transform2DComponent*>(uiWidget)->RenderWidgets();
 
-        uiWidget = currentObject->GetComponentByType(COMPONENT_LABEL);
+        uiWidget = child->GetComponentByType(COMPONENT_LABEL);
         if (uiWidget) static_cast<const UILabelComponent*>(uiWidget)->RenderUI(view, proj);
 
-        uiWidget = currentObject->GetComponentByType(COMPONENT_IMAGE);
+        uiWidget = child->GetComponentByType(COMPONENT_IMAGE);
         if (uiWidget) static_cast<const ImageComponent*>(uiWidget)->RenderUI(view, proj);
-
-        children.pop();
-
-        for (const UID child : currentObject->GetChildren())
-        {
-            children.push(child);
-        }
     }
 }
 
@@ -179,10 +169,10 @@ void CanvasComponent::RenderEditorInspector()
     }
 }
 
-void CanvasComponent::OnWindowResize(const unsigned int width, const unsigned int height)
+void CanvasComponent::OnWindowResize(const float width, const float height)
 {
-    this->width        = (float)width;
-    this->height       = (float)height;
+    this->width        = width;
+    this->height       = height;
 
     localComponentAABB = AABB(
         float3(
@@ -195,5 +185,76 @@ void CanvasComponent::OnWindowResize(const unsigned int width, const unsigned in
         )
     );
 
-    parent->UpdateTransformForGOBranch();
+    // parent->UpdateTransformForGOBranch();
+
+    for (const GameObject* child : sortedChildren)
+    {
+        // Only render UI components
+        Component* transform2D = child->GetComponentByType(COMPONENT_TRANSFORM_2D);
+        if (transform2D) static_cast<Transform2DComponent*>(transform2D)->AdaptToParentChanges();
+    }
+}
+
+void CanvasComponent::UpdateChildren()
+{
+    if (!IsEffectivelyEnabled()) return;
+
+    // TODO: Right now this updates the children list every frame in case they are reordered in hierarchy.
+    // To be more optimal, this could be called only when a gameObject is dragged around the hierarchy
+    sortedChildren.clear();
+
+    std::queue<UID> children;
+
+    for (const UID child : parent->GetChildren())
+    {
+        children.push(child);
+    }
+
+    while (!children.empty())
+    {
+        const GameObject* currentObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(children.front());
+        sortedChildren.push_back(currentObject);
+        children.pop();
+
+        for (const UID child : currentObject->GetChildren())
+        {
+            children.push(child);
+        }
+    }
+}
+
+void CanvasComponent::UpdateMousePosition(const float2& mousePos)
+{
+    if (!IsEffectivelyEnabled()) return;
+
+    // Only interact with elements if canvas is in screen mode
+    if (isInWorldSpaceEditor) return;
+
+    hoveredButton    = nullptr;
+    bool buttonFound = false;
+
+    for (int i = (int)sortedChildren.size() - 1; i >= 0; --i)
+    {
+        // Update all buttons
+        Component* button = sortedChildren[i]->GetComponentByType(COMPONENT_BUTTON);
+        if (button)
+        {
+            ButtonComponent* currentButton = static_cast<ButtonComponent*>(button);
+            if (currentButton->UpdateMousePosition(mousePos, buttonFound))
+            {
+                hoveredButton = currentButton;
+                buttonFound   = true;
+            }
+        }
+    }
+}
+
+void CanvasComponent::OnMouseButtonPressed() const
+{
+    if (hoveredButton) hoveredButton->OnClick();
+}
+
+void CanvasComponent::OnMouseButtonReleased() const
+{
+    if (hoveredButton) hoveredButton->OnRelease();
 }

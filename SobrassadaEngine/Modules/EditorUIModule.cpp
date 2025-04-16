@@ -9,21 +9,21 @@
 #include "InputModule.h"
 #include "LibraryModule.h"
 #include "OpenGLModule.h"
-#include "PhysicsModule.h"
 #include "PathfinderModule.h"
+#include "PhysicsModule.h"
 #include "ProjectModule.h"
 #include "ResourceNavmesh.h"
 
+#include "ResourceStateMachine.h"
 #include "ResourcesModule.h"
 #include "SceneImporter.h"
-#include "ResourceStateMachine.h"
 
 #include "SceneModule.h"
 #include "ScriptModule.h"
+#include "StateMachineEditor.h"
 #include "TextureEditor.h"
 #include "TextureImporter.h"
 #include "WindowModule.h"
-#include "StateMachineEditor.h"
 
 #include "Math/Quat.h"
 #include "SDL.h"
@@ -56,7 +56,8 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"Capsule Collider",     COMPONENT_CAPSULE_COLLIDER    },
         {"Script",               COMPONENT_SCRIPT              },
         {"AI Agent",             COMPONENT_AIAGENT             },
-        {"UI Image",             COMPONENT_IMAGE               }
+        {"UI Image",             COMPONENT_IMAGE               },
+        {"UI Button",            COMPONENT_BUTTON              },
     };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;
@@ -341,7 +342,8 @@ void EditorUIModule::MainMenu()
 
             if (ImGui::MenuItem("Node Editor", "")) OpenEditor(CreateEditor(EditorType::NODE));
 
-            if (ImGui::MenuItem("State Machine Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::ANIMATION));
+            if (ImGui::MenuItem("State Machine Editor Engine Editor", ""))
+                OpenEditor(CreateEditor(EditorType::ANIMATION));
             if (ImGui::MenuItem("Texture Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::TEXTURE));
 
             ImGui::EndMenu();
@@ -983,6 +985,7 @@ T EditorUIModule::RenderResourceSelectDialog(
                         if (ImGui::Selectable(valuePair.first.c_str(), false))
                         {
                             result = valuePair.second;
+                            memset(searchTextResource, 0, sizeof searchTextResource);
                             ImGui::CloseCurrentPopup();
                         }
                     }
@@ -1201,7 +1204,7 @@ void EditorUIModule::About(bool& aboutMenu)
 
 EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
 {
-    UID uid = GenerateUID();
+    UID uid                            = GenerateUID();
     ResourceStateMachine* stateMachine = new ResourceStateMachine(uid, "State Machine " + std::to_string(uid));
     switch (type)
     {
