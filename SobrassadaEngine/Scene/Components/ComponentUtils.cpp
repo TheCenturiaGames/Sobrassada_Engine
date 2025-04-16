@@ -16,6 +16,7 @@
 #include "Standalone/UI/Transform2DComponent.h"
 #include "Standalone/UI/UILabelComponent.h"
 #include "Standalone/UI/ImageComponent.h"
+#include "Standalone/UI/ButtonComponent.h"
 #include "Standalone/AIAgentComponent.h"
 #include <cstdint>
 
@@ -74,6 +75,9 @@ Component* ComponentUtils::CreateEmptyComponent(const ComponentType type, const 
     case COMPONENT_IMAGE:
         generatedComponent = new ImageComponent(uid, parent);
         break;
+    case COMPONENT_BUTTON:
+        generatedComponent = new ButtonComponent(uid, parent);
+        break;
     default:
         return nullptr;
     }
@@ -123,6 +127,8 @@ Component* ComponentUtils::CreateExistingComponent(const rapidjson::Value& initi
             return new AIAgentComponent(initialState, parent);
         case COMPONENT_IMAGE:
             return new ImageComponent(initialState, parent);
+        case COMPONENT_BUTTON:
+            return new ButtonComponent(initialState, parent);
         default:
             return nullptr;
         }

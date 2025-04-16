@@ -365,7 +365,7 @@
     </ClCompile>
     <ClCompile Include="ResourceManagement\Resources\ResourceAnimation.cpp">
       <Filter>Resources</Filter>
-      </ClCompile>
+    </ClCompile>
     <ClCompile Include="Utils\TextManager.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
@@ -473,6 +473,9 @@
     </ClCompile>
     <ClCompile Include="Scene\Components\Standalone\Lights\DirectionalLightComponent.cpp">
       <Filter>Scene\Components\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\UI\ButtonComponent.cpp">
+      <Filter>Scene\Components\UI</Filter>
     </ClCompile>
     <ClCompile Include="Modules\AudioModule.cpp">
       <Filter>Modules</Filter>
@@ -947,6 +950,9 @@
     </ClInclude>
     <ClInclude Include="Scene\Components\Standalone\Lights\DirectionalLightComponent.h">
       <Filter>Scene\Components\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\UI\ButtonComponent.h">
+      <Filter>Scene\Components\UI</Filter>
     </ClInclude>
     <ClInclude Include="Modules\AudioModule.h">
       <Filter>Modules</Filter>

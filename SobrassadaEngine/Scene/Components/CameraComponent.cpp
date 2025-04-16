@@ -292,6 +292,7 @@ void CameraComponent::RenderEditorInspector()
 
 void CameraComponent::Update(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
     if (isMainCamera && App->GetSceneModule()->GetScene()->GetMainCamera() == nullptr)
         App->GetSceneModule()->GetScene()->SetMainCamera(this);
 
@@ -373,6 +374,7 @@ void CameraComponent::RenderCameraPreview(float deltaTime)
 
 void CameraComponent::Render(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
     if (!enabled || !drawGizmos || App->GetSceneModule()->GetInPlayMode()) return;
     DebugDrawModule* debug = App->GetDebugDrawModule();
     debug->DrawFrustrum(camera.ProjectionMatrix(), camera.ViewMatrix());

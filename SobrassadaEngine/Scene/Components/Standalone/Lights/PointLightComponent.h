@@ -7,6 +7,8 @@
 class PointLightComponent : public LightComponent
 {
   public:
+    static const ComponentType STATIC_TYPE = ComponentType::COMPONENT_POINT_LIGHT;
+
     PointLightComponent(UID uid, GameObject* parent);
     PointLightComponent(const rapidjson::Value& initialState, GameObject* parent);
     ~PointLightComponent() override;

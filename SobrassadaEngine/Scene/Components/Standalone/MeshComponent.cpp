@@ -55,12 +55,6 @@ MeshComponent::MeshComponent(const rapidjson::Value& initialState, GameObject* p
     }
 
     if (!bonesUIDs.empty() && !bindMatrices.empty()) hasBones = true;
-
-    if (currentMesh != nullptr && currentMaterial != nullptr)
-    {
-        batch = App->GetResourcesModule()->GetBatchManager()->RequestBatch(this);
-        batch->AddComponent(this);
-    }
 }
 
 MeshComponent::~MeshComponent()
@@ -69,6 +63,15 @@ MeshComponent::~MeshComponent()
     App->GetResourcesModule()->ReleaseResource(currentMesh);
 
     if (uniqueBatch) App->GetResourcesModule()->GetBatchManager()->RemoveBatch(batch);
+}
+
+void MeshComponent::Init()
+{
+    if (currentMesh != nullptr && currentMaterial != nullptr)
+    {
+        batch = App->GetResourcesModule()->GetBatchManager()->RequestBatch(this);
+        batch->AddComponent(this);
+    }
 }
 
 void MeshComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
@@ -107,6 +110,9 @@ void MeshComponent::Clone(const Component* other)
         modelUID     = otherMesh->modelUID;
         skinIndex    = otherMesh->skinIndex;
         bindMatrices = otherMesh->bindMatrices;
+        hasBones     = otherMesh->hasBones;
+
+        // Maybe it could be added to an existing batch, but probably is more costly than what is worth
     }
     else
     {
@@ -159,6 +165,7 @@ void MeshComponent::RenderEditorInspector()
 
 void MeshComponent::Update(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
     if (batch == nullptr && currentMesh != nullptr && currentMaterial != nullptr)
     {
         BatchEditorMode();
@@ -167,6 +174,7 @@ void MeshComponent::Update(float deltaTime)
 
 void MeshComponent::Render(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
 }
 
 void MeshComponent::InitSkin()
@@ -206,12 +214,10 @@ void MeshComponent::AddMesh(UID resource, bool updateParent)
 
 void MeshComponent::AddMaterial(UID resource)
 {
-    bool isMaterialInvalid = false;
 
     if (resource == INVALID_UID || App->GetResourcesModule()->RequestResource(resource) == nullptr)
     {
         resource = DEFAULT_MATERIAL_UID;
-        isMaterialInvalid = true;
     }
 
     if (currentMaterial != nullptr && currentMaterial->GetUID() == resource) return;
@@ -223,8 +229,6 @@ void MeshComponent::AddMaterial(UID resource)
         App->GetResourcesModule()->ReleaseResource(currentMaterial);
         currentMaterial     = newMaterial;
         currentMaterialName = currentMaterial->GetName();
-
-        if (isMaterialInvalid) newMaterial->ChangeFallBackTexture();
 
         if (batch) BatchEditorMode();
     }
