@@ -67,4 +67,5 @@ class CameraComponent : public Component
     int previewHeight               = 256;
 
     bool autorendering              = false;
+    bool firstFrame                 = false;
 };

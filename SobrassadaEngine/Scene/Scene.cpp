@@ -257,8 +257,12 @@ update_status Scene::Update(float deltaTime)
 
 update_status Scene::Render(float deltaTime)
 {
-    if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
-        RenderScene(deltaTime, App->GetSceneModule()->GetScene()->GetMainCamera());
+    CameraComponent* mainCamera = App->GetSceneModule()->GetScene()->GetMainCamera();
+    if (App->GetSceneModule()->GetInPlayMode() && mainCamera != nullptr)
+    {
+        if (mainCamera->GetEnabled() && mainCamera->IsEffectivelyEnabled()) RenderScene(deltaTime, mainCamera);
+        else RenderScene(deltaTime, nullptr);
+    }
     else RenderScene(deltaTime, nullptr);
 
     GameObject* selectedGameObject = App->GetSceneModule()->GetScene()->GetSelectedGameObject();
@@ -547,11 +551,9 @@ void Scene::RenderSceneToFrameBuffer()
     if (framebuffer->GetTextureWidth() != windowSize.x || framebuffer->GetTextureHeight() != windowSize.y)
     {
         float aspectRatio = windowSize.y / windowSize.x;
-        if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
-        {
+        if (App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
             App->GetSceneModule()->GetScene()->GetMainCamera()->SetAspectRatio(aspectRatio);
-        }
-        else App->GetCameraModule()->SetAspectRatio(aspectRatio);
+        App->GetCameraModule()->SetAspectRatio(aspectRatio);
         framebuffer->Resize((int)windowSize.x, (int)windowSize.y);
     }
 
