@@ -16,7 +16,7 @@ class ImageComponent : public Component
     void Init() override;
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
     void Clone(const Component* other) override;
-    void Update(float deltaTime) override {};
+    void Update(float deltaTime) override;
     void Render(float deltaTime) override {};
     void RenderEditorInspector() override;
 
@@ -28,6 +28,7 @@ class ImageComponent : public Component
     void InitBuffers();
     void ClearBuffers() const;
     void ChangeTexture(const UID textureUID);
+    void MatchParentSize();
 
   private:
     Transform2DComponent* transform2D;
@@ -36,7 +37,8 @@ class ImageComponent : public Component
     ResourceTexture* texture;
     float3 color;
 
-    unsigned int vbo = 0;
-    unsigned int vao = 0;
+    unsigned int vbo     = 0;
+    unsigned int vao     = 0;
+    bool matchParentSize = false;
     UID bindlessUID;
 };

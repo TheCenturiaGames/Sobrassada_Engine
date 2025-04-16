@@ -7,6 +7,7 @@
 #include "LibraryModule.h"
 #include "OpenGLModule.h"
 #include "ResourcesModule.h"
+#include "SceneModule.h"
 #include "Transform2DComponent.h"
 
 #include "ImGui.h"
@@ -46,6 +47,8 @@ ImageComponent::ImageComponent(const rapidjson::Value& initialState, GameObject*
         color.y                           = initColor[1].GetFloat();
         color.z                           = initColor[2].GetFloat();
     }
+
+    if (initialState.HasMember("MatchParentSize")) matchParentSize = initialState["MatchParentSize"].GetBool();
 }
 
 ImageComponent::~ImageComponent()
@@ -84,6 +87,7 @@ void ImageComponent::Save(rapidjson::Value& targetState, rapidjson::Document::Al
     Component::Save(targetState, allocator);
 
     targetState.AddMember("TextureUID", texture->GetUID(), allocator);
+    targetState.AddMember("MatchParentSize", matchParentSize, allocator);
 
     rapidjson::Value valColor(rapidjson::kArrayType);
     valColor.PushBack(color.x, allocator);
@@ -111,6 +115,12 @@ void ImageComponent::Clone(const Component* other)
     }
 }
 
+void ImageComponent::Update(float deltaTime)
+{
+    if (matchParentSize) MatchParentSize();
+}
+
+
 void ImageComponent::RenderEditorInspector()
 {
     Component::RenderEditorInspector();
@@ -120,6 +130,8 @@ void ImageComponent::RenderEditorInspector()
     ImGui::Text("Source texture: ");
     ImGui::SameLine();
     ImGui::Text(texture->GetName().c_str());
+
+    ImGui::Checkbox("Match Parent Size", &matchParentSize);
 
     if (ImGui::Button("Select texture"))
     {
@@ -137,7 +149,7 @@ void ImageComponent::RenderEditorInspector()
 
 void ImageComponent::RenderUI(const float4x4& view, const float4x4& proj) const
 {
-    if (parentCanvas == nullptr || transform2D == nullptr ||!IsEffectivelyEnabled()) return;
+    if (parentCanvas == nullptr || transform2D == nullptr || !IsEffectivelyEnabled()) return;
 
     const float3 startPos =
         float3(transform2D->GetRenderingPosition(), 0) - parent->GetGlobalTransform().TranslatePart();
@@ -239,5 +251,30 @@ void ImageComponent::ChangeTexture(const UID textureUID)
         texture     = static_cast<ResourceTexture*>(newTexture);
         bindlessUID = glGetTextureHandleARB(texture->GetTextureID());
         glMakeTextureHandleResidentARB(bindlessUID);
+    }
+}
+
+void ImageComponent::MatchParentSize()
+{
+    if (transform2D == nullptr) return;
+
+    UID parentUID        = parent->GetParent();
+    GameObject* parentGO = App->GetSceneModule()->GetScene()->GetGameObjectByUID(parentUID);
+
+    // Check if parent has transform 2D
+    if (Transform2DComponent* parentT2D =
+            static_cast<Transform2DComponent*>(parentGO->GetComponentByType(COMPONENT_TRANSFORM_2D)))
+    {
+        transform2D->size     = parentT2D->size;
+        transform2D->position = float2(0, 0);
+        return;
+    }
+
+    // Check if parent is a canvas
+    if (CanvasComponent* canvas = static_cast<CanvasComponent*>(parentGO->GetComponentByType(COMPONENT_CANVAS)))
+    {
+        transform2D->size     = float2(canvas->GetWidth(), canvas->GetHeight());
+        transform2D->position = float2(0, 0);
+        return;
     }
 }
