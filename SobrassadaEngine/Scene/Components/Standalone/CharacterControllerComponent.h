@@ -2,6 +2,8 @@
 
 #include "Component.h"
 
+#include "Math/float3.h"
+
 class dtNavMeshQuery;
 
 using dtPolyRef = unsigned int;

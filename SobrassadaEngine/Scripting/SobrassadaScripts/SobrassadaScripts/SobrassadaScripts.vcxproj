@@ -277,7 +277,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)DirectXTex;$(SolutionDir)Libs;$(SolutionDir)Libs\SDL\include;$(SolutionDir)Libs\glew-2.1.0\include;$(SolutionDir)Libs\MathGeoLib\include;$(SolutionDir)Libs\ImGui;$(SolutionDir)Libs\ImGuizmo;$(SolutionDir)Libs\Tinygltf;$(SolutionDir)Libs\freetype\include;$(SolutionDir)Libs\Optick_1.4.0\include;$(SolutionDir)Libs\RecastDetour\Detour\Include;$(SolutionDir)Libs\RecastDetour\Recast\Include;$(SolutionDir)Modules;$(SolutionDir)ResourceManagement\Resources;$(SolutionDir)UI;$(SolutionDir)UI\EngineEditors\;$(SolutionDir)UI\EngineEditors\Editor;$(SolutionDir)UI\EngineEditors\Nodes;$(SolutionDir)Utils;$(SolutionDir)Utils\Trees;$(SolutionDir)FileSystem;$(SolutionDir)FileSystem\Config;$(SolutionDir)FileSystem\Importers;$(SolutionDir)FileSystem\Meta;$(SolutionDir)DebugDraw;$(SolutionDir)Scene;$(SolutionDir)Scene\GameObjects;$(SolutionDir)Scene\Components;$(SolutionDir)Libs\bullet\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)DirectXTex;$(SolutionDir)Libs;$(SolutionDir)Libs\Wwise\samples\SoundEngine\Common;$(SolutionDir)Libs\Wwise\samples\SoundEngine\IO;$(SolutionDir)Libs\Wwise\include;$(SolutionDir)Libs\ImNodeFlow-1.2.2\include;$(SolutionDir)Libs\SDL\include;$(SolutionDir)Libs\glew-2.1.0\include;$(SolutionDir)Libs\MathGeoLib\include;$(SolutionDir)Libs\ImGui;$(SolutionDir)Libs\ImGuizmo;$(SolutionDir)Libs\Tinygltf;.$(SolutionDir)Libs\freetype\include;$(SolutionDir)Libs\Optick_1.4.0\include;$(SolutionDir)Libs\RecastDetour\Detour\Include;$(SolutionDir)Libs\RecastDetour\DetourCrowd\Include;$(SolutionDir)Libs\RecastDetour\Recast\Include;$(SolutionDir)Modules;$(SolutionDir)ResourceManagement\Resources;$(SolutionDir)UI;$(SolutionDir)UI\EngineEditors;$(SolutionDir)UI\EngineEditors\Editor;$(SolutionDir)UI\EngineEditors\Nodes;$(SolutionDir)Utils;$(SolutionDir)Utils\Trees;$(SolutionDir)FileSystem;$(SolutionDir)FileSystem\Batching;$(SolutionDir)FileSystem\Config;$(SolutionDir)FileSystem\Importers;$(SolutionDir)FileSystem\Meta;$(SolutionDir)DebugDraw;$(SolutionDir)Scene;$(SolutionDir)Scene\GameObjects;$(SolutionDir)Scene\Components;$(SolutionDir)Libs\bullet\include;$(SolutionDir)Libs\bullet\include\LinearMath;$(SolutionDir)Utils\Physics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -297,7 +297,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)DirectXTex;$(SolutionDir)Libs;$(SolutionDir)Libs\SDL\include;$(SolutionDir)Libs\glew-2.1.0\include;$(SolutionDir)Libs\MathGeoLib\include;$(SolutionDir)Libs\ImGui;$(SolutionDir)Libs\ImGuizmo;$(SolutionDir)Libs\Tinygltf;$(SolutionDir)Libs\freetype\include;$(SolutionDir)Libs\Optick_1.4.0\include;$(SolutionDir)Libs\RecastDetour\Detour\Include;$(SolutionDir)Libs\RecastDetour\Recast\Include;$(SolutionDir)Modules;$(SolutionDir)ResourceManagement\Resources;$(SolutionDir)UI;$(SolutionDir)UI\EngineEditors\;$(SolutionDir)UI\EngineEditors\Editor;$(SolutionDir)UI\EngineEditors\Nodes;$(SolutionDir)Utils;$(SolutionDir)Utils\Trees;$(SolutionDir)FileSystem;$(SolutionDir)FileSystem\Config;$(SolutionDir)FileSystem\Importers;$(SolutionDir)FileSystem\Meta;$(SolutionDir)DebugDraw;$(SolutionDir)Scene;$(SolutionDir)Scene\GameObjects;$(SolutionDir)Scene\Components;$(SolutionDir)Libs\bullet\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)DirectXTex;$(SolutionDir)Libs;$(SolutionDir)Libs\Wwise\samples\SoundEngine\Common;$(SolutionDir)Libs\Wwise\samples\SoundEngine\IO;$(SolutionDir)Libs\Wwise\include;$(SolutionDir)Libs\ImNodeFlow-1.2.2\include;$(SolutionDir)Libs\SDL\include;$(SolutionDir)Libs\glew-2.1.0\include;$(SolutionDir)Libs\MathGeoLib\include;$(SolutionDir)Libs\ImGui;$(SolutionDir)Libs\ImGuizmo;$(SolutionDir)Libs\Tinygltf;.$(SolutionDir)Libs\freetype\include;$(SolutionDir)Libs\Optick_1.4.0\include;$(SolutionDir)Libs\RecastDetour\Detour\Include;$(SolutionDir)Libs\RecastDetour\DetourCrowd\Include;$(SolutionDir)Libs\RecastDetour\Recast\Include;$(SolutionDir)Modules;$(SolutionDir)ResourceManagement\Resources;$(SolutionDir)UI;$(SolutionDir)UI\EngineEditors;$(SolutionDir)UI\EngineEditors\Editor;$(SolutionDir)UI\EngineEditors\Nodes;$(SolutionDir)Utils;$(SolutionDir)Utils\Trees;$(SolutionDir)FileSystem;$(SolutionDir)FileSystem\Batching;$(SolutionDir)FileSystem\Config;$(SolutionDir)FileSystem\Importers;$(SolutionDir)FileSystem\Meta;$(SolutionDir)DebugDraw;$(SolutionDir)Scene;$(SolutionDir)Scene\GameObjects;$(SolutionDir)Scene\Components;$(SolutionDir)Libs\bullet\include;$(SolutionDir)Libs\bullet\include\LinearMath;$(SolutionDir)Utils\Physics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -319,7 +319,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)DirectXTex;$(SolutionDir)Libs;$(SolutionDir)Libs\SDL\include;$(SolutionDir)Libs\glew-2.1.0\include;$(SolutionDir)Libs\MathGeoLib\include;$(SolutionDir)Libs\ImGui;$(SolutionDir)Libs\ImGuizmo;$(SolutionDir)Libs\Tinygltf;$(SolutionDir)Libs\freetype\include;$(SolutionDir)Libs\Optick_1.4.0\include;$(SolutionDir)Libs\RecastDetour\Detour\Include;$(SolutionDir)Libs\RecastDetour\Recast\Include;$(SolutionDir)Modules;$(SolutionDir)ResourceManagement\Resources;$(SolutionDir)UI;$(SolutionDir)UI\EngineEditors\;$(SolutionDir)UI\EngineEditors\Editor;$(SolutionDir)UI\EngineEditors\Nodes;$(SolutionDir)Utils;$(SolutionDir)Utils\Trees;$(SolutionDir)FileSystem;$(SolutionDir)FileSystem\Config;$(SolutionDir)FileSystem\Importers;$(SolutionDir)FileSystem\Meta;$(SolutionDir)DebugDraw;$(SolutionDir)Scene;$(SolutionDir)Scene\GameObjects;$(SolutionDir)Scene\Components;$(SolutionDir)Libs\bullet\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)DirectXTex;$(SolutionDir)Libs;$(SolutionDir)Libs\Wwise\samples\SoundEngine\Common;$(SolutionDir)Libs\Wwise\samples\SoundEngine\IO;$(SolutionDir)Libs\Wwise\include;$(SolutionDir)Libs\ImNodeFlow-1.2.2\include;$(SolutionDir)Libs\SDL\include;$(SolutionDir)Libs\glew-2.1.0\include;$(SolutionDir)Libs\MathGeoLib\include;$(SolutionDir)Libs\ImGui;$(SolutionDir)Libs\ImGuizmo;$(SolutionDir)Libs\Tinygltf;.$(SolutionDir)Libs\freetype\include;$(SolutionDir)Libs\Optick_1.4.0\include;$(SolutionDir)Libs\RecastDetour\Detour\Include;$(SolutionDir)Libs\RecastDetour\DetourCrowd\Include;$(SolutionDir)Libs\RecastDetour\Recast\Include;$(SolutionDir)Modules;$(SolutionDir)ResourceManagement\Resources;$(SolutionDir)UI;$(SolutionDir)UI\EngineEditors;$(SolutionDir)UI\EngineEditors\Editor;$(SolutionDir)UI\EngineEditors\Nodes;$(SolutionDir)Utils;$(SolutionDir)Utils\Trees;$(SolutionDir)FileSystem;$(SolutionDir)FileSystem\Batching;$(SolutionDir)FileSystem\Config;$(SolutionDir)FileSystem\Importers;$(SolutionDir)FileSystem\Meta;$(SolutionDir)DebugDraw;$(SolutionDir)Scene;$(SolutionDir)Scene\GameObjects;$(SolutionDir)Scene\Components;$(SolutionDir)Libs\bullet\include;$(SolutionDir)Libs\bullet\include\LinearMath;$(SolutionDir)Utils\Physics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -343,7 +343,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)DirectXTex;$(SolutionDir)Libs;$(SolutionDir)Libs\SDL\include;$(SolutionDir)Libs\glew-2.1.0\include;$(SolutionDir)Libs\MathGeoLib\include;$(SolutionDir)Libs\ImGui;$(SolutionDir)Libs\ImGuizmo;$(SolutionDir)Libs\Tinygltf;$(SolutionDir)Libs\freetype\include;$(SolutionDir)Libs\Optick_1.4.0\include;$(SolutionDir)Libs\RecastDetour\Detour\Include;$(SolutionDir)Libs\RecastDetour\Recast\Include;$(SolutionDir)Modules;$(SolutionDir)ResourceManagement\Resources;$(SolutionDir)UI;$(SolutionDir)UI\EngineEditors\;$(SolutionDir)UI\EngineEditors\Editor;$(SolutionDir)UI\EngineEditors\Nodes;$(SolutionDir)Utils;$(SolutionDir)Utils\Trees;$(SolutionDir)FileSystem;$(SolutionDir)FileSystem\Config;$(SolutionDir)FileSystem\Importers;$(SolutionDir)FileSystem\Meta;$(SolutionDir)DebugDraw;$(SolutionDir)Scene;$(SolutionDir)Scene\GameObjects;$(SolutionDir)Scene\Components;$(SolutionDir)Libs\bullet\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)DirectXTex;$(SolutionDir)Libs;$(SolutionDir)Libs\Wwise\samples\SoundEngine\Common;$(SolutionDir)Libs\Wwise\samples\SoundEngine\IO;$(SolutionDir)Libs\Wwise\include;$(SolutionDir)Libs\ImNodeFlow-1.2.2\include;$(SolutionDir)Libs\SDL\include;$(SolutionDir)Libs\glew-2.1.0\include;$(SolutionDir)Libs\MathGeoLib\include;$(SolutionDir)Libs\ImGui;$(SolutionDir)Libs\ImGuizmo;$(SolutionDir)Libs\Tinygltf;.$(SolutionDir)Libs\freetype\include;$(SolutionDir)Libs\Optick_1.4.0\include;$(SolutionDir)Libs\RecastDetour\Detour\Include;$(SolutionDir)Libs\RecastDetour\DetourCrowd\Include;$(SolutionDir)Libs\RecastDetour\Recast\Include;$(SolutionDir)Modules;$(SolutionDir)ResourceManagement\Resources;$(SolutionDir)UI;$(SolutionDir)UI\EngineEditors;$(SolutionDir)UI\EngineEditors\Editor;$(SolutionDir)UI\EngineEditors\Nodes;$(SolutionDir)Utils;$(SolutionDir)Utils\Trees;$(SolutionDir)FileSystem;$(SolutionDir)FileSystem\Batching;$(SolutionDir)FileSystem\Config;$(SolutionDir)FileSystem\Importers;$(SolutionDir)FileSystem\Meta;$(SolutionDir)DebugDraw;$(SolutionDir)Scene;$(SolutionDir)Scene\GameObjects;$(SolutionDir)Scene\Components;$(SolutionDir)Libs\bullet\include;$(SolutionDir)Libs\bullet\include\LinearMath;$(SolutionDir)Utils\Physics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -367,7 +367,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)DirectXTex;$(SolutionDir)Libs;$(SolutionDir)Libs\SDL\include;$(SolutionDir)Libs\glew-2.1.0\include;$(SolutionDir)Libs\MathGeoLib\include;$(SolutionDir)Libs\ImGui;$(SolutionDir)Libs\ImGuizmo;$(SolutionDir)Libs\Tinygltf;$(SolutionDir)Libs\freetype\include;$(SolutionDir)Libs\Optick_1.4.0\include;$(SolutionDir)Libs\RecastDetour\Detour\Include;$(SolutionDir)Libs\RecastDetour\Recast\Include;$(SolutionDir)Modules;$(SolutionDir)ResourceManagement\Resources;$(SolutionDir)UI;$(SolutionDir)UI\EngineEditors\;$(SolutionDir)UI\EngineEditors\Editor;$(SolutionDir)UI\EngineEditors\Nodes;$(SolutionDir)Utils;$(SolutionDir)Utils\Trees;$(SolutionDir)FileSystem;$(SolutionDir)FileSystem\Config;$(SolutionDir)FileSystem\Importers;$(SolutionDir)FileSystem\Meta;$(SolutionDir)DebugDraw;$(SolutionDir)Scene;$(SolutionDir)Scene\GameObjects;$(SolutionDir)Scene\Components;$(SolutionDir)Libs\bullet\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)DirectXTex;$(SolutionDir)Libs;$(SolutionDir)Libs\Wwise\samples\SoundEngine\Common;$(SolutionDir)Libs\Wwise\samples\SoundEngine\IO;$(SolutionDir)Libs\Wwise\include;$(SolutionDir)Libs\ImNodeFlow-1.2.2\include;$(SolutionDir)Libs\SDL\include;$(SolutionDir)Libs\glew-2.1.0\include;$(SolutionDir)Libs\MathGeoLib\include;$(SolutionDir)Libs\ImGui;$(SolutionDir)Libs\ImGuizmo;$(SolutionDir)Libs\Tinygltf;.$(SolutionDir)Libs\freetype\include;$(SolutionDir)Libs\Optick_1.4.0\include;$(SolutionDir)Libs\RecastDetour\Detour\Include;$(SolutionDir)Libs\RecastDetour\DetourCrowd\Include;$(SolutionDir)Libs\RecastDetour\Recast\Include;$(SolutionDir)Modules;$(SolutionDir)ResourceManagement\Resources;$(SolutionDir)UI;$(SolutionDir)UI\EngineEditors;$(SolutionDir)UI\EngineEditors\Editor;$(SolutionDir)UI\EngineEditors\Nodes;$(SolutionDir)Utils;$(SolutionDir)Utils\Trees;$(SolutionDir)FileSystem;$(SolutionDir)FileSystem\Batching;$(SolutionDir)FileSystem\Config;$(SolutionDir)FileSystem\Importers;$(SolutionDir)FileSystem\Meta;$(SolutionDir)DebugDraw;$(SolutionDir)Scene;$(SolutionDir)Scene\GameObjects;$(SolutionDir)Scene\Components;$(SolutionDir)Libs\bullet\include;$(SolutionDir)Libs\bullet\include\LinearMath;$(SolutionDir)Utils\Physics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -387,10 +387,13 @@
   <ItemGroup>
     <ClInclude Include="CharacterScript.h" />
     <ClInclude Include="ButtonScript.h" />
+    <ClInclude Include="Character.h" />
+    <ClInclude Include="CuChulainn.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="RotateGameObject.h" />
     <ClInclude Include="Script.h" />
+    <ClInclude Include="Soldier.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Algorithm\Random\LCG.cpp">
@@ -619,6 +622,8 @@
     </ClCompile>
     <ClCompile Include="CharacterScript.cpp" />
     <ClCompile Include="ButtonScript.cpp" />
+    <ClCompile Include="Character.cpp" />
+    <ClCompile Include="CuChulainn.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -634,6 +639,7 @@
     </ClCompile>
     <ClCompile Include="RotateGameObject.cpp" />
     <ClCompile Include="ScriptExport.cpp" />
+    <ClCompile Include="Soldier.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

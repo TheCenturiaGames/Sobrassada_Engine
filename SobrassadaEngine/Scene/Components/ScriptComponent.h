@@ -18,6 +18,7 @@ class ScriptComponent : public Component
     void Render(float deltaTime) override;
     void RenderEditorInspector() override;
 
+    void InitScriptInstances();
     void CreateScript(const std::string& scriptType);
     void DeleteScript();
 
@@ -26,6 +27,6 @@ class ScriptComponent : public Component
   private:
     std::string scriptName           = "Not selected";
     Script* scriptInstance           = nullptr;
-    std::vector<std::string> scripts = {"RotateGameObject", "ButtonScript"};
+    std::vector<std::string> scripts = {"RotateGameObject", "ButtonScript", "CuChulainn", "Soldier"};
     bool startScript                 = false;
 };

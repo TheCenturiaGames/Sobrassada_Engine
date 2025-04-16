@@ -1,4 +1,5 @@
 #include "AIAgentComponent.h"
+
 #include "Application.h"
 #include "EditorUIModule.h"
 #include "GameObject.h"
@@ -32,7 +33,7 @@ AIAgentComponent::~AIAgentComponent()
 {
     if (agentId != -1)
     {
-        App->GetPathfinderModule()->RemoveAgent(agentId); // Step 1: Remove old agent
+        App->GetPathfinderModule()->RemoveAgent(agentId);
         agentId = -1;
     }
 }
@@ -53,8 +54,6 @@ void AIAgentComponent::Update(float deltaTime)
         transform.SetTranslatePart(newPos);
         parent->SetLocalTransform(transform); // Change parent position
     }
-
-    SetPath(App->GetSceneModule()->GetScene()->GetMainCharacter()->GetLastPosition());
 }
 
 void AIAgentComponent::Render(float deltaTime)
@@ -102,9 +101,8 @@ void AIAgentComponent::Save(rapidjson::Value& targetState, rapidjson::Document::
 }
 
 // finds closest navmesh walkable triangle.
-void AIAgentComponent::SetPath(const float3& destination) const
+void AIAgentComponent::SetPathNavigation(const math::float3& destination) const
 {
-
     if (agentId == -1) return;
 
     PathfinderModule* pathfinder = App->GetPathfinderModule();
@@ -131,6 +129,7 @@ void AIAgentComponent::SetPath(const float3& destination) const
         GLOG("Crowd agent failed to request movement.");
     }
 }
+
 void AIAgentComponent::AddToCrowd()
 {
     if (agentId != -1)
