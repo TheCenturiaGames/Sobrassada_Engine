@@ -18,6 +18,7 @@ class ScriptComponent : public Component
     void Render(float deltaTime) override;
     void RenderEditorInspector() override;
 
+    void InitScriptInstances();
     void CreateScript(const std::string& scriptType);
     void DeleteScript();
 

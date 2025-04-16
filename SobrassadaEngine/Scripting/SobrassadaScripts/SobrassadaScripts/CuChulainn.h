@@ -18,7 +18,6 @@ class CuChulainn : public Character
     void OnDamageTaken(int amount) override;
     void OnHealed(int amount) override;
     void PerformAttack() override;
-
-  private:
-    CharacterControllerComponent* character = nullptr;
 };
+
+extern CharacterControllerComponent* character;

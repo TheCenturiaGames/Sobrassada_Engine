@@ -52,15 +52,9 @@ void ScriptComponent::Update(float deltaTime)
     {
         if (scriptInstance != nullptr)
         {
-            if (!startScript)
-            {
-                scriptInstance->Init();
-                startScript = true;
-            }
             scriptInstance->Update(deltaTime);
         }
     }
-    else startScript = false;
 }
 
 void ScriptComponent::Render(float deltaTime)
@@ -91,6 +85,14 @@ void ScriptComponent::RenderEditorInspector()
             }
             ImGui::EndPopup();
         }
+    }
+}
+
+void ScriptComponent::InitScriptInstances()
+{
+    if (scriptInstance != nullptr)
+    {
+        scriptInstance->Init();
     }
 }
 

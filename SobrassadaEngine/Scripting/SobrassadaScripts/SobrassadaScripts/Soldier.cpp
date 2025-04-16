@@ -29,10 +29,11 @@ bool Soldier::Init()
 
 void Soldier::Update(float deltaTime)
 {
-    if (cuChulainn != nullptr) 
-        agentAI->SetPathNavigation(this->cuChulainn->GetLastPosition());
-    else 
-        GLOG("NULLPTR");
+    if (character != nullptr)
+    {
+        agentAI->SetPathNavigation(character->GetLastPosition());
+    }
+        
 }
 
 void Soldier::OnDeath()

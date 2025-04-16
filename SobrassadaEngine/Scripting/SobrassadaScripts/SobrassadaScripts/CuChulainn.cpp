@@ -5,6 +5,8 @@
 #include "GameObject.h"
 #include "Standalone/CharacterControllerComponent.h"
 
+CharacterControllerComponent* character = nullptr;
+
 CuChulainn::CuChulainn(GameObject* parent) : Character(parent, 5, 1, 2.0f, 1.0f, 1.0f)
 {
 }
@@ -22,14 +24,11 @@ bool CuChulainn::Init()
 
     character = dynamic_cast<CharacterControllerComponent*>(agent);
 
-    SetMainCharacter(character);
-
     return true;
 }
 
 void CuChulainn::Update(float deltaTime)
 {
-
 }
 
 void CuChulainn::OnDeath()

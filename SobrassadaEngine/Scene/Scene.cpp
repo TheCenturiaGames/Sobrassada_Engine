@@ -26,11 +26,12 @@
 #include "ResourcePrefab.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
+#include "ScriptComponent.h"
 #include "Standalone/AnimationComponent.h"
-#include "Standalone/MeshComponent.h"
-#include "Standalone/Lights/SpotLightComponent.h"
-#include "Standalone/Lights/PointLightComponent.h"
 #include "Standalone/Lights/DirectionalLightComponent.h"
+#include "Standalone/Lights/PointLightComponent.h"
+#include "Standalone/Lights/SpotLightComponent.h"
+#include "Standalone/MeshComponent.h"
 
 #include "SDL_mouse.h"
 #include "imgui.h"
@@ -212,6 +213,22 @@ update_status Scene::Update(float deltaTime)
 #ifdef OPTICK
     OPTICK_CATEGORY("Scene::Update", Optick::Category::GameLogic)
 #endif
+
+    if (App->GetSceneModule()->GetOnlyOnceInPlayMode())
+    {
+        for (auto& gameObject : gameObjectsContainer)
+        {
+            std::unordered_map<ComponentType, Component*> componentList = gameObject.second->GetComponents();
+
+            for (auto& component : componentList)
+            {
+                if (component.first == ComponentType::COMPONENT_SCRIPT)
+                    dynamic_cast<ScriptComponent*>(component.second)->InitScriptInstances();
+            }
+        }
+        App->GetSceneModule()->ResetOnlyOnceInPlayMode();
+    }
+
     for (auto& gameObject : gameObjectsContainer)
     {
         std::unordered_map<ComponentType, Component*> componentList = gameObject.second->GetComponents();
@@ -580,7 +597,9 @@ void Scene::RenderHierarchyUI(bool& hierarchyMenu)
 void Scene::RemoveGameObjectHierarchy(UID gameObjectUID)
 {
     // TODO: Change when filesystem defined
-    if (!gameObjectsContainer.count(gameObjectUID) || gameObjectUID == gameObjectRootUID || gameObjectUID == multiSelectParent->GetUID()) return;
+    if (!gameObjectsContainer.count(gameObjectUID) || gameObjectUID == gameObjectRootUID ||
+        gameObjectUID == multiSelectParent->GetUID())
+        return;
 
     std::stack<UID> toDelete;
     toDelete.push(gameObjectUID);
@@ -1158,7 +1177,6 @@ void Scene::OverridePrefabs(const UID prefabUID)
     App->GetResourcesModule()->ReleaseResource(prefab);
 }
 
-
 template <typename T> std::vector<T*> Scene::GetEnabledComponentsOfType() const
 {
     std::vector<T*> result;
@@ -1176,7 +1194,6 @@ template <typename T> std::vector<T*> Scene::GetEnabledComponentsOfType() const
 
     return result;
 }
-
 
 template std::vector<DirectionalLightComponent*> Scene::GetEnabledComponentsOfType<DirectionalLightComponent>() const;
 template std::vector<PointLightComponent*> Scene::GetEnabledComponentsOfType<PointLightComponent>() const;

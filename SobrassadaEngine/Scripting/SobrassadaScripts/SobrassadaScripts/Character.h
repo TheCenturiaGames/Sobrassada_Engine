@@ -20,9 +20,6 @@ class Character : public Script
     void Heal(int amount);
     void Kill();
 
-  protected:
-    void SetMainCharacter(CharacterControllerComponent* mainCharacter) { cuChulainn = mainCharacter; };
-
   private:
     virtual void OnDeath() {};
     virtual void OnDamageTaken(int amount) {};
@@ -30,7 +27,6 @@ class Character : public Script
     virtual void PerformAttack() {};
 
   protected:
-    CharacterControllerComponent* cuChulainn = nullptr;
     int maxHealth        = 0;
     int currentHealth    = 0;
     bool isInvulnerable  = false;
