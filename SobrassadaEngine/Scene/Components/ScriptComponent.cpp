@@ -1,11 +1,11 @@
 #include "ScriptComponent.h"
+
 #include "Application.h"
-#include "ImGui.h"
 #include "SceneModule.h"
 #include "Script.h"
 #include "ScriptModule.h"
 
-// Do script of object rotating
+#include "ImGui.h"
 
 ScriptComponent::ScriptComponent(UID uid, GameObject* parent) : Component(uid, parent, "Script", COMPONENT_SCRIPT)
 {

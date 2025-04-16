@@ -105,7 +105,7 @@ void PathfinderModule::HandleClickNavigation()
     for (auto& pair : agentComponentMap)
     {
         AIAgentComponent* comp = pair.second;
-        if (comp != nullptr) comp->SetPath(hitPoint);
+        if (comp != nullptr) comp->SetPathNavigation(hitPoint);
     }
 }
 
