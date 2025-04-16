@@ -18,4 +18,13 @@ class AudioSourceComponent : public Component
     void Render(float deltaTime) override {};
     void RenderEditorInspector() override;
 
+    void EmitEvent(const std::string& event) const;
+    void SetVolume(const float newVolume);
+    void SetPitch(const float newPitch);
+    void SetSpatialization(const float newSpatialization);
+
+  private:
+    float volume = 100;
+    float pitch = 100;
+    float spatialization = 100;
 };
