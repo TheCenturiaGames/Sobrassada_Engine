@@ -11,8 +11,8 @@
 #include "ResourcesModule.h"
 #include "SceneModule.h"
 
-#include "imgui.h"
 #include "Math/Quat.h"
+#include "imgui.h"
 
 AnimationComponent::AnimationComponent(const UID uid, GameObject* parent)
     : Component(uid, parent, "Animation", COMPONENT_ANIMATION)
@@ -78,14 +78,17 @@ void AnimationComponent::OnResume()
 
 void AnimationComponent::OnInspector()
 {
-
+    std::string originAnimation = "";
     if (resource != 0)
     {
         currentAnimResource = dynamic_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
-
+        const std::string animationName = App->GetLibraryModule()->GetResourceName(resource);
+        
+        const size_t underscorePos            = animationName.find('_');
+        if (underscorePos != std::string::npos) originAnimation = animationName.substr(0, underscorePos);
         if (currentAnimResource != nullptr)
         {
-            ImGui::Text("Animation: %s", currentAnimResource->GetName().c_str());
+            ImGui::Text("Animation: %s", animationName.c_str());
             ImGui::Text("Duration: %.2f seconds", currentAnimResource->GetDuration());
 
             if (animController != nullptr && ImGui::TreeNode("Channels"))
@@ -247,8 +250,36 @@ void AnimationComponent::OnInspector()
 
     if (ImGui::CollapsingHeader("Animation Library"))
     {
+        std::string selectedZombunnyAnim = "";
 
         ImGui::Text("Available Animations:");
+        const std::unordered_map<std::string, UID>& animationMap = App->GetLibraryModule()->GetAnimMap();
+
+        for (const auto& pair : animationMap)
+        {
+            const std::string& animationName = pair.first;
+
+            if (animationName.rfind(originAnimation, 0) == 0)
+            {
+                const bool isSelected = (selectedZombunnyAnim == animationName);
+
+                if (ImGui::Selectable(animationName.c_str(), isSelected))
+                {
+                    selectedZombunnyAnim = animationName;
+                    resource             = pair.second;
+
+                    if (currentAnimComp->playing)
+                    {
+                        playing     = false;
+                        currentTime = 0.0f;
+                        currentAnimComp->OnStop();
+                    }
+
+                    GLOG("Selected animation: %s (UID: %llu)", animationName.c_str(), resource);
+                }
+            }
+        }
+
     }
 
     if (playing && currentAnimComp && currentAnimComp->GetAnimationController())
@@ -265,6 +296,7 @@ void AnimationComponent::OnInspector()
 
 void AnimationComponent::Render(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
 }
 
 void AnimationComponent::Clone(const Component* other)
@@ -273,7 +305,7 @@ void AnimationComponent::Clone(const Component* other)
     {
         const AnimationComponent* otherAnimation = static_cast<const AnimationComponent*>(other);
 
-        AddAnimation(otherAnimation->currentAnimResource->GetUID());
+        if (otherAnimation->currentAnimResource) AddAnimation(otherAnimation->currentAnimResource->GetUID());
     }
     else
     {
@@ -283,6 +315,7 @@ void AnimationComponent::Clone(const Component* other)
 
 void AnimationComponent::Update(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
     if (!animController->IsPlaying()) return;
 
     if (boneMapping.empty())

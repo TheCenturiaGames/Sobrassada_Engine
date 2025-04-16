@@ -7,6 +7,8 @@
 #include "Scene.h"
 #include "SceneModule.h"
 #include "UILabelComponent.h"
+#include "ImageComponent.h"
+#include "ButtonComponent.h"
 
 #include "imgui.h"
 #include <queue>
@@ -53,14 +55,21 @@ Transform2DComponent::Transform2DComponent(const rapidjson::Value& initialState,
 
 Transform2DComponent::~Transform2DComponent()
 {
-    //if (parentTransform != nullptr) parentTransform->RemoveChild(this);
+    if (parentTransform != nullptr) parentTransform->RemoveChild(this);
 
-    if (parent->GetComponentByType(COMPONENT_LABEL) != nullptr)
+    Component* widget = parent->GetComponentByType(COMPONENT_LABEL);
+    if (widget) static_cast<UILabelComponent*>(widget)->RemoveTransform();
+    
+    widget = parent->GetComponentByType(COMPONENT_IMAGE);
+    if (widget) static_cast<ImageComponent*>(widget)->RemoveTransform();
+    
+    widget = parent->GetComponentByType(COMPONENT_BUTTON);
+    if (widget) static_cast<ButtonComponent*>(widget)->RemoveTransform();
+
+    for (const auto& child : childTransforms)
     {
-        UILabelComponent* label = static_cast<UILabelComponent*>(parent->GetComponentByType(COMPONENT_LABEL));
-        label->RemoveTransform();
+        child->RemoveParent();
     }
-    // Future UI Components will have to also be checked here
 }
 
 void Transform2DComponent::Init()
@@ -126,53 +135,6 @@ void Transform2DComponent::Clone(const Component* other)
     else
     {
         GLOG("It is not possible to clone a component of a different type!");
-    }
-}
-
-void Transform2DComponent::Update(float deltaTime)
-{
-}
-
-void Transform2DComponent::Render(float deltaTime)
-{
-    if (parentCanvas == nullptr) return;
-
-    // Draw a square to show the width and height
-    DebugDrawModule* debugDraw = App->GetDebugDrawModule();
-    debugDraw->DrawLine(
-        float3(GetRenderingPosition().x, GetRenderingPosition().y, 0), float3::unitX, size.x, float3(1, 1, 1)
-    );
-
-    debugDraw->DrawLine(
-        float3(GetRenderingPosition().x + size.x, GetRenderingPosition().y, 0), -float3::unitY, size.y, float3(1, 1, 1)
-    );
-
-    debugDraw->DrawLine(
-        float3(GetRenderingPosition().x, GetRenderingPosition().y - size.y, 0), float3::unitX, size.x, float3(1, 1, 1)
-    );
-
-    debugDraw->DrawLine(
-        float3(GetRenderingPosition().x, GetRenderingPosition().y, 0), -float3::unitY, size.y, float3(1, 1, 1)
-    );
-
-    // Draw anchor points when selected
-    if (App->GetSceneModule()->GetScene()->GetSelectedGameObject()->GetUID() == parent->GetUID())
-    {
-        // Top-left
-        const float3 x1 = float3(GetAnchorXPos(anchorsX.x), GetAnchorYPos(anchorsY.y), 0);
-        debugDraw->DrawCone(x1, float3(-10, 10, 0), 5, 1);
-
-        // Top-right
-        const float3 x2 = float3(GetAnchorXPos(anchorsX.y), GetAnchorYPos(anchorsY.y), 0);
-        debugDraw->DrawCone(x2, float3(10, 10, 0), 5, 1);
-
-        // Bottom-left
-        const float3 y1 = float3(GetAnchorXPos(anchorsX.x), GetAnchorYPos(anchorsY.x), 0);
-        debugDraw->DrawCone(y1, float3(-10, -10, 0), 5, 1);
-
-        // Bottom-right
-        const float3 y2 = float3(GetAnchorXPos(anchorsX.y), GetAnchorYPos(anchorsY.x), 0);
-        debugDraw->DrawCone(y2, float3(10, -10, 0), 5, 1);
     }
 }
 
@@ -254,6 +216,51 @@ void Transform2DComponent::RenderEditorInspector()
     }
 }
 
+void Transform2DComponent::RenderWidgets() const
+{
+    // Draw a square to show the width and height
+    DebugDrawModule* debugDraw = App->GetDebugDrawModule();
+    debugDraw->DrawLine(
+        float3(GetRenderingPosition().x - 1, GetRenderingPosition().y + 1, 0), float3::unitX, size.x + 2,
+        float3(1, 1, 1)
+    );
+
+    debugDraw->DrawLine(
+        float3(GetRenderingPosition().x + size.x + 1, GetRenderingPosition().y + 1, 0), -float3::unitY, size.y + 2,
+        float3(1, 1, 1)
+    );
+
+    debugDraw->DrawLine(
+        float3(GetRenderingPosition().x - 1, GetRenderingPosition().y - size.y - 1, 0), float3::unitX, size.x + 2,
+        float3(1, 1, 1)
+    );
+
+    debugDraw->DrawLine(
+        float3(GetRenderingPosition().x - 1, GetRenderingPosition().y + 1, 0), -float3::unitY, size.y + 2,
+        float3(1, 1, 1)
+    );
+
+    // Draw anchor points when selected
+    if (App->GetSceneModule()->GetScene()->GetSelectedGameObject()->GetUID() == parent->GetUID())
+    {
+        // Top-left
+        const float3 x1 = float3(GetAnchorXPos(anchorsX.x), GetAnchorYPos(anchorsY.y), 0);
+        debugDraw->DrawCone(x1, float3(-10, 10, 0), 5, 1);
+
+        // Top-right
+        const float3 x2 = float3(GetAnchorXPos(anchorsX.y), GetAnchorYPos(anchorsY.y), 0);
+        debugDraw->DrawCone(x2, float3(10, 10, 0), 5, 1);
+
+        // Bottom-left
+        const float3 y1 = float3(GetAnchorXPos(anchorsX.x), GetAnchorYPos(anchorsY.x), 0);
+        debugDraw->DrawCone(y1, float3(-10, -10, 0), 5, 1);
+
+        // Bottom-right
+        const float3 y2 = float3(GetAnchorXPos(anchorsX.y), GetAnchorYPos(anchorsY.x), 0);
+        debugDraw->DrawCone(y2, float3(10, -10, 0), 5, 1);
+    }
+}
+
 void Transform2DComponent::UpdateParent3DTransform()
 {
     // Get the parent local transform and update it according to the Transform2D. The parentTransform global
@@ -322,7 +329,12 @@ float2 Transform2DComponent::GetRenderingPosition() const
 float2 Transform2DComponent::GetGlobalPosition() const
 {
     return float2(parent->GetGlobalTransform().TranslatePart().x, parent->GetGlobalTransform().TranslatePart().y);
-}
+};
+
+float2 Transform2DComponent::GetCenterPosition() const
+{
+    return float2(GetGlobalPosition().x + (size.x * (0.5f - pivot.x)), GetGlobalPosition().y + (size.y * (0.5f - pivot.y)));
+};
 
 void Transform2DComponent::GetCanvas()
 {
@@ -363,9 +375,10 @@ float Transform2DComponent::GetAnchorXPos(const float anchor) const
     if (IsRootTransform2D())
         anchorPos = parent->GetParentGlobalTransform().TranslatePart().x +
                     (parentCanvas->GetWidth() * (anchor - 0.5f)); // 0.5f because canvas pivot is always in the middle
-    else
+    else if (parentTransform)
         anchorPos =
             parentTransform->GetGlobalPosition().x + (parentTransform->size.x * (anchor - parentTransform->pivot.x));
+    else anchorPos = 0;
 
     return anchorPos;
 }
@@ -377,9 +390,10 @@ float Transform2DComponent::GetAnchorYPos(const float anchor) const
     if (IsRootTransform2D())
         anchorPos = parent->GetParentGlobalTransform().TranslatePart().y +
                     (parentCanvas->GetHeight() * (anchor - 0.5f)); // 0.5f because canvas pivot is always in the middle
-    else
+    else if (parentTransform)
         anchorPos =
             parentTransform->GetGlobalPosition().y + (parentTransform->size.y * (anchor - parentTransform->pivot.y));
+    else anchorPos = 0;
 
     return anchorPos;
 }
@@ -407,36 +421,41 @@ void Transform2DComponent::OnSizeChanged()
     // When the size is changed, update the children anchors and margins as well
     for (const auto& child : childTransforms)
     {
-        child->OnAnchorsUpdated();
-
-        if (child->anchorsX.x == child->anchorsX.y)
-        {
-            child->position.x = child->previousPosition.x;
-        }
-        else
-        {
-            child->margins.x = child->previousMargins.x;
-            child->OnLeftMarginChanged();
-
-            child->margins.y = child->previousMargins.y;
-            child->OnRightMarginChanged();
-        }
-
-        if (child->anchorsY.x == child->anchorsY.y)
-        {
-            child->position.y = child->previousPosition.y;
-        }
-        else
-        {
-            child->margins.z = child->previousMargins.z;
-            child->OnTopMarginChanged();
-
-            child->margins.w = child->previousMargins.w;
-            child->OnBottomMarginChanged();
-        }
-
-        child->UpdateParent3DTransform();
+        child->AdaptToParentChanges();
     }
+}
+
+void Transform2DComponent::AdaptToParentChanges()
+{
+    OnAnchorsUpdated();
+
+    if (anchorsX.x == anchorsX.y)
+    {
+        position.x = previousPosition.x;
+    }
+    else
+    {
+        margins.x = previousMargins.x;
+        OnLeftMarginChanged();
+
+        margins.y = previousMargins.y;
+        OnRightMarginChanged();
+    }
+
+    if (anchorsY.x == anchorsY.y)
+    {
+        position.y = previousPosition.y;
+    }
+    else
+    {
+        margins.z = previousMargins.z;
+        OnTopMarginChanged();
+
+        margins.w = previousMargins.w;
+        OnBottomMarginChanged();
+    }
+
+    UpdateParent3DTransform();
 }
 
 void Transform2DComponent::OnLeftMarginChanged()
@@ -446,7 +465,7 @@ void Transform2DComponent::OnLeftMarginChanged()
             (parent->GetGlobalTransform().TranslatePart().x + (size.x * (1 - pivot.x))));
 
     position.x = ((GetAnchorXPos(anchorsX.x) + margins.x) + (GetAnchorXPos(anchorsX.y) + margins.y)) / 2;
-    if (!IsRootTransform2D()) position.x -= parentTransform->GetGlobalPosition().x;
+    if (!IsRootTransform2D() && parentTransform) position.x -= parentTransform->GetGlobalPosition().x;
     position.x += (pivot.x - 0.5f) * (size.x);
 
     UpdateParent3DTransform();
@@ -460,7 +479,7 @@ void Transform2DComponent::OnRightMarginChanged()
             (parent->GetGlobalTransform().TranslatePart().x - (size.x * pivot.x)));
 
     position.x = ((GetAnchorXPos(anchorsX.x) + margins.x) + (GetAnchorXPos(anchorsX.y) + margins.y)) / 2;
-    if (!IsRootTransform2D()) position.x -= parentTransform->GetGlobalPosition().x;
+    if (!IsRootTransform2D() && parentTransform) position.x -= parentTransform->GetGlobalPosition().x;
     position.x += (pivot.x - 0.5f) * (size.x);
 
     UpdateParent3DTransform();
@@ -474,7 +493,7 @@ void Transform2DComponent::OnTopMarginChanged()
             (parent->GetGlobalTransform().TranslatePart().y - (size.y * pivot.y)));
 
     position.y = ((GetAnchorYPos(anchorsY.y) + margins.z) + (GetAnchorYPos(anchorsY.x) + margins.w)) / 2;
-    if (!IsRootTransform2D()) position.y -= parentTransform->GetGlobalPosition().y;
+    if (!IsRootTransform2D() && parentTransform) position.y -= parentTransform->GetGlobalPosition().y;
     position.y += (pivot.y - 0.5f) * (size.y);
 
     UpdateParent3DTransform();
@@ -488,7 +507,7 @@ void Transform2DComponent::OnBottomMarginChanged()
             (parent->GetGlobalTransform().TranslatePart().y + (size.y * (1 - pivot.y))));
 
     position.y = ((GetAnchorYPos(anchorsY.y) + margins.z) + (GetAnchorYPos(anchorsY.x) + margins.w)) / 2;
-    if (!IsRootTransform2D()) position.y -= parentTransform->GetGlobalPosition().y;
+    if (!IsRootTransform2D() && parentTransform) position.y -= parentTransform->GetGlobalPosition().y;
     position.y += (pivot.y - 0.5f) * (size.y);
 
     UpdateParent3DTransform();
@@ -517,4 +536,25 @@ void Transform2DComponent::RemoveChild(Transform2DComponent* child)
 {
     const auto& it = std::find(childTransforms.begin(), childTransforms.end(), child);
     if (it != childTransforms.end()) childTransforms.erase(it);
+}
+
+void Transform2DComponent::OnParentChange()
+{
+    if (parentTransform) parentTransform->RemoveChild(this);
+
+    // Get the canvas again, just in case the object is now outside of a canvas
+    parentCanvas    = nullptr;
+    parentTransform = nullptr;
+    GetCanvas();
+
+    if (parentCanvas && !IsRootTransform2D())
+    {
+        parentTransform = static_cast<Transform2DComponent*>(App->GetSceneModule()
+                                                                 ->GetScene()
+                                                                 ->GetGameObjectByUID(parent->GetParent())
+                                                                 ->GetComponentByType(COMPONENT_TRANSFORM_2D));
+
+        if (parentTransform) parentTransform->AddChildTransform(this);
+        else GLOG("[WARNING] You are assigning a Transform2D as a child of a gameObject with no Transform2D");
+    }
 }

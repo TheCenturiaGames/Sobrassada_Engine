@@ -20,7 +20,7 @@ namespace MeshImporter
 
     UID ImportMesh(
         const tinygltf::Model& model, const tinygltf::Mesh& mesh, const tinygltf::Primitive& primitive,
-        const std::string& name, const char* sourceFilePath, const std::string& targetFilePath, UID sourceUID,
+        const std::string& name, const float4x4& meshTransform, const char* sourceFilePath, const std::string& targetFilePath, UID sourceUID,
         UID defaultMatUID
     )
     {
@@ -317,11 +317,7 @@ namespace MeshImporter
         {
             UID meshUID           = GenerateUID();
             finalMeshUID          = App->GetLibraryModule()->AssignFiletypeUID(meshUID, FileType::Mesh);
-
-            std::string nameNoExt = name;
-            if (!name.empty()) nameNoExt.pop_back(); // remove last character (number)
-            const float4x4& meshTransform = GetMeshDefaultTransform(model, nameNoExt);
-
+            
             std::string assetPath         = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
             MetaMesh meta(finalMeshUID, assetPath, generateTangents, meshTransform, defaultMatUID);
             meta.Save(name, assetPath);

@@ -1,29 +1,17 @@
 #pragma once
 
 #include "Component.h"
-
-#include "Math/float3.h"
-
-namespace TextManager
-{
-    struct FontData;
-}
-
-namespace Math
-{
-    class float4x4;
-}
+#include "ResourceTexture.h"
 
 class Transform2DComponent;
 class CanvasComponent;
-class ResourceFont;
 
-class UILabelComponent : public Component
+class ImageComponent : public Component
 {
   public:
-    UILabelComponent(UID uid, GameObject* parent);
-    UILabelComponent(const rapidjson::Value& initialState, GameObject* parent);
-    ~UILabelComponent() override;
+    ImageComponent(UID uid, GameObject* parent);
+    ImageComponent(const rapidjson::Value& initialState, GameObject* parent);
+    ~ImageComponent() override;
 
     void Init() override;
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
@@ -31,25 +19,24 @@ class UILabelComponent : public Component
     void Update(float deltaTime) override {};
     void Render(float deltaTime) override {};
     void RenderEditorInspector() override;
-    
-    void RenderUI(const float4x4& view, const float4x4 proj) const;
+
+    void RenderUI(const float4x4& view, const float4x4& proj) const;
     void RemoveTransform() { transform2D = nullptr; }
+    void SetColor(const float3& newColor) { color = newColor; }
 
   private:
     void InitBuffers();
-    void OnFontChange();
+    void ClearBuffers() const;
+    void ChangeTexture(const UID textureUID);
 
   private:
     Transform2DComponent* transform2D;
-    TextManager::FontData* fontData;
+    CanvasComponent* parentCanvas;
 
-    char text[512];
-    int fontSize = 48;
-    float3 fontColor;
-    ResourceFont* fontType;
+    ResourceTexture* texture;
+    float3 color;
 
     unsigned int vbo = 0;
     unsigned int vao = 0;
-
-    CanvasComponent* parentCanvas;
+    UID bindlessUID;
 };
