@@ -386,6 +386,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CharacterScript.h" />
+    <ClInclude Include="ButtonScript.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="RotateGameObject.h" />
@@ -617,6 +618,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Game|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="CharacterScript.cpp" />
+    <ClCompile Include="ButtonScript.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

@@ -5,14 +5,15 @@
 #include "PathfinderModule.h"
 #include "ResourceNavmesh.h"
 #include "SceneModule.h"
+#include "Standalone/CharacterControllerComponent.h"
 
 #include "DetourCrowd.h"
 
 AIAgentComponent::AIAgentComponent(UID uid, GameObject* parent) : Component(uid, parent, "AI Agent", COMPONENT_AIAGENT)
 {
-    speed   = 3.5f;
-    radius  = 0.6f;
-    height  = 2.0f;
+    speed  = 3.5f;
+    radius = 0.6f;
+    height = 2.0f;
 
     RecreateAgent();
 }
@@ -20,7 +21,6 @@ AIAgentComponent::AIAgentComponent(UID uid, GameObject* parent) : Component(uid,
 AIAgentComponent::AIAgentComponent(const rapidjson::Value& initialState, GameObject* parent)
     : Component(initialState, parent)
 {
-
     if (initialState.HasMember("Speed")) speed = initialState["Speed"].GetFloat();
     if (initialState.HasMember("Radius")) radius = initialState["Radius"].GetFloat();
     if (initialState.HasMember("Height")) height = initialState["Height"].GetFloat();
@@ -39,7 +39,7 @@ AIAgentComponent::~AIAgentComponent()
 // Updates agent position evey frame
 void AIAgentComponent::Update(float deltaTime)
 {
-    if (!enabled) return;
+    if (!IsEffectivelyEnabled()) return;
 
     if (!App->GetSceneModule()->GetInPlayMode()) return;
 
@@ -53,10 +53,13 @@ void AIAgentComponent::Update(float deltaTime)
         transform.SetTranslatePart(newPos);
         parent->SetLocalTransform(transform); // Change parent position
     }
+
+    SetPath(App->GetSceneModule()->GetScene()->GetMainCharacter()->GetLastPosition());
 }
 
 void AIAgentComponent::Render(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
 }
 
 void AIAgentComponent::RenderEditorInspector()
@@ -98,8 +101,8 @@ void AIAgentComponent::Save(rapidjson::Value& targetState, rapidjson::Document::
     targetState.AddMember("Height", height, allocator);
 }
 
-// finds closest navmesh walkable trianle.
-void AIAgentComponent::setPath(const float3& destination) const
+// finds closest navmesh walkable triangle.
+void AIAgentComponent::SetPath(const float3& destination) const
 {
 
     if (agentId == -1) return;

@@ -97,8 +97,8 @@ update_status InputModule::PreUpdate(float deltaTime)
             mouseMotion.x = sdlEvent.motion.xrel / 2.f;
             mouseMotion.y = sdlEvent.motion.yrel / 2.f;
 
-            mouse.x       = sdlEvent.motion.x / 2.f;
-            mouse.y       = sdlEvent.motion.y / 2.f;
+            mouse.x       = static_cast<float>(sdlEvent.motion.x);
+            mouse.y       = static_cast<float>(sdlEvent.motion.y);
             break;
         case SDL_MOUSEWHEEL:
             mouseWheel = sdlEvent.wheel.y;

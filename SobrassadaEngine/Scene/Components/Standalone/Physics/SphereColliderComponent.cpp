@@ -94,6 +94,23 @@ void SphereColliderComponent::Save(rapidjson::Value& targetState, rapidjson::Doc
 
 void SphereColliderComponent::Clone(const Component* other)
 {
+    if (other->GetType() == COMPONENT_SPHERE_COLLIDER)
+    {
+        const SphereColliderComponent* sphere = static_cast<const SphereColliderComponent*>(other);
+
+        generateCallback                      = sphere->generateCallback;
+        freezeRotation                        = sphere->freezeRotation;
+        mass                                  = sphere->mass;
+        centerOffset                          = sphere->centerOffset;
+        centerRotation                        = sphere->centerRotation;
+        radius                                = sphere->radius;
+        colliderType                          = sphere->colliderType;
+        layer                                 = sphere->layer;
+        fitToSize                             = sphere->fitToSize;
+
+        if (rigidBody) App->GetPhysicsModule()->UpdateSphereRigidBody(this);
+        else App->GetPhysicsModule()->CreateSphereRigidBody(this);
+    }
 }
 
 void SphereColliderComponent::RenderEditorInspector()
@@ -168,10 +185,12 @@ void SphereColliderComponent::RenderEditorInspector()
 
 void SphereColliderComponent::Update(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
 }
 
 void SphereColliderComponent::Render(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
 }
 
 void SphereColliderComponent::ParentUpdated()

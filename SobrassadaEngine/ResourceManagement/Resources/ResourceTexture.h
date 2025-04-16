@@ -20,7 +20,6 @@ class ResourceTexture : public Resource
     void LoadData(const DirectX::TexMetadata& metadata, const DirectX::ScratchImage& scratchImage);
     static void ConvertMetadata(const DirectX::TexMetadata& metadata, OpenGLMetadata& outMetadata);
 
-
     unsigned int GetTextureID() const { return textureID; }
     int GetTextureWidth() { return (int)metadata.width; }
     int GetTextureHeight() { return (int)metadata.height; }

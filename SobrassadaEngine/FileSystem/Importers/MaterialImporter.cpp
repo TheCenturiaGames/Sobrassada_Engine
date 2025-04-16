@@ -23,7 +23,8 @@ UID MaterialImporter::ImportMaterial(
     std::string path                       = FileSystem::GetFilePath(sourceFilePath);
     bool useOcclusion                      = false;
     const tinygltf::Material& gltfMaterial = model.materials[materialIndex];
-    const std::string materialName         = gltfMaterial.name;
+    std::string materialName         = gltfMaterial.name;
+
     int sizeofStrings                      = 0;
     auto it                                = gltfMaterial.extensions.find("KHR_materials_pbrSpecularGlossiness");
     // ADD OLD LOADING
@@ -180,6 +181,8 @@ UID MaterialImporter::ImportMaterial(
         // replace "" with shader used (example)
         UID tmpName               = GenerateUID();
         std::string tmpNameString = std::to_string(tmpName);
+
+        if (materialName.empty()) materialName = "MaterialType_" + std::to_string(finalMaterialUID);
 
         std::string assetPath     = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
         MetaMaterial meta(finalMaterialUID, assetPath, tmpNameString, useOcclusion, defaultTextureUID);
