@@ -5,21 +5,19 @@
 #include "LibraryModule.h"
 #include "Mesh.h"
 #include "MetaMesh.h"
-#include "ProjectModule.h"
 #include "ResourceMesh.h"
 
 #include "Math/Quat.h"
 #include "rapidjson/document.h"
 #include "tiny_gltf.h"
 #include <algorithm>
-#include <memory>
 #include <vector>
 
 namespace MeshImporter
 {
 
     UID ImportMesh(
-        const tinygltf::Model& model, const tinygltf::Mesh& mesh, const tinygltf::Primitive& primitive,
+        const tinygltf::Model& model, const uint32_t meshIndex, const uint32_t primitiveIndex,
         const std::string& name, const float4x4& meshTransform, const char* sourceFilePath, const std::string& targetFilePath, UID sourceUID,
         UID defaultMatUID
     )
@@ -34,6 +32,8 @@ namespace MeshImporter
         float3 minPos         = {0.0f, 0.0f, 0.0f};
         float3 maxPos         = {0.0f, 0.0f, 0.0f};
         bool generateTangents = false;
+
+        const tinygltf::Primitive& primitive = model.meshes[meshIndex].primitives[primitiveIndex];
 
         // First get the indices, the type is needed for the joints later
         const auto& itIndices = primitive.indices;
@@ -319,7 +319,7 @@ namespace MeshImporter
             finalMeshUID          = App->GetLibraryModule()->AssignFiletypeUID(meshUID, FileType::Mesh);
             
             std::string assetPath         = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
-            MetaMesh meta(finalMeshUID, assetPath, generateTangents, meshTransform, defaultMatUID);
+            MetaMesh meta(finalMeshUID, assetPath, generateTangents, meshTransform, defaultMatUID, meshIndex, primitiveIndex);
             meta.Save(name, assetPath);
         }
         else finalMeshUID = sourceUID;

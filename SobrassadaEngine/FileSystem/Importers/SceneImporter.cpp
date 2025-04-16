@@ -15,6 +15,7 @@
 #define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_EXTERNAL_IMAGE
 #define TINYGLTF_IMPLEMENTATION /* Only in one of the includes */
+#include "MetaMesh.h"
 #include "tiny_gltf.h"
 #include <unordered_set>
 #include <utility>
@@ -78,7 +79,7 @@ namespace SceneImporter
                     }
 
                     const UID meshUID = MeshImporter::ImportMesh(
-                        model, srcMesh, primitive, name, defaultTransform, filePath, targetFilePath, INVALID_UID, matUID
+                        model, srcNode.mesh, primitiveCounter, name, defaultTransform, filePath, targetFilePath, INVALID_UID, matUID
                     );
                     primitiveCounter++;
 
@@ -142,55 +143,18 @@ namespace SceneImporter
     }
 
     void ImportMeshFromMetadata(
-        const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID
+        const std::string& filePath, const std::string& targetFilePath, const std::string& name, const rapidjson::Value& importOptions, UID sourceUID
     )
     {
         tinygltf::Model model = LoadModelGLTF(filePath.c_str(), targetFilePath);
 
-        for (const tinygltf::Node& srcNode : model.nodes)
-        {
-            if (srcNode.mesh >= 0 && srcNode.mesh < model.meshes.size())
-            {
-                const tinygltf::Mesh& srcMesh = model.meshes[srcNode.mesh];
-                int primitiveCounter          = 0;
+        const uint32_t gltfMeshIndex = importOptions["gltfMeshIndex"].GetInt();
+        const uint32_t gltfPrimitiveIndex = importOptions["gltfPrimitiveIndex"].GetInt();
 
-                for (const auto& primitive : srcMesh.primitives)
-                {
-                    std::string generatedName = srcNode.name + "_" + srcMesh.name;
-                    if (primitiveCounter > 0) generatedName += "_" + std::to_string(primitiveCounter);
-
-                    if (name == generatedName)
-                    {
-                        const float4x4& defaultTransform = MeshImporter::GetNodeTransform(srcNode);
-                        MeshImporter::ImportMesh(
-                            model, srcMesh, primitive, name, defaultTransform, filePath.c_str(), targetFilePath,
-                            sourceUID
-                        );
-                        return;
-                    }
-
-                    primitiveCounter++;
-                }
-            }
-        }
-
-        std::string nameNoExt = name;
-        if (!name.empty()) nameNoExt.pop_back(); // remove last character (extension)
-
-        // find mesh name that equals to name
-        for (const auto& srcMesh : model.meshes)
-        {
-            if (srcMesh.name == nameNoExt)
-            {
-                for (const auto& primitive : srcMesh.primitives)
-                {
-                    MeshImporter::ImportMesh(
-                        model, srcMesh, primitive, name, float4x4::identity, filePath.c_str(), targetFilePath, sourceUID
-                    );
-                    return; // only one mesh with the same name
-                }
-            }
-        }
+        MeshImporter::ImportMesh(
+            model, gltfMeshIndex, gltfPrimitiveIndex, name, float4x4::identity, filePath.c_str(), targetFilePath,
+            sourceUID
+        );
     }
 
     void ImportMaterialFromMetadata(
