@@ -732,7 +732,6 @@ void Scene::AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
         GameObject* selectedGameObjectParent = GetGameObjectByUID(selectedGameObjects[gameObject]);
 
         selectedGameObject->SetParent(selectedGameObjectParent->GetUID());
-        selectedGameObjectParent->AddGameObject(gameObject);
 
         if (selectedGameObjectParent->GetUID() != gameObjectRootUID)
         {
