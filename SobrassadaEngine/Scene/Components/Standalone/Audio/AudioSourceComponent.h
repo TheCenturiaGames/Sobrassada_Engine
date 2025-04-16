@@ -26,6 +26,7 @@ class AudioSourceComponent : public Component
   private:
     void SetInitValues() const;
 
+    char defaultEvent[64];
     float volume = 1;
     float pitch = 0.5f;
     float spatialization = 0;
