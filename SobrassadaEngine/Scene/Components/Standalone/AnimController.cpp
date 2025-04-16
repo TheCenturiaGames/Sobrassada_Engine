@@ -93,7 +93,7 @@ update_status AnimController::Update(float deltaTime)
             
         fadeTime    += deltaTime;
 
-        if (fadeTime >= static_cast<float>(transitionTime))
+        if (fadeTime >= transitionTime)
         {
             App->GetResourcesModule()->ReleaseResource(currentAnimation);
             currentAnimation  = targetAnimation;
@@ -121,9 +121,7 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
     } else
     {
         float weight = transitionTime != 0 ? fadeTime / transitionTime : 1;
-        GLOG("Comparing anims [%s]:", nodeName.c_str());
-        GLOG("  - Current UID: %llu", currentAnimation->GetUID());
-        GLOG("  - Target UID:  %llu", targetAnimation->GetUID());
+        GLOG("transitionTime: %f, fadeTime: %f, weight: %f", transitionTime, fadeTime, weight);
         Channel* animChannel = currentAnimation->GetChannel(nodeName);
         Channel* targetAnimChannel = targetAnimation->GetChannel(nodeName);
         if (animChannel == nullptr || targetAnimChannel == nullptr) return;
@@ -141,24 +139,16 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
         pos = animPos.Lerp(targetAnimPos, weight);
         rot = Quat::Slerp(animQuat, targetAnimQuat, weight);
 
-        if (animPos.x != targetAnimPos.x || animPos.y != targetAnimPos.y || animPos.z != targetAnimPos.z)
-        {
-            GLOG(
-            "Blending node [%s]: animPos = (%.2f, %.2f, %.2f), targetAnimPos = (%.2f, %.2f, %.2f), pos = (%.2f, %.2f, %.2f), weight = %.2f",
-            nodeName.c_str(), animPos.x, animPos.y, animPos.z, targetAnimPos.x, targetAnimPos.y, targetAnimPos.z, pos.x, pos.y, pos.z, weight
-        );
-        }
     }
     
     // TODO Implement piecewise interpolation to support lerp between more than two animations
     // TODO https://stackoverflow.com/questions/66522629/given-3-or-more-numbers-or-vectors-how-do-i-interpolate-between-them-based-on-a
 }
 
-void AnimController::SetTargetAnimationResource(UID uid, float timeTransition)
+void AnimController::SetTargetAnimationResource(UID uid, unsigned timeTransition)
 {
     targetAnimation = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(uid));
-    GLOG("nAME: %s", targetAnimation->GetName().c_str());
-    transitionTime  = timeTransition;
+    transitionTime  = static_cast<float>(timeTransition) / 1000;
 }
 
 void AnimController::GetChannelPosition(const Channel* animChannel, float3& pos, const float time) const

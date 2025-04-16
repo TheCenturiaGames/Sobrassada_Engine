@@ -60,7 +60,7 @@ AnimationComponent::~AnimationComponent()
 void AnimationComponent::OnPlay(bool isTransition)
 {
     StateMachineEditor* stateMachine = nullptr;
-    float transitionTime             = 0;
+    unsigned transitionTime             = 0;
     if (animController != nullptr && resource != 0)
     {
         if (resourceStateMachine)

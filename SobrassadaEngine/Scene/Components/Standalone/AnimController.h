@@ -22,7 +22,7 @@ class AnimController
     ResourceAnimation* GetCurrentAnimation() const { return currentAnimation; }
     float GetTime() const { return currentTime; }
 
-    void SetTargetAnimationResource(UID uid, float transitionTime);
+    void SetTargetAnimationResource(UID uid, unsigned transitionTime);
     void SetPlaybackSpeed(float speed) { playbackSpeed = speed; }
     void SetTime(float time) { currentTime = time; }
 
@@ -43,7 +43,7 @@ class AnimController
     bool loop                    = false;
     bool playAnimation           = false;
     float playbackSpeed          = 1.0f;
-    unsigned transitionTime      = 0;
+    float transitionTime      = 0;
     float fadeTime               = 0;
     float currentTargetTime      = 0;
     
