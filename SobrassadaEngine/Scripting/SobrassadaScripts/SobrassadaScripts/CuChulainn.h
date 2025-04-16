@@ -1,9 +1,19 @@
 #pragma once
 
 #include "Character.h"
+#include <unordered_map>
 
 class GameObject;
 class CharacterControllerComponent;
+
+enum class CharacterStates
+{
+    NONE,
+    IDLE,
+    RUN,
+    DASH,
+    BASIC_ATTACK
+};
 
 class CuChulainn : public Character
 {
@@ -18,6 +28,11 @@ class CuChulainn : public Character
     void OnDamageTaken(int amount) override;
     void OnHealed(int amount) override;
     void PerformAttack() override;
+
+    void HandleAnimation();
+
+private:
+    static std::unordered_map<std::string, CharacterStates> stateMap;
 };
 
 extern CharacterControllerComponent* character;

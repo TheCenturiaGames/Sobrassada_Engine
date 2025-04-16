@@ -16,7 +16,7 @@ class Character : public Script
 
     void CanAttack();
     void ShouldAttackTarget();
-    void TakeDamage();
+    void TakeDamage(int amount);
     void Heal(int amount);
     void Kill();
 
