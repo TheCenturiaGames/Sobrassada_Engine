@@ -24,7 +24,9 @@ class AudioSourceComponent : public Component
     void SetSpatialization(const float newSpatialization);
 
   private:
-    float volume = 100;
-    float pitch = 100;
-    float spatialization = 100;
+    void SetInitValues() const;
+
+    float volume = 1;
+    float pitch = 0.5f;
+    float spatialization = 0;
 };

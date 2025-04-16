@@ -16,6 +16,9 @@ AudioSourceComponent::AudioSourceComponent(UID uid, GameObject* parent)
 AudioSourceComponent::AudioSourceComponent(const rapidjson::Value& initialState, GameObject* parent)
     : Component(initialState, parent)
 {
+    volume         = initialState["Volume"].GetFloat();
+    pitch          = initialState["Pitch"].GetFloat();
+    spatialization = initialState["Spatialization"].GetFloat();
 }
 
 AudioSourceComponent::~AudioSourceComponent()
@@ -26,11 +29,16 @@ AudioSourceComponent::~AudioSourceComponent()
 void AudioSourceComponent::Init()
 {
     App->GetAudioModule()->AddAudioSource(this);
+    SetInitValues();
 }
 
 void AudioSourceComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
 {
     Component::Save(targetState, allocator);
+
+    targetState.AddMember("Volume", volume, allocator);
+    targetState.AddMember("Pitch", pitch, allocator);
+    targetState.AddMember("Spatialization", spatialization, allocator);
 }
 
 void AudioSourceComponent::Clone(const Component* other)
@@ -39,6 +47,12 @@ void AudioSourceComponent::Clone(const Component* other)
     {
         const AudioSourceComponent* otherAudioSource = static_cast<const AudioSourceComponent*>(other);
         enabled                                      = otherAudioSource->enabled;
+
+        volume                                       = otherAudioSource->volume;
+        pitch                                        = otherAudioSource->pitch;
+        spatialization                               = otherAudioSource->spatialization;
+
+        SetInitValues();
     }
     else
     {
@@ -61,15 +75,16 @@ void AudioSourceComponent::RenderEditorInspector()
 
     if (enabled)
     {
-        if (ImGui::SliderFloat("Volume", &volume, 0, 1)) SetVolume(volume);
-        if (ImGui::SliderFloat("Pitch", &pitch, 0, 1)) SetPitch(pitch);
-        if (ImGui::SliderFloat("Pitch", &spatialization, 0, 1)) SetSpatialization(spatialization);
+        if (ImGui::DragFloat("Volume", &volume, 0.01f, 0, 1, "%.3f", ImGuiSliderFlags_AlwaysClamp)) SetVolume(volume);
+        if (ImGui::DragFloat("Pitch", &pitch, 0.01f, 0, 1, "%.3f", ImGuiSliderFlags_AlwaysClamp)) SetPitch(pitch);
+        if (ImGui::DragFloat("3D Spatialization", &spatialization, 0.01f, 0, 1, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+            SetSpatialization(spatialization);
     }
 }
 
 void AudioSourceComponent::EmitEvent(const std::string& event) const
 {
-    AK::SoundEngine::PostEvent("Test", (AkGameObjectID)parent->GetUID());
+    AK::SoundEngine::PostEvent(event.c_str(), (AkGameObjectID)parent->GetUID());
 }
 
 void AudioSourceComponent::SetVolume(const float newVolume)
@@ -81,11 +96,18 @@ void AudioSourceComponent::SetVolume(const float newVolume)
 void AudioSourceComponent::SetPitch(const float newPitch)
 {
     pitch = newPitch;
-    AK::SoundEngine::SetRTPCValue("Pitch", volume, parent->GetUID());
+    AK::SoundEngine::SetRTPCValue("Pitch", pitch, parent->GetUID());
 }
 
 void AudioSourceComponent::SetSpatialization(const float newSpatialization)
 {
     spatialization = newSpatialization;
+    AK::SoundEngine::SetRTPCValue("Spatialization", spatialization, parent->GetUID());
+}
+
+void AudioSourceComponent::SetInitValues() const
+{
+    AK::SoundEngine::SetRTPCValue("Volume", volume, parent->GetUID());
+    AK::SoundEngine::SetRTPCValue("Pitch", pitch, parent->GetUID());
     AK::SoundEngine::SetRTPCValue("Spatialization", spatialization, parent->GetUID());
 }
