@@ -2,6 +2,8 @@
 #include "RotateGameObject.h"
 #include "GameObject.h"
 #include "Math/float4x4.h"
+#include "CameraModule.h"
+#include "Application.h"
 
 bool RotateGameObject::Init()
 {
@@ -15,4 +17,5 @@ void RotateGameObject::Update(float deltaTime)
     newTransform = newTransform * float4x4::RotateX(0.5f * deltaTime);
     parent->SetLocalTransform(newTransform);
     parent->UpdateTransformForGOBranch();
+    GLOG("%f", AppEngine->GetCameraModule()->GetCameraPosition().y);
 }

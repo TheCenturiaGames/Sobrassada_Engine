@@ -10,6 +10,13 @@
 #define SOBRASSADA_API __declspec(dllimport)
 #endif
 
+Application* AppEngine = nullptr;
+extern "C" SOBRASSADA_API void InitSobrassadaScripts(Application* App)
+{
+    GLOG("Sobrassada Scripts Initialized");
+    AppEngine = App;
+}
+
 extern "C" SOBRASSADA_API Script* CreateScript(const std::string& scriptType, GameObject* parent)
 {
     if (scriptType == "RotateGameObject") return new RotateGameObject(parent);

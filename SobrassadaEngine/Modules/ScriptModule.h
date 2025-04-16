@@ -38,7 +38,9 @@ class ScriptModule : public Module
 
     typedef Script* (*CreateScriptFunc)(const std::string&, GameObject*);
     typedef void (*DestroyScriptFunc)(Script*);
+    typedef void (*StartSobrassadaScripts)(Application* App);
 
+    StartSobrassadaScripts startScriptFunc    = nullptr;
     CreateScriptFunc createScriptFunc    = nullptr;
     DestroyScriptFunc destroyScriptFunc  = nullptr;
 

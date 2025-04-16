@@ -1,6 +1,7 @@
 #pragma once
 
 class GameObject;
+class Application;
 
 class Script
 {
@@ -14,3 +15,5 @@ class Script
   protected:
     GameObject* parent;
 };
+
+extern Application* AppEngine;
