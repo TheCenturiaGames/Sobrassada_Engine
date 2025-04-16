@@ -2,11 +2,11 @@
 
 #include "Application.h"
 #include "FileSystem.h"
+#include "GameObject.h"
 #include "LibraryModule.h"
 #include "MetaPrefab.h"
 #include "ProjectModule.h"
 #include "ResourcePrefab.h"
-#include "GameObject.h"
 #include "SceneModule.h"
 
 #include "rapidjson/prettywriter.h"
@@ -26,13 +26,31 @@ namespace PrefabManager
         rapidjson::Value prefab(rapidjson::kObjectType);
 
         // Scene values
-        UID uid              = GenerateUID();
-        std::string savePath = PREFABS_LIB_PATH + std::string("Prefab") + PREFAB_EXTENSION;
-        UID finalPrefabUID =
+        const UID uid = GenerateUID();
+        const UID finalPrefabUID =
             override ? gameObject->GetPrefabUID() : App->GetLibraryModule()->AssignFiletypeUID(uid, FileType::Prefab);
-        savePath = App->GetProjectModule()->GetLoadedProjectPath() + PREFABS_LIB_PATH + std::to_string(finalPrefabUID) +
-                   PREFAB_EXTENSION;
-        const std::string& name = gameObject->GetName();
+        const std::string& savePath = App->GetProjectModule()->GetLoadedProjectPath() + PREFABS_LIB_PATH +
+                                      std::to_string(finalPrefabUID) + PREFAB_EXTENSION;
+
+        const std::string& originalName = gameObject->GetName();
+
+        int numRepeated                 = 0;
+        bool updateName                 = true;
+        std::string name                = std::string(originalName);
+        while (updateName)
+        {
+            updateName = false;
+            for (const auto& savedPrefab : App->GetLibraryModule()->GetPrefabMap())
+            {
+                if (savedPrefab.first == name)
+                {
+                    updateName = true;
+                    ++numRepeated;
+                    name = originalName + "(" + std::to_string(numRepeated) + ")";
+                    break;
+                }
+            }
+        }
 
         // Create structure
         prefab.AddMember("UID", finalPrefabUID, allocator);

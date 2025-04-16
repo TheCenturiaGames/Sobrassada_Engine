@@ -33,7 +33,6 @@ class UILabelComponent : public Component
     void RenderEditorInspector() override;
     
     void RenderUI(const float4x4& view, const float4x4 proj) const;
-
     void RemoveTransform() { transform2D = nullptr; }
 
   private:

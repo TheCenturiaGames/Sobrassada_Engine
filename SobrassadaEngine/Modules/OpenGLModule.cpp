@@ -40,6 +40,7 @@ bool OpenGLModule::Init()
     glEnable(GL_DEPTH_TEST); // Enable depth test
     glEnable(GL_CULL_FACE);  // Enable cull backward faces
     glFrontFace(GL_CCW);     // Enable conter clock wise backward faces
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // Enable seamless cubemap 
 
     framebuffer = new Framebuffer(App->GetWindowModule()->GetWidth(), App->GetWindowModule()->GetHeight(), true);
 
