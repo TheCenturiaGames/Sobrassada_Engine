@@ -24,7 +24,7 @@ PathfinderModule::PathfinderModule()
 bool PathfinderModule ::Init()
 {
     if (!crowd) crowd = dtAllocCrowd();
-    tmpNavmesh = new ResourceNavMesh(15345456565, "defaultName");
+    tmpNavmesh = new ResourceNavMesh(15345456565, "dummyNavmesh");
     return true;
 }
 
@@ -46,6 +46,8 @@ update_status PathfinderModule::Update(float deltaTime)
 
     return UPDATE_CONTINUE;
 }
+
+
 
 // All ai agent components will call this to add themselves to crowd
 int PathfinderModule::CreateAgent(const float3& position, const float radius, const float height, const float speed)
@@ -80,8 +82,12 @@ void PathfinderModule::RemoveAgent(int agentId)
 
 void PathfinderModule::InitQuerySystem()
 {
+    if (!tmpNavmesh)
+    {
+        GLOG("[Error] No navmesh assigned for query system");
+        return;
+    }
 
-    tmpNavmesh  = GetNavMesh();
     navQuery = tmpNavmesh->GetDetourNavMeshQuery();
 
     if (tmpNavmesh != nullptr)
@@ -148,6 +154,16 @@ AIAgentComponent* PathfinderModule::GetComponentFromAgentId(int agentId)
 
 void PathfinderModule::CreateNavMesh()
 {
+    // Cleanup old navmesh
+    if (tmpNavmesh != nullptr){
+   
+        delete tmpNavmesh;
+        tmpNavmesh = nullptr;
+    }
+
+    UID navUID = GenerateUID();
+
+    tmpNavmesh = new ResourceNavMesh(navUID, "RuntimeNavMesh");
 
     std::vector<std::pair<const ResourceMesh*, const float4x4&>> meshes;
     float minPos[3] = { FLT_MAX, FLT_MAX, FLT_MAX };
@@ -185,12 +201,16 @@ void PathfinderModule::CreateNavMesh()
             }
         }
     }
+
     if (meshes.size() == 0)
     {
         GLOG("[WARNING] Trying to create NavMesh but no meshes are found in the scene");
         return;
     }
     tmpNavmesh->BuildNavMesh(meshes, minPos, maxPos);
-    App->GetPathfinderModule()->InitQuerySystem();
+
+    InitQuerySystem();
 }
+
+
 
