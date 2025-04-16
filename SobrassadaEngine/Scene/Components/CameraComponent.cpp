@@ -375,6 +375,11 @@ void CameraComponent::RenderCameraPreview(float deltaTime)
 void CameraComponent::Render(float deltaTime)
 {
     if (!IsEffectivelyEnabled()) return;
+}
+
+void CameraComponent::RenderDebug(float deltaTime)
+{
+    if (!IsEffectivelyEnabled()) return;
     if (!enabled || !drawGizmos || App->GetSceneModule()->GetInPlayMode()) return;
     DebugDrawModule* debug = App->GetDebugDrawModule();
     debug->DrawFrustrum(camera.ProjectionMatrix(), camera.ViewMatrix());

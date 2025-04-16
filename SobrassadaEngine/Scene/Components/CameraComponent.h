@@ -21,6 +21,7 @@ class CameraComponent : public Component
 
     void Update(float deltaTime) override;
     void Render(float deltaTime) override;
+    void RenderDebug(float deltaTime) override;
     void RenderEditorInspector() override;
 
     void ChangeToPerspective();

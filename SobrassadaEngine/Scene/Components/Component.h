@@ -22,6 +22,7 @@ class SOBRASADA_API_ENGINE Component
 
     virtual void Update(float deltaTime)       = 0;
     virtual void Render(float deltaTime)       = 0;
+    virtual void RenderDebug(float deltaTime)       = 0;
     virtual void RenderEditorInspector();
     virtual void ParentUpdated() { return; };
 

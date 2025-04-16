@@ -61,6 +61,11 @@ void AIAgentComponent::Render(float deltaTime)
     if (!IsEffectivelyEnabled()) return;
 }
 
+void AIAgentComponent::RenderDebug(float deltaTime)
+{
+
+}
+
 void AIAgentComponent::RenderEditorInspector()
 {
     Component::RenderEditorInspector();

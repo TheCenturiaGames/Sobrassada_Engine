@@ -260,6 +260,16 @@ update_status Scene::Render(float deltaTime)
     if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
         RenderScene(deltaTime, App->GetSceneModule()->GetScene()->GetMainCamera());
     else RenderScene(deltaTime, nullptr);
+
+    GameObject* selectedGameObject = App->GetSceneModule()->GetScene()->GetSelectedGameObject();
+    if (selectedGameObject != nullptr)
+    {
+        for (const auto& component : selectedGameObject->GetComponents())
+        {
+            component.second->RenderDebug(deltaTime);
+        }
+    }
+
     return UPDATE_CONTINUE;
 }
 
@@ -752,7 +762,7 @@ void Scene::ClearObjectSelection()
     // UPDATE TO LET ORIGINAL GAME OBJECTS WITH THEIR ORIGINAL MOBILITY
     for (auto& pairGameObject : selectedGameObjectsMobility)
     {
-        GameObject* currentGameObject        = GetGameObjectByUID(pairGameObject.first);
+        GameObject* currentGameObject = GetGameObjectByUID(pairGameObject.first);
         currentGameObject->UpdateMobilityHierarchy(pairGameObject.second);
     }
 
