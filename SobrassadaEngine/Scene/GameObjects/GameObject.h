@@ -32,6 +32,7 @@ class SOBRASADA_API_ENGINE GameObject
     ~GameObject();
 
     void Init();
+    void InitHierarchy();
 
     const float4x4& GetParentGlobalTransform() const;
 
@@ -112,7 +113,6 @@ class SOBRASADA_API_ENGINE GameObject
     void SetWillUpdate(bool willUpdate) { this->willUpdate = willUpdate; };
     bool IsEnabled() const { return enabled; }
     void SetEnabled(bool state) { enabled = state; }
-
 
   private:
     void DrawNodes() const;

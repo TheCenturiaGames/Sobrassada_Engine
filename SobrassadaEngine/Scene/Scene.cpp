@@ -27,10 +27,10 @@
 #include "ResourcesModule.h"
 #include "SceneModule.h"
 #include "Standalone/AnimationComponent.h"
-#include "Standalone/MeshComponent.h"
-#include "Standalone/Lights/SpotLightComponent.h"
-#include "Standalone/Lights/PointLightComponent.h"
 #include "Standalone/Lights/DirectionalLightComponent.h"
+#include "Standalone/Lights/PointLightComponent.h"
+#include "Standalone/Lights/SpotLightComponent.h"
+#include "Standalone/MeshComponent.h"
 
 #include "SDL_mouse.h"
 #include "imgui.h"
@@ -110,7 +110,8 @@ void Scene::Init()
 {
     for (auto& gameObject : gameObjectsContainer)
     {
-        gameObject.second->Init();
+        if (gameObject.second->GetParent() == gameObjectRootUID) 
+            gameObject.second->InitHierarchy();
     }
     App->GetResourcesModule()->GetBatchManager()->LoadData();
 
@@ -1187,7 +1188,6 @@ void Scene::OverridePrefabs(const UID prefabUID)
     App->GetResourcesModule()->ReleaseResource(prefab);
 }
 
-
 template <typename T> std::vector<T*> Scene::GetEnabledComponentsOfType() const
 {
     std::vector<T*> result;
@@ -1205,7 +1205,6 @@ template <typename T> std::vector<T*> Scene::GetEnabledComponentsOfType() const
 
     return result;
 }
-
 
 template std::vector<DirectionalLightComponent*> Scene::GetEnabledComponentsOfType<DirectionalLightComponent>() const;
 template std::vector<PointLightComponent*> Scene::GetEnabledComponentsOfType<PointLightComponent>() const;

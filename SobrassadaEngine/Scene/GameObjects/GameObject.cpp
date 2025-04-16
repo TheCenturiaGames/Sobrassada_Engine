@@ -11,6 +11,7 @@
 #include "Standalone/UI/Transform2DComponent.h"
 
 #include "imgui.h"
+#include <queue>
 #include <set>
 #include <stack>
 
@@ -148,11 +149,39 @@ GameObject::~GameObject()
 
 void GameObject::Init()
 {
+    if (name == "CH_MC_Chu_V02") int x = 0;
     globalTransform = GetParentGlobalTransform() * localTransform;
 
     for (auto& component : components)
     {
         component.second->Init();
+    }
+}
+
+void GameObject::InitHierarchy()
+{
+    std::queue<UID> gameObjects;
+
+    for (UID child : this->GetChildren())
+    {
+        gameObjects.push(child);
+    }
+
+    Scene* scene = App->GetSceneModule()->GetScene();
+
+    while (!gameObjects.empty())
+    {
+        UID currentGameObject = gameObjects.front();
+        gameObjects.pop();
+
+        GameObject* current = scene->GetGameObjectByUID(currentGameObject);
+
+        current->Init();
+
+        for (UID child : current->GetChildren())
+        {
+            gameObjects.push(child);
+        }
     }
 }
 
@@ -425,9 +454,17 @@ AnimationComponent* GameObject::GetAnimationComponent() const
 
 void GameObject::OnTransformUpdated()
 {
-    globalTransform              = GetParentGlobalTransform() * localTransform;
-    globalOBB                    = globalTransform * OBB(localAABB);
-    globalAABB                   = AABB(globalOBB);
+    if (name == "CH_MC_Chu_V02")
+        int x = 0;
+    globalTransform = GetParentGlobalTransform() * localTransform;
+    globalOBB       = globalTransform * OBB(localAABB);
+    globalAABB      = AABB(globalOBB);
+
+    if (globalAABB.IsFinite())
+        GLOG(
+            "%s has globalAABB: %.3f %.3f %.3f", name.c_str(), globalAABB.maxPoint.x, globalAABB.maxPoint.y,
+            globalAABB.maxPoint.z
+        );
 
     MeshComponent* meshComponent = GetMeshComponent();
     if (meshComponent != nullptr)
