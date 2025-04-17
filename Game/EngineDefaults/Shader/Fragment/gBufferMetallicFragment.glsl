@@ -50,7 +50,11 @@ void main()
     gDiffuse = vec4(pow(texture(sampler2D(mat.diffuseTex), uv0).rgb, vec3(2.2f)), 1);
     gSpecular = vec4(pow(texture(sampler2D(mat.metallicTex), uv0), vec4(2.2)));
     gPosition = vec4(pos,0);
-    // gNormal = vec4(normal,0);
+    gNormal = vec4(normal,0);
+
+
+    gSpecular.y = mat.roughnessFactor * gSpecular.y;
+    gSpecular.z = mat.metallicFactor * gSpecular.z;
 
     vec3 N = normalize(normal);
     // Retrive normal for normal map
@@ -60,6 +64,6 @@ void main()
         const vec3 final_normal = space * texNormal;
         N = normalize(final_normal);
     }
-    
+
     gNormal = vec4(N,0);
 }

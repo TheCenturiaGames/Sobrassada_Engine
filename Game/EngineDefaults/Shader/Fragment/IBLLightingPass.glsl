@@ -15,20 +15,6 @@ out vec4 outColor;
 
 uniform vec3 cameraPos;
 
-struct Material
-{
-    vec4 diffColor;
-    vec3 specColor;
-    float shininess;
-    bool shininessInAlpha;
-    float metallicFactor;
-    float roughnessFactor;
-    uvec2 diffuseTex;
-    uvec2 specularTex;
-    uvec2 metallicTex;
-    uvec2 normalTex;
-};
-
 struct DirectionalLight
 {
     vec3 direction;
@@ -49,7 +35,6 @@ struct SpotLight
 	float innerAngle;
 	float outerAngle;
 };
-
 
 // UBOs
 layout(std140, binding = 2) uniform Ambient
@@ -78,10 +63,6 @@ readonly layout(std430, binding = 5) buffer SpotLights
 {
 	int spotLightsCount;
 	SpotLight spotLights[];
-};
-
-readonly layout(std430, binding = 11) buffer Materials {
-    Material materials[];
 };
 
 
