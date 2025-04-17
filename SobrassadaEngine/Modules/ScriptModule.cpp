@@ -88,8 +88,8 @@ void ScriptModule::DeleteAllScripts()
                 scriptComponent->DeleteScript();
             }
         }
+        freeScriptFunc();
     }
-    freeScriptFunc();
 }
 
 void ScriptModule::RecreateAllScripts()
