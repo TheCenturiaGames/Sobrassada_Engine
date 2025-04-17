@@ -4,6 +4,7 @@
 #include "AudioModule.h"
 #include "GameObject.h"
 #include "InputModule.h" // TODO: DELETE THIS
+#include "WwiseIDs.h"
 
 #include "ImGui.h"
 #include <AK/SoundEngine/Common/AkSoundEngine.h>
@@ -118,4 +119,14 @@ void AudioSourceComponent::SetInitValues() const
     AK::SoundEngine::SetRTPCValue("Volume", volume, parent->GetUID());
     AK::SoundEngine::SetRTPCValue("Pitch", pitch, parent->GetUID());
     AK::SoundEngine::SetRTPCValue("Spatialization", spatialization, parent->GetUID());
+}
+
+void AudioSourceComponent::SetRTPCValue(const std::string& name, const float value)
+{
+    AK::SoundEngine::SetRTPCValue(name.c_str(), value, parent->GetUID());
+}
+
+void AudioSourceComponent::SetSwitch(const std::string& switchGroup, const std::string& activeSwitch)
+{
+    AK::SoundEngine::SetSwitch(switchGroup.c_str(), activeSwitch.c_str(), parent->GetUID());
 }

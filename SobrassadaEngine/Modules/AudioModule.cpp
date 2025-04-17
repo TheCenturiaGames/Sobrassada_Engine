@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "Globals.h"
 #include "ProjectModule.h"
+#include "WwiseIDs.h"
 
 #include <AK/IBytes.h>
 #include <AK/MusicEngine/Common/AkMusicEngine.h>

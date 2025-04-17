@@ -23,6 +23,10 @@ class AudioSourceComponent : public Component
     void SetPitch(const float newPitch);
     void SetSpatialization(const float newSpatialization);
 
+    // TODO: Replace strings by IDs (located in the soundbank header file)
+    void SetRTPCValue(const std::string& name, const float value);
+    void SetSwitch(const std::string& switchGroup, const std::string& activeSwitch);
+
   private:
     void SetInitValues() const;
 
