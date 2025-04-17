@@ -880,6 +880,7 @@ bool GameObject::CreateComponent(const ComponentType componentType)
         {
             components.insert({componentType, createdComponent});
             selectedComponentIndex = componentType;
+            OnAABBUpdated();
             return true;
         }
     }

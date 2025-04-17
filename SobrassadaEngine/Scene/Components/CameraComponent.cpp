@@ -316,7 +316,11 @@ void CameraComponent::Update(float deltaTime)
     frustumPlanes.UpdateFrustumPlanes(camera.ViewMatrix(), camera.ProjectionMatrix());
 
     if (App->GetSceneModule()->GetScene()->GetSelectedGameObject() == parent && seePreview) previewEnabled = true;
-    else previewEnabled = false;
+    else
+    {
+        firstFrame     = true;
+        previewEnabled = false;
+    }
 }
 
 void CameraComponent::RenderCameraPreview(float deltaTime)
@@ -325,8 +329,8 @@ void CameraComponent::RenderCameraPreview(float deltaTime)
     int mainFramebufferHeight = App->GetOpenGLModule()->GetFramebuffer()->GetTextureHeight();
 
     float scaleFactor         = 0.2f;
-    previewWidth  = static_cast<int>(mainFramebufferWidth * scaleFactor);
-    previewHeight = static_cast<int>(previewWidth / camera.AspectRatio());
+    previewWidth              = static_cast<int>(mainFramebufferWidth * scaleFactor);
+    previewHeight             = static_cast<int>(previewWidth / camera.AspectRatio());
 
     if (!autorendering)
     {
@@ -345,19 +349,26 @@ void CameraComponent::RenderCameraPreview(float deltaTime)
         glViewport(0, 0, mainFramebufferWidth, mainFramebufferHeight);
     }
 
-    static bool open          = true;
-    ImVec2 pos(
-        static_cast<float>(mainFramebufferWidth - previewWidth + 200),
-        static_cast<float>(mainFramebufferHeight - previewHeight + 50)
-    );
+    static bool open = true;
+
+    if (firstFrame)
+    {
+        ImVec2 pos(
+            static_cast<float>(mainFramebufferWidth - previewWidth + 200),
+            static_cast<float>(mainFramebufferHeight - previewHeight + 50)
+        );
+        ImGui::SetNextWindowPos(pos);
+        firstFrame = false;
+    }
 
     // Set the size of the preview window
-    ImGui::SetNextWindowSize(ImVec2(static_cast<float>(previewWidth + 16), static_cast<float>(previewHeight + 16)));
-    ImGui::SetNextWindowPos(pos);
+    ImGui::SetNextWindowSize(ImVec2(static_cast<float>(previewWidth + 16), static_cast<float>(previewHeight + 36)));
 
     if (ImGui::Begin(
             "Camera Preview", &open,
-            ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse
+            ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |
+            ImGuiWindowFlags_NoDocking
+
         ))
     {
         ImTextureID texID = (ImTextureID)(intptr_t)previewFramebuffer->GetTextureID();
@@ -373,6 +384,11 @@ void CameraComponent::RenderCameraPreview(float deltaTime)
 }
 
 void CameraComponent::Render(float deltaTime)
+{
+    if (!IsEffectivelyEnabled()) return;
+}
+
+void CameraComponent::RenderDebug(float deltaTime)
 {
     if (!IsEffectivelyEnabled()) return;
     if (!enabled || !drawGizmos || App->GetSceneModule()->GetInPlayMode()) return;
