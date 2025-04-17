@@ -77,27 +77,23 @@ class ResourceStateMachine : public Resource
     const Clip* GetClip(const std::string& name) const;
     const State* GetState(const std::string& name) const;
     const Transition* GetTransition(const std::string& fromState, const std::string& toState) const;
-
-    bool ClipExists(const std::string& clipName) const;
-
-    void SetUID(UID uid) { stateMachineUID = uid; };
-
-    void SetDefaultState(int state) { defaultStateIndex = state; }
     const State* GetDefaultState()
     {
         if (defaultStateIndex >= 0 && defaultStateIndex < (int)states.size()) return &states[defaultStateIndex];
         return nullptr;
     }
-
-    void SetActiveState(int state) { activeStateIndex = state; }
     const State* GetActiveState()
     {
         if (activeStateIndex >= 0 && activeStateIndex < (int)states.size()) return &states[activeStateIndex];
         return nullptr;
     }
 
+    bool ClipExists(const std::string& clipName) const;
+    
+    void SetDefaultState(int state) { defaultStateIndex = state; }
+    void SetActiveState(int state) { activeStateIndex = state; }
+
   private:
     int defaultStateIndex = -1;
     int activeStateIndex  = -1;
-    UID stateMachineUID;
 };

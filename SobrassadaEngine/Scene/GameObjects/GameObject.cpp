@@ -47,7 +47,8 @@ GameObject::GameObject(UID parentUID, const std::string& name, UID uid) : parent
 }
 
 GameObject::GameObject(UID parentUID, GameObject* refObject)
-    : parentUID(parentUID), name(refObject->name), localTransform(refObject->localTransform)
+    : parentUID(parentUID), name(refObject->name), localTransform(refObject->localTransform),
+      globalTransform(refObject->globalTransform)
 {
     uid       = GenerateUID();
 
@@ -145,8 +146,10 @@ GameObject::~GameObject()
     components.clear();
 }
 
-void GameObject::Init() const
+void GameObject::Init()
 {
+    globalTransform = GetParentGlobalTransform() * localTransform;
+
     for (auto& component : components)
     {
         component.second->Init();
@@ -847,15 +850,19 @@ void GameObject::UpdateMobilityHierarchy(MobilitySettings type)
         if (visitedGameObjects.find(currentUID) == visitedGameObjects.end())
         {
             visitedGameObjects.insert(currentUID);
+
             GameObject* currentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentUID);
+            if (currentGameObject)
+            {
+                currentGameObject->SetMobility(type);
+                App->GetSceneModule()->AddGameObjectToUpdate(currentGameObject);
 
-            currentGameObject->SetMobility(type);
-            App->GetSceneModule()->AddGameObjectToUpdate(currentGameObject);
+                for (UID childID : currentGameObject->GetChildren())
+                    toVisitGameObjects.push(childID);
 
-            for (UID childID : currentGameObject->GetChildren())
-                toVisitGameObjects.push(childID);
-
-            if (currentGameObject->GetParent() != sceneRootUID) toVisitGameObjects.push(currentGameObject->GetParent());
+                if (currentGameObject->GetParent() != sceneRootUID)
+                    toVisitGameObjects.push(currentGameObject->GetParent());
+            }
         }
     }
 
@@ -873,6 +880,7 @@ bool GameObject::CreateComponent(const ComponentType componentType)
         {
             components.insert({componentType, createdComponent});
             selectedComponentIndex = componentType;
+            OnAABBUpdated();
             return true;
         }
     }

@@ -46,8 +46,6 @@ StateMachineEditor::~StateMachineEditor()
         }
         graph->getNodes().clear();
     }
-    resource->SetActiveState(-1);
-    resource->SetDefaultState(-1);
 }
 
 bool StateMachineEditor::RenderEditor()
@@ -240,7 +238,7 @@ void StateMachineEditor::ShowInspector()
                     {
                         if (transition.fromState.GetString() == stateName)
                         {
-                            std::string prevTrigger    = transition.triggerName.GetString();
+                            const std::string& prevTrigger    = transition.triggerName.GetString();
                             uint32_t prevInterpolation = transition.interpolationTime;
                             resource->RemoveTransition(
                                 transition.fromState.GetString(), transition.toState.GetString()
@@ -251,7 +249,7 @@ void StateMachineEditor::ShowInspector()
                         }
                         if (transition.toState.GetString() == stateName)
                         {
-                            std::string prevTrigger    = transition.triggerName.GetString();
+                            const std::string& prevTrigger    = transition.triggerName.GetString();
                             uint32_t prevInterpolation = transition.interpolationTime;
                             resource->RemoveTransition(
                                 transition.toState.GetString(), transition.fromState.GetString()
@@ -461,7 +459,7 @@ void StateMachineEditor::ShowInspector()
             if (modified)
             {
                 resource->EditTransition(
-                    transition.toState.GetString(), transition.fromState.GetString(),
+                    transition.fromState.GetString(), transition.toState.GetString(),
                     transition.triggerName.GetString(), transition.interpolationTime
                 );
             }
@@ -771,12 +769,12 @@ void StateMachineEditor::DeleteStateResource(StateNode& node)
     resource->RemoveClip(clip->clipName.GetString());
 }
 
-void StateMachineEditor::ShowTriggers()
+ void StateMachineEditor::ShowTriggers()
 {
     ImGui::OpenPopup("Available Triggers");
 }
 
-void StateMachineEditor::ShowTriggersPopup()
+ void StateMachineEditor::ShowTriggersPopup()
 {
 
     if (ImGui::BeginPopupModal("Available Triggers", NULL, ImGuiWindowFlags_AlwaysAutoResize))

@@ -45,7 +45,7 @@ Quat AnimController::Interpolate(Quat& first, Quat& second, float lambda)
 
 update_status AnimController::Update(float deltaTime)
 {
-    if (!playAnimation || resource == 0) return UPDATE_CONTINUE;
+    if (!playAnimation || resource == INVALID_UID) return UPDATE_CONTINUE;
 
     deltaTime          *= playbackSpeed;
 
@@ -86,16 +86,21 @@ update_status AnimController::Update(float deltaTime)
 
     if (targetAnimation != nullptr)
     {
-
+        currentTargetTime += deltaTime;
+        const float targetDuration = targetAnimation->GetDuration();
+        if (currentTargetTime > targetDuration)
+            currentTargetTime = fmod(currentTargetTime, targetDuration);
+            
         fadeTime    += deltaTime;
 
-        if (fadeTime >= static_cast<float>(transitionTime))
+        if (fadeTime >= transitionTime)
         {
-            // App->GetResourcesModule()->ReleaseResource(currentAnimation);
+            App->GetResourcesModule()->ReleaseResource(currentAnimation);
             currentAnimation  = targetAnimation;
             targetAnimation   = nullptr;
-            currentTime       = fadeTime;
-            fadeTime = 0;
+            currentTime       = currentTargetTime;
+            fadeTime          = 0;
+            currentTargetTime = 0;
         }
     }
 
@@ -104,54 +109,50 @@ update_status AnimController::Update(float deltaTime)
 
 void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat& rot)
 {
-    if (!playAnimation || resource == 0 || currentAnimation == nullptr) return;
+    if (!playAnimation || resource == INVALID_UID || currentAnimation == nullptr) return;
 
     if (targetAnimation == nullptr)
     {
         Channel* animChannel = currentAnimation->GetChannel(nodeName);
         if (animChannel == nullptr) return;
 
-        GetChannelPosition(animChannel, pos);
-        GetChannelRotation(animChannel, rot);
+        GetChannelPosition(animChannel, pos, currentTime);
+        GetChannelRotation(animChannel, rot, currentTime);
     } else
     {
         float weight = transitionTime != 0 ? fadeTime / transitionTime : 1;
-        
+        //GLOG("transitionTime: %f, fadeTime: %f, weight: %f", transitionTime, fadeTime, weight);
         Channel* animChannel = currentAnimation->GetChannel(nodeName);
         Channel* targetAnimChannel = targetAnimation->GetChannel(nodeName);
         if (animChannel == nullptr || targetAnimChannel == nullptr) return;
 
         float3 animPos = float3(pos);
         Quat animQuat = Quat(rot);
-        GetChannelPosition(animChannel, animPos);
-        GetChannelRotation(animChannel, animQuat);
+        GetChannelPosition(animChannel, animPos, currentTime);
+        GetChannelRotation(animChannel, animQuat, currentTime);
         
         float3 targetAnimPos = float3(pos);
         Quat targetAnimQuat = Quat(rot);
-        GetChannelPosition(animChannel, targetAnimPos);
-        GetChannelRotation(animChannel, targetAnimQuat);
-
-       /* if (nodeName == "Hat2")
-        {
-
-            targetAnimPos += float3(0, 3, 0);
-        }*/
+        GetChannelPosition(targetAnimChannel, targetAnimPos, currentTargetTime);
+        GetChannelRotation(targetAnimChannel, targetAnimQuat, currentTargetTime);
 
         pos = animPos.Lerp(targetAnimPos, weight);
         rot = Quat::Slerp(animQuat, targetAnimQuat, weight);
+
     }
     
     // TODO Implement piecewise interpolation to support lerp between more than two animations
     // TODO https://stackoverflow.com/questions/66522629/given-3-or-more-numbers-or-vectors-how-do-i-interpolate-between-them-based-on-a
 }
 
-void AnimController::SetTargetAnimationResource(UID uid, float timeTransition)
+void AnimController::SetTargetAnimationResource(UID uid, unsigned timeTransition, bool shouldLoop)
 {
     targetAnimation = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(uid));
-    transitionTime  = timeTransition;
+    transitionTime  = static_cast<float>(timeTransition) / 1000;
+    loop            = shouldLoop;
 }
 
-void AnimController::GetChannelPosition(const Channel* animChannel, float3& pos) const
+void AnimController::GetChannelPosition(const Channel* animChannel, float3& pos, const float time) const
 {
     if (animChannel->numPositions > 0)
     {
@@ -163,7 +164,7 @@ void AnimController::GetChannelPosition(const Channel* animChannel, float3& pos)
         else
         {
             size_t nextIndex = 0;
-            while (nextIndex < animChannel->numPositions && animChannel->posTimeStamps[nextIndex] <= currentTime)
+            while (nextIndex < animChannel->numPositions && animChannel->posTimeStamps[nextIndex] <= time)
             {
                 nextIndex++;
             }
@@ -186,7 +187,7 @@ void AnimController::GetChannelPosition(const Channel* animChannel, float3& pos)
                 const float endTime   = animChannel->posTimeStamps[nextIndex];
                 const float timeDiff  = endTime - startTime;
 
-                float lambda          = (timeDiff > 0.0001f) ? (currentTime - startTime) / timeDiff : 0.0f;
+                float lambda          = (timeDiff > 0.0001f) ? (time - startTime) / timeDiff : 0.0f;
 
                 lambda                = (lambda < 0) ? 0 : (lambda > 1) ? 1 : lambda;
 
@@ -200,7 +201,7 @@ void AnimController::GetChannelPosition(const Channel* animChannel, float3& pos)
     }
 }
 
-void AnimController::GetChannelRotation(Channel* animChannel, Quat& rot)
+void AnimController::GetChannelRotation(Channel* animChannel, Quat& rot, const float time)
 {
     if (animChannel->numRotations > 0)
     {
@@ -212,7 +213,7 @@ void AnimController::GetChannelRotation(Channel* animChannel, Quat& rot)
         else
         {
             size_t nextIndex = 0;
-            while (nextIndex < animChannel->numRotations && animChannel->rotTimeStamps[nextIndex] <= currentTime)
+            while (nextIndex < animChannel->numRotations && animChannel->rotTimeStamps[nextIndex] <= time)
             {
                 nextIndex++;
             }
@@ -235,7 +236,7 @@ void AnimController::GetChannelRotation(Channel* animChannel, Quat& rot)
                 const float endTime   = animChannel->rotTimeStamps[nextIndex];
                 const float timeDiff  = endTime - startTime;
 
-                float lambda          = (timeDiff > 0.0001f) ? (currentTime - startTime) / timeDiff : 0.0f;
+                float lambda          = (timeDiff > 0.0001f) ? (time - startTime) / timeDiff : 0.0f;
 
                 lambda                = (lambda < 0) ? 0 : (lambda > 1) ? 1 : lambda;
 

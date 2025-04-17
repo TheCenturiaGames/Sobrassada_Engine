@@ -22,6 +22,7 @@ class AnimationComponent : public Component
     void Clone(const Component* other) override;
     void Update(float deltaTime) override;
     void Render(float deltaTime) override;
+    void RenderDebug(float deltaTime) override;
     void RenderEditorInspector() override;
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
 
@@ -37,10 +38,9 @@ class AnimationComponent : public Component
     AnimController* GetAnimationController() { return animController; }
     ResourceStateMachine* GetResourceStateMachine() const { return resourceStateMachine; }
     const std::unordered_map<std::string, GameObject*>& GetBoneMapping() const { return boneMapping; }
-
-    void SetAnimationResource(UID animResource);
     bool IsPlaying() const;
 
+    void SetAnimationResource(UID animResource);
     void SetBoneMapping();
 
   private:
@@ -57,5 +57,5 @@ class AnimationComponent : public Component
     float animationDuration = 0.0f;
     bool playing            = false;
     float currentTime       = 0.0f;
-    float fadeTime          = 0;
+    float fadeTime          = 0.0f;
 };

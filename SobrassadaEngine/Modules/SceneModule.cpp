@@ -231,13 +231,16 @@ void SceneModule::HandleRaycast(const KeyState* mouseButtons, const KeyState* ke
 void SceneModule::HandleObjectDuplication()
 {
     std::vector<std::pair<UID, UID>> objectsToDuplicate; // GAME OBJECT | GAME OBJECT PARENT
+    std::map<UID, UID> remappingTable;                   // Reference UID | New GameObject UID
 
     if (loadedScene->IsMultiselecting())
     {
         const std::map<UID, UID> selectedGameObjects = loadedScene->GetMultiselectedObjects();
 
         for (auto& childToDuplicate : selectedGameObjects)
+        {
             objectsToDuplicate.push_back(childToDuplicate);
+        }
     }
     else
     {
@@ -245,10 +248,8 @@ void SceneModule::HandleObjectDuplication()
             {loadedScene->GetSelectedGameObject()->GetUID(), loadedScene->GetSelectedGameObject()->GetParent()}
         );
     }
-
     for (int indexToDuplicate = 0; indexToDuplicate < objectsToDuplicate.size(); ++indexToDuplicate)
     {
-        std::map<UID, UID> remappingTable; // Reference UID | New GameObject UID
         std::vector<GameObject*> createdGameObjects;
         std::vector<GameObject*> originalGameObjects;
 
@@ -256,7 +257,7 @@ void SceneModule::HandleObjectDuplication()
         GameObject* gameObjectToCloneParent =
             loadedScene->GetGameObjectByUID(objectsToDuplicate[indexToDuplicate].second);
 
-        GameObject* clonedGameObject = new GameObject(gameObjectToClone->GetParent(), gameObjectToClone);
+        GameObject* clonedGameObject = new GameObject(objectsToDuplicate[indexToDuplicate].second, gameObjectToClone);
 
         remappingTable.insert({gameObjectToClone->GetUID(), clonedGameObject->GetUID()});
         createdGameObjects.push_back(clonedGameObject);
@@ -322,6 +323,18 @@ void SceneModule::HandleObjectDuplication()
 
             AnimationComponent* animComp = createdGameObjects[i]->GetAnimationComponent();
             if (animComp) animComp->SetBoneMapping();
+        }
+    }
+
+    if (loadedScene->IsMultiselecting())
+    {
+        const std::map<UID, MobilitySettings> originalObjectMobility = loadedScene->GetMultiselectedObjectsMobility();
+
+        for (int i = 0; i < objectsToDuplicate.size(); ++i)
+        {
+            MobilitySettings originalMobility = originalObjectMobility.find(objectsToDuplicate[i].first)->second;
+            loadedScene->GetGameObjectByUID(remappingTable[objectsToDuplicate[i].first])
+                ->UpdateMobilityHierarchy(originalMobility);
         }
     }
 }

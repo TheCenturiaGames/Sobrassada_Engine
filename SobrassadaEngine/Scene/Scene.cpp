@@ -83,8 +83,6 @@ Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUI
     }
 
     GLOG("%s scene loaded", sceneName.c_str());
-
-    App->GetResourcesModule()->GetBatchManager()->LoadData();
 }
 
 Scene::~Scene()
@@ -115,8 +113,7 @@ void Scene::Init()
     {
         gameObject.second->Init();
     }
-
-    GetGameObjectByUID(gameObjectRootUID)->UpdateTransformForGOBranch();
+    App->GetResourcesModule()->GetBatchManager()->LoadData();
 
     // When loading a scene, overrides all gameObjects that have a prefabUID. That is because if the prefab has been
     // modified, the scene file may have not, so the prefabs need to be updated when loading the scene again
@@ -129,6 +126,7 @@ void Scene::Init()
         std::vector<UID>::iterator it = std::find(prefabs.begin(), prefabs.end(), gameObject.second->GetPrefabUID());
         if (it == prefabs.end()) prefabs.emplace_back(gameObject.second->GetPrefabUID());
     }
+
     for (const UID prefab : prefabs)
     {
         OverridePrefabs(prefab);
@@ -143,6 +141,9 @@ void Scene::Init()
 
     lightsConfig->InitSkybox();
     lightsConfig->InitLightBuffers();
+
+    // Call this after overriding the prefabs to avoid duplicates in gameObjectsToUpdate
+    GetGameObjectByUID(gameObjectRootUID)->UpdateTransformForGOBranch();
 
     UpdateStaticSpatialStructure();
     UpdateDynamicSpatialStructure();
@@ -247,9 +248,23 @@ update_status Scene::Update(float deltaTime)
 
 update_status Scene::Render(float deltaTime)
 {
-    if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
-        RenderScene(deltaTime, App->GetSceneModule()->GetScene()->GetMainCamera());
+    CameraComponent* mainCamera = App->GetSceneModule()->GetScene()->GetMainCamera();
+    if (App->GetSceneModule()->GetInPlayMode() && mainCamera != nullptr)
+    {
+        if (mainCamera->GetEnabled() && mainCamera->IsEffectivelyEnabled()) RenderScene(deltaTime, mainCamera);
+        else RenderScene(deltaTime, nullptr);
+    }
     else RenderScene(deltaTime, nullptr);
+
+    GameObject* selectedGameObject = App->GetSceneModule()->GetScene()->GetSelectedGameObject();
+    if (selectedGameObject != nullptr)
+    {
+        for (const auto& component : selectedGameObject->GetComponents())
+        {
+            component.second->RenderDebug(deltaTime);
+        }
+    }
+
     return UPDATE_CONTINUE;
 }
 
@@ -527,11 +542,9 @@ void Scene::RenderSceneToFrameBuffer()
     if (framebuffer->GetTextureWidth() != windowSize.x || framebuffer->GetTextureHeight() != windowSize.y)
     {
         float aspectRatio = windowSize.y / windowSize.x;
-        if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
-        {
+        if (App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
             App->GetSceneModule()->GetScene()->GetMainCamera()->SetAspectRatio(aspectRatio);
-        }
-        else App->GetCameraModule()->SetAspectRatio(aspectRatio);
+        App->GetCameraModule()->SetAspectRatio(aspectRatio);
         framebuffer->Resize((int)windowSize.x, (int)windowSize.y);
     }
 
@@ -598,7 +611,7 @@ void Scene::RemoveGameObjectHierarchy(UID gameObjectUID)
 {
     // TODO: Change when filesystem defined
     if (!gameObjectsContainer.count(gameObjectUID) || gameObjectUID == gameObjectRootUID ||
-        gameObjectUID == multiSelectParent->GetUID())
+        (multiSelectParent && gameObjectUID == multiSelectParent->GetUID()))
         return;
 
     std::stack<UID> toDelete;
@@ -681,11 +694,16 @@ void Scene::ClearGameObjectsToUpdate()
 
 void Scene::AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
 {
-    auto pairResult = selectedGameObjects.insert({gameObject, gameObjectParent});
+    GameObject* selectedGameObject = GetGameObjectByUID(gameObject);
+    auto pairResult                = selectedGameObjects.insert({gameObject, gameObjectParent});
+
+    MobilitySettings gameObjectMobility =
+        selectedGameObject->IsStatic() ? MobilitySettings::STATIC : MobilitySettings::DYNAMIC;
+
+    auto pairResultMobility = selectedGameObjectsMobility.insert({gameObject, gameObjectMobility});
 
     if (pairResult.second)
     {
-        GameObject* selectedGameObject       = GetGameObjectByUID(gameObject);
         GameObject* selectedGameObjectParent = GetGameObjectByUID(gameObjectParent);
 
         // selectedGameObjectParent->RemoveGameObject(gameObject);
@@ -702,11 +720,9 @@ void Scene::AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
     {
         multiSelectParent->RemoveGameObject(gameObject);
 
-        GameObject* selectedGameObject       = GetGameObjectByUID(gameObject);
         GameObject* selectedGameObjectParent = GetGameObjectByUID(selectedGameObjects[gameObject]);
 
         selectedGameObject->SetParent(selectedGameObjectParent->GetUID());
-        selectedGameObjectParent->AddGameObject(gameObject);
 
         if (selectedGameObjectParent->GetUID() != gameObjectRootUID)
         {
@@ -715,6 +731,7 @@ void Scene::AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
         }
 
         selectedGameObjects.erase(pairResult.first);
+        selectedGameObjectsMobility.erase(pairResultMobility.first);
     }
 }
 
@@ -734,7 +751,15 @@ void Scene::ClearObjectSelection()
         currentGameObject->UpdateTransformForGOBranch();
     }
 
+    // UPDATE TO LET ORIGINAL GAME OBJECTS WITH THEIR ORIGINAL MOBILITY
+    for (auto& pairGameObject : selectedGameObjectsMobility)
+    {
+        GameObject* currentGameObject = GetGameObjectByUID(pairGameObject.first);
+        currentGameObject->UpdateMobilityHierarchy(pairGameObject.second);
+    }
+
     selectedGameObjects.clear();
+    selectedGameObjectsMobility.clear();
 }
 
 void Scene::DeleteMultiselection()
@@ -752,6 +777,7 @@ void Scene::DeleteMultiselection()
         RemoveGameObjectHierarchy(pairGameObject.first);
     }
     selectedGameObjects.clear();
+    selectedGameObjectsMobility.clear();
     ClearGameObjectsToUpdate();
 }
 

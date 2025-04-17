@@ -19,6 +19,7 @@ class Quadtree;
 class CameraComponent;
 class CharacterControllerComponent;
 enum class SaveMode;
+enum MobilitySettings;
 
 class Scene
 {
@@ -99,6 +100,10 @@ class Scene
     UID GetMultiselectUID() const;
     GameObject* GetMultiselectParent() const { return multiSelectParent; }
     const std::map<UID, UID>& GetMultiselectedObjects() const { return selectedGameObjects; }
+    const std::map<UID, MobilitySettings>& GetMultiselectedObjectsMobility() const
+    {
+        return selectedGameObjectsMobility;
+    }
 
     void SetMainCamera(CameraComponent* camera) { mainCamera = camera; }
     void SetMainCharacter(CharacterControllerComponent* character) { mainCharacter = character; }
@@ -146,4 +151,5 @@ class Scene
 
     GameObject* multiSelectParent = nullptr;
     std::map<UID, UID> selectedGameObjects;
+    std::map<UID, MobilitySettings> selectedGameObjectsMobility;
 };

@@ -60,8 +60,8 @@ AnimationComponent::~AnimationComponent()
 void AnimationComponent::OnPlay(bool isTransition)
 {
     StateMachineEditor* stateMachine = nullptr;
-    float transitionTime             = 0;
-    if (animController != nullptr && resource != 0)
+    unsigned transitionTime             = 0;
+    if (animController != nullptr && resource != INVALID_UID)
     {
         if (resourceStateMachine)
         {
@@ -83,8 +83,8 @@ void AnimationComponent::OnPlay(bool isTransition)
                         {
                             GLOG("TransitionTime: %f", transitionTime);
                             if (isTransition)
-                                animController->SetTargetAnimationResource(clip.animationResourceUID, transitionTime);
-                            else animController->Play(clip.animationResourceUID, true);
+                                animController->SetTargetAnimationResource(clip.animationResourceUID, transitionTime, clip.loop);
+                            else animController->Play(clip.animationResourceUID, clip.loop);
                             resource = clip.animationResourceUID;
                         }
                     }
@@ -124,7 +124,7 @@ void AnimationComponent::OnInspector()
     std::string originAnimation = "";
     if (resource != 0)
     {
-        currentAnimResource = dynamic_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
+        currentAnimResource = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
         const std::string animationName = App->GetLibraryModule()->GetResourceName(resource);
 
         const size_t underscorePos      = animationName.find('_');
@@ -382,6 +382,40 @@ void AnimationComponent::OnInspector()
         }
     }
 
+    if (resourceStateMachine)
+    {
+        ImGui::Separator();
+        ImGui::Text("Available Triggers:");
+
+        for (const std::string& triggerName : resourceStateMachine->availableTriggers)
+        {
+            if (ImGui::Button(triggerName.c_str()))
+            {
+                if (IsPlaying())
+                {
+                    GLOG("Trigger selected: %s", triggerName.c_str());
+                    for (const auto& transition : resourceStateMachine->transitions)
+                    {
+                        if (transition.triggerName == triggerName &&
+                            transition.fromState.GetString() ==
+                                resourceStateMachine->GetActiveState()->name.GetString())
+                        {
+                            for (size_t i = 0; i < resourceStateMachine->states.size(); ++i)
+                            {
+                                if (resourceStateMachine->states[i].name.GetString() == transition.toState.GetString())
+                                {
+                                    resourceStateMachine->SetActiveState(static_cast<int>(i));
+                                    OnPlay(true);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     if (playing && currentAnimComp && currentAnimComp->GetAnimationController())
     {
 
@@ -399,13 +433,18 @@ void AnimationComponent::Render(float deltaTime)
     if (!IsEffectivelyEnabled()) return;
 }
 
+void AnimationComponent::RenderDebug(float deltaTime)
+{
+
+}
+
 void AnimationComponent::Clone(const Component* other)
 {
     if (other->GetType() == ComponentType::COMPONENT_ANIMATION)
     {
         const AnimationComponent* otherAnimation = static_cast<const AnimationComponent*>(other);
 
-        AddAnimation(otherAnimation->currentAnimResource->GetUID());
+        if (otherAnimation->currentAnimResource) AddAnimation(otherAnimation->currentAnimResource->GetUID());
     }
     else
     {
