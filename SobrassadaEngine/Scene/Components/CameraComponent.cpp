@@ -7,6 +7,7 @@
 #include "InputModule.h"
 #include "OpenGLModule.h"
 #include "SceneModule.h"
+#include "Math/Quat.h"
 
 #include "ImGui.h"
 #include "glew.h"
@@ -296,10 +297,13 @@ void CameraComponent::Update(float deltaTime)
     if (isMainCamera && App->GetSceneModule()->GetScene()->GetMainCamera() == nullptr)
         App->GetSceneModule()->GetScene()->SetMainCamera(this);
 
-    float4x4 globalTransform = GetGlobalTransform();
-    camera.pos               = float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
-    camera.front     = -float3(globalTransform[0][2], globalTransform[1][2], globalTransform[2][2]).Normalized();
-    camera.up        = float3(globalTransform[0][1], globalTransform[1][1], globalTransform[2][1]).Normalized();
+    if (!freeCamera)
+    {
+        float4x4 globalTransform = GetGlobalTransform();
+        camera.pos               = float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
+        camera.front = -float3(globalTransform[0][2], globalTransform[1][2], globalTransform[2][2]).Normalized();
+        camera.up    = float3(globalTransform[0][1], globalTransform[1][1], globalTransform[2][1]).Normalized();
+    }
 
     auto framebuffer = App->GetOpenGLModule()->GetFramebuffer();
     int width        = framebuffer->GetTextureWidth();
@@ -367,7 +371,7 @@ void CameraComponent::RenderCameraPreview(float deltaTime)
     if (ImGui::Begin(
             "Camera Preview", &open,
             ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |
-            ImGuiWindowFlags_NoDocking
+                ImGuiWindowFlags_NoDocking
 
         ))
     {
@@ -381,6 +385,26 @@ void CameraComponent::RenderCameraPreview(float deltaTime)
         ImGui::Image(texID, size, uv0, uv1);
     }
     ImGui::End();
+}
+
+void CameraComponent::Translate(const float3& direction)
+{
+    camera.pos += direction;
+}
+
+void SOBRASADA_API_ENGINE CameraComponent::Rotate(float yaw, float pitch)
+{
+    Quat yawRotation = Quat::RotateY(yaw);
+    camera.front     = yawRotation.Mul(camera.front).Normalized();
+    camera.up        = yawRotation.Mul(camera.up).Normalized();
+
+    if ((currentPitchAngle + pitch) > maximumNegativePitch && (currentPitchAngle + pitch) < maximumPositivePitch)
+    {
+        currentPitchAngle  += pitch;
+        Quat pitchRotation  = Quat::RotateAxisAngle(camera.WorldRight(), pitch);
+        camera.front        = pitchRotation.Mul(camera.front).Normalized();
+        camera.up           = pitchRotation.Mul(camera.up).Normalized();
+    }
 }
 
 void CameraComponent::Render(float deltaTime)

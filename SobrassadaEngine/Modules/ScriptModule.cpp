@@ -4,6 +4,10 @@
 #include "SceneModule.h"
 #include "Script.h"
 #include "ScriptComponent.h"
+#include "imgui.h"
+#include "imgui_impl_opengl3.h"
+#include "imgui_impl_sdl2.h"
+#include "imgui_internal.h"
 
 bool ScriptModule::Init()
 {
@@ -13,11 +17,21 @@ bool ScriptModule::Init()
     return true;
 }
 
-bool ScriptModule::ShutDown()
+bool ScriptModule::close()
 {
+    DeleteAllScripts();
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
     UnloadDLL();
     running = false;
     if (dllMonitorThread.joinable()) dllMonitorThread.join();
+
+    return true;
+}
+
+bool ScriptModule::ShutDown()
+{
     return true;
 }
 
@@ -36,9 +50,9 @@ void ScriptModule::LoadDLL()
     destroyScriptFunc = (DestroyScriptFunc)GetProcAddress(dllHandle, "DestroyScript");
     freeScriptFunc    = (FreeSobrassadaScripts)GetProcAddress(dllHandle, "FreeSobrassadaScripts");
 
-    if (!createScriptFunc || !destroyScriptFunc)
+    if (!startScriptFunc || !createScriptFunc || !destroyScriptFunc)
     {
-        GLOG("Failed to load CreateScript or DestroyScript functions\n");
+        GLOG("Failed to load required functions from DLL\n Trying Again.");
         return;
     }
 

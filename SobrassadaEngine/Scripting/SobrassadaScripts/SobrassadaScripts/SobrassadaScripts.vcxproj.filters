@@ -36,6 +36,9 @@
     <ClInclude Include="ButtonScript.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="GodMode.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -166,6 +169,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Libs\ImGui\imgui_widgets.cpp">
       <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="GodMode.cpp">
+      <Filter>Archivos de origen</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

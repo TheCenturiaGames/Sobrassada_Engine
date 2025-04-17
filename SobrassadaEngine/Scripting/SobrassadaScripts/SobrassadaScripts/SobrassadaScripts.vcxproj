@@ -387,6 +387,7 @@
   <ItemGroup>
     <ClInclude Include="ButtonScript.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="GodMode.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="RotateGameObject.h" />
     <ClInclude Include="Script.h" />
@@ -636,6 +637,7 @@
     </ClCompile>
     <ClCompile Include="ButtonScript.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="GodMode.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Game Debug|x64'">Create</PrecompiledHeader>

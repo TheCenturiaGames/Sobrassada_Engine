@@ -23,10 +23,13 @@ void RotateGameObject::Update(float deltaTime)
 }
 
 void RotateGameObject::Inspector()
-{
-    ImGui::SetCurrentContext(AppEngine->GetEditorUIModule()->GetImGuiContext());
+{   
+    // Probably I will change this
+    /*
     AppEngine->GetEditorUIModule()->DrawScriptInspector([this]() {
+        ImGui::SetCurrentContext(AppEngine->GetEditorUIModule()->GetImGuiContext());
         ImGui::Text("Hello");
         ImGui::SliderFloat("Speed", &speed, 0.0f, 1.0f);
     });
+    */
 }

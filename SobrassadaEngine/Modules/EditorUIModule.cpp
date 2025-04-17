@@ -24,7 +24,6 @@
 #include "TextureEditor.h"
 #include "TextureImporter.h"
 #include "WindowModule.h"
-#include "ScriptModule.h"
 
 #include "Math/Quat.h"
 #include "SDL.h"
@@ -101,11 +100,12 @@ bool EditorUIModule::Init()
 
 void EditorUIModule::DrawScriptInspector(std::function<void()> callback)
 {
-    ImGui::SetNextItemOpen(true, ImGuiCond_Always);
+
     if (ImGui::CollapsingHeader("Script Inspector", ImGuiTreeNodeFlags_None))
     {
         callback();
     }
+    callback = nullptr;
 }
 
 update_status EditorUIModule::PreUpdate(float deltaTime)
@@ -184,9 +184,8 @@ update_status EditorUIModule::PostUpdate(float deltaTime)
 
 bool EditorUIModule::ShutDown()
 {
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
-    ImGui::DestroyContext();
+    App->GetScriptModule()->close();
+
 
     framerate.clear();
     frametime.clear();
