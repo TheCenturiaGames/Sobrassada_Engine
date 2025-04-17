@@ -46,14 +46,14 @@ void GodMode::Update(float deltaTime)
             godCamera->Rotate(-mouseX * deltaRotationAngle, -mouseY * deltaRotationAngle);
         }
 
-        if (keyboard[SDL_SCANCODE_K] == KEY_DOWN)
+        if (keyboard[SDL_SCANCODE_O] == KEY_DOWN)
         {
             freeCamera = false;
             godCamera->SetFreeCamera(false);
             characterController->SetInputDown(true);
         }
     }
-    if (keyboard[SDL_SCANCODE_L] == KEY_DOWN)
+    if (keyboard[SDL_SCANCODE_P] == KEY_DOWN)
     {
         characterController->SetInputDown(false);
         godCamera->SetFreeCamera(true);
