@@ -769,12 +769,12 @@ void StateMachineEditor::DeleteStateResource(StateNode& node)
     resource->RemoveClip(clip->clipName.GetString());
 }
 
-const void StateMachineEditor::ShowTriggers()
+ void StateMachineEditor::ShowTriggers()
 {
     ImGui::OpenPopup("Available Triggers");
 }
 
-const void StateMachineEditor::ShowTriggersPopup()
+ void StateMachineEditor::ShowTriggersPopup()
 {
 
     if (ImGui::BeginPopupModal("Available Triggers", NULL, ImGuiWindowFlags_AlwaysAutoResize))
