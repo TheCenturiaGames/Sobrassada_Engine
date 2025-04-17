@@ -4,10 +4,10 @@
 
 #define PI 3.14159265359
 
-uniform sampler2D gDiffuse;
-uniform sampler2D gSpecular;
-uniform sampler2D gPosition;
-uniform sampler2D gNormal;
+layout(binding = 0) uniform sampler2D gDiffuse;
+layout(binding = 1) uniform sampler2D gSpecular;
+layout(binding = 2) uniform sampler2D gPosition;
+layout(binding = 3) uniform sampler2D gNormal;
 
 in vec2 uv0;
 
