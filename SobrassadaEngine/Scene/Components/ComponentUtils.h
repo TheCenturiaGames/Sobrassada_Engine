@@ -31,8 +31,9 @@ enum ComponentType
     COMPONENT_ANIMATION,
     COMPONENT_AIAGENT,
     COMPONENT_IMAGE,
+    COMPONENT_BUTTON,
     FIRST = COMPONENT_NONE,
-    LAST = COMPONENT_IMAGE
+    LAST  = COMPONENT_BUTTON
 };
 
 enum class ColliderType : uint8_t

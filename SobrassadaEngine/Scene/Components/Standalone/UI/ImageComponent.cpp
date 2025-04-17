@@ -111,6 +111,11 @@ void ImageComponent::Clone(const Component* other)
     }
 }
 
+void ImageComponent::RenderDebug(float deltaTime)
+{
+
+}
+
 void ImageComponent::RenderEditorInspector()
 {
     Component::RenderEditorInspector();
@@ -137,7 +142,7 @@ void ImageComponent::RenderEditorInspector()
 
 void ImageComponent::RenderUI(const float4x4& view, const float4x4& proj) const
 {
-    if (parentCanvas == nullptr) return;
+    if (parentCanvas == nullptr || transform2D == nullptr ||!IsEffectivelyEnabled()) return;
 
     const float3 startPos =
         float3(transform2D->GetRenderingPosition(), 0) - parent->GetGlobalTransform().TranslatePart();

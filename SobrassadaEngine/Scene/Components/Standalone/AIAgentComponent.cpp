@@ -39,6 +39,7 @@ AIAgentComponent::~AIAgentComponent()
 // Updates agent position evey frame
 void AIAgentComponent::Update(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
     if (!enabled) return;
 
     if (!App->GetSceneModule()->GetInPlayMode()) return;
@@ -57,6 +58,12 @@ void AIAgentComponent::Update(float deltaTime)
 
 void AIAgentComponent::Render(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
+}
+
+void AIAgentComponent::RenderDebug(float deltaTime)
+{
+
 }
 
 void AIAgentComponent::RenderEditorInspector()

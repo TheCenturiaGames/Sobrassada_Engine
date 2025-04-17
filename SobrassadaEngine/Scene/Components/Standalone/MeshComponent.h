@@ -20,6 +20,7 @@ class MeshComponent : public Component
 
     ~MeshComponent() override;
 
+    void Init() override;
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
     void Clone(const Component* other) override;
 
@@ -27,6 +28,7 @@ class MeshComponent : public Component
 
     void Update(float deltaTime) override;
     void Render(float deltaTime) override;
+    void RenderDebug(float deltaTime) override;
 
     void InitSkin();
     void OnTransformUpdated();

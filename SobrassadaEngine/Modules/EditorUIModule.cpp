@@ -9,21 +9,21 @@
 #include "InputModule.h"
 #include "LibraryModule.h"
 #include "OpenGLModule.h"
-#include "PhysicsModule.h"
 #include "PathfinderModule.h"
+#include "PhysicsModule.h"
 #include "ProjectModule.h"
 #include "ResourceNavmesh.h"
 
+#include "ResourceStateMachine.h"
 #include "ResourcesModule.h"
 #include "SceneImporter.h"
-#include "ResourceStateMachine.h"
 
 #include "SceneModule.h"
 #include "ScriptModule.h"
+#include "StateMachineEditor.h"
 #include "TextureEditor.h"
 #include "TextureImporter.h"
 #include "WindowModule.h"
-#include "StateMachineEditor.h"
 
 #include "Math/Quat.h"
 #include "SDL.h"
@@ -56,7 +56,8 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"Capsule Collider",     COMPONENT_CAPSULE_COLLIDER    },
         {"Script",               COMPONENT_SCRIPT              },
         {"AI Agent",             COMPONENT_AIAGENT             },
-        {"UI Image",             COMPONENT_IMAGE               }
+        {"UI Image",             COMPONENT_IMAGE               },
+        {"UI Button",            COMPONENT_BUTTON              },
     };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;
@@ -341,7 +342,8 @@ void EditorUIModule::MainMenu()
 
             if (ImGui::MenuItem("Node Editor", "")) OpenEditor(CreateEditor(EditorType::NODE));
 
-            if (ImGui::MenuItem("State Machine Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::ANIMATION));
+            if (ImGui::MenuItem("State Machine Editor Engine Editor", ""))
+                OpenEditor(CreateEditor(EditorType::ANIMATION));
             if (ImGui::MenuItem("Texture Editor Engine Editor", "")) OpenEditor(CreateEditor(EditorType::TEXTURE));
 
             ImGui::EndMenu();
@@ -832,6 +834,19 @@ bool EditorUIModule::RenderTransformWidget(
     std::string transformName = std::string(transformType == GizmoTransform::LOCAL ? "Local " : "World ") + "Transform";
     ImGui::SeparatorText(transformName.c_str());
 
+    if (transformType == GizmoTransform::LOCAL && !pos.Equals(localTransform.TranslatePart()))
+    {
+        pos   = localTransform.TranslatePart();
+        rot   = localTransform.RotatePart().ToEulerXYZ();
+        scale = localTransform.GetScale();
+    }
+    else if (transformType == GizmoTransform::WORLD && !pos.Equals(globalTransform.TranslatePart()))
+    {
+        pos   = globalTransform.TranslatePart();
+        rot   = globalTransform.RotatePart().ToEulerXYZ();
+        scale = globalTransform.GetScale();
+    }
+
     RenderBasicTransformModifiers(
         pos, rot, scale, lockScaleAxis, positionValueChanged, rotationValueChanged, scaleValueChanged
     );
@@ -970,6 +985,7 @@ T EditorUIModule::RenderResourceSelectDialog(
                         if (ImGui::Selectable(valuePair.first.c_str(), false))
                         {
                             result = valuePair.second;
+                            memset(searchTextResource, 0, sizeof searchTextResource);
                             ImGui::CloseCurrentPopup();
                         }
                     }
@@ -1188,7 +1204,7 @@ void EditorUIModule::About(bool& aboutMenu)
 
 EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
 {
-    UID uid = GenerateUID();
+    UID uid                            = GenerateUID();
     ResourceStateMachine* stateMachine = new ResourceStateMachine(uid, "State Machine " + std::to_string(uid));
     switch (type)
     {
@@ -1200,7 +1216,7 @@ EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
         return new NodeEditor("NodeEditor_" + std::to_string(uid), uid);
 
     case EditorType::ANIMATION:
-        return new StateMachineEditor("StateMachineEditor_" + std::to_string(uid), uid, stateMachine);
+        return stateMachineEditor = new StateMachineEditor("StateMachineEditor_" + std::to_string(uid), uid, stateMachine);
 
     case EditorType::TEXTURE:
         return new TextureEditor("TextureEditor_" + std::to_string(uid), uid);

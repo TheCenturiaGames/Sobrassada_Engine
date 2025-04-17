@@ -18,9 +18,12 @@ class ImageComponent : public Component
     void Clone(const Component* other) override;
     void Update(float deltaTime) override {};
     void Render(float deltaTime) override {};
+    void RenderDebug(float deltaTime) override;
     void RenderEditorInspector() override;
 
     void RenderUI(const float4x4& view, const float4x4& proj) const;
+    void RemoveTransform() { transform2D = nullptr; }
+    void SetColor(const float3& newColor) { color = newColor; }
 
   private:
     void InitBuffers();

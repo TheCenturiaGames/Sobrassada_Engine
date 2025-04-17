@@ -49,6 +49,12 @@ void DirectionalLightComponent::Clone(const Component* other)
 
 void DirectionalLightComponent::Render(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
+}
+
+void DirectionalLightComponent::RenderDebug(float deltaTime)
+{
+    if (!IsEffectivelyEnabled()) return;
     if (!enabled || !drawGizmos || App->GetSceneModule()->GetInPlayMode()) return;
 
     DebugDrawModule* debug = App->GetDebugDrawModule();
