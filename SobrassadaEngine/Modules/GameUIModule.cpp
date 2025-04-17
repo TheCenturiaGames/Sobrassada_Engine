@@ -103,3 +103,70 @@ void GameUIModule::RemoveCanvas(CanvasComponent* canvasToRemove)
         canvases.erase(iterator);
     }
 }
+
+void GameUIModule::RegisterScreen(const std::string& screenName, const std::vector<UID>& gameObjects)
+{
+    screens[screenName] = gameObjects;
+}
+
+void GameUIModule::RegisterScreenFromChildren(const std::string& screenName, const std::string& parentGOName)
+{
+    GameObject* parentGO = FindGameObjectByName(parentGOName);
+    if (!parentGO)
+    {
+        GLOG("GameUIModule: GameObject '%s' not found for screen '%s'", parentGOName.c_str(), screenName.c_str());
+        return;
+    }
+
+    std::vector<UID> screenObjects;
+    screenObjects.push_back(parentGO->GetUID());
+
+    for (UID childUID : parentGO->GetChildren())
+    {
+        screenObjects.push_back(childUID);
+    }
+
+    RegisterScreen(screenName, screenObjects);
+}
+
+void GameUIModule::SwitchToScreen(const std::string& screenName)
+{
+    if (currentScreen == screenName) return;
+
+    // Desactiva l’anterior
+    if (screens.count(currentScreen))
+    {
+        for (UID uid : screens[currentScreen])
+        {
+            GameObject* go = App->GetSceneModule()->GetScene()->GetGameObjectByUID(uid);
+            if (go) go->SetEnabled(false);
+        }
+    }
+
+    // Activa la nova
+    if (screens.count(screenName))
+    {
+        for (UID uid : screens[screenName])
+        {
+            GameObject* go = App->GetSceneModule()->GetScene()->GetGameObjectByUID(uid);
+            if (go) go->SetEnabled(true);
+        }
+    }
+
+    currentScreen = screenName;
+}
+
+GameObject* GameUIModule::FindGameObjectByName(const std::string& name)
+{
+    const auto& gameObjects = App->GetSceneModule()->GetScene()->GetAllGameObjects();
+
+    for (const auto& [uid, go] : gameObjects)
+    {
+        if (go && go->GetName() == name)
+        {
+            return go;
+        }
+    }
+
+    return nullptr;
+}

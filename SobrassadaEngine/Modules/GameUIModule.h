@@ -1,10 +1,13 @@
 #pragma once
 
 #include "Module.h"
+#include "GameObject.h"
+#include "Globals.h"
 
 #include <ft2build.h>
 #include <vector>
 #include FT_FREETYPE_H
+
 
 namespace TextManager
 {
@@ -13,7 +16,7 @@ namespace TextManager
 
 class CanvasComponent;
 
-class GameUIModule : public Module
+class SOBRASADA_API_ENGINE GameUIModule : public Module
 {
   public:
     GameUIModule();
@@ -28,6 +31,15 @@ class GameUIModule : public Module
     void AddCanvas(CanvasComponent* newCanvas) { canvases.push_back(newCanvas); }
     void RemoveCanvas(CanvasComponent* canvasToRemove);
 
+    void RegisterScreen(const std::string& screenName, const std::vector<UID>& gameObjects);
+    void RegisterScreenFromChildren(const std::string& screenName, const std::string& parentGOName);
+    void SwitchToScreen(const std::string& screenName);
+
   private:
+    GameObject* FindGameObjectByName(const std::string& name);
+
     std::vector<CanvasComponent*> canvases;
+
+    std::unordered_map<std::string, std::vector<UID>> screens;
+    std::string currentScreen;
 };

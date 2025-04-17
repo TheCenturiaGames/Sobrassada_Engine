@@ -213,10 +213,11 @@ bool ButtonComponent::IsWithinBounds(const float2& pos) const
     return abs(localRotated.x) <= transform2D->size.x * 0.5f && abs(localRotated.y) <= transform2D->size.y * 0.5f;
 }
 
-void ButtonComponent::AddOnClickCallback(Delegate<void>& newDelegate)
+void ButtonComponent::AddOnClickCallback(Delegate<void> newDelegate)
 {
     delegateID = onClickDispatcher.SubscribeCallback(std::move(newDelegate));
 }
+
 
 void ButtonComponent::RemoveOnClickCallback()
 {
