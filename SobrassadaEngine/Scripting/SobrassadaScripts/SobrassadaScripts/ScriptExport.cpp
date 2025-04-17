@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "RotateGameObject.h"
-#include "UIButtonScript.h"
 #include "Globals.h"
 #include "ButtonScript.h"
 #include <string>
@@ -22,7 +21,6 @@ extern "C" SOBRASSADA_API Script* CreateScript(const std::string& scriptType, Ga
 {
     if (scriptType == "RotateGameObject") return new RotateGameObject(parent);
     if (scriptType == "ButtonScript") return new ButtonScript(parent);
-    if (scriptType == "UIButtonScript") return new UIButtonScript(parent);
     return nullptr;
 }
 

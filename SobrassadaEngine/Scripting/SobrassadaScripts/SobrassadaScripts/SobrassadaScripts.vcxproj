@@ -391,7 +391,6 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="RotateGameObject.h" />
     <ClInclude Include="Script.h" />
-    <ClInclude Include="UIButtonScript.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Libs\ImGui\imgui.cpp">
@@ -652,7 +651,6 @@
     </ClCompile>
     <ClCompile Include="RotateGameObject.cpp" />
     <ClCompile Include="ScriptExport.cpp" />
-    <ClCompile Include="UIButtonScript.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SobrassadaScripts.rc" />
