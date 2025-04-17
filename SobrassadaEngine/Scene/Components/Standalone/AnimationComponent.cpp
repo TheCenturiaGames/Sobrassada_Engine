@@ -61,7 +61,7 @@ void AnimationComponent::OnPlay(bool isTransition)
 {
     StateMachineEditor* stateMachine = nullptr;
     unsigned transitionTime             = 0;
-    if (animController != nullptr && resource != 0)
+    if (animController != nullptr && resource != INVALID_UID)
     {
         if (resourceStateMachine)
         {
@@ -124,7 +124,7 @@ void AnimationComponent::OnInspector()
     std::string originAnimation = "";
     if (resource != 0)
     {
-        currentAnimResource = dynamic_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
+        currentAnimResource = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
         const std::string animationName = App->GetLibraryModule()->GetResourceName(resource);
 
         const size_t underscorePos      = animationName.find('_');

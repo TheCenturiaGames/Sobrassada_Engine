@@ -45,7 +45,7 @@ Quat AnimController::Interpolate(Quat& first, Quat& second, float lambda)
 
 update_status AnimController::Update(float deltaTime)
 {
-    if (!playAnimation || resource == 0) return UPDATE_CONTINUE;
+    if (!playAnimation || resource == INVALID_UID) return UPDATE_CONTINUE;
 
     deltaTime          *= playbackSpeed;
 
@@ -109,7 +109,7 @@ update_status AnimController::Update(float deltaTime)
 
 void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat& rot)
 {
-    if (!playAnimation || resource == 0 || currentAnimation == nullptr) return;
+    if (!playAnimation || resource == INVALID_UID || currentAnimation == nullptr) return;
 
     if (targetAnimation == nullptr)
     {
@@ -121,7 +121,7 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
     } else
     {
         float weight = transitionTime != 0 ? fadeTime / transitionTime : 1;
-        GLOG("transitionTime: %f, fadeTime: %f, weight: %f", transitionTime, fadeTime, weight);
+        //GLOG("transitionTime: %f, fadeTime: %f, weight: %f", transitionTime, fadeTime, weight);
         Channel* animChannel = currentAnimation->GetChannel(nodeName);
         Channel* targetAnimChannel = targetAnimation->GetChannel(nodeName);
         if (animChannel == nullptr || targetAnimChannel == nullptr) return;

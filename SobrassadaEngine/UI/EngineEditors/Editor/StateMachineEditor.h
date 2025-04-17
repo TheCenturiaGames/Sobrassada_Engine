@@ -28,8 +28,8 @@ class StateMachineEditor : public EngineEditorBase
     void RemoveStateNode(StateNode& node);
     void ShowInspector();
     void DeleteStateResource(StateNode& node);
-    void ShowTriggers();
-    void ShowTriggersPopup();
+    const void ShowTriggers();
+    const void ShowTriggersPopup();
 
 
   private:

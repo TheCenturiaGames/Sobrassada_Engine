@@ -36,9 +36,9 @@ class AnimationComponent : public Component
     ResourceAnimation* GetCurrentAnimation() const { return currentAnimResource; }
     AnimController* GetAnimationController() { return animController; }
     const std::unordered_map<std::string, GameObject*>& GetBoneMapping() const { return boneMapping; }
+    bool IsPlaying() const;
 
     void SetAnimationResource(UID animResource);
-    bool IsPlaying() const;
 
     void SetBoneMapping();
 
@@ -56,5 +56,5 @@ class AnimationComponent : public Component
     float animationDuration = 0.0f;
     bool playing            = false;
     float currentTime       = 0.0f;
-    float fadeTime          = 0;
+    float fadeTime          = 0.0f;
 };
