@@ -9,6 +9,7 @@
 #include "SceneModule.h"
 #include "GameObject.h"
 #include "Standalone/MeshComponent.h"
+#include "FileSystem/Importers/NavmeshImporter.h"
 
 #include "Geometry/Plane.h"
 #include "ImGui.h"
@@ -32,7 +33,11 @@ PathfinderModule::~PathfinderModule()
 {
     dtFreeCrowd(crowd);
     dtFreeNavMeshQuery(navQuery);
-    delete tmpNavmesh;
+    if (tmpNavmesh)
+    {
+        delete tmpNavmesh;
+        tmpNavmesh = nullptr;
+    }
 }
 
 update_status PathfinderModule::Update(float deltaTime)
@@ -135,6 +140,22 @@ bool PathfinderModule::RaycastToGround(const LineSegment& ray, float3& outHitPoi
 void PathfinderModule::RenderCrowdEditor()
 {
     ImGui::Checkbox("Navigation Enabled", &clickNavigationEnabled);
+}
+
+void PathfinderModule::SaveNavMesh(const std::string& name)
+{
+    if (!tmpNavmesh) //todo check if it's built maybe?
+    {
+        GLOG("Cannot save: NavMesh not built.");
+        return;
+    }
+
+    UID uid = NavmeshImporter::SaveNavmesh(name.c_str(), tmpNavmesh, navconf);
+    GLOG("NavMesh saved with UID: %u", uid);
+}
+
+void PathfinderModule::LoadNavMesh(const std::string& name)
+{
 }
 
 void PathfinderModule::AddAIAgentComponent(int agentId, AIAgentComponent* comp)

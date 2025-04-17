@@ -28,6 +28,8 @@ class PathfinderModule : public Module
     bool RaycastToGround(const LineSegment& ray, float3& outHitPoint);
     void RenderCrowdEditor();
     ResourceNavMesh* GetNavMesh() { return tmpNavmesh; }
+    void SaveNavMesh(const std::string& name);
+    void LoadNavMesh(const std::string& name);
 
     NavMeshConfig& GetNavMeshConfig() { return navconf; }
 
@@ -38,7 +40,7 @@ class PathfinderModule : public Module
   private:
     dtNavMeshQuery* navQuery = nullptr;
     dtCrowd* crowd     = nullptr;
-    ResourceNavMesh* tmpNavmesh = nullptr;
+    ResourceNavMesh* tmpNavmesh;
     const unsigned int maxAgents = 100;
     const float maxAgentRadius = 0.5f;
     bool clickNavigationEnabled  = false;

@@ -3,12 +3,12 @@
 #include "Globals.h"
 
 class NavMeshConfig;
-class ResourceNavmesh;
+class ResourceNavMesh;
 class dtNavMesh;
 
 namespace NavmeshImporter
 {
-    UID SaveNavmesh(const char* name, const unsigned char* navData, const int dataSize, const NavMeshConfig& config);
-    ResourceNavmesh* LoadNavmesh(UID navmeshUID);
+    UID SaveNavmesh(const char* name, ResourceNavMesh* resource, const NavMeshConfig& config);
+    ResourceNavMesh* LoadNavmesh(UID navmeshUID);
     
 }; // namespace NavmeshImporter

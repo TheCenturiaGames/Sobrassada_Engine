@@ -403,7 +403,7 @@
     <ClCompile Include="Scene\Components\Standalone\AnimationComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\AnimController.cpp" />
     <ClCompile Include="Modules\PhysicsModule.cpp" />
-    <ClCompile Include="ResourceManagement\Resources\ResourceNavmesh.cpp" />
+    <ClCompile Include="ResourceManagement\Resources\ResourceNavMesh.cpp" />
     <ClCompile Include="Modules\GameUIModule.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceFont.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceStateMachine.cpp" />
@@ -620,7 +620,7 @@
     <ClInclude Include="Utils\TextManager.h" />
     <ClInclude Include="Modules\ScriptModule.h" />
     <ClInclude Include="Modules\PhysicsModule.h" />
-    <ClInclude Include="ResourceManagement\Resources\ResourceNavmesh.h" />
+    <ClInclude Include="ResourceManagement\Resources\ResourceNavMesh.h" />
     <ClInclude Include="FileSystem\Importers\NavmeshImporter.h" />
     <ClInclude Include="Modules\PathfinderModule.h" />
     <ClInclude Include="Scene\Components\Standalone\AIAgentComponent.h" />
