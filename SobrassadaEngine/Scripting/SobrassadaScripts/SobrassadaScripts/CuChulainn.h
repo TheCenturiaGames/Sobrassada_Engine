@@ -32,7 +32,7 @@ class CuChulainn : public Character
     void HandleAnimation();
 
 private:
-    static std::unordered_map<std::string, CharacterStates> stateMap;
+    std::unordered_map<std::string, CharacterStates> stateMap;
 };
 
 extern CharacterControllerComponent* character;

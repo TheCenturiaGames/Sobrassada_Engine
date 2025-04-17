@@ -385,7 +385,6 @@
     <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CharacterScript.h" />
     <ClInclude Include="ButtonScript.h" />
     <ClInclude Include="Character.h" />
     <ClInclude Include="CuChulainn.h" />
@@ -620,7 +619,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Game|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="CharacterScript.cpp" />
     <ClCompile Include="ButtonScript.cpp" />
     <ClCompile Include="Character.cpp" />
     <ClCompile Include="CuChulainn.cpp" />

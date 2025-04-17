@@ -11,20 +11,21 @@ class Character : public Script
     Character(GameObject* parent, int maxHealth, int damage, float speed, float cooldown, float range)
         : Script(parent) {};
 
-    virtual bool Init() override = 0;
+    virtual bool Init() override;
     virtual void Update(float deltaTime) override;
 
-    void CanAttack();
-    void ShouldAttackTarget();
+    void Attack(float deltaTime);
     void TakeDamage(int amount);
     void Heal(int amount);
     void Kill();
 
   private:
     virtual void OnDeath() {};
-    virtual void OnDamageTaken(int amount) {};
+    virtual void OnDamageTaken(int amount) {}; // depending of amout damage taken do some sound or another for example
     virtual void OnHealed(int amount) {};
     virtual void PerformAttack() {};
+    virtual void ShouldAttackTarget() {};
+    bool CanAttack(float deltaTime);
 
   protected:
     int maxHealth        = 0;
