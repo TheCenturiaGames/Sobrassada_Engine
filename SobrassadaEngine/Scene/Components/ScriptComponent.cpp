@@ -96,6 +96,11 @@ void ScriptComponent::RenderEditorInspector()
             }
             ImGui::EndPopup();
         }
+        if (scriptInstance != nullptr)
+        {
+            ImGui::Separator();
+            scriptInstance->Inspector();
+        }
     }
 }
 
