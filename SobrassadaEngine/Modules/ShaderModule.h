@@ -16,7 +16,8 @@ class ShaderModule : public Module
 
     int GetSpecularGlossinessProgram() const;
     int GetMetallicRoughnessProgram() const;
-    int GetGBufferProgram() const;
+    int GetGeometryPassProgram() const;
+    int GetLightingPassProgram() const;
     int GetUIWidgetProgram() const { return uiWidgetProgram; }
 
   private:
@@ -31,7 +32,8 @@ class ShaderModule : public Module
     int metallicRoughnessProgram       = -1;
     int metallicRoughnessProgramUnlit  = -1;
 
-    int gBufferProgram                 = -1;
+    int geometryPassProgram            = -1;
+    int lightingPassProgram            = -1;
 
     int uiWidgetProgram                = -1;
 };

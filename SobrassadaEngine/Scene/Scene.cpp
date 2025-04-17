@@ -27,6 +27,7 @@
 #include "ResourcePrefab.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
+#include "ShaderModule.h"
 #include "Standalone/AnimationComponent.h"
 #include "Standalone/Lights/DirectionalLightComponent.h"
 #include "Standalone/Lights/PointLightComponent.h"
@@ -34,6 +35,7 @@
 #include "Standalone/MeshComponent.h"
 
 #include "SDL_mouse.h"
+#include "glew.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 // guizmo after imgui include
@@ -269,6 +271,37 @@ void Scene::RenderScene(float deltaTime, CameraComponent* camera)
     GBuffer* gbuffer         = App->GetOpenGLModule()->GetGBuffer();
     Framebuffer* framebuffer = App->GetOpenGLModule()->GetFramebuffer();
 
+    // GEOMETRY PASS
+    gbuffer->Bind();
+
+    std::vector<GameObject*> objectsToRender;
+    CheckObjectsToRender(objectsToRender, camera);
+
+    {
+#ifdef OPTICK
+        OPTICK_CATEGORY("Scene::MeshesToRender", Optick::Category::GameLogic)
+#endif
+        BatchManager* batchManager = App->GetResourcesModule()->GetBatchManager();
+        std::vector<MeshComponent*> meshesToRender;
+
+        for (const auto& gameObject : objectsToRender)
+        {
+            MeshComponent* mesh = gameObject->GetMeshComponent();
+            if (mesh != nullptr && mesh->GetEnabled() && mesh->GetBatch() != nullptr) meshesToRender.push_back(mesh);
+        }
+
+        batchManager->Render(meshesToRender, camera);
+    }
+
+    // LIGHTING PASS
+    framebuffer->Bind();
+
+    unsigned int width  = framebuffer->GetTextureWidth();
+    unsigned int height = framebuffer->GetTextureHeight();
+
+    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+    framebuffer->Bind();
+
     if (!App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_WIREFRAME))
     {
         float4x4 projection;
@@ -291,32 +324,24 @@ void Scene::RenderScene(float deltaTime, CameraComponent* camera)
             if (change) camera->ChangeToOrtographic();
         }
     }
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, gbuffer->diffuseTexture);
 
-    gbuffer->Bind();
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, gbuffer->specularTexture);
+
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, gbuffer->positionTexture);
+
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, gbuffer->normalTexture);
+
     lightsConfig->SetLightsShaderData();
 
-    std::vector<GameObject*> objectsToRender;
-    CheckObjectsToRender(objectsToRender, camera);
+    glUseProgram(App->GetShaderModule()->GetLightingPassProgram());
 
-    {
-#ifdef OPTICK
-        OPTICK_CATEGORY("Scene::MeshesToRender", Optick::Category::GameLogic)
-#endif
-        BatchManager* batchManager = App->GetResourcesModule()->GetBatchManager();
-        std::vector<MeshComponent*> meshesToRender;
+    App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 3);
 
-        for (const auto& gameObject : objectsToRender)
-        {
-            MeshComponent* mesh = gameObject->GetMeshComponent();
-            if (mesh != nullptr && mesh->GetEnabled() && mesh->GetBatch() != nullptr) meshesToRender.push_back(mesh);
-        }
-
-        batchManager->Render(meshesToRender, camera);
-    }
-
-    gbuffer->Unbind();
-
-    framebuffer->Bind();
     {
 #ifdef OPTICK
         OPTICK_CATEGORY("Scene::GameObject::Render", Optick::Category::Rendering)
@@ -351,7 +376,6 @@ void Scene::RenderScene(float deltaTime, CameraComponent* camera)
         for (int i = 0; i < 12; ++i)
             debugDraw->DrawLineSegment(aabb.Edge(i), float3(1.f, 1.0f, 0.5f));
     }
-
 }
 
 update_status Scene::RenderEditor(float deltaTime)

@@ -144,6 +144,7 @@ constexpr const char* IRRADIANCE_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader
 constexpr const char* PREFILTERED_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader/Fragment/PreFilteredEnvironmentFragment.glsl";
 constexpr const char* ENVIRONMENTBRDF_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader/Fragment/EnvironmentBRDFFragment.glsl";
 constexpr const char* GBUFFER_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader/Fragment/gBufferFragment.glsl";
+constexpr const char* LIGHTINGPASS_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader/Fragment/IBLLightingPass.glsl";
 
 using UID                                             = uint64_t;
 

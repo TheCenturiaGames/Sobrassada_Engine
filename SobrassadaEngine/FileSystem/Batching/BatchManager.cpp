@@ -95,7 +95,7 @@ void BatchManager::Render(const std::vector<MeshComponent*>& meshesToRender, Cam
         const auto start           = std::chrono::high_resolution_clock::now();
 
         // TODO REMOVE JUST TEST FOR GBUFFER
-        unsigned int program2        = App->GetShaderModule()->GetGBufferProgram();
+        unsigned int program2        = App->GetShaderModule()->GetGeometryPassProgram();
         glUseProgram(program2);
         glDisable(GL_BLEND);
 

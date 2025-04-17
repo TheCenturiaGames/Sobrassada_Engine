@@ -22,7 +22,8 @@ bool ShaderModule::Init()
 
     uiWidgetProgram                = CreateShaderProgram(UIWIDGET_VERTEX_SHADER_PATH, UIWIDGET_FRAGMENT_SHADER_PATH);
 
-    gBufferProgram                 = CreateShaderProgram(LIGHTS_VERTEX_SHADER_PATH, GBUFFER_FRAGMENT_SHADER_PATH);
+    geometryPassProgram            = CreateShaderProgram(LIGHTS_VERTEX_SHADER_PATH, GBUFFER_FRAGMENT_SHADER_PATH);
+    lightingPassProgram            = CreateShaderProgram(QUAD_VERTEX_SHADER_PATH, LIGHTINGPASS_FRAGMENT_SHADER_PATH);
     return true;
 }
 
@@ -157,8 +158,14 @@ int ShaderModule::GetMetallicRoughnessProgram() const
              : metallicRoughnessProgramUnlit;
 }
 
-int ShaderModule::GetGBufferProgram() const
+int ShaderModule::GetGeometryPassProgram() const
 {
-    return App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_LIGTHS) ? gBufferProgram
-                                                                                            : gBufferProgram;
+    return App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_LIGTHS) ? geometryPassProgram
+                                                                                            : geometryPassProgram;
+}
+
+int ShaderModule::GetLightingPassProgram() const
+{
+    return App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_LIGTHS) ? lightingPassProgram
+                                                                                            : lightingPassProgram;
 }
