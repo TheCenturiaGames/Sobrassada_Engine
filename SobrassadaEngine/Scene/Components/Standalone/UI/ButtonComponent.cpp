@@ -148,6 +148,10 @@ void ButtonComponent::Clone(const Component* other)
     }
 }
 
+void ButtonComponent::RenderDebug(float deltaTime)
+{
+}
+
 void ButtonComponent::RenderEditorInspector()
 {
     Component::RenderEditorInspector();

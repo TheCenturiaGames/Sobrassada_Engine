@@ -115,6 +115,11 @@ void ImageComponent::Clone(const Component* other)
     }
 }
 
+void ImageComponent::RenderDebug(float deltaTime)
+{
+
+}
+
 void ImageComponent::Update(float deltaTime)
 {
     if (matchParentSize) MatchParentSize();

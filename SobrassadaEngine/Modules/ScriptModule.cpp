@@ -1,7 +1,7 @@
 #include "ScriptModule.h"
 #include "Application.h"
-#include "SceneModule.h"
 #include "Component.h"
+#include "SceneModule.h"
 #include "Script.h"
 #include "ScriptComponent.h"
 
@@ -29,16 +29,20 @@ void ScriptModule::LoadDLL()
         GLOG("Failed to load DLL\n");
         return;
     }
-    lastWriteTime         = fs::last_write_time("SobrassadaScripts.dll");
+    lastWriteTime     = fs::last_write_time("SobrassadaScripts.dll");
 
-    createScriptFunc      = (CreateScriptFunc)GetProcAddress(dllHandle, "CreateScript");
-    destroyScriptFunc     = (DestroyScriptFunc)GetProcAddress(dllHandle, "DestroyScript");
+    startScriptFunc   = (StartSobrassadaScripts)GetProcAddress(dllHandle, "InitSobrassadaScripts");
+    createScriptFunc  = (CreateScriptFunc)GetProcAddress(dllHandle, "CreateScript");
+    destroyScriptFunc = (DestroyScriptFunc)GetProcAddress(dllHandle, "DestroyScript");
+    freeScriptFunc    = (FreeSobrassadaScripts)GetProcAddress(dllHandle, "FreeSobrassadaScripts");
 
     if (!createScriptFunc || !destroyScriptFunc)
     {
         GLOG("Failed to load CreateScript or DestroyScript functions\n");
         return;
     }
+
+    startScriptFunc(App);
 }
 
 update_status ScriptModule::Update(float deltaTime)
@@ -50,8 +54,10 @@ void ScriptModule::UnloadDLL()
 {
     if (dllHandle)
     {
-        createScriptFunc      = nullptr;
-        destroyScriptFunc     = nullptr;
+        createScriptFunc  = nullptr;
+        destroyScriptFunc = nullptr;
+        startScriptFunc   = nullptr;
+        freeScriptFunc    = nullptr;
 
         FreeLibrary(dllHandle);
         dllHandle = nullptr;
@@ -82,6 +88,7 @@ void ScriptModule::DeleteAllScripts()
                 scriptComponent->DeleteScript();
             }
         }
+        freeScriptFunc();
     }
 }
 

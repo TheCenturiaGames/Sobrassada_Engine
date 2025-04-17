@@ -67,6 +67,11 @@ void ScriptComponent::Render(float deltaTime)
 {
 }
 
+void ScriptComponent::RenderDebug(float deltaTime)
+{
+
+}
+
 void ScriptComponent::RenderEditorInspector()
 {
     Component::RenderEditorInspector();
@@ -90,6 +95,11 @@ void ScriptComponent::RenderEditorInspector()
                 }
             }
             ImGui::EndPopup();
+        }
+        if (scriptInstance != nullptr)
+        {
+            ImGui::Separator();
+            scriptInstance->Inspector();
         }
     }
 }
