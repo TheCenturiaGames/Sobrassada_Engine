@@ -293,37 +293,15 @@ void Scene::RenderScene(float deltaTime, CameraComponent* camera)
         batchManager->Render(meshesToRender, camera);
     }
 
+    gbuffer->Unbind();
     // LIGHTING PASS
+
     framebuffer->Bind();
 
-    unsigned int width  = framebuffer->GetTextureWidth();
-    unsigned int height = framebuffer->GetTextureHeight();
+    glClearColor(0.f, 0.f, 0.f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_BLEND);
 
-    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-    framebuffer->Bind();
-
-    if (!App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_WIREFRAME))
-    {
-        float4x4 projection;
-        float4x4 view;
-
-        if (camera == nullptr)
-            lightsConfig->RenderSkybox(
-                App->GetCameraModule()->GetProjectionMatrix(), App->GetCameraModule()->GetViewMatrix()
-            );
-        else
-        {
-            bool change = false;
-            // Cubemap does not support Ortographic projection
-            if (camera->GetType() == 1)
-            {
-                change = true;
-                camera->ChangeToPerspective();
-            }
-            lightsConfig->RenderSkybox(camera->GetProjectionMatrix(), camera->GetViewMatrix());
-            if (change) camera->ChangeToOrtographic();
-        }
-    }
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, gbuffer->diffuseTexture);
 
@@ -341,6 +319,39 @@ void Scene::RenderScene(float deltaTime, CameraComponent* camera)
     glUseProgram(App->GetShaderModule()->GetLightingPassProgram());
 
     App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 3);
+    
+    // SKYBOX
+
+    //unsigned int width = framebuffer->GetTextureWidth();
+    //unsigned int height = framebuffer->GetTextureHeight();
+
+    //glBindFramebuffer(GL_READ_FRAMEBUFFER, gbuffer->gBufferObject);
+    //glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer->GetFramebufferID()); // write to default framebuffer
+    //glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+    //glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->GetFramebufferID());
+
+    //if (!App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_WIREFRAME))
+    //{
+    //    float4x4 projection;
+    //    float4x4 view;
+
+    //    if (camera == nullptr)
+    //        lightsConfig->RenderSkybox(
+    //            App->GetCameraModule()->GetProjectionMatrix(), App->GetCameraModule()->GetViewMatrix()
+    //        );
+    //    else
+    //    {
+    //        bool change = false;
+    //        // Cubemap does not support Ortographic projection
+    //        if (camera->GetType() == 1)
+    //        {
+    //            change = true;
+    //            camera->ChangeToPerspective();
+    //        }
+    //        lightsConfig->RenderSkybox(camera->GetProjectionMatrix(), camera->GetViewMatrix());
+    //        if (change) camera->ChangeToOrtographic();
+    //    }
+    //}
 
     {
 #ifdef OPTICK

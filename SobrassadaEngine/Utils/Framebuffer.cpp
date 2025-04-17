@@ -61,8 +61,7 @@ bool Framebuffer::Initialize()
         if (rbo == 0) glCreateRenderbuffers(1, &rbo);
         glBindRenderbuffer(GL_RENDERBUFFER, rbo);
 
-        // IF SHADOWS GL_DEPTH_COMPONENT32F
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, textureWidth, textureHeight);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32F, textureWidth, textureHeight);
 
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbo);
     }

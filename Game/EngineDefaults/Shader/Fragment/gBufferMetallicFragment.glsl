@@ -35,6 +35,14 @@ readonly layout(std430, binding = 11) buffer Materials {
     Material materials[];
 };
 
+mat3 CreateTBN()
+{
+    const vec3 T = normalize(vec3(tangent));
+    const vec3 N = normalize(normal);
+    const vec3 B = tangent.w * cross(N, T);
+    return mat3(T, B, N);
+}
+
 void main()
 {
     const Material mat = materials[instance_index];
@@ -42,5 +50,16 @@ void main()
     gDiffuse = vec4(pow(texture(sampler2D(mat.diffuseTex), uv0).rgb, vec3(2.2f)), 1);
     gSpecular = vec4(pow(texture(sampler2D(mat.metallicTex), uv0), vec4(2.2)));
     gPosition = vec4(pos,0);
-    gNormal = vec4(normal,0);
+    // gNormal = vec4(normal,0);
+
+    vec3 N = normalize(normal);
+    // Retrive normal for normal map
+    if (mat.normalTex.r != 0 || mat.normalTex.g != 0) {
+        const mat3 space = CreateTBN();
+        const vec3 texNormal = (texture(sampler2D(mat.normalTex), uv0).xyz*2.0-1.0);
+        const vec3 final_normal = space * texNormal;
+        N = normalize(final_normal);
+    }
+    
+    gNormal = vec4(N,0);
 }

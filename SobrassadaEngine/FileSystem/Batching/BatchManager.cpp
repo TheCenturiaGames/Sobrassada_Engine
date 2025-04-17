@@ -89,23 +89,23 @@ void BatchManager::Render(const std::vector<MeshComponent*>& meshesToRender, Cam
 
         if (batchMeshes.empty()) continue;
 
-        const unsigned int program = it->GetIsMetallic() ? App->GetShaderModule()->GetMetallicRoughnessProgram()
-                                                         : App->GetShaderModule()->GetSpecularGlossinessProgram();
+        const unsigned int program = it->GetIsMetallic() ? App->GetShaderModule()->GetMetallicGeometryPassProgram()
+                                                         : App->GetShaderModule()->GetSpecularGeometryPassProgram();
 
         const auto start           = std::chrono::high_resolution_clock::now();
 
         // TODO REMOVE JUST TEST FOR GBUFFER
-        unsigned int program2        = App->GetShaderModule()->GetGeometryPassProgram();
-        glUseProgram(program2);
         glDisable(GL_BLEND);
 
+        glUseProgram(program);
+
         glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
-        unsigned int blockIdx = glGetUniformBlockIndex(program2, "CameraMatrices");
-        glUniformBlockBinding(program2, blockIdx, 0);
+        unsigned int blockIdx = glGetUniformBlockIndex(program, "CameraMatrices");
+        glUniformBlockBinding(program, blockIdx, 0);
         glBindBufferBase(GL_UNIFORM_BUFFER, 0, cameraUBO);
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-        glUniform3fv(glGetUniformLocation(program2, "cameraPos"), 1, &cameraPos[0]);
+        glUniform3fv(glGetUniformLocation(program, "cameraPos"), 1, &cameraPos[0]);
 
         it->ResetUpdatedOnce();
         it->Render(batchMeshes);
