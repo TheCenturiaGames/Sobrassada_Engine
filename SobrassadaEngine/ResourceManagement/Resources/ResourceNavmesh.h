@@ -50,8 +50,7 @@ class ResourceNavMesh : public Resource
         const float maxPoint[3], const NavMeshConfig& navconf
     );
 
-    void RenderNavmeshEditor();
-    void CreateDetourData(const rcPolyMesh* pmesh, const rcPolyMeshDetail* dmesh);
+    void CreateDetourData(const rcPolyMesh* pmesh, const rcPolyMeshDetail* dmesh, const rcConfig& config);
 
     dtNavMesh* GetDetourNavMesh() const { return navMesh; }
     dtNavMeshQuery* GetDetourNavMeshQuery() const { return navQuery; }

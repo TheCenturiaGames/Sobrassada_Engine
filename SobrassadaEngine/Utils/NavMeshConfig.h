@@ -1,5 +1,12 @@
 #pragma once
 
+enum class SamplePartitionType
+{
+    SAMPLE_PARTITION_WATERSHED = 0,
+    SAMPLE_PARTITION_MONOTONE,
+    SAMPLE_PARTITION_LAYERS
+};
+
 struct NavMeshSettings {
     float cellSize = 0.3f;
     float cellHeight = 0.2f;
@@ -14,7 +21,7 @@ struct NavMeshSettings {
     int maxVertsPerPoly = 6;
     float detailSampleDist = 6.0f;
     float detailSampleMaxError = 1.0f;
-
+    SamplePartitionType partitionType = SamplePartitionType::SAMPLE_PARTITION_MONOTONE;
     // Your custom params
     bool filterLowHangingObstacles = true;
     bool filterLedgeSpans = true;
@@ -28,6 +35,7 @@ struct NavMeshSettings {
 class NavMeshConfig {
 public:
     NavMeshConfig();
+    ~NavMeshConfig();
 
     void ApplyTo(void* outRecastRcConfig) const; // opaque interface
     void RenderEditorUI();

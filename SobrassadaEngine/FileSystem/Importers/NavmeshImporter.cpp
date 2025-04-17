@@ -5,6 +5,7 @@
 #include "FileSystem.h"
 #include "LibraryModule.h"
 #include "MetaNavmesh.h"
+#include "NavMeshConfig.h"
 
 struct NavMeshSetHeader
 {
@@ -23,98 +24,116 @@ struct NavMeshTileHeader
 const int NAVMESHSET_MAGIC   = 'S' << 24 | 'O' << 16 | 'B' << 8 | 'R';
 const int NAVMESHSET_VERSION = 1;
 
-UID NavmeshImporter::SaveNavmesh(const char* name, const dtNavMesh& navmesh)
+UID NavmeshImporter::SaveNavmesh(const char* name, const unsigned char* navData, const int dataSize, const NavMeshConfig& config)
 {
-    unsigned int size     = 0;
-    unsigned int byteSize = 0;
-
-    NavMeshSetHeader header;
-
-    header.magic    = NAVMESHSET_MAGIC;
-    header.version  = NAVMESHSET_VERSION;
-    header.numTiles = 0;
-
-    for (int i = 0; i < navmesh.getMaxTiles(); ++i)
+    if (!navData || dataSize <= 0)
     {
-        const dtMeshTile* tile = navmesh.getTile(i);
-        if (!tile || !tile->header || !tile->dataSize) continue;
-        header.numTiles++;
-    }
-    memcpy(&header.params, navmesh.getParams(), sizeof(dtNavMeshParams));
-    size += sizeof(NavMeshSetHeader);
-
-    for (int i = 0; i < navmesh.getMaxTiles(); ++i)
-    {
-        const dtMeshTile* tile = navmesh.getTile(i);
-        if (!tile || !tile->header || !tile->dataSize) continue;
-
-        NavMeshTileHeader tileHeader;
-        tileHeader.tileRef   = navmesh.getTileRef(tile);
-        tileHeader.dataSize  = tile->dataSize;
-
-        size                += sizeof(tile->dataSize);
-        size                += tile->dataSize;
+        GLOG("Invalid navmesh data.");
+        return 0;
     }
 
-    char* fileBuffer   = new char[size];
-    char* cursor       = fileBuffer;
+    // Save raw navmesh data
+    UID navmeshUID = GenerateUID();
+    navmeshUID = App->GetLibraryModule()->AssignFiletypeUID(navmeshUID, FileType::Navmesh);
 
-    unsigned int bytes = sizeof(NavMeshSetHeader);
-    memcpy(cursor, &header, bytes);
-    cursor       += bytes;
-    byteSize     += bytes;
-    int maxTiles  = navmesh.getMaxTiles();
+    std::string navpath = NAVMESHES_PATH + std::string(name) + NAVMESH_EXTENSION;
+    FileSystem::Save(navpath.c_str(), navData, dataSize, true);
 
-    for (int i = 0; i < maxTiles; ++i)
-    {
-        const dtMeshTile* tile = navmesh.getTile(i);
-        if (!tile || !tile->header || !tile->dataSize) continue;
-
-        NavMeshTileHeader tileHeader;
-        tileHeader.tileRef  = navmesh.getTileRef(tile);
-        tileHeader.dataSize = tile->dataSize;
-        bytes               = sizeof(tile->dataSize);
-        memcpy(cursor, &tileHeader.dataSize, bytes);
-        cursor   += bytes;
-        byteSize += bytes;
-        bytes     = tile->dataSize;
-        memcpy(cursor, tile->data, bytes);
-        if (i + 1 < maxTiles)
-        {
-            cursor   += bytes;
-            byteSize += bytes;
-        }
-    }
-
-    UID navmeshUID            = GenerateUID();
-    navmeshUID                = App->GetLibraryModule()->AssignFiletypeUID(navmeshUID, FileType::Navmesh);
-
-    std::string navpath       = NAVMESHES_PATH + std::string(name) + NAVMESH_EXTENSION; 
-
-
-    MetaNavmesh meta(navmeshUID, navpath);
+    // Save config to meta
+    MetaNavmesh meta(navmeshUID, navpath, config);
     meta.Save(name, navpath);
 
-
-
-    unsigned int bytesWritten = (unsigned int)FileSystem::Save(navpath.c_str(), fileBuffer, size, true);
-
-    delete[] fileBuffer;
-
-    // added navmesh to resources
-    // Optional: navmesh map
     App->GetLibraryModule()->AddResource(navpath, navmeshUID);
     App->GetLibraryModule()->AddName(name, navmeshUID);
-    
-    GLOG("%s saved as binary", name);
 
+    GLOG("%s saved as single-tile navmesh", name);
     return navmeshUID;
-
-    delete[] fileBuffer;
 }
 
 ResourceNavmesh* NavmeshImporter::LoadNavmesh(UID navmeshUID)
 {
-
     return nullptr;
 }
+/*
+ResourceNavMesh* NavmeshImporter::LoadNavmesh(UID navmeshUID)
+{
+
+    if (navmeshPath.empty())
+    {
+        GLOG("Failed to find navmesh path for UID %llu", navmeshUID);
+        return nullptr;
+    }
+
+    char* fileBuffer = nullptr;
+    unsigned int size = FileSystem::Load(navmeshPath.c_str(), &fileBuffer);
+    if (size == 0 || fileBuffer == nullptr)
+    {
+        GLOG("Failed to load navmesh file: %s", navmeshPath.c_str());
+        return nullptr;
+    }
+
+    char* cursor = fileBuffer;
+
+    // Read and validate header
+    NavMeshSetHeader header;
+    memcpy(&header, cursor, sizeof(NavMeshSetHeader));
+    cursor += sizeof(NavMeshSetHeader);
+
+    if (header.magic != NAVMESHSET_MAGIC || header.version != NAVMESHSET_VERSION)
+    {
+        GLOG("Invalid navmesh file header: %s", navmeshPath.c_str());
+        delete[] fileBuffer;
+        return nullptr;
+    }
+
+    dtNavMesh* navMesh = dtAllocNavMesh();
+    if (!navMesh || dtStatusFailed(navMesh->init(&header.params)))
+    {
+        GLOG("Failed to init Detour navmesh");
+        delete[] fileBuffer;
+        return nullptr;
+    }
+
+    // Load tiles
+    for (int i = 0; i < header.numTiles; ++i)
+    {
+        int dataSize = 0;
+        memcpy(&dataSize, cursor, sizeof(int));
+        cursor += sizeof(int);
+
+        if (dataSize == 0) continue;
+
+        unsigned char* tileData = (unsigned char*)dtAlloc(dataSize, DT_ALLOC_PERM);
+        if (!tileData)
+        {
+            GLOG("Failed to allocate tile data");
+            continue;
+        }
+
+        memcpy(tileData, cursor, dataSize);
+        cursor += dataSize;
+
+        dtTileRef tileRef = 0;
+        navMesh->addTile(tileData, dataSize, DT_TILE_FREE_DATA, 0, &tileRef);
+    }
+
+    delete[] fileBuffer;
+
+    // Allocate navmesh query
+    dtNavMeshQuery* navQuery = dtAllocNavMeshQuery();
+    if (!navQuery || dtStatusFailed(navQuery->init(navMesh, 2048)))
+    {
+        GLOG("Failed to create navmesh query");
+        dtFreeNavMesh(navMesh);
+        return nullptr;
+    }
+
+    // Create the resource object and set its navmesh
+    ResourceNavMesh* resource = new ResourceNavMesh();
+    resource->SetNavMesh(navMesh);
+    resource->SetNavMeshQuery(navQuery);
+    resource->SetUID(navmeshUID);
+    resource->SetName(navmeshPath);
+
+    return resource;
+}*/

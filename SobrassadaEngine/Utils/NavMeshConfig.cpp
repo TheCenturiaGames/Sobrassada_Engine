@@ -4,6 +4,14 @@
 
 #include <memory>
 
+NavMeshConfig::NavMeshConfig()
+{
+}
+
+NavMeshConfig::~NavMeshConfig()
+{
+}
+
 void NavMeshConfig::ApplyTo(void* out) const {
     rcConfig& outCfg = *reinterpret_cast<rcConfig*>(out);
     memset(&outCfg, 0, sizeof(rcConfig));
@@ -21,7 +29,6 @@ void NavMeshConfig::ApplyTo(void* out) const {
     outCfg.maxVertsPerPoly = settings.maxVertsPerPoly;
     outCfg.detailSampleDist = settings.detailSampleDist;
     outCfg.detailSampleMaxError = settings.detailSampleMaxError;
-
 
 }
 
@@ -41,6 +48,17 @@ void NavMeshConfig::RenderEditorUI() {
     ImGui::SliderInt("Min Region Area", &settings.minRegionArea, 0, 100);
     ImGui::SliderInt("Merge Region Area", &settings.mergeRegionArea, 0, 100);
     ImGui::SliderInt("Max Verts Per Poly", &settings.maxVertsPerPoly, 3, 12);
+
+    const char* partitionLabels[] = {
+     "SAMPLE_PARTITION_WATERSHED",
+     "SAMPLE_PARTITION_MONOTONE",
+     "SAMPLE_PARTITION_LAYERS"
+    };
+
+    int currentIndex = static_cast<int>(settings.partitionType);
+    if (ImGui::Combo("Partition Type", &currentIndex, partitionLabels, IM_ARRAYSIZE(partitionLabels))) {
+        settings.partitionType = static_cast<SamplePartitionType>(currentIndex);
+    }
 
     ImGui::SliderFloat("Detail Sample Distance", &settings.detailSampleDist, 0.0f, 10.0f);
     ImGui::SliderFloat("Detail Sample Max Error", &settings.detailSampleMaxError, 0.0f, 10.0f);
