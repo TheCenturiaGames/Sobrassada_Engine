@@ -207,10 +207,8 @@ void PathfinderModule::CreateNavMesh()
         GLOG("[WARNING] Trying to create NavMesh but no meshes are found in the scene");
         return;
     }
-    tmpNavmesh->BuildNavMesh(meshes, minPos, maxPos);
+    tmpNavmesh->BuildNavMesh(meshes, minPos, maxPos, navconf);
 
     InitQuerySystem();
 }
-
-
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Module.h"
+#include "NavmeshConfig.h"
 #include <unordered_map>
 
 class dtNavMesh;
@@ -28,6 +29,8 @@ class PathfinderModule : public Module
     void RenderCrowdEditor();
     ResourceNavMesh* GetNavMesh() { return tmpNavmesh; }
 
+    NavMeshConfig& GetNavMeshConfig() { return navconf; }
+
     void AddAIAgentComponent(int agentId, AIAgentComponent* comp);
     void RemoveAIAgentComponent(int agentId);
     AIAgentComponent* GetComponentFromAgentId(int agentId);
@@ -39,7 +42,7 @@ class PathfinderModule : public Module
     const unsigned int maxAgents = 100;
     const float maxAgentRadius = 0.5f;
     bool clickNavigationEnabled  = false;
-
+    NavMeshConfig navconf;
     float3 outHitPoint;
 
     std::unordered_map<int, AIAgentComponent*> agentComponentMap;

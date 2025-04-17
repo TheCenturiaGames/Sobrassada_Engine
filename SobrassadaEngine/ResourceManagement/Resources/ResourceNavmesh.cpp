@@ -5,6 +5,7 @@
 #include "EditorUIModule.h"
 #include "FileSystem/Mesh.h"
 #include "NavmeshImporter.h"
+#include "NavMeshConfig.h"
 
 #include <DetourNavMeshBuilder.h>
 #include <DetourNavMeshQuery.h>
@@ -26,76 +27,25 @@ ResourceNavMesh::~ResourceNavMesh()
         navMesh = nullptr;      // Set the pointer to null for safety
     }
 
-    if (polymesh)
-    {
-        rcFreePolyMesh(polymesh); // Free the polymesh memory
-        polymesh = nullptr;
-    }
-
-    if (polymeshDetail)
-    {
-        rcFreePolyMeshDetail(polymeshDetail); // Free the detail polymesh memory
-        polymeshDetail = nullptr;
-    }
-    if (config)
-    {
-        delete config;
-    }
 }
 
 ResourceNavMesh::ResourceNavMesh(UID uid, const std::string& name) : Resource(uid, name, ResourceType::Navmesh)
 {
-    config          = new rcConfig();
-    // Default Heightfield Options
-    config->bmin[0] = config->bmin[1] = config->bmin[2] = FLT_MAX;
-    config->bmax[0] = config->bmax[1] = config->bmax[2] = FLT_MIN;
-    config->cs                                          = 0.1f; // Default cell size
-    config->ch                                          = 0.2f; // Default cell height
-    config->width                                       = 1000; // Arbitrary default width
-    config->height                                      = 1000; // Arbitrary default height
 
-    // Default Walkable Options
-    config->walkableSlopeAngle                          = 90.0f; // Max slope an agent can walk on
-    config->walkableClimb                               = 20;    // Max step height agent can climb
-    config->walkableHeight                              = 20;    // Min height required to pass
-    config->walkableRadius                              = 1;     // Agent radius
-
-    // Default Partition Options
-    partitionType                                       = SAMPLE_PARTITION_MONOTONE;
-    config->minRegionArea                               = 70; // Min region area (small regions will be removed)
-    config->mergeRegionArea                             = 20; // Merge regions smaller than this size
-
-    // Default Contour Options
-    config->maxSimplificationError                      = 1.3f;
-    config->maxEdgeLen                                  = 12;
-    config->maxVertsPerPoly                             = 6;
-
-    // Default PolyMesh Options
-    config->detailSampleDist                            = 6.0f; // Higher = more accurate, lower = faster
-    config->detailSampleMaxError                        = 1.0f; // Higher = more smooth, lower = accurate
-
-    // Default Filters
-    m_filterLowHangingObstacles                         = true;
-    m_filterLedgeSpans                                  = true;
-    m_filterWalkableLowHeightSpans                      = true;
-
-    m_agentHeight                                       = 1.0f;
-    m_agentMaxClimb                                     = 0.5f;
-    m_agentRadius                                       = 0.5f;
-
-    navQuery                                            = dtAllocNavMeshQuery();
+    
 }
 // add together all meshes to create navmesh - needs the direction to a vector of resourcemesh pointers
 bool ResourceNavMesh::BuildNavMesh(
     const std::vector<std::pair<const ResourceMesh*, const float4x4&>>& meshes, const float minPoint[3],
-    const float maxPoint[3]
+    const float maxPoint[3], const NavMeshConfig& config
 )
 {
     int allVertexCount   = 0;
     int allTriangleCount = 0;
     int indexOffset      = 0;
+    navQuery = dtAllocNavMeshQuery();
 
-    rcContext* context   = new rcContext();
+    rcContext* context = new rcContext();
 
     // first pass to get necessary sizes and AABB
     for (const auto& mesh : meshes)
@@ -105,7 +55,7 @@ bool ResourceNavMesh::BuildNavMesh(
     }
 
     config->bmin[0] = minPoint[0];
-    config->bmin[1] = minPoint[1];
+    config.bmin[1] = minPoint[1];
     config->bmin[2] = minPoint[2];
 
     config->bmax[0] = maxPoint[0];
@@ -146,7 +96,8 @@ bool ResourceNavMesh::BuildNavMesh(
         indexOffset += vertexCount;
     }
     rcCalcGridSize(config->bmin, config->bmax, config->cs, &config->width, &config->height);
-    heightfield = rcAllocHeightfield();
+
+    rcHeightfield* heightfield = rcAllocHeightfield();
 
     if (!heightfield)
     {
@@ -193,7 +144,8 @@ bool ResourceNavMesh::BuildNavMesh(
     if (m_filterWalkableLowHeightSpans) rcFilterWalkableLowHeightSpans(context, config->walkableHeight, *heightfield);
 
     // make a compact heightfield from the heightfield
-    compactHeightfield = rcAllocCompactHeightfield();
+
+    rcCompactHeightfield* compactHeightfield = rcAllocCompactHeightfield();
 
     if (!compactHeightfield)
     {
@@ -224,7 +176,7 @@ bool ResourceNavMesh::BuildNavMesh(
         return false;
     }
 
-    if (partitionType == SAMPLE_PARTITION_WATERSHED)
+    if (navconf.partitionType == SAMPLE_PARTITION_WATERSHED)
     {
         // Prepare for region partitioning, by calculating distance field along the walkable surface.
         if (!rcBuildDistanceField(context, *compactHeightfield))
@@ -267,9 +219,9 @@ bool ResourceNavMesh::BuildNavMesh(
             return false;
         }
     }
-
+    
     // allocate and build contourSet (for tracing region contours)
-    contourSet = rcAllocContourSet();
+    rcContourSet* contourSet = rcAllocContourSet();
     if (!contourSet)
     {
         GLOG("buildNavigation: ContourSet out of memory ");
@@ -289,7 +241,9 @@ bool ResourceNavMesh::BuildNavMesh(
     // Build polygon navmesh from the contours.
 
     // temporal polymesh and detailpolymesh
-    polymesh = rcAllocPolyMesh();
+    
+
+    rcPolyMesh* polymesh = rcAllocPolyMesh();
 
     if (!polymesh)
     {
@@ -301,7 +255,9 @@ bool ResourceNavMesh::BuildNavMesh(
         GLOG("buildNavigation: Could not triangulate contours.");
         return false;
     }
-    polymeshDetail = rcAllocPolyMeshDetail();
+    
+
+    rcPolyMeshDetail* polymeshDetail = rcAllocPolyMeshDetail();
     if (!polymeshDetail)
     {
         GLOG("buildNavigation: Out of memory 'tempPolyMeshDetail'.");
@@ -345,13 +301,13 @@ bool ResourceNavMesh::BuildNavMesh(
     }
 
 
-    CreateDetourData();
+    CreateDetourData(polymesh, polymeshDetail);
 
     delete context;
     return true;
 }
 
-void ResourceNavMesh::CreateDetourData()
+void ResourceNavMesh::CreateDetourData(const rcPolyMesh* polymesh, const rcPolyMeshDetail* polymeshDetail)
 {
     if (!polymesh) return;
     unsigned char* navData        = 0;

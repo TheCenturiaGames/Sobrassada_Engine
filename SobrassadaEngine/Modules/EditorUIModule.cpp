@@ -424,13 +424,14 @@ void EditorUIModule::Navmesh(bool& navmesh)
 
     ImGui::Begin("NavMesh Creation", &navmesh, ImGuiWindowFlags_None);
 
+    // Draw shared config UI
+    App->GetPathfinderModule()->GetNavMeshConfig().RenderEditorUI();
+
     if (ImGui::Button("Create NavMesh"))
     {
         App->GetPathfinderModule()->CreateNavMesh();
         ImGui::Text("NavMesh created!");
     }
-
-    App->GetPathfinderModule()->GetNavMesh()->RenderNavmeshEditor();
 
     ImGui::End();
 }
