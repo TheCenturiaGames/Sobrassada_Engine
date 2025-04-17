@@ -39,10 +39,12 @@ class ScriptModule : public Module
     typedef Script* (*CreateScriptFunc)(const std::string&, GameObject*);
     typedef void (*DestroyScriptFunc)(Script*);
     typedef void (*StartSobrassadaScripts)(Application* App);
+    typedef void (*FreeSobrassadaScripts)();
 
     StartSobrassadaScripts startScriptFunc    = nullptr;
     CreateScriptFunc createScriptFunc    = nullptr;
     DestroyScriptFunc destroyScriptFunc  = nullptr;
+    FreeSobrassadaScripts freeScriptFunc  = nullptr;
 
     fs::file_time_type lastWriteTime;
     std::atomic<bool> running = true;

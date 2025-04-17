@@ -34,6 +34,7 @@ void ScriptModule::LoadDLL()
     startScriptFunc   = (StartSobrassadaScripts)GetProcAddress(dllHandle, "InitSobrassadaScripts");
     createScriptFunc  = (CreateScriptFunc)GetProcAddress(dllHandle, "CreateScript");
     destroyScriptFunc = (DestroyScriptFunc)GetProcAddress(dllHandle, "DestroyScript");
+    freeScriptFunc    = (FreeSobrassadaScripts)GetProcAddress(dllHandle, "FreeSobrassadaScripts");
 
     if (!createScriptFunc || !destroyScriptFunc)
     {
@@ -55,6 +56,8 @@ void ScriptModule::UnloadDLL()
     {
         createScriptFunc  = nullptr;
         destroyScriptFunc = nullptr;
+        startScriptFunc   = nullptr;
+        freeScriptFunc    = nullptr;
 
         FreeLibrary(dllHandle);
         dllHandle = nullptr;
@@ -86,6 +89,7 @@ void ScriptModule::DeleteAllScripts()
             }
         }
     }
+    freeScriptFunc();
 }
 
 void ScriptModule::RecreateAllScripts()

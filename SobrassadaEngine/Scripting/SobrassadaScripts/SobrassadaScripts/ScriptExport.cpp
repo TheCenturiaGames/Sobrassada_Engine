@@ -28,3 +28,9 @@ extern "C" SOBRASSADA_API void DestroyScript(Script* script)
 {
     delete script;
 }
+
+extern "C" SOBRASSADA_API void FreeSobrassadaScripts()
+{
+    GLOG("Sobrassada Scripts deleted");
+    AppEngine = nullptr;
+}
