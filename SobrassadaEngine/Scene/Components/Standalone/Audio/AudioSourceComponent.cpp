@@ -86,7 +86,7 @@ void AudioSourceComponent::RenderEditorInspector()
     }
 }
 
-void AudioSourceComponent::EmitEvent(const WwiseID event) const
+void AudioSourceComponent::EmitEvent(const AkUniqueID event) const
 {
     AK::SoundEngine::PostEvent(event, (AkGameObjectID)parent->GetUID());
 }
@@ -99,29 +99,29 @@ void AudioSourceComponent::EmitEvent(const std::string& event) const
 void AudioSourceComponent::SetVolume(const float newVolume)
 {
     volume = newVolume;
-    AK::SoundEngine::SetRTPCValue(VOLUME, volume, parent->GetUID());
+    AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::VOLUME, volume, parent->GetUID());
 }
 
 void AudioSourceComponent::SetPitch(const float newPitch)
 {
     pitch = newPitch;
-    AK::SoundEngine::SetRTPCValue(PITCH, pitch, parent->GetUID());
+    AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::PITCH, pitch, parent->GetUID());
 }
 
 void AudioSourceComponent::SetSpatialization(const float newSpatialization)
 {
     spatialization = newSpatialization;
-    AK::SoundEngine::SetRTPCValue(SPATIALIZATION, spatialization, parent->GetUID());
+    AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::SPATIALIZATION, spatialization, parent->GetUID());
 }
 
 void AudioSourceComponent::SetInitValues() const
 {
-    AK::SoundEngine::SetRTPCValue("Volume", volume, parent->GetUID());
-    AK::SoundEngine::SetRTPCValue("Pitch", pitch, parent->GetUID());
-    AK::SoundEngine::SetRTPCValue("Spatialization", spatialization, parent->GetUID());
+    AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::VOLUME, volume, parent->GetUID());
+    AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::PITCH, pitch, parent->GetUID());
+    AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::SPATIALIZATION, spatialization, parent->GetUID());
 }
 
-void AudioSourceComponent::SetRTPCValue(const WwiseID parameterID, const float value)
+void AudioSourceComponent::SetRTPCValue(const AkUniqueID parameterID, const float value)
 {
     AK::SoundEngine::SetRTPCValue(parameterID, value, parent->GetUID());
 }
@@ -131,7 +131,7 @@ void AudioSourceComponent::SetRTPCValue(const std::string& parameterName, const 
     AK::SoundEngine::SetRTPCValue(parameterName.c_str(), value, parent->GetUID());
 }
 
-void AudioSourceComponent::SetSwitch(const WwiseID switchGroupID, const WwiseID activeSwitchID)
+void AudioSourceComponent::SetSwitch(const AkUniqueID switchGroupID, const AkUniqueID activeSwitchID)
 {
     AK::SoundEngine::SetSwitch(switchGroupID, activeSwitchID, parent->GetUID());
 }
@@ -141,7 +141,7 @@ void AudioSourceComponent::SetSwitch(const std::string& switchGroupName, const s
     AK::SoundEngine::SetSwitch(switchGroupName.c_str(), activeSwitchName.c_str(), parent->GetUID());
 }
 
-void AudioSourceComponent::SetDefaultEvent(const WwiseID event)
+void AudioSourceComponent::SetDefaultEvent(const AkUniqueID event)
 {
     defaultEvent = event;
 }

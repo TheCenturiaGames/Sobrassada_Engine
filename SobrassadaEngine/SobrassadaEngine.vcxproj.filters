@@ -513,9 +513,6 @@
     <ClCompile Include="Scene\Components\Standalone\Audio\AudioListenerComponent.cpp">
       <Filter>Scene\Components\Audio</Filter>
     </ClCompile>
-    <ClCompile Include="WwiseIDs.h">
-      <Filter>Utils</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -1007,6 +1004,7 @@
     <ClInclude Include="Scene\Components\Standalone\Audio\AudioListenerComponent.h">
       <Filter>Scene\Components\Audio</Filter>
     </ClInclude>
+    <ClInclude Include="Utils\Wwise_IDs.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl">

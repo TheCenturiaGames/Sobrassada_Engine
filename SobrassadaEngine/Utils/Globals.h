@@ -136,6 +136,10 @@ constexpr const char* SPECULAR_FRAGMENT_SHADER_PATH  = "./EngineDefaults/Shader/
 constexpr const char* METALLIC_FRAGMENT_SHADER_PATH  = "./EngineDefaults/Shader/Fragment/BRDFCookTorranceShader.glsl";
 constexpr const char* UIWIDGET_FRAGMENT_SHADER_PATH  = "./EngineDefaults/Shader/Fragment/UIWidgetFragment.glsl";
 
+// Soundbanks
+constexpr const wchar_t* BANKNAME_INIT               = L"Init.bnk";
+constexpr const wchar_t* BANKNAME_MAIN               = L"main.bnk";
+
 using UID                                            = uint64_t;
 
 constexpr UID INVALID_UID                            = 0;

@@ -2,7 +2,7 @@
 
 #include "Application.h"
 #include "Component.h"
-#include "WwiseIDs.h"
+#include "Wwise_IDs.h"
 
 class AudioSourceComponent : public Component
 {
@@ -20,14 +20,14 @@ class AudioSourceComponent : public Component
     void RenderEditorInspector() override;
 
     // More efficient to use the IDs, but both exist in case it is needed to use the string variant in some scenario
-    void EmitEvent(const WwiseID event) const;
+    void EmitEvent(const AkUniqueID event) const;
     void EmitEvent(const std::string& event) const;
-    void SetRTPCValue(const WwiseID parameterID, const float value);
+    void SetRTPCValue(const AkUniqueID parameterID, const float value);
     void SetRTPCValue(const std::string& parameterName, const float value);
-    void SetSwitch(const WwiseID switchGroupID, const WwiseID activeSwitchID);
+    void SetSwitch(const AkUniqueID switchGroupID, const AkUniqueID activeSwitchID);
     void SetSwitch(const std::string& switchGroupName, const std::string& activeSwitchName);
 
-    void SetDefaultEvent(const WwiseID event);
+    void SetDefaultEvent(const AkUniqueID event);
     void SetVolume(const float newVolume);
     void SetPitch(const float newPitch);
     void SetSpatialization(const float newSpatialization);
@@ -35,7 +35,7 @@ class AudioSourceComponent : public Component
   private:
     void SetInitValues() const;
 
-    WwiseID defaultEvent;
+    AkUniqueID defaultEvent;
     float volume         = 1;
     float pitch          = 0.5f;
     float spatialization = 0;

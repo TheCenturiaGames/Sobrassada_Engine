@@ -569,7 +569,6 @@
     <ClCompile Include="Utils\TextManager.cpp" />
     <ClCompile Include="Utils\Trees\Octree.cpp" />
     <ClCompile Include="Utils\Trees\Quadtree.cpp" />
-    <ClCompile Include="WwiseIDs.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -709,6 +708,7 @@
     <ClInclude Include="Utils\Script.h" />
     <ClInclude Include="Utils\Trees\Octree.h" />
     <ClInclude Include="Utils\Trees\Quadtree.h" />
+    <ClInclude Include="Utils\Wwise_IDs.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".clang-format" />
