@@ -316,24 +316,32 @@ void Scene::RenderScene(float deltaTime, CameraComponent* camera)
 
     lightsConfig->SetLightsShaderData();
 
-    glUseProgram(App->GetShaderModule()->GetLightingPassProgram());
+    unsigned int lightingPassProgram = App->GetShaderModule()->GetLightingPassProgram();
+
+    glUseProgram(lightingPassProgram);
+
+    float3 cameraPos;
+    if (camera == nullptr) cameraPos = App->GetCameraModule()->GetCameraPosition();
+    else cameraPos = camera->GetCameraPosition();
+
+    glUniform3fv(glGetUniformLocation(lightingPassProgram, "cameraPos"), 1, &cameraPos[0]);
 
     App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 3);
-    
+
     // SKYBOX
 
-    //unsigned int width = framebuffer->GetTextureWidth();
-    //unsigned int height = framebuffer->GetTextureHeight();
+    // unsigned int width = framebuffer->GetTextureWidth();
+    // unsigned int height = framebuffer->GetTextureHeight();
 
-    //glBindFramebuffer(GL_READ_FRAMEBUFFER, gbuffer->gBufferObject);
-    //glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer->GetFramebufferID()); // write to default framebuffer
-    //glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-    //glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->GetFramebufferID());
+    // glBindFramebuffer(GL_READ_FRAMEBUFFER, gbuffer->gBufferObject);
+    // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer->GetFramebufferID()); // write to default framebuffer
+    // glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+    // glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->GetFramebufferID());
 
-    //if (!App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_WIREFRAME))
+    // if (!App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_WIREFRAME))
     //{
-    //    float4x4 projection;
-    //    float4x4 view;
+    //     float4x4 projection;
+    //     float4x4 view;
 
     //    if (camera == nullptr)
     //        lightsConfig->RenderSkybox(
