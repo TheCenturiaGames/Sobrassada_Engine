@@ -271,36 +271,43 @@ void Scene::RenderScene(float deltaTime, CameraComponent* camera)
     GBuffer* gbuffer         = App->GetOpenGLModule()->GetGBuffer();
     Framebuffer* framebuffer = App->GetOpenGLModule()->GetFramebuffer();
 
-    // GEOMETRY PASS
-    gbuffer->Bind();
-
     std::vector<GameObject*> objectsToRender;
     CheckObjectsToRender(objectsToRender, camera);
 
-    {
 #ifdef OPTICK
-        OPTICK_CATEGORY("Scene::MeshesToRender", Optick::Category::GameLogic)
+    OPTICK_CATEGORY("Scene::MeshesToRender", Optick::Category::GameLogic)
 #endif
-        BatchManager* batchManager = App->GetResourcesModule()->GetBatchManager();
-        std::vector<MeshComponent*> meshesToRender;
+    GeometryPassRender(objectsToRender, camera, gbuffer);
 
-        for (const auto& gameObject : objectsToRender)
-        {
-            MeshComponent* mesh = gameObject->GetMeshComponent();
-            if (mesh != nullptr && mesh->GetEnabled() && mesh->GetBatch() != nullptr) meshesToRender.push_back(mesh);
-        }
-
-        batchManager->Render(meshesToRender, camera);
-    }
-
-    gbuffer->Unbind();
     // LIGHTING PASS
 
     framebuffer->Bind();
-
-    glClearColor(0.f, 0.f, 0.f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_BLEND);
+
+    if (!App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_WIREFRAME))
+    {
+        float4x4 projection;
+        float4x4 view;
+
+        if (camera == nullptr)
+            lightsConfig->RenderSkybox(
+                App->GetCameraModule()->GetProjectionMatrix(), App->GetCameraModule()->GetViewMatrix()
+            );
+        else
+        {
+            bool change = false;
+            // Cubemap does not support Ortographic projection
+            if (camera->GetType() == 1)
+            {
+                change = true;
+                camera->ChangeToPerspective();
+            }
+            lightsConfig->RenderSkybox(camera->GetProjectionMatrix(), camera->GetViewMatrix());
+            if (change) camera->ChangeToOrtographic();
+        }
+    }
+
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, gbuffer->diffuseTexture);
@@ -313,6 +320,9 @@ void Scene::RenderScene(float deltaTime, CameraComponent* camera)
 
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D, gbuffer->normalTexture);
+    
+    glActiveTexture(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, gbuffer->depthTexture);
 
     lightsConfig->SetLightsShaderData();
 
@@ -328,38 +338,18 @@ void Scene::RenderScene(float deltaTime, CameraComponent* camera)
 
     App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 3);
 
-    // SKYBOX
+    // SKYBOX, GIZMOS AND DEBUG ONWARDS
 
-    // unsigned int width = framebuffer->GetTextureWidth();
-    // unsigned int height = framebuffer->GetTextureHeight();
+    // COPYING DEPTH BUFFER FROM GBUFFER TO RENDER FRAMEBUFFER
+    // TODO CHECK IF GAME RELEASE TO RENDER TO DEFAULT BUFFER INSTEAD OF FRAMEBUFFER
 
-    // glBindFramebuffer(GL_READ_FRAMEBUFFER, gbuffer->gBufferObject);
-    // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer->GetFramebufferID()); // write to default framebuffer
-    // glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-    // glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->GetFramebufferID());
+    unsigned int width  = framebuffer->GetTextureWidth();
+    unsigned int height = framebuffer->GetTextureHeight();
 
-    // if (!App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_WIREFRAME))
-    //{
-    //     float4x4 projection;
-    //     float4x4 view;
-
-    //    if (camera == nullptr)
-    //        lightsConfig->RenderSkybox(
-    //            App->GetCameraModule()->GetProjectionMatrix(), App->GetCameraModule()->GetViewMatrix()
-    //        );
-    //    else
-    //    {
-    //        bool change = false;
-    //        // Cubemap does not support Ortographic projection
-    //        if (camera->GetType() == 1)
-    //        {
-    //            change = true;
-    //            camera->ChangeToPerspective();
-    //        }
-    //        lightsConfig->RenderSkybox(camera->GetProjectionMatrix(), camera->GetViewMatrix());
-    //        if (change) camera->ChangeToOrtographic();
-    //    }
-    //}
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, gbuffer->gBufferObject);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer->GetFramebufferID()); // write to default framebuffer
+    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->GetFramebufferID());
 
     {
 #ifdef OPTICK
@@ -938,6 +928,31 @@ void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects,
 
         if (frustumPlanes.Intersects(objectOBB)) outRenderGameObjects.push_back(gameObject);
     }
+}
+
+void Scene::GeometryPassRender(
+    const std::vector<GameObject*>& objectsToRender, CameraComponent* camera, GBuffer* gbuffer
+) const
+{
+    gbuffer->Bind();
+    glDisable(GL_BLEND);
+
+    BatchManager* batchManager = App->GetResourcesModule()->GetBatchManager();
+    std::vector<MeshComponent*> meshesToRender;
+
+    for (const auto& gameObject : objectsToRender)
+    {
+        MeshComponent* mesh = gameObject->GetMeshComponent();
+        if (mesh != nullptr && mesh->GetEnabled() && mesh->GetBatch() != nullptr) meshesToRender.push_back(mesh);
+    }
+
+    batchManager->Render(meshesToRender, camera);
+
+    gbuffer->Unbind();
+}
+
+void Scene::LightingPassRender(const std::vector<GameObject*>& renderGameObjects, CameraComponent* camera) const
+{
 }
 
 GameObject* Scene::GetGameObjectByUID(UID gameObjectUUID)

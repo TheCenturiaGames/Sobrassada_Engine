@@ -15,8 +15,6 @@ in vec3 normal;
 in vec4 tangent;
 flat in int instance_index;
 
-uniform vec3 cameraPos;
-
 struct Material
 {
     vec4 diffColor;
@@ -64,6 +62,5 @@ void main()
         const vec3 final_normal = space * texNormal;
         N = normalize(final_normal);
     }
-
     gNormal = vec4(N,0);
 }

@@ -65,16 +65,8 @@ void BatchManager::Render(const std::vector<MeshComponent*>& meshesToRender, Cam
 #endif
 
     unsigned int cameraUBO;
-    float3 cameraPos;
-    if (camera == nullptr)
-    {
-        cameraUBO = App->GetCameraModule()->GetUbo();
-        cameraPos = App->GetCameraModule()->GetCameraPosition();
-    }
-    else  {
-        cameraUBO = camera->GetUbo();
-        cameraPos = camera->GetCameraPosition();
-    }
+    if (camera == nullptr) cameraUBO = App->GetCameraModule()->GetUbo();
+    else cameraUBO = camera->GetUbo();
 
     for (GeometryBatch* it : batches)
     {
@@ -94,9 +86,6 @@ void BatchManager::Render(const std::vector<MeshComponent*>& meshesToRender, Cam
 
         const auto start           = std::chrono::high_resolution_clock::now();
 
-        // TODO REMOVE JUST TEST FOR GBUFFER
-        glDisable(GL_BLEND);
-
         glUseProgram(program);
 
         glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
@@ -104,8 +93,6 @@ void BatchManager::Render(const std::vector<MeshComponent*>& meshesToRender, Cam
         glUniformBlockBinding(program, blockIdx, 0);
         glBindBufferBase(GL_UNIFORM_BUFFER, 0, cameraUBO);
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-        glUniform3fv(glGetUniformLocation(program, "cameraPos"), 1, &cameraPos[0]);
 
         it->ResetUpdatedOnce();
         it->Render(batchMeshes);

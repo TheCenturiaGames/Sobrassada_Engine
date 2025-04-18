@@ -17,12 +17,13 @@ class GBuffer
     void InitializeGBuffer();
 
   public:
-    unsigned int gBufferObject       = 0;
+    unsigned int gBufferObject   = 0;
 
     unsigned int diffuseTexture  = 0;
     unsigned int specularTexture = 0;
     unsigned int positionTexture = 0;
     unsigned int normalTexture   = 0;
+    unsigned int depthTexture    = 0;
 
   private:
     bool shouldResize                = false;
@@ -30,6 +31,4 @@ class GBuffer
     int screenWidth                  = 0;
 
     unsigned int colorAttachments[4] = {};
-
-    unsigned int depthTexture        = 0;
 };
