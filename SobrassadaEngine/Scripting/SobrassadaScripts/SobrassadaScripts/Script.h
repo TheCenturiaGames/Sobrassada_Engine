@@ -11,7 +11,11 @@ struct InspectorField
         Text,
         Float,
         Int,
-        Bool
+        Bool,
+        Vec2,
+        Vec3,
+        Vec4,
+        Color
     };
 
     const char* name;

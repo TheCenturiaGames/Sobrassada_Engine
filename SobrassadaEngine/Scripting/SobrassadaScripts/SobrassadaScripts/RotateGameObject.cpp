@@ -28,7 +28,9 @@ void RotateGameObject::Inspector()
     if (fields.empty())
     {
         fields.push_back({InspectorField::FieldType::Text, (void*)"Test"});
-        fields.push_back({"Speed", InspectorField::FieldType::Float, &speed});
+        fields.push_back({"Speed", InspectorField::FieldType::Float, &speed, 0.0f, 2.0f});
+        fields.push_back({"Prueba vec2", InspectorField::FieldType::Vec2, &prueba});
+        fields.push_back({"Color", InspectorField::FieldType::Color, &color});
     }
 
     AppEngine->GetEditorUIModule()->DrawScriptInspector(fields);
