@@ -17,12 +17,13 @@ AnimController::~AnimController()
 
 void AnimController::Play(UID newResource, bool shouldLoop)
 {
-    Stop();
-    resource      = newResource;
-    currentTime   = 0;
-    loop          = shouldLoop;
-    currentAnimation     = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
-    playAnimation = true;
+    GLOG("RESOURCE %llu", newResource);
+    if (currentAnimation == nullptr) Stop();
+    resource         = newResource;
+    currentTime      = 0.0f;
+    loop             = shouldLoop;
+    currentAnimation = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
+    playAnimation    = true;
 }
 
 void AnimController::Stop()
@@ -83,15 +84,13 @@ update_status AnimController::Update(float deltaTime)
         }
     }
 
-
     if (targetAnimation != nullptr)
     {
-        currentTargetTime += deltaTime;
-        const float targetDuration = targetAnimation->GetDuration();
-        if (currentTargetTime > targetDuration)
-            currentTargetTime = fmod(currentTargetTime, targetDuration);
-            
-        fadeTime    += deltaTime;
+        currentTargetTime          += deltaTime;
+        const float targetDuration  = targetAnimation->GetDuration();
+        if (currentTargetTime > targetDuration) currentTargetTime = fmod(currentTargetTime, targetDuration);
+
+        fadeTime += deltaTime;
 
         if (fadeTime >= transitionTime)
         {
@@ -118,31 +117,32 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
 
         GetChannelPosition(animChannel, pos, currentTime);
         GetChannelRotation(animChannel, rot, currentTime);
-    } else
+    }
+    else
     {
-        float weight = transitionTime != 0 ? fadeTime / transitionTime : 1;
-        //GLOG("transitionTime: %f, fadeTime: %f, weight: %f", transitionTime, fadeTime, weight);
-        Channel* animChannel = currentAnimation->GetChannel(nodeName);
+        float weight               = transitionTime != 0 ? fadeTime / transitionTime : 1;
+        // GLOG("transitionTime: %f, fadeTime: %f, weight: %f", transitionTime, fadeTime, weight);
+        Channel* animChannel       = currentAnimation->GetChannel(nodeName);
         Channel* targetAnimChannel = targetAnimation->GetChannel(nodeName);
         if (animChannel == nullptr || targetAnimChannel == nullptr) return;
 
         float3 animPos = float3(pos);
-        Quat animQuat = Quat(rot);
+        Quat animQuat  = Quat(rot);
         GetChannelPosition(animChannel, animPos, currentTime);
         GetChannelRotation(animChannel, animQuat, currentTime);
-        
+
         float3 targetAnimPos = float3(pos);
-        Quat targetAnimQuat = Quat(rot);
+        Quat targetAnimQuat  = Quat(rot);
         GetChannelPosition(targetAnimChannel, targetAnimPos, currentTargetTime);
         GetChannelRotation(targetAnimChannel, targetAnimQuat, currentTargetTime);
 
         pos = animPos.Lerp(targetAnimPos, weight);
         rot = Quat::Slerp(animQuat, targetAnimQuat, weight);
-
     }
-    
+
     // TODO Implement piecewise interpolation to support lerp between more than two animations
-    // TODO https://stackoverflow.com/questions/66522629/given-3-or-more-numbers-or-vectors-how-do-i-interpolate-between-them-based-on-a
+    // TODO
+    // https://stackoverflow.com/questions/66522629/given-3-or-more-numbers-or-vectors-how-do-i-interpolate-between-them-based-on-a
 }
 
 void AnimController::SetTargetAnimationResource(UID uid, unsigned timeTransition, bool shouldLoop)

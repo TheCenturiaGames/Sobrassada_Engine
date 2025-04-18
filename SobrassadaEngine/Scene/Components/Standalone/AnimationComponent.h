@@ -33,7 +33,7 @@ class SOBRASADA_API_ENGINE AnimationComponent : public Component
     void OnInspector();
     void AddAnimation(UID resource);
 
-    UID GetAnimationResource() const { GLOG("Resource AnimUID  is: %d", resource) return resource; }
+    UID GetAnimationResource() const { GLOG("Resource AnimUID  is: %llu", resource) return resource; }
     ResourceAnimation* GetCurrentAnimation() const { return currentAnimResource; }
     AnimController* GetAnimationController() { return animController; }
     ResourceStateMachine* GetResourceStateMachine() const { return resourceStateMachine; }

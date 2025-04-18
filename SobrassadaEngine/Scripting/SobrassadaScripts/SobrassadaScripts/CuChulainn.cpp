@@ -19,6 +19,8 @@ bool CuChulainn::Init()
 {
     GLOG("Initiating CuChulainn");
 
+    Character::Init();
+
     Component* agent = parent->GetComponentByType(COMPONENT_CHARACTER_CONTROLLER);
     if (!agent)
     {
@@ -27,20 +29,6 @@ bool CuChulainn::Init()
     }
 
     character = dynamic_cast<CharacterControllerComponent*>(agent);
-
-    stateMap  = {
-        {"Idle",         CharacterStates::IDLE        },
-        {"Run",          CharacterStates::RUN         },
-        {"Dash",         CharacterStates::DASH        },
-        {"Basic_Attack", CharacterStates::BASIC_ATTACK}
-    };
-    animComponent = parent->GetAnimationComponent();
-    if (!animComponent)
-    {
-        GLOG("Animation component not found for CuChulainn");
-        return false;
-    }
-    animComponent->OnPlay(false); // Starts On Idle
 
     return true;
 }

@@ -30,10 +30,11 @@ AnimationComponent::AnimationComponent(const rapidjson::Value& initialState, Gam
     if (initialState.HasMember("Animations") && initialState["Animations"].IsUint64())
     {
         resource = initialState["Animations"].GetUint64();
+        currentAnimResource = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
     }
     else
     {
-        resource = 0;
+        resource = INVALID_UID;
     }
 
     if (initialState.HasMember("StateMachine") && initialState["StateMachine"].IsUint64())
@@ -59,8 +60,9 @@ AnimationComponent::~AnimationComponent()
 
 void AnimationComponent::OnPlay(bool isTransition)
 {
+    playing                 = true;
     unsigned transitionTime             = 0;
-    if (animController != nullptr && resource != INVALID_UID)
+    if (animController != nullptr)
     {
         if (resourceStateMachine)
         {
@@ -96,6 +98,8 @@ void AnimationComponent::OnPlay(bool isTransition)
 
 void AnimationComponent::OnStop()
 {
+    playing     = false;
+    currentTime = 0.0f;
     if (animController != nullptr)
     {
         animController->Stop();
@@ -104,6 +108,7 @@ void AnimationComponent::OnStop()
 
 void AnimationComponent::OnPause()
 {
+    playing = false;
     if (animController != nullptr)
     {
         animController->Pause();
@@ -112,6 +117,7 @@ void AnimationComponent::OnPause()
 
 void AnimationComponent::OnResume()
 {
+    playing = true;
     if (animController != nullptr)
     {
         animController->Resume();
@@ -202,7 +208,6 @@ void AnimationComponent::OnInspector()
 
                     if (ImGui::Button("Play"))
                     {
-                        playing = true;
                         currentAnimComp->OnPlay(false);
                     }
 
@@ -210,7 +215,6 @@ void AnimationComponent::OnInspector()
 
                     if (ImGui::Button("Pause"))
                     {
-                        playing = false;
                         currentAnimComp->OnPause();
                     }
 
@@ -218,14 +222,11 @@ void AnimationComponent::OnInspector()
 
                     if (ImGui::Button("Stop"))
                     {
-                        playing     = false;
-                        currentTime = 0.0f;
                         currentAnimComp->OnStop();
                     }
 
                     if (ImGui::Button("Resume"))
                     {
-                        playing = true;
                         currentAnimComp->OnResume();
                     }
 
@@ -418,8 +419,6 @@ void AnimationComponent::Update(float deltaTime)
     }
 
     animController->Update(deltaTime);
-
-    if (currentAnimResource == nullptr) return; // TODO: check why crashes here
 
     for (auto& channel : currentAnimResource->channels)
     {
