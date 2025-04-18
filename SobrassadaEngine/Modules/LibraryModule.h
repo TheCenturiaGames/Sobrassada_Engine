@@ -55,6 +55,7 @@ class LibraryModule : public Module
     void AddAnimation(UID animUID, const std::string& animPath);
     void AddStateMachine(UID stateMachineUID, const std::string& stMachPath);
     void AddFont(UID fontUID, const std::string& fontName);
+    void AddNavmesh(UID navmeshUID, const std::string& navmeshName);
     void AddName(const std::string& resourceName, UID resourceUID);
     void AddResource(const std::string& resourcePath, UID resourceUID);
 
@@ -64,10 +65,9 @@ class LibraryModule : public Module
     UID GetModelUID(const std::string& modelPath) const;
     UID GetAnimUID(const std::string& animPath) const;
     UID GetStateMachineUID(const std::string& stMachPath) const;
-
+    UID GetNavmeshUID(const std::string& navmeshPath) const;
 
     const std::string& GetResourceName(UID resourceID) const;
-
     const std::string& GetResourcePath(UID resourceID) const;
 
     const std::unordered_map<std::string, UID>& GetTextureMap() const { return textureMap; }
@@ -78,6 +78,7 @@ class LibraryModule : public Module
     const std::unordered_map<std::string, UID>& GetPrefabMap() const { return prefabMap; }
     const std::unordered_map<std::string, UID>& GetStateMachinePath() const { return stateMachineMap; }
     const std::unordered_map<std::string, UID>& GetFontMap() const { return fontMap; }
+    const std::unordered_map<std::string, UID>& GetNavmeshMap() const { return navmeshMap; }
 
   private:
     // maps for user visuals | name -> UID
@@ -87,9 +88,9 @@ class LibraryModule : public Module
     std::unordered_map<std::string, UID> prefabMap;
     std::unordered_map<std::string, UID> modelMap;
     std::unordered_map<std::string, UID> stateMachineMap;
-
     std::unordered_map<std::string, UID> animMap;
-     std::unordered_map<std::string, UID> fontMap;
+    std::unordered_map<std::string, UID> fontMap;
+    std::unordered_map<std::string, UID> navmeshMap;
 
     // inversed map          | UID -> name
     std::unordered_map<UID, std::string> namesMap;

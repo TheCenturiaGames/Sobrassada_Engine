@@ -422,6 +422,8 @@ void EditorUIModule::Navmesh(bool& navmesh)
 {
     if (!navmesh) return;
 
+    static bool showLoadDialog = false; // Made static so it persists across frames
+
     ImGui::Begin("NavMesh Creation", &navmesh, ImGuiWindowFlags_None);
 
     // Draw config UI
@@ -444,12 +446,65 @@ void EditorUIModule::Navmesh(bool& navmesh)
     // Load navmesh
     if (ImGui::Button("Load NavMesh"))
     {
-        App->GetPathfinderModule()->LoadNavMesh("TestNavmesh"); // you can pass UID or name
-        ImGui::Text("NavMesh loaded!");
+        showLoadDialog = true;
     }
 
-    ImGui::End();
+    ImGui::End(); // End NavMesh Creation
+
+    // Load dialog window
+    if (showLoadDialog)
+    {
+        ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_FirstUseEver);
+        bool open = true;
+        if (ImGui::Begin("Load NavMesh", &open, ImGuiWindowFlags_NoCollapse))
+        {
+            ImGui::InputText("Search", searchTextNavmesh, IM_ARRAYSIZE(searchTextNavmesh));
+            ImGui::Separator();
+
+            if (ImGui::BeginListBox("##NavmeshList", ImVec2(-FLT_MIN, -40)))
+            {
+                int i = 0;
+                for (const auto& pair : App->GetLibraryModule()->GetNavmeshMap())
+                {
+                    if (pair.first.find(searchTextNavmesh) != std::string::npos)
+                    {
+                        ++i;
+                        if (ImGui::Selectable(pair.first.c_str(), selectedNavmesh == i))
+                        {
+                            selectedNavmesh = i;
+                            navmeshUID = pair.second;
+                        }
+                    }
+                }
+                ImGui::EndListBox();
+            }
+
+            ImGui::Dummy(ImVec2(0, 3));
+
+            if (ImGui::Button("Load"))
+            {
+                if (navmeshUID != 0)
+                {
+                    App->GetPathfinderModule()->LoadNavMesh(App->GetLibraryModule()->GetResourceName(navmeshUID));
+                }
+                open = false;
+            }
+
+            ImGui::SameLine();
+
+            if (ImGui::Button("Cancel"))
+            {
+                open = false;
+            }
+
+            ImGui::End(); // End Load NavMesh window
+        }
+
+        if (!open)
+            showLoadDialog = false;
+    }
 }
+
 
 void EditorUIModule::CrowdControl(bool& crowdControl)
 {

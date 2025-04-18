@@ -66,6 +66,7 @@ UID NavmeshImporter::SaveNavmesh(const char* name, ResourceNavMesh* resource, co
 
     delete[] fileBuffer;
 
+    App->GetLibraryModule()->AddNavmesh(navmeshUID, name);
     App->GetLibraryModule()->AddResource(navPath, navmeshUID);
     App->GetLibraryModule()->AddName(name, navmeshUID);
 
@@ -74,39 +75,34 @@ UID NavmeshImporter::SaveNavmesh(const char* name, ResourceNavMesh* resource, co
     return navmeshUID;
 }
 
-ResourceNavMesh* NavmeshImporter::LoadNavmesh(UID navmeshUID)
-{
-    return nullptr;
-}
-/*
-ResourceNavMesh* NavmeshImporter::LoadNavmesh(UID navmeshUID)
-{
 
-    if (navmeshPath.empty())
+
+ResourceNavMesh* NavmeshImporter::LoadNavmesh(UID navmeshUID)
+{
+    const int NAVMESHSET_MAGIC = 'S' << 24 | 'O' << 16 | 'B' << 8 | 'R';
+    const int NAVMESHSET_VERSION = 1;
+
+    std::string navPath = App->GetLibraryModule()->GetResourcePath(navmeshUID);
+
+    char* buffer = nullptr;
+    unsigned int size = FileSystem::Load(navPath.c_str(), &buffer);
+    if (size == 0 || !buffer)
     {
-        GLOG("Failed to find navmesh path for UID %llu", navmeshUID);
+        GLOG("Failed to load navmesh binary: %s", navPath.c_str());
         return nullptr;
     }
 
-    char* fileBuffer = nullptr;
-    unsigned int size = FileSystem::Load(navmeshPath.c_str(), &fileBuffer);
-    if (size == 0 || fileBuffer == nullptr)
-    {
-        GLOG("Failed to load navmesh file: %s", navmeshPath.c_str());
-        return nullptr;
-    }
+    char* cursor = buffer;
 
-    char* cursor = fileBuffer;
-
-    // Read and validate header
+    // Read and verify header
     NavMeshSetHeader header;
     memcpy(&header, cursor, sizeof(NavMeshSetHeader));
     cursor += sizeof(NavMeshSetHeader);
 
     if (header.magic != NAVMESHSET_MAGIC || header.version != NAVMESHSET_VERSION)
     {
-        GLOG("Invalid navmesh file header: %s", navmeshPath.c_str());
-        delete[] fileBuffer;
+        GLOG("Invalid navmesh file: %s", navPath.c_str());
+        delete[] buffer;
         return nullptr;
     }
 
@@ -114,50 +110,32 @@ ResourceNavMesh* NavmeshImporter::LoadNavmesh(UID navmeshUID)
     if (!navMesh || dtStatusFailed(navMesh->init(&header.params)))
     {
         GLOG("Failed to init Detour navmesh");
-        delete[] fileBuffer;
+        delete[] buffer;
         return nullptr;
     }
 
-    // Load tiles
-    for (int i = 0; i < header.numTiles; ++i)
+    dtStatus status = navMesh->init(&header.params);
+    if (dtStatusFailed(status))
     {
-        int dataSize = 0;
-        memcpy(&dataSize, cursor, sizeof(int));
-        cursor += sizeof(int);
-
-        if (dataSize == 0) continue;
-
-        unsigned char* tileData = (unsigned char*)dtAlloc(dataSize, DT_ALLOC_PERM);
-        if (!tileData)
-        {
-            GLOG("Failed to allocate tile data");
-            continue;
-        }
-
-        memcpy(tileData, cursor, dataSize);
-        cursor += dataSize;
-
-        dtTileRef tileRef = 0;
-        navMesh->addTile(tileData, dataSize, DT_TILE_FREE_DATA, 0, &tileRef);
-    }
-
-    delete[] fileBuffer;
-
-    // Allocate navmesh query
-    dtNavMeshQuery* navQuery = dtAllocNavMeshQuery();
-    if (!navQuery || dtStatusFailed(navQuery->init(navMesh, 2048)))
-    {
-        GLOG("Failed to create navmesh query");
+        GLOG("Failed to init Detour navmesh.");
         dtFreeNavMesh(navMesh);
+        delete[] buffer;
+        return nullptr;
+    }
+    unsigned char* tileData = (unsigned char*)cursor;
+    int tileRef = 0;
+    status = navMesh->addTile(tileData, size - sizeof(NavMeshSetHeader), DT_TILE_FREE_DATA, 0, (dtTileRef*)&tileRef);
+    if (dtStatusFailed(status))
+    {
+        GLOG("Failed to add tile to Detour navmesh.");
+        dtFreeNavMesh(navMesh);
+        delete[] buffer;
         return nullptr;
     }
 
-    // Create the resource object and set its navmesh
-    ResourceNavMesh* resource = new ResourceNavMesh();
-    resource->SetNavMesh(navMesh);
-    resource->SetNavMeshQuery(navQuery);
-    resource->SetUID(navmeshUID);
-    resource->SetName(navmeshPath);
+    ResourceNavMesh* resource = new ResourceNavMesh(navmeshUID, "LoadedNavmesh");
+
+    GLOG("Loaded navmesh binary: %s", navPath.c_str());
 
     return resource;
-}*/
+}

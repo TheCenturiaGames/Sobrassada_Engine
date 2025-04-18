@@ -10,6 +10,7 @@
 #include "GameObject.h"
 #include "Standalone/MeshComponent.h"
 #include "FileSystem/Importers/NavmeshImporter.h"
+#include "MetaNavmesh.h"
 
 #include "Geometry/Plane.h"
 #include "ImGui.h"
@@ -32,7 +33,7 @@ bool PathfinderModule ::Init()
 PathfinderModule::~PathfinderModule()
 {
     dtFreeCrowd(crowd);
-    dtFreeNavMeshQuery(navQuery);
+
     if (tmpNavmesh)
     {
         delete tmpNavmesh;
@@ -93,9 +94,32 @@ void PathfinderModule::InitQuerySystem()
         return;
     }
 
-    navQuery = tmpNavmesh->GetDetourNavMeshQuery();
+    // Free previous navQuery
+    if (navQuery)
+    {
+        dtFreeNavMeshQuery(navQuery);
+        navQuery = nullptr;
+    }
 
-    if (tmpNavmesh != nullptr)
+    // Allocate and initialize new query
+    navQuery = dtAllocNavMeshQuery();
+    if (navQuery && tmpNavmesh->GetDetourNavMesh())
+    {
+        navQuery->init(tmpNavmesh->GetDetourNavMesh(), 2048);
+    }
+    else
+    {
+        GLOG("Failed to initialize navQuery.");
+    }
+
+    if (crowd)
+    {
+        dtFreeCrowd(crowd);
+        crowd = nullptr;
+    }
+
+    crowd = dtAllocCrowd();
+    if (crowd && tmpNavmesh->GetDetourNavMesh())
     {
         crowd->init(maxAgents, maxAgentRadius, tmpNavmesh->GetDetourNavMesh());
     }
@@ -156,6 +180,29 @@ void PathfinderModule::SaveNavMesh(const std::string& name)
 
 void PathfinderModule::LoadNavMesh(const std::string& name)
 {
+    UID navmeshUID = App->GetLibraryModule()->GetNavmeshUID(name);
+    if (navmeshUID == 0)
+    {
+        GLOG("Navmesh '%s' not found in LibraryModule.", name.c_str());
+        return;
+    }
+
+    ResourceNavMesh* loadedNavmesh = NavmeshImporter::LoadNavmesh(navmeshUID);
+    if (!loadedNavmesh)
+    {
+        GLOG("Failed to load navmesh binary for UID %llu.", navmeshUID);
+        return;
+    }
+
+    if (tmpNavmesh)
+        delete tmpNavmesh;
+
+    tmpNavmesh = loadedNavmesh;
+
+    
+    InitQuerySystem();
+
+    GLOG("Navmesh '%s' successfully loaded and set.", name.c_str());
 }
 
 void PathfinderModule::AddAIAgentComponent(int agentId, AIAgentComponent* comp)
