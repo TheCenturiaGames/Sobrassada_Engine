@@ -383,4 +383,9 @@
             return;
         }
     }
+
+    void ResourceNavMesh::SetDetourNavMesh(dtNavMesh* navMesh)
+    {
+        this->navMesh = navMesh;
+    }
     

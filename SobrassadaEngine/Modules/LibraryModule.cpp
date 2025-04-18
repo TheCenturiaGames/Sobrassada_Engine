@@ -203,9 +203,12 @@ bool LibraryModule::LoadLibraryMaps(const std::string& projectPath)
             case 20:
                 AddNavmesh(assetUID, assetName);
                 AddName(assetName, assetUID);
-                libraryPath = projectPath + NAVMESHES_PATH + std::to_string(assetUID) + NAVMESH_EXTENSION;
-                if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
-                else SceneImporter::CopyFont(assetPath, projectPath, assetName, assetUID);
+                libraryPath = projectPath + NAVMESHES_PATH + assetName + NAVMESH_EXTENSION;
+
+                if (FileSystem::Exists(libraryPath.c_str()))
+                    AddResource(libraryPath, assetUID); // Register for loading later
+                else
+                    GLOG("Navmesh binary missing for UID %llu (%s)", assetUID, assetName.c_str()); // Optional warning
                 break;
             default:
                 GLOG("Unknown UID prefix (%s) for: %s", std::to_string(prefix).c_str(), assetName.c_str());
