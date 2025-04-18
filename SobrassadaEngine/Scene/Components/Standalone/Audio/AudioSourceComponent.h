@@ -18,6 +18,7 @@ class AudioSourceComponent : public Component
     void Update(float deltaTime) override;
     void Render(float deltaTime) override {};
     void RenderEditorInspector() override;
+    virtual void RenderDebug(float deltaTime) {};
 
     // More efficient to use the IDs, but both exist in case it is needed to use the string variant in some scenario
     void EmitEvent(const AkUniqueID event) const;

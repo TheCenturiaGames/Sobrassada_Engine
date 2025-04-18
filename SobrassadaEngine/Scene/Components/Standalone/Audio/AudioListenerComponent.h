@@ -17,6 +17,7 @@ class AudioListenerComponent : public Component
     void Update(float deltaTime) override {};
     void Render(float deltaTime) override {};
     void RenderEditorInspector() override;
+    virtual void RenderDebug(float deltaTime) {};
 
   private:
     bool isActiveListener;
