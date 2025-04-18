@@ -8,8 +8,11 @@
 #include "LibraryModule.h"
 #include "Resource.h"
 #include "ResourceAnimation.h"
+#include "ResourceModel.h"
+#include "ResourceStateMachine.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
+#include "StateMachineEditor.h"
 
 #include "Math/Quat.h"
 #include "imgui.h"
@@ -32,6 +35,16 @@ AnimationComponent::AnimationComponent(const rapidjson::Value& initialState, Gam
     {
         resource = 0;
     }
+
+    if (initialState.HasMember("StateMachine") && initialState["StateMachine"].IsUint64())
+    {
+        UID smUID            = initialState["StateMachine"].GetUint64();
+        resourceStateMachine = static_cast<ResourceStateMachine*>(App->GetResourcesModule()->RequestResource(smUID));
+    }
+    else
+    {
+        resourceStateMachine = nullptr;
+    }
 }
 
 AnimationComponent::~AnimationComponent()
@@ -44,11 +57,41 @@ AnimationComponent::~AnimationComponent()
     App->GetResourcesModule()->ReleaseResource(currentAnimResource);
 }
 
-void AnimationComponent::OnPlay()
+void AnimationComponent::OnPlay(bool isTransition)
 {
-    if (animController != nullptr && resource != 0)
+    StateMachineEditor* stateMachine = nullptr;
+    unsigned transitionTime             = 0;
+    if (animController != nullptr && resource != INVALID_UID)
     {
-        animController->Play(resource, true);
+        if (resourceStateMachine)
+        {
+            const State* activeState = resourceStateMachine->GetActiveState();
+            for (const auto& state : resourceStateMachine->states)
+            {
+                if (state.name.GetString() == activeState->name.GetString())
+                {
+                    for (const auto& transition : resourceStateMachine->transitions)
+                    {
+                        if (state.name.GetString() == transition.toState.GetString())
+                        {
+                            transitionTime = transition.interpolationTime;
+                        }
+                    }
+                    for (const auto& clip : resourceStateMachine->clips)
+                    {
+                        if (clip.clipName.GetString() == activeState->clipName.GetString())
+                        {
+                            GLOG("TransitionTime: %f", transitionTime);
+                            if (isTransition)
+                                animController->SetTargetAnimationResource(clip.animationResourceUID, transitionTime, clip.loop);
+                            else animController->Play(clip.animationResourceUID, clip.loop);
+                            resource = clip.animationResourceUID;
+                        }
+                    }
+                }
+            }
+        }
+        else animController->Play(resource, true);
     }
 }
 
@@ -81,10 +124,10 @@ void AnimationComponent::OnInspector()
     std::string originAnimation = "";
     if (resource != 0)
     {
-        currentAnimResource = dynamic_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
+        currentAnimResource = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
         const std::string animationName = App->GetLibraryModule()->GetResourceName(resource);
-        
-        const size_t underscorePos            = animationName.find('_');
+
+        const size_t underscorePos      = animationName.find('_');
         if (underscorePos != std::string::npos) originAnimation = animationName.substr(0, underscorePos);
         if (currentAnimResource != nullptr)
         {
@@ -161,7 +204,7 @@ void AnimationComponent::OnInspector()
                     if (ImGui::Button("Play"))
                     {
                         playing = true;
-                        currentAnimComp->OnPlay();
+                        currentAnimComp->OnPlay(false);
                     }
 
                     ImGui::SameLine();
@@ -279,7 +322,64 @@ void AnimationComponent::OnInspector()
                 }
             }
         }
+    }
 
+    ImGui::Separator();
+    ImGui::Text("Associated State Machine");
+
+    const std::unordered_map<std::string, UID>& stateMap = App->GetLibraryModule()->GetStateMachineMap();
+
+    std::string currentName                              = "None";
+    if (resourceStateMachine) currentName = resourceStateMachine->GetName();
+
+    if (ImGui::BeginCombo("##StateMachineCombo", currentName.c_str()))
+    {
+        for (const auto& [name, uid] : stateMap)
+        {
+            const bool isSelected = (resourceStateMachine && resourceStateMachine->GetUID() == uid);
+            if (ImGui::Selectable(name.c_str(), isSelected))
+            {
+                if (resourceStateMachine) App->GetResourcesModule()->ReleaseResource(resourceStateMachine);
+                resourceStateMachine =
+                    static_cast<ResourceStateMachine*>(App->GetResourcesModule()->RequestResource(uid));
+            }
+            if (isSelected) ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndCombo();
+    }
+
+    if (resourceStateMachine)
+    {
+        ImGui::Separator();
+        ImGui::Text("Available Triggers:");
+
+        for (const std::string& triggerName : resourceStateMachine->availableTriggers)
+        {
+            if (ImGui::Button(triggerName.c_str()))
+            {
+                if (IsPlaying())
+                {
+                    GLOG("Trigger selected: %s", triggerName.c_str());
+                    for (const auto& transition : resourceStateMachine->transitions)
+                    {
+                        if (transition.triggerName == triggerName &&
+                            transition.fromState.GetString() ==
+                                resourceStateMachine->GetActiveState()->name.GetString())
+                        {
+                            for (size_t i = 0; i < resourceStateMachine->states.size(); ++i)
+                            {
+                                if (resourceStateMachine->states[i].name.GetString() == transition.toState.GetString())
+                                {
+                                    resourceStateMachine->SetActiveState(static_cast<int>(i));
+                                    OnPlay(true);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     if (playing && currentAnimComp && currentAnimComp->GetAnimationController())
@@ -335,16 +435,17 @@ void AnimationComponent::Update(float deltaTime)
         const std::string& boneName = channel.first;
 
         auto boneIt                 = boneMapping.find(boneName);
-
         if (boneIt != boneMapping.end())
         {
-            GameObject* bone = boneIt->second;
-            float3 position  = bone->GetLocalTransform().TranslatePart();
-            Quat rotation    = Quat(bone->GetLocalTransform().RotatePart());
+            GameObject* bone       = boneIt->second;
+            float4x4 boneTransform = bone->GetLocalTransform();
+
+            float3 position        = boneTransform.TranslatePart();
+            Quat rotation          = Quat(boneTransform.RotatePart());
 
             animController->GetTransform(boneName, position, rotation);
 
-            float4x4 transformMatrix = float4x4::FromTRS(position, rotation, float3(1.0, 1.0, 1.0));
+            float4x4 transformMatrix = float4x4::FromTRS(position, rotation, float3(1.0f, 1.0f, 1.0f));
             bone->SetLocalTransform(transformMatrix);
             bone->OnTransformUpdated();
         }
@@ -357,6 +458,9 @@ void AnimationComponent::Save(rapidjson::Value& targetState, rapidjson::Document
 
     targetState.AddMember(
         "Animations", currentAnimResource != nullptr ? currentAnimResource->GetUID() : INVALID_UID, allocator
+    );
+    targetState.AddMember(
+        "StateMachine", resourceStateMachine != nullptr ? resourceStateMachine->GetUID() : INVALID_UID, allocator
     );
 }
 
@@ -415,4 +519,9 @@ void AnimationComponent::RenderEditorInspector()
     {
         OnInspector();
     }
+}
+
+bool AnimationComponent::IsPlaying() const
+{
+    return animController->IsPlaying();
 }
