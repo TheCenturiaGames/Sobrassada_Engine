@@ -6,6 +6,7 @@
 #include "LibraryModule.h"
 #include "MetaNavmesh.h"
 #include "NavMeshConfig.h"
+#include "ProjectModule.h"
 #include "ResourceNavmesh.h"
 
 struct NavMeshSetHeader
@@ -15,34 +16,33 @@ struct NavMeshSetHeader
     dtNavMeshParams params;
 };
 
-
 UID NavmeshImporter::SaveNavmesh(const char* name, ResourceNavMesh* resource, const NavMeshConfig& config)
 {
 
-    const int NAVMESHSET_MAGIC = 'S' << 24 | 'O' << 16 | 'B' << 8 | 'R';
+    const int NAVMESHSET_MAGIC   = 'S' << 24 | 'O' << 16 | 'B' << 8 | 'R';
     const int NAVMESHSET_VERSION = 1;
 
-    dtNavMesh* navmesh = resource->GetDetourNavMesh();
+    dtNavMesh* navmesh           = resource->GetDetourNavMesh();
     if (!navmesh) return 0;
 
     const dtNavMeshParams* params = navmesh->getParams();
 
     // Get raw navmesh data (we assume 1 tile, single data block)
-    const dtMeshTile* tile = navmesh->getTileAt(0, 0, 0);
+    const dtMeshTile* tile        = navmesh->getTileAt(0, 0, 0);
 
     if (!tile || !tile->data || tile->dataSize == 0) return 0;
 
     // Fill header
     NavMeshSetHeader header;
-    header.magic = NAVMESHSET_MAGIC;
+    header.magic   = NAVMESHSET_MAGIC;
     header.version = NAVMESHSET_VERSION;
     memcpy(&header.params, params, sizeof(dtNavMeshParams));
 
     // Allocate buffer
     const size_t totalSize = sizeof(NavMeshSetHeader) + tile->dataSize;
 
-    char* fileBuffer = new char[totalSize];
-    char* cursor = fileBuffer;
+    char* fileBuffer       = new char[totalSize];
+    char* cursor           = fileBuffer;
 
     memcpy(cursor, &header, sizeof(NavMeshSetHeader));
     cursor += sizeof(NavMeshSetHeader);
@@ -50,17 +50,19 @@ UID NavmeshImporter::SaveNavmesh(const char* name, ResourceNavMesh* resource, co
 
     // Generate UID and file path
     UID navmeshUID = GenerateUID();
-    navmeshUID = App->GetLibraryModule()->AssignFiletypeUID(navmeshUID, FileType::Navmesh);
+    navmeshUID     = App->GetLibraryModule()->AssignFiletypeUID(navmeshUID, FileType::Navmesh);
 
     std::string metaNavPath = NAVMESHES_PATH + std::string(name) + META_EXTENSION;
-    std::string navPath = NAVMESHES_PATH + std::string(name) + NAVMESH_EXTENSION;
+    std::string navPath =
+        App->GetProjectModule()->GetLoadedProjectPath() + NAVMESHES_PATH + std::string(name) + NAVMESH_EXTENSION;
 
-    // Save metadata 
+    // Save metadata
     MetaNavmesh meta(navmeshUID, metaNavPath, config);
     meta.Save(name, metaNavPath);
 
     // Write binary navmesh
-    unsigned int bytesWritten = FileSystem::Save(navPath.c_str(), fileBuffer, (unsigned int)totalSize);
+    unsigned int bytesWritten =
+        (unsigned int)FileSystem::Save(navPath.c_str(), fileBuffer, (unsigned int)totalSize, true);
 
     delete[] fileBuffer;
 
@@ -71,7 +73,6 @@ UID NavmeshImporter::SaveNavmesh(const char* name, ResourceNavMesh* resource, co
 
     return navmeshUID;
 }
-
 
 ResourceNavMesh* NavmeshImporter::LoadNavmesh(UID navmeshUID)
 {
