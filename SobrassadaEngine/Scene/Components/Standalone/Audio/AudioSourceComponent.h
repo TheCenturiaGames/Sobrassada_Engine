@@ -33,10 +33,12 @@ class AudioSourceComponent : public Component
     void SetPitch(const float newPitch);
     void SetSpatialization(const float newSpatialization);
 
+    void UpdateEventsNames();
+
   private:
     void SetInitValues();
 
-    std::string defaultEventName;
+    std::string defaultEventName = "Default";
     AkUniqueID defaultEvent;
     float volume         = 1;
     float pitch          = 0.5f;

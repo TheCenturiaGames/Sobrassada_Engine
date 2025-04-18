@@ -131,11 +131,6 @@ void AudioSourceComponent::SetSpatialization(const float newSpatialization)
 
 void AudioSourceComponent::SetInitValues()
 {
-    for (const auto& event : App->GetAudioModule()->GetEventsMap())
-    {
-        if (event.second == defaultEvent) defaultEventName = event.first;
-    }
-
     AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::VOLUME, volume, parent->GetUID());
     AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::PITCH, pitch, parent->GetUID());
     AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::SPATIALIZATION, spatialization, parent->GetUID());
@@ -166,8 +161,13 @@ void AudioSourceComponent::SetDefaultEvent(const AkUniqueID newEvent)
     if (newEvent == 0) return;
 
     defaultEvent = newEvent;
+    UpdateEventsNames();
+}
+
+void AudioSourceComponent::UpdateEventsNames()
+{
     for (const auto& event : App->GetAudioModule()->GetEventsMap())
     {
-        if (event.second == newEvent) defaultEventName = event.first;
+        if (event.second == defaultEvent) defaultEventName = event.first;
     }
 }

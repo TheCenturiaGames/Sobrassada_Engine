@@ -13,11 +13,12 @@ class AudioModule : public Module
     AudioModule();
     ~AudioModule() override;
 
-    bool Init() override { return true; }
-    bool InitAudio();
+    bool Init() override;
     update_status Update(float deltaTime) override;
     bool ShutDown() override;
 
+    void InitAudio();
+    void UnloadBanks();
     void musicvol(int volume) { music = volume; };
     void soundvol(int volume) { sound = volume; };
     void voicevol(int volume) { voice = volume; };

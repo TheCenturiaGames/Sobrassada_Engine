@@ -142,7 +142,7 @@ constexpr const char* PREFILTERED_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shade
 constexpr const char* ENVIRONMENTBRDF_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader/Fragment/EnvironmentBRDFFragment.glsl";
 
 // Soundbanks
-constexpr const char* WINDOWS_BANKS_PATH             = "Soundbanks\\Windows\\";
+constexpr const char* WINDOWS_BANKS_PATH             = "Assets\\Soundbanks\\Windows\\";
 constexpr const wchar_t* BANKNAME_INIT               = L"Init.bnk";
 constexpr const wchar_t* BANKNAME_MAIN               = L"main.bnk";
 constexpr const char* BANKMETA_MAIN                  = "main.json";

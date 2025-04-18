@@ -13,7 +13,7 @@ namespace AK
 {
     namespace EVENTS
     {
-        static const AkUniqueID ICE = 344481046U;
+        static const AkUniqueID ICE_BLAST = 3920196677U;
         static const AkUniqueID TELEPORT = 530129416U;
     } // namespace EVENTS
 

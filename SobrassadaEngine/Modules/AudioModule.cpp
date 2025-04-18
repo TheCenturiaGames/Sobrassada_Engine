@@ -34,7 +34,7 @@ AudioModule::~AudioModule()
 {
 }
 
-bool AudioModule::InitAudio()
+bool AudioModule::Init()
 {
     AkMemSettings memSettings;
     AK::MemoryMgr::GetDefaultSettings(memSettings);
@@ -49,11 +49,6 @@ bool AudioModule::InitAudio()
     AkPlatformInitSettings l_platInitSetings;
     AK::SoundEngine::GetDefaultInitSettings(l_InitSettings);
     AK::SoundEngine::GetDefaultPlatformInitSettings(l_platInitSetings);
-
-    // Setting pool sizes for this game. Here, allow for user content;
-    // every game should determine its own optimal values.
-    // l_InitSettings.uDefaultPoolSize           = 2 * 1024 * 1024;
-    // l_platInitSetings.uLEngineDefaultPoolSize = 4 * 1024 * 1024;
 
     AkMusicSettings musicInit;
     AK::MusicEngine::GetDefaultInitSettings(musicInit);
@@ -96,7 +91,12 @@ bool AudioModule::InitAudio()
         return false;
     }
 
-    // load initialization and main soundbanks
+    return true;
+}
+
+void AudioModule::InitAudio()
+{
+    loadedAudio                      = true;
     const std::string soundbanksPath = App->GetProjectModule()->GetLoadedProjectPath() + WINDOWS_BANKS_PATH;
 
     const int size                   = MultiByteToWideChar(CP_UTF8, 0, soundbanksPath.c_str(), -1, nullptr, 0);
@@ -116,7 +116,7 @@ bool AudioModule::InitAudio()
     if (AK::Comm::Init(commSettings) != AK_Success)
     {
         GLOG("Could not initialize communication.");
-        return false;
+        return;
     }
 #endif
 
@@ -126,13 +126,13 @@ bool AudioModule::InitAudio()
     if (retValue != AK_Success)
     {
         GLOG("Cannot initialize Init.bnk soundbank");
-        return false;
+        return;
     }
     retValue = AK::SoundEngine::LoadBank(BANKNAME_MAIN, bankID);
     if (retValue != AK_Success)
     {
         GLOG("Cannot initialize main.bnk soundbank");
-        return false;
+        return;
     }
 
     //  initialize volume parameters to sensible default values
@@ -142,18 +142,21 @@ bool AudioModule::InitAudio()
 
     ParseEvents();
 
-    return true;
+    for (const auto& source : sources)
+    {
+        source->UpdateEventsNames();
+    }
 }
 
 update_status AudioModule::Update(float deltaTime)
 {
-    if (!App->GetProjectModule()->IsProjectLoaded()) return UPDATE_CONTINUE;
-
-    if (!loadedAudio)
+    // Do this here because if trying to load soundbanks when no project loaded, no soundbanks are found and souns doesn't work
+    if (!App->GetProjectModule()->IsProjectLoaded())
     {
-        InitAudio();
-        loadedAudio = true;
+        if (loadedAudio) UnloadBanks();
+        return UPDATE_CONTINUE;
     }
+    if (!loadedAudio) InitAudio();
 
     if (listener)
     {
@@ -192,16 +195,18 @@ update_status AudioModule::Update(float deltaTime)
     return UPDATE_CONTINUE;
 }
 
+void AudioModule::UnloadBanks()
+{
+    loadedAudio = false;
+    AK::SoundEngine::UnloadBank(BANKNAME_MAIN, NULL);
+    AK::SoundEngine::UnloadBank(BANKNAME_INIT, NULL);
+}
+
 bool AudioModule::ShutDown()
 {
-    if (!App->GetProjectModule()->IsProjectLoaded()) return true;
-
 #ifndef AK_OPTIMIZED
     AK::Comm::Term();
 #endif
-    // Unload banks
-    AK::SoundEngine::UnloadBank(BANKNAME_MAIN, NULL);
-    AK::SoundEngine::UnloadBank(BANKNAME_INIT, NULL);
 
     AK::MusicEngine::Term();
     AK::SoundEngine::Term();
