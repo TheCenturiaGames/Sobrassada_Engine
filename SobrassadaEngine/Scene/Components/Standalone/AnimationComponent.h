@@ -12,7 +12,7 @@ class AnimController;
 class GameObject;
 
 
-class AnimationComponent : public Component
+class SOBRASADA_API_ENGINE AnimationComponent : public Component
 {
   public:
     AnimationComponent(UID uid, GameObject* parent);

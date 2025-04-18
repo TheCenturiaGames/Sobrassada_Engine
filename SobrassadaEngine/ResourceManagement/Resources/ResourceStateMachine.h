@@ -46,7 +46,7 @@ struct Transition
     unsigned interpolationTime;
 };
 
-class ResourceStateMachine : public Resource
+class SOBRASADA_API_ENGINE ResourceStateMachine : public Resource
 {
   public:
     std::vector<Clip> clips;

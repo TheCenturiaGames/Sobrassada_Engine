@@ -5,6 +5,7 @@
 
 class GameObject;
 class CharacterControllerComponent;
+class AnimationComponent;
 
 enum class CharacterStates
 {
@@ -34,6 +35,7 @@ class CuChulainn : public Character
 private:
     std::unordered_map<std::string, CharacterStates> stateMap;
     AnimationComponent* animComponent;
+    bool runActive = false;
 };
 
 extern CharacterControllerComponent* character;
