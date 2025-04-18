@@ -57,6 +57,7 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"Script",               COMPONENT_SCRIPT              },
         {"AI Agent",             COMPONENT_AIAGENT             },
         {"UI Image",             COMPONENT_IMAGE               },
+        {"UI Button",            COMPONENT_BUTTON              },
         {"Audio Source",         COMPONENT_AUDIO_SOURCE        },
         {"Audio Listener",       COMPONENT_AUDIO_LISTENER      },
     };
@@ -835,6 +836,19 @@ bool EditorUIModule::RenderTransformWidget(
     std::string transformName = std::string(transformType == GizmoTransform::LOCAL ? "Local " : "World ") + "Transform";
     ImGui::SeparatorText(transformName.c_str());
 
+    if (transformType == GizmoTransform::LOCAL && !pos.Equals(localTransform.TranslatePart()))
+    {
+        pos   = localTransform.TranslatePart();
+        rot   = localTransform.RotatePart().ToEulerXYZ();
+        scale = localTransform.GetScale();
+    }
+    else if (transformType == GizmoTransform::WORLD && !pos.Equals(globalTransform.TranslatePart()))
+    {
+        pos   = globalTransform.TranslatePart();
+        rot   = globalTransform.RotatePart().ToEulerXYZ();
+        scale = globalTransform.GetScale();
+    }
+
     RenderBasicTransformModifiers(
         pos, rot, scale, lockScaleAxis, positionValueChanged, rotationValueChanged, scaleValueChanged
     );
@@ -975,6 +989,7 @@ T EditorUIModule::RenderResourceSelectDialog(
                         if (ImGui::Selectable(valuePair.first.c_str(), false))
                         {
                             result = valuePair.second;
+                            memset(searchTextResource, 0, sizeof searchTextResource);
                             ImGui::CloseCurrentPopup();
                         }
                     }
@@ -1205,7 +1220,7 @@ EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
         return new NodeEditor("NodeEditor_" + std::to_string(uid), uid);
 
     case EditorType::ANIMATION:
-        return new StateMachineEditor("StateMachineEditor_" + std::to_string(uid), uid, stateMachine);
+        return stateMachineEditor = new StateMachineEditor("StateMachineEditor_" + std::to_string(uid), uid, stateMachine);
 
     case EditorType::TEXTURE:
         return new TextureEditor("TextureEditor_" + std::to_string(uid), uid);

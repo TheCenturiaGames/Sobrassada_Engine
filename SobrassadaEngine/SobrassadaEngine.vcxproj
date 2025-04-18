@@ -375,6 +375,7 @@
     <ClCompile Include="Scene\Components\Standalone\Audio\AudioSourceComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\Physics\CapsuleColliderComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\Physics\SphereColliderComponent.cpp" />
+    <ClCompile Include="Scene\Components\Standalone\UI\ButtonComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\UI\ImageComponent.cpp" />
     <ClCompile Include="Utils\Physics\BulletMotionState.cpp" />
     <ClCompile Include="Scene\Components\Standalone\Physics\CubeColliderComponent.cpp" />
@@ -589,6 +590,7 @@
     <ClInclude Include="Modules\AudioModule.h" />
     <ClInclude Include="Scene\Components\Standalone\Audio\AudioSourceComponent.h" />
     <ClInclude Include="Scene\Components\Standalone\Physics\CapsuleColliderComponent.h" />
+    <ClInclude Include="Scene\Components\Standalone\UI\ButtonComponent.h" />
     <ClInclude Include="Scene\Components\Standalone\UI\ImageComponent.h" />
     <ClInclude Include="Utils\Physics\BulletUserPointer.h" />
     <ClInclude Include="Scene\Components\Standalone\Physics\SphereColliderComponent.h" />

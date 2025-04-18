@@ -10,13 +10,18 @@
 #include "ImGuizmo.h"
 #include "InputModule.h"
 #include "LibraryModule.h"
+#include "PathfinderModule.h"
 #include "PhysicsModule.h"
 #include "ProjectModule.h"
 #include "RaycastController.h"
 #include "ResourcesModule.h"
-#include "PathfinderModule.h"
+#include "Standalone/AnimationComponent.h"
+#include "Standalone/MeshComponent.h"
 
 #include <SDL_mouse.h>
+#include <map>
+#include <queue>
+#include <tuple>
 #ifdef OPTICK
 #include "optick.h"
 #endif
@@ -86,62 +91,35 @@ update_status SceneModule::PostUpdate(float deltaTime)
 {
     if (App->GetProjectModule()->IsProjectLoaded())
     {
+
+        const KeyState* mouseButtons = App->GetInputModule()->GetMouseButtons();
+        const KeyState* keyboard     = App->GetInputModule()->GetKeyboard();
+
         // CAST RAY WHEN LEFT CLICK IS RELEASED
-        if (GetDoMouseInputsScene() && !ImGuizmo::IsUsingAny())
-        {
-            const KeyState* mouseButtons = App->GetInputModule()->GetMouseButtons();
-            const KeyState* keyboard     = App->GetInputModule()->GetKeyboard();
-            if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_DOWN && !keyboard[SDL_SCANCODE_LALT] &&
-                keyboard[SDL_SCANCODE_LSHIFT])
-            {
-                GameObject* selectedObject = RaycastController::GetRayIntersectionTrees<Octree, Quadtree>(
-                    App->GetCameraModule()->CastCameraRay(), loadedScene->GetOctree(), loadedScene->GetDynamicTree()
-                );
-
-                if (selectedObject != nullptr)
-                {
-                    if (!loadedScene->IsMultiselecting())
-                        loadedScene->SetMultiselectPosition(selectedObject->GetPosition());
-
-                    loadedScene->AddGameObjectToSelection(selectedObject->GetUID(), selectedObject->GetParent());
-                }
-            }
-            else if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_DOWN && !keyboard[SDL_SCANCODE_LALT])
-            {
-                GameObject* selectedObject = RaycastController::GetRayIntersectionTrees<Octree, Quadtree>(
-                    App->GetCameraModule()->CastCameraRay(), loadedScene->GetOctree(), loadedScene->GetDynamicTree()
-                );
-
-                if (selectedObject != nullptr) loadedScene->SetSelectedGameObject(selectedObject->GetUID());
-
-                loadedScene->ClearObjectSelection();
-            }
-        }
+        if (GetDoMouseInputsScene() && !ImGuizmo::IsUsingAny()) HandleRaycast(mouseButtons, keyboard);
 
         if (GetDoInputsGame())
         {
-            const KeyState* mouseButtons = App->GetInputModule()->GetMouseButtons();
             if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_DOWN)
             {
                 App->GetPathfinderModule()->HandleClickNavigation();
             }
         }
 
+        // CTRL+D -> Duplicate selected game object
+        if (keyboard[SDL_SCANCODE_LCTRL] && keyboard[SDL_SCANCODE_D] == KeyState::KEY_DOWN &&
+            loadedScene->GetGameObjectRootUID() != loadedScene->GetSelectedGameObjectUID())
+            HandleObjectDuplication();
+
+        // Delete -> Delete selected game object
+        if (keyboard[SDL_SCANCODE_DELETE] == KeyState::KEY_DOWN &&
+            loadedScene->GetGameObjectRootUID() != loadedScene->GetSelectedGameObjectUID())
+            HandleObjectDeletion();
+
         // CHECKING FOR UPDATED STATIC AND DYNAMIC OBJECTS
         GizmoDragState currentGizmoState = App->GetEditorUIModule()->GetImGuizmoDragState();
         if (currentGizmoState == GizmoDragState::RELEASED || currentGizmoState == GizmoDragState::IDLE)
-        {
-            if (loadedScene->IsStaticModified())
-            {
-                loadedScene->UpdateStaticSpatialStructure();
-            }
-            if (loadedScene->IsDynamicModified())
-            {
-                loadedScene->UpdateDynamicSpatialStructure();
-            }
-
-            loadedScene->UpdateGameObjects();
-        }
+            HandleTreesUpdates();
 
         // IF SCENE NOT FOCUSED AND WAS MULTISELECTING RELEASE
         if (loadedScene->IsMultiselecting() && !loadedScene->IsSceneFocused()) loadedScene->ClearObjectSelection();
@@ -216,4 +194,165 @@ void SceneModule::SwitchPlayMode(bool play)
     {
         if (App->GetLibraryModule()->SaveScene("", SaveMode::SavePlayMode)) inPlayMode = true;
     }
+}
+
+void SceneModule::HandleRaycast(const KeyState* mouseButtons, const KeyState* keyboard)
+{
+    if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_DOWN && !keyboard[SDL_SCANCODE_LALT] &&
+        keyboard[SDL_SCANCODE_LSHIFT])
+    {
+        GameObject* selectedObject = RaycastController::GetRayIntersectionTrees<Octree, Quadtree>(
+            App->GetCameraModule()->CastCameraRay(), loadedScene->GetOctree(), loadedScene->GetDynamicTree()
+        );
+
+        if (selectedObject != nullptr)
+        {
+            if (!loadedScene->IsMultiselecting()) loadedScene->SetMultiselectPosition(selectedObject->GetPosition());
+
+            loadedScene->AddGameObjectToSelection(selectedObject->GetUID(), selectedObject->GetParent());
+        }
+    }
+    else if (mouseButtons[SDL_BUTTON_LEFT - 1] == KeyState::KEY_DOWN && !keyboard[SDL_SCANCODE_LALT])
+    {
+        GameObject* selectedObject = RaycastController::GetRayIntersectionTrees<Octree, Quadtree>(
+            App->GetCameraModule()->CastCameraRay(), loadedScene->GetOctree(), loadedScene->GetDynamicTree()
+        );
+
+        if (selectedObject != nullptr) loadedScene->SetSelectedGameObject(selectedObject->GetUID());
+
+        loadedScene->ClearObjectSelection();
+    }
+}
+
+void SceneModule::HandleObjectDuplication()
+{
+    std::vector<std::pair<UID, UID>> objectsToDuplicate; // GAME OBJECT | GAME OBJECT PARENT
+    std::map<UID, UID> remappingTable;                   // Reference UID | New GameObject UID
+
+    if (loadedScene->IsMultiselecting())
+    {
+        const std::map<UID, UID> selectedGameObjects = loadedScene->GetMultiselectedObjects();
+
+        for (auto& childToDuplicate : selectedGameObjects)
+        {
+            objectsToDuplicate.push_back(childToDuplicate);
+        }
+    }
+    else
+    {
+        objectsToDuplicate.push_back(
+            {loadedScene->GetSelectedGameObject()->GetUID(), loadedScene->GetSelectedGameObject()->GetParent()}
+        );
+    }
+    for (int indexToDuplicate = 0; indexToDuplicate < objectsToDuplicate.size(); ++indexToDuplicate)
+    {
+        std::vector<GameObject*> createdGameObjects;
+        std::vector<GameObject*> originalGameObjects;
+
+        GameObject* gameObjectToClone = loadedScene->GetGameObjectByUID(objectsToDuplicate[indexToDuplicate].first);
+        GameObject* gameObjectToCloneParent =
+            loadedScene->GetGameObjectByUID(objectsToDuplicate[indexToDuplicate].second);
+
+        GameObject* clonedGameObject = new GameObject(objectsToDuplicate[indexToDuplicate].second, gameObjectToClone);
+
+        remappingTable.insert({gameObjectToClone->GetUID(), clonedGameObject->GetUID()});
+        createdGameObjects.push_back(clonedGameObject);
+        originalGameObjects.push_back(gameObjectToClone);
+
+        gameObjectToCloneParent->AddChildren(clonedGameObject->GetUID());
+        loadedScene->AddGameObject(clonedGameObject->GetUID(), clonedGameObject);
+
+        // CREATE DOWARDS HIERARCHY, FIRST ADD ALL CHILDREN (Parent, ChildrenUID)
+        std::queue<std::pair<UID, UID>> gameObjectsToClone;
+
+        for (UID child : gameObjectToClone->GetChildren())
+        {
+            gameObjectsToClone.push(std::make_pair(clonedGameObject->GetUID(), child));
+        }
+
+        Scene* scene = App->GetSceneModule()->GetScene();
+
+        while (!gameObjectsToClone.empty())
+        {
+            std::pair<UID, UID> currentGameObjectPair = gameObjectsToClone.front();
+            gameObjectsToClone.pop();
+
+            gameObjectToClone       = loadedScene->GetGameObjectByUID(currentGameObjectPair.second);
+            gameObjectToCloneParent = loadedScene->GetGameObjectByUID(currentGameObjectPair.first);
+
+            clonedGameObject        = new GameObject(currentGameObjectPair.first, gameObjectToClone);
+
+            remappingTable.insert({gameObjectToClone->GetUID(), clonedGameObject->GetUID()});
+            createdGameObjects.push_back(clonedGameObject);
+            originalGameObjects.push_back(gameObjectToClone);
+
+            for (UID child : gameObjectToClone->GetChildren())
+            {
+                gameObjectsToClone.push(std::make_pair(clonedGameObject->GetUID(), child));
+            }
+
+            gameObjectToCloneParent->AddChildren(clonedGameObject->GetUID());
+            loadedScene->AddGameObject(clonedGameObject->GetUID(), clonedGameObject);
+        }
+
+        // ITERATE OVER ALL GAME OBJECTS TO CHECK IF ANY REMAPING IS NEEDED
+        for (int i = 0; i < createdGameObjects.size(); ++i)
+        {
+            MeshComponent* originalMeshComp = originalGameObjects[i]->GetMeshComponent();
+            if (originalMeshComp && originalMeshComp->GetHasBones())
+            {
+                // Remap the bones references
+                const std::vector<UID>& bones = originalMeshComp->GetBones();
+                std::vector<UID> newBonesUIDs;
+                std::vector<GameObject*> newBonesObjects;
+
+                for (const UID bone : bones)
+                {
+                    const UID uid = remappingTable.find(bone)->second;
+                    newBonesUIDs.push_back(uid);
+                    newBonesObjects.push_back(loadedScene->GetGameObjectByUID(uid));
+                }
+
+                MeshComponent* newMesh = createdGameObjects[i]->GetMeshComponent();
+                newMesh->SetBones(newBonesObjects, newBonesUIDs);
+            }
+
+            AnimationComponent* animComp = createdGameObjects[i]->GetAnimationComponent();
+            if (animComp) animComp->SetBoneMapping();
+        }
+    }
+
+    if (loadedScene->IsMultiselecting())
+    {
+        const std::map<UID, MobilitySettings> originalObjectMobility = loadedScene->GetMultiselectedObjectsMobility();
+
+        for (int i = 0; i < objectsToDuplicate.size(); ++i)
+        {
+            MobilitySettings originalMobility = originalObjectMobility.find(objectsToDuplicate[i].first)->second;
+            loadedScene->GetGameObjectByUID(remappingTable[objectsToDuplicate[i].first])
+                ->UpdateMobilityHierarchy(originalMobility);
+        }
+    }
+}
+
+void SceneModule::HandleObjectDeletion()
+{
+    if (loadedScene->IsMultiselecting()) loadedScene->DeleteMultiselection();
+    else loadedScene->RemoveGameObjectHierarchy(loadedScene->GetSelectedGameObjectUID());
+
+    loadedScene->SetSelectedGameObject(loadedScene->GetGameObjectRootUID());
+}
+
+void SceneModule::HandleTreesUpdates()
+{
+    if (loadedScene->IsStaticModified())
+    {
+        loadedScene->UpdateStaticSpatialStructure();
+    }
+    if (loadedScene->IsDynamicModified())
+    {
+        loadedScene->UpdateDynamicSpatialStructure();
+    }
+
+    loadedScene->UpdateGameObjects();
 }

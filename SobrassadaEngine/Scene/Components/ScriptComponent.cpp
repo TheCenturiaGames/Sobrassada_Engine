@@ -67,6 +67,11 @@ void ScriptComponent::Render(float deltaTime)
 {
 }
 
+void ScriptComponent::RenderDebug(float deltaTime)
+{
+
+}
+
 void ScriptComponent::RenderEditorInspector()
 {
     Component::RenderEditorInspector();

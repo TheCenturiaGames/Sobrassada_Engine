@@ -1,10 +1,10 @@
 #include "SceneImporter.h"
 
+#include "AnimationImporter.h"
 #include "Application.h"
 #include "FileSystem.h"
 #include "FontImporter.h"
 #include "MaterialImporter.h"
-#include "AnimationImporter.h"
 #include "MeshImporter.h"
 #include "ModelImporter.h"
 #include "PrefabManager.h"
@@ -15,9 +15,10 @@
 #define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_EXTERNAL_IMAGE
 #define TINYGLTF_IMPLEMENTATION /* Only in one of the includes */
+#include "MetaMesh.h"
 #include "tiny_gltf.h"
-#include <utility>
 #include <unordered_set>
+#include <utility>
 
 namespace SceneImporter
 {
@@ -43,39 +44,52 @@ namespace SceneImporter
         std::vector<std::vector<std::pair<UID, UID>>> gltfMeshes;
         std::unordered_map<int, UID> matIndices;
 
-        for (const auto& srcMesh : model.meshes)
+        for (const tinygltf::Node& srcNode : model.nodes)
         {
-            int n = 0;
             int matIndex = -1;
-            std::vector<std::pair<UID, UID>> primitives;
 
-            for (const auto& primitive : srcMesh.primitives)
+            if (srcNode.mesh >= 0 && srcNode.mesh < model.meshes.size())
             {
-                std::string name = srcMesh.name + std::to_string(n);
+                std::vector<std::pair<UID, UID>> primitives;
 
-                UID matUID   = INVALID_UID;
-                matIndex = primitive.material;
-                if (matIndex == -1)
+                const tinygltf::Mesh& srcMesh    = model.meshes[srcNode.mesh];
+                const float4x4& defaultTransform = MeshImporter::GetNodeTransform(srcNode);
+                int primitiveCounter             = 0;
+
+                for (const auto& primitive : srcMesh.primitives)
                 {
-                    GLOG("Material index invalid for mesh: %s", name.c_str());
+                    std::string name = srcNode.name + "_" + srcMesh.name;
+                    if (primitiveCounter > 0) name += "_" + std::to_string(primitiveCounter);
+
+                    UID matUID = INVALID_UID;
+                    matIndex   = primitive.material;
+                    if (matIndex == -1)
+                    {
+                        GLOG("Material index invalid for mesh: %s. Using default material.", name.c_str());
+                        matUID = DEFAULT_MATERIAL_UID;
+                    }
+                    else if (matIndices.find(matIndex) == matIndices.end())
+                    {
+                        matUID = MaterialImporter::ImportMaterial(model, matIndex, filePath, targetFilePath);
+                        matIndices[matIndex] = matUID;
+                    }
+                    else
+                    {
+                        matUID = matIndices[matIndex];
+                    }
+
+                    const UID meshUID = MeshImporter::ImportMesh(
+                        model, srcNode.mesh, primitiveCounter, name, defaultTransform, filePath, targetFilePath,
+                        INVALID_UID, matUID
+                    );
+                    primitiveCounter++;
+
+                    primitives.emplace_back(meshUID, matUID);
+                    GLOG("New primitive with mesh UID: %d and Material UID: %d", meshUID, matUID);
                 }
-                else if (matIndices.find(matIndex) == matIndices.end())
-                {
-                    matUID = MaterialImporter::ImportMaterial(model, matIndex, filePath, targetFilePath);
-                    matIndices[matIndex] = matUID;
-                }
-                else
-                {
-                    matUID = matIndices[matIndex];
-                }
-                
-                const UID meshUID      = MeshImporter::ImportMesh(model, srcMesh, primitive, name, filePath, targetFilePath, INVALID_UID, matUID);
-                n++;
-                
-                primitives.emplace_back(meshUID, matUID);
-                GLOG("New primitive with mesh UID: %d and Material UID: %d", meshUID, matUID);
+
+                gltfMeshes.push_back(primitives);
             }
-            gltfMeshes.push_back(primitives);
         }
 
         GLOG("Total .gltf meshes: %d", gltfMeshes.size());
@@ -130,28 +144,19 @@ namespace SceneImporter
     }
 
     void ImportMeshFromMetadata(
-        const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID
+        const std::string& filePath, const std::string& targetFilePath, const std::string& name,
+        const rapidjson::Value& importOptions, UID sourceUID
     )
     {
-        tinygltf::Model model = LoadModelGLTF(filePath.c_str(), targetFilePath);
+        tinygltf::Model model             = LoadModelGLTF(filePath.c_str(), targetFilePath);
 
-        std::string nameNoExt = name;
-        if (!name.empty()) nameNoExt.pop_back(); // remove last character (extension)
+        const uint32_t gltfMeshIndex      = importOptions["gltfMeshIndex"].GetInt();
+        const uint32_t gltfPrimitiveIndex = importOptions["gltfPrimitiveIndex"].GetInt();
 
-        // find mesh name that equals to name
-        for (const auto& srcMesh : model.meshes)
-        {
-            if (srcMesh.name == nameNoExt)
-            {
-                for (const auto& primitive : srcMesh.primitives)
-                {
-                    MeshImporter::ImportMesh(
-                        model, srcMesh, primitive, name, filePath.c_str(), targetFilePath, sourceUID
-                    );
-                    return; // only one mesh with the same name
-                }
-            }
-        }
+        MeshImporter::ImportMesh(
+            model, gltfMeshIndex, gltfPrimitiveIndex, name, float4x4::identity, filePath.c_str(), targetFilePath,
+            sourceUID
+        );
     }
 
     void ImportMaterialFromMetadata(
@@ -182,8 +187,10 @@ namespace SceneImporter
         {
             if (model.animations[i].name == name)
             {
-               AnimationImporter::ImportAnimation(model, model.animations[i], name, filePath.c_str(), targetFilePath, sourceUID);
-                return; // only one animation with the same name 
+                AnimationImporter::ImportAnimation(
+                    model, model.animations[i], name, filePath.c_str(), targetFilePath, sourceUID
+                );
+                return; // only one animation with the same name
             }
         }
     }
@@ -199,14 +206,12 @@ namespace SceneImporter
     {
         ModelImporter::CopyModel(filePath, targetFilePath, name, sourceUID);
     }
- 
 
     void
     CopyFont(const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID)
     {
         FontImporter::CopyFont(filePath, targetFilePath, name, sourceUID);
     }
-
 
     void CreateLibraryDirectories(const std::string& projectFilePath)
     {

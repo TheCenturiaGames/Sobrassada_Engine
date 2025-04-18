@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "Globals.h"
 #include "ComponentUtils.h"
 
 #include "Geometry/AABB.h"
@@ -7,7 +8,7 @@
 
 class GameObject;
 
-class Component
+class SOBRASADA_API_ENGINE Component
 {
   public:
     Component(UID uid, GameObject* parent, const char* initName, ComponentType type);
@@ -21,6 +22,7 @@ class Component
 
     virtual void Update(float deltaTime)       = 0;
     virtual void Render(float deltaTime)       = 0;
+    virtual void RenderDebug(float deltaTime)       = 0;
     virtual void RenderEditorInspector();
     virtual void ParentUpdated() { return; };
 
@@ -35,6 +37,7 @@ class Component
     const bool GetEnabled() const { return enabled; }
 
     const float4x4& GetGlobalTransform() const;
+    bool IsEffectivelyEnabled() const;
 
   protected:
     const UID uid;

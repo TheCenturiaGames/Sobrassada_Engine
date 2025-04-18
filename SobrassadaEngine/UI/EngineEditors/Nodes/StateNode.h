@@ -25,6 +25,14 @@ class StateNode : public ImFlow::BaseNode
     void SetClipName(const std::string& newClip) { state.clipName = HashString(newClip); }
     std::string GetClipName() const { return state.clipName.GetString(); }
 
+    void SetColor(const ImColor& color)
+    {
+        if (getStyle())
+        {
+            getStyle()->header_bg = color;
+        }
+    }
+
   private:
     State state;
     std::shared_ptr<ImFlow::InPin<int>> inputPin;

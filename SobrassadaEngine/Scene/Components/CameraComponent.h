@@ -7,6 +7,8 @@
 #include "Math/float4x4.h"
 #include "rapidjson/document.h"
 
+class Framebuffer;
+
 class CameraComponent : public Component
 {
   public:
@@ -19,10 +21,13 @@ class CameraComponent : public Component
 
     void Update(float deltaTime) override;
     void Render(float deltaTime) override;
+    void RenderDebug(float deltaTime) override;
     void RenderEditorInspector() override;
 
     void ChangeToPerspective();
     void ChangeToOrtographic();
+
+    void RenderCameraPreview(float deltaTime);
 
     const FrustumPlanes& GetFrustrumPlanes() const { return frustumPlanes; }
     const float3& GetCameraPosition() const { return camera.pos; }
@@ -49,8 +54,18 @@ class CameraComponent : public Component
 
     float orthographicWidth;
     float orthographicHeight;
-    float ortographicNearPlane = 25.10f;
-    float ortographicFarPlane  = 50.0f;
+    float ortographicNearPlane      = 25.10f;
+    float ortographicFarPlane       = 50.0f;
 
-    bool firstTime             = true;
+    bool firstTime                  = true;
+
+    bool previewEnabled             = false;
+    bool seePreview                 = true;
+
+    Framebuffer* previewFramebuffer = nullptr;
+    int previewWidth                = 256;
+    int previewHeight               = 256;
+
+    bool autorendering              = false;
+    bool firstFrame                 = false;
 };

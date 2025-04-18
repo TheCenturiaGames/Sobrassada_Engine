@@ -95,6 +95,12 @@ void SpotLightComponent::RenderEditorInspector()
 
 void SpotLightComponent::Render(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
+}
+
+void SpotLightComponent::RenderDebug(float deltaTime)
+{
+    if (!IsEffectivelyEnabled()) return;
     if (!enabled || !drawGizmos || App->GetSceneModule()->GetInPlayMode()) return;
 
     const float innerRads = innerAngle * (PI / 180.0f) > PI / 2 ? PI / 2 : innerAngle * (PI / 180.0f);

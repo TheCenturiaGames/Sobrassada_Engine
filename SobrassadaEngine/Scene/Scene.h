@@ -18,6 +18,7 @@ class ResourcePrefab;
 class Quadtree;
 class CameraComponent;
 enum class SaveMode;
+enum MobilitySettings;
 
 class Scene
 {
@@ -46,7 +47,8 @@ class Scene
     update_status RenderEditor(float deltaTime);
 
     void RenderEditorControl(bool& editorControlMenu);
-    void RenderScene();
+    void RenderScene(float deltaTime, CameraComponent* camera);
+    void RenderSceneToFrameBuffer();
     void RenderSelectedGameObjectUI();
     void RenderHierarchyUI(bool& hierarchyMenu);
 
@@ -63,14 +65,17 @@ class Scene
 
     void AddGameObjectToUpdate(GameObject* gameObject);
     void UpdateGameObjects();
+    void ClearGameObjectsToUpdate();
 
     void AddGameObjectToSelection(UID gameObject, UID gameObjectParent);
     void ClearObjectSelection();
+    void DeleteMultiselection();
 
     const std::string& GetSceneName() const { return sceneName; }
     UID GetSceneUID() const { return sceneUID; }
     UID GetGameObjectRootUID() const { return gameObjectRootUID; }
     GameObject* GetSelectedGameObject() { return GetGameObjectByUID(selectedGameObjectUID); }
+    UID GetSelectedGameObjectUID() const { return selectedGameObjectUID; }
 
     const std::unordered_map<UID, GameObject*>& GetAllGameObjects() const { return gameObjectsContainer; }
     const std::vector<Component*> GetAllComponents() const;
@@ -93,6 +98,12 @@ class Scene
     Octree* GetOctree() const { return sceneOctree; }
     Quadtree* GetDynamicTree() const { return dynamicTree; }
     UID GetMultiselectUID() const;
+    GameObject* GetMultiselectParent() { return multiSelectParent; }
+    const std::map<UID, UID>& GetMultiselectedObjects() const { return selectedGameObjects; }
+    const std::map<UID, MobilitySettings>& GetMultiselectedObjectsMobility() const
+    {
+        return selectedGameObjectsMobility;
+    }
 
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
 
@@ -101,11 +112,12 @@ class Scene
     void SetStaticModified() { staticModified = true; }
     void SetDynamicModified() { dynamicModified = true; }
     void SetMultiselectPosition(const float3& newPosition);
+    template <typename T> std::vector<T*> GetEnabledComponentsOfType() const;
 
   private:
     void CreateStaticSpatialDataStruct();
     void CreateDynamicSpatialDataStruct();
-    void CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects) const;
+    void CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects, CameraComponent* camera) const;
 
   private:
     std::string sceneName;
@@ -137,4 +149,5 @@ class Scene
 
     GameObject* multiSelectParent = nullptr;
     std::map<UID, UID> selectedGameObjects;
+    std::map<UID, MobilitySettings> selectedGameObjectsMobility;
 };
