@@ -34,7 +34,7 @@ AudioModule::~AudioModule()
 {
 }
 
-bool AudioModule::Init()
+bool AudioModule::InitAudio()
 {
     AkMemSettings memSettings;
     AK::MemoryMgr::GetDefaultSettings(memSettings);
@@ -126,13 +126,13 @@ bool AudioModule::Init()
     if (retValue != AK_Success)
     {
         GLOG("Cannot initialize Init.bnk soundbank");
-        // return false;
+        return false;
     }
     retValue = AK::SoundEngine::LoadBank(BANKNAME_MAIN, bankID);
     if (retValue != AK_Success)
     {
         GLOG("Cannot initialize main.bnk soundbank");
-        // return false;
+        return false;
     }
 
     //  initialize volume parameters to sensible default values
@@ -147,6 +147,14 @@ bool AudioModule::Init()
 
 update_status AudioModule::Update(float deltaTime)
 {
+    if (!App->GetProjectModule()->IsProjectLoaded()) return UPDATE_CONTINUE;
+
+    if (!loadedAudio)
+    {
+        InitAudio();
+        loadedAudio = true;
+    }
+
     if (listener)
     {
         // Set the listener position
@@ -186,6 +194,8 @@ update_status AudioModule::Update(float deltaTime)
 
 bool AudioModule::ShutDown()
 {
+    if (!App->GetProjectModule()->IsProjectLoaded()) return true;
+
 #ifndef AK_OPTIMIZED
     AK::Comm::Term();
 #endif

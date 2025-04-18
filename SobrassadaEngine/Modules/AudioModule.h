@@ -13,7 +13,8 @@ class AudioModule : public Module
     AudioModule();
     ~AudioModule() override;
 
-    bool Init() override;
+    bool Init() override { return true; }
+    bool InitAudio();
     update_status Update(float deltaTime) override;
     bool ShutDown() override;
 
@@ -37,6 +38,8 @@ class AudioModule : public Module
     int sound = 0;
     int voice = 0;
     int g_envMAP[255];
+
+    bool loadedAudio = false;
 
     std::vector<AudioSourceComponent*> sources;
     AudioListenerComponent* listener;
