@@ -18,22 +18,18 @@ bool Soldier::Init()
 {
     GLOG("Initiating Soldier");
 
+    Character::Init();
+
     Component* agent = parent->GetComponentByType(COMPONENT_AIAGENT);
     if (!agent)
     {
-        GLOG("Component AIAgent not found for Soldier");
+        GLOG("AIAgent component not found for Soldier");
         return false;
     }
 
-    agentAI  = dynamic_cast<AIAgentComponent*>(agent);
+    agentAI       = dynamic_cast<AIAgentComponent*>(agent);
 
-    stateMap = {
-        {"Patrol",       SoldierStates::PATROL      },
-        {"Chase",        SoldierStates::CHASE       },
-        {"Basic_Attack", SoldierStates::BASIC_ATTACK}
-    };
-    animComponent = parent->GetAnimationComponent();
-    animComponent->OnPlay(false); // Starts On Patrol
+    currentState = SoldierStates::PATROL;
 
     return true;
 }
@@ -45,18 +41,22 @@ void Soldier::Update(float deltaTime)
 
 void Soldier::OnDeath()
 {
+    // TODO: include death sound for the character
+    // TODO: animation and particles
 }
 
 void Soldier::OnDamageTaken(int amount)
 {
-}
-
-void Soldier::OnHealed(int amount)
-{
+    // TODO: play soldier take damage sound
+    // TODO: particles? and animation
 }
 
 void Soldier::PerformAttack()
 {
+    // TODO: play basicAttack sound
+    // TODO: make interaction with hitboxes with the character
+    // TODO: activate and disable the box collider located on one on the gameobjects weapon
+    // TODO: trails, particles and animation
 }
 
 void Soldier::HandleState(float deltaTime)
@@ -66,19 +66,11 @@ void Soldier::HandleState(float deltaTime)
     ResourceStateMachine* stateMachine = animComponent->GetResourceStateMachine();
     if (!stateMachine) return;
 
-    const State* activeState = stateMachine->GetActiveState();
-    if (!activeState) return;
-
-    std::string stateName      = activeState->name.GetString();
-    SoldierStates currentState = SoldierStates::NONE;
-
-    auto it                    = stateMap.find(stateName);
-    if (it != stateMap.end()) currentState = it->second;
-
     switch (currentState)
     {
     case SoldierStates::PATROL:
         GLOG("Soldier Patrolling");
+        PatrolAI();
         break;
     case SoldierStates::CHASE:
         GLOG("Soldier Chasing");
@@ -90,8 +82,13 @@ void Soldier::HandleState(float deltaTime)
         break;
     default:
         GLOG("No state provided to Soldier");
+        currentState = SoldierStates::PATROL;
         break;
     }
+}
+
+void Soldier::PatrolAI()
+{
 }
 
 void Soldier::ChaseAI()
@@ -100,4 +97,5 @@ void Soldier::ChaseAI()
     {
         agentAI->SetPathNavigation(character->GetLastPosition());
     }
+    else currentState = SoldierStates::PATROL;
 }

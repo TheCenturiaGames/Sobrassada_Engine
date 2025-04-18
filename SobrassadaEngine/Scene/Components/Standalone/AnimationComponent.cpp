@@ -59,7 +59,6 @@ AnimationComponent::~AnimationComponent()
 
 void AnimationComponent::OnPlay(bool isTransition)
 {
-    StateMachineEditor* stateMachine = nullptr;
     unsigned transitionTime             = 0;
     if (animController != nullptr && resource != INVALID_UID)
     {
@@ -419,6 +418,8 @@ void AnimationComponent::Update(float deltaTime)
     }
 
     animController->Update(deltaTime);
+
+    if (currentAnimResource == nullptr) return; // TODO: check why crashes here
 
     for (auto& channel : currentAnimResource->channels)
     {

@@ -4,10 +4,10 @@
 #include "Component.h"
 #include "CuChulainn.h"
 #include "GameObject.h"
+#include "Modules/InputModule.h"
 #include "ResourceStateMachine.h"
 #include "Standalone/AnimationComponent.h"
 #include "Standalone/CharacterControllerComponent.h"
-#include "Modules/InputModule.h"
 
 CharacterControllerComponent* character = nullptr;
 
@@ -22,7 +22,7 @@ bool CuChulainn::Init()
     Component* agent = parent->GetComponentByType(COMPONENT_CHARACTER_CONTROLLER);
     if (!agent)
     {
-        GLOG("Component CharacterController not found for CuChulainn");
+        GLOG("CharacterController component not found for CuChulainn");
         return false;
     }
 
@@ -35,6 +35,11 @@ bool CuChulainn::Init()
         {"Basic_Attack", CharacterStates::BASIC_ATTACK}
     };
     animComponent = parent->GetAnimationComponent();
+    if (!animComponent)
+    {
+        GLOG("Animation component not found for CuChulainn");
+        return false;
+    }
     animComponent->OnPlay(false); // Starts On Idle
 
     return true;
@@ -77,9 +82,11 @@ void CuChulainn::HandleAnimation()
     if (!stateMachine) return;
 
     const KeyState* keyboard = AppEngine->GetInputModule()->GetKeyboard();
-    const bool move          = keyboard[SDL_SCANCODE_W] == KEY_DOWN || keyboard[SDL_SCANCODE_D] == KEY_DOWN ||
-                      keyboard[SDL_SCANCODE_A] == KEY_DOWN || keyboard[SDL_SCANCODE_S] == KEY_DOWN;
-    
+    const bool move          = keyboard[SDL_SCANCODE_W] || keyboard[SDL_SCANCODE_D] ||
+                      keyboard[SDL_SCANCODE_A]|| keyboard[SDL_SCANCODE_S];
+
+    GLOG("%d", move);
+
     if (move && !runActive)
     {
         stateMachine->UseTrigger("Run");
@@ -91,12 +98,11 @@ void CuChulainn::HandleAnimation()
         runActive = false;
     }
 
-
     // If(Input de dash){
-    //stateMachine->UseTrigger("Dash");
+    // stateMachine->UseTrigger("Dash");
     ////}else Deja de dashear{
-    //stateMachine->UseTrigger("Idle");
+    // stateMachine->UseTrigger("Idle");
 
-    //if (keyboard[SDL_SCANCODE_R] == KEY_REPEAT) stateMachine->UseTrigger("Basic_Attack");
-    //else stateMachine->UseTrigger("Idle");
+    // if (keyboard[SDL_SCANCODE_R] == KEY_REPEAT) stateMachine->UseTrigger("Basic_Attack");
+    // else stateMachine->UseTrigger("Idle");
 }

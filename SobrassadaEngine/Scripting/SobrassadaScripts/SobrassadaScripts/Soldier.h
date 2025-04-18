@@ -2,11 +2,8 @@
 
 #include "Character.h"
 
-#include <unordered_map>
-
 class GameObject;
 class AIAgentComponent;
-class AnimationComponent;
 
 enum class SoldierStates
 {
@@ -28,14 +25,13 @@ class Soldier : public Character
   private:
     void OnDeath() override;
     void OnDamageTaken(int amount) override;
-    void OnHealed(int amount) override;
     void PerformAttack() override;
 
     void HandleState(float deltaTime);
+    void PatrolAI();
     void ChaseAI();
 
   private:
     AIAgentComponent* agentAI         = nullptr;
-    AnimationComponent* animComponent = nullptr;
-    std::unordered_map<std::string, SoldierStates> stateMap;
+    SoldierStates currentState        = SoldierStates::NONE;
 };
