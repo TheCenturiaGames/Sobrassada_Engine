@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "ComponentUtils.h"
-#include "Globals.h"
 
 #include "Geometry/AABB.h"
 #include "rapidjson/document.h"

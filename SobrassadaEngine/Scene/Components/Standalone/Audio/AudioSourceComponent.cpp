@@ -57,6 +57,7 @@ void AudioSourceComponent::Clone(const Component* other)
         spatialization                               = otherAudioSource->spatialization;
 
         SetInitValues();
+        UpdateEventsNames();
     }
     else
     {

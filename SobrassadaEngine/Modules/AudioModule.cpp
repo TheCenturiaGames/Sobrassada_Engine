@@ -150,7 +150,8 @@ void AudioModule::InitAudio()
 
 update_status AudioModule::Update(float deltaTime)
 {
-    // Do this here because if trying to load soundbanks when no project loaded, no soundbanks are found and souns doesn't work
+    // Do this here because if trying to load soundbanks when no project loaded, no soundbanks are found and sounds
+    // don't work
     if (!App->GetProjectModule()->IsProjectLoaded())
     {
         if (loadedAudio) UnloadBanks();
@@ -264,11 +265,13 @@ void AudioModule::ParseEvents()
     if (!loaded)
     {
         GLOG("Failed to load bankMeta file: %s", metaPath);
+        return;
     }
 
     if (!doc.HasMember("SoundBanksInfo") || !doc["SoundBanksInfo"].IsObject())
     {
         GLOG("Invalid bankMeta format: %s", metaPath);
+        return;
     }
 
     rapidjson::Value& soundbankInfo = doc["SoundBanksInfo"];
@@ -276,6 +279,7 @@ void AudioModule::ParseEvents()
     if (!soundbankInfo.HasMember("SoundBanks") || !soundbankInfo["SoundBanks"].IsArray())
     {
         GLOG("Invalid bankMeta format: %s", metaPath);
+        return;
     }
 
     const rapidjson::Value& soundBank = soundbankInfo["SoundBanks"][0];
@@ -291,5 +295,9 @@ void AudioModule::ParseEvents()
 
             eventsMap.insert({name, static_cast<uint32_t>(std::stoul(id))});
         }
+    }
+    else
+    {
+        GLOG("Soundbank has no events: %s", metaPath);
     }
 }
