@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "Component.h"
+#include "WwiseIDs.h"
 
 class AudioSourceComponent : public Component
 {
@@ -18,20 +19,24 @@ class AudioSourceComponent : public Component
     void Render(float deltaTime) override {};
     void RenderEditorInspector() override;
 
+    // More efficient to use the IDs, but both exist in case it is needed to use the string variant in some scenario
+    void EmitEvent(const WwiseID event) const;
     void EmitEvent(const std::string& event) const;
+    void SetRTPCValue(const WwiseID parameterID, const float value);
+    void SetRTPCValue(const std::string& parameterName, const float value);
+    void SetSwitch(const WwiseID switchGroupID, const WwiseID activeSwitchID);
+    void SetSwitch(const std::string& switchGroupName, const std::string& activeSwitchName);
+
+    void SetDefaultEvent(const WwiseID event);
     void SetVolume(const float newVolume);
     void SetPitch(const float newPitch);
     void SetSpatialization(const float newSpatialization);
 
-    // TODO: Replace strings by IDs (located in the soundbank header file)
-    void SetRTPCValue(const std::string& name, const float value);
-    void SetSwitch(const std::string& switchGroup, const std::string& activeSwitch);
-
   private:
     void SetInitValues() const;
 
-    char defaultEvent[64];
-    float volume = 1;
-    float pitch = 0.5f;
+    WwiseID defaultEvent;
+    float volume         = 1;
+    float pitch          = 0.5f;
     float spatialization = 0;
 };

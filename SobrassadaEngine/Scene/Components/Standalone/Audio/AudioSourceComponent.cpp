@@ -3,8 +3,7 @@
 #include "Application.h"
 #include "AudioModule.h"
 #include "GameObject.h"
-#include "InputModule.h" // TODO: DELETE THIS
-#include "WwiseIDs.h"
+#include "InputModule.h" // TODO:  Delete this after testing
 
 #include "ImGui.h"
 #include <AK/SoundEngine/Common/AkSoundEngine.h>
@@ -17,9 +16,7 @@ AudioSourceComponent::AudioSourceComponent(UID uid, GameObject* parent)
 AudioSourceComponent::AudioSourceComponent(const rapidjson::Value& initialState, GameObject* parent)
     : Component(initialState, parent)
 {
-    const char* textPtr = initialState["Text"].GetString();
-    strcpy_s(defaultEvent, sizeof(defaultEvent), textPtr);
-
+    defaultEvent   = initialState["DefaultEvent"].GetUint();
     volume         = initialState["Volume"].GetFloat();
     pitch          = initialState["Pitch"].GetFloat();
     spatialization = initialState["Spatialization"].GetFloat();
@@ -53,12 +50,10 @@ void AudioSourceComponent::Clone(const Component* other)
         const AudioSourceComponent* otherAudioSource = static_cast<const AudioSourceComponent*>(other);
         enabled                                      = otherAudioSource->enabled;
 
-        const char* textPtr                          = otherAudioSource->defaultEvent;
-        strcpy_s(defaultEvent, sizeof(defaultEvent), textPtr);
-
-        volume         = otherAudioSource->volume;
-        pitch          = otherAudioSource->pitch;
-        spatialization = otherAudioSource->spatialization;
+        defaultEvent                                 = otherAudioSource->defaultEvent;
+        volume                                       = otherAudioSource->volume;
+        pitch                                        = otherAudioSource->pitch;
+        spatialization                               = otherAudioSource->spatialization;
 
         SetInitValues();
     }
@@ -83,12 +78,17 @@ void AudioSourceComponent::RenderEditorInspector()
 
     if (enabled)
     {
-        ImGui::InputText("Default event", &defaultEvent[0], sizeof(defaultEvent));
+        //ImGui::InputText("Default event", &defaultEvent[0], sizeof(defaultEvent));
         if (ImGui::DragFloat("Volume", &volume, 0.01f, 0, 1, "%.3f", ImGuiSliderFlags_AlwaysClamp)) SetVolume(volume);
         if (ImGui::DragFloat("Pitch", &pitch, 0.01f, 0, 1, "%.3f", ImGuiSliderFlags_AlwaysClamp)) SetPitch(pitch);
         if (ImGui::DragFloat("3D Spatialization", &spatialization, 0.01f, 0, 1, "%.3f", ImGuiSliderFlags_AlwaysClamp))
             SetSpatialization(spatialization);
     }
+}
+
+void AudioSourceComponent::EmitEvent(const WwiseID event) const
+{
+    AK::SoundEngine::PostEvent(event, (AkGameObjectID)parent->GetUID());
 }
 
 void AudioSourceComponent::EmitEvent(const std::string& event) const
@@ -99,19 +99,19 @@ void AudioSourceComponent::EmitEvent(const std::string& event) const
 void AudioSourceComponent::SetVolume(const float newVolume)
 {
     volume = newVolume;
-    AK::SoundEngine::SetRTPCValue("Volume", volume, parent->GetUID());
+    AK::SoundEngine::SetRTPCValue(VOLUME, volume, parent->GetUID());
 }
 
 void AudioSourceComponent::SetPitch(const float newPitch)
 {
     pitch = newPitch;
-    AK::SoundEngine::SetRTPCValue("Pitch", pitch, parent->GetUID());
+    AK::SoundEngine::SetRTPCValue(PITCH, pitch, parent->GetUID());
 }
 
 void AudioSourceComponent::SetSpatialization(const float newSpatialization)
 {
     spatialization = newSpatialization;
-    AK::SoundEngine::SetRTPCValue("Spatialization", spatialization, parent->GetUID());
+    AK::SoundEngine::SetRTPCValue(SPATIALIZATION, spatialization, parent->GetUID());
 }
 
 void AudioSourceComponent::SetInitValues() const
@@ -121,12 +121,27 @@ void AudioSourceComponent::SetInitValues() const
     AK::SoundEngine::SetRTPCValue("Spatialization", spatialization, parent->GetUID());
 }
 
-void AudioSourceComponent::SetRTPCValue(const std::string& name, const float value)
+void AudioSourceComponent::SetRTPCValue(const WwiseID parameterID, const float value)
 {
-    AK::SoundEngine::SetRTPCValue(name.c_str(), value, parent->GetUID());
+    AK::SoundEngine::SetRTPCValue(parameterID, value, parent->GetUID());
 }
 
-void AudioSourceComponent::SetSwitch(const std::string& switchGroup, const std::string& activeSwitch)
+void AudioSourceComponent::SetRTPCValue(const std::string& parameterName, const float value)
 {
-    AK::SoundEngine::SetSwitch(switchGroup.c_str(), activeSwitch.c_str(), parent->GetUID());
+    AK::SoundEngine::SetRTPCValue(parameterName.c_str(), value, parent->GetUID());
+}
+
+void AudioSourceComponent::SetSwitch(const WwiseID switchGroupID, const WwiseID activeSwitchID)
+{
+    AK::SoundEngine::SetSwitch(switchGroupID, activeSwitchID, parent->GetUID());
+}
+
+void AudioSourceComponent::SetSwitch(const std::string& switchGroupName, const std::string& activeSwitchName)
+{
+    AK::SoundEngine::SetSwitch(switchGroupName.c_str(), activeSwitchName.c_str(), parent->GetUID());
+}
+
+void AudioSourceComponent::SetDefaultEvent(const WwiseID event)
+{
+    defaultEvent = event;
 }

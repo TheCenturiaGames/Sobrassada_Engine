@@ -513,6 +513,9 @@
     <ClCompile Include="Scene\Components\Standalone\Audio\AudioListenerComponent.cpp">
       <Filter>Scene\Components\Audio</Filter>
     </ClCompile>
+    <ClCompile Include="WwiseIDs.h">
+      <Filter>Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
