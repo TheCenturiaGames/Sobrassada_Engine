@@ -3,6 +3,12 @@
 #include "Character.h"
 #include "GameObject.h"
 
+Character::Character(GameObject* parent, int maxHealth, int damage, float speed, float cooldown, float range)
+    : Script(parent), maxHealth(maxHealth), damage(damage), speed(speed), cooldown(cooldown), range(range)
+{
+
+}
+
 bool Character::Init()
 {
     return true;

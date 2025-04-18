@@ -6,6 +6,7 @@
 
 class GameObject;
 class AIAgentComponent;
+class AnimationComponent;
 
 enum class SoldierStates
 {
@@ -19,6 +20,7 @@ class Soldier : public Character
 {
   public:
     Soldier(GameObject* parent);
+    ~Soldier() noexcept override { parent = nullptr; };
 
     bool Init() override;
     void Update(float deltaTime) override;
@@ -33,6 +35,7 @@ class Soldier : public Character
     void ChaseAI();
 
   private:
-    AIAgentComponent* agentAI = nullptr;
+    AIAgentComponent* agentAI         = nullptr;
+    AnimationComponent* animComponent = nullptr;
     std::unordered_map<std::string, SoldierStates> stateMap;
 };

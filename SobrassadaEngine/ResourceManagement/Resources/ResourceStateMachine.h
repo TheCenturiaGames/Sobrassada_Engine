@@ -46,7 +46,7 @@ struct Transition
     unsigned interpolationTime;
 };
 
-class ResourceStateMachine : public Resource
+class SOBRASADA_API_ENGINE ResourceStateMachine : public Resource
 {
   public:
     std::vector<Clip> clips;
@@ -93,7 +93,7 @@ class ResourceStateMachine : public Resource
     void SetDefaultState(int state) { defaultStateIndex = state; }
     void SetActiveState(int state) { activeStateIndex = state; }
 
-    bool UseTrigger(std::string triggerName);
+    bool UseTrigger(const std::string& triggerName);
 
   private:
     int defaultStateIndex = -1;

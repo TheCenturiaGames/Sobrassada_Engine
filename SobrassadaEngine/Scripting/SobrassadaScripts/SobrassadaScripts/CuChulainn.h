@@ -5,6 +5,7 @@
 
 class GameObject;
 class CharacterControllerComponent;
+class AnimationComponent;
 
 enum class CharacterStates
 {
@@ -19,6 +20,7 @@ class CuChulainn : public Character
 {
   public:
     CuChulainn(GameObject* parent);
+    virtual ~CuChulainn() noexcept override { parent = nullptr; };
 
     bool Init() override;
     void Update(float deltaTime) override;
@@ -31,9 +33,9 @@ class CuChulainn : public Character
 
     void HandleAnimation();
 
-private:
+  private:
     std::unordered_map<std::string, CharacterStates> stateMap;
-    AnimationComponent* animComponent;
+    AnimationComponent* animComponent = nullptr;
 };
 
 extern CharacterControllerComponent* character;

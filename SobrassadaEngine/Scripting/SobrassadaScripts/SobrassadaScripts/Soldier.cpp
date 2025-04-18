@@ -32,6 +32,8 @@ bool Soldier::Init()
         {"Chase",        SoldierStates::CHASE       },
         {"Basic_Attack", SoldierStates::BASIC_ATTACK}
     };
+    animComponent = parent->GetAnimationComponent();
+    animComponent->OnPlay(false); // Starts On Patrol
 
     return true;
 }
@@ -39,7 +41,6 @@ bool Soldier::Init()
 void Soldier::Update(float deltaTime)
 {
     HandleState(deltaTime);
-    Attack(deltaTime);
 }
 
 void Soldier::OnDeath()
@@ -60,7 +61,6 @@ void Soldier::PerformAttack()
 
 void Soldier::HandleState(float deltaTime)
 {
-    AnimationComponent* animComponent = parent->GetAnimationComponent();
     if (!animComponent) return;
 
     ResourceStateMachine* stateMachine = animComponent->GetResourceStateMachine();

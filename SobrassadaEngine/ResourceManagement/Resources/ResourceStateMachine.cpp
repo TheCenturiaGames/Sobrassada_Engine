@@ -296,7 +296,7 @@ bool ResourceStateMachine::ClipExists(const std::string& clipName) const
     return false;
 }
 
-bool ResourceStateMachine::UseTrigger(std::string triggerName)
+bool ResourceStateMachine::UseTrigger(const std::string& triggerName)
 {
     bool triggerExists = false;
     for (const auto& transition :  transitions)

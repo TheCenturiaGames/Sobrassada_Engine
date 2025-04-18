@@ -8,8 +8,8 @@ class CharacterControllerComponent;
 class Character : public Script
 {
   public:
-    Character(GameObject* parent, int maxHealth, int damage, float speed, float cooldown, float range)
-        : Script(parent) {};
+    Character(GameObject* parent, int maxHealth, int damage, float speed, float cooldown, float range);
+    virtual ~Character() noexcept override { parent = nullptr; };
 
     virtual bool Init() override;
     virtual void Update(float deltaTime) override;
