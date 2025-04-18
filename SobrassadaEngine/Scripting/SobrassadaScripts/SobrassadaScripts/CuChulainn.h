@@ -36,6 +36,7 @@ class CuChulainn : public Character
   private:
     std::unordered_map<std::string, CharacterStates> stateMap;
     AnimationComponent* animComponent = nullptr;
+    bool runActive = false;
 };
 
 extern CharacterControllerComponent* character;
