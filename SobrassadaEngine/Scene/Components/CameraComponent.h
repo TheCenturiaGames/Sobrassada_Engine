@@ -35,7 +35,7 @@ class CameraComponent : public Component
     const FrustumPlanes& GetFrustrumPlanes() const { return frustumPlanes; }
     const float3& GetCameraPosition() const { return camera.pos; }
     const float3& GetCameraFront() const { return camera.front; }
-    const float3& GetCameraRight() const { return camera.WorldRight(); }
+    float3 GetCameraRight() const { return camera.WorldRight(); }
     const float3& GetCameraUp() const { return camera.up; }
     unsigned int GetUbo() const { return ubo; }
     const float4x4 GetProjectionMatrix() { return camera.ProjectionMatrix(); }

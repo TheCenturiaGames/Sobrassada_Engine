@@ -19,6 +19,7 @@
 #include "SceneImporter.h"
 
 #include "SceneModule.h"
+#include "Script.h"
 #include "ScriptModule.h"
 #include "StateMachineEditor.h"
 #include "TextureEditor.h"
@@ -98,16 +99,6 @@ bool EditorUIModule::Init()
     return true;
 }
 
-void EditorUIModule::DrawScriptInspector(std::function<void()> callback)
-{
-
-    if (ImGui::CollapsingHeader("Script Inspector", ImGuiTreeNodeFlags_None))
-    {
-        callback();
-    }
-    callback = nullptr;
-}
-
 update_status EditorUIModule::PreUpdate(float deltaTime)
 {
 #ifndef GAME
@@ -185,7 +176,6 @@ update_status EditorUIModule::PostUpdate(float deltaTime)
 bool EditorUIModule::ShutDown()
 {
     App->GetScriptModule()->close();
-
 
     framerate.clear();
     frametime.clear();
@@ -799,6 +789,29 @@ std::string EditorUIModule::RenderFileDialog(bool& window, const char* windowTit
     }
 
     return importPath;
+}
+
+void EditorUIModule::DrawScriptInspector(const std::vector<InspectorField>& fields)
+{
+
+    for (auto& field : fields)
+    {
+        switch (field.type)
+        {
+        case InspectorField::FieldType::Text:
+            ImGui::Text(static_cast<const char*>(field.data));
+            break;
+        case InspectorField::FieldType::Float:
+            ImGui::SliderFloat(field.name, (float*)field.data, field.minValue, field.maxValue);
+            break;
+        case InspectorField::FieldType::Bool:
+            ImGui::Checkbox(field.name, (bool*)field.data);
+            break;
+        case InspectorField::FieldType::Int:
+            ImGui::InputInt(field.name, (int*)field.data);
+            break;
+        }
+    }
 }
 
 void EditorUIModule::ImportDialog(bool& import)

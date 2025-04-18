@@ -20,10 +20,10 @@ bool ScriptModule::Init()
 bool ScriptModule::close()
 {
     DeleteAllScripts();
+    UnloadDLL();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
-    UnloadDLL();
     running = false;
     if (dllMonitorThread.joinable()) dllMonitorThread.join();
 

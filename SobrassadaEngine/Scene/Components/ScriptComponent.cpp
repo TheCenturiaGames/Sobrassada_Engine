@@ -4,6 +4,7 @@
 #include "SceneModule.h"
 #include "Script.h"
 #include "ScriptModule.h"
+#include "EditorUIModule.h"
 
 // Do script of object rotating
 
@@ -100,6 +101,7 @@ void ScriptComponent::RenderEditorInspector()
         {
             ImGui::Separator();
             scriptInstance->Inspector();
+            ImGui::SetCurrentContext(App->GetEditorUIModule()->GetImGuiContext());
         }
     }
 }

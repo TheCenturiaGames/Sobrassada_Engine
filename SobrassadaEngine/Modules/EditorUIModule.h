@@ -15,6 +15,7 @@
 #include <vector>
 
 class EngineEditorBase;
+struct InspectorField;
 
 namespace ImGuizmo
 {
@@ -83,7 +84,7 @@ class EditorUIModule : public Module
     GizmoTransform& GetTransformType() { return transformType; }
     float3& GetSnapValues() { return snapValues; }
     GizmoDragState GetImGuizmoDragState() const { return guizmoDragState; };
-    void SOBRASADA_API_ENGINE DrawScriptInspector(std::function<void()> callback);
+    void SOBRASADA_API_ENGINE DrawScriptInspector(const std::vector<InspectorField>& fields);
     ImGuiContext* GetImGuiContext() { return context; }
 
     const std::unordered_map<std::string, ComponentType>& GetStandaloneComponents() const
