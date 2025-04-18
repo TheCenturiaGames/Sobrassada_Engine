@@ -429,6 +429,8 @@ void EditorUIModule::Navmesh(bool& navmesh)
     // Draw config UI
     App->GetPathfinderModule()->GetNavMeshConfig().RenderEditorUI();
 
+    ImGui::InputText("NavMesh Name", navmeshName, IM_ARRAYSIZE(navmeshName));
+
     // Create navmesh
     if (ImGui::Button("Create NavMesh"))
     {
@@ -439,7 +441,7 @@ void EditorUIModule::Navmesh(bool& navmesh)
     // Save navmesh
     if (ImGui::Button("Save NavMesh"))
     {
-        App->GetPathfinderModule()->SaveNavMesh("TestNavmesh"); // or ask user for name
+        App->GetPathfinderModule()->SaveNavMesh(navmeshName); // or ask user for name
         ImGui::Text("NavMesh saved!");
     }
 

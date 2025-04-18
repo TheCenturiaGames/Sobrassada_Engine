@@ -204,7 +204,7 @@ class EditorUIModule : public Module
     bool showDrives              = false;
     std::string inputFileDialog  = "";
     int selectedFileDialog       = -1;
-
+    char navmeshName[64]         = "MyNavmesh";
     // render resource select dialog
     char searchTextResource[255] = "";
 
