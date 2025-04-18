@@ -30,7 +30,7 @@ class PathfinderModule : public Module
     ResourceNavMesh* GetNavMesh() { return tmpNavmesh; }
     void SaveNavMesh(const std::string& name);
     void LoadNavMesh(const std::string& name);
-
+    dtNavMeshQuery* GetDetourNavMeshQuery() const { return navQuery; }
     NavMeshConfig& GetNavMeshConfig() { return navconf; }
 
     void AddAIAgentComponent(int agentId, AIAgentComponent* comp);

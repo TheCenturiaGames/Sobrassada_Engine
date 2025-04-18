@@ -817,7 +817,7 @@ void DebugDrawModule::HandleDebugRenderOptions()
         {
             DrawNavMesh(
                 navmesh->GetDetourNavMesh(),
-                navmesh->GetDetourNavMeshQuery(), DRAWNAVMESH_COLOR_TILES
+                App->GetPathfinderModule()->GetDetourNavMeshQuery(), DRAWNAVMESH_COLOR_TILES
             );
         }
     }

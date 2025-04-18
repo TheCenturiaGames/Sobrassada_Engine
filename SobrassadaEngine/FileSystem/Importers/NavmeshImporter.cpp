@@ -85,7 +85,7 @@ ResourceNavMesh* NavmeshImporter::LoadNavmesh(UID navmeshUID)
     std::string navPath = App->GetLibraryModule()->GetResourcePath(navmeshUID);
 
     char* buffer = nullptr;
-    unsigned int size = FileSystem::Load(navPath.c_str(), &buffer);
+    unsigned int size = FileSystem::LoadForDetour(navPath.c_str(), &buffer);
     if (size == 0 || !buffer)
     {
         GLOG("Failed to load navmesh binary: %s", navPath.c_str());
@@ -119,7 +119,6 @@ ResourceNavMesh* NavmeshImporter::LoadNavmesh(UID navmeshUID)
     {
         GLOG("Failed to init Detour navmesh.");
         dtFreeNavMesh(navMesh);
-        delete[] buffer;
         return nullptr;
     }
     unsigned char* tileData = (unsigned char*)cursor;
@@ -129,7 +128,6 @@ ResourceNavMesh* NavmeshImporter::LoadNavmesh(UID navmeshUID)
     {
         GLOG("Failed to add tile to Detour navmesh.");
         dtFreeNavMesh(navMesh);
-        delete[] buffer;
         return nullptr;
     }
 

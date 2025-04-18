@@ -104,10 +104,12 @@ void CharacterControllerComponent::Update(float deltaTime) //SO many navmesh get
     if (deltaTime <= 0.0f) return;
 
     ResourceNavMesh* navRes = App->GetPathfinderModule()->GetNavMesh();
+    dtNavMeshQuery* tmpQuery = App->GetPathfinderModule()->GetDetourNavMeshQuery();
+
     if (!navRes) return;
 
     dtNavMesh* dtNav         = navRes->GetDetourNavMesh();
-    dtNavMeshQuery* tmpQuery = navRes->GetDetourNavMeshQuery();
+
     if (!tmpQuery || !dtNav) return;
 
     if (!navMeshQuery)

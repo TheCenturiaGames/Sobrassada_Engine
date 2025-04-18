@@ -16,16 +16,6 @@
 
     ResourceNavMesh::~ResourceNavMesh()
     {
-        if (navQuery)
-        {
-            dtFreeNavMeshQuery(navQuery);
-            navQuery = nullptr;
-        }
-        if (navMesh)
-        {
-            dtFreeNavMesh(navMesh); // Free the navMesh memory
-            navMesh = nullptr;      // Set the pointer to null for safety
-        }
 
     }
 
@@ -43,7 +33,6 @@
         int allVertexCount   = 0;
         int allTriangleCount = 0;
         int indexOffset      = 0;
-        navQuery = dtAllocNavMeshQuery();
         rcConfig config;
 
         //fills temporary config with values from the ui
@@ -374,12 +363,6 @@
         {
             dtFree(navData);
             GLOG("Could not init Detour navmesh");
-            return;
-        }
-        status = navQuery->init(navMesh, 2048);
-        if (dtStatusFailed(status))
-        {
-            GLOG("Could not init Detour navmesh query");
             return;
         }
     }
