@@ -1004,7 +1004,9 @@
     <ClInclude Include="Scene\Components\Standalone\Audio\AudioListenerComponent.h">
       <Filter>Scene\Components\Audio</Filter>
     </ClInclude>
-    <ClInclude Include="Utils\Wwise_IDs.h" />
+    <ClInclude Include="Utils\Wwise_IDs.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl">

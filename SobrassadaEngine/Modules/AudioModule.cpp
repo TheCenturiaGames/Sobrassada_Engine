@@ -1,9 +1,11 @@
 #include "AudioModule.h"
 
 #include "Application.h"
+#include "FileSystem.h"
 #include "Globals.h"
 #include "ProjectModule.h"
 
+#include "rapidjson/document.h"
 #include <AK/IBytes.h>
 #include <AK/MusicEngine/Common/AkMusicEngine.h>
 #include <AK/SoundEngine/Common/AkMemoryMgr.h>       // Memory Manager interface
@@ -12,7 +14,6 @@
 #include <AK/SoundEngine/Common/AkStreamMgrModule.h>
 #include <AK/SoundEngine/Common/IAkStreamMgr.h>    // Streaming Manager
 #include <AK/SpatialAudio/Common/AkSpatialAudio.h> // Spatial Audio
-
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
@@ -96,7 +97,7 @@ bool AudioModule::Init()
     }
 
     // load initialization and main soundbanks
-    const std::string soundbanksPath = App->GetProjectModule()->GetLoadedProjectPath() + "Soundbanks\\Windows\\";
+    const std::string soundbanksPath = App->GetProjectModule()->GetLoadedProjectPath() + WINDOWS_BANKS_PATH;
 
     const int size                   = MultiByteToWideChar(CP_UTF8, 0, soundbanksPath.c_str(), -1, nullptr, 0);
     std::wstring wSoundbanksPath(size, 0);
@@ -138,6 +139,8 @@ bool AudioModule::Init()
     musicvol(255);
     soundvol(255);
     voicevol(255);
+
+    ParseEvents();
 
     return true;
 }
@@ -235,4 +238,43 @@ void AudioModule::RemoveAudioListener(AudioListenerComponent* listenerToRemove)
         GLOG("[ERROR] Audio listener could not be unregistered");
 
     listener = nullptr;
+}
+
+void AudioModule::ParseEvents()
+{
+    const std::string metaPath = App->GetProjectModule()->GetLoadedProjectPath() + WINDOWS_BANKS_PATH + BANKMETA_MAIN;
+    rapidjson::Document doc;
+    bool loaded = FileSystem::LoadJSON(metaPath.c_str(), doc);
+
+    if (!loaded)
+    {
+        GLOG("Failed to load bankMeta file: %s", metaPath);
+    }
+
+    if (!doc.HasMember("SoundBanksInfo") || !doc["SoundBanksInfo"].IsObject())
+    {
+        GLOG("Invalid bankMeta format: %s", metaPath);
+    }
+
+    rapidjson::Value& soundbankInfo = doc["SoundBanksInfo"];
+
+    if (!soundbankInfo.HasMember("SoundBanks") || !soundbankInfo["SoundBanks"].IsArray())
+    {
+        GLOG("Invalid bankMeta format: %s", metaPath);
+    }
+
+    const rapidjson::Value& soundBank = soundbankInfo["SoundBanks"][0];
+
+    if (soundBank.HasMember("Events") && soundBank["Events"].IsArray())
+    {
+        const rapidjson::Value& events = soundBank["Events"];
+        for (rapidjson::SizeType i = 0; i < events.Size(); i++)
+        {
+            const rapidjson::Value& event = events[i];
+            const std::string name        = event["Name"].GetString();
+            const std::string id          = event["Id"].GetString();
+
+            eventsMap.insert({name, static_cast<uint32_t>(std::stoul(id))});
+        }
+    }
 }

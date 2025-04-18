@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Module.h"
-#include "Standalone/Audio/AudioSourceComponent.h"
 #include "Standalone/Audio/AudioListenerComponent.h"
+#include "Standalone/Audio/AudioSourceComponent.h"
 
 #include <AkFilePackageLowLevelIODeferred.h>
 #include <vector>
@@ -27,7 +27,11 @@ class AudioModule : public Module
     bool AddAudioListener(AudioListenerComponent* newListener);
     void RemoveAudioListener(AudioListenerComponent* newListener);
 
+    const std::unordered_map<std::string, uint32_t>& GetEventsMap() const { return eventsMap; }
+
   private:
+    void ParseEvents();
+
     CAkFilePackageLowLevelIODeferred g_lowLevelIO;
     int music = 0;
     int sound = 0;
@@ -36,4 +40,5 @@ class AudioModule : public Module
 
     std::vector<AudioSourceComponent*> sources;
     AudioListenerComponent* listener;
+    std::unordered_map<std::string, uint32_t> eventsMap;
 };

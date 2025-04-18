@@ -15,7 +15,7 @@
 
 #pragma warning(disable : 4251)
 
-extern SOBRASADA_API_ENGINE std::vector<char*> *Logs;
+extern SOBRASADA_API_ENGINE std::vector<char*>* Logs;
 extern LCG* rng;
 
 SOBRASADA_API_ENGINE void glog(const char file[], int line, const char* format, ...);
@@ -137,8 +137,10 @@ constexpr const char* METALLIC_FRAGMENT_SHADER_PATH  = "./EngineDefaults/Shader/
 constexpr const char* UIWIDGET_FRAGMENT_SHADER_PATH  = "./EngineDefaults/Shader/Fragment/UIWidgetFragment.glsl";
 
 // Soundbanks
+constexpr const char* WINDOWS_BANKS_PATH             = "Soundbanks\\Windows\\";
 constexpr const wchar_t* BANKNAME_INIT               = L"Init.bnk";
 constexpr const wchar_t* BANKNAME_MAIN               = L"main.bnk";
+constexpr const char* BANKMETA_MAIN                  = "main.json";
 
 using UID                                            = uint64_t;
 
@@ -148,25 +150,25 @@ constexpr UID FALLBACK_TEXTURE_UID                   = 1200000000000000;
 constexpr UID DEFAULT_MATERIAL_UID                   = 1300000000000000;
 
 constexpr const char* CONSTANT_MESH_SELECT_DIALOG_ID = "mesh-select";
-constexpr const char* CONSTANT_MATERIAL_SELECT_DIALOG_ID = "material-select";
-constexpr const char* CONSTANT_TEXTURE_SELECT_DIALOG_ID = "texture-select";
-constexpr const char* CONSTANT_DIFFUSE_TEXTURE_SELECT_DIALOG_ID = "diffuse-texture-select";
+constexpr const char* CONSTANT_MATERIAL_SELECT_DIALOG_ID         = "material-select";
+constexpr const char* CONSTANT_TEXTURE_SELECT_DIALOG_ID          = "texture-select";
+constexpr const char* CONSTANT_DIFFUSE_TEXTURE_SELECT_DIALOG_ID  = "diffuse-texture-select";
 constexpr const char* CONSTANT_METALLIC_TEXTURE_SELECT_DIALOG_ID = "metallic-texture-select";
 constexpr const char* CONSTANT_SPECULAR_TEXTURE_SELECT_DIALOG_ID = "specular-texture-select";
-constexpr const char* CONSTANT_NORMAL_TEXTURE_SELECT_DIALOG_ID = "normal-texture-select";
-constexpr const char* CONSTANT_PREFAB_SELECT_DIALOG_ID  = "prefab-select";
-constexpr const char* CONSTANT_MODEL_SELECT_DIALOG_ID   = "model-select";
+constexpr const char* CONSTANT_NORMAL_TEXTURE_SELECT_DIALOG_ID   = "normal-texture-select";
+constexpr const char* CONSTANT_PREFAB_SELECT_DIALOG_ID           = "prefab-select";
+constexpr const char* CONSTANT_MODEL_SELECT_DIALOG_ID            = "model-select";
+constexpr const char* CONSTANT_EVENT_SELECT_DIALOG_ID            = "event-select";
 
-constexpr uint32_t CONSTANT_NO_MESH_UUID                = 0;
-constexpr uint32_t CONSTANT_NO_TEXTURE_UUID             = 0;
+constexpr uint32_t CONSTANT_NO_MESH_UUID                         = 0;
+constexpr uint32_t CONSTANT_NO_TEXTURE_UUID                      = 0;
 
-constexpr float PI                                      = 3.14159265359f;
-constexpr float RAD_DEGREE_CONV                         = 180.f / PI;
-constexpr float DEGREE_RAD_CONV                         = PI / 180.f;
+constexpr float PI                                               = 3.14159265359f;
+constexpr float RAD_DEGREE_CONV                                  = 180.f / PI;
+constexpr float DEGREE_RAD_CONV                                  = PI / 180.f;
 
-constexpr float MINIMUM_TREE_LEAF_SIZE                  = 5.f;
-constexpr int PALETTE_SIZE                              = 64;
-
+constexpr float MINIMUM_TREE_LEAF_SIZE                           = 5.f;
+constexpr int PALETTE_SIZE                                       = 64;
 
 inline UID GenerateUID()
 {

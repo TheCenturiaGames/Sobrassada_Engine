@@ -27,14 +27,15 @@ class AudioSourceComponent : public Component
     void SetSwitch(const AkUniqueID switchGroupID, const AkUniqueID activeSwitchID);
     void SetSwitch(const std::string& switchGroupName, const std::string& activeSwitchName);
 
-    void SetDefaultEvent(const AkUniqueID event);
+    void SetDefaultEvent(const AkUniqueID newEvent);
     void SetVolume(const float newVolume);
     void SetPitch(const float newPitch);
     void SetSpatialization(const float newSpatialization);
 
   private:
-    void SetInitValues() const;
+    void SetInitValues();
 
+    std::string defaultEventName;
     AkUniqueID defaultEvent;
     float volume         = 1;
     float pitch          = 0.5f;

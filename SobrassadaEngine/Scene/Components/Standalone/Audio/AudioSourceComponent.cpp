@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "AudioModule.h"
+#include "EditorUIModule.h"
 #include "GameObject.h"
 #include "InputModule.h" // TODO:  Delete this after testing
 
@@ -78,7 +79,21 @@ void AudioSourceComponent::RenderEditorInspector()
 
     if (enabled)
     {
-        //ImGui::InputText("Default event", &defaultEvent[0], sizeof(defaultEvent));
+        ImGui::SeparatorText("Audio Soure");
+        ImGui::Text(defaultEventName.c_str());
+        ImGui::SameLine();
+        if (ImGui::Button("Select default event"))
+        {
+            ImGui::OpenPopup(CONSTANT_EVENT_SELECT_DIALOG_ID);
+        }
+
+        if (ImGui::IsPopupOpen(CONSTANT_EVENT_SELECT_DIALOG_ID))
+        {
+            SetDefaultEvent(App->GetEditorUIModule()->RenderResourceSelectDialog<uint32_t>(
+                CONSTANT_EVENT_SELECT_DIALOG_ID, App->GetAudioModule()->GetEventsMap(), (uint32_t)0
+            ));
+        }
+
         if (ImGui::DragFloat("Volume", &volume, 0.01f, 0, 1, "%.3f", ImGuiSliderFlags_AlwaysClamp)) SetVolume(volume);
         if (ImGui::DragFloat("Pitch", &pitch, 0.01f, 0, 1, "%.3f", ImGuiSliderFlags_AlwaysClamp)) SetPitch(pitch);
         if (ImGui::DragFloat("3D Spatialization", &spatialization, 0.01f, 0, 1, "%.3f", ImGuiSliderFlags_AlwaysClamp))
@@ -114,8 +129,13 @@ void AudioSourceComponent::SetSpatialization(const float newSpatialization)
     AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::SPATIALIZATION, spatialization, parent->GetUID());
 }
 
-void AudioSourceComponent::SetInitValues() const
+void AudioSourceComponent::SetInitValues()
 {
+    for (const auto& event : App->GetAudioModule()->GetEventsMap())
+    {
+        if (event.second == defaultEvent) defaultEventName = event.first;
+    }
+
     AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::VOLUME, volume, parent->GetUID());
     AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::PITCH, pitch, parent->GetUID());
     AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::SPATIALIZATION, spatialization, parent->GetUID());
@@ -141,7 +161,13 @@ void AudioSourceComponent::SetSwitch(const std::string& switchGroupName, const s
     AK::SoundEngine::SetSwitch(switchGroupName.c_str(), activeSwitchName.c_str(), parent->GetUID());
 }
 
-void AudioSourceComponent::SetDefaultEvent(const AkUniqueID event)
+void AudioSourceComponent::SetDefaultEvent(const AkUniqueID newEvent)
 {
-    defaultEvent = event;
+    if (newEvent == 0) return;
+
+    defaultEvent = newEvent;
+    for (const auto& event : App->GetAudioModule()->GetEventsMap())
+    {
+        if (event.second == newEvent) defaultEventName = event.first;
+    }
 }
