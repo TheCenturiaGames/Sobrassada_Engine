@@ -37,6 +37,11 @@ PathfinderModule::~PathfinderModule()
         dtFreeNavMeshQuery(navQuery);
         navQuery = nullptr;
     }
+    if (tmpNavmesh)
+    {
+        delete tmpNavmesh;
+        tmpNavmesh = nullptr;
+    }
 
 }
 
