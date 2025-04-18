@@ -17,8 +17,14 @@ ScriptComponent::ScriptComponent(const rapidjson::Value& initialState, GameObjec
     if (initialState.HasMember("Script Name"))
     {
         CreateScript(initialState["Script Name"].GetString());
+
+        if (scriptInstance != nullptr && initialState.HasMember("ScriptData") && initialState["ScriptData"].IsObject())
+        {
+            scriptInstance->LoadFromJson(initialState["ScriptData"]);
+        }
     }
 }
+
 
 ScriptComponent::~ScriptComponent()
 {
@@ -29,7 +35,15 @@ void ScriptComponent::Save(rapidjson::Value& targetState, rapidjson::Document::A
 {
     Component::Save(targetState, allocator);
     targetState.AddMember("Script Name", rapidjson::Value(scriptName.c_str(), allocator), allocator);
+
+    if (scriptInstance != nullptr)
+    {
+        rapidjson::Value scriptData(rapidjson::kObjectType);
+        scriptInstance->SaveToJson(scriptData, allocator);
+        targetState.AddMember("ScriptData", scriptData, allocator);
+    }
 }
+
 
 void ScriptComponent::Clone(const Component* other)
 {

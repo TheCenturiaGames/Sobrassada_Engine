@@ -20,7 +20,7 @@ class CameraComponent;
 enum class SaveMode;
 enum MobilitySettings;
 
-class Scene
+class SOBRASADA_API_ENGINE Scene
 {
   public:
     Scene(const char* sceneName);
