@@ -4,17 +4,17 @@
 #include "Component.h"
 #include "ComponentUtils.h"
 #include "FileSystem.h"
+#include "FileSystem/StateMachineManager.h"
 #include "GameObject.h"
 #include "ProjectModule.h"
 #include "SceneImporter.h"
 #include "SceneModule.h"
 #include "TextureImporter.h"
-#include "FileSystem/StateMachineManager.h"
 
-#include "rapidjson/writer.h"
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
 #include <filesystem>
 #include <fstream>
 
@@ -142,6 +142,9 @@ bool LibraryModule::LoadLibraryMaps(const std::string& projectPath)
             UID prefix            = assetUID / UID_PREFIX_DIVISOR;
             std::string libraryPath;
 
+            rapidjson::Value importOptions;
+            if (doc.HasMember("importOptions") && doc["importOptions"].IsObject()) importOptions = doc["importOptions"];
+
             switch (prefix)
             {
             case 11:
@@ -149,7 +152,7 @@ bool LibraryModule::LoadLibraryMaps(const std::string& projectPath)
                 AddName(assetName, assetUID);
                 libraryPath = projectPath + MESHES_PATH + std::to_string(assetUID) + MESH_EXTENSION;
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
-                else SceneImporter::ImportMeshFromMetadata(assetPath, projectPath, assetName, assetUID);
+                else SceneImporter::ImportMeshFromMetadata(assetPath, projectPath, assetName, importOptions, assetUID);
                 break;
             case 12:
                 AddTexture(assetUID, assetName);
@@ -175,7 +178,7 @@ bool LibraryModule::LoadLibraryMaps(const std::string& projectPath)
             case 15:
                 AddAnimation(assetUID, assetName);
                 AddName(assetName, assetUID);
-                libraryPath = projectPath + ANIMATIONS_PATH+ std::to_string(assetUID) + ANIMATION_EXTENSION;
+                libraryPath = projectPath + ANIMATIONS_PATH + std::to_string(assetUID) + ANIMATION_EXTENSION;
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 else SceneImporter::CopyModel(assetPath, projectPath, assetName, assetUID);
                 break;
@@ -374,7 +377,6 @@ UID LibraryModule::GetModelUID(const std::string& modelPath) const
     return INVALID_UID;
 }
 
-
 UID LibraryModule::GetAnimUID(const std::string& animPath) const
 {
     auto it = animMap.find(animPath);
@@ -403,8 +405,8 @@ const std::string& LibraryModule::GetResourcePath(UID resourceID) const
     auto it = resourcePathsMap.find(resourceID);
     if (it != resourcePathsMap.end())
     {
-        //GLOG("requested uid: %llu", resourceID);
-        //GLOG("obtained path: %s", it->second.c_str());
+        // GLOG("requested uid: %llu", resourceID);
+        // GLOG("obtained path: %s", it->second.c_str());
         return it->second;
     }
     static const std::string emptyString = "";
@@ -416,8 +418,8 @@ const std::string& LibraryModule::GetResourceName(UID resourceID) const
     auto it = namesMap.find(resourceID);
     if (it != namesMap.end())
     {
-        //GLOG("requested uid: %llu", resourceID);
-        //GLOG("obtained name: %s", it->second.c_str());
+        // GLOG("requested uid: %llu", resourceID);
+        // GLOG("obtained name: %s", it->second.c_str());
         return it->second;
     }
     static const std::string emptyString = "";

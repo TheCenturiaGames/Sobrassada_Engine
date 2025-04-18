@@ -193,6 +193,11 @@ void SphereColliderComponent::Render(float deltaTime)
     if (!IsEffectivelyEnabled()) return;
 }
 
+void SphereColliderComponent::RenderDebug(float deltaTime)
+{
+
+}
+
 void SphereColliderComponent::ParentUpdated()
 {
     if (App->GetSceneModule()->GetInPlayMode()) return;
