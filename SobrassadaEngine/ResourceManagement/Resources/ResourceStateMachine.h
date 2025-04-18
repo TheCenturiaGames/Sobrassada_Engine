@@ -93,6 +93,8 @@ class ResourceStateMachine : public Resource
     void SetDefaultState(int state) { defaultStateIndex = state; }
     void SetActiveState(int state) { activeStateIndex = state; }
 
+    bool UseTrigger(std::string triggerName);
+
   private:
     int defaultStateIndex = -1;
     int activeStateIndex  = -1;

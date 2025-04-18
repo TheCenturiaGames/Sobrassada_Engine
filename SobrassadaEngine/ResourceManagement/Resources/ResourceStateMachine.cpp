@@ -295,3 +295,25 @@ bool ResourceStateMachine::ClipExists(const std::string& clipName) const
     }
     return false;
 }
+
+bool ResourceStateMachine::UseTrigger(std::string triggerName)
+{
+    bool triggerExists = false;
+    for (const auto& transition :  transitions)
+    {
+        if (transition.triggerName == triggerName &&
+            transition.fromState.GetString() == GetActiveState()->name.GetString())
+        {
+            for (size_t i = 0; i < states.size(); ++i)
+            {
+                if (states[i].name.GetString() == transition.toState.GetString())
+                {
+                    SetActiveState(static_cast<int>(i));
+                    triggerExists = true;
+                    break;
+                }
+            }
+        }
+    }
+    return triggerExists;
+}

@@ -348,39 +348,6 @@ void AnimationComponent::OnInspector()
         ImGui::EndCombo();
     }
 
-    if (resourceStateMachine)
-    {
-        ImGui::Separator();
-        ImGui::Text("Available Triggers:");
-
-        for (const std::string& triggerName : resourceStateMachine->availableTriggers)
-        {
-            if (ImGui::Button(triggerName.c_str()))
-            {
-                if (IsPlaying())
-                {
-                    GLOG("Trigger selected: %s", triggerName.c_str());
-                    for (const auto& transition : resourceStateMachine->transitions)
-                    {
-                        if (transition.triggerName == triggerName &&
-                            transition.fromState.GetString() ==
-                                resourceStateMachine->GetActiveState()->name.GetString())
-                        {
-                            for (size_t i = 0; i < resourceStateMachine->states.size(); ++i)
-                            {
-                                if (resourceStateMachine->states[i].name.GetString() == transition.toState.GetString())
-                                {
-                                    resourceStateMachine->SetActiveState(static_cast<int>(i));
-                                    OnPlay(true);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     if (resourceStateMachine)
     {
@@ -391,25 +358,14 @@ void AnimationComponent::OnInspector()
         {
             if (ImGui::Button(triggerName.c_str()))
             {
+                GLOG("Trigger selected: %s", triggerName.c_str());
+                bool triggerAvailable = false;
                 if (IsPlaying())
                 {
-                    GLOG("Trigger selected: %s", triggerName.c_str());
-                    for (const auto& transition : resourceStateMachine->transitions)
+                    triggerAvailable = resourceStateMachine->UseTrigger(triggerName);
+                    if (triggerAvailable)
                     {
-                        if (transition.triggerName == triggerName &&
-                            transition.fromState.GetString() ==
-                                resourceStateMachine->GetActiveState()->name.GetString())
-                        {
-                            for (size_t i = 0; i < resourceStateMachine->states.size(); ++i)
-                            {
-                                if (resourceStateMachine->states[i].name.GetString() == transition.toState.GetString())
-                                {
-                                    resourceStateMachine->SetActiveState(static_cast<int>(i));
-                                    OnPlay(true);
-                                    break;
-                                }
-                            }
-                        }
+                        OnPlay(true);
                     }
                 }
             }

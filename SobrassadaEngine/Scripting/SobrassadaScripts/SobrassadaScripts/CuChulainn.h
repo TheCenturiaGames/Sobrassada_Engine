@@ -33,6 +33,7 @@ class CuChulainn : public Character
 
 private:
     std::unordered_map<std::string, CharacterStates> stateMap;
+    AnimationComponent* animComponent;
 };
 
 extern CharacterControllerComponent* character;

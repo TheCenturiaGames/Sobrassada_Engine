@@ -3,9 +3,9 @@
 #include "Component.h"
 #include "CuChulainn.h"
 #include "GameObject.h"
-#include "Standalone/CharacterControllerComponent.h"
 #include "ResourceStateMachine.h"
 #include "Standalone/AnimationComponent.h"
+#include "Standalone/CharacterControllerComponent.h"
 
 CharacterControllerComponent* character = nullptr;
 
@@ -32,6 +32,8 @@ bool CuChulainn::Init()
         {"Dash",         CharacterStates::DASH        },
         {"Basic_Attack", CharacterStates::BASIC_ATTACK}
     };
+    animComponent = parent->GetAnimationComponent();
+    animComponent->OnPlay(false); // Starts On Idle
 
     return true;
 }
@@ -59,34 +61,23 @@ void CuChulainn::PerformAttack()
 
 void CuChulainn::HandleAnimation()
 {
-    AnimationComponent* animComponent = parent->GetAnimationComponent();
     if (!animComponent) return;
 
     ResourceStateMachine* stateMachine = animComponent->GetResourceStateMachine();
     if (!stateMachine) return;
 
-    const State* activeState = stateMachine->GetActiveState();
-    if (!activeState) return;
+    // If(input de correr){
+    stateMachine->UseTrigger("Run");
+    //}else Deja de correr{
+    stateMachine->UseTrigger("Idle");
 
-    std::string stateName        = activeState->name.GetString();
-    CharacterStates currentState = CharacterStates::NONE;
+    // If(Input de dash){
+    stateMachine->UseTrigger("Dash");
+    //}else Deja de dashear{
+    stateMachine->UseTrigger("Idle");
 
-    auto it                      = stateMap.find(stateName);
-    if (it != stateMap.end()) currentState = it->second;
-
-    switch (currentState)
-    {
-    case CharacterStates::IDLE:
-        // TODO: Play IDLE ANIMATION
-        break;
-    case CharacterStates::RUN:
-        // TODO: Play RUN ANIMATION
-        break;
-    case CharacterStates::DASH:
-        // TODO: Play DASH ANIMATION
-        break;
-    case CharacterStates::BASIC_ATTACK:
-        // TODO: Play BASIC_ATTACK ANIMATION
-        break;
-    }
+    // If(Input de ataque){
+    stateMachine->UseTrigger("Basic_Attack");
+    //}else Deja de atacar{
+    stateMachine->UseTrigger("Idle");
 }
