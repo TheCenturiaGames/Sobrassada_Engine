@@ -86,7 +86,6 @@ class EditorUIModule : public Module
     float3& GetSnapValues() { return snapValues; }
     GizmoDragState GetImGuizmoDragState() const { return guizmoDragState; };
     void SOBRASADA_API_ENGINE DrawScriptInspector(const std::vector<InspectorField>& fields);
-    ImGuiContext* GetImGuiContext() { return context; }
     StateMachineEditor* GetStateMachine() { return stateMachineEditor; }
 
     const std::unordered_map<std::string, ComponentType>& GetStandaloneComponents() const
@@ -230,6 +229,5 @@ class EditorUIModule : public Module
     std::string tpsStr;
     std::unordered_map<std::string, ComponentType> standaloneComponents;
 
-    ImGuiContext* context;
     StateMachineEditor* stateMachineEditor = nullptr;
 };

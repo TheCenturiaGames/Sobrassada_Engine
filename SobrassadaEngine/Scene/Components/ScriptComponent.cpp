@@ -101,7 +101,6 @@ void ScriptComponent::RenderEditorInspector()
         {
             ImGui::Separator();
             scriptInstance->Inspector();
-            ImGui::SetCurrentContext(App->GetEditorUIModule()->GetImGuiContext());
         }
     }
 }

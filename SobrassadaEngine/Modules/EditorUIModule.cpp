@@ -80,7 +80,7 @@ EditorUIModule::~EditorUIModule()
 
 bool EditorUIModule::Init()
 {
-    context = ImGui::CreateContext();
+    ImGuiContext* context = ImGui::CreateContext();
     ImGuizmo::SetImGuiContext(context);
     ImGuiIO& io     = ImGui::GetIO();
     io.ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
