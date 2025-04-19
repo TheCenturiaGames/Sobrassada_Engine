@@ -389,6 +389,7 @@
     <ClInclude Include="ExitGameScript.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="FullscreenToggleScript.h" />
+    <ClInclude Include="PauseMenuScript.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="RotateGameObject.h" />
@@ -642,6 +643,7 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="ExitGameScript.cpp" />
     <ClCompile Include="FullscreenToggleScript.cpp" />
+    <ClCompile Include="PauseMenuScript.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Game Debug|x64'">Create</PrecompiledHeader>

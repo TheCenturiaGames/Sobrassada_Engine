@@ -5,6 +5,7 @@
 #include "ExitGameScript.h"
 #include "FullscreenToggleScript.h"
 #include "VSyncToggleScript.h"
+#include "PauseMenuScript.h"
 #include <string>
 
 #ifndef SOBRASSADASCRIPTS_EXPORTS
@@ -27,6 +28,7 @@ extern "C" SOBRASSADA_API Script* CreateScript(const std::string& scriptType, Ga
     if (scriptType == "ExitGameScript") return new ExitGameScript(parent);
     if (scriptType == "FullscreenToggleScript") return new FullscreenToggleScript(parent);
     if (scriptType == "VSyncToggleScript") return new VSyncToggleScript(parent);
+    if (scriptType == "PauseMenuScript") return new PauseMenuScript(parent);
     return nullptr;
 }
 

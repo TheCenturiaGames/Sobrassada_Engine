@@ -47,6 +47,7 @@
     <ClCompile Include="ExitGameScript.cpp" />
     <ClCompile Include="FullscreenToggleScript.cpp" />
     <ClCompile Include="VSyncToggleScript.cpp" />
+    <ClCompile Include="PauseMenuScript.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ButtonScript.h" />
@@ -58,6 +59,7 @@
     <ClInclude Include="ExitGameScript.h" />
     <ClInclude Include="FullscreenToggleScript.h" />
     <ClInclude Include="VSyncToggleScript.h" />
+    <ClInclude Include="PauseMenuScript.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SobrassadaScripts.rc" />
