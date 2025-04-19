@@ -283,7 +283,9 @@ update_status Scene::Render(float deltaTime)
 void Scene::RenderScene(float deltaTime, CameraComponent* camera)
 {
     GBuffer* gbuffer         = App->GetOpenGLModule()->GetGBuffer();
-    Framebuffer* framebuffer = App->GetOpenGLModule()->GetFramebuffer();
+    Framebuffer* framebuffer = App->GetSceneModule()->GetInPlayMode() ? App->GetOpenGLModule()->GetFramebuffer()
+                             : camera != nullptr                      ? camera->GetFramebuffer()
+                                                                      : App->GetOpenGLModule()->GetFramebuffer();
 
     std::vector<GameObject*> objectsToRender;
     CheckObjectsToRender(objectsToRender, camera);
@@ -900,10 +902,17 @@ void Scene::GeometryPassRender(
     glEnable(GL_BLEND);
 }
 
-void Scene::LightingPassRender(const std::vector<GameObject*>& renderGameObjects, CameraComponent* camera, GBuffer* gbuffer, Framebuffer* framebuffer) const
+void Scene::LightingPassRender(
+    const std::vector<GameObject*>& renderGameObjects, CameraComponent* camera, GBuffer* gbuffer,
+    Framebuffer* framebuffer
+) const
 {
     // LIGHTING PASS
+#ifndef GAME
     framebuffer->Bind();
+#else
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
 
     // SKYBOX
     if (!App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_WIREFRAME))
@@ -935,11 +944,22 @@ void Scene::LightingPassRender(const std::vector<GameObject*>& renderGameObjects
     unsigned int height = framebuffer->GetTextureHeight();
 
     glBindFramebuffer(GL_READ_FRAMEBUFFER, gbuffer->gBufferObject);
+
+#ifndef GAME
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer->GetFramebufferID()); // write to default framebuffer
+#else
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+#endif
+
     glBlitFramebuffer(
         0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, GL_NEAREST
     );
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->GetFramebufferID());
+
+#ifndef GAME
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->GetFramebufferID()); // write to default framebuffer
+#else
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
 
     // SETTING STENCIL TEST FOR ONLY RENDER TO GBUFFER FRAGMENTS WRITES
     glStencilFunc(GL_EQUAL, 1, 0xFF);
@@ -975,9 +995,19 @@ void Scene::LightingPassRender(const std::vector<GameObject*>& renderGameObjects
 
     // COPYING DEPTH BUFFER FROM GBUFFER TO RENDER FRAMEBUFFER
     glBindFramebuffer(GL_READ_FRAMEBUFFER, gbuffer->gBufferObject);
+
+#ifndef GAME
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer->GetFramebufferID()); // write to default framebuffer
+#else
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+#endif
     glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->GetFramebufferID());
+
+#ifndef GAME
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->GetFramebufferID()); // write to default framebuffer
+#else
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
 }
 
 GameObject* Scene::GetGameObjectByUID(UID gameObjectUUID)

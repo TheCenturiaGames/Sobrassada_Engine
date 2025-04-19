@@ -38,6 +38,16 @@ bool PhysicsModule::Init()
 
 update_status PhysicsModule::PreUpdate(float deltaTime)
 {
+    // DELETING BODIES BEFORE PHYSICS SIMULATION IF NOT, ENGINE KAPUT
+    for (btRigidBody* rigidBody : bodiesToRemove)
+    {
+        dynamicsWorld->removeRigidBody(rigidBody);
+        btCollisionShape* shape = rigidBody->getCollisionShape();
+        delete shape;
+        delete rigidBody;
+    }
+    bodiesToRemove.clear();
+
     if (!App->GetSceneModule()->GetInPlayMode()) return UPDATE_CONTINUE;
 
     dynamicsWorld->stepSimulation(deltaTime, 10);
@@ -86,16 +96,6 @@ update_status PhysicsModule::PostUpdate(float deltaTime)
         updateGravity = false;
         dynamicsWorld->setGravity(btVector3(0, gravity, 0));
     }
-
-    // REMOVE RIGID BODIES
-    for (btRigidBody* rigidBody : bodiesToRemove)
-    {
-        dynamicsWorld->removeRigidBody(rigidBody);
-        btCollisionShape* shape = rigidBody->getCollisionShape();
-        delete shape;
-        delete rigidBody;
-    }
-    bodiesToRemove.clear();
 
     return UPDATE_CONTINUE;
 }
