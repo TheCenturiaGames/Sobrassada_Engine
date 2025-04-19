@@ -1,19 +1,18 @@
 #include "pch.h"
+#include "VSyncToggleScript.h"
 
-#include "ExitGameScript.h"
 #include "Application.h"
 #include "GameObject.h"
-#include "EditorUIModule.h"
 #include "Scene/Components/Standalone/UI/ButtonComponent.h"
 #include "Utils/Delegate.h"
+#include "EditorUIModule.h"
 
-
-bool ExitGameScript::Init()
+bool VSyncToggleScript::Init()
 {
     Component* button = parent->GetComponentByType(COMPONENT_BUTTON);
     if (button)
     {
-        std::function<void(void)> function = std::bind(&ExitGameScript::OnClick, this);
+        std::function<void(void)> function = std::bind(&VSyncToggleScript::OnClick, this);
         Delegate<void> delegate(function);
         static_cast<ButtonComponent*>(button)->AddOnClickCallback(delegate);
     }
@@ -21,16 +20,15 @@ bool ExitGameScript::Init()
     return true;
 }
 
-void ExitGameScript::Update(float deltaTime)
+void VSyncToggleScript::Update(float deltaTime)
 {
 }
 
-void ExitGameScript::Inspector()
+void VSyncToggleScript::Inspector()
 {
 }
 
-void ExitGameScript::OnClick()
+void VSyncToggleScript::OnClick()
 {
-    GLOG("Exiting game...");
-    AppEngine->GetEditorUIModule()->RequestExit();
+    AppEngine->GetEditorUIModule()->ToggleVSync();
 }

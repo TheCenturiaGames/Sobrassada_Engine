@@ -3,6 +3,8 @@
 #include "Globals.h"
 #include "ButtonScript.h"
 #include "ExitGameScript.h"
+#include "FullscreenToggleScript.h"
+#include "VSyncToggleScript.h"
 #include <string>
 
 #ifndef SOBRASSADASCRIPTS_EXPORTS
@@ -23,6 +25,8 @@ extern "C" SOBRASSADA_API Script* CreateScript(const std::string& scriptType, Ga
     if (scriptType == "RotateGameObject") return new RotateGameObject(parent);
     if (scriptType == "ButtonScript") return new ButtonScript(parent);
     if (scriptType == "ExitGameScript") return new ExitGameScript(parent);
+    if (scriptType == "FullscreenToggleScript") return new FullscreenToggleScript(parent);
+    if (scriptType == "VSyncToggleScript") return new VSyncToggleScript(parent);
     return nullptr;
 }
 

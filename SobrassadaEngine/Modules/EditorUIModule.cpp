@@ -1688,3 +1688,15 @@ void EditorUIModule::RequestExit()
 {
     closeApplication = true;
 }
+
+void EditorUIModule::ToggleFullscreen()
+{
+    bool current = App->GetWindowModule()->GetFullscreen();
+    App->GetWindowModule()->SetFullscreen(!current);
+}
+
+void EditorUIModule::ToggleVSync()
+{
+    bool current = App->GetWindowModule()->GetVsync();
+    App->GetWindowModule()->SetVsync(!current);
+}

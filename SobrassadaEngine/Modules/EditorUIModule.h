@@ -48,7 +48,7 @@ enum class GizmoDragState
     RELEASED
 };
 
-class SOBRASADA_API_ENGINE EditorUIModule : public Module
+class EditorUIModule : public Module
 {
   public:
     EditorUIModule();
@@ -81,7 +81,7 @@ class SOBRASADA_API_ENGINE EditorUIModule : public Module
     GizmoTransform& GetTransformType() { return transformType; }
     float3& GetSnapValues() { return snapValues; }
     GizmoDragState GetImGuizmoDragState() const { return guizmoDragState; };
-    void DrawScriptInspector(std::function<void()> callback);
+    SOBRASADA_API_ENGINE void DrawScriptInspector(std::function<void()> callback);
     ImGuiContext* GetImGuiContext() { return context; }
 
     const std::unordered_map<std::string, ComponentType>& GetStandaloneComponents() const
@@ -91,7 +91,9 @@ class SOBRASADA_API_ENGINE EditorUIModule : public Module
 
     void SetFileDialogCurrentPath(char* newProjectPath) { fileDialogCurrentPath = newProjectPath; }
 
-    void RequestExit();
+    SOBRASADA_API_ENGINE void RequestExit();
+    SOBRASADA_API_ENGINE void ToggleFullscreen();
+    SOBRASADA_API_ENGINE void ToggleVSync();
 
   private:
     void RenderBasicTransformModifiers(
@@ -134,6 +136,8 @@ class SOBRASADA_API_ENGINE EditorUIModule : public Module
     EngineEditorBase* CreateEditor(EditorType type);
 
     void UpdateGizmoDragState();
+    
+   
 
 
   public:
