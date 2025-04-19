@@ -167,7 +167,7 @@ void main()
     const vec3 normal = texture(gNormal, uv0).rgb;
     const vec4 depth = texture(gDepth, uv0);
 
-    if(depth.rgb == vec3(1)) discard;
+    // if(depth.rgb == vec3(1)) discard;
 
     vec3 N = normalize(normal);
 

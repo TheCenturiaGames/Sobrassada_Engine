@@ -291,13 +291,15 @@ void Scene::RenderScene(float deltaTime, CameraComponent* camera)
 #ifdef OPTICK
     OPTICK_CATEGORY("Scene::MeshesToRender", Optick::Category::GameLogic)
 #endif
+    glEnable(GL_STENCIL_TEST);
+
     GeometryPassRender(objectsToRender, camera, gbuffer);
 
     // LIGHTING PASS
 
     framebuffer->Bind();
-    glEnable(GL_BLEND);
 
+    // SKYBOX
     if (!App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_WIREFRAME))
     {
         float4x4 projection;
@@ -321,7 +323,20 @@ void Scene::RenderScene(float deltaTime, CameraComponent* camera)
         }
     }
 
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // COPYING DEPTH BUFFER FROM GBUFFER TO RENDER FRAMEBUFFER
+    // TODO CHECK IF GAME RELEASE TO RENDER TO DEFAULT BUFFER INSTEAD OF FRAMEBUFFER
+    unsigned int width  = framebuffer->GetTextureWidth();
+    unsigned int height = framebuffer->GetTextureHeight();
+
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, gbuffer->gBufferObject);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer->GetFramebufferID()); // write to default framebuffer
+    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, GL_NEAREST);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->GetFramebufferID());
+
+    //glEnable(GL_STENCIL_TEST);
+
+    glStencilFunc(GL_EQUAL, 1, 0xFF);
+    glStencilMask(0x00);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, gbuffer->diffuseTexture);
@@ -352,18 +367,7 @@ void Scene::RenderScene(float deltaTime, CameraComponent* camera)
 
     App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 3);
 
-    // SKYBOX, GIZMOS AND DEBUG ONWARDS
-
-    // COPYING DEPTH BUFFER FROM GBUFFER TO RENDER FRAMEBUFFER
-    // TODO CHECK IF GAME RELEASE TO RENDER TO DEFAULT BUFFER INSTEAD OF FRAMEBUFFER
-
-    unsigned int width  = framebuffer->GetTextureWidth();
-    unsigned int height = framebuffer->GetTextureHeight();
-
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, gbuffer->gBufferObject);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer->GetFramebufferID()); // write to default framebuffer
-    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->GetFramebufferID());
+    glDisable(GL_STENCIL_TEST);
 
     {
 #ifdef OPTICK
@@ -946,6 +950,11 @@ void Scene::GeometryPassRender(
 ) const
 {
     gbuffer->Bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);
+    glStencilMask(0xFF);
+
     glDisable(GL_BLEND);
 
     BatchManager* batchManager = App->GetResourcesModule()->GetBatchManager();
@@ -958,8 +967,9 @@ void Scene::GeometryPassRender(
     }
 
     batchManager->Render(meshesToRender, camera);
-
     gbuffer->Unbind();
+
+    glEnable(GL_BLEND);
 }
 
 void Scene::LightingPassRender(const std::vector<GameObject*>& renderGameObjects, CameraComponent* camera) const

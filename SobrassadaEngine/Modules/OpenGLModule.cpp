@@ -42,6 +42,10 @@ bool OpenGLModule::Init()
     glEnable(GL_CULL_FACE);  // Enable cull backward faces
     glFrontFace(GL_CCW);     // Enable conter clock wise backward faces
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // Enable seamless cubemap 
+    
+    // stencil op
+    glEnable(GL_STENCIL_TEST);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
     framebuffer = new Framebuffer(App->GetWindowModule()->GetWidth(), App->GetWindowModule()->GetHeight(), true);
     gBuffer     = new GBuffer(App->GetWindowModule()->GetWidth(), App->GetWindowModule()->GetHeight());
@@ -71,7 +75,7 @@ update_status OpenGLModule::PreUpdate(float deltaTime)
 #endif
         glClearColor(clearColorRed, clearColorGreen, clearColorBlue, 1.0f);
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
 
     drawCallsCount     = 0;
