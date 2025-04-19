@@ -147,7 +147,8 @@ void LightsConfig::LoadSkyboxTexture(UID resource)
     ResourceTexture* newCubemap = TextureImporter::LoadCubemap(resource);
     if (newCubemap != nullptr)
     {
-        FreeCubemap();
+        if (!firstTime) FreeCubemap();
+        else firstTime = false;
         App->GetResourcesModule()->ReleaseResource(currentTexture);
         currentTexture     = newCubemap;
         currentTextureName = currentTexture->GetName();
@@ -159,10 +160,9 @@ void LightsConfig::LoadSkyboxTexture(UID resource)
 
         App->GetOpenGLModule()->SetDepthFunc(false);
 
-        // Im not changing cubemaps right now
         cubemapIrradiance = CubeMapToTexture(1024, 1024);
         irradianceHandle  = glGetTextureHandleARB(cubemapIrradiance);
-        glMakeTextureHandleResidentARB(skyboxHandle);
+        glMakeTextureHandleResidentARB(irradianceHandle);
 
         prefilteredEnvironmentMap       = PreFilteredEnvironmentMapGeneration(1024, 1024);
         prefilteredEnvironmentMapHandle = glGetTextureHandleARB(prefilteredEnvironmentMap);
