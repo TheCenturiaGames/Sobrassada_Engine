@@ -66,9 +66,6 @@ void CuChulainn::HandleAnimation()
 {
     if (!animComponent) return;
 
-    ResourceStateMachine* stateMachine = animComponent->GetResourceStateMachine();
-    if (!stateMachine) return;
-
     const KeyState* keyboard = AppEngine->GetInputModule()->GetKeyboard();
     const bool move          = keyboard[SDL_SCANCODE_W] || keyboard[SDL_SCANCODE_D] ||
                       keyboard[SDL_SCANCODE_A]|| keyboard[SDL_SCANCODE_S];
@@ -76,24 +73,18 @@ void CuChulainn::HandleAnimation()
     GLOG("%d", move);
     if (move && !runActive)
     {
-        triggerAvailable = stateMachine->UseTrigger("run");
-        if (triggerAvailable)
-        {
-            animComponent->OnPlay(true);
-            triggerAvailable = false;
-        }
-        runActive = true;
+        triggerAvailable = animComponent->UseTrigger("Run");
+        runActive        = true;
+        
     }
     else if (runActive && !move)
     {
-        triggerAvailable = stateMachine->UseTrigger("idle");
-        if (triggerAvailable)
-        {
-            animComponent->OnPlay(true);
-            triggerAvailable = false;
-        }
+        triggerAvailable = animComponent->UseTrigger("idle");
         runActive = false;
     }
+
+    
+
 
     // If(Input de dash){
     // stateMachine->UseTrigger("Dash");

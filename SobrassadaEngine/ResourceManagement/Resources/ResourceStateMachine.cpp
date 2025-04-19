@@ -4,6 +4,8 @@
 #include "FileSystem.h"
 #include "LibraryModule.h"
 #include "MetaModel.h"
+#include <algorithm> 
+#include <cctype>
 
 ResourceStateMachine::ResourceStateMachine(UID uid, const std::string& name)
     : Resource(uid, name, ResourceType::Material)
@@ -299,9 +301,13 @@ bool ResourceStateMachine::ClipExists(const std::string& clipName) const
 bool ResourceStateMachine::UseTrigger(const std::string& triggerName)
 {
     bool triggerExists = false;
+    std::string lowerTrigger = triggerName;
+    std::transform(lowerTrigger.begin(), lowerTrigger.end(), lowerTrigger.begin(), ::tolower);
     for (const auto& transition :  transitions)
     {
-        if (transition.triggerName == triggerName &&
+        std::string transitionTrigger = transition.triggerName.GetString();
+        std::transform(transitionTrigger.begin(), transitionTrigger.end(), transitionTrigger.begin(), ::tolower);
+        if (transitionTrigger == lowerTrigger &&
             transition.fromState.GetString() == GetActiveState()->name.GetString())
         {
             for (size_t i = 0; i < states.size(); ++i)

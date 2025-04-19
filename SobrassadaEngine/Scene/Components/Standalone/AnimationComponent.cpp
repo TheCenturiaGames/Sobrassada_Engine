@@ -515,3 +515,17 @@ bool AnimationComponent::IsPlaying() const
 {
     return animController->IsPlaying();
 }
+
+bool AnimationComponent::UseTrigger(std::string triggerName)
+{
+    bool triggerDone = false;
+    if (resourceStateMachine)
+    {
+       triggerDone = resourceStateMachine->UseTrigger(triggerName);
+       if (triggerDone)
+       {
+           OnPlay(true);
+       }
+    }
+    return triggerDone;
+}
