@@ -386,6 +386,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ButtonScript.h" />
+    <ClInclude Include="ExitGameScript.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="resource.h" />
@@ -637,6 +638,7 @@
     </ClCompile>
     <ClCompile Include="ButtonScript.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="ExitGameScript.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Game Debug|x64'">Create</PrecompiledHeader>

@@ -1683,3 +1683,8 @@ std::string EditorUIModule::FormatWithCommas(unsigned int number) const
     ss << number;
     return ss.str();
 }
+
+void EditorUIModule::RequestExit()
+{
+    closeApplication = true;
+}
