@@ -20,6 +20,7 @@ class ScriptModule : public Module
 
     bool Init() override;
     update_status Update(float deltaTime) override;
+    bool close();
     bool ShutDown() override;
 
     Script* CreateScript(const std::string& name, GameObject* parent) const { return createScriptFunc(name, parent); }
@@ -38,9 +39,13 @@ class ScriptModule : public Module
 
     typedef Script* (*CreateScriptFunc)(const std::string&, GameObject*);
     typedef void (*DestroyScriptFunc)(Script*);
+    typedef void (*StartSobrassadaScripts)(Application* App);
+    typedef void (*FreeSobrassadaScripts)();
 
+    StartSobrassadaScripts startScriptFunc    = nullptr;
     CreateScriptFunc createScriptFunc    = nullptr;
     DestroyScriptFunc destroyScriptFunc  = nullptr;
+    FreeSobrassadaScripts freeScriptFunc  = nullptr;
 
     fs::file_time_type lastWriteTime;
     std::atomic<bool> running = true;

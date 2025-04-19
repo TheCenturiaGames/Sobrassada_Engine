@@ -89,6 +89,7 @@ class SOBRASADA_API_ENGINE GameObject
 
     const std::unordered_map<ComponentType, Component*>& GetComponents() const { return components; }
     Component* GetComponentByType(ComponentType type) const;
+    Component* GetComponentChildByType(ComponentType componentType) const;
 
     MeshComponent* GetMeshComponent() const;
 

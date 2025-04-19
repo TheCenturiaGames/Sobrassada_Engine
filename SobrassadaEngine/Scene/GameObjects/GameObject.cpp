@@ -405,6 +405,17 @@ Component* GameObject::GetComponentByType(ComponentType type) const
     return nullptr;
 }
 
+Component* GameObject::GetComponentChildByType(ComponentType componentType) const
+{
+    const std::vector<UID>& children = GetChildren();
+    if (!children.empty())
+    {
+        GameObject* gameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(children[0]);
+        return gameObject->GetComponentByType(componentType);
+    }
+    return nullptr;
+}
+
 MeshComponent* GameObject::GetMeshComponent() const
 {
     if (components.find(COMPONENT_MESH) != components.end())
