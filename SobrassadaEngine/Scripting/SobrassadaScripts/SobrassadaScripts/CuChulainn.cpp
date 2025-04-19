@@ -74,15 +74,24 @@ void CuChulainn::HandleAnimation()
                       keyboard[SDL_SCANCODE_A]|| keyboard[SDL_SCANCODE_S];
 
     GLOG("%d", move);
-
     if (move && !runActive)
     {
-        stateMachine->UseTrigger("Run");
+        triggerAvailable = stateMachine->UseTrigger("run");
+        if (triggerAvailable)
+        {
+            animComponent->OnPlay(true);
+            triggerAvailable = false;
+        }
         runActive = true;
     }
     else if (runActive && !move)
     {
-        stateMachine->UseTrigger("Idle");
+        triggerAvailable = stateMachine->UseTrigger("idle");
+        if (triggerAvailable)
+        {
+            animComponent->OnPlay(true);
+            triggerAvailable = false;
+        }
         runActive = false;
     }
 
