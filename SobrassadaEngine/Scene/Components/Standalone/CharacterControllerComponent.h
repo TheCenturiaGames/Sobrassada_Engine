@@ -26,6 +26,7 @@ class CharacterControllerComponent : public Component
 
     void AdjustHeightToNavMesh(float3& currentPos);
     void Move(const float3& direction, float deltaTime);
+    void LookAtMovement(const float3& moveDir, float deltaTime);
     void Rotate(float rotationDirection, float deltaTime);
     void HandleInput(float deltaTime);
 

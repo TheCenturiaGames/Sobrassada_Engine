@@ -266,11 +266,19 @@ void CharacterControllerComponent::Move(const float3& direction, float deltaTime
     float3 currentPos  = globalTr.TranslatePart();
 
     float finalSpeed   = std::min(speed, maxLinearSpeed);
-    float3 offsetXZ    = direction * finalSpeed * deltaTime;
 
-    float3 desiredPos  = currentPos;
-    desiredPos.x      += offsetXZ.x;
-    desiredPos.z      += offsetXZ.z;
+    float3 forward      = globalTr.WorldZ().Normalized();
+    float3 right      = globalTr.WorldZ().Normalized();
+
+    float3 moveDir        = right * direction.x + forward * (-direction.z);
+    if (moveDir.LengthSq() < 1e-6f) return;
+    moveDir.Normalize();
+
+    float3 offsetXZ    = direction * finalSpeed * deltaTime;
+    float3 desiredPos = currentPos + offsetXZ;
+
+    //desiredPos.x      += offsetXZ.x;
+    //desiredPos.z      += offsetXZ.z;
 
     dtQueryFilter filter;
     filter.setIncludeFlags(SAMPLE_POLYFLAGS_WALK);
@@ -300,6 +308,33 @@ void CharacterControllerComponent::Move(const float3& direction, float deltaTime
     float4x4 finalLocal = parent->GetParentGlobalTransform().Transposed() * globalTr;
 
     parent->SetLocalTransform(finalLocal);
+    parent->UpdateTransformForGOBranch();
+}
+
+void CharacterControllerComponent::LookAtMovement(const float3& moveDir, float deltaTime)
+{
+    if (moveDir.LengthSq() < 0.0001f) return;
+
+    float3 desired = moveDir;
+    desired.y      = 0.0f;
+    desired.Normalize();
+
+    float4x4 global = parent->GetGlobalTransform();
+    float3 forward  = global.WorldZ();
+    forward.y       = 0.0f;
+    forward.Normalize();
+
+    float angle = atan2(forward.Cross(desired).y, forward.Dot(desired));
+
+    float maxStep = maxAngularSpeed * deltaTime;
+    angle         = std::clamp(angle, -maxStep, maxStep);
+
+    if (fabs(angle) < 0.0001f) return;
+
+    float4x4 rotY = float4x4::FromEulerXYZ(0.0f, angle, 0.0f);
+    float4x4 local = parent->GetGlobalTransform() * rotY;
+
+    parent->SetLocalTransform(local);
     parent->UpdateTransformForGOBranch();
 }
 
@@ -348,6 +383,7 @@ void CharacterControllerComponent::HandleInput(float deltaTime)
         targetDirection = direction;
 
         Move(direction, deltaTime);
+        LookAtMovement(direction, deltaTime);
     }
 
     if (fabs(rotationDir) > 0.0001f)
