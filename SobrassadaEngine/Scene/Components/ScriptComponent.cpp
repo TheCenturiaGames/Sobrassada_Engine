@@ -4,6 +4,7 @@
 #include "SceneModule.h"
 #include "Script.h"
 #include "ScriptModule.h"
+#include "EditorUIModule.h"
 
 // Do script of object rotating
 
@@ -95,6 +96,11 @@ void ScriptComponent::RenderEditorInspector()
                 }
             }
             ImGui::EndPopup();
+        }
+        if (scriptInstance != nullptr)
+        {
+            ImGui::Separator();
+            scriptInstance->Inspector();
         }
     }
 }

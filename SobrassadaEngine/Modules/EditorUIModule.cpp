@@ -19,6 +19,7 @@
 #include "SceneImporter.h"
 
 #include "SceneModule.h"
+#include "Script.h"
 #include "ScriptModule.h"
 #include "StateMachineEditor.h"
 #include "TextureEditor.h"
@@ -174,9 +175,7 @@ update_status EditorUIModule::PostUpdate(float deltaTime)
 
 bool EditorUIModule::ShutDown()
 {
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
-    ImGui::DestroyContext();
+    App->GetScriptModule()->close();
 
     framerate.clear();
     frametime.clear();
@@ -790,6 +789,53 @@ std::string EditorUIModule::RenderFileDialog(bool& window, const char* windowTit
     }
 
     return importPath;
+}
+
+void EditorUIModule::DrawScriptInspector(const std::vector<InspectorField>& fields)
+{
+
+    for (auto& field : fields)
+    {
+        switch (field.type)
+        {
+        case InspectorField::FieldType::Text:
+            ImGui::Text(static_cast<const char*>(field.data));
+            break;
+        case InspectorField::FieldType::Float:
+            ImGui::SliderFloat(field.name, (float*)field.data, field.minValue, field.maxValue);
+            break;
+        case InspectorField::FieldType::Bool:
+            ImGui::Checkbox(field.name, (bool*)field.data);
+            break;
+        case InspectorField::FieldType::Int:
+            ImGui::InputInt(field.name, (int*)field.data);
+            break;
+        case InspectorField::FieldType::Vec2:
+        {
+            float* vec2Data = reinterpret_cast<float*>(field.data);
+            ImGui::SliderFloat2(field.name, vec2Data, field.minValue, field.maxValue);
+            break;
+        }
+        case InspectorField::FieldType::Vec3:
+        {
+            float* vec3Data = reinterpret_cast<float*>(field.data);
+            ImGui::SliderFloat3(field.name, vec3Data, field.minValue, field.maxValue);
+            break;
+        }
+        case InspectorField::FieldType::Vec4:
+        {
+            float* vec4Data = reinterpret_cast<float*>(field.data);
+            ImGui::SliderFloat4(field.name, vec4Data, field.minValue, field.maxValue);
+            break;
+        }
+        case InspectorField::FieldType::Color:
+        {
+            ImColor* color = (ImColor*)field.data;
+            ImGui::ColorEdit3(field.name, (float*)&color->Value);
+            break;
+        }
+        }
+    }
 }
 
 void EditorUIModule::ImportDialog(bool& import)
