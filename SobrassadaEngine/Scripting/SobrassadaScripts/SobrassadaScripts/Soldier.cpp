@@ -10,13 +10,15 @@
 #include "Standalone/AnimationComponent.h"
 #include "Standalone/CharacterControllerComponent.h"
 
-Soldier::Soldier(GameObject* parent) : Character(parent, 5, 1, 2.0f, 1.0f, 1.0f)
+Soldier::Soldier(GameObject* parent) : Character(parent, 3, 1, 0.5f, 2.0f, 1.0f, 1.0f)
 {
 }
 
 bool Soldier::Init()
 {
     GLOG("Initiating Soldier");
+
+    currentState = SoldierStates::CHASE;
 
     Character::Init();
 
@@ -27,16 +29,15 @@ bool Soldier::Init()
         return false;
     }
 
-    agentAI       = dynamic_cast<AIAgentComponent*>(agent);
-
-    currentState = SoldierStates::PATROL;
+    agentAI = dynamic_cast<AIAgentComponent*>(agent);
+    agentAI->SetSpeed(speed);
 
     return true;
 }
 
 void Soldier::Update(float deltaTime)
 {
-    HandleState(deltaTime);
+    Character::Update(deltaTime);
 }
 
 void Soldier::OnDeath()
@@ -66,16 +67,18 @@ void Soldier::HandleState(float deltaTime)
     switch (currentState)
     {
     case SoldierStates::PATROL:
-        GLOG("Soldier Patrolling");
+        // GLOG("Soldier Patrolling");
+        animComponent->UseTrigger("walk");
         PatrolAI();
         break;
     case SoldierStates::CHASE:
-        GLOG("Soldier Chasing");
+        // GLOG("Soldier Chasing");
         animComponent->UseTrigger("Run");
         ChaseAI();
         break;
     case SoldierStates::BASIC_ATTACK:
-        GLOG("Soldier Basic Attack");
+        // GLOG("Soldier Basic Attack");
+        animComponent->UseTrigger("Idle");
         Attack(deltaTime);
         break;
     default:
@@ -93,7 +96,7 @@ void Soldier::ChaseAI()
 {
     if (character != nullptr)
     {
-        agentAI->SetPathNavigation(character->GetLastPosition());
+        if (!agentAI->SetPathNavigation(character->GetLastPosition())) currentState = SoldierStates::PATROL;
     }
     else currentState = SoldierStates::PATROL;
 }

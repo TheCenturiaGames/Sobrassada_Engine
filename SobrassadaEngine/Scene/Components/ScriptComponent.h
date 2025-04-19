@@ -1,8 +1,15 @@
 #pragma once
+
 #include "Component.h"
 #include "Globals.h"
 
+namespace math
+{
+    class float3;
+}
+
 class Script;
+class GameObject;
 
 class ScriptComponent : public Component
 {
@@ -20,6 +27,7 @@ class ScriptComponent : public Component
     void RenderEditorInspector() override;
 
     void InitScriptInstances();
+    void OnCollision(GameObject* otherObject, const float3& collisionNormal);
     void CreateScript(const std::string& scriptType);
     void DeleteScript();
 
@@ -28,6 +36,6 @@ class ScriptComponent : public Component
   private:
     std::string scriptName           = "Not selected";
     Script* scriptInstance           = nullptr;
-    std::vector<std::string> scripts = {"RotateGameObject", "ButtonScript", "CuChulainn", "Soldier"};
+    std::vector<std::string> scripts = {"RotateGameObject", "ButtonScript", "GodMode", "CuChulainn", "Soldier"};
     bool startScript                 = false;
 };

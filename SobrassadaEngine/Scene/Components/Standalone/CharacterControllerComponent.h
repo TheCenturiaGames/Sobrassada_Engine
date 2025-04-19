@@ -8,7 +8,7 @@ class dtNavMeshQuery;
 
 using dtPolyRef = unsigned int;
 
-class CharacterControllerComponent : public Component
+class SOBRASADA_API_ENGINE CharacterControllerComponent : public Component
 {
 
   public:
@@ -36,6 +36,7 @@ class CharacterControllerComponent : public Component
 
     void SetTargetDirection(float3 newTargetDirection) { targetDirection = newTargetDirection; }
     void SetSpeed(float newSpeed) { speed = newSpeed; }
+    void SetInputDown(bool input) { inputDown = input; }
 
   private:
     float3 targetDirection       = float3::zero;
@@ -53,4 +54,6 @@ class CharacterControllerComponent : public Component
     float gravity                = -9.81f;
     float verticalSpeed          = 0.0f;
     float maxFallSpeed           = -20.0f;
+
+    bool inputDown               = true;
 };

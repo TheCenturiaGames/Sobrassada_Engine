@@ -72,6 +72,8 @@ void AIAgentComponent::RenderEditorInspector()
 
     if (enabled)
     {
+        ImGui::SeparatorText("AIAgent Component");
+
         if (ImGui::DragFloat("Speed", &speed, 0.1f, 0.1f, 200.f, "%.2f")) RecreateAgent();
         if (ImGui::DragFloat("Radius", &radius, 0.1f, 0.1f, 200.f, "%.2f")) RecreateAgent();
         if (ImGui::DragFloat("Height", &height, 0.1f, 0.1f, 200.f, "%.2f")) RecreateAgent();
@@ -106,13 +108,13 @@ void AIAgentComponent::Save(rapidjson::Value& targetState, rapidjson::Document::
 }
 
 // finds closest navmesh walkable triangle.
-void AIAgentComponent::SetPathNavigation(const math::float3& destination) const
+bool AIAgentComponent::SetPathNavigation(const math::float3& destination) const
 {
-    if (agentId == -1) return;
+    if (agentId == -1) return false;
 
     PathfinderModule* pathfinder = App->GetPathfinderModule();
     dtNavMeshQuery* navQuery     = pathfinder->GetNavQuery();
-    if (!navQuery) return;
+    if (!navQuery) return false;
 
     // Prepare for finding the nearest poly
     dtQueryFilter filter;
@@ -124,7 +126,7 @@ void AIAgentComponent::SetPathNavigation(const math::float3& destination) const
     if (dtStatusFailed(status) || targetRef == 0)
     {
         GLOG("Failed to find valid target poly for movement.");
-        return;
+        return false;
     }
 
     // Request move to destination
@@ -132,7 +134,9 @@ void AIAgentComponent::SetPathNavigation(const math::float3& destination) const
     if (!result)
     {
         GLOG("Crowd agent failed to request movement.");
+        return false;
     }
+    return true;
 }
 
 void AIAgentComponent::AddToCrowd()

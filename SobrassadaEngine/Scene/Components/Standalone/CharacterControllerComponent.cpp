@@ -22,8 +22,6 @@ CharacterControllerComponent::CharacterControllerComponent(UID uid, GameObject* 
     maxAngularSpeed = 90 / RAD_DEGREE_CONV;
     isRadians       = true;
     targetDirection.Set(0.0f, 0.0f, 1.0f);
-
-    App->GetSceneModule()->GetScene()->SetMainCharacter(this);
 }
 
 CharacterControllerComponent::CharacterControllerComponent(const rapidjson::Value& initialState, GameObject* parent)
@@ -61,7 +59,6 @@ CharacterControllerComponent::CharacterControllerComponent(const rapidjson::Valu
 
 CharacterControllerComponent::~CharacterControllerComponent()
 {
-    App->GetSceneModule()->GetScene()->SetMainCharacter(nullptr);
 }
 
 void CharacterControllerComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator)
@@ -100,9 +97,6 @@ void CharacterControllerComponent::Clone(const Component* other)
 void CharacterControllerComponent::Update(float deltaTime)
 {
     if (!IsEffectivelyEnabled()) return;
-
-    if (App->GetSceneModule()->GetScene()->GetMainCharacter() == nullptr)
-        App->GetSceneModule()->GetScene()->SetMainCharacter(this);
 
     if (!App->GetSceneModule()->GetInPlayMode()) return;
 
@@ -163,7 +157,7 @@ void CharacterControllerComponent::Update(float deltaTime)
     parent->SetLocalTransform(finalLocal);
     parent->UpdateTransformForGOBranch();
 
-    HandleInput(deltaTime);
+    if(inputDown) HandleInput(deltaTime);
 }
 
 void CharacterControllerComponent::Render(float deltaTime)
@@ -182,6 +176,8 @@ void CharacterControllerComponent::RenderEditorInspector()
 
     if (enabled)
     {
+        ImGui::SeparatorText("Character Controller Component");
+
         float availableWidth = ImGui::GetContentRegionAvail().x;
 
         ImGui::Separator();

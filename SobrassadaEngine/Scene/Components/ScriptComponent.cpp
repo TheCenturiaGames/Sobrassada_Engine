@@ -1,11 +1,14 @@
 #include "ScriptComponent.h"
 
 #include "Application.h"
+#include "EditorUIModule.h"
+#include "GameObject.h"
 #include "SceneModule.h"
 #include "Script.h"
 #include "ScriptModule.h"
 
 #include "ImGui.h"
+#include "Math/float3.h"
 
 ScriptComponent::ScriptComponent(UID uid, GameObject* parent) : Component(uid, parent, "Script", COMPONENT_SCRIPT)
 {
@@ -63,7 +66,6 @@ void ScriptComponent::Render(float deltaTime)
 
 void ScriptComponent::RenderDebug(float deltaTime)
 {
-
 }
 
 void ScriptComponent::RenderEditorInspector()
@@ -90,6 +92,11 @@ void ScriptComponent::RenderEditorInspector()
             }
             ImGui::EndPopup();
         }
+        if (scriptInstance != nullptr)
+        {
+            ImGui::Separator();
+            scriptInstance->Inspector();
+        }
     }
 }
 
@@ -98,6 +105,14 @@ void ScriptComponent::InitScriptInstances()
     if (scriptInstance != nullptr)
     {
         scriptInstance->Init();
+    }
+}
+
+void ScriptComponent::OnCollision(GameObject* otherObject, const float3& collisionNormal)
+{
+    if (scriptInstance != nullptr)
+    {
+        scriptInstance->OnCollision(otherObject, collisionNormal);
     }
 }
 

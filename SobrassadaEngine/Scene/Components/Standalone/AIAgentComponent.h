@@ -26,7 +26,9 @@ class SOBRASADA_API_ENGINE AIAgentComponent : public Component
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
     void AddToCrowd();
     void RecreateAgent();
-    void SetPathNavigation(const math::float3& destination) const;
+    bool SetPathNavigation(const math::float3& destination) const;
+
+    void SetSpeed(float newSpeed) { speed = newSpeed; }
 
   private:
     float speed  = 0.f;

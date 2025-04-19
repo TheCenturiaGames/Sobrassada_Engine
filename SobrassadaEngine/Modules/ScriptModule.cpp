@@ -1,9 +1,13 @@
 #include "ScriptModule.h"
 #include "Application.h"
-#include "SceneModule.h"
 #include "Component.h"
+#include "SceneModule.h"
 #include "Script.h"
 #include "ScriptComponent.h"
+#include "imgui.h"
+#include "imgui_impl_opengl3.h"
+#include "imgui_impl_sdl2.h"
+#include "imgui_internal.h"
 
 bool ScriptModule::Init()
 {
@@ -13,11 +17,21 @@ bool ScriptModule::Init()
     return true;
 }
 
-bool ScriptModule::ShutDown()
+bool ScriptModule::close()
 {
+    DeleteAllScripts();
     UnloadDLL();
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
     running = false;
     if (dllMonitorThread.joinable()) dllMonitorThread.join();
+
+    return true;
+}
+
+bool ScriptModule::ShutDown()
+{
     return true;
 }
 
@@ -88,7 +102,6 @@ void ScriptModule::DeleteAllScripts()
                 scriptComponent->DeleteScript();
             }
         }
-
         freeScriptFunc();
     }
 }

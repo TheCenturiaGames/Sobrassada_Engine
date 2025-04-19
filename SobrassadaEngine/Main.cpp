@@ -9,8 +9,6 @@
 #include "optick.h"
 #endif
 
-#include <memory>
-
 extern "C"
 {
     _declspec(dllexport) DWORD NvOptimusEnablement                = 1;

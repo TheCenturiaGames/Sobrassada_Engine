@@ -83,7 +83,6 @@ class Scene
 
     LightsConfig* GetLightsConfig() const { return lightsConfig; }
     CameraComponent* GetMainCamera() const { return mainCamera; }
-    CharacterControllerComponent* GetMainCharacter() const { return mainCharacter; }
 
     template <typename T> std::vector<T*> GetEnabledComponentsOfType() const;
 
@@ -106,7 +105,6 @@ class Scene
     }
 
     void SetMainCamera(CameraComponent* camera) { mainCamera = camera; }
-    void SetMainCharacter(CharacterControllerComponent* character) { mainCharacter = character; }
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
 
     void SetStopPlaying(bool stop) { stopPlaying = stop; }
@@ -126,7 +124,6 @@ class Scene
     UID gameObjectRootUID                       = INVALID_UID;
     UID selectedGameObjectUID                   = INVALID_UID;
     CameraComponent* mainCamera                 = nullptr;
-    CharacterControllerComponent* mainCharacter = nullptr;
     bool stopPlaying                            = false;
     bool doInputs                               = false;
     bool doMouseInputs                          = false;

@@ -9,10 +9,13 @@
 #include "Standalone/AnimationComponent.h"
 #include "Standalone/CharacterControllerComponent.h"
 
+#include "SDL.h"
+
 CharacterControllerComponent* character = nullptr;
 
-CuChulainn::CuChulainn(GameObject* parent) : Character(parent, 5, 1, 2.0f, 1.0f, 1.0f)
+CuChulainn::CuChulainn(GameObject* parent) : Character(parent, 5, 1, 0.5f, 2.0f, 1.0f, 1.0f)
 {
+    currentHealth = 3; // mainChar starts low hp
 }
 
 bool CuChulainn::Init()
@@ -29,13 +32,14 @@ bool CuChulainn::Init()
     }
 
     character = dynamic_cast<CharacterControllerComponent*>(agent);
+    character->SetSpeed(speed);
 
     return true;
 }
 
 void CuChulainn::Update(float deltaTime)
 {
-    HandleAnimation();
+    Character::Update(deltaTime);
 }
 
 void CuChulainn::OnDeath()
@@ -62,29 +66,32 @@ void CuChulainn::PerformAttack()
     // TODO: activate and disable the box collider located on one on the gameobjects bones
 }
 
-void CuChulainn::HandleAnimation()
+void CuChulainn::HandleState(float deltaTime)
 {
     if (!animComponent) return;
 
     const KeyState* keyboard = AppEngine->GetInputModule()->GetKeyboard();
-    const bool move          = keyboard[SDL_SCANCODE_W] || keyboard[SDL_SCANCODE_D] ||
-                      keyboard[SDL_SCANCODE_A]|| keyboard[SDL_SCANCODE_S];
+    const KeyState* mouse    = AppEngine->GetInputModule()->GetMouseButtons();
+    const bool move =
+        keyboard[SDL_SCANCODE_W] || keyboard[SDL_SCANCODE_D] || keyboard[SDL_SCANCODE_A] || keyboard[SDL_SCANCODE_S];
 
-    GLOG("%d", move);
-    if (move && !runActive)
+    if (mouse[SDL_BUTTON_LEFT - 1] && CanAttack(deltaTime))
     {
-        triggerAvailable = animComponent->UseTrigger("Run");
-        runActive        = true;
-        
+        GLOG("ATTACK");
+        animComponent->UseTrigger("walk");
+        Attack(deltaTime);
+        TakeDamage(5);
+    }
+    else if (move && !runActive)
+    {
+        animComponent->UseTrigger("run");
+        runActive = true;
     }
     else if (runActive && !move)
     {
-        triggerAvailable = animComponent->UseTrigger("idle");
+        animComponent->UseTrigger("idle");
         runActive = false;
     }
-
-    
-
 
     // If(Input de dash){
     // stateMachine->UseTrigger("Dash");

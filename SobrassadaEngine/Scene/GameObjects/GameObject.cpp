@@ -11,6 +11,7 @@
 #include "Standalone/UI/Transform2DComponent.h"
 
 #include "imgui.h"
+#include <queue>
 #include <set>
 #include <stack>
 
@@ -403,6 +404,37 @@ Component* GameObject::GetComponentByType(ComponentType type) const
         return components.at(type);
     }
     return nullptr;
+}
+
+Component* GameObject::GetComponentChildByType(ComponentType componentType) const
+{
+    std::queue<UID> gameObjects;
+
+    for (UID child : this->GetChildren())
+    {
+        gameObjects.push(child);
+    }
+
+    Scene* scene         = App->GetSceneModule()->GetScene();
+    Component* component = nullptr;
+
+    while (!gameObjects.empty())
+    {
+        UID currentGameObject = gameObjects.front();
+        gameObjects.pop();
+
+        GameObject* current = scene->GetGameObjectByUID(currentGameObject);
+        component           = current->GetComponentByType(componentType);
+
+        if (component != nullptr) break;
+
+        for (UID child : current->GetChildren())
+        {
+            gameObjects.push(child);
+        }
+    }
+
+    return component;
 }
 
 MeshComponent* GameObject::GetMeshComponent() const
