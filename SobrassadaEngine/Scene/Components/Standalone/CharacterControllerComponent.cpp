@@ -261,6 +261,7 @@ void CharacterControllerComponent::AdjustHeightToNavMesh(float3& currentPos)
 void CharacterControllerComponent::Move(const float3& direction, float deltaTime)
 {
     if (!navMeshQuery || currentPolyRef == 0) return;
+    if (direction.LengthSq() < 0.0001f) return;
 
     float4x4 globalTr  = parent->GetGlobalTransform();
     float3 currentPos  = globalTr.TranslatePart();
@@ -268,7 +269,7 @@ void CharacterControllerComponent::Move(const float3& direction, float deltaTime
     float finalSpeed   = std::min(speed, maxLinearSpeed);
 
     float3 forward      = globalTr.WorldZ().Normalized();
-    float3 right      = globalTr.WorldZ().Normalized();
+    float3 right      = globalTr.WorldX().Normalized();
 
     float3 moveDir        = right * direction.x + forward * (-direction.z);
     if (moveDir.LengthSq() < 1e-6f) return;
