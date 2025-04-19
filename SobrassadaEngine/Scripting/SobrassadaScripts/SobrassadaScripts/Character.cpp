@@ -8,7 +8,6 @@ Character::Character(GameObject* parent, int maxHealth, int damage, float speed,
     : Script(parent), maxHealth(maxHealth), damage(damage), speed(speed), cooldown(cooldown), range(range)
 {
     currentHealth      = maxHealth;
-    //this->patrolPoints = patrolPoints;
 }
 
 bool Character::Init()

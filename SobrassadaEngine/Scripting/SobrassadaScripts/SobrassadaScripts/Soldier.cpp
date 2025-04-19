@@ -63,9 +63,6 @@ void Soldier::HandleState(float deltaTime)
 {
     if (!animComponent) return;
 
-    ResourceStateMachine* stateMachine = animComponent->GetResourceStateMachine();
-    if (!stateMachine) return;
-
     switch (currentState)
     {
     case SoldierStates::PATROL:
@@ -74,6 +71,7 @@ void Soldier::HandleState(float deltaTime)
         break;
     case SoldierStates::CHASE:
         GLOG("Soldier Chasing");
+        animComponent->UseTrigger("Run");
         ChaseAI();
         break;
     case SoldierStates::BASIC_ATTACK:

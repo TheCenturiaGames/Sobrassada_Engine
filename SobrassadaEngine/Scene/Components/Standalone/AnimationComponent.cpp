@@ -516,7 +516,7 @@ bool AnimationComponent::IsPlaying() const
     return animController->IsPlaying();
 }
 
-bool AnimationComponent::UseTrigger(std::string triggerName)
+bool AnimationComponent::UseTrigger(const std::string& triggerName)
 {
     bool triggerDone = false;
     if (resourceStateMachine)
