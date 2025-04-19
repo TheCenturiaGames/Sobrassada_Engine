@@ -28,8 +28,8 @@ void GodMode::Update(float deltaTime)
         float scaleFactor            = 1.0f;
         if (keyboard[SDL_SCANCODE_LSHIFT]) scaleFactor *= 2;
 
-        float finalCameraSpeed       = 7.5f * scaleFactor * deltaTime;
-        float finalRotateSensitivity = 0.006f * scaleFactor;
+        const float finalCameraSpeed       = 7.5f * scaleFactor * deltaTime;
+        const float finalRotateSensitivity = 0.006f * scaleFactor;
 
         if (keyboard[SDL_SCANCODE_W]) godCamera->Translate(godCamera->GetCameraFront() * finalCameraSpeed);
         if (keyboard[SDL_SCANCODE_S]) godCamera->Translate(-godCamera->GetCameraFront() * finalCameraSpeed);
@@ -40,9 +40,9 @@ void GodMode::Update(float deltaTime)
 
         if (mouseButtons[SDL_BUTTON_RIGHT - 1])
         {
-            float mouseX             = mouseMotion.x;
-            float mouseY             = mouseMotion.y;
-            float deltaRotationAngle = cameraRotationAngle * finalRotateSensitivity;
+            const float mouseX             = mouseMotion.x;
+            const float mouseY             = mouseMotion.y;
+            const float deltaRotationAngle = cameraRotationAngle * finalRotateSensitivity;
             godCamera->Rotate(-mouseX * deltaRotationAngle, -mouseY * deltaRotationAngle);
         }
 

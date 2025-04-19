@@ -15,7 +15,7 @@
 
 CameraComponent::CameraComponent(UID uid, GameObject* parent) : Component(uid, parent, "Camera", COMPONENT_CAMERA)
 {
-    float4x4 globalTransform  = GetGlobalTransform();
+    const float4x4 globalTransform  = GetGlobalTransform();
     camera.type               = FrustumType::PerspectiveFrustum;
     camera.pos                = float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
     camera.front              = -float3(globalTransform[0][2], globalTransform[1][2], globalTransform[2][2]);
@@ -27,8 +27,8 @@ CameraComponent::CameraComponent(UID uid, GameObject* parent) : Component(uid, p
     camera.horizontalFov      = (float)HFOV * DEGREE_RAD_CONV;
 
     auto framebuffer          = App->GetOpenGLModule()->GetFramebuffer();
-    int width                 = framebuffer->GetTextureWidth();
-    int height                = framebuffer->GetTextureHeight();
+    const int width                 = framebuffer->GetTextureWidth();
+    const int height                = framebuffer->GetTextureHeight();
 
     camera.verticalFov        = 2.0f * atanf(tanf(camera.horizontalFov * 0.5f) * ((float)height / (float)width));
 
@@ -299,15 +299,15 @@ void CameraComponent::Update(float deltaTime)
 
     if (!freeCamera)
     {
-        float4x4 globalTransform = GetGlobalTransform();
+        const float4x4 globalTransform = GetGlobalTransform();
         camera.pos               = float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
         camera.front = -float3(globalTransform[0][2], globalTransform[1][2], globalTransform[2][2]).Normalized();
         camera.up    = float3(globalTransform[0][1], globalTransform[1][1], globalTransform[2][1]).Normalized();
     }
 
     auto framebuffer = App->GetOpenGLModule()->GetFramebuffer();
-    int width        = framebuffer->GetTextureWidth();
-    int height       = framebuffer->GetTextureHeight();
+    const int width        = framebuffer->GetTextureWidth();
+    const int height       = framebuffer->GetTextureHeight();
     SetAspectRatio((float)height / (float)width);
 
     matrices.projectionMatrix = camera.ProjectionMatrix();
@@ -329,8 +329,8 @@ void CameraComponent::Update(float deltaTime)
 
 void CameraComponent::RenderCameraPreview(float deltaTime)
 {
-    int mainFramebufferWidth  = App->GetOpenGLModule()->GetFramebuffer()->GetTextureWidth();
-    int mainFramebufferHeight = App->GetOpenGLModule()->GetFramebuffer()->GetTextureHeight();
+    const int mainFramebufferWidth  = App->GetOpenGLModule()->GetFramebuffer()->GetTextureWidth();
+    const int mainFramebufferHeight = App->GetOpenGLModule()->GetFramebuffer()->GetTextureHeight();
 
     float scaleFactor         = 0.2f;
     previewWidth              = static_cast<int>(mainFramebufferWidth * scaleFactor);
@@ -394,14 +394,14 @@ void CameraComponent::Translate(const float3& direction)
 
 void SOBRASADA_API_ENGINE CameraComponent::Rotate(float yaw, float pitch)
 {
-    Quat yawRotation = Quat::RotateY(yaw);
+    const Quat yawRotation = Quat::RotateY(yaw);
     camera.front     = yawRotation.Mul(camera.front).Normalized();
     camera.up        = yawRotation.Mul(camera.up).Normalized();
 
     if ((currentPitchAngle + pitch) > maximumNegativePitch && (currentPitchAngle + pitch) < maximumPositivePitch)
     {
         currentPitchAngle  += pitch;
-        Quat pitchRotation  = Quat::RotateAxisAngle(camera.WorldRight(), pitch);
+        const Quat pitchRotation  = Quat::RotateAxisAngle(camera.WorldRight(), pitch);
         camera.front        = pitchRotation.Mul(camera.front).Normalized();
         camera.up           = pitchRotation.Mul(camera.up).Normalized();
     }
