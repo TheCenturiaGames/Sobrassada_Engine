@@ -39,10 +39,10 @@ class PathfinderModule : public Module
 
   private:
     dtNavMeshQuery* navQuery = nullptr;
-    dtCrowd* crowd     = nullptr;
+    dtCrowd* crowd           = nullptr;
     ResourceNavMesh* tmpNavmesh;
     const unsigned int maxAgents = 100;
-    const float maxAgentRadius = 0.5f;
+    const float maxAgentRadius   = 0.5f;
     bool clickNavigationEnabled  = false;
     NavMeshConfig navconf;
     float3 outHitPoint;

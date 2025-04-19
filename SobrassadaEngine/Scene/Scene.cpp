@@ -58,6 +58,7 @@ Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUI
     this->sceneName       = initialState["Name"].GetString();
     gameObjectRootUID     = initialState["RootGameObject"].GetUint64();
     selectedGameObjectUID = gameObjectRootUID;
+    navmeshUID            = initialState["NavmeshUID"].GetUint64();
 
     App->GetPhysicsModule()->LoadLayerData(&initialState);
 
@@ -169,6 +170,7 @@ void Scene::Save(
     targetState.AddMember("Name", rapidjson::Value(sceneName.c_str(), allocator), allocator);
 
     targetState.AddMember("RootGameObject", gameObjectRootUID, allocator);
+    targetState.AddMember("NavmeshUID", navmeshUID, allocator);
 
     App->GetPhysicsModule()->SaveLayerData(targetState, allocator);
 
@@ -752,7 +754,7 @@ void Scene::ClearObjectSelection()
     // UPDATE TO LET ORIGINAL GAME OBJECTS WITH THEIR ORIGINAL MOBILITY
     for (auto& pairGameObject : selectedGameObjectsMobility)
     {
-        GameObject* currentGameObject        = GetGameObjectByUID(pairGameObject.first);
+        GameObject* currentGameObject = GetGameObjectByUID(pairGameObject.first);
         currentGameObject->UpdateMobilityHierarchy(pairGameObject.second);
     }
 

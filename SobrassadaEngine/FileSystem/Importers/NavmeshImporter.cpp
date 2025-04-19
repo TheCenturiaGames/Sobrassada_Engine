@@ -22,7 +22,7 @@ UID NavmeshImporter::SaveNavmesh(const char* name, ResourceNavMesh* resource, co
     const int NAVMESHSET_MAGIC   = 'S' << 24 | 'O' << 16 | 'B' << 8 | 'R';
     const int NAVMESHSET_VERSION = 1;
 
-    dtNavMesh* navmesh           = resource->GetDetourNavMesh();
+    const dtNavMesh* navmesh           = resource->GetDetourNavMesh();
     if (!navmesh) return 0;
 
     const dtNavMeshParams* params = navmesh->getParams();
@@ -52,8 +52,8 @@ UID NavmeshImporter::SaveNavmesh(const char* name, ResourceNavMesh* resource, co
     UID navmeshUID = GenerateUID();
     navmeshUID     = App->GetLibraryModule()->AssignFiletypeUID(navmeshUID, FileType::Navmesh);
 
-    std::string metaNavPath = NAVMESHES_PATH + std::string(name) + META_EXTENSION;
-    std::string navPath =
+    const std::string metaNavPath = NAVMESHES_PATH + std::string(name) + META_EXTENSION;
+    const std::string navPath =
         App->GetProjectModule()->GetLoadedProjectPath() + NAVMESHES_PATH + std::string(name) + NAVMESH_EXTENSION;
 
     // Save metadata
@@ -61,7 +61,7 @@ UID NavmeshImporter::SaveNavmesh(const char* name, ResourceNavMesh* resource, co
     meta.Save(name, metaNavPath);
 
     // Write binary navmesh
-    unsigned int bytesWritten =
+    const unsigned int bytesWritten =
         (unsigned int)FileSystem::Save(navPath.c_str(), fileBuffer, (unsigned int)totalSize, true);
 
     delete[] fileBuffer;
@@ -77,12 +77,12 @@ UID NavmeshImporter::SaveNavmesh(const char* name, ResourceNavMesh* resource, co
 
 
 
-ResourceNavMesh* NavmeshImporter::LoadNavmesh(UID navmeshUID)
+ResourceNavMesh* NavmeshImporter::LoadNavmesh(const UID navmeshUID)
 {
     const int NAVMESHSET_MAGIC = 'S' << 24 | 'O' << 16 | 'B' << 8 | 'R';
     const int NAVMESHSET_VERSION = 1;
 
-    std::string navPath = App->GetLibraryModule()->GetResourcePath(navmeshUID);
+    const std::string navPath = App->GetLibraryModule()->GetResourcePath(navmeshUID);
 
     char* buffer = nullptr;
     unsigned int size = FileSystem::LoadForDetour(navPath.c_str(), &buffer);
@@ -92,7 +92,7 @@ ResourceNavMesh* NavmeshImporter::LoadNavmesh(UID navmeshUID)
         return nullptr;
     }
 
-    char* cursor = buffer;
+    const char* cursor = buffer;
 
     // Read and verify header
     NavMeshSetHeader header;

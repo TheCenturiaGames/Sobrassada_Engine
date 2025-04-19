@@ -2,15 +2,16 @@
 
 #include "Application.h"
 #include "CameraModule.h"
-#include "Standalone/AIAgentComponent.h"
+#include "FileSystem/Importers/NavmeshImporter.h"
+#include "GameObject.h"
 #include "LibraryModule.h"
+#include "MetaNavmesh.h"
 #include "ResourceNavmesh.h"
 #include "ResourcesModule.h"
+#include "Scene.h"
 #include "SceneModule.h"
-#include "GameObject.h"
+#include "Standalone/AIAgentComponent.h"
 #include "Standalone/MeshComponent.h"
-#include "FileSystem/Importers/NavmeshImporter.h"
-#include "MetaNavmesh.h"
 
 #include "Geometry/Plane.h"
 #include "ImGui.h"
@@ -23,17 +24,31 @@ PathfinderModule::PathfinderModule()
 {
 }
 
-bool PathfinderModule ::Init()
+bool PathfinderModule::Init()
 {
     if (!crowd) crowd = dtAllocCrowd();
-    tmpNavmesh = new ResourceNavMesh(15345456565, "dummyNavmesh");
+
+    UID sceneNavmeshUID = App->GetSceneModule()->GetScene()->GetNavmeshUID();
+    if (sceneNavmeshUID != INVALID_UID)
+    {
+        std::string navmeshName = App->GetLibraryModule()->GetResourceName(sceneNavmeshUID);
+        LoadNavMesh(navmeshName.c_str());
+        GLOG("NavMesh loaded on Pathfinder Init: %s (UID: %llu)", navmeshName.c_str(), sceneNavmeshUID);
+    }
+    else
+    {
+        tmpNavmesh = new ResourceNavMesh(15345456565, "dummyNavmesh");
+        GLOG("No scene navmesh UID found. Skipping navmesh load. Initializing with empty navmesh");
+    }
+
     return true;
 }
 
 PathfinderModule::~PathfinderModule()
 {
     dtFreeCrowd(crowd);
-    if (navQuery) {
+    if (navQuery)
+    {
         dtFreeNavMeshQuery(navQuery);
         navQuery = nullptr;
     }
@@ -42,7 +57,6 @@ PathfinderModule::~PathfinderModule()
         delete tmpNavmesh;
         tmpNavmesh = nullptr;
     }
-
 }
 
 update_status PathfinderModule::Update(float deltaTime)
@@ -56,8 +70,6 @@ update_status PathfinderModule::Update(float deltaTime)
 
     return UPDATE_CONTINUE;
 }
-
-
 
 // All ai agent components will call this to add themselves to crowd
 int PathfinderModule::CreateAgent(const float3& position, const float radius, const float height, const float speed)
@@ -172,19 +184,19 @@ void PathfinderModule::RenderCrowdEditor()
 
 void PathfinderModule::SaveNavMesh(const std::string& name)
 {
-    if (!tmpNavmesh) //todo check if it's built maybe?
+    if (!tmpNavmesh) // todo check if it's built maybe?
     {
         GLOG("Cannot save: NavMesh not built.");
         return;
     }
-
+    App->GetSceneModule()->GetScene()->SetNavmeshUID(tmpNavmesh->GetUID());
     UID uid = NavmeshImporter::SaveNavmesh(name.c_str(), tmpNavmesh, navconf);
     GLOG("NavMesh saved with UID: %u", uid);
 }
 
 void PathfinderModule::LoadNavMesh(const std::string& name)
 {
-    UID navmeshUID = App->GetLibraryModule()->GetNavmeshUID(name);
+    const UID navmeshUID = App->GetLibraryModule()->GetNavmeshUID(name);
     if (navmeshUID == 0)
     {
         GLOG("Navmesh '%s' not found in LibraryModule.", name.c_str());
@@ -198,12 +210,10 @@ void PathfinderModule::LoadNavMesh(const std::string& name)
         return;
     }
 
-    if (tmpNavmesh)
-        delete tmpNavmesh;
+    if (tmpNavmesh) delete tmpNavmesh;
 
     tmpNavmesh = loadedNavmesh;
 
-    
     InitQuerySystem();
 
     GLOG("Navmesh '%s' successfully loaded and set.", name.c_str());
@@ -227,8 +237,9 @@ AIAgentComponent* PathfinderModule::GetComponentFromAgentId(int agentId)
 void PathfinderModule::CreateNavMesh()
 {
     // Cleanup old navmesh
-    if (tmpNavmesh != nullptr){
-   
+    if (tmpNavmesh != nullptr)
+    {
+
         delete tmpNavmesh;
         tmpNavmesh = nullptr;
     }
@@ -238,8 +249,8 @@ void PathfinderModule::CreateNavMesh()
     tmpNavmesh = new ResourceNavMesh(navUID, "RuntimeNavMesh");
 
     std::vector<std::pair<const ResourceMesh*, const float4x4&>> meshes;
-    float minPos[3] = { FLT_MAX, FLT_MAX, FLT_MAX };
-    float maxPos[3] = { FLT_MIN, FLT_MIN, FLT_MIN };
+    float minPos[3]                                         = {FLT_MAX, FLT_MAX, FLT_MAX};
+    float maxPos[3]                                         = {FLT_MIN, FLT_MIN, FLT_MIN};
 
     const std::unordered_map<UID, GameObject*>& gameObjects = App->GetSceneModule()->GetScene()->GetAllGameObjects();
 
@@ -251,7 +262,7 @@ void PathfinderModule::CreateNavMesh()
             if (!gameObject || !gameObject->IsGloballyEnabled()) continue;
             {
                 const MeshComponent* meshComponent = gameObject->GetMeshComponent();
-                const float4x4& globalMatrix = gameObject->GetGlobalTransform();
+                const float4x4& globalMatrix       = gameObject->GetGlobalTransform();
 
                 if (meshComponent && meshComponent->GetEnabled())
                 {
@@ -260,15 +271,15 @@ void PathfinderModule::CreateNavMesh()
 
                     const AABB& aabb = gameObject->GetGlobalAABB();
 
-                    minPos[0] = std::min(minPos[0], aabb.minPoint.x);
-                    minPos[1] = std::min(minPos[1], aabb.minPoint.y);
-                    minPos[2] = std::min(minPos[2], aabb.minPoint.z);
+                    minPos[0]        = std::min(minPos[0], aabb.minPoint.x);
+                    minPos[1]        = std::min(minPos[1], aabb.minPoint.y);
+                    minPos[2]        = std::min(minPos[2], aabb.minPoint.z);
 
-                    maxPos[0] = std::max(maxPos[0], aabb.maxPoint.x);
-                    maxPos[1] = std::max(maxPos[1], aabb.maxPoint.y);
-                    maxPos[2] = std::max(maxPos[2], aabb.maxPoint.z);
+                    maxPos[0]        = std::max(maxPos[0], aabb.maxPoint.x);
+                    maxPos[1]        = std::max(maxPos[1], aabb.maxPoint.y);
+                    maxPos[2]        = std::max(maxPos[2], aabb.maxPoint.z);
 
-                    meshes.push_back({ resourceMesh, globalMatrix });
+                    meshes.push_back({resourceMesh, globalMatrix});
                 }
             }
         }
@@ -283,4 +294,3 @@ void PathfinderModule::CreateNavMesh()
 
     InitQuerySystem();
 }
-

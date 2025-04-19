@@ -17,7 +17,6 @@ class ResourceMesh;
 
 struct Vertex;
 
-
 enum SamplePolyAreas
 {
     SAMPLE_POLYAREA_GROUND,
@@ -54,8 +53,6 @@ class ResourceNavMesh : public Resource
     void SetDetourNavMesh(dtNavMesh* navMesh);
     dtNavMesh* GetDetourNavMesh() const { return navMesh; }
 
-
-
   private:
-    dtNavMesh* navMesh                       = nullptr;
+    dtNavMesh* navMesh = nullptr;
 };
