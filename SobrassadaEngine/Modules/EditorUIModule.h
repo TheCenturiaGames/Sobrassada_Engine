@@ -191,6 +191,10 @@ class EditorUIModule : public Module
     char searchTextModel[255]  = "";
     int selectedModel          = -1;
 
+    UID navmeshUID             = INVALID_UID;
+    char searchTextNavmesh[255] = "";
+    int selectedNavmesh        = -1;
+
     // render file dialog
     std::string fileDialogCurrentPath;
     std::vector<std::string> accPaths;
@@ -204,7 +208,7 @@ class EditorUIModule : public Module
     bool showDrives              = false;
     std::string inputFileDialog  = "";
     int selectedFileDialog       = -1;
-
+    char navmeshName[64]         = "MyNavmesh";
     // render resource select dialog
     char searchTextResource[255] = "";
 

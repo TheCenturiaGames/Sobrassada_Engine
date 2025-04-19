@@ -10,7 +10,7 @@
 #include "OpenGLModule.h"
 #include "Quadtree.h"
 #include "SceneModule.h"
-#include "ResourcesModule.h"
+#include "PathfinderModule.h"
 #include "ResourceNavmesh.h"
 #include "DetourNavMesh.h"
 #include "DetourNavMeshQuery.h"
@@ -813,11 +813,11 @@ void DebugDrawModule::HandleDebugRenderOptions()
     }
     if (debugOptionValues[(int)DebugOptions::RENDER_NAVMESH])
     {
-        if (const ResourceNavMesh* navmesh = App->GetResourcesModule()->GetNavMesh())
+        if (const ResourceNavMesh* navmesh = App->GetPathfinderModule()->GetNavMesh())
         {
             DrawNavMesh(
                 navmesh->GetDetourNavMesh(),
-                navmesh->GetDetourNavMeshQuery(), DRAWNAVMESH_COLOR_TILES
+                App->GetPathfinderModule()->GetDetourNavMeshQuery(), DRAWNAVMESH_COLOR_TILES
             );
         }
     }

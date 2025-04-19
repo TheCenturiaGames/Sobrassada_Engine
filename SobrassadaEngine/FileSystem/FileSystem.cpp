@@ -1,6 +1,7 @@
 #include "FileSystem.h"
 
 #include "rapidjson/istreamwrapper.h"
+#include "DetourAlloc.h"
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -43,6 +44,43 @@ namespace FileSystem
             return 0;
         }
     }
+    //Needs special allocation and C-style loading
+    unsigned int LoadForDetour(const char* filePath, char** buffer)
+    {
+        std::ifstream file(filePath, std::ios::in | std::ios::ate | std::ios::binary);
+
+        if (!file.is_open())
+        {
+            GLOG("Failed to open file: %s", filePath);
+            return 0;
+        }
+
+        size_t size = file.tellg();
+        file.seekg(0, std::ifstream::beg);
+
+        *buffer = (char*)dtAlloc(size, DT_ALLOC_PERM);
+        if (!*buffer)
+        {
+            file.close();
+            GLOG("dtAlloc failed for navmesh data: %s", filePath);
+            return 0;
+        }
+
+        if (file.read((char*)*buffer, size))
+        {
+            file.close();
+            return static_cast<unsigned int>(size);
+        }
+        else
+        {
+            dtFree(*buffer); // free Detour memory
+            *buffer = nullptr;
+            file.close();
+            GLOG("Failed to read navmesh data: %s", filePath);
+            return 0;
+        }
+    }
+
 
     bool LoadJSON(const char* scenePath, rapidjson::Document& doc)
     {
