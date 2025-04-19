@@ -8,7 +8,6 @@ layout(binding = 0) uniform sampler2D gDiffuse;
 layout(binding = 1) uniform sampler2D gSpecular;
 layout(binding = 2) uniform sampler2D gPosition;
 layout(binding = 3) uniform sampler2D gNormal;
-layout(binding = 4) uniform sampler2D gDepth;
 
 in vec2 uv0;
 
@@ -165,9 +164,6 @@ void main()
     const float alpha = metallicRoughnessTexColor.a;
     const vec3 pos = texture(gPosition, uv0).rgb;
     const vec3 normal = texture(gNormal, uv0).rgb;
-    const vec4 depth = texture(gDepth, uv0);
-
-    // if(depth.rgb == vec3(1)) discard;
 
     vec3 N = normalize(normal);
 

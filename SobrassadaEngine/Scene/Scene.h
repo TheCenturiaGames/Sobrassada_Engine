@@ -18,6 +18,7 @@ class ResourcePrefab;
 class Quadtree;
 class CameraComponent;
 class GBuffer;
+class Framebuffer;
 enum class SaveMode;
 enum MobilitySettings;
 
@@ -121,7 +122,10 @@ class Scene
     void CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects, CameraComponent* camera) const;
     void GeometryPassRender(const std::vector<GameObject*>& objectsToRender, CameraComponent* camera, GBuffer* gbuffer)
         const;
-    void LightingPassRender(const std::vector<GameObject*>& objectsToRender, CameraComponent* camera) const;
+    void LightingPassRender(
+        const std::vector<GameObject*>& renderGameObjects, CameraComponent* camera, GBuffer* gbuffer,
+        Framebuffer* framebuffer
+    ) const;
 
   private:
     std::string sceneName;
