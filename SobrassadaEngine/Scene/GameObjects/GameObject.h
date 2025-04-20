@@ -104,6 +104,7 @@ class SOBRASADA_API_ENGINE GameObject
     void DrawGizmos() const;
 
     void CreatePrefab();
+    void DeleteLinkedPrefab();
     bool IsGloballyEnabled() const;
     UID GetPrefabUID() const { return prefabUID; }
     void SetPrefabUID(const UID uid) { prefabUID = uid; }

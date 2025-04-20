@@ -645,6 +645,12 @@ void GameObject::RenderContextMenu()
         const char* label = prefabUID == INVALID_UID ? "Create Prefab" : "Update Prefab";
         if (ImGui::MenuItem(label)) CreatePrefab();
 
+        if (prefabUID != INVALID_UID)
+        {
+            if (ImGui::MenuItem("Unlink prefab")) prefabUID = INVALID_UID;
+            if (ImGui::MenuItem("Delete prefab")) DeleteLinkedPrefab();
+        }
+
         if (uid != App->GetSceneModule()->GetScene()->GetGameObjectRootUID() && ImGui::MenuItem("Delete"))
         {
             App->GetSceneModule()->GetScene()->RemoveGameObjectHierarchy(uid);
@@ -922,6 +928,15 @@ void GameObject::CreatePrefab()
         // Update all prefabs
         App->GetSceneModule()->GetScene()->OverridePrefabs(prefabUID);
     }
+}
+
+void GameObject::DeleteLinkedPrefab()
+{
+
+
+    // This will remove all the links to this prefab, because the resourcePrefab will be nullptr
+    App->GetSceneModule()->GetScene()->OverridePrefabs(prefabUID);
+    prefabUID = INVALID_UID;
 }
 
 bool GameObject::IsGloballyEnabled() const
