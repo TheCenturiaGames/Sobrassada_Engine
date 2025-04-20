@@ -88,15 +88,15 @@ void LightsConfig::InitSkybox()
     // default skybox texture
     LoadSkyboxTexture(App->GetLibraryModule()->GetTextureUID("cubemap"));
 
-    cubemapIrradiance = CubeMapToTexture(512, 512);
+    cubemapIrradiance = CubeMapToTexture(irradianceMapResolution, irradianceMapResolution);
     irradianceHandle  = glGetTextureHandleARB(cubemapIrradiance);
     glMakeTextureHandleResidentARB(irradianceHandle);
 
-    prefilteredEnvironmentMap       = PreFilteredEnvironmentMapGeneration(512, 512);
+    prefilteredEnvironmentMap       = PreFilteredEnvironmentMapGeneration(prefilteredMapResolution, prefilteredMapResolution);
     prefilteredEnvironmentMapHandle = glGetTextureHandleARB(prefilteredEnvironmentMap);
     glMakeTextureHandleResidentARB(prefilteredEnvironmentMapHandle);
 
-    environmentBRDF       = EnvironmentBRDFGeneration(512, 512);
+    environmentBRDF       = EnvironmentBRDFGeneration(environmentBRDFResolution, environmentBRDFResolution);
     environmentBRDFHandle = glGetTextureHandleARB(environmentBRDF);
     glMakeTextureHandleResidentARB(environmentBRDFHandle);
 
@@ -159,15 +159,15 @@ void LightsConfig::LoadSkyboxTexture(UID resource)
 
         App->GetOpenGLModule()->SetDepthFunc(false);
 
-        cubemapIrradiance = CubeMapToTexture(512, 512);
+        cubemapIrradiance = CubeMapToTexture(irradianceMapResolution, irradianceMapResolution);
         irradianceHandle  = glGetTextureHandleARB(cubemapIrradiance);
         glMakeTextureHandleResidentARB(irradianceHandle);
 
-        prefilteredEnvironmentMap       = PreFilteredEnvironmentMapGeneration(512, 512);
+        prefilteredEnvironmentMap       = PreFilteredEnvironmentMapGeneration(prefilteredMapResolution, prefilteredMapResolution);
         prefilteredEnvironmentMapHandle = glGetTextureHandleARB(prefilteredEnvironmentMap);
         glMakeTextureHandleResidentARB(prefilteredEnvironmentMapHandle);
 
-        environmentBRDF       = EnvironmentBRDFGeneration(512, 512);
+        environmentBRDF       = EnvironmentBRDFGeneration(environmentBRDFResolution, environmentBRDFResolution);
         environmentBRDFHandle = glGetTextureHandleARB(environmentBRDF);
         glMakeTextureHandleResidentARB(environmentBRDFHandle);
 

@@ -1,10 +1,11 @@
 #include "pch.h"
-#include "Script.h"
+
 #include "Application.h"
 #include "EditorUIModule.h"
 #include "Math/float2.h"
 #include "Math/float3.h"
 #include "Math/float4.h"
+#include "Script.h"
 
 void Script::Inspector()
 {
@@ -66,34 +67,30 @@ void Script::Load(const rapidjson::Value& initialState)
 {
     for (auto& field : fields)
     {
-        if (!initialState.HasMember(field.name))
-            continue;
+        if (!initialState.HasMember(field.name)) continue;
 
         const auto& value = initialState[field.name];
 
         switch (field.type)
         {
         case InspectorField::FieldType::Float:
-            if (value.IsNumber())
-                *(float*)field.data = value.GetFloat();
+            if (value.IsNumber()) *(float*)field.data = value.GetFloat();
             break;
 
         case InspectorField::FieldType::Int:
-            if (value.IsInt())
-                *(int*)field.data = value.GetInt();
+            if (value.IsInt()) *(int*)field.data = value.GetInt();
             break;
 
         case InspectorField::FieldType::Bool:
-            if (value.IsBool())
-                *(bool*)field.data = value.GetBool();
+            if (value.IsBool()) *(bool*)field.data = value.GetBool();
             break;
 
         case InspectorField::FieldType::Vec2:
             if (value.IsArray() && value.Size() == 2)
             {
                 float2* vec = (float2*)field.data;
-                vec->x = value[0].GetFloat();
-                vec->y = value[1].GetFloat();
+                vec->x      = value[0].GetFloat();
+                vec->y      = value[1].GetFloat();
             }
             break;
 
@@ -102,9 +99,9 @@ void Script::Load(const rapidjson::Value& initialState)
             if (value.IsArray() && value.Size() == 3)
             {
                 float3* vec = (float3*)field.data;
-                vec->x = value[0].GetFloat();
-                vec->y = value[1].GetFloat();
-                vec->z = value[2].GetFloat();
+                vec->x      = value[0].GetFloat();
+                vec->y      = value[1].GetFloat();
+                vec->z      = value[2].GetFloat();
             }
             break;
 
@@ -112,10 +109,10 @@ void Script::Load(const rapidjson::Value& initialState)
             if (value.IsArray() && value.Size() == 4)
             {
                 float4* vec = (float4*)field.data;
-                vec->x = value[0].GetFloat();
-                vec->y = value[1].GetFloat();
-                vec->z = value[2].GetFloat();
-                vec->w = value[3].GetFloat();
+                vec->x      = value[0].GetFloat();
+                vec->y      = value[1].GetFloat();
+                vec->z      = value[2].GetFloat();
+                vec->w      = value[3].GetFloat();
             }
             break;
         }
