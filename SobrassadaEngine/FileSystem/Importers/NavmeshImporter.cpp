@@ -92,7 +92,7 @@ ResourceNavMesh* NavmeshImporter::LoadNavmesh(const UID navmeshUID)
         return nullptr;
     }
 
-    const char* cursor = buffer;
+    char* cursor = buffer;
 
     // Read and verify header
     NavMeshSetHeader header;
