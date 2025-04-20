@@ -126,7 +126,11 @@ namespace SceneImporter
         {
             // Copy gltf to Assets folder
             std::string copyPath = targetFilePath + ASSETS_PATH + FileSystem::GetFileNameWithExtension(filePath);
-            if (!FileSystem::Exists(copyPath.c_str())) FileSystem::Copy(filePath, copyPath.c_str());
+            
+            if (FileSystem::Exists(copyPath.c_str()))
+                FileSystem::Delete(copyPath.c_str());
+            
+            FileSystem::Copy(filePath, copyPath.c_str());
         }
         {
             std::string path = FileSystem::GetFilePath(filePath);
@@ -136,7 +140,10 @@ namespace SceneImporter
             {
                 std::string binPath     = path + srcBuffers.uri;
                 std::string copyBinPath = targetFilePath + ASSETS_PATH + FileSystem::GetFileNameWithExtension(binPath);
-                if (!FileSystem::Exists(copyBinPath.c_str())) FileSystem::Copy(binPath.c_str(), copyBinPath.c_str());
+                if (FileSystem::Exists(copyBinPath.c_str()))
+                    FileSystem::Delete(copyBinPath.c_str());
+
+                FileSystem::Copy(binPath.c_str(), copyBinPath.c_str());
             }
         }
 
