@@ -930,15 +930,6 @@ void GameObject::CreatePrefab()
     }
 }
 
-void GameObject::DeleteLinkedPrefab()
-{
-
-
-    // This will remove all the links to this prefab, because the resourcePrefab will be nullptr
-    App->GetSceneModule()->GetScene()->OverridePrefabs(prefabUID);
-    prefabUID = INVALID_UID;
-}
-
 bool GameObject::IsGloballyEnabled() const
 {
     if (!enabled) return false;
