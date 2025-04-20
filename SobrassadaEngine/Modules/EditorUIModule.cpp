@@ -855,9 +855,11 @@ void EditorUIModule::Console(bool& consoleMenu) const
         return;
     }
 
+    int index = 0;
     for (const char* log : *Logs)
     {
-        ImGui::Selectable(log);
+        std::string label = std::string(log) + "##" + std::to_string(index);
+        ImGui::Selectable(label.c_str());
 
         if (ImGui::BeginPopupContextItem())
         {
@@ -867,6 +869,7 @@ void EditorUIModule::Console(bool& consoleMenu) const
             }
             ImGui::EndPopup();
         }
+        ++index;
     }
 
     // Autoscroll only if the scroll is in the bottom position
