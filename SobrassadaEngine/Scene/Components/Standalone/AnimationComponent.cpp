@@ -416,9 +416,8 @@ void AnimationComponent::Clone(const Component* other)
         enabled                                  = otherAnimation->enabled;
 
         resource                                 = otherAnimation->resource;
-        if (otherAnimation->currentAnimResource) AddAnimation(otherAnimation->currentAnimResource->GetUID());
-        resourceStateMachine = otherAnimation->resourceStateMachine;
-        animController       = otherAnimation->animController;
+        AddAnimation(resource);
+        //resourceStateMachine = otherAnimation->resourceStateMachine;
     }
     else
     {
