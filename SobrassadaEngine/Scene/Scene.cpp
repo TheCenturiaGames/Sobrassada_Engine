@@ -798,7 +798,7 @@ void Scene::CreateStaticSpatialDataStruct()
 {
     // PARAMETRIZED IN FUTURE
     float3 octreeCenter = float3::zero;
-    float octreeLength  = 200;
+    float octreeLength  = 2000;
     int nodeCapacity    = 10;
     sceneOctree         = new Octree(octreeCenter, octreeLength, nodeCapacity);
 
@@ -818,7 +818,7 @@ void Scene::CreateDynamicSpatialDataStruct()
 {
     // PARAMETRIZED IN FUTURE
     float3 center    = float3::zero;
-    float length     = 200;
+    float length     = 2000;
     int nodeCapacity = 5;
     dynamicTree      = new Quadtree(center, length, nodeCapacity);
 
