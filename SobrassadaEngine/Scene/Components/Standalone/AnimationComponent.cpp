@@ -57,10 +57,16 @@ AnimationComponent::~AnimationComponent()
     App->GetResourcesModule()->ReleaseResource(currentAnimResource);
 }
 
+void AnimationComponent::Init()
+{
+    currentAnimResource = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
+    currentAnimName = App->GetLibraryModule()->GetResourceName(resource);
+}
+
 void AnimationComponent::OnPlay(bool isTransition)
 {
     StateMachineEditor* stateMachine = nullptr;
-    unsigned transitionTime             = 0;
+    unsigned transitionTime          = 0;
     if (animController != nullptr && resource != INVALID_UID)
     {
         if (resourceStateMachine)
@@ -83,7 +89,9 @@ void AnimationComponent::OnPlay(bool isTransition)
                         {
                             GLOG("TransitionTime: %f", transitionTime);
                             if (isTransition)
-                                animController->SetTargetAnimationResource(clip.animationResourceUID, transitionTime, clip.loop);
+                                animController->SetTargetAnimationResource(
+                                    clip.animationResourceUID, transitionTime, clip.loop
+                                );
                             else animController->Play(clip.animationResourceUID, clip.loop);
                             resource = clip.animationResourceUID;
                         }
@@ -124,14 +132,11 @@ void AnimationComponent::OnInspector()
     std::string originAnimation = "";
     if (resource != 0)
     {
-        currentAnimResource = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
-        const std::string animationName = App->GetLibraryModule()->GetResourceName(resource);
-
-        const size_t underscorePos      = animationName.find('_');
-        if (underscorePos != std::string::npos) originAnimation = animationName.substr(0, underscorePos);
+        const size_t underscorePos = currentAnimName.find('_');
+        if (underscorePos != std::string::npos) originAnimation = currentAnimName.substr(0, underscorePos);
         if (currentAnimResource != nullptr)
         {
-            ImGui::Text("Animation: %s", animationName.c_str());
+            ImGui::Text("Animation: %s", currentAnimName.c_str());
             ImGui::Text("Duration: %.2f seconds", currentAnimResource->GetDuration());
 
             if (animController != nullptr && ImGui::TreeNode("Channels"))
@@ -401,7 +406,6 @@ void AnimationComponent::Render(float deltaTime)
 
 void AnimationComponent::RenderDebug(float deltaTime)
 {
-
 }
 
 void AnimationComponent::Clone(const Component* other)
@@ -409,8 +413,12 @@ void AnimationComponent::Clone(const Component* other)
     if (other->GetType() == ComponentType::COMPONENT_ANIMATION)
     {
         const AnimationComponent* otherAnimation = static_cast<const AnimationComponent*>(other);
+        enabled                                  = otherAnimation->enabled;
 
+        resource                                 = otherAnimation->resource;
         if (otherAnimation->currentAnimResource) AddAnimation(otherAnimation->currentAnimResource->GetUID());
+        resourceStateMachine = otherAnimation->resourceStateMachine;
+        animController       = otherAnimation->animController;
     }
     else
     {
