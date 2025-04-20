@@ -41,11 +41,7 @@ void ResourceAnimation::SetDuration()
             maxTime        = std::max(maxTime, lastTime);
         }
 
-        if (channel.second.numScales > 0)
-        {
-            float lastTime = channel.second.scaleTimeStamps[channel.second.numScales - 1];
-            maxTime        = std::max(maxTime, lastTime);
-        }
+        
     }
 
     duration = maxTime;
