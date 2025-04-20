@@ -516,6 +516,11 @@ bool AnimationComponent::IsPlaying() const
     return animController->IsPlaying();
 }
 
+bool AnimationComponent::IsFinished() const
+{
+    return animController->IsFinished();
+}
+
 bool AnimationComponent::UseTrigger(const std::string& triggerName)
 {
     bool triggerDone = false;

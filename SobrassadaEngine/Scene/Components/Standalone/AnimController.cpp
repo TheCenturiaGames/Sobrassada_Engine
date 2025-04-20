@@ -24,6 +24,8 @@ void AnimController::Play(UID newResource, bool shouldLoop)
     loop             = shouldLoop;
     currentAnimation = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
     playAnimation    = true;
+    playAnimation    = true;
+    animationFinished = false;
 }
 
 void AnimController::Stop()
@@ -75,12 +77,13 @@ update_status AnimController::Update(float deltaTime)
             currentTime   = duration;
             // GLOG("Animation reached end: time = %f", currentTime);
             playAnimation = false;
+            animationFinished = true;
 
-            if (currentAnimation != nullptr)
-            {
-                App->GetResourcesModule()->ReleaseResource(currentAnimation);
-                currentAnimation = nullptr;
-            }
+            //if (currentAnimation != nullptr)
+            //{
+            //    App->GetResourcesModule()->ReleaseResource(currentAnimation);
+            //    currentAnimation = nullptr;
+            //}
         }
     }
 
@@ -150,6 +153,8 @@ void AnimController::SetTargetAnimationResource(UID uid, unsigned timeTransition
     targetAnimation = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(uid));
     transitionTime  = static_cast<float>(timeTransition) / 1000;
     loop            = shouldLoop;
+    playAnimation     = true;
+    animationFinished = false;
 }
 
 void AnimController::GetChannelPosition(const Channel* animChannel, float3& pos, const float time) const

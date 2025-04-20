@@ -78,7 +78,7 @@ void CuChulainn::HandleState(float deltaTime)
     if (mouse[SDL_BUTTON_LEFT - 1] && CanAttack(deltaTime))
     {
         GLOG("ATTACK");
-        animComponent->UseTrigger("walk");
+        animComponent->UseTrigger("attack");
         Attack(deltaTime);
     }
     else if (move && !runActive)
@@ -92,6 +92,18 @@ void CuChulainn::HandleState(float deltaTime)
         runActive = false;
     }
 
+    if (animComponent->IsFinished())
+    {
+        if (runActive)
+        {
+            animComponent->UseTrigger("run");
+        }
+        else
+        {
+            animComponent->UseTrigger("idle");
+        }
+
+    }
     // If(Input de dash){
     // stateMachine->UseTrigger("Dash");
     ////}else Deja de dashear{

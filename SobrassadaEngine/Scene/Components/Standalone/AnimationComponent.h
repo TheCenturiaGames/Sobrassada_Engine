@@ -40,6 +40,7 @@ class SOBRASADA_API_ENGINE AnimationComponent : public Component
     ResourceStateMachine* GetResourceStateMachine() const { return resourceStateMachine; }
     const std::unordered_map<std::string, GameObject*>& GetBoneMapping() const { return boneMapping; }
     bool IsPlaying() const;
+    bool IsFinished() const;
 
     void SetAnimationResource(UID animResource);
     void SetBoneMapping();
