@@ -123,7 +123,7 @@ class Scene
   private:
     std::string sceneName;
     UID sceneUID;
-    UID navmeshUID;
+    UID navmeshUID = INVALID_UID;
     UID gameObjectRootUID;
     UID selectedGameObjectUID;
     CameraComponent* mainCamera;
