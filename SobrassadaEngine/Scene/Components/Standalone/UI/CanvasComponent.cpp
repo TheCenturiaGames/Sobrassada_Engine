@@ -41,11 +41,6 @@ void CanvasComponent::Init()
 {
     App->GetGameUIModule()->AddCanvas(this);
 
-    width  = (float)App->GetWindowModule()->GetWidth();
-    height = (float)App->GetWindowModule()->GetHeight();
-
-    OnWindowResize(width, height);
-
     localComponentAABB = AABB(
         float3(
             parent->GetGlobalTransform().TranslatePart().x - (width / 4.0f),

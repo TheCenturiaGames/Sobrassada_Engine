@@ -22,6 +22,7 @@ class OptionsMenuSwitcherScript : public Script
     };
 
     int currentIndex = 0;
+    bool initialized = false;
 
     void ShowOnlyCurrentPanel();
     GameObject* FindPanelByName(const std::string& name) const;

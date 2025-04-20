@@ -19,8 +19,7 @@ void PauseMenuScript::Update(float deltaTime)
 
     if (keys[SDL_SCANCODE_ESCAPE] == KEY_DOWN)
     {
-        const std::unordered_map<UID, GameObject*>& allGameObjects =
-            AppEngine->GetSceneModule()->GetScene()->GetAllGameObjects();
+        const std::unordered_map<UID, GameObject*>& allGameObjects = AppEngine->GetSceneModule()->GetScene()->GetAllGameObjects();
 
         for (const std::pair<const UID, GameObject*>& gameObjectPair : allGameObjects)
         {
@@ -28,7 +27,7 @@ void PauseMenuScript::Update(float deltaTime)
 
             if (gameObject->GetName() == panelToShowName)
             {
-                UID parentUID        = gameObject->GetParent();
+                UID parentUID = gameObject->GetParent();
                 GameObject* parentGO = AppEngine->GetSceneModule()->GetScene()->GetGameObjectByUID(parentUID);
 
                 if (parentGO != nullptr && parentGO->IsEnabled())

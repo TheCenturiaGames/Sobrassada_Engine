@@ -1,9 +1,9 @@
 #include "pch.h"
-#include "OptionsMenuSwitcherScript.h"
 
 #include "Application.h"
 #include "GameObject.h"
 #include "InputModule.h"
+#include "OptionsMenuSwitcherScript.h"
 #include "Scene.h"
 #include "SceneModule.h"
 
@@ -15,6 +15,15 @@ bool OptionsMenuSwitcherScript::Init()
 
 void OptionsMenuSwitcherScript::Update(float deltaTime)
 {
+
+    if (!parent->IsEnabled()) return;
+
+    if (!initialized)
+    {
+        ShowOnlyCurrentPanel();
+        initialized = true;
+    }
+
     const KeyState* keys = AppEngine->GetInputModule()->GetKeyboard();
 
     if (keys[SDL_SCANCODE_Q] == KEY_DOWN || keys[SDL_SCANCODE_E] == KEY_DOWN)
@@ -29,6 +38,23 @@ void OptionsMenuSwitcherScript::Update(float deltaTime)
 
         // Activate new
         ShowOnlyCurrentPanel();
+    }
+
+    if (keys[SDL_SCANCODE_ESCAPE] == KEY_DOWN)
+    {
+        // Disable all panels in the options menu
+        for (const std::string& name : panelNames)
+        {
+            GameObject* panel = FindPanelByName(name);
+            if (panel) panel->SetEnabled(false);
+        }
+
+        // Enable the MainMenuPanel
+        GameObject* mainMenuPanel = FindPanelByName("MainMenuPanel");
+        if (mainMenuPanel) mainMenuPanel->SetEnabled(true);
+
+        parent->SetEnabled(false);
+        initialized = false;
     }
 }
 
