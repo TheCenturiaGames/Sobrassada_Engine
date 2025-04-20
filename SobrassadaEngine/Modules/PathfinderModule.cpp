@@ -28,6 +28,8 @@ bool PathfinderModule::Init()
 {
     if (!crowd) crowd = dtAllocCrowd();
 
+    if (!App->GetSceneModule()->GetScene()) return true;
+
     UID sceneNavmeshUID = App->GetSceneModule()->GetScene()->GetNavmeshUID();
     if (sceneNavmeshUID != INVALID_UID)
     {
