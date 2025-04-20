@@ -87,6 +87,8 @@ Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUI
 
 Scene::~Scene()
 {
+    App->GetPhysicsModule()->EmptyWorld();
+
     for (auto it = gameObjectsContainer.begin(); it != gameObjectsContainer.end(); ++it)
     {
         delete it->second;
@@ -103,7 +105,6 @@ Scene::~Scene()
     sceneOctree  = nullptr;
     dynamicTree  = nullptr;
 
-    App->GetPhysicsModule()->EmptyWorld();
     GLOG("%s scene closed", sceneName.c_str());
 }
 

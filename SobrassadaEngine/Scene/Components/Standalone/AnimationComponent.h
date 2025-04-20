@@ -34,7 +34,7 @@ class SOBRASADA_API_ENGINE AnimationComponent : public Component
     void AddAnimation(UID resource);
     bool UseTrigger(const std::string& triggerName);
 
-    UID GetAnimationResource() const { GLOG("Resource AnimUID  is: %llu", resource) return resource; }
+    UID GetAnimationResource() const { return resource; }
     ResourceAnimation* GetCurrentAnimation() const { return currentAnimResource; }
     AnimController* GetAnimationController() { return animController; }
     ResourceStateMachine* GetResourceStateMachine() const { return resourceStateMachine; }

@@ -82,7 +82,6 @@ void AnimationComponent::OnPlay(bool isTransition)
                     {
                         if (clip.clipName.GetString() == activeState->clipName.GetString())
                         {
-                            GLOG("TransitionTime: %f", transitionTime);
                             if (isTransition)
                                 animController->SetTargetAnimationResource(clip.animationResourceUID, transitionTime, clip.loop);
                             else animController->Play(clip.animationResourceUID, clip.loop);

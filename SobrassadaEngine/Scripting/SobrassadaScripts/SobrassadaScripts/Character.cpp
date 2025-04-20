@@ -43,7 +43,7 @@ bool Character::Init()
         GLOG("Weapon cube collider component not found for %s", parent->GetName().c_str());
         return false;
     }
-    // weaponCollider->SetEnabled(false);
+    weaponCollider->SetEnabled(false);
 
     lastAttackTime = -1.0f;
 
@@ -54,7 +54,7 @@ void Character::Update(float deltaTime)
 {
     if (isDead) return;
 
-    // if (deltaTime - lastAttackTime >= attackDuration) weaponCollider->SetEnabled(false);
+    if (deltaTime - lastAttackTime >= attackDuration) weaponCollider->SetEnabled(false);
 
     HandleState(deltaTime);
 }

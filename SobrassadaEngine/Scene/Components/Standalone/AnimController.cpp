@@ -17,7 +17,6 @@ AnimController::~AnimController()
 
 void AnimController::Play(UID newResource, bool shouldLoop)
 {
-    GLOG("RESOURCE %llu", newResource);
     if (currentAnimation == nullptr) Stop();
     resource         = newResource;
     currentTime      = 0.0f;
