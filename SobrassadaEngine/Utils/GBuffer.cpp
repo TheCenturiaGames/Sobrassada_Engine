@@ -10,6 +10,11 @@ GBuffer::GBuffer(int width, int height)
     colorAttachments[1] = GL_COLOR_ATTACHMENT1;
     colorAttachments[2] = GL_COLOR_ATTACHMENT2;
     colorAttachments[3] = GL_COLOR_ATTACHMENT3;
+
+    screenWidth         = width;
+    screenHeight        = height;
+
+    InitializeGBuffer();
 }
 
 GBuffer::~GBuffer()
@@ -91,8 +96,8 @@ void GBuffer::InitializeGBuffer()
     if (depthTexture == 0) glGenTextures(1, &depthTexture);
     glBindTexture(GL_TEXTURE_2D, depthTexture);
     glTexImage2D(
-        GL_TEXTURE_2D, 0, GL_DEPTH32F_STENCIL8, screenWidth, screenHeight, 0, GL_DEPTH_STENCIL,
-        GL_FLOAT_32_UNSIGNED_INT_24_8_REV,
+        GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, screenWidth, screenHeight, 0, GL_DEPTH_STENCIL,
+        GL_UNSIGNED_INT_24_8,
         NULL
     );
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
