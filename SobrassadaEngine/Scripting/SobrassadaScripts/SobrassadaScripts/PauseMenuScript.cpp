@@ -19,13 +19,23 @@ void PauseMenuScript::Update(float deltaTime)
 
     if (keys[SDL_SCANCODE_ESCAPE] == KEY_DOWN)
     {
-        const auto& gameObjects = AppEngine->GetSceneModule()->GetScene()->GetAllGameObjects();
-        for (const auto& pair : gameObjects)
+        const std::unordered_map<UID, GameObject*>& allGameObjects =
+            AppEngine->GetSceneModule()->GetScene()->GetAllGameObjects();
+
+        for (const std::pair<const UID, GameObject*>& gameObjectPair : allGameObjects)
         {
-            GameObject* go = pair.second;
-            if (go->GetName() == panelToShowName)
+            GameObject* gameObject = gameObjectPair.second;
+
+            if (gameObject->GetName() == panelToShowName)
             {
-                go->SetEnabled(!go->IsEnabled());
+                UID parentUID        = gameObject->GetParent();
+                GameObject* parentGO = AppEngine->GetSceneModule()->GetScene()->GetGameObjectByUID(parentUID);
+
+                if (parentGO != nullptr && parentGO->IsEnabled())
+                {
+                    gameObject->SetEnabled(!gameObject->IsEnabled());
+                }
+
                 break;
             }
         }
