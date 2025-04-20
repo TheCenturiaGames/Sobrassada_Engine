@@ -857,7 +857,16 @@ void EditorUIModule::Console(bool& consoleMenu) const
 
     for (const char* log : *Logs)
     {
-        ImGui::TextUnformatted(log);
+        ImGui::Selectable(log);
+
+        if (ImGui::BeginPopupContextItem())
+        {
+            if (ImGui::MenuItem("Copy Text"))
+            {
+                ImGui::SetClipboardText(log);
+            }
+            ImGui::EndPopup();
+        }
     }
 
     // Autoscroll only if the scroll is in the bottom position
@@ -1262,7 +1271,8 @@ EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
         return new NodeEditor("NodeEditor_" + std::to_string(uid), uid);
 
     case EditorType::ANIMATION:
-        return stateMachineEditor = new StateMachineEditor("StateMachineEditor_" + std::to_string(uid), uid, stateMachine);
+        return stateMachineEditor =
+                   new StateMachineEditor("StateMachineEditor_" + std::to_string(uid), uid, stateMachine);
 
     case EditorType::TEXTURE:
         return new TextureEditor("TextureEditor_" + std::to_string(uid), uid);

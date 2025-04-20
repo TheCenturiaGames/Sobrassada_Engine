@@ -147,4 +147,6 @@ class LightsConfig
 
     ResourceTexture* currentTexture = nullptr;
     std::string currentTextureName  = "Not selected";
+
+    bool firstTime                  = true;
 };

@@ -86,20 +86,7 @@ void LightsConfig::InitSkybox()
     glBindVertexArray(0);
 
     // default skybox texture
-
     LoadSkyboxTexture(App->GetLibraryModule()->GetTextureUID("cubemap"));
-
-    cubemapIrradiance = CubeMapToTexture(512, 512);
-    irradianceHandle  = glGetTextureHandleARB(cubemapIrradiance);
-    glMakeTextureHandleResidentARB(irradianceHandle);
-
-    prefilteredEnvironmentMap       = PreFilteredEnvironmentMapGeneration(512, 512);
-    prefilteredEnvironmentMapHandle = glGetTextureHandleARB(prefilteredEnvironmentMap);
-    glMakeTextureHandleResidentARB(prefilteredEnvironmentMapHandle);
-
-    environmentBRDF       = EnvironmentBRDFGeneration(512, 512);
-    environmentBRDFHandle = glGetTextureHandleARB(environmentBRDF);
-    glMakeTextureHandleResidentARB(environmentBRDFHandle);
 
     glViewport(
         0, 0, App->GetOpenGLModule()->GetFramebuffer()->GetTextureWidth(),
@@ -147,7 +134,8 @@ void LightsConfig::LoadSkyboxTexture(UID resource)
     ResourceTexture* newCubemap = TextureImporter::LoadCubemap(resource);
     if (newCubemap != nullptr)
     {
-        FreeCubemap();
+        if (!firstTime) FreeCubemap();
+        else firstTime = false;
         App->GetResourcesModule()->ReleaseResource(currentTexture);
         currentTexture     = newCubemap;
         currentTextureName = currentTexture->GetName();
@@ -159,16 +147,15 @@ void LightsConfig::LoadSkyboxTexture(UID resource)
 
         App->GetOpenGLModule()->SetDepthFunc(false);
 
-        // Im not changing cubemaps right now
-        cubemapIrradiance = CubeMapToTexture(1024, 1024);
+        cubemapIrradiance = CubeMapToTexture(512, 512);
         irradianceHandle  = glGetTextureHandleARB(cubemapIrradiance);
-        glMakeTextureHandleResidentARB(skyboxHandle);
+        glMakeTextureHandleResidentARB(irradianceHandle);
 
-        prefilteredEnvironmentMap       = PreFilteredEnvironmentMapGeneration(1024, 1024);
+        prefilteredEnvironmentMap       = PreFilteredEnvironmentMapGeneration(512, 512);
         prefilteredEnvironmentMapHandle = glGetTextureHandleARB(prefilteredEnvironmentMap);
         glMakeTextureHandleResidentARB(prefilteredEnvironmentMapHandle);
 
-        environmentBRDF       = EnvironmentBRDFGeneration(1024, 1024);
+        environmentBRDF       = EnvironmentBRDFGeneration(512, 512);
         environmentBRDFHandle = glGetTextureHandleARB(environmentBRDF);
         glMakeTextureHandleResidentARB(environmentBRDFHandle);
 
@@ -551,11 +538,11 @@ void LightsConfig::AddPointLight(PointLightComponent* newPoint)
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, pointBufferId);
     int bufferSize = static_cast<int>(sizeof(Lights::PointLightShaderData) * pointLights.size() + 16);
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize, nullptr, GL_STATIC_DRAW);
-
+    /*
     GLOG(
         "Add point light with uid: %d. Point lights count: %d. Buffer size: %d", newPoint->GetUID(), pointLights.size(),
         bufferSize
-    );
+    );*/
 }
 void LightsConfig::AddSpotLight(SpotLightComponent* newSpot)
 {
@@ -573,11 +560,11 @@ void LightsConfig::AddSpotLight(SpotLightComponent* newSpot)
         (sizeof(Lights::SpotLightShaderData) + 12) * spotLights.size() + 16
     ); // 12 bytes offset between spotlights
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize, nullptr, GL_STATIC_DRAW);
-
+    /*
     GLOG(
         "Add spot light with uid: %d. Spot lights count: %d. Buffer size: %d", newSpot->GetUID(), spotLights.size(),
         bufferSize
-    );
+    );*/
 }
 
 void LightsConfig::RemoveDirectionalLight(DirectionalLightComponent* directional)
@@ -601,13 +588,13 @@ void LightsConfig::RemovePointLight(PointLightComponent* point)
         return;
     }
 
-    GLOG("Remove point light with UID: %d", point->GetUID());
+    //GLOG("Remove point light with UID: %d", point->GetUID());
     for (int i = 0; i < pointLights.size(); ++i)
     {
         if (pointLights[i] == point)
         {
             // Not optimal to remove an element which is not last from a vector, but this will not happen often
-            GLOG("Remove point light in index: %d", i);
+            //GLOG("Remove point light in index: %d", i);
             pointLights.erase(pointLights.begin() + i);
             // No need to delete the pointer, because this function is triggered by the destructor and will be deleted
             // afterwards
@@ -618,7 +605,7 @@ void LightsConfig::RemovePointLight(PointLightComponent* point)
     int bufferSize = static_cast<int>(sizeof(Lights::PointLightShaderData) * pointLights.size() + 16);
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize, nullptr, GL_STATIC_DRAW);
 
-    GLOG("Point lights size: %d. Buffer size: %d", pointLights.size(), bufferSize);
+    //GLOG("Point lights size: %d. Buffer size: %d", pointLights.size(), bufferSize);
 }
 
 void LightsConfig::RemoveSpotLight(SpotLightComponent* spot)
@@ -630,13 +617,13 @@ void LightsConfig::RemoveSpotLight(SpotLightComponent* spot)
         return;
     }
 
-    GLOG("Remove spot light with UID: %d", spot->GetUID());
+    //GLOG("Remove spot light with UID: %d", spot->GetUID());
     for (int i = 0; i < spotLights.size(); ++i)
     {
         if (spotLights[i] == spot)
         {
             // Not optimal to remove an element which is not last from a vector, but this will not happen often
-            GLOG("Remove spot light in index: %d", i);
+            //GLOG("Remove spot light in index: %d", i);
             spotLights.erase(spotLights.begin() + i);
             // No need to delete the pointer, because this function is triggered by the destructor and will be deleted
             // afterwards
@@ -650,7 +637,7 @@ void LightsConfig::RemoveSpotLight(SpotLightComponent* spot)
     ); // 12 bytes offset between spotlights
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize, nullptr, GL_STATIC_DRAW);
 
-    GLOG("Spot lights size: %d. Buffer size: %d", spotLights.size(), bufferSize);
+    //GLOG("Spot lights size: %d. Buffer size: %d", spotLights.size(), bufferSize);
 }
 
 void LightsConfig::GetAllSceneLights()
@@ -665,11 +652,11 @@ void LightsConfig::GetAllSceneLights()
 
         // Point
         pointLights           = scene->GetEnabledComponentsOfType<PointLightComponent>();
-        GLOG("Point lights count: %d", pointLights.size());
+        //GLOG("Point lights count: %d", pointLights.size());
 
         // Spot
         spotLights = scene->GetEnabledComponentsOfType<SpotLightComponent>();
-        GLOG("Spot lights count: %d", spotLights.size());
+        //GLOG("Spot lights count: %d", spotLights.size());
 
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, pointBufferId);
         size_t pointBufferSize = sizeof(Lights::PointLightShaderData) * pointLights.size() + 16;
@@ -694,11 +681,11 @@ void LightsConfig::GetAllPointLights(const std::vector<Component*>& components)
     {
         if (component->GetType() == COMPONENT_POINT_LIGHT)
         {
-            GLOG("Add point light");
+            //GLOG("Add point light");
             pointLights.push_back(static_cast<PointLightComponent*>(component));
         }
     }
-    GLOG("Point lights count: %d", pointLights.size());
+    //GLOG("Point lights count: %d", pointLights.size());
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, pointBufferId);
     size_t bufferSize = sizeof(Lights::PointLightShaderData) * pointLights.size() + 16;
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize, nullptr, GL_STATIC_DRAW);
@@ -713,11 +700,11 @@ void LightsConfig::GetAllSpotLights(const std::vector<Component*>& components)
     {
         if (component->GetType() == COMPONENT_SPOT_LIGHT)
         {
-            GLOG("Add spotlight");
+            //GLOG("Add spotlight");
             spotLights.push_back(static_cast<SpotLightComponent*>(component));
         }
     }
-    GLOG("Spot lights count: %d", spotLights.size());
+    //GLOG("Spot lights count: %d", spotLights.size());
 
     // Maybe make function to do this because it's called like 3 times
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, spotBufferId);
@@ -733,7 +720,7 @@ void LightsConfig::GetDirectionalLight(const std::vector<Component*>& components
     {
         if (component->GetType() == COMPONENT_DIRECTIONAL_LIGHT)
         {
-            GLOG("Add directional light");
+            //GLOG("Add directional light");
             directionalLight = static_cast<DirectionalLightComponent*>(component);
             break;
         }
