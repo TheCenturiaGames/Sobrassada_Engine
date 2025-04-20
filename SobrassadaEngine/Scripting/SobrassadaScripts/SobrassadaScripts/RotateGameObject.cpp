@@ -23,10 +23,15 @@ void RotateGameObject::Update(float deltaTime)
 }
 
 void RotateGameObject::Inspector()
-{
-    ImGui::SetCurrentContext(AppEngine->GetEditorUIModule()->GetImGuiContext());
-    AppEngine->GetEditorUIModule()->DrawScriptInspector([this]() {
-        ImGui::Text("Hello");
-        ImGui::SliderFloat("Speed", &speed, 0.0f, 1.0f);
-    });
+{   
+    //Using ImGui in the dll cause problems, so we need to call ImGui outside the dll
+    if (fields.empty())
+    {
+        fields.push_back({InspectorField::FieldType::Text, (void*)"Test"});
+        fields.push_back({"Speed", InspectorField::FieldType::Float, &speed, 0.0f, 2.0f});
+        fields.push_back({"Prueba vec2", InspectorField::FieldType::Vec2, &prueba});
+        fields.push_back({"Color", InspectorField::FieldType::Color, &color});
+    }
+
+    AppEngine->GetEditorUIModule()->DrawScriptInspector(fields);
 }

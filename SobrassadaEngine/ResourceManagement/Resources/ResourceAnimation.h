@@ -6,12 +6,20 @@
 
 struct Channel
 {
-    std::vector<float3> positions;
+    // Position data
     std::vector<float> posTimeStamps;
-    std::vector<Quat> rotations;
-    std::vector<float> rotTimeStamps;
+    std::vector<float3> positions;
     uint32_t numPositions = 0;
+
+    // Rotation data
+    std::vector<float> rotTimeStamps;
+    std::vector<Quat> rotations;
     uint32_t numRotations = 0;
+
+    // Scale data
+    std::vector<float> scaleTimeStamps;
+    std::vector<float3> scales;
+    uint32_t numScales = 0;
 };
 
 class ResourceAnimation : public Resource

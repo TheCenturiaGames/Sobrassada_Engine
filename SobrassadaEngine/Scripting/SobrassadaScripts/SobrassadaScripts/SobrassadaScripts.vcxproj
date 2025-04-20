@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -277,6 +277,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)DirectXTex;$(SolutionDir)Libs;$(SolutionDir)Libs\SDL\include;$(SolutionDir)Libs\glew-2.1.0\include;$(SolutionDir)Libs\MathGeoLib\include;$(SolutionDir)Libs\ImGui;$(SolutionDir)Libs\ImGuizmo;$(SolutionDir)Libs\Tinygltf;$(SolutionDir)Libs\freetype\include;$(SolutionDir)Libs\Optick_1.4.0\include;$(SolutionDir)Libs\RecastDetour\Detour\Include;$(SolutionDir)Libs\RecastDetour\Recast\Include;$(SolutionDir)Modules;$(SolutionDir)ResourceManagement\Resources;$(SolutionDir)UI;$(SolutionDir)UI\EngineEditors\;$(SolutionDir)UI\EngineEditors\Editor;$(SolutionDir)UI\EngineEditors\Nodes;$(SolutionDir)Utils;$(SolutionDir)Utils\Trees;$(SolutionDir)FileSystem;$(SolutionDir)FileSystem\Config;$(SolutionDir)FileSystem\Importers;$(SolutionDir)FileSystem\Meta;$(SolutionDir)DebugDraw;$(SolutionDir)Scene;$(SolutionDir)Scene\GameObjects;$(SolutionDir)Scene\Components;$(SolutionDir)Libs\bullet\include;$(SolutionDir)Libs\ImNodeFlow-1.2.2\include;$(SolutionDir)Libs\ImNodeFlow-1.2.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)DirectXTex;$(SolutionDir)Libs;$(SolutionDir)Libs\SDL\include;$(SolutionDir)Libs\glew-2.1.0\include;$(SolutionDir)Libs\MathGeoLib\include;$(SolutionDir)Libs\ImGui;$(SolutionDir)Libs\ImGuizmo;$(SolutionDir)Libs\Tinygltf;$(SolutionDir)Libs\freetype\include;$(SolutionDir)Libs\Optick_1.4.0\include;$(SolutionDir)Libs\RecastDetour\Detour\Include;$(SolutionDir)Libs\RecastDetour\Recast\Include;$(SolutionDir)Modules;$(SolutionDir)ResourceManagement\Resources;$(SolutionDir)UI;$(SolutionDir)UI\EngineEditors\;$(SolutionDir)UI\EngineEditors\Editor;$(SolutionDir)UI\EngineEditors\Nodes;$(SolutionDir)Utils;$(SolutionDir)Utils\Trees;$(SolutionDir)FileSystem;$(SolutionDir)FileSystem\Config;$(SolutionDir)FileSystem\Importers;$(SolutionDir)FileSystem\Meta;$(SolutionDir)DebugDraw;$(SolutionDir)Scene;$(SolutionDir)Scene\GameObjects;$(SolutionDir)Scene\Components;$(SolutionDir)Libs\bullet\include;$(SolutionDir)Libs\ImNodeFlow-1.2.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -297,7 +298,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)DirectXTex;$(SolutionDir)Libs;$(SolutionDir)Libs\SDL\include;$(SolutionDir)Libs\glew-2.1.0\include;$(SolutionDir)Libs\MathGeoLib\include;$(SolutionDir)Libs\ImGui;$(SolutionDir)Libs\ImGuizmo;$(SolutionDir)Libs\Tinygltf;$(SolutionDir)Libs\freetype\include;$(SolutionDir)Libs\Optick_1.4.0\include;$(SolutionDir)Libs\RecastDetour\Detour\Include;$(SolutionDir)Libs\RecastDetour\Recast\Include;$(SolutionDir)Modules;$(SolutionDir)ResourceManagement\Resources;$(SolutionDir)UI;$(SolutionDir)UI\EngineEditors\;$(SolutionDir)UI\EngineEditors\Editor;$(SolutionDir)UI\EngineEditors\Nodes;$(SolutionDir)Utils;$(SolutionDir)Utils\Trees;$(SolutionDir)FileSystem;$(SolutionDir)FileSystem\Config;$(SolutionDir)FileSystem\Importers;$(SolutionDir)FileSystem\Meta;$(SolutionDir)DebugDraw;$(SolutionDir)Scene;$(SolutionDir)Scene\GameObjects;$(SolutionDir)Scene\Components;$(SolutionDir)Libs\bullet\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)DirectXTex;$(SolutionDir)Libs;$(SolutionDir)Libs\SDL\include;$(SolutionDir)Libs\glew-2.1.0\include;$(SolutionDir)Libs\MathGeoLib\include;$(SolutionDir)Libs\ImGui;$(SolutionDir)Libs\ImGuizmo;$(SolutionDir)Libs\Tinygltf;$(SolutionDir)Libs\freetype\include;$(SolutionDir)Libs\Optick_1.4.0\include;$(SolutionDir)Libs\RecastDetour\Detour\Include;$(SolutionDir)Libs\RecastDetour\Recast\Include;$(SolutionDir)Modules;$(SolutionDir)ResourceManagement\Resources;$(SolutionDir)UI;$(SolutionDir)UI\EngineEditors\;$(SolutionDir)UI\EngineEditors\Editor;$(SolutionDir)UI\EngineEditors\Nodes;$(SolutionDir)Utils;$(SolutionDir)Utils\Trees;$(SolutionDir)FileSystem;$(SolutionDir)FileSystem\Config;$(SolutionDir)FileSystem\Importers;$(SolutionDir)FileSystem\Meta;$(SolutionDir)DebugDraw;$(SolutionDir)Scene;$(SolutionDir)Scene\GameObjects;$(SolutionDir)Scene\Components;$(SolutionDir)Libs\bullet\include;$(SolutionDir)Libs\ImNodeFlow-1.2.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -319,7 +320,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)DirectXTex;$(SolutionDir)Libs;$(SolutionDir)Libs\SDL\include;$(SolutionDir)Libs\glew-2.1.0\include;$(SolutionDir)Libs\MathGeoLib\include;$(SolutionDir)Libs\ImGui;$(SolutionDir)Libs\ImGuizmo;$(SolutionDir)Libs\Tinygltf;$(SolutionDir)Libs\freetype\include;$(SolutionDir)Libs\Optick_1.4.0\include;$(SolutionDir)Libs\RecastDetour\Detour\Include;$(SolutionDir)Libs\RecastDetour\Recast\Include;$(SolutionDir)Modules;$(SolutionDir)ResourceManagement\Resources;$(SolutionDir)UI;$(SolutionDir)UI\EngineEditors\;$(SolutionDir)UI\EngineEditors\Editor;$(SolutionDir)UI\EngineEditors\Nodes;$(SolutionDir)Utils;$(SolutionDir)Utils\Trees;$(SolutionDir)FileSystem;$(SolutionDir)FileSystem\Config;$(SolutionDir)FileSystem\Importers;$(SolutionDir)FileSystem\Meta;$(SolutionDir)DebugDraw;$(SolutionDir)Scene;$(SolutionDir)Scene\GameObjects;$(SolutionDir)Scene\Components;$(SolutionDir)Libs\bullet\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)DirectXTex;$(SolutionDir)Libs;$(SolutionDir)Libs\SDL\include;$(SolutionDir)Libs\glew-2.1.0\include;$(SolutionDir)Libs\MathGeoLib\include;$(SolutionDir)Libs\ImGui;$(SolutionDir)Libs\ImGuizmo;$(SolutionDir)Libs\Tinygltf;$(SolutionDir)Libs\freetype\include;$(SolutionDir)Libs\Optick_1.4.0\include;$(SolutionDir)Libs\RecastDetour\Detour\Include;$(SolutionDir)Libs\RecastDetour\Recast\Include;$(SolutionDir)Modules;$(SolutionDir)ResourceManagement\Resources;$(SolutionDir)UI;$(SolutionDir)UI\EngineEditors\;$(SolutionDir)UI\EngineEditors\Editor;$(SolutionDir)UI\EngineEditors\Nodes;$(SolutionDir)Utils;$(SolutionDir)Utils\Trees;$(SolutionDir)FileSystem;$(SolutionDir)FileSystem\Config;$(SolutionDir)FileSystem\Importers;$(SolutionDir)FileSystem\Meta;$(SolutionDir)DebugDraw;$(SolutionDir)Scene;$(SolutionDir)Scene\GameObjects;$(SolutionDir)Scene\Components;$(SolutionDir)Libs\bullet\include;$(SolutionDir)Libs\ImNodeFlow-1.2.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -343,7 +344,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)DirectXTex;$(SolutionDir)Libs;$(SolutionDir)Libs\SDL\include;$(SolutionDir)Libs\glew-2.1.0\include;$(SolutionDir)Libs\MathGeoLib\include;$(SolutionDir)Libs\ImGui;$(SolutionDir)Libs\ImGuizmo;$(SolutionDir)Libs\Tinygltf;$(SolutionDir)Libs\freetype\include;$(SolutionDir)Libs\Optick_1.4.0\include;$(SolutionDir)Libs\RecastDetour\Detour\Include;$(SolutionDir)Libs\RecastDetour\Recast\Include;$(SolutionDir)Modules;$(SolutionDir)ResourceManagement\Resources;$(SolutionDir)UI;$(SolutionDir)UI\EngineEditors\;$(SolutionDir)UI\EngineEditors\Editor;$(SolutionDir)UI\EngineEditors\Nodes;$(SolutionDir)Utils;$(SolutionDir)Utils\Trees;$(SolutionDir)FileSystem;$(SolutionDir)FileSystem\Config;$(SolutionDir)FileSystem\Importers;$(SolutionDir)FileSystem\Meta;$(SolutionDir)DebugDraw;$(SolutionDir)Scene;$(SolutionDir)Scene\GameObjects;$(SolutionDir)Scene\Components;$(SolutionDir)Libs\bullet\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)DirectXTex;$(SolutionDir)Libs;$(SolutionDir)Libs\SDL\include;$(SolutionDir)Libs\glew-2.1.0\include;$(SolutionDir)Libs\MathGeoLib\include;$(SolutionDir)Libs\ImGui;$(SolutionDir)Libs\ImGuizmo;$(SolutionDir)Libs\Tinygltf;$(SolutionDir)Libs\freetype\include;$(SolutionDir)Libs\Optick_1.4.0\include;$(SolutionDir)Libs\RecastDetour\Detour\Include;$(SolutionDir)Libs\RecastDetour\Recast\Include;$(SolutionDir)Modules;$(SolutionDir)ResourceManagement\Resources;$(SolutionDir)UI;$(SolutionDir)UI\EngineEditors\;$(SolutionDir)UI\EngineEditors\Editor;$(SolutionDir)UI\EngineEditors\Nodes;$(SolutionDir)Utils;$(SolutionDir)Utils\Trees;$(SolutionDir)FileSystem;$(SolutionDir)FileSystem\Config;$(SolutionDir)FileSystem\Importers;$(SolutionDir)FileSystem\Meta;$(SolutionDir)DebugDraw;$(SolutionDir)Scene;$(SolutionDir)Scene\GameObjects;$(SolutionDir)Scene\Components;$(SolutionDir)Libs\bullet\include;$(SolutionDir)Libs\ImNodeFlow-1.2.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -367,7 +368,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)DirectXTex;$(SolutionDir)Libs;$(SolutionDir)Libs\SDL\include;$(SolutionDir)Libs\glew-2.1.0\include;$(SolutionDir)Libs\MathGeoLib\include;$(SolutionDir)Libs\ImGui;$(SolutionDir)Libs\ImGuizmo;$(SolutionDir)Libs\Tinygltf;$(SolutionDir)Libs\freetype\include;$(SolutionDir)Libs\Optick_1.4.0\include;$(SolutionDir)Libs\RecastDetour\Detour\Include;$(SolutionDir)Libs\RecastDetour\Recast\Include;$(SolutionDir)Modules;$(SolutionDir)ResourceManagement\Resources;$(SolutionDir)UI;$(SolutionDir)UI\EngineEditors\;$(SolutionDir)UI\EngineEditors\Editor;$(SolutionDir)UI\EngineEditors\Nodes;$(SolutionDir)Utils;$(SolutionDir)Utils\Trees;$(SolutionDir)FileSystem;$(SolutionDir)FileSystem\Config;$(SolutionDir)FileSystem\Importers;$(SolutionDir)FileSystem\Meta;$(SolutionDir)DebugDraw;$(SolutionDir)Scene;$(SolutionDir)Scene\GameObjects;$(SolutionDir)Scene\Components;$(SolutionDir)Libs\bullet\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)DirectXTex;$(SolutionDir)Libs;$(SolutionDir)Libs\SDL\include;$(SolutionDir)Libs\glew-2.1.0\include;$(SolutionDir)Libs\MathGeoLib\include;$(SolutionDir)Libs\ImGui;$(SolutionDir)Libs\ImGuizmo;$(SolutionDir)Libs\Tinygltf;$(SolutionDir)Libs\freetype\include;$(SolutionDir)Libs\Optick_1.4.0\include;$(SolutionDir)Libs\RecastDetour\Detour\Include;$(SolutionDir)Libs\RecastDetour\Recast\Include;$(SolutionDir)Modules;$(SolutionDir)ResourceManagement\Resources;$(SolutionDir)UI;$(SolutionDir)UI\EngineEditors\;$(SolutionDir)UI\EngineEditors\Editor;$(SolutionDir)UI\EngineEditors\Nodes;$(SolutionDir)Utils;$(SolutionDir)Utils\Trees;$(SolutionDir)FileSystem;$(SolutionDir)FileSystem\Config;$(SolutionDir)FileSystem\Importers;$(SolutionDir)FileSystem\Meta;$(SolutionDir)DebugDraw;$(SolutionDir)Scene;$(SolutionDir)Scene\GameObjects;$(SolutionDir)Scene\Components;$(SolutionDir)Libs\bullet\include;$(SolutionDir)Libs\ImNodeFlow-1.2.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -392,6 +393,7 @@
     <ClInclude Include="MainMenuSelectorScript.h" />
     <ClInclude Include="OptionsMenuSwitcherScript.h" />
     <ClInclude Include="PauseMenuScript.h" />
+    <ClInclude Include="GodMode.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PressAnyKeyScript.h" />
     <ClInclude Include="resource.h" />
@@ -402,21 +404,45 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\Libs\ImGui\imgui.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Game|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Game Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\..\Libs\ImGui\imgui_demo.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Game|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Game Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\..\Libs\ImGui\imgui_draw.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Game|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Game Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\..\Libs\ImGui\imgui_impl_opengl3.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Game|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Game Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\..\Libs\ImGui\imgui_tables.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Game|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Game Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\..\Libs\ImGui\imgui_widgets.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Game|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Game Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Algorithm\Random\LCG.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
@@ -649,6 +675,7 @@
     <ClCompile Include="MainMenuSelectorScript.cpp" />
     <ClCompile Include="OptionsMenuSwitcherScript.cpp" />
     <ClCompile Include="PauseMenuScript.cpp" />
+    <ClCompile Include="GodMode.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Game Debug|x64'">Create</PrecompiledHeader>

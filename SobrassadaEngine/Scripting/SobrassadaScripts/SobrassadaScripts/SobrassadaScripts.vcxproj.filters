@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="..\..\..\Libs\ImGui\imgui.cpp" />
@@ -69,8 +69,158 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SobrassadaScripts.rc" />
+    <ClInclude Include="framework.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="Script.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="RotateGameObject.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="ButtonScript.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="GodMode.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptExport.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="RotateGameObject.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Time\Clock.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\BitOps.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\float2.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\float3.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\float3x3.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\float3x4.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\float4.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\float4x4.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\MathFunc.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\MathLog.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\MathOps.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\Polynomial.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\Quat.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\SSEMath.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Math\TransformOps.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\AABB.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\Capsule.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\Circle.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\Cone.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\Cylinder.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\Frustum.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\Line.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\LineSegment.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\OBB.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\Plane.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\Polygon.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\Polyhedron.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\Ray.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\Sphere.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\Triangle.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Geometry\TriangleMesh.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Algorithm\Random\LCG.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="ButtonScript.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\ImGui\imgui.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\ImGui\imgui_demo.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\ImGui\imgui_draw.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\ImGui\imgui_impl_opengl3.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\ImGui\imgui_tables.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\ImGui\imgui_widgets.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="GodMode.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

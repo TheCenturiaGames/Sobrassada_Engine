@@ -15,7 +15,7 @@ bool PressAnyKeyScript::Init()
 
 void PressAnyKeyScript::Update(float deltaTime)
 {
-    if (!parent->IsEnabled()) return;
+   /* if (!parent->IsEnabled()) return;
 
     const KeyState* keys = AppEngine->GetInputModule()->GetKeyboard();
 
@@ -36,12 +36,12 @@ void PressAnyKeyScript::Update(float deltaTime)
             }
             break;
         }
-    }
+    }*/
 }
 
 void PressAnyKeyScript::Inspector()
 {
-    ImGui::SetCurrentContext(AppEngine->GetEditorUIModule()->GetImGuiContext());
+   /* ImGui::SetCurrentContext(AppEngine->GetEditorUIModule()->GetImGuiContext());
     AppEngine->GetEditorUIModule()->DrawScriptInspector(
         [this]()
         {
@@ -54,18 +54,18 @@ void PressAnyKeyScript::Inspector()
                 panelToShowName = buffer;
             }
         }
-    );
+    );*/
 }
 
 void PressAnyKeyScript::SaveToJson(rapidjson::Value& value, rapidjson::Document::AllocatorType& allocator) const
 {
-    value.AddMember("NextGameObject", rapidjson::Value(nextGameObjectName.c_str(), allocator), allocator);
+   // value.AddMember("NextGameObject", rapidjson::Value(nextGameObjectName.c_str(), allocator), allocator);
 }
 
 void PressAnyKeyScript::LoadFromJson(const rapidjson::Value& value)
 {
-    if (value.HasMember("NextGameObject") && value["NextGameObject"].IsString())
+   /* if (value.HasMember("NextGameObject") && value["NextGameObject"].IsString())
     {
         nextGameObjectName = value["NextGameObject"].GetString();
-    }
+    }*/
 }

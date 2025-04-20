@@ -9,6 +9,7 @@
 #include "OptionsMenuSwitcherScript.h"
 #include "MainMenuSelectorScript.h"
 #include "PressAnyKeyScript.h"
+#include "GodMode.h"
 #include <string>
 
 #ifndef SOBRASSADASCRIPTS_EXPORTS
@@ -36,6 +37,7 @@ extern "C" SOBRASSADA_API Script* CreateScript(const std::string& scriptType, Ga
     if (scriptType == "MainMenuSelectorScript") return new MainMenuSelectorScript(parent);
     if (scriptType == "PressAnyKeyScript") return new PressAnyKeyScript(parent);
 
+    if (scriptType == "GodMode") return new GodMode(parent);
     return nullptr;
 }
 

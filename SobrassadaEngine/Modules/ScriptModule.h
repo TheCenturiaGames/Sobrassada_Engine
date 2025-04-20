@@ -20,6 +20,7 @@ class ScriptModule : public Module
 
     bool Init() override;
     update_status Update(float deltaTime) override;
+    bool close();
     bool ShutDown() override;
 
     Script* CreateScript(const std::string& name, GameObject* parent) const { return createScriptFunc(name, parent); }

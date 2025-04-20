@@ -157,8 +157,7 @@ void CharacterControllerComponent::Update(float deltaTime)
     parent->SetLocalTransform(finalLocal);
     parent->UpdateTransformForGOBranch();
 
-    HandleInput(deltaTime);
-
+    if(inputDown) HandleInput(deltaTime);
 }
 
 void CharacterControllerComponent::Render(float deltaTime)

@@ -13,6 +13,8 @@
 #include <vector>
 
 class EngineEditorBase;
+struct InspectorField;
+class StateMachineEditor;
 
 namespace ImGuizmo
 {
@@ -81,8 +83,11 @@ class EditorUIModule : public Module
     GizmoTransform& GetTransformType() { return transformType; }
     float3& GetSnapValues() { return snapValues; }
     GizmoDragState GetImGuizmoDragState() const { return guizmoDragState; };
-    SOBRASADA_API_ENGINE void DrawScriptInspector(std::function<void()> callback);
-    ImGuiContext* GetImGuiContext() { return context; }
+    SOBRASADA_API_ENGINE void DrawScriptInspector(const std::vector<InspectorField>& fields);
+    SOBRASADA_API_ENGINE  void DrawScriptInspector(std::function<void()> callback);
+
+    StateMachineEditor* GetStateMachine() { return stateMachineEditor; }
+    SOBRASADA_API_ENGINE ImGuiContext* GetImGuiContext() { return context; }
 
     const std::unordered_map<std::string, ComponentType>& GetStandaloneComponents() const
     {
@@ -234,4 +239,6 @@ class EditorUIModule : public Module
     std::unordered_map<std::string, ComponentType> standaloneComponents;
 
     ImGuiContext* context;
+
+    StateMachineEditor* stateMachineEditor = nullptr;
 };

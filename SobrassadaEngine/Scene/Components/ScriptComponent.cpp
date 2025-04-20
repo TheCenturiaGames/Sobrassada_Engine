@@ -4,6 +4,7 @@
 #include "SceneModule.h"
 #include "Script.h"
 #include "ScriptModule.h"
+#include "EditorUIModule.h"
 
 // Do script of object rotating
 
