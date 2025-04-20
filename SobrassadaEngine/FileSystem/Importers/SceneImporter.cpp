@@ -58,7 +58,7 @@ namespace SceneImporter
 
                 for (const auto& primitive : srcMesh.primitives)
                 {
-                    std::string name = srcNode.name + "_" + srcMesh.name;
+                    std::string name = srcNode.name;
                     if (primitiveCounter > 0) name += "_" + std::to_string(primitiveCounter);
 
                     UID matUID = INVALID_UID;
