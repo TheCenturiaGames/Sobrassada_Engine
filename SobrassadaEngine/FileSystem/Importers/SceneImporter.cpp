@@ -149,9 +149,17 @@ namespace SceneImporter
     )
     {
         tinygltf::Model model             = LoadModelGLTF(filePath.c_str(), targetFilePath);
-
-        const uint32_t gltfMeshIndex      = importOptions["gltfMeshIndex"].GetInt();
-        const uint32_t gltfPrimitiveIndex = importOptions["gltfPrimitiveIndex"].GetInt();
+        
+        uint32_t gltfMeshIndex      = 0;
+        if (importOptions.HasMember("gltfMeshIndex"))
+            gltfMeshIndex      = importOptions["gltfMeshIndex"].GetInt();
+        else
+            GLOG("Mesh %s does not have a gltfMeshIndex assigned. Using 0 as default", name.c_str());
+        uint32_t gltfPrimitiveIndex = 0;
+        if (importOptions.HasMember("gltfMeshIndex"))
+            gltfPrimitiveIndex = importOptions["gltfPrimitiveIndex"].GetInt();
+        else
+            GLOG("Mesh %s does not have a gltfPrimitiveIndex assigned. Using 0 as default", name.c_str());
 
         MeshImporter::ImportMesh(
             model, gltfMeshIndex, gltfPrimitiveIndex, name, float4x4::identity, filePath.c_str(), targetFilePath,
