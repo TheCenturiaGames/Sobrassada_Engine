@@ -189,8 +189,10 @@ void PathfinderModule::SaveNavMesh(const std::string& name)
         GLOG("Cannot save: NavMesh not built.");
         return;
     }
-    App->GetSceneModule()->GetScene()->SetNavmeshUID(tmpNavmesh->GetUID());
-    UID uid = NavmeshImporter::SaveNavmesh(name.c_str(), tmpNavmesh, navconf);
+
+    const UID uid = NavmeshImporter::SaveNavmesh(name.c_str(), tmpNavmesh, navconf);
+    App->GetSceneModule()->GetScene()->SetNavmeshUID(uid);
+
     GLOG("NavMesh saved with UID: %u", uid);
 }
 
