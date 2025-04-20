@@ -94,7 +94,6 @@ constexpr const wchar_t* BANKNAME_MAIN               = L"main.bnk";
 constexpr const char* ENGINE_DEFAULT_ASSETS          = "EngineDefaults/";
 constexpr const char* ASSETS_PATH                    = "Assets/";
 constexpr const char* SCENES_PATH                    = "Assets/Scenes/";
-constexpr const char* NAVMESHES_PATH                 = "Assets/Navmeshes/";
 constexpr const char* METADATA_PATH                  = "Assets/Metadata/";
 constexpr const char* PREFABS_ASSETS_PATH            = "Assets/Prefabs/";
 constexpr const char* MODELS_ASSETS_PATH             = "Assets/Models/";
@@ -112,6 +111,7 @@ constexpr const char* MATERIALS_PATH                  = "Library/Materials/";
 constexpr const char* STATEMACHINES_LIB_PATH          = "Library/StateMachines/";
 constexpr const char* PREFABS_LIB_PATH                = "Library/Prefabs/";
 constexpr const char* FONTS_PATH                      = "Library/Fonts/";
+constexpr const char* NAVMESHES_PATH                  = "Library/Navmeshes/";
 
 constexpr const char* ASSET_EXTENSION                = ".gltf";
 constexpr const char* MESH_EXTENSION                 = ".sobrassada";
