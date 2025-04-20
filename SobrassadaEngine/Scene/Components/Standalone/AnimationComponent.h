@@ -5,6 +5,7 @@
 
 #include "rapidjson/document.h"
 #include <unordered_map>
+#include <map>
 
 class ResourceAnimation;
 class ResourceStateMachine;
@@ -40,7 +41,7 @@ class AnimationComponent : public Component
     bool IsPlaying() const;
 
     void SetAnimationResource(UID animResource);
-
+    void UpdateBoneHierarchy(GameObject* bone);
     void SetBoneMapping();
 
   private:
@@ -53,6 +54,7 @@ class AnimationComponent : public Component
     ResourceStateMachine* resourceStateMachine = nullptr;
 
     std::unordered_map<std::string, GameObject*> boneMapping;
+    std::map<std::string, float4x4> bindPoseTransforms;
 
     float animationDuration = 0.0f;
     bool playing            = false;
