@@ -39,9 +39,6 @@
     <ClInclude Include="GodMode.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Libs\rapidjson\document.h">
-      <Filter>External</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

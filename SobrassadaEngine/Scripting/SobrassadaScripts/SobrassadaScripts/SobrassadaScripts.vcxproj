@@ -385,7 +385,6 @@
     <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Libs\rapidjson\document.h" />
     <ClInclude Include="ButtonScript.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GodMode.h" />
