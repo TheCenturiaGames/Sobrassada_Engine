@@ -645,11 +645,7 @@ void GameObject::RenderContextMenu()
         const char* label = prefabUID == INVALID_UID ? "Create Prefab" : "Update Prefab";
         if (ImGui::MenuItem(label)) CreatePrefab();
 
-        if (prefabUID != INVALID_UID)
-        {
-            if (ImGui::MenuItem("Unlink prefab")) prefabUID = INVALID_UID;
-            if (ImGui::MenuItem("Delete prefab")) DeleteLinkedPrefab();
-        }
+        if (prefabUID != INVALID_UID && ImGui::MenuItem("Unlink prefab")) prefabUID = INVALID_UID;
 
         if (uid != App->GetSceneModule()->GetScene()->GetGameObjectRootUID() && ImGui::MenuItem("Delete"))
         {

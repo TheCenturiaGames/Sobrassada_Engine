@@ -318,10 +318,7 @@ void SceneModule::HandleObjectDuplication()
             }
 
             AnimationComponent* animComp = createdGameObjects[i]->GetAnimationComponent();
-            if (animComp)
-            {
-                animComp->SetBoneMapping();
-            }
+            if (animComp) animComp->SetBoneMapping();
         }
     }
 

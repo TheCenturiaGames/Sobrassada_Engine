@@ -1161,10 +1161,7 @@ void Scene::LoadPrefab(const UID prefabUID, const ResourcePrefab* prefab, const 
 
             // If has animations, map them here
             AnimationComponent* animComp = newObjects[i]->GetAnimationComponent();
-            if (animComp)
-            {
-                animComp->SetBoneMapping();
-            }
+            if (animComp) animComp->SetBoneMapping();
         }
 
         if (prefab == nullptr) App->GetResourcesModule()->ReleaseResource(resourcePrefab);
