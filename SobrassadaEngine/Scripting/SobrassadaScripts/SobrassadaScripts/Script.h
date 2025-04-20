@@ -3,6 +3,7 @@
 class GameObject;
 class Application;
 #include <vector>
+#include "rapidjson/document.h"
 
 struct InspectorField
 {
@@ -45,7 +46,9 @@ class Script
 
     virtual bool Init()                  = 0;
     virtual void Update(float deltaTime) = 0;
-    virtual void Inspector()             = 0;
+    virtual void Inspector();
+    virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator);
+    virtual void Load(const rapidjson::Value& initialState);
 
   protected:
     GameObject* parent;

@@ -60,7 +60,3 @@ void GodMode::Update(float deltaTime)
         freeCamera = true;
     }
 }
-
-void GodMode::Inspector()
-{
-}

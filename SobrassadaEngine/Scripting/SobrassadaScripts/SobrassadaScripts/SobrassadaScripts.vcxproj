@@ -385,6 +385,7 @@
     <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Libs\rapidjson\document.h" />
     <ClInclude Include="ButtonScript.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GodMode.h" />
@@ -675,6 +676,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Game|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="RotateGameObject.cpp" />
+    <ClCompile Include="Script.cpp" />
     <ClCompile Include="ScriptExport.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
