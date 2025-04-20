@@ -48,6 +48,7 @@
     <ClCompile Include="FullscreenToggleScript.cpp" />
     <ClCompile Include="VSyncToggleScript.cpp" />
     <ClCompile Include="PauseMenuScript.cpp" />
+    <ClCompile Include="OptionsMenuSwitcherScript.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ButtonScript.h" />
@@ -60,6 +61,7 @@
     <ClInclude Include="FullscreenToggleScript.h" />
     <ClInclude Include="VSyncToggleScript.h" />
     <ClInclude Include="PauseMenuScript.h" />
+    <ClInclude Include="OptionsMenuSwitcherScript.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SobrassadaScripts.rc" />
