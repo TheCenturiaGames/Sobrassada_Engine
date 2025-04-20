@@ -22,9 +22,10 @@ class Character : public Script
     void Inspector() override;
     void OnCollision(GameObject* otherObject, const float3& collisionNormal) override;
 
+    void TakeDamage(int amount);
+
   protected:
     void Attack(float deltaTime);
-    void TakeDamage(int amount);
     void Heal(int amount);
     bool CanAttack(float deltaTime);
 

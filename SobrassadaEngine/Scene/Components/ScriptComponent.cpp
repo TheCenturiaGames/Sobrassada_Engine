@@ -82,12 +82,12 @@ void ScriptComponent::RenderEditorInspector()
         }
         if (ImGui::BeginPopup("Select Script"))
         {
-            for (const auto& scriptType : scripts)
+            for (int i = 0; i < sizeof(scripts) / sizeof(char*); i++)
             {
-                if (ImGui::Selectable(scriptType.c_str()))
+                if (ImGui::Selectable(scripts[i]))
                 {
                     if (scriptInstance != nullptr) DeleteScript();
-                    CreateScript(scriptType);
+                    CreateScript(scripts[i]);
                 }
             }
             ImGui::EndPopup();
@@ -116,15 +116,31 @@ void ScriptComponent::OnCollision(GameObject* otherObject, const float3& collisi
     }
 }
 
-void ScriptComponent::CreateScript(const std::string& scriptType)
+void ScriptComponent::CreateScript(const std::string& scripString)
 {
-    scriptName     = scriptType;
-    scriptInstance = App->GetScriptModule()->CreateScript(scriptType, parent);
+    scriptName     = scripString;
+    scriptInstance = App->GetScriptModule()->CreateScript(scripString, parent);
     if (scriptInstance == nullptr) scriptName = "Not selected";
+
+    scriptType = ScriptType(SearchIdxForString(scriptName));
 }
 
 void ScriptComponent::DeleteScript()
 {
     App->GetScriptModule()->DestroyScript(scriptInstance);
     scriptInstance = nullptr;
+}
+
+int ScriptComponent::SearchIdxForString(const std::string& scriptString) const
+{
+    int idx = 0;
+    for (int i = 0; i < sizeof(scripts) / sizeof(scripts[0]); ++i)
+    {
+        if (scriptString == scripts[i])
+        {
+            idx = i;
+            break;
+        }
+    }
+    return idx;
 }

@@ -4,9 +4,12 @@
 #include "Character.h"
 #include "EditorUIModule.h"
 #include "GameObject.h"
+#include "ScriptComponent.h"
 #include "Standalone/AnimationComponent.h"
 #include "Standalone/Physics/CapsuleColliderComponent.h"
 #include "Standalone/Physics/CubeColliderComponent.h"
+
+#include <string>
 
 Character::Character(
     GameObject* parent, int maxHealth, int damage, float attackDuration, float speed, float cooldown, float range
@@ -77,7 +80,19 @@ void Character::Inspector()
 
 void Character::OnCollision(GameObject* otherObject, const float3& collisionNormal)
 {
-
+    GLOG("COLLISION %s with %s", parent->GetName().c_str(), otherObject->GetName().c_str())
+    //ScriptComponent* enemyScriptComponent =
+    //    dynamic_cast<ScriptComponent*>(otherObject->GetComponentByType(COMPONENT_SCRIPT)); 
+    //CapsuleColliderComponent* enemyCollider =
+    //    dynamic_cast<CapsuleColliderComponent*>(otherObject->GetComponentByType(COMPONENT_CAPSULE_COLLIDER));
+    //CubeColliderComponent* enemyWeapon =
+    //    dynamic_cast<CubeColliderComponent*>(otherObject->GetComponentChildByType(COMPONENT_CUBE_COLLIDER));
+    //if (enemyScriptComponent != nullptr && enemyCollider != nullptr && enemyWeapon != nullptr)
+    //{
+    //    Script* enemyScript           = enemyScriptComponent->GetScriptInstance();
+    //    //const std::string& scriptName = enemyScriptComponent->GetScriptName();
+    //    dynamic_cast<Character*>(enemyScript)->TakeDamage(damage);
+    //}
 }
 
 void Character::Attack(float deltaTime)

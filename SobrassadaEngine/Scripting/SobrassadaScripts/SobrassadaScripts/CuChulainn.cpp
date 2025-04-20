@@ -80,7 +80,6 @@ void CuChulainn::HandleState(float deltaTime)
         GLOG("ATTACK");
         animComponent->UseTrigger("walk");
         Attack(deltaTime);
-        TakeDamage(5);
     }
     else if (move && !runActive)
     {
