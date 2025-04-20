@@ -7,6 +7,8 @@
 #include "VSyncToggleScript.h"
 #include "PauseMenuScript.h"
 #include "OptionsMenuSwitcherScript.h"
+#include "MainMenuSelectorScript.h"
+#include "PressAnyKeyScript.h"
 #include <string>
 
 #ifndef SOBRASSADASCRIPTS_EXPORTS
@@ -31,6 +33,9 @@ extern "C" SOBRASSADA_API Script* CreateScript(const std::string& scriptType, Ga
     if (scriptType == "VSyncToggleScript") return new VSyncToggleScript(parent);
     if (scriptType == "PauseMenuScript") return new PauseMenuScript(parent);
     if (scriptType == "OptionsMenuSwitcherScript") return new OptionsMenuSwitcherScript(parent);
+    if (scriptType == "MainMenuSelectorScript") return new MainMenuSelectorScript(parent);
+    if (scriptType == "PressAnyKeyScript") return new PressAnyKeyScript(parent);
+
     return nullptr;
 }
 
