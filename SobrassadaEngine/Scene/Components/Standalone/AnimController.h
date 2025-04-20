@@ -17,7 +17,7 @@ class AnimController
     void Resume() { playAnimation = true; }
 
     void GetTransform(const std::string& nodeName, float3& pos, Quat& rot);
-    void GetTransform(const std::string& nodeName, float3& pos, Quat& rot, float3& scale);
+
     ResourceAnimation* GetCurrentAnimation() const { return currentAnimation; }
     float GetTime() const { return currentTime; }
 
@@ -30,7 +30,7 @@ class AnimController
   private:
     void GetChannelPosition(const Channel* animChannel, float3& pos, float time) const;
     void GetChannelRotation(Channel* animChannel, Quat& rot, float time);
-    void GetChannelScale(const Channel* animChannel, float3& scale, const float time) const;
+   
     void SetAnimationResource(ResourceAnimation* anim) { currentAnimation = anim; }
 
     Quat Interpolate(Quat& first, Quat& second, float lambda);
