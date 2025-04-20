@@ -4,6 +4,7 @@
 #include "GameObject.h"
 #include "PhysicsModule.h"
 #include "SceneModule.h"
+#include "ScriptComponent.h"
 
 #include "ImGui.h"
 #include "rapidjson/document.h"
@@ -233,6 +234,10 @@ void CubeColliderComponent::ParentUpdated()
 
 void CubeColliderComponent::OnCollision(GameObject* otherObject, float3 collisionNormal)
 {
+    if (!enabled) return;
+
+    dynamic_cast<ScriptComponent*>(parent->GetComponentByType(COMPONENT_SCRIPT))
+        ->OnCollision(otherObject, collisionNormal);
 }
 
 void CubeColliderComponent::DeleteRigidBody()

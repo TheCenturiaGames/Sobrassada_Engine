@@ -4,6 +4,7 @@
 #include "GameObject.h"
 #include "PhysicsModule.h"
 #include "SceneModule.h"
+#include "ScriptComponent.h"
 
 #include "Geometry/Sphere.h"
 #include "ImGui.h"
@@ -227,6 +228,10 @@ void SphereColliderComponent::ParentUpdated()
 
 void SphereColliderComponent::OnCollision(GameObject* otherObject, float3 collisionNormal)
 {
+    if (!enabled) return;
+
+    dynamic_cast<ScriptComponent*>(parent->GetComponentByType(COMPONENT_SCRIPT))
+        ->OnCollision(otherObject, collisionNormal);
 }
 
 void SphereColliderComponent::DeleteRigidBody()

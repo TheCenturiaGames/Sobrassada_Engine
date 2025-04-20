@@ -437,6 +437,26 @@ Component* GameObject::GetComponentChildByType(ComponentType componentType) cons
     return component;
 }
 
+Component* GameObject::GetComponentParentByType(ComponentType componentType) const
+{
+    UID currentUID       = parentUID;
+
+    Scene* scene         = App->GetSceneModule()->GetScene();
+    Component* component = nullptr;
+
+    while (currentUID != scene->GetGameObjectRootUID())
+    {
+        GameObject* current = scene->GetGameObjectByUID(currentUID);
+        component           = current->GetComponentByType(componentType);
+
+        if (component != nullptr) break;
+
+        currentUID = current->parentUID;
+    }
+
+    return component;
+}
+
 MeshComponent* GameObject::GetMeshComponent() const
 {
     if (components.find(COMPONENT_MESH) != components.end())

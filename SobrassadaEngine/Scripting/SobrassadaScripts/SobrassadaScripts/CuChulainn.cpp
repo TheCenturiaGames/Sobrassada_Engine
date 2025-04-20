@@ -77,7 +77,6 @@ void CuChulainn::HandleState(float deltaTime)
 
     if (mouse[SDL_BUTTON_LEFT - 1] && CanAttack(deltaTime))
     {
-        GLOG("ATTACK");
         animComponent->UseTrigger("attack");
         Attack(deltaTime);
     }

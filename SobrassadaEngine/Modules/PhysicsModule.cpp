@@ -371,7 +371,7 @@ void PhysicsModule::EmptyWorld()
     // REMOVE RIGID BODIES
     for (btRigidBody* rigidBody : bodiesToRemove)
     {
-        dynamicsWorld->removeRigidBody(rigidBody);
+        if (rigidBody != nullptr) dynamicsWorld->removeRigidBody(rigidBody);
         btCollisionShape* shape = rigidBody->getCollisionShape();
         delete shape;
         delete rigidBody;

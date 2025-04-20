@@ -43,7 +43,7 @@ bool Character::Init()
         GLOG("Weapon cube collider component not found for %s", parent->GetName().c_str());
         return false;
     }
-    //weaponCollider->SetEnabled(false);
+    // weaponCollider->SetEnabled(false);
 
     lastAttackTime = -1.0f;
 
@@ -54,7 +54,7 @@ void Character::Update(float deltaTime)
 {
     if (isDead) return;
 
-   // if (deltaTime - lastAttackTime >= attackDuration) weaponCollider->SetEnabled(false);
+    // if (deltaTime - lastAttackTime >= attackDuration) weaponCollider->SetEnabled(false);
 
     HandleState(deltaTime);
 }
@@ -80,27 +80,28 @@ void Character::Inspector()
 
 void Character::OnCollision(GameObject* otherObject, const float3& collisionNormal)
 {
+    // cube collider should be only if is enabled here already checked by OnCollision of cubeColliderComponent
     GLOG("COLLISION %s with %s", parent->GetName().c_str(), otherObject->GetName().c_str())
-    //ScriptComponent* enemyScriptComponent =
-    //    dynamic_cast<ScriptComponent*>(otherObject->GetComponentByType(COMPONENT_SCRIPT)); 
-    //CapsuleColliderComponent* enemyCollider =
-    //    dynamic_cast<CapsuleColliderComponent*>(otherObject->GetComponentByType(COMPONENT_CAPSULE_COLLIDER));
-    //CubeColliderComponent* enemyWeapon =
-    //    dynamic_cast<CubeColliderComponent*>(otherObject->GetComponentChildByType(COMPONENT_CUBE_COLLIDER));
-    //if (enemyScriptComponent != nullptr && enemyCollider != nullptr && enemyWeapon != nullptr)
-    //{
-    //    Script* enemyScript           = enemyScriptComponent->GetScriptInstance();
-    //    //const std::string& scriptName = enemyScriptComponent->GetScriptName();
-    //    dynamic_cast<Character*>(enemyScript)->TakeDamage(damage);
-    //}
+    CubeColliderComponent* enemyWeapon =
+        dynamic_cast<CubeColliderComponent*>(otherObject->GetComponentByType(COMPONENT_CUBE_COLLIDER));
+    ScriptComponent* enemyScriptComponent =
+        dynamic_cast<ScriptComponent*>(otherObject->GetComponentParentByType(COMPONENT_SCRIPT));
+
+    if (enemyScriptComponent != nullptr && enemyWeapon != nullptr)
+    {
+        Script* enemyScript = enemyScriptComponent->GetScriptInstance();
+        // ScriptType scriptType = enemyScriptComponent->GetScriptType(); // not needed for now
+        TakeDamage(dynamic_cast<Character*>(enemyScript)->damage);
+    }
 }
 
 void Character::Attack(float deltaTime)
 {
     if (CanAttack(deltaTime))
     {
+        GLOG("ATTACK");
         lastAttackTime = deltaTime;
-        //weaponCollider->SetEnabled(true);
+        weaponCollider->SetEnabled(true);
         PerformAttack();
     }
 }
@@ -137,10 +138,10 @@ void Character::Die()
     OnDeath();
 
     characterCollider->DeleteRigidBody();
-    //characterCollider->SetEnabled(false);
+    characterCollider->SetEnabled(false);
 
     weaponCollider->DeleteRigidBody();
-    //weaponCollider->SetEnabled(false);
+    weaponCollider->SetEnabled(false);
 
-    //parent->SetEnabled(false);
+    parent->SetEnabled(false);
 }
