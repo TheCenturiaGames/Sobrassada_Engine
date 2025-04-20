@@ -60,7 +60,7 @@ AnimationComponent::~AnimationComponent()
 void AnimationComponent::Init()
 {
     currentAnimResource = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
-    currentAnimName = App->GetLibraryModule()->GetResourceName(resource);
+    currentAnimName     = App->GetLibraryModule()->GetResourceName(resource);
 }
 
 void AnimationComponent::OnPlay(bool isTransition)
@@ -417,7 +417,12 @@ void AnimationComponent::Clone(const Component* other)
 
         resource                                 = otherAnimation->resource;
         AddAnimation(resource);
-        //resourceStateMachine = otherAnimation->resourceStateMachine;
+
+        if (otherAnimation->resourceStateMachine)
+        {
+            resourceStateMachine = otherAnimation->resourceStateMachine;
+            resourceStateMachine->AddReference();
+        }
     }
     else
     {
