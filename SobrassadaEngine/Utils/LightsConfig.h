@@ -147,4 +147,9 @@ class LightsConfig
 
     ResourceTexture* currentTexture = nullptr;
     std::string currentTextureName  = "Not selected";
+
+    bool firstTime                  = true;
+    int irradianceMapResolution     = 512;
+    int prefilteredMapResolution    = 512;
+    int environmentBRDFResolution   = 512;
 };

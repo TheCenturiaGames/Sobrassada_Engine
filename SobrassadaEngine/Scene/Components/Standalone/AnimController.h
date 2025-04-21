@@ -1,8 +1,9 @@
 #pragma once
+#include "AnimationComponent.h"
 #include "Globals.h"
 
 class ResourceAnimation;
-class Channel;
+struct Channel;
 
 class AnimController
 {
@@ -17,6 +18,7 @@ class AnimController
     void Resume() { playAnimation = true; }
 
     void GetTransform(const std::string& nodeName, float3& pos, Quat& rot);
+
     ResourceAnimation* GetCurrentAnimation() const { return currentAnimation; }
     float GetTime() const { return currentTime; }
 
@@ -25,15 +27,16 @@ class AnimController
     void SetTime(float time) { currentTime = time; }
 
     bool IsPlaying() const { return playAnimation; }
+    bool IsFinished() const { return animationFinished; }
 
   private:
     void GetChannelPosition(const Channel* animChannel, float3& pos, float time) const;
     void GetChannelRotation(Channel* animChannel, Quat& rot, float time);
-
+   
     void SetAnimationResource(ResourceAnimation* anim) { currentAnimation = anim; }
 
     Quat Interpolate(Quat& first, Quat& second, float lambda);
-
+  
   private:
     UID resource                        = INVALID_UID;
     float currentTime                   = 0.0f;
@@ -43,6 +46,7 @@ class AnimController
     float transitionTime                = 0.0f;
     float fadeTime                      = 0.0f;
     float currentTargetTime             = 0.0f;
+    bool animationFinished              = false;
 
     ResourceAnimation* currentAnimation = nullptr;
     ResourceAnimation* targetAnimation  = nullptr;

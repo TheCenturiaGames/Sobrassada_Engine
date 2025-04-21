@@ -26,7 +26,7 @@ class AudioModule;
 class EngineTimer;
 class GameTimer;
 
-class Application
+class SOBRASADA_API_ENGINE Application
 {
   public:
     Application();
@@ -85,4 +85,4 @@ class Application
     EngineConfig* engineConfig       = nullptr;
 };
 
-extern Application* App;
+extern SOBRASADA_API_ENGINE Application* App;
