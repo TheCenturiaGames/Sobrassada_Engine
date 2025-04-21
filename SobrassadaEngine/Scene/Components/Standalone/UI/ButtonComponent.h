@@ -28,8 +28,8 @@ class SOBRASADA_API_ENGINE ButtonComponent : public Component
     void OnClick();
     void OnRelease() const;
 
-    void AddOnClickCallback(Delegate<void> newDelegate);
-    void RemoveOnClickCallback();
+    std::list<Delegate<void>>::iterator AddOnClickCallback(Delegate<void> newDelegate);
+    void RemoveOnClickCallback(std::list<Delegate<void>>::iterator delegate);
     void RemoveTransform() { transform2D = nullptr; }
 
   private:

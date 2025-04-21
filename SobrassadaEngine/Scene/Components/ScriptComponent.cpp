@@ -5,6 +5,7 @@
 #include "Script.h"
 #include "ScriptModule.h"
 #include "EditorUIModule.h"
+#include "GameObject.h"
 
 // Do script of object rotating
 
@@ -63,6 +64,8 @@ void ScriptComponent::Clone(const Component* other)
 
 void ScriptComponent::Update(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
+
     if (App->GetSceneModule()->GetInPlayMode())
     {
         if (scriptInstance != nullptr)

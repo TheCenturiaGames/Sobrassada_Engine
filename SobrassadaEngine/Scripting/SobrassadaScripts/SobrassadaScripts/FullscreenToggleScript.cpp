@@ -1,14 +1,11 @@
 #include "pch.h"
+
 #include "FullscreenToggleScript.h"
-
 #include "Application.h"
-#include "Scene/Components/Standalone/UI/ButtonComponent.h"
-#include "GameObject.h"
-#include "Utils/Delegate.h"
 #include "EditorUIModule.h"
-
-
-
+#include "GameObject.h"
+#include "Scene/Components/Standalone/UI/ButtonComponent.h"
+#include "Utils/Delegate.h"
 
 bool FullscreenToggleScript::Init()
 {
@@ -18,7 +15,8 @@ bool FullscreenToggleScript::Init()
     {
         std::function<void(void)> function = std::bind(&FullscreenToggleScript::OnClick, this);
         Delegate<void> delegate(function);
-        static_cast<ButtonComponent*>(button)->AddOnClickCallback(delegate);
+        delegateID            = static_cast<ButtonComponent*>(button)->AddOnClickCallback(delegate);
+        hasRegisteredCallback = true;
     }
 
     return true;
@@ -35,4 +33,16 @@ void FullscreenToggleScript::Inspector()
 void FullscreenToggleScript::OnClick()
 {
     AppEngine->GetEditorUIModule()->ToggleFullscreen();
+}
+
+FullscreenToggleScript::~FullscreenToggleScript()
+{
+    if (hasRegisteredCallback)
+    {
+        Component* button = parent->GetComponentByType(COMPONENT_BUTTON);
+        if (button)
+        {
+            static_cast<ButtonComponent*>(button)->RemoveOnClickCallback(delegateID);
+        }
+    }
 }

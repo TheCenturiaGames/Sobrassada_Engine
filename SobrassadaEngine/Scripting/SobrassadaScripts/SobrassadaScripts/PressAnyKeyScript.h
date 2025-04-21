@@ -1,11 +1,12 @@
 #pragma once
+
 #include "Script.h"
 #include <string>
+
 class PressAnyKeyScript : public Script
 {
   public:
-    
-      PressAnyKeyScript(GameObject* parent) : Script(parent) {}
+    PressAnyKeyScript(GameObject* parent) : Script(parent) {}
 
     bool Init() override;
     void Update(float deltaTime) override;
@@ -14,5 +15,5 @@ class PressAnyKeyScript : public Script
     void LoadFromJson(const rapidjson::Value& value) override;
 
   private:
-    std::string nextGameObjectName; 
+    std::string nextGameObjectName;
 };

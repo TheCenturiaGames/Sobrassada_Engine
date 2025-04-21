@@ -22,11 +22,25 @@ bool ButtonScript::Init()
     {
         std::function<void(void)> function = std::bind(&ButtonScript::OnClick, this);
         Delegate<void> delegate(function);
-        static_cast<ButtonComponent*>(button)->AddOnClickCallback(delegate);
+        delegateID            = static_cast<ButtonComponent*>(button)->AddOnClickCallback(delegate);
+        hasRegisteredCallback = true;
     }
 
     return true;
 }
+
+ButtonScript::~ButtonScript()
+{
+    if (hasRegisteredCallback)
+    {
+        Component* button = parent->GetComponentByType(COMPONENT_BUTTON);
+        if (button)
+        {
+            static_cast<ButtonComponent*>(button)->RemoveOnClickCallback(delegateID);
+        }
+    }
+}
+
 
 void ButtonScript::Update(float deltaTime)
 {
