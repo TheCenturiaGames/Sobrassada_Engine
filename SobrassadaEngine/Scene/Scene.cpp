@@ -144,11 +144,11 @@ void Scene::Init()
     lightsConfig->InitSkybox();
     lightsConfig->InitLightBuffers();
 
+    //Load navmesh from scene.
     if (navmeshUID != INVALID_UID)
     {
         std::string navmeshName = App->GetLibraryModule()->GetResourceName(navmeshUID);
         App->GetPathfinderModule()->LoadNavMesh(navmeshName);
-        GLOG("NavMesh loaded during scene Init: %s", navmeshName.c_str());
     }
     // Call this after overriding the prefabs to avoid duplicates in gameObjectsToUpdate
     GetGameObjectByUID(gameObjectRootUID)->UpdateTransformForGOBranch();
