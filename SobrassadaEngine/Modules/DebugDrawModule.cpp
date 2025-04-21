@@ -1,7 +1,10 @@
 #include "DebugDrawModule.h"
 
 #include "Application.h"
+#include "CameraComponent.h"
 #include "CameraModule.h"
+#include "DetourNavMesh.h"
+#include "DetourNavMeshQuery.h"
 #include "Framebuffer.h"
 #include "GameObject.h"
 #include "Globals.h"
@@ -9,21 +12,18 @@
 #include "Octree.h"
 #include "OpenGLModule.h"
 #include "Quadtree.h"
-#include "SceneModule.h"
-#include "ResourcesModule.h"
 #include "ResourceNavmesh.h"
-#include "DetourNavMesh.h"
-#include "DetourNavMeshQuery.h"
-
+#include "ResourcesModule.h"
+#include "SceneModule.h"
 
 #include "SDL_video.h"
 #define DEBUG_DRAW_IMPLEMENTATION
 #include "DebugDraw.h" // Debug Draw API. Notice that we need the DEBUG_DRAW_IMPLEMENTATION macro here!
 #include "Geometry/AABB.h"
 #include "Geometry/OBB.h"
+#include "btVector3.h"
 #include "glew.h"
 #include "imgui.h"
-#include "btVector3.h"
 #include <unordered_map>
 
 class DDRenderInterfaceCoreGL final : public dd::RenderInterface
@@ -627,8 +627,16 @@ update_status DebugDrawModule::Render(float deltaTime)
     // dd::axisTriad(float4x4::identity, 0.1f, 1.0f);
     if (!App->GetSceneModule()->GetInPlayMode()) dd::xzSquareGrid(-10, 10, 0.0f, 1.0f, dd::colors::Blue);
 
+    if (App->GetSceneModule()->GetInPlayMode())
+    {
+        CameraComponent* camera = App->GetSceneModule()->GetScene()->GetMainCamera();
+        auto framebuffer        = App->GetOpenGLModule()->GetFramebuffer();
+        int width                   = framebuffer->GetTextureWidth();
+        int height                  = framebuffer->GetTextureHeight();
+        Draw(camera->GetViewMatrix(), camera->GetProjectionMatrix(), width, height);
+    }
+    else Draw();
     // Probably should go somewhere else, but must go after skybox and meshes
-    Draw();
 
     return UPDATE_CONTINUE;
 }
@@ -694,7 +702,6 @@ void DebugDrawModule::DrawLine(
     dd::line(origin, dir + origin, color, 0, enableDepth);
 }
 
-
 void DebugDrawModule::DrawLine(const btVector3& from, const btVector3& to, const btVector3& color)
 {
     dd::line(
@@ -721,6 +728,8 @@ void DebugDrawModule::DrawFrustrum(float4x4 frustumProj, float4x4 frustumView)
 
 void DebugDrawModule::Draw(const float4x4& view, const float4x4& proj, unsigned width, unsigned height)
 {
+    if (App->GetSceneModule()->IsSceneLoaded()) HandleDebugRenderOptions();
+
     implementation->width     = width;
     implementation->height    = height;
     implementation->mvpMatrix = proj * view;
@@ -757,8 +766,8 @@ void DebugDrawModule::Draw3DText(const btVector3& location, const char* textStri
     const float3 pos           = float3(location);
 
     auto framebuffer           = App->GetOpenGLModule()->GetFramebuffer();
-    int width                      = framebuffer->GetTextureWidth();
-    int height                     = framebuffer->GetTextureHeight();
+    int width                  = framebuffer->GetTextureWidth();
+    int height                 = framebuffer->GetTextureHeight();
 
     dd::projectedText(textString, pos, float3::zero, view * projection, 0, 0, width, height);
 }
@@ -815,10 +824,7 @@ void DebugDrawModule::HandleDebugRenderOptions()
     {
         if (const ResourceNavMesh* navmesh = App->GetResourcesModule()->GetNavMesh())
         {
-            DrawNavMesh(
-                navmesh->GetDetourNavMesh(),
-                navmesh->GetDetourNavMeshQuery(), DRAWNAVMESH_COLOR_TILES
-            );
+            DrawNavMesh(navmesh->GetDetourNavMesh(), navmesh->GetDetourNavMeshQuery(), DRAWNAVMESH_COLOR_TILES);
         }
     }
 }
@@ -836,7 +842,6 @@ static unsigned int DetourRGBA(int r, int g, int b, int a)
 {
     return ((unsigned int)r) | ((unsigned int)g << 8) | ((unsigned int)b << 16) | ((unsigned int)a << 24);
 }
-
 
 static unsigned int DetourIntToCol(int i, int a)
 {

@@ -29,5 +29,11 @@ void glog(const char file[], int line, const char* format, ...)
 
     memcpy(newString, tmp_string, 4096 * sizeof(char));
 
+    if (Logs->size() >= 100)
+    {
+        free((*Logs)[0]);
+        Logs->erase(Logs->begin());
+    }
+
     Logs->push_back(newString);
 }
