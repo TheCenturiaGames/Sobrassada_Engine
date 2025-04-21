@@ -2,6 +2,7 @@
 
 #include "Resource.h"
 
+class NavMeshConfig;
 class ResourceMesh;
 class dtNavMesh;
 class dtNavMeshQuery;
@@ -15,13 +16,6 @@ struct rcPolyMeshDetail;
 class ResourceMesh;
 
 struct Vertex;
-
-enum SamplePartitionType
-{
-    SAMPLE_PARTITION_WATERSHED,
-    SAMPLE_PARTITION_MONOTONE,
-    SAMPLE_PARTITION_LAYERS
-};
 
 enum SamplePolyAreas
 {
@@ -52,33 +46,13 @@ class ResourceNavMesh : public Resource
 
     bool BuildNavMesh(
         const std::vector<std::pair<const ResourceMesh*, const float4x4&>>& meshes, const float minPoint[3],
-        const float maxPoint[3]
+        const float maxPoint[3], const NavMeshConfig& navconf
     );
 
-    void RenderNavmeshEditor();
-    void CreateDetourData();
-
-    dtNavMesh* GetDetourNavMesh() const { return navMesh; }
-    dtNavMeshQuery* GetDetourNavMeshQuery() const { return navQuery; }
-
-
+    void CreateDetourData(const rcPolyMesh* pmesh, const rcPolyMeshDetail* dmesh, const rcConfig& config);
+    void SetDetourNavMesh(dtNavMesh* navMesh);
+    const dtNavMesh* GetDetourNavMesh() const { return navMesh; }
+    dtNavMesh* GetDetourNavMesh() { return navMesh; }
   private:
-    rcConfig* config                         = nullptr;
-    rcHeightfield* heightfield               = nullptr;
-    rcCompactHeightfield* compactHeightfield = nullptr;
-    rcContourSet* contourSet                 = nullptr;
-    rcPolyMesh* polymesh                     = nullptr;
-    rcPolyMeshDetail* polymeshDetail         = nullptr;
-    dtNavMesh* navMesh                       = nullptr;
-    dtNavMeshQuery* navQuery                 = nullptr;
-
-    bool m_filterLowHangingObstacles;
-    bool m_filterLedgeSpans;
-    bool m_filterWalkableLowHeightSpans;
-
-    float m_agentMaxClimb;
-    float m_agentHeight;
-    float m_agentRadius;
-
-    int partitionType;
+    dtNavMesh* navMesh = nullptr;
 };

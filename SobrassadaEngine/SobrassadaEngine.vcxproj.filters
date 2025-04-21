@@ -366,6 +366,15 @@
     <ClCompile Include="ResourceManagement\Resources\ResourceAnimation.cpp">
       <Filter>Resources</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\UI\CanvasComponent.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\UI\UILabelComponent.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\UI\Transform2DComponent.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
     <ClCompile Include="Utils\TextManager.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
@@ -417,7 +426,7 @@
     <ClCompile Include="FileSystem\Meta\MetaStateMachine.cpp">
       <Filter>FileSystem\Meta</Filter>
     </ClCompile>
-    <ClCompile Include="ResourceManagement\Resources\ResourceNavmesh.cpp">
+    <ClCompile Include="ResourceManagement\Resources\ResourceNavMesh.cpp">
       <Filter>Resources</Filter>
     </ClCompile>
     <ClCompile Include="FileSystem\Importers\NavmeshImporter.cpp">
@@ -440,9 +449,6 @@
     </ClCompile>
     <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourProximityGrid.cpp">
       <Filter>External\DetourCrowd</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\Components\Standalone\AIAgentComponent.cpp">
-      <Filter>Scene\Components</Filter>
     </ClCompile>
     <ClCompile Include="Modules\PathfinderModule.cpp">
       <Filter>Modules</Filter>
@@ -509,6 +515,24 @@
     </ClCompile>
     <ClCompile Include="Libs\Wwise\samples\SoundEngine\IO\stdafx.cpp">
       <Filter>External\Wwise</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\Audio\AudioSourceComponent.cpp">
+      <Filter>Scene\Components\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\Audio\AudioListenerComponent.cpp">
+      <Filter>Scene\Components\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\AIAgentComponent.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\GBuffer.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\Meta\MetaNavmesh.cpp">
+      <Filter>FileSystem\Meta</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\NavMeshConfig.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -595,6 +619,9 @@
     </Filter>
     <Filter Include="External\Wwise">
       <UniqueIdentifier>{6e4f8d0d-c331-4d88-ace9-d3f3ce3e6c2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Components\Audio">
+      <UniqueIdentifier>{cebf4c5a-89d4-4d73-af66-dee049d7cbf1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -911,7 +938,7 @@
     <ClInclude Include="FileSystem\Meta\MetaStateMachine.h">
       <Filter>FileSystem\Meta</Filter>
     </ClInclude>
-    <ClInclude Include="ResourceManagement\Resources\ResourceNavmesh.h">
+    <ClInclude Include="ResourceManagement\Resources\ResourceNavMesh.h">
       <Filter>Resources</Filter>
     </ClInclude>
     <ClInclude Include="FileSystem\Importers\NavmeshImporter.h">
@@ -994,6 +1021,27 @@
     </ClInclude>
     <ClInclude Include="Libs\Wwise\samples\SoundEngine\IO\stdafx.h">
       <Filter>External\Wwise</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\Audio\AudioSourceComponent.h">
+      <Filter>Scene\Components\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\Standalone\Audio\AudioListenerComponent.h">
+      <Filter>Scene\Components\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Wwise_IDs.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\GBuffer.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\Meta\MetaNavmesh.h">
+      <Filter>FileSystem\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\NavMeshConfig.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\HashString.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

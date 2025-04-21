@@ -2,9 +2,15 @@
 
 #include "Component.h"
 
+#include "Math/float3.h"
 #include <vector>
 
-class AIAgentComponent : public Component
+namespace math
+{
+    class float3;
+}
+
+class SOBRASADA_API_ENGINE AIAgentComponent : public Component
 {
 
   public:
@@ -20,11 +26,17 @@ class AIAgentComponent : public Component
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
     void AddToCrowd();
     void RecreateAgent();
-    void setPath(const float3& destination) const;
+    void LookAtMovement(const float3& moveDir, float deltaTime);
+
+    bool SetPathNavigation(const math::float3& destination);
+    void SetSpeed(float newSpeed) { speed = newSpeed; }
 
   private:
-    float speed  = 0.f;
-    float radius = 0.f;
-    float height = 0.f;
-    int agentId  = -1; // Assigned by dtCrowd
+    float speed           = 0.f;
+    float radius          = 0.f;
+    float height          = 0.f;
+    int agentId           = -1; // Assigned by dtCrowd
+
+    float maxAngularSpeed = 0.0f;
+    bool isRadians        = false;
 };

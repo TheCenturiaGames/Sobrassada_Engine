@@ -4,13 +4,14 @@
 
 #include "Math/float4x4.h"
 #include "imgui.h"
-#include "Math/float4x4.h"
 #include <string>
 
 Component::Component(UID uid, GameObject* parent, const char* initName, ComponentType type)
     : uid(uid), parent(parent), type(type), enabled(true)
 {
     memcpy(name, initName, strlen(initName));
+
+    localComponentAABB.SetNegativeInfinity();
 }
 
 Component::Component(const rapidjson::Value& initialState, GameObject* parent)
@@ -21,6 +22,8 @@ Component::Component(const rapidjson::Value& initialState, GameObject* parent)
 
     const char* initName = initialState["Name"].GetString();
     memcpy(name, initName, strlen(initName));
+
+    localComponentAABB.SetNegativeInfinity();
 }
 
 void Component::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const

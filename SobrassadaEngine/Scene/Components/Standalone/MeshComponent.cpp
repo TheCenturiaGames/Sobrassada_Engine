@@ -130,7 +130,8 @@ void MeshComponent::RenderEditorInspector()
 
     if (enabled)
     {
-        ImGui::SeparatorText("Mesh");
+        ImGui::SeparatorText("Mesh Component");
+
         ImGui::Text(currentMeshName.c_str());
         ImGui::SameLine();
         if (ImGui::Button("Select mesh"))
