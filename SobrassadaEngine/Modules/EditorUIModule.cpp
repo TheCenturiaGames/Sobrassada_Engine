@@ -500,7 +500,15 @@ void EditorUIModule::Navmesh(bool& navmesh)
             ImGui::End();
         }
 
-        if (!open) showNavLoadDialog = false;
+       if (!open)
+        {
+            showNavLoadDialog    = false;
+
+            // Reset search and selection
+            searchTextNavmesh[0] = '\0';
+            selectedNavmesh      = -1;          
+            navmeshUID           = INVALID_UID;
+        }
     }
 }
 
