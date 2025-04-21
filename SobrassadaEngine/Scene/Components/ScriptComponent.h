@@ -9,7 +9,7 @@ enum ScriptType
     SCRIPT_BUTTON,
     SCRIPT_GOD_MODE,
     SCRIPT_CU_CHULAINN,
-    SCRIPT_SOLDIER
+    SCRIPT_SOLDIER,
     SCRIPT_EXIT_GAME,
     SCRIPT_FULLSCREEN_TOGGLE,
     SCRIPT_VSYNC_TOGGLE,
@@ -17,6 +17,8 @@ enum ScriptType
     SCRIPT_OPTIONS_MENU_SWITCHER,
     SCRIPT_MAIN_MENU_SELECTOR,
     SCRIPT_PRESS_ANY_KEY,
+
+    SCRIPT_TYPE_COUNT //Add at the end
 };
 
 namespace math
@@ -31,6 +33,8 @@ constexpr const char* scripts[] = {
     "RotateGameObject",          // SCRIPT_ROTATE_GAME_OBJECT
     "ButtonScript",              // SCRIPT_BUTTON
     "GodMode",                   // SCRIPT_GOD_MODE
+    "CuChulainnScript",          // SCRIPT_CU_CHULAINN
+    "SoldierScript",             // SCRIPT_SOLDIER
     "ExitGameScript",            // SCRIPT_EXIT_GAME
     "FullscreenToggleScript",    // SCRIPT_FULLSCREEN_TOGGLE
     "VSyncToggleScript",         // SCRIPT_VSYNC_TOGGLE
