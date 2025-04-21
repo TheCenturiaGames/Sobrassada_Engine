@@ -17,7 +17,7 @@ WindowModule::~WindowModule()
 
 bool WindowModule::Init()
 {
-    GLOG("Init SDL window & surface");
+    //GLOG("Init SDL window & surface");
     bool returnStatus = true;
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -71,7 +71,7 @@ bool WindowModule::Init()
 
 bool WindowModule::ShutDown()
 {
-    GLOG("Destroying SDL window and quitting all SDL systems");
+    //GLOG("Destroying SDL window and quitting all SDL systems");
 
     if (window != NULL)
     {

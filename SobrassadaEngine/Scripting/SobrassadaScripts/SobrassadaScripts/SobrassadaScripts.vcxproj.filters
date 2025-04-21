@@ -182,6 +182,9 @@
     <ClCompile Include="GodMode.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
+    <ClCompile Include="Script.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
     <ClCompile Include="Character.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>

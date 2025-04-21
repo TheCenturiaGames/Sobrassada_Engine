@@ -1,4 +1,8 @@
 #pragma once
+#include "rapidjson/document.h"
+#include "Math/float3.h"
+
+class GameObject;
 
 struct InspectorField
 {
@@ -27,8 +31,10 @@ class Script
   public:
     virtual ~Script() {}
 
-    virtual bool Init()                                                              = 0;
-    virtual void Update(float deltaTime)                                             = 0;
-    virtual void Inspector()                                                         = 0;
-    virtual void OnCollision(GameObject* otherObject, const float3& collisionNormal) = 0;
+    virtual bool Init()                                                                             = 0;
+    virtual void Update(float deltaTime)                                                            = 0;
+    virtual void Inspector()                                                                        = 0;
+    virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) = 0;
+    virtual void Load(const rapidjson::Value& initialState)                                         = 0;
+    virtual void OnCollision(GameObject* otherObject, const float3& collisionNormal)                = 0;
 };
