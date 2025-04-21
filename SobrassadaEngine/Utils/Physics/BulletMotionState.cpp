@@ -2,9 +2,9 @@
 
 #include "Application.h"
 #include "Component.h"
-#include "Standalone/Physics/CubeColliderComponent.h"
 #include "GameObject.h"
 #include "SceneModule.h"
+#include "Standalone/Physics/CubeColliderComponent.h"
 
 #include "Math/Quat.h"
 #include "Math/float3.h"
@@ -20,19 +20,25 @@ BulletMotionState::BulletMotionState(
         btQuaternion(btScalar(newCenterRotation.y), btScalar(newCenterRotation.x), btScalar(newCenterRotation.z));
 
     centerOffset = btTransform(
-        rotationQuat, btVector3(btScalar(newCenterOffset.x), btScalar(newCenterOffset.y), btScalar(newCenterOffset.z))
-    ).inverse();
+                       rotationQuat,
+                       btVector3(btScalar(newCenterOffset.x), btScalar(newCenterOffset.y), btScalar(newCenterOffset.z))
+    )
+                       .inverse();
 }
 
 // Syncronize from render world to physics world
 void BulletMotionState::getWorldTransform(btTransform& outPhysicsWorldTransform) const
 {
-    GameObject* parent = collider->GetParent();
+    GameObject* parent              = collider->GetParent();
+
+    const float4x4& globalTransform = parent->GetGlobalTransform();
+
+    float3 globalRotation           = globalTransform.RotatePart().ToEulerXYZ();
+    float3 globalPosition           = globalTransform.TranslatePart();
 
     btTransform gameObjectWorldTransform;
 
-    float3x3 rotationMat =
-        float3x3::FromEulerXYZ(parent->GetRotation().x, parent->GetRotation().y, parent->GetRotation().z);
+    float3x3 rotationMat = float3x3::FromEulerXYZ(globalRotation.x, globalRotation.y, globalRotation.z);
     btMatrix3x3 bulletRotation;
 
     for (int i = 0; i < 3; ++i)
@@ -44,9 +50,9 @@ void BulletMotionState::getWorldTransform(btTransform& outPhysicsWorldTransform)
     }
 
     gameObjectWorldTransform.setBasis(bulletRotation);
-    gameObjectWorldTransform.setOrigin(btVector3(
-        btScalar(parent->GetPosition().x), btScalar(parent->GetPosition().y), btScalar(parent->GetPosition().z)
-    ));
+    gameObjectWorldTransform.setOrigin(
+        btVector3(btScalar(globalPosition.x), btScalar(globalPosition.y), btScalar(globalPosition.z))
+    );
 
     outPhysicsWorldTransform = gameObjectWorldTransform * centerOffset.inverse();
 }

@@ -3,6 +3,7 @@
 #include "CameraComponent.h"
 #include "Component.h"
 #include "ScriptComponent.h"
+#include "Standalone/AIAgentComponent.h"
 #include "Standalone/AnimationComponent.h"
 #include "Standalone/CharacterControllerComponent.h"
 #include "Standalone/Lights/DirectionalLightComponent.h"
@@ -12,12 +13,12 @@
 #include "Standalone/Physics/CapsuleColliderComponent.h"
 #include "Standalone/Physics/CubeColliderComponent.h"
 #include "Standalone/Physics/SphereColliderComponent.h"
+#include "Standalone/UI/ButtonComponent.h"
 #include "Standalone/UI/CanvasComponent.h"
+#include "Standalone/UI/ImageComponent.h"
 #include "Standalone/UI/Transform2DComponent.h"
 #include "Standalone/UI/UILabelComponent.h"
-#include "Standalone/UI/ImageComponent.h"
-#include "Standalone/UI/ButtonComponent.h"
-#include "Standalone/AIAgentComponent.h"
+
 #include <cstdint>
 
 Component* ComponentUtils::CreateEmptyComponent(const ComponentType type, const UID uid, GameObject* parent)
