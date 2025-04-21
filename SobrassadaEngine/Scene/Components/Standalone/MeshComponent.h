@@ -39,7 +39,7 @@ class MeshComponent : public Component
     const ResourceMaterial* GetResourceMaterial() const { return currentMaterial; }
 
     void AddMesh(UID resource, bool updateParent = true);
-    void AddMaterial(UID resource);
+    void AddMaterial(UID resource, bool setDefaultMaterial = false);
 
     const bool GetHasBones() const { return hasBones; }
     const std::vector<GameObject*>& GetBonesGO() const { return bones; }
@@ -67,6 +67,7 @@ class MeshComponent : public Component
 
     std::string currentMaterialName   = "Not selected";
     ResourceMaterial* currentMaterial = nullptr;
+    bool bUsesMeshDefaultMaterial = true;
 
     std::vector<UID> bonesUIDs;
     std::vector<GameObject*> bones;
