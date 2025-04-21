@@ -34,10 +34,11 @@ AnimationComponent::AnimationComponent(const rapidjson::Value& initialState, Gam
     if (initialState.HasMember("Animations") && initialState["Animations"].IsUint64())
     {
         resource = initialState["Animations"].GetUint64();
+        currentAnimResource = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
     }
     else
     {
-        resource = 0;
+        resource = INVALID_UID;
     }
 
     if (initialState.HasMember("StateMachine") && initialState["StateMachine"].IsUint64())
@@ -63,9 +64,9 @@ AnimationComponent::~AnimationComponent()
 
 void AnimationComponent::OnPlay(bool isTransition)
 {
-    StateMachineEditor* stateMachine = nullptr;
-    unsigned transitionTime          = 0;
-    if (animController != nullptr && resource != INVALID_UID)
+    playing                 = true;
+    unsigned transitionTime             = 0;
+    if (animController != nullptr)
     {
         if (resourceStateMachine)
         {
@@ -85,11 +86,8 @@ void AnimationComponent::OnPlay(bool isTransition)
                     {
                         if (clip.clipName.GetString() == activeState->clipName.GetString())
                         {
-                            GLOG("TransitionTime: %f", transitionTime);
                             if (isTransition)
-                                animController->SetTargetAnimationResource(
-                                    clip.animationResourceUID, transitionTime, clip.loop
-                                );
+                                animController->SetTargetAnimationResource(clip.animationResourceUID, transitionTime, clip.loop);
                             else animController->Play(clip.animationResourceUID, clip.loop);
                             resource = clip.animationResourceUID;
                         }
@@ -103,6 +101,8 @@ void AnimationComponent::OnPlay(bool isTransition)
 
 void AnimationComponent::OnStop()
 {
+    playing     = false;
+    currentTime = 0.0f;
     if (animController != nullptr)
     {
         animController->Stop();
@@ -111,6 +111,7 @@ void AnimationComponent::OnStop()
 
 void AnimationComponent::OnPause()
 {
+    playing = false;
     if (animController != nullptr)
     {
         animController->Pause();
@@ -119,6 +120,7 @@ void AnimationComponent::OnPause()
 
 void AnimationComponent::OnResume()
 {
+    playing = true;
     if (animController != nullptr)
     {
         animController->Resume();
@@ -208,7 +210,6 @@ void AnimationComponent::OnInspector()
 
                     if (ImGui::Button("Play"))
                     {
-                        playing = true;
                         currentAnimComp->OnPlay(false);
                     }
 
@@ -216,7 +217,6 @@ void AnimationComponent::OnInspector()
 
                     if (ImGui::Button("Pause"))
                     {
-                        playing = false;
                         currentAnimComp->OnPause();
                     }
 
@@ -224,14 +224,11 @@ void AnimationComponent::OnInspector()
 
                     if (ImGui::Button("Stop"))
                     {
-                        playing     = false;
-                        currentTime = 0.0f;
                         currentAnimComp->OnStop();
                     }
 
                     if (ImGui::Button("Resume"))
                     {
-                        playing = true;
                         currentAnimComp->OnResume();
                     }
 
@@ -352,6 +349,7 @@ void AnimationComponent::OnInspector()
         ImGui::EndCombo();
     }
 
+
     if (resourceStateMachine)
     {
         ImGui::Separator();
@@ -361,25 +359,14 @@ void AnimationComponent::OnInspector()
         {
             if (ImGui::Button(triggerName.c_str()))
             {
+                GLOG("Trigger selected: %s", triggerName.c_str());
+                bool triggerAvailable = false;
                 if (IsPlaying())
                 {
-                    GLOG("Trigger selected: %s", triggerName.c_str());
-                    for (const auto& transition : resourceStateMachine->transitions)
+                    triggerAvailable = resourceStateMachine->UseTrigger(triggerName);
+                    if (triggerAvailable)
                     {
-                        if (transition.triggerName == triggerName &&
-                            transition.fromState.GetString() ==
-                                resourceStateMachine->GetActiveState()->name.GetString())
-                        {
-                            for (size_t i = 0; i < resourceStateMachine->states.size(); ++i)
-                            {
-                                if (resourceStateMachine->states[i].name.GetString() == transition.toState.GetString())
-                                {
-                                    resourceStateMachine->SetActiveState(static_cast<int>(i));
-                                    OnPlay(true);
-                                    break;
-                                }
-                            }
-                        }
+                        OnPlay(true);
                     }
                 }
             }
@@ -594,4 +581,23 @@ void AnimationComponent::SetBoneMapping()
     mapBones(parent);
 
     GLOG("Bone mapping completed: %zu bones mapped", boneMapping.size());
+}
+
+bool AnimationComponent::IsFinished() const
+{
+    return animController->IsFinished();
+}
+
+bool AnimationComponent::UseTrigger(const std::string& triggerName)
+{
+    bool triggerDone = false;
+    if (resourceStateMachine)
+    {
+       triggerDone = resourceStateMachine->UseTrigger(triggerName);
+       if (triggerDone)
+       {
+           OnPlay(true);
+       }
+    }
+    return triggerDone;
 }

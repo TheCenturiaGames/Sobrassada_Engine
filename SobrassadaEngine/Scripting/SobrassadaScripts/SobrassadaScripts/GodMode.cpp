@@ -11,7 +11,17 @@ bool GodMode::Init()
 {
     characterController =
         dynamic_cast<CharacterControllerComponent*>(parent->GetComponentByType(COMPONENT_CHARACTER_CONTROLLER));
+    if (!characterController)
+    {
+        GLOG("GodMode character controller component not found for %s", parent->GetName().c_str());
+        return false;
+    }
     godCamera = dynamic_cast<CameraComponent*>(parent->GetComponentChildByType(COMPONENT_CAMERA));
+    if (!godCamera)
+    {
+        GLOG("GodMode camera component not found for %s", parent->GetName().c_str());
+        return false;
+    }
 
     return true;
 }

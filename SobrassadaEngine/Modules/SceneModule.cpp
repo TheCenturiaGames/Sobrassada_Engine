@@ -192,7 +192,11 @@ void SceneModule::SwitchPlayMode(bool play)
     }
     else
     {
-        if (App->GetLibraryModule()->SaveScene("", SaveMode::SavePlayMode)) inPlayMode = true;
+        if (App->GetLibraryModule()->SaveScene("", SaveMode::SavePlayMode))
+        {
+            inPlayMode       = true;
+            onlyOncePlayMode = true;
+        }
     }
 }
 

@@ -1,4 +1,5 @@
 #pragma once
+
 struct InspectorField
 {
     enum class FieldType
@@ -26,7 +27,8 @@ class Script
   public:
     virtual ~Script() {}
 
-    virtual bool Init()                  = 0;
-    virtual void Update(float deltaTime) = 0;
-    virtual void Inspector()             = 0;
+    virtual bool Init()                                                              = 0;
+    virtual void Update(float deltaTime)                                             = 0;
+    virtual void Inspector()                                                         = 0;
+    virtual void OnCollision(GameObject* otherObject, const float3& collisionNormal) = 0;
 };
