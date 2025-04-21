@@ -140,7 +140,7 @@ void ScriptComponent::DeleteScript()
 int ScriptComponent::SearchIdxForString(const std::string& scriptString) const
 {
     int idx = 0;
-    for (int i = 0; i < sizeof(scripts) / sizeof(scripts[0]); ++i)
+    for (int i = 0; i < SCRIPT_TYPE_COUNT; ++i)
     {
         if (scriptString == scripts[i])
         {
