@@ -100,31 +100,27 @@ namespace SceneImporter
 
     tinygltf::Model CopyAndLoadGLTF(const char* filePath, const std::string& targetFilePath)
     {
-        {
-            // Copy gltf to Assets folder
-            const std::string copyPath = targetFilePath + ASSETS_PATH + FileSystem::GetFileNameWithExtension(filePath);
+        // Copy gltf to Assets folder
+        const std::string copyPath = targetFilePath + ASSETS_PATH + FileSystem::GetFileNameWithExtension(filePath);
             
-            if (FileSystem::Exists(copyPath.c_str()))
-                FileSystem::Delete(copyPath.c_str());
+        if (FileSystem::Exists(copyPath.c_str()))
+            FileSystem::Delete(copyPath.c_str());
             
-            FileSystem::Copy(filePath, copyPath.c_str());
-        }
+        FileSystem::Copy(filePath, copyPath.c_str());
 
-        const tinygltf::Model model = LoadModelGLTF(targetFilePath.c_str());
+        const tinygltf::Model model = LoadModelGLTF(copyPath.c_str());
         
+        const std::string path = FileSystem::GetFilePath(filePath);
+
+        // Copy bin to Assets folder
+        for (const auto& srcBuffers : model.buffers)
         {
-            const std::string path = FileSystem::GetFilePath(filePath);
+            std::string binPath     = path + srcBuffers.uri;
+            std::string copyBinPath = targetFilePath + ASSETS_PATH + FileSystem::GetFileNameWithExtension(binPath);
+            if (FileSystem::Exists(copyBinPath.c_str()))
+                FileSystem::Delete(copyBinPath.c_str());
 
-            // Copy bin to Assets folder
-            for (const auto& srcBuffers : model.buffers)
-            {
-                std::string binPath     = path + srcBuffers.uri;
-                std::string copyBinPath = targetFilePath + ASSETS_PATH + FileSystem::GetFileNameWithExtension(binPath);
-                if (FileSystem::Exists(copyBinPath.c_str()))
-                    FileSystem::Delete(copyBinPath.c_str());
-
-                FileSystem::Copy(binPath.c_str(), copyBinPath.c_str());
-            }
+            FileSystem::Copy(binPath.c_str(), copyBinPath.c_str());
         }
 
         return model;
