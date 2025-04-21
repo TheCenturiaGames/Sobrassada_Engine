@@ -5,7 +5,7 @@
 #include <rapidjson/document.h>
 #include <string>
 #include <list>
-#include "Utils/Delegate.h"
+#include "Delegate.h"
 
 
 class ButtonScript : public Script

@@ -1,16 +1,15 @@
 #include "pch.h"
 
 #include "ButtonScript.h"
-
 #include "Application.h"
 #include "EditorUIModule.h"
 #include "Component.h"
 #include "GameObject.h"
 #include "GameUIModule.h"
-#include "Scene/Components/Standalone/UI/ButtonComponent.h"
 #include "SceneModule.h"
 #include "Scene.h"
-#include "Utils/Delegate.h"
+#include "Standalone/UI/ButtonComponent.h"
+#include "Delegate.h"
 #include <imgui.h>
 #include <string>
 
@@ -74,7 +73,7 @@ void ButtonScript::Inspector()
 
 void ButtonScript::OnClick()
 {
-    std::string panelToHideName = GetCurrentPanelName();
+    const std::string panelToHideName = GetCurrentPanelName();
     if (panelToHideName.empty())
     {
         return;

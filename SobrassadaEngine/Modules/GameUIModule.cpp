@@ -111,7 +111,7 @@ void GameUIModule::RegisterScreen(const std::string& screenName, const std::vect
 
 void GameUIModule::RegisterScreenFromChildren(const std::string& screenName, const std::string& parentGOName)
 {
-    GameObject* parentGO = FindGameObjectByName(parentGOName);
+    const GameObject* parentGO = FindGameObjectByName(parentGOName);
     if (!parentGO)
     {
         GLOG("GameUIModule: GameObject '%s' not found for screen '%s'", parentGOName.c_str(), screenName.c_str());
@@ -133,7 +133,6 @@ void GameUIModule::SwitchToScreen(const std::string& screenName)
 {
     if (currentScreen == screenName) return;
 
-    // Desactiva l’anterior
     if (screens.count(currentScreen))
     {
         for (UID uid : screens[currentScreen])
@@ -143,7 +142,6 @@ void GameUIModule::SwitchToScreen(const std::string& screenName)
         }
     }
 
-    // Activa la nova
     if (screens.count(screenName))
     {
         for (UID uid : screens[screenName])

@@ -263,7 +263,7 @@ void ImageComponent::MatchParentSize()
 {
     if (transform2D == nullptr) return;
 
-    UID parentUID        = parent->GetParent();
+    const UID parentUID        = parent->GetParent();
     GameObject* parentGO = App->GetSceneModule()->GetScene()->GetGameObjectByUID(parentUID);
 
     // Check if parent has transform 2D

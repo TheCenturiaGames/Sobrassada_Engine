@@ -1827,12 +1827,12 @@ void EditorUIModule::RequestExit()
 
 void EditorUIModule::ToggleFullscreen()
 {
-    bool current = App->GetWindowModule()->GetFullscreen();
+    const bool current = App->GetWindowModule()->GetFullscreen();
     App->GetWindowModule()->SetFullscreen(!current);
 }
 
 void EditorUIModule::ToggleVSync()
 {
-    bool current = App->GetWindowModule()->GetVsync();
+    const bool current = App->GetWindowModule()->GetVsync();
     App->GetWindowModule()->SetVsync(!current);
 }

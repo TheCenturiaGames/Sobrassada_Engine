@@ -1,6 +1,6 @@
 #pragma once
 #include "Script.h"
-#include "Utils/Delegate.h"
+#include "Delegate.h"
 #include <list>
 
 class FullscreenToggleScript : public Script

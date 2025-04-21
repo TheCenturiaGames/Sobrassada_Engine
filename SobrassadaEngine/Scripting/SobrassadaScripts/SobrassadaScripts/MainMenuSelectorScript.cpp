@@ -6,7 +6,7 @@
 #include "MainMenuSelectorScript.h"
 #include "Scene.h"
 #include "SceneModule.h"
-#include <Standalone/UI/ButtonComponent.h>
+#include "Standalone/UI/ButtonComponent.h"
 
 bool MainMenuSelectorScript::Init()
 {

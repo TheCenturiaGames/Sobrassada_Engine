@@ -4,8 +4,7 @@
 #include "Application.h"
 #include "EditorUIModule.h"
 #include "GameObject.h"
-#include "Scene/Components/Standalone/UI/ButtonComponent.h"
-#include "Utils/Delegate.h"
+#include "Standalone/UI/ButtonComponent.h"
 
 bool FullscreenToggleScript::Init()
 {

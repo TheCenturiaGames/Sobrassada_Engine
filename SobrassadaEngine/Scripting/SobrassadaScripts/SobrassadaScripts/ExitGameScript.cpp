@@ -1,11 +1,11 @@
 #include "pch.h"
 
 #include "Application.h"
+#include "Delegate.h"
 #include "EditorUIModule.h"
 #include "ExitGameScript.h"
 #include "GameObject.h"
-#include "Scene/Components/Standalone/UI/ButtonComponent.h"
-#include "Utils/Delegate.h"
+#include "Standalone/UI/ButtonComponent.h"
 
 bool ExitGameScript::Init()
 {
