@@ -2,20 +2,24 @@
 
 #include "Application.h"
 #include "Character.h"
+#include "CuChulainn.h"
 #include "EditorUIModule.h"
 #include "GameObject.h"
+#include "GameTimer.h"
 #include "ScriptComponent.h"
 #include "Standalone/AnimationComponent.h"
+#include "Standalone/CharacterControllerComponent.h"
 #include "Standalone/Physics/CapsuleColliderComponent.h"
 #include "Standalone/Physics/CubeColliderComponent.h"
 
 #include <string>
 
 Character::Character(
-    GameObject* parent, int maxHealth, int damage, float attackDuration, float speed, float cooldown, float range
+    GameObject* parent, int maxHealth, int damage, float attackDuration, float speed, float cooldown, float range,
+    float rangeAIAttack
 )
     : Script(parent), maxHealth(maxHealth), damage(damage), attackDuration(attackDuration), speed(speed),
-      cooldown(cooldown), range(range)
+      cooldown(cooldown), range(range), rangeAIAttack(rangeAIAttack)
 {
     currentHealth = maxHealth;
 }
@@ -46,6 +50,7 @@ bool Character::Init()
     weaponCollider->SetEnabled(false);
 
     lastAttackTime = -1.0f;
+    lastTimeHit    = -1.0f;
 
     return true;
 }
@@ -54,9 +59,20 @@ void Character::Update(float deltaTime)
 {
     if (isDead) return;
 
-    if (deltaTime - lastAttackTime >= attackDuration) weaponCollider->SetEnabled(false);
+    float gameTime = AppEngine->GetGameTimer()->GetTime() / 1000.0f;
+    if (weaponCollider->GetEnabled() && isAttacking && gameTime - lastAttackTime >= attackDuration)
+    {
+        GLOG("Not Attacking %.3f", gameTime);
+        weaponCollider->SetEnabled(false);
+        isAttacking = false;
+    }
+    if (isInvulnerable && gameTime - lastTimeHit >= invulnerableDuration)
+    {
+        GLOG("Not vulnerable %.3f", gameTime);
+        isInvulnerable = false;
+    }
 
-    HandleState(deltaTime);
+    HandleState(gameTime);
 }
 
 void Character::Inspector()
@@ -87,20 +103,27 @@ void Character::OnCollision(GameObject* otherObject, const float3& collisionNorm
     ScriptComponent* enemyScriptComponent =
         dynamic_cast<ScriptComponent*>(otherObject->GetComponentParentByType(COMPONENT_SCRIPT));
 
-    if (enemyScriptComponent != nullptr && enemyWeapon != nullptr)
+    if (!isInvulnerable && enemyScriptComponent != nullptr && enemyWeapon != nullptr && enemyWeapon->GetEnabled())
     {
-        Script* enemyScript = enemyScriptComponent->GetScriptInstance();
+        Script* enemyScript       = enemyScriptComponent->GetScriptInstance();
         // ScriptType scriptType = enemyScriptComponent->GetScriptType(); // not needed for now
-        TakeDamage(dynamic_cast<Character*>(enemyScript)->damage);
+        Character* enemyCharacter = dynamic_cast<Character*>(enemyScript);
+        if (!enemyCharacter->isAttacking) return;
+
+        TakeDamage(enemyCharacter->damage);
+        isInvulnerable     = true;
+        float newDeltaTime = AppEngine->GetGameTimer()->GetTime() / 1000.0f;
+        lastTimeHit        = newDeltaTime;
     }
 }
 
-void Character::Attack(float deltaTime)
+void Character::Attack(float time)
 {
-    if (CanAttack(deltaTime))
+    if (CanAttack(time))
     {
         GLOG("ATTACK");
-        lastAttackTime = deltaTime;
+        isAttacking    = true;
+        lastAttackTime = time;
         weaponCollider->SetEnabled(true);
         PerformAttack();
     }
@@ -123,11 +146,19 @@ void Character::Heal(int amount)
     OnHealed(amount);
 }
 
-bool Character::CanAttack(float deltaTime)
+bool Character::CanAttack(float time)
 {
-    deltaTime *= 1000.0f;
-    if (deltaTime - lastAttackTime >= cooldown) return true;
+    if (!isAttacking && time - lastAttackTime >= cooldown) return true;
 
+    return false;
+}
+
+bool Character::CheckDistanceWithPlayer() const
+{
+    if (character != nullptr)
+    {
+        if (character->GetLastPosition().Distance(parent->GetPosition()) <= rangeAIAttack) return true;
+    }
     return false;
 }
 

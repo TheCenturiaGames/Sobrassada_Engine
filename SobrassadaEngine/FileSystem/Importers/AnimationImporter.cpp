@@ -329,10 +329,10 @@ namespace AnimationImporter
             memcpy(&keyframeCount, cursor, sizeof(uint32_t));
             cursor += sizeof(uint32_t);
 
-            GLOG(
-                "Channel %d: Node='%s', Type=%d, Keyframes=%d", i, nodeName.c_str(), static_cast<int>(animType),
-                keyframeCount
-            );
+            //GLOG(
+            //    "Channel %d: Node='%s', Type=%d, Keyframes=%d", i, nodeName.c_str(), static_cast<int>(animType),
+            //    keyframeCount
+            //);
 
             
             Channel& animChannel = animation->channels[nodeName];

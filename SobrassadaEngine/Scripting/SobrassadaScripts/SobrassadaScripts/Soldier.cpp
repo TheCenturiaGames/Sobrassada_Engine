@@ -10,7 +10,7 @@
 #include "Standalone/AnimationComponent.h"
 #include "Standalone/CharacterControllerComponent.h"
 
-Soldier::Soldier(GameObject* parent) : Character(parent, 3, 1, 0.5f, 1.0f, 1.0f, 1.0f)
+Soldier::Soldier(GameObject* parent) : Character(parent, 3, 1, 0.5f, 1.0f, 1.0f, 1.0f, 2.0f)
 {
 }
 
@@ -60,7 +60,7 @@ void Soldier::PerformAttack()
     // TODO: trails, particles and animation
 }
 
-void Soldier::HandleState(float deltaTime)
+void Soldier::HandleState(float gameTime)
 {
     if (!animComponent) return;
 
@@ -78,8 +78,9 @@ void Soldier::HandleState(float deltaTime)
         break;
     case SoldierStates::BASIC_ATTACK:
         // GLOG("Soldier Basic Attack");
-        animComponent->UseTrigger("Idle");
-        Attack(deltaTime);
+        animComponent->UseTrigger("attack");
+        Attack(gameTime);
+        if (!CheckDistanceWithPlayer()) currentState = SoldierStates::CHASE;
         break;
     default:
         GLOG("No state provided to Soldier");
@@ -96,7 +97,8 @@ void Soldier::ChaseAI()
 {
     if (character != nullptr)
     {
-        if (!agentAI->SetPathNavigation(character->GetLastPosition())) currentState = SoldierStates::PATROL;
+        if (CheckDistanceWithPlayer()) currentState = SoldierStates::BASIC_ATTACK;
+        else if (!agentAI->SetPathNavigation(character->GetLastPosition())) currentState = SoldierStates::PATROL;
     }
     else currentState = SoldierStates::PATROL;
 }

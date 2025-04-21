@@ -13,7 +13,8 @@ class Character : public Script
 {
   public:
     Character(
-        GameObject* parent, int maxHealth, int damage, float attackDuration, float speed, float cooldown, float range
+        GameObject* parent, int maxHealth, int damage, float attackDuration, float speed, float cooldown, float range,
+        float rangeAIAttack
     );
     virtual ~Character() noexcept override { parent = nullptr; };
 
@@ -28,6 +29,7 @@ class Character : public Script
     void Attack(float deltaTime);
     void Heal(int amount);
     bool CanAttack(float deltaTime);
+    bool CheckDistanceWithPlayer() const;
 
   private:
     virtual void HandleState(float deltaTime) {};
@@ -53,4 +55,10 @@ class Character : public Script
     CubeColliderComponent* weaponCollider       = nullptr;
 
     float lastAttackTime                        = -1.0f;
+    float lastTimeHit                           = -1.0f;
+    const float invulnerableDuration            = 0.7f;
+    bool isAttacking                            = false;
+
+    // AI
+    float rangeAIAttack                         = 0.0f;
 };

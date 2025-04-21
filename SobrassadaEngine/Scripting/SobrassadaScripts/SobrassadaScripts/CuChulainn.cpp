@@ -13,7 +13,7 @@
 
 CharacterControllerComponent* character = nullptr;
 
-CuChulainn::CuChulainn(GameObject* parent) : Character(parent, 5, 1, 0.5f, 2.0f, 1.0f, 1.0f)
+CuChulainn::CuChulainn(GameObject* parent) : Character(parent, 5, 1, 0.5f, 2.0f, 1.0f, 1.0f, 0.0f)
 {
     currentHealth = 3; // mainChar starts low hp
 }
@@ -66,7 +66,7 @@ void CuChulainn::PerformAttack()
     // TODO: activate and disable the box collider located on one on the gameobjects bones
 }
 
-void CuChulainn::HandleState(float deltaTime)
+void CuChulainn::HandleState(float time)
 {
     if (!animComponent) return;
 
@@ -75,10 +75,10 @@ void CuChulainn::HandleState(float deltaTime)
     const bool move =
         keyboard[SDL_SCANCODE_W] || keyboard[SDL_SCANCODE_D] || keyboard[SDL_SCANCODE_A] || keyboard[SDL_SCANCODE_S];
 
-    if (mouse[SDL_BUTTON_LEFT - 1] && CanAttack(deltaTime))
+    if (mouse[SDL_BUTTON_LEFT - 1] && CanAttack(time))
     {
         animComponent->UseTrigger("attack");
-        Attack(deltaTime);
+        Attack(time);
     }
     else if (move && !runActive)
     {
