@@ -19,6 +19,7 @@
 #include "ModelImporter.h"
 #include "Octree.h"
 #include "OpenGLModule.h"
+#include "PathfinderModule.h"
 #include "PhysicsModule.h"
 #include "ProjectModule.h"
 #include "Quadtree.h"
@@ -27,15 +28,13 @@
 #include "ResourcePrefab.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
-#include "ShaderModule.h"
 #include "ScriptComponent.h"
-#include "PathfinderModule.h"
+#include "ShaderModule.h"
 #include "Standalone/AnimationComponent.h"
 #include "Standalone/Lights/DirectionalLightComponent.h"
 #include "Standalone/Lights/PointLightComponent.h"
 #include "Standalone/Lights/SpotLightComponent.h"
 #include "Standalone/MeshComponent.h"
-
 
 #include "SDL_mouse.h"
 #include "glew.h"
@@ -67,6 +66,13 @@ Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUI
     navmeshUID            = initialState["NavmeshUID"].GetUint64();
 
     App->GetPhysicsModule()->LoadLayerData(&initialState);
+
+    // Load navmesh from scene.
+    if (navmeshUID != INVALID_UID)
+    {
+        std::string navmeshName = App->GetLibraryModule()->GetResourceName(navmeshUID);
+        App->GetPathfinderModule()->LoadNavMesh(navmeshName);
+    }
 
     // Deserialize GameObjects
     if (initialState.HasMember("GameObjects") && initialState["GameObjects"].IsArray())
@@ -149,12 +155,6 @@ void Scene::Init()
     lightsConfig->InitSkybox();
     lightsConfig->InitLightBuffers();
 
-    //Load navmesh from scene.
-    if (navmeshUID != INVALID_UID)
-    {
-        std::string navmeshName = App->GetLibraryModule()->GetResourceName(navmeshUID);
-        App->GetPathfinderModule()->LoadNavMesh(navmeshName);
-    }
     // Call this after overriding the prefabs to avoid duplicates in gameObjectsToUpdate
     GetGameObjectByUID(gameObjectRootUID)->UpdateTransformForGOBranch();
 
