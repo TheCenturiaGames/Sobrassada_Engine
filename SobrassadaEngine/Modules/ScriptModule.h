@@ -1,6 +1,8 @@
 #pragma once
+
 #include "Globals.h"
 #include "Module.h"
+
 #include <atomic>
 #include <filesystem>
 #include <thread>
@@ -42,10 +44,10 @@ class ScriptModule : public Module
     typedef void (*StartSobrassadaScripts)(Application* App);
     typedef void (*FreeSobrassadaScripts)();
 
-    StartSobrassadaScripts startScriptFunc    = nullptr;
-    CreateScriptFunc createScriptFunc    = nullptr;
-    DestroyScriptFunc destroyScriptFunc  = nullptr;
-    FreeSobrassadaScripts freeScriptFunc  = nullptr;
+    StartSobrassadaScripts startScriptFunc = nullptr;
+    CreateScriptFunc createScriptFunc      = nullptr;
+    DestroyScriptFunc destroyScriptFunc    = nullptr;
+    FreeSobrassadaScripts freeScriptFunc   = nullptr;
 
     fs::file_time_type lastWriteTime;
     std::atomic<bool> running = true;

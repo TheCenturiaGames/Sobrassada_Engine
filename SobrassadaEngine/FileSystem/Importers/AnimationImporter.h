@@ -17,7 +17,8 @@ class ResourceAnimation;
 
 enum class  AnimationType : uint8_t
 {   TRANSLATION,
-    ROTATION
+    ROTATION,
+    SCALE
 };
 namespace AnimationImporter
 {

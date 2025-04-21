@@ -1,6 +1,7 @@
 #pragma once
-#include "Script.h"
+
 #include "Math/float4x4.h"
+#include "Script.h"
 
 class CharacterControllerComponent;
 class CameraComponent;
@@ -13,8 +14,8 @@ class GodMode : public Script
     void Update(float deltaTime) override;
 
   private:
-    CharacterControllerComponent* characterController;
-    CameraComponent* godCamera;
+    CharacterControllerComponent* characterController = nullptr;
+    CameraComponent* godCamera                        = nullptr;
     float4x4 originalTransform;
     bool freeCamera = false;
 };

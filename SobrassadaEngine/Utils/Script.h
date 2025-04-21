@@ -1,6 +1,6 @@
 #pragma once
-//
 #include "rapidjson/document.h"
+
 struct InspectorField
 {
     enum class FieldType
@@ -32,5 +32,6 @@ class Script
     virtual void Update(float deltaTime)                                                            = 0;
     virtual void Inspector()                                                                        = 0;
     virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) = 0;
-    virtual void Load(const rapidjson::Value& initialState)                                                                             = 0;
+    virtual void Load(const rapidjson::Value& initialState)                                         = 0;
+    virtual void OnCollision(GameObject* otherObject, const float3& collisionNormal)                = 0;
 };

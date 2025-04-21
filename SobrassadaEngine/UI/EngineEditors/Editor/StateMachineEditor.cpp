@@ -805,26 +805,16 @@ void StateMachineEditor::DeleteStateResource(StateNode& node)
         {
             if (ImGui::Button(trigger.c_str()))
             {
+                bool triggerAvailable = false;
                 if (animComponent)
                 {
                     if (animComponent->IsPlaying())
                     {
                         GLOG("Trigger selected: %s", trigger.c_str());
-                        for (const auto& transition : resource->transitions)
+                        triggerAvailable = resource->UseTrigger(trigger);
+                        if (triggerAvailable)
                         {
-                            if (transition.triggerName == trigger &&
-                                transition.fromState.GetString() == resource->GetActiveState()->name.GetString())
-                            {
-                                for (size_t i = 0; i < resource->states.size(); ++i)
-                                {
-                                    if (resource->states[i].name.GetString() == transition.toState.GetString())
-                                    {
-                                        resource->SetActiveState(static_cast<int>(i));
-                                        animComponent->OnPlay(true);
-                                        break;
-                                    }
-                                }
-                            }
+                            animComponent->OnPlay(true);
                         }
                     }
                 }
