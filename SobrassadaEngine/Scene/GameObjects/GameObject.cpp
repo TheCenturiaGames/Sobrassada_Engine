@@ -686,6 +686,8 @@ void GameObject::RenderContextMenu()
         const char* label = prefabUID == INVALID_UID ? "Create Prefab" : "Update Prefab";
         if (ImGui::MenuItem(label)) CreatePrefab();
 
+        if (prefabUID != INVALID_UID && ImGui::MenuItem("Unlink prefab")) prefabUID = INVALID_UID;
+
         if (uid != App->GetSceneModule()->GetScene()->GetGameObjectRootUID() && ImGui::MenuItem("Delete"))
         {
             App->GetSceneModule()->GetScene()->RemoveGameObjectHierarchy(uid);
@@ -787,6 +789,7 @@ void GameObject::OnAABBUpdated()
     {
         localAABB.Enclose(component.second->GetLocalAABB());
     }
+
     OnTransformUpdated();
 }
 

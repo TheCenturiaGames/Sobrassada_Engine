@@ -12,7 +12,6 @@ class GodMode : public Script
     GodMode(GameObject* parent) : Script(parent) {}
     bool Init() override;
     void Update(float deltaTime) override;
-    void Inspector() override;
 
   private:
     CharacterControllerComponent* characterController = nullptr;

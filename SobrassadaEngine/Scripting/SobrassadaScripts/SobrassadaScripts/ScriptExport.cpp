@@ -18,7 +18,7 @@
 Application* AppEngine = nullptr;
 extern "C" SOBRASSADA_API void InitSobrassadaScripts(Application* App)
 {
-    GLOG("Sobrassada Scripts Initialized");
+    // GLOG("Sobrassada Scripts Initialized");
     AppEngine = App;
 }
 
@@ -39,6 +39,6 @@ extern "C" SOBRASSADA_API void DestroyScript(Script* script)
 
 extern "C" SOBRASSADA_API void FreeSobrassadaScripts()
 {
-    GLOG("Sobrassada Scripts deleted");
+    // GLOG("Sobrassada Scripts deleted");
     AppEngine = nullptr;
 }

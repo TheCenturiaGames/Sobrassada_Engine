@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Math/float3.h"
+#include "rapidjson/document.h"
 #include <vector>
 
 class GameObject;
@@ -47,7 +48,9 @@ class Script
 
     virtual bool Init()                  = 0;
     virtual void Update(float deltaTime) = 0;
-    virtual void Inspector()             = 0;
+    virtual void Inspector();
+    virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator);
+    virtual void Load(const rapidjson::Value& initialState);
     virtual void OnCollision(GameObject* otherObject, const float3& collisionNormal) {};
 
   protected:

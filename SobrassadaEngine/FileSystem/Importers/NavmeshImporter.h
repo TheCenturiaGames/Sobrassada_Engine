@@ -2,12 +2,13 @@
 
 #include "Globals.h"
 
-class ResourceNavmesh;
+class NavMeshConfig;
+class ResourceNavMesh;
 class dtNavMesh;
 
 namespace NavmeshImporter
 {
-    UID SaveNavmesh(const char* path, const dtNavMesh& navmesh);
-
-    ResourceNavmesh* LoadNavmesh(UID navmeshUID);
+    UID SaveNavmesh(const char* name, const ResourceNavMesh* resource, const NavMeshConfig& config);
+    ResourceNavMesh* LoadNavmesh(UID navmeshUID);
+    
 }; // namespace NavmeshImporter

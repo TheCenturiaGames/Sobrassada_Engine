@@ -1,9 +1,10 @@
 #include "pch.h"
-#include "GodMode.h"
+
 #include "Application.h"
 #include "CameraComponent.h"
 #include "Components/Standalone/CharacterControllerComponent.h"
 #include "GameObject.h"
+#include "GodMode.h"
 #include "InputModule.h"
 #include <SDL_mouse.h>
 
@@ -69,8 +70,4 @@ void GodMode::Update(float deltaTime)
         godCamera->SetFreeCamera(true);
         freeCamera = true;
     }
-}
-
-void GodMode::Inspector()
-{
 }

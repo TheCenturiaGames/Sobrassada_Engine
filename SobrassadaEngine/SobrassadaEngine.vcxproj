@@ -366,6 +366,7 @@
     <ClCompile Include="Libs\Wwise\samples\SoundEngine\Common\AkPlatformProfilerHookStubs.cpp" />
     <ClCompile Include="Libs\Wwise\samples\SoundEngine\IO\AkDefaultIOHookDeferred.cpp" />
     <ClCompile Include="Libs\Wwise\samples\SoundEngine\IO\stdafx.cpp" />
+    <ClCompile Include="FileSystem\Meta\MetaNavmesh.cpp" />
     <ClCompile Include="Modules\AudioModule.cpp" />
     <ClCompile Include="FileSystem\Importers\AnimationImporter.cpp" />
     <ClCompile Include="FileSystem\Meta\MetaAnimation.cpp" />
@@ -378,6 +379,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Utils\GBuffer.cpp" />
+    <ClCompile Include="Utils\NavMeshConfig.cpp" />
     <ClCompile Include="Scene\Components\Standalone\Physics\CapsuleColliderComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\Physics\SphereColliderComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\UI\ButtonComponent.cpp" />
@@ -407,7 +410,7 @@
     <ClCompile Include="Scene\Components\Standalone\AnimationComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\AnimController.cpp" />
     <ClCompile Include="Modules\PhysicsModule.cpp" />
-    <ClCompile Include="ResourceManagement\Resources\ResourceNavmesh.cpp" />
+    <ClCompile Include="ResourceManagement\Resources\ResourceNavMesh.cpp" />
     <ClCompile Include="Modules\GameUIModule.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceFont.cpp" />
     <ClCompile Include="ResourceManagement\Resources\ResourceStateMachine.cpp" />
@@ -590,7 +593,10 @@
     <ClInclude Include="Libs\Wwise\samples\SoundEngine\IO\AkDefaultIOHookDeferred.h" />
     <ClInclude Include="Libs\Wwise\samples\SoundEngine\IO\AkFileHelpers.h" />
     <ClInclude Include="Libs\Wwise\samples\SoundEngine\IO\stdafx.h" />
+    <ClInclude Include="FileSystem\Meta\MetaNavmesh.h" />
     <ClInclude Include="Modules\AudioModule.h" />
+    <ClInclude Include="Utils\GBuffer.h" />
+    <ClInclude Include="Utils\NavMeshConfig.h" />
     <ClInclude Include="Scene\Components\Standalone\Physics\CapsuleColliderComponent.h" />
     <ClInclude Include="Scene\Components\Standalone\UI\ButtonComponent.h" />
     <ClInclude Include="Scene\Components\Standalone\UI\ImageComponent.h" />
@@ -622,7 +628,7 @@
     <ClInclude Include="Utils\TextManager.h" />
     <ClInclude Include="Modules\ScriptModule.h" />
     <ClInclude Include="Modules\PhysicsModule.h" />
-    <ClInclude Include="ResourceManagement\Resources\ResourceNavmesh.h" />
+    <ClInclude Include="ResourceManagement\Resources\ResourceNavMesh.h" />
     <ClInclude Include="FileSystem\Importers\NavmeshImporter.h" />
     <ClInclude Include="Modules\PathfinderModule.h" />
     <ClInclude Include="Scene\Components\Standalone\AIAgentComponent.h">
