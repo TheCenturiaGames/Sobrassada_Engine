@@ -108,11 +108,6 @@ Scene::~Scene()
 
 void Scene::Init()
 {
-    for (auto& gameObject : gameObjectsContainer)
-    {
-        gameObject.second->Init();
-    }
-    App->GetResourcesModule()->GetBatchManager()->LoadData();
 
     // When loading a scene, overrides all gameObjects that have a prefabUID. That is because if the prefab has been
     // modified, the scene file may have not, so the prefabs need to be updated when loading the scene again
@@ -137,6 +132,12 @@ void Scene::Init()
         MeshComponent* mesh = gameObject.second->GetMeshComponent();
         if (mesh != nullptr) mesh->InitSkin();
     }
+
+    for (auto& gameObject : gameObjectsContainer)
+    {
+        gameObject.second->Init();
+    }
+    App->GetResourcesModule()->GetBatchManager()->LoadData();
 
     lightsConfig->InitSkybox();
     lightsConfig->InitLightBuffers();
