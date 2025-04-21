@@ -30,19 +30,6 @@ bool PathfinderModule::Init()
 
     if (!App->GetSceneModule()->GetScene()) return true;
 
-    const UID sceneNavmeshUID = App->GetSceneModule()->GetScene()->GetNavmeshUID();
-    if (sceneNavmeshUID != INVALID_UID)
-    {
-        const std::string& navmeshName = App->GetLibraryModule()->GetResourceName(sceneNavmeshUID);
-        LoadNavMesh(navmeshName);
-        GLOG("NavMesh loaded on Pathfinder Init: %s (UID: %llu)", navmeshName.c_str(), sceneNavmeshUID);
-    }
-    else
-    {
-        tmpNavmesh = new ResourceNavMesh(GenerateUID(), DEFAULT_NAVMESH_NAME);
-        GLOG("No scene navmesh UID found. Skipping navmesh load. Initializing with empty navmesh");
-    }
-
     return true;
 }
 

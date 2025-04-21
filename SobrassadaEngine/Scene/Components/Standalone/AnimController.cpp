@@ -240,14 +240,14 @@ void AnimController::GetChannelPosition(const Channel* animChannel, float3& pos,
 
                 pos = float3::Lerp(animChannel->positions[prevIndex], animChannel->positions[nextIndex], lambda);
 
-                GLOG(
-                    "Position interpolation: From (%.2f,%.2f,%.2f) to (%.2f,%.2f,%.2f) with lambda %.2f = "
-                    "(%.2f,%.2f,%.2f)",
-                    animChannel->positions[prevIndex].x, animChannel->positions[prevIndex].y,
-                    animChannel->positions[prevIndex].z, animChannel->positions[nextIndex].x,
-                    animChannel->positions[nextIndex].y, animChannel->positions[nextIndex].z, lambda, pos.x, pos.y,
-                    pos.z
-                );
+                //GLOG(
+                //    "Position interpolation: From (%.2f,%.2f,%.2f) to (%.2f,%.2f,%.2f) with lambda %.2f = "
+                //    "(%.2f,%.2f,%.2f)",
+                //    animChannel->positions[prevIndex].x, animChannel->positions[prevIndex].y,
+                //    animChannel->positions[prevIndex].z, animChannel->positions[nextIndex].x,
+                //    animChannel->positions[nextIndex].y, animChannel->positions[nextIndex].z, lambda, pos.x, pos.y,
+                //    pos.z
+                //);
             }
         }
     }
