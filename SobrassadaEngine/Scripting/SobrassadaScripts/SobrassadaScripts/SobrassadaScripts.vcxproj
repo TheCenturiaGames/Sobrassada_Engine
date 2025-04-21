@@ -1751,6 +1751,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Game|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="RotateGameObject.cpp" />
+    <ClCompile Include="Script.cpp" />
     <ClCompile Include="ScriptExport.cpp" />
     <ClCompile Include="Soldier.cpp" />
   </ItemGroup>

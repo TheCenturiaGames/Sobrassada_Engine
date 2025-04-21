@@ -25,7 +25,7 @@ InputModule::~InputModule()
 
 bool InputModule::Init()
 {
-    GLOG("Init SDL input event system");
+    //GLOG("Init SDL input event system");
     bool returnStatus = true;
     SDL_Init(0);
 
@@ -113,7 +113,7 @@ update_status InputModule::PreUpdate(float deltaTime)
 
 bool InputModule::ShutDown()
 {
-    GLOG("Quitting SDL input event subsystem");
+    //GLOG("Quitting SDL input event subsystem");
     SDL_QuitSubSystem(SDL_INIT_EVENTS);
     return true;
 }

@@ -45,7 +45,7 @@ int  main(int argc, char** argv)
         {
         case MAIN_CREATION:
 
-            GLOG("----- Application Creation -----");
+            //GLOG("----- Application Creation -----");
             App       = new Application();
             mainState = MAIN_START;
             break;

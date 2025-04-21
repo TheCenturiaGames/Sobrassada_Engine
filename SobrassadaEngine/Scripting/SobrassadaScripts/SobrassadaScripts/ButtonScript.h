@@ -8,6 +8,5 @@ class ButtonScript : public Script
     ButtonScript(GameObject* parent) : Script(parent) {}
     bool Init() override;
     void Update(float deltaTime) override;
-    void Inspector() override {};
     void TestDispatcher();
 };
