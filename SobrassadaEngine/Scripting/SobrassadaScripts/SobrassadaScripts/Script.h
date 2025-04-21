@@ -3,6 +3,10 @@
 #include "Math/float3.h"
 #include <vector>
 
+#include "Math/float3.h"
+#include "rapidjson/document.h"
+#include <vector>
+
 class GameObject;
 class Application;
 

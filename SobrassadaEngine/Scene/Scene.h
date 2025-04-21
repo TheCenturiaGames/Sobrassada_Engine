@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Globals.h"
 #include "LightsConfig.h"
@@ -17,9 +17,9 @@ class Octree;
 class ResourcePrefab;
 class Quadtree;
 class CameraComponent;
+class CharacterControllerComponent;
 class GBuffer;
 class Framebuffer;
-class CharacterControllerComponent;
 enum class SaveMode;
 enum MobilitySettings;
 
