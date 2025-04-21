@@ -128,9 +128,6 @@ bool OpenGLModule::Init()
     WindowModule* windowModule = App->GetWindowModule();
     windowModule->SetVsync(windowModule->GetVsync());
 
-    int x;
-    SDL_GL_GetAttribute(SDL_GL_DEPTH_SIZE, &x);
-
     return true;
 }
 
