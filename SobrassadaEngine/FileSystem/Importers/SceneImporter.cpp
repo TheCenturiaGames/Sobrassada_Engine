@@ -39,7 +39,7 @@ namespace SceneImporter
 
     void ImportGLTF(const char* filePath, const std::string& targetFilePath)
     {
-        tinygltf::Model model = LoadModelGLTF(filePath, targetFilePath);
+        tinygltf::Model model = CopyAndLoadGLTF(filePath, targetFilePath);
 
         std::vector<std::vector<std::pair<UID, UID>>> gltfMeshes;
         std::unordered_map<int, UID> matIndices;
@@ -98,7 +98,39 @@ namespace SceneImporter
         ModelImporter::ImportModel(model, gltfMeshes, filePath, targetFilePath);
     }
 
-    tinygltf::Model LoadModelGLTF(const char* filePath, const std::string& targetFilePath)
+    tinygltf::Model CopyAndLoadGLTF(const char* filePath, const std::string& targetFilePath)
+    {
+        {
+            // Copy gltf to Assets folder
+            const std::string copyPath = targetFilePath + ASSETS_PATH + FileSystem::GetFileNameWithExtension(filePath);
+            
+            if (FileSystem::Exists(copyPath.c_str()))
+                FileSystem::Delete(copyPath.c_str());
+            
+            FileSystem::Copy(filePath, copyPath.c_str());
+        }
+
+        const tinygltf::Model model = LoadModelGLTF(targetFilePath.c_str());
+        
+        {
+            const std::string path = FileSystem::GetFilePath(filePath);
+
+            // Copy bin to Assets folder
+            for (const auto& srcBuffers : model.buffers)
+            {
+                std::string binPath     = path + srcBuffers.uri;
+                std::string copyBinPath = targetFilePath + ASSETS_PATH + FileSystem::GetFileNameWithExtension(binPath);
+                if (FileSystem::Exists(copyBinPath.c_str()))
+                    FileSystem::Delete(copyBinPath.c_str());
+
+                FileSystem::Copy(binPath.c_str(), copyBinPath.c_str());
+            }
+        }
+
+        return model;
+    }
+
+    tinygltf::Model LoadModelGLTF(const char* filePath)
     {
         tinygltf::TinyGLTF gltfContext;
         tinygltf::Model model;
@@ -122,31 +154,7 @@ namespace SceneImporter
                 GLOG("Failed to parse glTF\n");
             }
         }
-
-        {
-            // Copy gltf to Assets folder
-            std::string copyPath = targetFilePath + ASSETS_PATH + FileSystem::GetFileNameWithExtension(filePath);
-            
-            if (FileSystem::Exists(copyPath.c_str()))
-                FileSystem::Delete(copyPath.c_str());
-            
-            FileSystem::Copy(filePath, copyPath.c_str());
-        }
-        {
-            std::string path = FileSystem::GetFilePath(filePath);
-
-            // Copy bin to Assets folder
-            for (const auto& srcBuffers : model.buffers)
-            {
-                std::string binPath     = path + srcBuffers.uri;
-                std::string copyBinPath = targetFilePath + ASSETS_PATH + FileSystem::GetFileNameWithExtension(binPath);
-                if (FileSystem::Exists(copyBinPath.c_str()))
-                    FileSystem::Delete(copyBinPath.c_str());
-
-                FileSystem::Copy(binPath.c_str(), copyBinPath.c_str());
-            }
-        }
-
+        
         return model;
     }
 
@@ -155,7 +163,7 @@ namespace SceneImporter
         const rapidjson::Value& importOptions, UID sourceUID
     )
     {
-        tinygltf::Model model             = LoadModelGLTF(filePath.c_str(), targetFilePath);
+        tinygltf::Model model             = LoadModelGLTF(filePath.c_str());
         
         uint32_t gltfMeshIndex      = 0;
         if (importOptions.HasMember("gltfMeshIndex"))
@@ -178,7 +186,7 @@ namespace SceneImporter
         const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID
     )
     {
-        tinygltf::Model model = LoadModelGLTF(filePath.c_str(), targetFilePath);
+        tinygltf::Model model = LoadModelGLTF(filePath.c_str());
 
         // find material name that equals to name
         for (int i = 0; i < model.materials.size(); i++)
@@ -195,7 +203,7 @@ namespace SceneImporter
         const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID
     )
     {
-        tinygltf::Model model = LoadModelGLTF(filePath.c_str(), targetFilePath);
+        tinygltf::Model model = LoadModelGLTF(filePath.c_str());
 
         // find material name that equals to name
         for (int i = 0; i < model.animations.size(); i++)
