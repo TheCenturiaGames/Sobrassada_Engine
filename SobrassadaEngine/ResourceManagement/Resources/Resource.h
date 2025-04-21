@@ -20,7 +20,7 @@ enum class ResourceType
     Font,         // 19
 };
 
-class Resource
+class SOBRASADA_API_ENGINE Resource
 {
   public:
     Resource(UID uid, const std::string& name, ResourceType type);

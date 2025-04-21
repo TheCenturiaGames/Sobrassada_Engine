@@ -26,6 +26,7 @@
 #include "ResourcePrefab.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
+#include "ScriptComponent.h"
 #include "Standalone/AnimationComponent.h"
 #include "Standalone/Lights/DirectionalLightComponent.h"
 #include "Standalone/Lights/PointLightComponent.h"
@@ -86,6 +87,8 @@ Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUI
 
 Scene::~Scene()
 {
+    App->GetPhysicsModule()->EmptyWorld();
+
     for (auto it = gameObjectsContainer.begin(); it != gameObjectsContainer.end(); ++it)
     {
         delete it->second;
@@ -102,7 +105,6 @@ Scene::~Scene()
     sceneOctree  = nullptr;
     dynamicTree  = nullptr;
 
-    App->GetPhysicsModule()->EmptyWorld();
     GLOG("%s scene closed", sceneName.c_str());
 }
 
@@ -208,37 +210,27 @@ void Scene::Save(
     if (saveMode != SaveMode::SavePlayMode) App->GetProjectModule()->SetAsStartupScene(sceneName);
 }
 
-void Scene::LoadComponents() const
-{
-    lightsConfig->InitSkybox();
-    lightsConfig->InitLightBuffers();
-}
-
-void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects)
-{
-    for (auto it = gameObjectsContainer.begin(); it != gameObjectsContainer.end(); ++it)
-    {
-        delete it->second;
-    }
-    gameObjectsContainer.clear();
-    gameObjectsContainer.insert(loadedGameObjects.begin(), loadedGameObjects.end());
-
-    GameObject* root = GetGameObjectByUID(gameObjectRootUID);
-    if (root != nullptr)
-    {
-        GLOG("Init transform and AABB calculation");
-        root->UpdateTransformForGOBranch();
-    }
-
-    UpdateStaticSpatialStructure();
-    UpdateDynamicSpatialStructure();
-}
-
 update_status Scene::Update(float deltaTime)
 {
 #ifdef OPTICK
     OPTICK_CATEGORY("Scene::Update", Optick::Category::GameLogic)
 #endif
+
+    if (App->GetSceneModule()->GetOnlyOnceInPlayMode())
+    {
+        for (auto& gameObject : gameObjectsContainer)
+        {
+            std::unordered_map<ComponentType, Component*> componentList = gameObject.second->GetComponents();
+
+            for (auto& component : componentList)
+            {
+                if (component.first == ComponentType::COMPONENT_SCRIPT)
+                    dynamic_cast<ScriptComponent*>(component.second)->InitScriptInstances();
+            }
+        }
+        App->GetSceneModule()->ResetOnlyOnceInPlayMode();
+    }
+
     for (auto& gameObject : gameObjectsContainer)
     {
         std::unordered_map<ComponentType, Component*> componentList = gameObject.second->GetComponents();
@@ -1158,6 +1150,10 @@ void Scene::LoadPrefab(const UID prefabUID, const ResourcePrefab* prefab, const 
                 MeshComponent* newMesh = newObjects[i]->GetMeshComponent();
                 newMesh->SetBones(newBonesObjects, newBonesUIDs);
             }
+
+            // If has animations, map them here
+            AnimationComponent* animComp = newObjects[i]->GetAnimationComponent();
+            if (animComp) animComp->SetBoneMapping();
         }
 
         if (prefab == nullptr) App->GetResourcesModule()->ReleaseResource(resourcePrefab);

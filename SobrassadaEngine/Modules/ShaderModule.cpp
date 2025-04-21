@@ -36,7 +36,7 @@ bool ShaderModule::ShutDown()
 
 unsigned int ShaderModule::CreateShaderProgram(const char* vertexPath, const char* fragmentPath)
 {
-    GLOG("Loading shaders")
+    //GLOG("Loading shaders")
     unsigned int program    = 0;
 
     char* vertexShader      = LoadShaderSource(vertexPath);
@@ -55,7 +55,7 @@ unsigned int ShaderModule::CreateShaderProgram(const char* vertexPath, const cha
 
 char* ShaderModule::LoadShaderSource(const char* shaderPath)
 {
-    GLOG("Reading shader: %s", shaderPath)
+    //GLOG("Reading shader: %s", shaderPath)
     char* data = nullptr;
     FILE* file = nullptr;
 
@@ -76,7 +76,7 @@ char* ShaderModule::LoadShaderSource(const char* shaderPath)
 
 unsigned int ShaderModule::CompileShader(unsigned int shaderType, const char* source)
 {
-    GLOG("Compiling %s", GL_VERTEX_SHADER == shaderType ? "vertex shader" : "fragment shader")
+    //GLOG("Compiling %s", GL_VERTEX_SHADER == shaderType ? "vertex shader" : "fragment shader")
     unsigned shaderId = glCreateShader(shaderType);
     glShaderSource(shaderId, 1, &source, 0);
     glCompileShader(shaderId);
@@ -104,7 +104,7 @@ unsigned int ShaderModule::CompileShader(unsigned int shaderType, const char* so
 
 unsigned int ShaderModule::CreateProgram(unsigned int vertexShader, unsigned fragmentShader)
 {
-    GLOG("Creating shader program")
+    //GLOG("Creating shader program")
     unsigned programId = glCreateProgram();
     glAttachShader(programId, vertexShader);
     glAttachShader(programId, fragmentShader);

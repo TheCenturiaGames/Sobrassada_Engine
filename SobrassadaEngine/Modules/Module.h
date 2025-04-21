@@ -2,7 +2,7 @@
 
 #include "Globals.h"
 
-class Module
+class SOBRASADA_API_ENGINE Module
 {
   public:
     Module() {}

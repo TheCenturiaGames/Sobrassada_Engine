@@ -1,7 +1,8 @@
 #include "pch.h"
+
 #include "ButtonScript.h"
-#include "GameObject.h"
 #include "Component.h"
+#include "GameObject.h"
 #include "Scene/Components/Standalone/UI/ButtonComponent.h"
 #include "Utils/Delegate.h"
 
@@ -15,7 +16,7 @@ bool ButtonScript::Init()
         std::function<void(void)> function = std::bind(&ButtonScript::TestDispatcher, this);
         Delegate<void> delegate(function);
         static_cast<ButtonComponent*>(button)->AddOnClickCallback(delegate);
-    }     
+    }
 
     return true;
 }

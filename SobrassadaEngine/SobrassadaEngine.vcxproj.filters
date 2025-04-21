@@ -441,9 +441,6 @@
     <ClCompile Include="Libs\RecastDetour\DetourCrowd\Source\DetourProximityGrid.cpp">
       <Filter>External\DetourCrowd</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Components\Standalone\AIAgentComponent.cpp">
-      <Filter>Scene\Components</Filter>
-    </ClCompile>
     <ClCompile Include="Modules\PathfinderModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
@@ -515,6 +512,9 @@
     </ClCompile>
     <ClCompile Include="Scene\Components\Standalone\Audio\AudioListenerComponent.cpp">
       <Filter>Scene\Components\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\AIAgentComponent.cpp">
+      <Filter>Scene\Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

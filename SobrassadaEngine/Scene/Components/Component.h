@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "ComponentUtils.h"
+#include "Globals.h"
 
 #include "Geometry/AABB.h"
 #include "rapidjson/document.h"
@@ -37,6 +38,8 @@ class SOBRASADA_API_ENGINE Component
 
     const float4x4& GetGlobalTransform() const;
     bool IsEffectivelyEnabled() const;
+
+    void SetEnabled(bool newEnabled) { enabled = newEnabled; }
 
   protected:
     const UID uid;
