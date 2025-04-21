@@ -631,8 +631,8 @@ update_status DebugDrawModule::Render(float deltaTime)
     {
         CameraComponent* camera = App->GetSceneModule()->GetScene()->GetMainCamera();
         auto framebuffer        = App->GetOpenGLModule()->GetFramebuffer();
-        int width                   = framebuffer->GetTextureWidth();
-        int height                  = framebuffer->GetTextureHeight();
+        const int width                   = framebuffer->GetTextureWidth();
+        const int height                  = framebuffer->GetTextureHeight();
         Draw(camera->GetViewMatrix(), camera->GetProjectionMatrix(), width, height);
     }
     else Draw();
