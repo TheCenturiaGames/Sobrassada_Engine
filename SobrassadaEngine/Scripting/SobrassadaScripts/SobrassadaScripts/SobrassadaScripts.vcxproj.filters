@@ -39,6 +39,15 @@
     <ClInclude Include="GodMode.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="Character.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="Soldier.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="CuChulainn.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -172,6 +181,477 @@
     </ClCompile>
     <ClCompile Include="GodMode.cpp">
       <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="Script.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="Character.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="Soldier.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="CuChulainn.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\LinearMath\btVector3.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\LinearMath\btThreads.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\LinearMath\btSerializer64.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\LinearMath\btSerializer.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\LinearMath\btReducedVector.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\LinearMath\btQuickprof.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\LinearMath\btPolarDecomposition.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\LinearMath\btGeometryUtil.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\LinearMath\btConvexHullComputer.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\LinearMath\btConvexHull.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\LinearMath\btAlignedAllocator.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\LinearMath\TaskScheduler\btThreadSupportPosix.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\LinearMath\TaskScheduler\btThreadSupportWin32.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\LinearMath\TaskScheduler\btTaskScheduler.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\Vehicle\btWheelInfo.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\Vehicle\btRaycastVehicle.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\MLCPSolvers\btMLCPSolver.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\MLCPSolvers\btLemkeAlgorithm.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\MLCPSolvers\btDantzigLCP.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\Featherstone\btMultiBodySphericalJointMotor.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\Featherstone\btMultiBodySphericalJointLimit.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\Featherstone\btMultiBodySliderConstraint.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\Featherstone\btMultiBodyPoint2Point.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\Featherstone\btMultiBodyMLCPConstraintSolver.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\Featherstone\btMultiBodyJointMotor.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\Featherstone\btMultiBodyJointLimitConstraint.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\Featherstone\btMultiBodyGearConstraint.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\Featherstone\btMultiBodyFixedConstraint.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\Featherstone\btMultiBodyDynamicsWorld.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\Featherstone\btMultiBodyConstraintSolver.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\Featherstone\btMultiBodyConstraint.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\Featherstone\btMultiBody.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\Dynamics\btSimulationIslandManagerMt.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\Dynamics\btSimpleDynamicsWorld.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\Dynamics\btRigidBody.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\Dynamics\btDiscreteDynamicsWorldMt.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\Dynamics\btDiscreteDynamicsWorld.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\ConstraintSolver\btUniversalConstraint.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\ConstraintSolver\btTypedConstraint.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\ConstraintSolver\btSolve2LinearConstraint.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\ConstraintSolver\btSliderConstraint.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\ConstraintSolver\btSequentialImpulseConstraintSolverMt.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\ConstraintSolver\btSequentialImpulseConstraintSolver.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\ConstraintSolver\btPoint2PointConstraint.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\ConstraintSolver\btNNCGConstraintSolver.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\ConstraintSolver\btHingeConstraint.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\ConstraintSolver\btHinge2Constraint.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\ConstraintSolver\btGeneric6DofSpringConstraint.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\ConstraintSolver\btGeneric6DofSpring2Constraint.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\ConstraintSolver\btGeneric6DofConstraint.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\ConstraintSolver\btGearConstraint.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\ConstraintSolver\btFixedConstraint.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\ConstraintSolver\btContactConstraint.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\ConstraintSolver\btConeTwistConstraint.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\ConstraintSolver\btBatchedConstraints.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletDynamics\Character\btKinematicCharacterController.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\NarrowPhaseCollision\btVoronoiSimplexSolver.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\NarrowPhaseCollision\btSubSimplexConvexCast.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\NarrowPhaseCollision\btRaycastCallback.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\NarrowPhaseCollision\btPolyhedralContactClipping.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\NarrowPhaseCollision\btPersistentManifold.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\NarrowPhaseCollision\btMinkowskiPenetrationDepthSolver.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\NarrowPhaseCollision\btGjkPairDetector.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\NarrowPhaseCollision\btGjkEpaPenetrationDepthSolver.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\NarrowPhaseCollision\btGjkEpa2.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\NarrowPhaseCollision\btGjkConvexCast.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\NarrowPhaseCollision\btConvexCast.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\NarrowPhaseCollision\btContinuousConvexCollision.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\Gimpact\gim_tri_collision.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\Gimpact\gim_memory.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\Gimpact\gim_contact.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\Gimpact\gim_box_set.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\Gimpact\btTriangleShapeEx.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\Gimpact\btGenericPoolAllocator.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\Gimpact\btGImpactShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\Gimpact\btGImpactQuantizedBvh.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\Gimpact\btGImpactCollisionAlgorithm.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\Gimpact\btGImpactBvh.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\Gimpact\btContactProcessing.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btUniformScalingShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btTriangleMeshShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btTriangleMesh.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btTriangleIndexVertexMaterialArray.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btTriangleIndexVertexArray.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btTriangleCallback.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btTriangleBuffer.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btTetrahedronShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btStridingMeshInterface.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btSphereShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btStaticPlaneShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btShapeHull.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btSdfCollisionShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btScaledBvhTriangleMeshShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btPolyhedralConvexShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btOptimizedBvh.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btMultimaterialTriangleMeshShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btMultiSphereShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btMiniSDF.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btMinkowskiSumShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btHeightfieldTerrainShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btEmptyShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btCylinderShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btConvexTriangleMeshShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btConvexPolyhedron.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btConvexShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btConvexPointCloudShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btConvexInternalShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btConvexHullShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btConvex2dShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btConeShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btConcaveShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btCompoundShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btCollisionShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btCapsuleShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btBvhTriangleMeshShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btBoxShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionShapes\btBox2dShape.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\btUnionFind.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\btSphereSphereCollisionAlgorithm.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\btSphereTriangleCollisionAlgorithm.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\btSphereBoxCollisionAlgorithm.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\btSimulationIslandManager.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\btManifoldResult.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\btInternalEdgeUtility.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\btHashedSimplePairCache.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\btGhostObject.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\btEmptyCollisionAlgorithm.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\btDefaultCollisionConfiguration.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\btConvexConvexAlgorithm.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\btConvexPlaneCollisionAlgorithm.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\btConvexConcaveCollisionAlgorithm.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\btConvex2dConvex2dAlgorithm.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\btCompoundCollisionAlgorithm.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\btCompoundCompoundCollisionAlgorithm.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\btCollisionWorldImporter.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\btCollisionWorld.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\btCollisionDispatcherMt.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\btCollisionObject.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\btCollisionDispatcher.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\btBoxBoxDetector.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\btBoxBoxCollisionAlgorithm.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\btBox2dBox2dCollisionAlgorithm.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\btActivatingCollisionAlgorithm.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\CollisionDispatch\SphereTriangleDetector.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\BroadphaseCollision\btSimpleBroadphase.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\BroadphaseCollision\btQuantizedBvh.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\BroadphaseCollision\btOverlappingPairCache.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\BroadphaseCollision\btDispatcher.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\BroadphaseCollision\btDbvtBroadphase.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\BroadphaseCollision\btDbvt.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\BroadphaseCollision\btCollisionAlgorithm.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\BroadphaseCollision\btBroadphaseProxy.cpp">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\BroadphaseCollision\btAxisSweep3.cpp">
+      <Filter>External</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

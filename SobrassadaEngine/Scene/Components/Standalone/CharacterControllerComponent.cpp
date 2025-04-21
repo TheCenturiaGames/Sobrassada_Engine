@@ -1,13 +1,13 @@
 #include "CharacterControllerComponent.h"
 
 #include "Application.h"
+#include "DetourNavMeshQuery.h"
 #include "EditorUIModule.h"
 #include "GameObject.h"
 #include "InputModule.h"
-#include "SceneModule.h"
-#include "DetourNavMeshQuery.h"
-#include "ResourcesModule.h"
 #include "ResourceNavMesh.h"
+#include "ResourcesModule.h"
+#include "SceneModule.h"
 
 #include "Math/float3.h"
 #include "Math/float4x4.h"
@@ -97,7 +97,6 @@ void CharacterControllerComponent::Clone(const Component* other)
 void CharacterControllerComponent::Update(float deltaTime)
 {
     if (!IsEffectivelyEnabled()) return;
-    if (!enabled) return;
 
     if (!App->GetSceneModule()->GetInPlayMode()) return;
 
@@ -115,7 +114,7 @@ void CharacterControllerComponent::Update(float deltaTime)
         navMeshQuery = tmpQuery;
 
         if (currentPolyRef == 0)
-        {                    
+        {
             float3 startPos = parent->GetGlobalTransform().TranslatePart();
 
             dtQueryFilter filter;
@@ -126,8 +125,7 @@ void CharacterControllerComponent::Update(float deltaTime)
             float nearestPoint[3];
             dtPolyRef targetRef = 0;
 
-            dtStatus status =
-                navMeshQuery->findNearestPoly(startPos.ptr(), extents, &filter, &targetRef, nearestPoint);
+            dtStatus status = navMeshQuery->findNearestPoly(startPos.ptr(), extents, &filter, &targetRef, nearestPoint);
 
             if (dtStatusFailed(status) || targetRef == 0)
             {
@@ -138,18 +136,20 @@ void CharacterControllerComponent::Update(float deltaTime)
             currentPolyRef = targetRef;
         }
     }
-    
+
     if (!navMeshQuery || currentPolyRef == 0) return;
-    
-    verticalSpeed += gravity * deltaTime; 
+
+    verticalSpeed     += gravity * deltaTime;
     verticalSpeed      = std::max(verticalSpeed, maxFallSpeed); // Clamp fall speed
 
-    float4x4 globalTr = parent->GetGlobalTransform();
-    float3 currentPos = globalTr.TranslatePart();
+    float4x4 globalTr  = parent->GetGlobalTransform();
+    float3 currentPos  = globalTr.TranslatePart();
 
     currentPos.y      += (verticalSpeed * deltaTime);
 
     AdjustHeightToNavMesh(currentPos);
+
+    lastPosition = currentPos;
 
     globalTr.SetTranslatePart(currentPos);
     float4x4 finalLocal = parent->GetParentGlobalTransform().Transposed() * globalTr;
@@ -176,6 +176,8 @@ void CharacterControllerComponent::RenderEditorInspector()
 
     if (enabled)
     {
+        ImGui::SeparatorText("Character Controller Component");
+
         float availableWidth = ImGui::GetContentRegionAvail().x;
 
         ImGui::Separator();
@@ -236,7 +238,7 @@ void CharacterControllerComponent::AdjustHeightToNavMesh(float3& currentPos)
     dtStatus st2 = navMeshQuery->closestPointOnPoly(newRef, currentPos.ptr(), closest, &posOverPoly);
     if (!dtStatusSucceed(st2) || !posOverPoly) return;
 
-    currentPolyRef   = newRef; 
+    currentPolyRef   = newRef;
 
     float polyHeight = 0.0f;
     dtStatus stH     = navMeshQuery->getPolyHeight(newRef, closest, &polyHeight);
@@ -255,16 +257,25 @@ void CharacterControllerComponent::AdjustHeightToNavMesh(float3& currentPos)
 void CharacterControllerComponent::Move(const float3& direction, float deltaTime)
 {
     if (!navMeshQuery || currentPolyRef == 0) return;
+    if (direction.LengthSq() < 0.0001f) return;
 
     float4x4 globalTr  = parent->GetGlobalTransform();
     float3 currentPos  = globalTr.TranslatePart();
 
     float finalSpeed   = std::min(speed, maxLinearSpeed);
-    float3 offsetXZ    = direction * finalSpeed * deltaTime;
 
-    float3 desiredPos  = currentPos;
-    desiredPos.x      += offsetXZ.x;
-    desiredPos.z      += offsetXZ.z;
+    float3 forward      = globalTr.WorldZ().Normalized();
+    float3 right      = globalTr.WorldX().Normalized();
+
+    float3 moveDir        = right * direction.x + forward * (-direction.z);
+    if (moveDir.LengthSq() < 1e-6f) return;
+    moveDir.Normalize();
+
+    float3 offsetXZ    = direction * finalSpeed * deltaTime;
+    float3 desiredPos = currentPos + offsetXZ;
+
+    //desiredPos.x      += offsetXZ.x;
+    //desiredPos.z      += offsetXZ.z;
 
     dtQueryFilter filter;
     filter.setIncludeFlags(SAMPLE_POLYFLAGS_WALK);
@@ -294,6 +305,33 @@ void CharacterControllerComponent::Move(const float3& direction, float deltaTime
     float4x4 finalLocal = parent->GetParentGlobalTransform().Transposed() * globalTr;
 
     parent->SetLocalTransform(finalLocal);
+    parent->UpdateTransformForGOBranch();
+}
+
+void CharacterControllerComponent::LookAtMovement(const float3& moveDir, float deltaTime)
+{
+    if (moveDir.LengthSq() < 0.0001f) return;
+
+    float3 desired = moveDir;
+    desired.y      = 0.0f;
+    desired.Normalize();
+
+    float4x4 global = parent->GetGlobalTransform();
+    float3 forward  = global.WorldZ();
+    forward.y       = 0.0f;
+    forward.Normalize();
+
+    float angle = atan2(forward.Cross(desired).y, forward.Dot(desired));
+
+    float maxStep = maxAngularSpeed * deltaTime;
+    angle         = std::clamp(angle, -maxStep, maxStep);
+
+    if (fabs(angle) < 0.0001f) return;
+
+    float4x4 rotY = float4x4::FromEulerXYZ(0.0f, angle, 0.0f);
+    float4x4 local = parent->GetGlobalTransform() * rotY;
+
+    parent->SetLocalTransform(local);
     parent->UpdateTransformForGOBranch();
 }
 
@@ -342,8 +380,9 @@ void CharacterControllerComponent::HandleInput(float deltaTime)
         targetDirection = direction;
 
         Move(direction, deltaTime);
+        LookAtMovement(direction, deltaTime);
     }
-    
+
     if (fabs(rotationDir) > 0.0001f)
     {
         Rotate(rotationDir, deltaTime);

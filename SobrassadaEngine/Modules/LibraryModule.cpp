@@ -210,7 +210,7 @@ bool LibraryModule::LoadLibraryMaps(const std::string& projectPath)
         }
     }
 
-    GLOG("MODELS MAP SIZE: %d", modelMap.size());
+    //GLOG("MODELS MAP SIZE: %d", modelMap.size());
 
     return true;
 }

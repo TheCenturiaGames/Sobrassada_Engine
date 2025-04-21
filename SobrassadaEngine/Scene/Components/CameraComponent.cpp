@@ -231,7 +231,8 @@ void CameraComponent::RenderEditorInspector()
 
     if (enabled)
     {
-        ImGui::SeparatorText("Camera");
+        ImGui::SeparatorText("Camera Component");
+
         if (App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
             isMainCamera = (App->GetSceneModule()->GetScene()->GetMainCamera()->GetUbo() == ubo);
         if (ImGui::Checkbox("Main Camera", &isMainCamera))

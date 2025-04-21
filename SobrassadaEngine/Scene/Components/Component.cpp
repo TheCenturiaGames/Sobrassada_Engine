@@ -4,7 +4,6 @@
 
 #include "Math/float4x4.h"
 #include "imgui.h"
-#include "Math/float4x4.h"
 #include <string>
 
 Component::Component(UID uid, GameObject* parent, const char* initName, ComponentType type)

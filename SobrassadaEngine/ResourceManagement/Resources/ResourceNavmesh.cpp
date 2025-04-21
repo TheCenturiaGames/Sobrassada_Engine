@@ -48,7 +48,7 @@ ResourceNavMesh::ResourceNavMesh(UID uid, const std::string& name) : Resource(ui
     // Default Heightfield Options
     config->bmin[0] = config->bmin[1] = config->bmin[2] = FLT_MAX;
     config->bmax[0] = config->bmax[1] = config->bmax[2] = FLT_MIN;
-    config->cs                                          = 0.1f; // Default cell size
+    config->cs                                          = 0.2f; // Default cell size
     config->ch                                          = 0.2f; // Default cell height
     config->width                                       = 1000; // Arbitrary default width
     config->height                                      = 1000; // Arbitrary default height
@@ -66,7 +66,7 @@ ResourceNavMesh::ResourceNavMesh(UID uid, const std::string& name) : Resource(ui
 
     // Default Contour Options
     config->maxSimplificationError                      = 1.3f;
-    config->maxEdgeLen                                  = 12;
+    config->maxEdgeLen                                  = 100;
     config->maxVertsPerPoly                             = 6;
 
     // Default PolyMesh Options

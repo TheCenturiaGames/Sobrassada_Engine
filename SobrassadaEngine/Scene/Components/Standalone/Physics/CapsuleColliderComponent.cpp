@@ -4,6 +4,7 @@
 #include "GameObject.h"
 #include "PhysicsModule.h"
 #include "SceneModule.h"
+#include "ScriptComponent.h"
 
 #include "ImGui.h"
 #include "rapidjson/document.h"
@@ -63,7 +64,7 @@ CapsuleColliderComponent::CapsuleColliderComponent(const rapidjson::Value& initi
 
 CapsuleColliderComponent::~CapsuleColliderComponent()
 {
-    App->GetPhysicsModule()->DeleteCapsuleRigidBody(this);
+    DeleteRigidBody();
 }
 
 void CapsuleColliderComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
@@ -118,71 +119,79 @@ void CapsuleColliderComponent::Clone(const Component* other)
 
 void CapsuleColliderComponent::RenderEditorInspector()
 {
-    if (ImGui::BeginCombo("Collider type", ColliderTypeStrings[(int)colliderType]))
+    Component::RenderEditorInspector();
+
+    if (enabled)
     {
-        int colliderStringSize = sizeof(ColliderTypeStrings) / sizeof(char*);
-        for (int i = 0; i < colliderStringSize; ++i)
+        ImGui::SeparatorText("Capsule Collider Component");
+
+        if (ImGui::BeginCombo("Collider type", ColliderTypeStrings[(int)colliderType]))
         {
-            if (ImGui::Selectable(ColliderTypeStrings[i]))
+            int colliderStringSize = sizeof(ColliderTypeStrings) / sizeof(char*);
+            for (int i = 0; i < colliderStringSize; ++i)
             {
-                colliderType = ColliderType(i);
-                if (colliderType == ColliderType::STATIC)
+                if (ImGui::Selectable(ColliderTypeStrings[i]))
                 {
-                    parent->UpdateMobilityHierarchy(MobilitySettings::STATIC);
-                    mass = 0.f;
+                    colliderType = ColliderType(i);
+                    if (colliderType == ColliderType::STATIC)
+                    {
+                        parent->UpdateMobilityHierarchy(MobilitySettings::STATIC);
+                        mass = 0.f;
+                    }
+                    else
+                    {
+                        parent->UpdateMobilityHierarchy(MobilitySettings::DYNAMIC);
+                        mass = 1.f;
+                    }
+                    App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
                 }
-                else
-                {
-                    parent->UpdateMobilityHierarchy(MobilitySettings::DYNAMIC);
-                    mass = 1.f;
-                }
-                App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
             }
+            ImGui::EndCombo();
         }
-        ImGui::EndCombo();
-    }
 
-    ImGui::BeginDisabled(colliderType == ColliderType::STATIC);
-    if (ImGui::InputFloat("Mass", &mass))
-    {
-        App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
-    }
-    ImGui::EndDisabled();
-
-    if (ImGui::InputFloat3("Center offset", &centerOffset[0])) App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
-
-    if (ImGui::InputFloat("Radius", &radius)) App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
-    if (ImGui::InputFloat("Length", &length)) App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
-
-    if (ImGui::Checkbox("Freeze rotation", &freezeRotation)) App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
-
-    if (ImGui::InputFloat3("Center rotation", &centerRotation[0]))
-        App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
-
-    // COLLIDER LAYER SETTINGS
-    if (ImGui::BeginCombo("Layer options", ColliderLayerStrings[(int)layer]))
-    {
-        const int colliderStringSize = sizeof(ColliderLayerStrings) / sizeof(char*);
-        for (int i = 0; i < colliderStringSize; ++i)
+        ImGui::BeginDisabled(colliderType == ColliderType::STATIC);
+        if (ImGui::InputFloat("Mass", &mass))
         {
-            if (ImGui::Selectable(ColliderLayerStrings[i]))
-            {
-                layer = ColliderLayer(i);
-                App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
-            }
+            App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
         }
-        ImGui::EndCombo();
-    }
+        ImGui::EndDisabled();
 
-    if (ImGui::Checkbox("Fit to size", &fitToSize))
-    {
-        CalculateCollider();
-        App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
-    }
+        if (ImGui::InputFloat3("Center offset", &centerOffset[0]))
+            App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
 
-    if (ImGui::Checkbox("Generate Callbacks", &generateCallback))
-    {
-        userPointer = BulletUserPointer(this, &onCollissionCallback, generateCallback);
+        if (ImGui::InputFloat("Radius", &radius)) App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
+        if (ImGui::InputFloat("Length", &length)) App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
+
+        if (ImGui::Checkbox("Freeze rotation", &freezeRotation)) App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
+
+        if (ImGui::InputFloat3("Center rotation", &centerRotation[0]))
+            App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
+
+        // COLLIDER LAYER SETTINGS
+        if (ImGui::BeginCombo("Layer options", ColliderLayerStrings[(int)layer]))
+        {
+            const int colliderStringSize = sizeof(ColliderLayerStrings) / sizeof(char*);
+            for (int i = 0; i < colliderStringSize; ++i)
+            {
+                if (ImGui::Selectable(ColliderLayerStrings[i]))
+                {
+                    layer = ColliderLayer(i);
+                    App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
+                }
+            }
+            ImGui::EndCombo();
+        }
+
+        if (ImGui::Checkbox("Fit to size", &fitToSize))
+        {
+            CalculateCollider();
+            App->GetPhysicsModule()->UpdateCapsuleRigidBody(this);
+        }
+
+        if (ImGui::Checkbox("Generate Callbacks", &generateCallback))
+        {
+            userPointer = BulletUserPointer(this, &onCollissionCallback, generateCallback);
+        }
     }
 }
 
@@ -198,7 +207,6 @@ void CapsuleColliderComponent::Render(float deltaTime)
 
 void CapsuleColliderComponent::RenderDebug(float deltaTime)
 {
-
 }
 
 void CapsuleColliderComponent::ParentUpdated()
@@ -223,16 +231,27 @@ void CapsuleColliderComponent::ParentUpdated()
 
 void CapsuleColliderComponent::OnCollision(GameObject* otherObject, float3 collisionNormal)
 {
+    if (!enabled) return;
+
+    dynamic_cast<ScriptComponent*>(parent->GetComponentByType(COMPONENT_SCRIPT))
+        ->OnCollision(otherObject, collisionNormal);
+}
+
+void CapsuleColliderComponent::DeleteRigidBody()
+{
+    App->GetPhysicsModule()->DeleteCapsuleRigidBody(this);
 }
 
 void CapsuleColliderComponent::CalculateCollider()
 {
-    AABB heriachyAABB = parent->GetHierarchyAABB();
+    AABB heriachyAABB               = parent->GetHierarchyAABB();
+
+    const float4x4& globalTransform = parent->GetGlobalTransform();
 
     if (heriachyAABB.IsFinite() && !heriachyAABB.IsDegenerate())
     {
         radius       = heriachyAABB.Size().MaxElement() / 2.f;
         length       = heriachyAABB.Size().y / 2.f;
-        centerOffset = heriachyAABB.CenterPoint() - parent->GetPosition();
+        centerOffset = heriachyAABB.CenterPoint() - globalTransform.TranslatePart();
     }
 }
