@@ -42,6 +42,7 @@ class LibraryModule : public Module
 
     bool LoadLibraryMaps(const std::string& projectPath);
     void GetImportOptions(UID uid, rapidjson::Document& doc, rapidjson::Value& importOptions) const;
+    UID GetUIDFromMetaFile(const std::string& path) const;
     void SearchImportOptionsFromUID(
         UID uid, const std::string& path, rapidjson::Document& doc, rapidjson::Value& importOptions
     ) const;

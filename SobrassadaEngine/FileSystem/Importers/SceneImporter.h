@@ -13,7 +13,7 @@ namespace SceneImporter
 {
     void Import(const char* filePath);
     void ImportGLTF(const char* filePath, const std::string& targetFilePath);
-    tinygltf::Model CopyAndLoadGLTF(const char* filePath, const std::string& targetFilePath);
+    void CopyGLTF(const char* filePath, const std::string& targetFilePath, std::string& copiedFilePath);
     tinygltf::Model LoadModelGLTF(const char* filePath);
     void ImportMeshFromMetadata(
         const std::string& filePath, const std::string& targetFilePath, const std::string& name,

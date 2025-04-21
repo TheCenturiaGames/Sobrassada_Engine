@@ -226,6 +226,18 @@ void LibraryModule::GetImportOptions(UID uid, rapidjson::Document& doc, rapidjso
     }
 }
 
+UID LibraryModule::GetUIDFromMetaFile(const std::string& filePath) const
+{
+    if (FileSystem::GetFileExtension(filePath) == META_EXTENSION)
+    {
+        rapidjson::Document doc;
+        if (FileSystem::LoadJSON(filePath.c_str(), doc))
+            return doc["UID"].GetUint64();
+        
+    }
+    return INVALID_UID;
+}
+
 void LibraryModule::SearchImportOptionsFromUID(
     UID uid, const std::string& path, rapidjson::Document& doc, rapidjson::Value& outImportOptions
 ) const

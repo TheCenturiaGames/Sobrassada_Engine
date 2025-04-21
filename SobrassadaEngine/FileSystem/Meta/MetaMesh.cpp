@@ -1,5 +1,8 @@
 #include "MetaMesh.h"
 
+#include "Application.h"
+#include "LibraryModule.h"
+
 MetaMesh::MetaMesh(
     UID uid, const std::string& assetPath, bool generateTangents, const float4x4& transform, UID defaultMaterialUID,
     uint32_t gltfMeshIndex, uint32_t gltfPrimitiveIndex
@@ -7,6 +10,7 @@ MetaMesh::MetaMesh(
     : MetaFile(uid, assetPath), generateTangents(generateTangents), transform(transform),
       defaultMaterialUID(defaultMaterialUID), gltfMeshIndex(gltfMeshIndex), gltfPrimitiveIndex(gltfPrimitiveIndex)
 {
+    
 }
 
 void MetaMesh::AddImportOptions(rapidjson::Document& doc, rapidjson::Document::AllocatorType& allocator) const

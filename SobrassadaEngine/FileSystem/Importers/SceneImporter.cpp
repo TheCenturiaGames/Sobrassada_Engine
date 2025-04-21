@@ -39,7 +39,9 @@ namespace SceneImporter
 
     void ImportGLTF(const char* filePath, const std::string& targetFilePath)
     {
-        tinygltf::Model model = CopyAndLoadGLTF(filePath, targetFilePath);
+        std::string modelFilePath;
+        CopyGLTF(filePath, targetFilePath, modelFilePath);
+        tinygltf::Model model = LoadModelGLTF(modelFilePath.c_str());
 
         std::vector<std::vector<std::pair<UID, UID>>> gltfMeshes;
         std::unordered_map<int, UID> matIndices;
@@ -79,7 +81,7 @@ namespace SceneImporter
                     }
 
                     const UID meshUID = MeshImporter::ImportMesh(
-                        model, srcNode.mesh, primitiveCounter, name, defaultTransform, filePath, targetFilePath,
+                        model, srcNode.mesh, primitiveCounter, name, defaultTransform, modelFilePath.c_str(), targetFilePath,
                         INVALID_UID, matUID
                     );
                     primitiveCounter++;
@@ -98,17 +100,17 @@ namespace SceneImporter
         ModelImporter::ImportModel(model, gltfMeshes, filePath, targetFilePath);
     }
 
-    tinygltf::Model CopyAndLoadGLTF(const char* filePath, const std::string& targetFilePath)
+    void CopyGLTF(const char* filePath, const std::string& targetFilePath, std::string& copiedFilePath)
     {
+        const tinygltf::Model model = LoadModelGLTF(filePath);
+        
         // Copy gltf to Assets folder
-        const std::string copyPath = targetFilePath + ASSETS_PATH + FileSystem::GetFileNameWithExtension(filePath);
+        copiedFilePath = targetFilePath + ASSETS_PATH + FileSystem::GetFileNameWithExtension(filePath);
             
-        if (FileSystem::Exists(copyPath.c_str()))
-            FileSystem::Delete(copyPath.c_str());
+        if (FileSystem::Exists(copiedFilePath.c_str()))
+            FileSystem::Delete(copiedFilePath.c_str());
             
-        FileSystem::Copy(filePath, copyPath.c_str());
-
-        const tinygltf::Model model = LoadModelGLTF(copyPath.c_str());
+        FileSystem::Copy(filePath, copiedFilePath.c_str());
         
         const std::string path = FileSystem::GetFilePath(filePath);
 
@@ -122,8 +124,6 @@ namespace SceneImporter
 
             FileSystem::Copy(binPath.c_str(), copyBinPath.c_str());
         }
-
-        return model;
     }
 
     tinygltf::Model LoadModelGLTF(const char* filePath)
