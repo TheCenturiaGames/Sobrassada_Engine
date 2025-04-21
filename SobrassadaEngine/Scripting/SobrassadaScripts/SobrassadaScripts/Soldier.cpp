@@ -38,6 +38,8 @@ bool Soldier::Init()
 void Soldier::Update(float deltaTime)
 {
     Character::Update(deltaTime);
+
+    if (character != nullptr && currentState != SoldierStates::PATROL) agentAI->LookAtMovement(character->GetLastPosition(), deltaTime);
 }
 
 void Soldier::OnDeath()

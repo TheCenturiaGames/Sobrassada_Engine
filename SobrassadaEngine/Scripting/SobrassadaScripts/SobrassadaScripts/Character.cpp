@@ -62,13 +62,13 @@ void Character::Update(float deltaTime)
     float gameTime = AppEngine->GetGameTimer()->GetTime() / 1000.0f;
     if (weaponCollider->GetEnabled() && isAttacking && gameTime - lastAttackTime >= attackDuration)
     {
-        GLOG("Not Attacking %.3f", gameTime);
+        // GLOG("Not Attacking %.3f", gameTime);
         weaponCollider->SetEnabled(false);
         isAttacking = false;
     }
     if (isInvulnerable && gameTime - lastTimeHit >= invulnerableDuration)
     {
-        GLOG("Not vulnerable %.3f", gameTime);
+        // GLOG("Not vulnerable %.3f", gameTime);
         isInvulnerable = false;
     }
 
@@ -97,7 +97,7 @@ void Character::Inspector()
 void Character::OnCollision(GameObject* otherObject, const float3& collisionNormal)
 {
     // cube collider should be only if is enabled here already checked by OnCollision of cubeColliderComponent
-    GLOG("COLLISION %s with %s", parent->GetName().c_str(), otherObject->GetName().c_str())
+    // GLOG("COLLISION %s with %s", parent->GetName().c_str(), otherObject->GetName().c_str())
     CubeColliderComponent* enemyWeapon =
         dynamic_cast<CubeColliderComponent*>(otherObject->GetComponentByType(COMPONENT_CUBE_COLLIDER));
     ScriptComponent* enemyScriptComponent =
@@ -121,7 +121,7 @@ void Character::Attack(float time)
 {
     if (CanAttack(time))
     {
-        GLOG("ATTACK");
+        // GLOG("ATTACK");
         isAttacking    = true;
         lastAttackTime = time;
         weaponCollider->SetEnabled(true);
