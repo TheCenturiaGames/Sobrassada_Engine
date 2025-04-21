@@ -262,6 +262,7 @@ void PhysicsModule::AddRigidBody(btRigidBody* rigidBody, ColliderType colliderTy
     case ColliderType::KINEMATIC:
         rigidBody->setCollisionFlags(rigidBody->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
         rigidBody->setActivationState(DISABLE_DEACTIVATION);
+        rigidBody->setCustomDebugColor(btVector3(0.859, 0.196, 0.784)); // COLOR TO NOT BE RED, COLORBLIND ISSUE
         break;
     case ColliderType::TRIGGER:
         rigidBody->setCollisionFlags(

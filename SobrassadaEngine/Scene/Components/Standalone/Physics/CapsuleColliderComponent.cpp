@@ -244,12 +244,14 @@ void CapsuleColliderComponent::DeleteRigidBody()
 
 void CapsuleColliderComponent::CalculateCollider()
 {
-    AABB heriachyAABB = parent->GetHierarchyAABB();
+    AABB heriachyAABB               = parent->GetHierarchyAABB();
+
+    const float4x4& globalTransform = parent->GetGlobalTransform();
 
     if (heriachyAABB.IsFinite() && !heriachyAABB.IsDegenerate())
     {
         radius       = heriachyAABB.Size().MaxElement() / 2.f;
         length       = heriachyAABB.Size().y / 2.f;
-        centerOffset = heriachyAABB.CenterPoint() - parent->GetPosition();
+        centerOffset = heriachyAABB.CenterPoint() - globalTransform.TranslatePart();
     }
 }

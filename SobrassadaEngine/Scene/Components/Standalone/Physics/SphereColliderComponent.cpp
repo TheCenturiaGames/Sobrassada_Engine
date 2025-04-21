@@ -241,13 +241,15 @@ void SphereColliderComponent::DeleteRigidBody()
 
 void SphereColliderComponent::CalculateCollider()
 {
-    AABB heriachyAABB = parent->GetHierarchyAABB();
+    AABB heriachyAABB               = parent->GetHierarchyAABB();
+
+    const float4x4& globalTransform = parent->GetGlobalTransform();
 
     if (heriachyAABB.IsFinite() && !heriachyAABB.IsDegenerate())
     {
         Sphere sphere = heriachyAABB.MinimalEnclosingSphere();
 
         radius        = sphere.r;
-        centerOffset  = heriachyAABB.CenterPoint() - parent->GetPosition();
+        centerOffset  = heriachyAABB.CenterPoint() - globalTransform.TranslatePart();
     }
 }
