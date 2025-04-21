@@ -787,6 +787,7 @@ void GameObject::OnAABBUpdated()
     {
         localAABB.Enclose(component.second->GetLocalAABB());
     }
+
     OnTransformUpdated();
 }
 
