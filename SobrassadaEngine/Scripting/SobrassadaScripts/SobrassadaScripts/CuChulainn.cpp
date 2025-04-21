@@ -13,7 +13,7 @@
 
 CharacterControllerComponent* character = nullptr;
 
-CuChulainn::CuChulainn(GameObject* parent) : Character(parent, 5, 1, 0.5f, 2.0f, 1.0f, 1.0f, 0.0f)
+CuChulainn::CuChulainn(GameObject* parent) : Character(parent, 5, 1, 0.5f, 2.0f, 1.0f, 1.0f, 0.0f, 0.0f)
 {
     currentHealth = 3; // mainChar starts low hp
 }

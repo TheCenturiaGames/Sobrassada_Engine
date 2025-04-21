@@ -16,10 +16,10 @@
 
 Character::Character(
     GameObject* parent, int maxHealth, int damage, float attackDuration, float speed, float cooldown, float range,
-    float rangeAIAttack
+    float rangeAIAttack, float rangeAIChase
 )
     : Script(parent), maxHealth(maxHealth), damage(damage), attackDuration(attackDuration), speed(speed),
-      cooldown(cooldown), range(range), rangeAIAttack(rangeAIAttack)
+      cooldown(cooldown), range(range), rangeAIAttack(rangeAIAttack), rangeAIChase(rangeAIChase)
 {
     currentHealth = maxHealth;
 }
@@ -153,13 +153,15 @@ bool Character::CanAttack(float time)
     return false;
 }
 
-bool Character::CheckDistanceWithPlayer() const
+AIStates Character::CheckDistanceWithPlayer() const
 {
     if (character != nullptr)
     {
-        if (character->GetLastPosition().Distance(parent->GetPosition()) <= rangeAIAttack) return true;
+        float distance = character->GetLastPosition().Distance(parent->GetPosition());
+        if (distance <= rangeAIAttack) return CLOSE;
+        else if (distance <= rangeAIChase) return MEDIUM;
     }
-    return false;
+    return FAR_AWAY;
 }
 
 void Character::Die()

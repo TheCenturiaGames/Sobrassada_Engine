@@ -10,7 +10,7 @@
 #include "Standalone/AnimationComponent.h"
 #include "Standalone/CharacterControllerComponent.h"
 
-Soldier::Soldier(GameObject* parent) : Character(parent, 3, 1, 0.5f, 1.0f, 1.0f, 1.0f, 2.0f)
+Soldier::Soldier(GameObject* parent) : Character(parent, 3, 1, 0.5f, 1.0f, 1.0f, 1.0f, 2.0f, 10.0f)
 {
 }
 
@@ -18,7 +18,7 @@ bool Soldier::Init()
 {
     GLOG("Initiating Soldier");
 
-    currentState = SoldierStates::CHASE;
+    currentState = SoldierStates::PATROL;
 
     Character::Init();
 
@@ -37,9 +37,10 @@ bool Soldier::Init()
 
 void Soldier::Update(float deltaTime)
 {
-    Character::Update(deltaTime);
+    if (character != nullptr && currentState != SoldierStates::PATROL)
+        agentAI->LookAtMovement(character->GetLastPosition(), deltaTime);
 
-    if (character != nullptr && currentState != SoldierStates::PATROL) agentAI->LookAtMovement(character->GetLastPosition(), deltaTime);
+    Character::Update(deltaTime);
 }
 
 void Soldier::OnDeath()
@@ -70,7 +71,7 @@ void Soldier::HandleState(float gameTime)
     {
     case SoldierStates::PATROL:
         // GLOG("Soldier Patrolling");
-        animComponent->UseTrigger("walk");
+        animComponent->UseTrigger("idle");
         PatrolAI();
         break;
     case SoldierStates::CHASE:
@@ -82,7 +83,7 @@ void Soldier::HandleState(float gameTime)
         // GLOG("Soldier Basic Attack");
         animComponent->UseTrigger("attack");
         Attack(gameTime);
-        if (!CheckDistanceWithPlayer()) currentState = SoldierStates::CHASE;
+        if (CheckDistanceWithPlayer() != CLOSE) currentState = SoldierStates::CHASE;
         break;
     default:
         GLOG("No state provided to Soldier");
@@ -93,13 +94,15 @@ void Soldier::HandleState(float gameTime)
 
 void Soldier::PatrolAI()
 {
+    if (CheckDistanceWithPlayer() == MEDIUM) currentState = SoldierStates::CHASE;
+    else if (CheckDistanceWithPlayer() == CLOSE) currentState = SoldierStates::BASIC_ATTACK;
 }
 
 void Soldier::ChaseAI()
 {
     if (character != nullptr)
     {
-        if (CheckDistanceWithPlayer()) currentState = SoldierStates::BASIC_ATTACK;
+        if (CheckDistanceWithPlayer() == CLOSE) currentState = SoldierStates::BASIC_ATTACK;
         else if (!agentAI->SetPathNavigation(character->GetLastPosition())) currentState = SoldierStates::PATROL;
     }
     else currentState = SoldierStates::PATROL;

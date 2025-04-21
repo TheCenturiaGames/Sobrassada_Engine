@@ -9,12 +9,19 @@ class AnimationComponent;
 class CubeColliderComponent;
 class CapsuleColliderComponent;
 
+enum AIStates
+{
+    CLOSE = 0,
+    MEDIUM,
+    FAR_AWAY
+};
+
 class Character : public Script
 {
   public:
     Character(
         GameObject* parent, int maxHealth, int damage, float attackDuration, float speed, float cooldown, float range,
-        float rangeAIAttack
+        float rangeAIAttack, float rangeAIChase
     );
     virtual ~Character() noexcept override { parent = nullptr; };
 
@@ -29,7 +36,7 @@ class Character : public Script
     void Attack(float deltaTime);
     void Heal(int amount);
     bool CanAttack(float deltaTime);
-    bool CheckDistanceWithPlayer() const;
+    AIStates CheckDistanceWithPlayer() const;
 
   private:
     virtual void HandleState(float deltaTime) {};
@@ -61,4 +68,5 @@ class Character : public Script
 
     // AI
     float rangeAIAttack                         = 0.0f;
+    float rangeAIChase                          = 0.0f;
 };
