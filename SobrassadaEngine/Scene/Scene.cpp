@@ -63,7 +63,8 @@ Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUI
     this->sceneName       = initialState["Name"].GetString();
     gameObjectRootUID     = initialState["RootGameObject"].GetUint64();
     selectedGameObjectUID = gameObjectRootUID;
-    navmeshUID            = initialState["NavmeshUID"].GetUint64();
+    if (initialState.HasMember("NavmeshUID"))
+        navmeshUID = initialState["NavmeshUID"].GetUint64();
 
     App->GetPhysicsModule()->LoadLayerData(&initialState);
 
