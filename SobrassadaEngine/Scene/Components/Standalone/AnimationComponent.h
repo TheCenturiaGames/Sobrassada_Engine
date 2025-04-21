@@ -5,6 +5,7 @@
 
 #include "rapidjson/document.h"
 #include <unordered_map>
+#include <map>
 
 class ResourceAnimation;
 class ResourceStateMachine;
@@ -12,7 +13,7 @@ class AnimController;
 class GameObject;
 
 
-class AnimationComponent : public Component
+class SOBRASADA_API_ENGINE AnimationComponent : public Component
 {
   public:
     AnimationComponent(UID uid, GameObject* parent);
@@ -32,15 +33,18 @@ class AnimationComponent : public Component
     void OnResume();
     void OnInspector();
     void AddAnimation(UID resource);
+    bool UseTrigger(const std::string& triggerName);
 
-    UID GetAnimationResource() const { GLOG("Resource AnimUID  is: %d", resource) return resource; }
+    UID GetAnimationResource() const { return resource; }
     ResourceAnimation* GetCurrentAnimation() const { return currentAnimResource; }
     AnimController* GetAnimationController() { return animController; }
+    ResourceStateMachine* GetResourceStateMachine() const { return resourceStateMachine; }
     const std::unordered_map<std::string, GameObject*>& GetBoneMapping() const { return boneMapping; }
     bool IsPlaying() const;
+    bool IsFinished() const;
 
     void SetAnimationResource(UID animResource);
-
+    void UpdateBoneHierarchy(GameObject* bone);
     void SetBoneMapping();
 
   private:
@@ -53,6 +57,7 @@ class AnimationComponent : public Component
     ResourceStateMachine* resourceStateMachine = nullptr;
 
     std::unordered_map<std::string, GameObject*> boneMapping;
+    std::map<std::string, float4x4> bindPoseTransforms;
 
     float animationDuration = 0.0f;
     bool playing            = false;

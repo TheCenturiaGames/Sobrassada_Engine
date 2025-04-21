@@ -19,6 +19,7 @@ class Quadtree;
 class CameraComponent;
 class GBuffer;
 class Framebuffer;
+class CharacterControllerComponent;
 enum class SaveMode;
 enum MobilitySettings;
 
@@ -36,8 +37,6 @@ class Scene
         UID newUID = INVALID_UID, const char* newName = nullptr
     );
 
-    void LoadComponents() const;
-    void LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects);
     void LoadModel(const UID modelUID);
     void LoadPrefab(
         const UID prefabUid, const ResourcePrefab* prefab = nullptr, const float4x4& transform = float4x4::identity
@@ -84,10 +83,10 @@ class Scene
 
     GameObject* GetGameObjectByUID(UID gameObjectUID); // TODO: Change when filesystem defined
 
-    LightsConfig* GetLightsConfig() { return lightsConfig; }
+    LightsConfig* GetLightsConfig() const { return lightsConfig; }
+    CameraComponent* GetMainCamera() const { return mainCamera; }
 
-    void SetMainCamera(CameraComponent* camera) { mainCamera = camera; }
-    CameraComponent* GetMainCamera() { return mainCamera; }
+    template <typename T> std::vector<T*> GetEnabledComponentsOfType() const;
 
     bool GetDoInputs() const { return doInputs; }
     bool GetDoMouseInputs() const { return doMouseInputs; }
@@ -100,13 +99,14 @@ class Scene
     Octree* GetOctree() const { return sceneOctree; }
     Quadtree* GetDynamicTree() const { return dynamicTree; }
     UID GetMultiselectUID() const;
-    GameObject* GetMultiselectParent() { return multiSelectParent; }
+    GameObject* GetMultiselectParent() const { return multiSelectParent; }
     const std::map<UID, UID>& GetMultiselectedObjects() const { return selectedGameObjects; }
     const std::map<UID, MobilitySettings>& GetMultiselectedObjectsMobility() const
     {
         return selectedGameObjectsMobility;
     }
 
+    void SetMainCamera(CameraComponent* camera) { mainCamera = camera; }
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
 
     void SetStopPlaying(bool stop) { stopPlaying = stop; }
@@ -114,7 +114,6 @@ class Scene
     void SetStaticModified() { staticModified = true; }
     void SetDynamicModified() { dynamicModified = true; }
     void SetMultiselectPosition(const float3& newPosition);
-    template <typename T> std::vector<T*> GetEnabledComponentsOfType() const;
 
   private:
     void CreateStaticSpatialDataStruct();
@@ -128,16 +127,16 @@ class Scene
     ) const;
 
   private:
-    std::string sceneName;
-    UID sceneUID;
-    UID gameObjectRootUID;
-    UID selectedGameObjectUID;
-    CameraComponent* mainCamera;
-    bool stopPlaying   = false;
-    bool doInputs      = false;
-    bool doMouseInputs = false;
-    bool sceneVisible  = false;
-    bool isFocused     = false;
+    std::string sceneName                       = DEFAULT_SCENE_NAME;
+    UID sceneUID                                = INVALID_UID;
+    UID gameObjectRootUID                       = INVALID_UID;
+    UID selectedGameObjectUID                   = INVALID_UID;
+    CameraComponent* mainCamera                 = nullptr;
+    bool stopPlaying                            = false;
+    bool doInputs                               = false;
+    bool doMouseInputs                          = false;
+    bool sceneVisible                           = false;
+    bool isFocused                              = false;
 
     std::unordered_map<UID, GameObject*> gameObjectsContainer;
 

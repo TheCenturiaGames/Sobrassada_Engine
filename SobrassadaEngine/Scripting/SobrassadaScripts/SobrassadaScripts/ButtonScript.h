@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Script.h"
 
 class ButtonScript : public Script
