@@ -20,6 +20,7 @@ class SOBRASADA_API_ENGINE AnimationComponent : public Component
     AnimationComponent(const rapidjson::Value& initialState, GameObject* parent);
     ~AnimationComponent() override;
 
+    void Init() override;
     void Clone(const Component* other) override;
     void Update(float deltaTime) override;
     void Render(float deltaTime) override;
