@@ -89,9 +89,6 @@ constexpr const char* GAME_PATH                      = "..\\Game";
 constexpr const char* DEBUG_DLL_PATH                 = "..\\SobrassadaEngine\\x64\\Debug\\SobrassadaScripts.dll";
 constexpr const char* RELEASE_DLL_PATH               = "..\\SobrassadaEngine\\x64\\Release\\SobrassadaScripts.dll";
 
-constexpr const wchar_t* BANKNAME_INIT               = L"Init.bnk";
-constexpr const wchar_t* BANKNAME_MAIN               = L"main.bnk";
-
 constexpr const char* ENGINE_DEFAULT_ASSETS          = "EngineDefaults/";
 constexpr const char* ASSETS_PATH                    = "Assets/";
 constexpr const char* SCENES_PATH                    = "Assets/Scenes/";
@@ -129,12 +126,17 @@ constexpr const char* NAVMESH_EXTENSION              = ".nav";
 
 constexpr int MAX_COMPONENT_NAME_LENGTH              = 64;
 
+// Soundbanks
+constexpr const char* WINDOWS_BANKS_PATH             = "Assets\\Soundbanks\\Windows\\";
+constexpr const wchar_t* BANKNAME_INIT               = L"Init.bnk";
+constexpr const wchar_t* BANKNAME_MAIN               = L"main.bnk";
+constexpr const char* BANKMETA_MAIN                  = "main.json";
+
 // SHADER PATHS
 constexpr const char* LIGHTS_VERTEX_SHADER_PATH      = "./EngineDefaults/Shader/Vertex/VertexShader.glsl";
 constexpr const char* SKYBOX_VERTEX_SHADER_PATH      = "./EngineDefaults/Shader/Vertex/SkyboxVertex.glsl";
 constexpr const char* UIWIDGET_VERTEX_SHADER_PATH    = "./EngineDefaults/Shader/Vertex/UIWidgetVertex.glsl";
 constexpr const char* QUAD_VERTEX_SHADER_PATH        = "./EngineDefaults/Shader/Vertex/QuadVertexShader.glsl";
-
 constexpr const char* UNLIT_FRAGMENT_SHADER_PATH     = "./EngineDefaults/Shader/Fragment/UnlitFragmentShader.glsl";
 constexpr const char* SKYBOX_FRAGMENT_SHADER_PATH    = "./EngineDefaults/Shader/Fragment/SkyboxFragment.glsl";
 constexpr const char* SPECULAR_FRAGMENT_SHADER_PATH  = "./EngineDefaults/Shader/Fragment/BRDFPhongFragmentShader.glsl";
@@ -167,6 +169,7 @@ constexpr const char* CONSTANT_SPECULAR_TEXTURE_SELECT_DIALOG_ID = "specular-tex
 constexpr const char* CONSTANT_NORMAL_TEXTURE_SELECT_DIALOG_ID   = "normal-texture-select";
 constexpr const char* CONSTANT_PREFAB_SELECT_DIALOG_ID           = "prefab-select";
 constexpr const char* CONSTANT_MODEL_SELECT_DIALOG_ID            = "model-select";
+constexpr const char* CONSTANT_EVENT_SELECT_DIALOG_ID            = "event-select";
 
 constexpr uint32_t CONSTANT_NO_MESH_UUID                         = 0;
 constexpr uint32_t CONSTANT_NO_TEXTURE_UUID                      = 0;

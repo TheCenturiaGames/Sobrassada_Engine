@@ -59,6 +59,8 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"AI Agent",             COMPONENT_AIAGENT             },
         {"UI Image",             COMPONENT_IMAGE               },
         {"UI Button",            COMPONENT_BUTTON              },
+        {"Audio Source",         COMPONENT_AUDIO_SOURCE        },
+        {"Audio Listener",       COMPONENT_AUDIO_LISTENER      },
     };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;
@@ -1080,7 +1082,9 @@ template ComponentType EditorUIModule::RenderResourceSelectDialog<ComponentType>
     const char* id, const std::unordered_map<std::string, ComponentType>& availableResources,
     const ComponentType& defaultResource
 );
-
+template uint32_t EditorUIModule::RenderResourceSelectDialog<uint32_t>(
+    const char* id, const std::unordered_map<std::string, uint32_t>& availableResources, const uint32_t& defaultResource
+);
 void EditorUIModule::RenderBasicTransformModifiers(
     float3& outputPosition, float3& outputRotation, float3& outputScale, bool& lockScaleAxis,
     bool& positionValueChanged, bool& rotationValueChanged, bool& scaleValueChanged
