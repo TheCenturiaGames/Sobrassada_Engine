@@ -1,5 +1,8 @@
 #pragma once
 #include "rapidjson/document.h"
+#include "Math/float3.h"
+
+class GameObject;
 
 struct InspectorField
 {

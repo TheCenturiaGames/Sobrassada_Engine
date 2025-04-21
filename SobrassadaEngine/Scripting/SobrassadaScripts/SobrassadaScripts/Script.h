@@ -1,12 +1,11 @@
 #pragma once
 
 #include "Math/float3.h"
+#include "rapidjson/document.h"
 #include <vector>
 
 class GameObject;
 class Application;
-#include <vector>
-#include "rapidjson/document.h"
 
 struct InspectorField
 {
