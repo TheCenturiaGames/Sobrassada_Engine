@@ -600,6 +600,7 @@
     <ClInclude Include="Modules\AudioModule.h" />
     <ClInclude Include="Scene\Components\Standalone\Audio\AudioSourceComponent.h" />
     <ClInclude Include="Utils\GBuffer.h" />
+    <ClInclude Include="Utils\HashString.h" />
     <ClInclude Include="Utils\NavMeshConfig.h" />
     <ClInclude Include="Scene\Components\Standalone\Physics\CapsuleColliderComponent.h" />
     <ClInclude Include="Scene\Components\Standalone\UI\ButtonComponent.h" />

@@ -1,13 +1,12 @@
 #include "AudioModule.h"
 
 #include "Application.h"
+#include "Components/Standalone/Audio/AudioListenerComponent.h"
+#include "Components/Standalone/Audio/AudioSourceComponent.h"
 #include "FileSystem.h"
 #include "Globals.h"
 #include "ProjectModule.h"
-#include "Components/Standalone/Audio/AudioListenerComponent.h"
-#include "Components/Standalone/Audio/AudioSourceComponent.h"
 
-#include "rapidjson/document.h"
 #include "AK/IBytes.h"
 #include "AK/MusicEngine/Common/AkMusicEngine.h"
 #include "AK/SoundEngine/Common/AkMemoryMgr.h"       // Memory Manager interface
@@ -16,6 +15,7 @@
 #include "AK/SoundEngine/Common/AkStreamMgrModule.h"
 #include "AK/SoundEngine/Common/IAkStreamMgr.h"    // Streaming Manager
 #include "AK/SpatialAudio/Common/AkSpatialAudio.h" // Spatial Audio
+#include "rapidjson/document.h"
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
