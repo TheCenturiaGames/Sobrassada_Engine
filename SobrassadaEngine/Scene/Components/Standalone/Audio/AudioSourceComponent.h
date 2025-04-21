@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Application.h"
 #include "Component.h"
 #include "Wwise_IDs.h"
 

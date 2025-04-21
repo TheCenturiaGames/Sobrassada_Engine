@@ -7,7 +7,7 @@
 #include "InputModule.h" // TODO:  Delete this after testing
 
 #include "ImGui.h"
-#include <AK/SoundEngine/Common/AkSoundEngine.h>
+#include "AK/SoundEngine/Common/AkSoundEngine.h"
 
 AudioSourceComponent::AudioSourceComponent(UID uid, GameObject* parent)
     : Component(uid, parent, "Audio Source", COMPONENT_AUDIO_SOURCE)

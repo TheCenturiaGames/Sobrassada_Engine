@@ -1,11 +1,13 @@
 #pragma once
 
 #include "Module.h"
-#include "Standalone/Audio/AudioListenerComponent.h"
-#include "Standalone/Audio/AudioSourceComponent.h"
 
-#include <AkFilePackageLowLevelIODeferred.h>
+#include "AkFilePackageLowLevelIODeferred.h"
 #include <vector>
+#include <unordered_map>
+
+class AudioSourceComponent;
+class AudioListenerComponent;
 
 class AudioModule : public Module
 {

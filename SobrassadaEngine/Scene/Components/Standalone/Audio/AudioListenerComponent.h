@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Application.h"
 #include "Component.h"
 
 class AudioListenerComponent : public Component
