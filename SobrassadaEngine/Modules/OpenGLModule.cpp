@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "Framebuffer.h"
+#include "GBuffer.h"
 #include "WindowModule.h"
 
 #include "glew.h"
@@ -93,14 +94,6 @@ bool OpenGLModule::Init()
 {
     //GLOG("Creating Renderer context");
 
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
-
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-
     context    = SDL_GL_CreateContext(App->GetWindowModule()->window);
     GLenum err = glewInit();
 
@@ -125,7 +118,12 @@ bool OpenGLModule::Init()
     glDebugMessageControl(GL_DEBUG_SOURCE_API, GL_DEBUG_TYPE_OTHER, GL_DEBUG_SEVERITY_LOW, 0, nullptr, GL_FALSE); //Filter Low with Other (like another notification message)
 #endif
 
+    // stencil op
+    glEnable(GL_STENCIL_TEST);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
     framebuffer = new Framebuffer(App->GetWindowModule()->GetWidth(), App->GetWindowModule()->GetHeight(), true);
+    gBuffer     = new GBuffer(App->GetWindowModule()->GetWidth(), App->GetWindowModule()->GetHeight());
 
     WindowModule* windowModule = App->GetWindowModule();
     windowModule->SetVsync(windowModule->GetVsync());
@@ -152,7 +150,7 @@ update_status OpenGLModule::PreUpdate(float deltaTime)
 #endif
         glClearColor(clearColorRed, clearColorGreen, clearColorBlue, 1.0f);
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
 
     drawCallsCount     = 0;
@@ -169,9 +167,8 @@ update_status OpenGLModule::Update(float deltaTime)
 
 update_status OpenGLModule::PostUpdate(float deltaTime)
 {
-#ifndef GAME
     framebuffer->CheckResize();
-#endif
+    gBuffer->CheckResize();
 
     SDL_GL_SwapWindow(App->GetWindowModule()->window);
 

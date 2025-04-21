@@ -140,7 +140,7 @@ bool SceneModule::ShutDown()
 void SceneModule::CreateScene()
 {
     CloseScene();
-
+    App->GetPathfinderModule()->ResetNavmesh();
     loadedScene = new Scene(DEFAULT_SCENE_NAME);
     loadedScene->Init();
 }
