@@ -61,6 +61,28 @@ template <> class EventDispatcher<void>
         }
     };
 
+    bool IsValidCallback(std::list<Delegate<void>>::iterator it) const
+    {
+        for (auto iter = subscribedCallbacks.begin(); iter != subscribedCallbacks.end(); ++iter)
+        {
+            if (iter == it) return true;
+        }
+        return false;
+    }
+
+    void SafeRemoveCallback(std::list<Delegate<void>>::iterator delegatePosition)
+    {
+        if (IsValidCallback(delegatePosition))
+        {
+            subscribedCallbacks.erase(delegatePosition);
+        }
+        else
+        {
+            GLOG("[WARNING] Tried to remove invalid or stale delegate iterator!");
+        }
+    }
+
+
   private:
     std::list<Delegate<void>> subscribedCallbacks;
 };

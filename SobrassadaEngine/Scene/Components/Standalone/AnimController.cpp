@@ -17,12 +17,14 @@ AnimController::~AnimController()
 
 void AnimController::Play(UID newResource, bool shouldLoop)
 {
-    Stop();
+    if (currentAnimation == nullptr) Stop();
     resource         = newResource;
-    currentTime      = 0;
+    currentTime      = 0.0f;
     loop             = shouldLoop;
     currentAnimation = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
     playAnimation    = true;
+    playAnimation    = true;
+    animationFinished = false;
 }
 
 void AnimController::Stop()
@@ -68,12 +70,13 @@ update_status AnimController::Update(float deltaTime)
         {
             currentTime   = duration;
             playAnimation = false;
+            animationFinished = true;
 
-            if (currentAnimation != nullptr)
-            {
-                App->GetResourcesModule()->ReleaseResource(currentAnimation);
-                currentAnimation = nullptr;
-            }
+            //if (currentAnimation != nullptr)
+            //{
+            //    App->GetResourcesModule()->ReleaseResource(currentAnimation);
+            //    currentAnimation = nullptr;
+            //}
         }
     }
 
@@ -101,8 +104,6 @@ update_status AnimController::Update(float deltaTime)
 
 void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat& rot)
 {
-    GLOG("GetTransform called for %s at time %.2f", nodeName.c_str(), currentTime);
-
     if (!playAnimation || resource == INVALID_UID || currentAnimation == nullptr) return;
 
     if (targetAnimation == nullptr)
@@ -113,8 +114,6 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
             GLOG("No channel for node %s", nodeName.c_str());
             return; // IMPORTANT: Don't modify pos/rot if no channel exists
         }
-
-        GLOG("Channel found with %d positions and %d rotations", animChannel->numPositions, animChannel->numRotations);
 
         // CRITICAL: Only modify position if there's position data
         // Otherwise leave the input position unchanged
@@ -129,11 +128,6 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
         {
             GetChannelRotation(animChannel, rot, currentTime);
         }
-
-        GLOG(
-            "Applying transform for %s: pos=(%.2f,%.2f,%.2f) rot=(%.2f,%.2f,%.2f,%.2f)", nodeName.c_str(), pos.x, pos.y,
-            pos.z, rot.x, rot.y, rot.z, rot.w
-        );
     }
     else
     {
@@ -204,6 +198,8 @@ void AnimController::SetTargetAnimationResource(UID uid, unsigned timeTransition
     targetAnimation = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(uid));
     transitionTime  = static_cast<float>(timeTransition) / 1000;
     loop            = shouldLoop;
+    playAnimation     = true;
+    animationFinished = false;
 }
 
 void AnimController::GetChannelPosition(const Channel* animChannel, float3& pos, const float time) const

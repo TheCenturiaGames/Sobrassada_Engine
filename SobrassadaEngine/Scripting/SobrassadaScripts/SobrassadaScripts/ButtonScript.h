@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Script.h"
 
 #include <rapidjson/document.h>
@@ -19,8 +20,9 @@ class ButtonScript : public Script
 
     void OnClick();
     std::string GetCurrentPanelName() const;
-    void SaveToJson(rapidjson::Value& value, rapidjson::Document::AllocatorType& allocator) const override;
-    void LoadFromJson(const rapidjson::Value& value) override;
+    void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) override;
+    void Load(const rapidjson::Value& initialState) override;
+
 
   private:
     std::string panelToHideName = "MainMenuPanel";

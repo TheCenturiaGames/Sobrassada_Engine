@@ -433,15 +433,92 @@ void EditorUIModule::Navmesh(bool& navmesh)
 
     ImGui::Begin("NavMesh Creation", &navmesh, ImGuiWindowFlags_None);
 
+    // Draw config UI
+    App->GetPathfinderModule()->GetNavMeshConfig().RenderEditorUI();
+
+    ImGui::InputText("NavMesh Name", navmeshName, IM_ARRAYSIZE(navmeshName));
+
+    // Create navmesh
     if (ImGui::Button("Create NavMesh"))
     {
-        App->GetResourcesModule()->CreateNavMesh();
+        App->GetPathfinderModule()->CreateNavMesh();
         ImGui::Text("NavMesh created!");
     }
 
-    App->GetResourcesModule()->GetNavMesh()->RenderNavmeshEditor();
+    // Save navmesh
+    if (ImGui::Button("Save NavMesh"))
+    {
+        App->GetPathfinderModule()->SaveNavMesh(navmeshName); // or ask user for name
+        ImGui::Text("NavMesh saved!");
+    }
 
-    ImGui::End();
+    // Load navmesh
+    if (ImGui::Button("Load NavMesh"))
+    {
+        showNavLoadDialog = true;
+    }
+
+    ImGui::End(); // End NavMesh Creation
+
+    // Load dialog window
+    if (showNavLoadDialog)
+    {
+        ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_FirstUseEver);
+        bool open = true;
+        if (ImGui::Begin("Load NavMesh", &open, ImGuiWindowFlags_NoCollapse))
+        {
+            ImGui::InputText("Search", searchTextNavmesh, IM_ARRAYSIZE(searchTextNavmesh));
+            ImGui::Separator();
+
+            if (ImGui::BeginListBox("##NavmeshList", ImVec2(-FLT_MIN, -40)))
+            {
+                int i = 0;
+                for (const auto& pair : App->GetLibraryModule()->GetNavmeshMap())
+                {
+                    if (pair.first.find(searchTextNavmesh) != std::string::npos)
+                    {
+                        ++i;
+                        if (ImGui::Selectable(pair.first.c_str(), selectedNavmesh == i))
+                        {
+                            selectedNavmesh = i;
+                            navmeshUID      = pair.second;
+                        }
+                    }
+                }
+                ImGui::EndListBox();
+            }
+
+            ImGui::Dummy(ImVec2(0, 3));
+
+            if (ImGui::Button("Load"))
+            {
+                if (navmeshUID != INVALID_UID)
+                {
+                    App->GetPathfinderModule()->LoadNavMesh(App->GetLibraryModule()->GetResourceName(navmeshUID));
+                }
+                open = false;
+            }
+
+            ImGui::SameLine();
+
+            if (ImGui::Button("Cancel"))
+            {
+                open = false;
+            }
+
+            ImGui::End();
+        }
+
+       if (!open)
+        {
+            showNavLoadDialog    = false;
+
+            // Reset search and selection
+            searchTextNavmesh[0] = '\0';
+            selectedNavmesh      = -1;          
+            navmeshUID           = INVALID_UID;
+        }
+    }
 }
 
 void EditorUIModule::CrowdControl(bool& crowdControl)
@@ -865,9 +942,21 @@ void EditorUIModule::Console(bool& consoleMenu) const
         return;
     }
 
+    int index = 0;
     for (const char* log : *Logs)
     {
-        ImGui::TextUnformatted(log);
+        std::string label = std::string(log) + "##" + std::to_string(index);
+        ImGui::Selectable(label.c_str());
+
+        if (ImGui::BeginPopupContextItem())
+        {
+            if (ImGui::MenuItem("Copy Text"))
+            {
+                ImGui::SetClipboardText(log);
+            }
+            ImGui::EndPopup();
+        }
+        ++index;
     }
 
     // Autoscroll only if the scroll is in the bottom position
@@ -1272,7 +1361,8 @@ EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
         return new NodeEditor("NodeEditor_" + std::to_string(uid), uid);
 
     case EditorType::ANIMATION:
-        return stateMachineEditor = new StateMachineEditor("StateMachineEditor_" + std::to_string(uid), uid, stateMachine);
+        return stateMachineEditor =
+                   new StateMachineEditor("StateMachineEditor_" + std::to_string(uid), uid, stateMachine);
 
     case EditorType::TEXTURE:
         return new TextureEditor("TextureEditor_" + std::to_string(uid), uid);

@@ -198,7 +198,6 @@ void CanvasComponent::OnWindowResize(const float width, const float height)
     {
         // Only render UI components
         Component* transform2D = child->GetComponentByType(COMPONENT_TRANSFORM_2D);
-        if (transform2D) static_cast<Transform2DComponent*>(transform2D)->AdaptToParentChanges();
     }
 }
 

@@ -4,6 +4,7 @@
 
 #include "Application.h"
 #include "EditorUIModule.h"
+#include "Component.h"
 #include "GameObject.h"
 #include "GameUIModule.h"
 #include "Scene/Components/Standalone/UI/ButtonComponent.h"
@@ -17,6 +18,12 @@ bool ButtonScript::Init()
 {
     GLOG("Initiating ButtonScript");
 
+    if (!parent)
+    {
+        GLOG("ButtonScript::Init() failed: parent is null.");
+        return false;
+    }
+
     Component* button = parent->GetComponentByType(COMPONENT_BUTTON);
     if (button)
     {
@@ -28,6 +35,7 @@ bool ButtonScript::Init()
 
     return true;
 }
+
 
 ButtonScript::~ButtonScript()
 {
@@ -105,15 +113,15 @@ std::string ButtonScript::GetCurrentPanelName() const
 }
 
 //To save and Load the values input in PANELS
-void ButtonScript::SaveToJson(rapidjson::Value& value, rapidjson::Document::AllocatorType& allocator) const
+void ButtonScript::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator)
 {
-    value.AddMember("PanelToShow", rapidjson::Value(panelToShowName.c_str(), allocator), allocator);
+    targetState.AddMember("PanelToShow", rapidjson::Value(panelToShowName.c_str(), allocator), allocator);
 }
 
-void ButtonScript::LoadFromJson(const rapidjson::Value& value)
+void ButtonScript::Load(const rapidjson::Value& initialState)
 {
-    if (value.HasMember("PanelToShow") && value["PanelToShow"].IsString())
+    if (initialState.HasMember("PanelToShow") && initialState["PanelToShow"].IsString())
     {
-        panelToShowName = value["PanelToShow"].GetString();
+        panelToShowName = initialState["PanelToShow"].GetString();
     }
 }

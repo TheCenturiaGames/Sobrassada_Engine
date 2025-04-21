@@ -11,19 +11,8 @@ class PauseMenuScript : public Script
     bool Init() override;
     void Update(float deltaTime) override;
     void Inspector() override {};
-
-    void SaveToJson(rapidjson::Value& value, rapidjson::Document::AllocatorType& allocator) const override
-    {
-        value.AddMember("PanelToShow", rapidjson::Value(panelToShowName.c_str(), allocator), allocator);
-    }
-
-    void LoadFromJson(const rapidjson::Value& value) override
-    {
-        if (value.HasMember("PanelToShow") && value["PanelToShow"].IsString())
-        {
-            panelToShowName = value["PanelToShow"].GetString();
-        }
-    }
+    void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) override;
+    void Load(const rapidjson::Value& initialState) override;
 
   private:
     std::string panelToShowName = "PauseMenuPanel";

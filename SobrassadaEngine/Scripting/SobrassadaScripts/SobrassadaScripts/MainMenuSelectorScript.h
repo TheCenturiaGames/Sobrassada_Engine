@@ -14,9 +14,6 @@ class MainMenuSelectorScript : public Script
     void Update(float deltaTime) override;
     void Inspector() override {}
 
-    void SaveToJson(rapidjson::Value& value, rapidjson::Document::AllocatorType& allocator) const override {}
-    void LoadFromJson(const rapidjson::Value& value) override {}
-
   private:
     std::vector<GameObject*> menuItems;
     std::vector<GameObject*> arrowImages;

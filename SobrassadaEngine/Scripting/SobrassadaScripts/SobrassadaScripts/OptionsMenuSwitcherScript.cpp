@@ -81,15 +81,15 @@ GameObject* OptionsMenuSwitcherScript::FindPanelByName(const std::string& name) 
     return nullptr;
 }
 
-void OptionsMenuSwitcherScript::SaveToJson(rapidjson::Value& value, rapidjson::Document::AllocatorType& allocator) const
+void OptionsMenuSwitcherScript::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator)
 {
-    value.AddMember("CurrentPanelIndex", currentIndex, allocator);
+    targetState.AddMember("CurrentPanelIndex", currentIndex, allocator);
 }
 
-void OptionsMenuSwitcherScript::LoadFromJson(const rapidjson::Value& value)
+void OptionsMenuSwitcherScript::Load(const rapidjson::Value& initialState)
 {
-    if (value.HasMember("CurrentPanelIndex") && value["CurrentPanelIndex"].IsInt())
+    if (initialState.HasMember("CurrentPanelIndex") && initialState["CurrentPanelIndex"].IsInt())
     {
-        currentIndex = value["CurrentPanelIndex"].GetInt();
+        currentIndex = initialState["CurrentPanelIndex"].GetInt();
     }
 }

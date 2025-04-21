@@ -63,15 +63,15 @@ void PressAnyKeyScript::Inspector()
     );
 }
 
-void PressAnyKeyScript::SaveToJson(rapidjson::Value& value, rapidjson::Document::AllocatorType& allocator) const
+void PressAnyKeyScript::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator)
 {
-    value.AddMember("NextGameObject", rapidjson::Value(nextGameObjectName.c_str(), allocator), allocator);
+    targetState.AddMember("NextGameObject", rapidjson::Value(nextGameObjectName.c_str(), allocator), allocator);
 }
 
-void PressAnyKeyScript::LoadFromJson(const rapidjson::Value& value)
+void PressAnyKeyScript::Load(const rapidjson::Value& initialState)
 {
-    if (value.HasMember("NextGameObject") && value["NextGameObject"].IsString())
+    if (initialState.HasMember("NextGameObject") && initialState["NextGameObject"].IsString())
     {
-        nextGameObjectName = value["NextGameObject"].GetString();
+        nextGameObjectName = initialState["NextGameObject"].GetString();
     }
 }
