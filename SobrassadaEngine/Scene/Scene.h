@@ -17,6 +17,8 @@ class Octree;
 class ResourcePrefab;
 class Quadtree;
 class CameraComponent;
+class GBuffer;
+class Framebuffer;
 class CharacterControllerComponent;
 enum class SaveMode;
 enum MobilitySettings;
@@ -117,6 +119,12 @@ class Scene
     void CreateStaticSpatialDataStruct();
     void CreateDynamicSpatialDataStruct();
     void CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects, CameraComponent* camera) const;
+    void GeometryPassRender(const std::vector<GameObject*>& objectsToRender, CameraComponent* camera, GBuffer* gbuffer)
+        const;
+    void LightingPassRender(
+        const std::vector<GameObject*>& renderGameObjects, CameraComponent* camera, GBuffer* gbuffer,
+        Framebuffer* framebuffer
+    ) const;
 
   private:
     std::string sceneName                       = DEFAULT_SCENE_NAME;

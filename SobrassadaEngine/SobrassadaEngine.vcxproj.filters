@@ -510,6 +510,9 @@
     <ClCompile Include="Scene\Components\Standalone\AIAgentComponent.cpp">
       <Filter>Scene\Components</Filter>
     </ClCompile>
+    <ClCompile Include="Utils\GBuffer.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -994,6 +997,9 @@
     </ClInclude>
     <ClInclude Include="Libs\Wwise\samples\SoundEngine\IO\stdafx.h">
       <Filter>External\Wwise</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\GBuffer.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
