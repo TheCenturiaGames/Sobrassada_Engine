@@ -10,7 +10,6 @@ MetaMesh::MetaMesh(
     : MetaFile(uid, assetPath), generateTangents(generateTangents), transform(transform),
       defaultMaterialUID(defaultMaterialUID), gltfMeshIndex(gltfMeshIndex), gltfPrimitiveIndex(gltfPrimitiveIndex)
 {
-    
 }
 
 void MetaMesh::AddImportOptions(rapidjson::Document& doc, rapidjson::Document::AllocatorType& allocator) const

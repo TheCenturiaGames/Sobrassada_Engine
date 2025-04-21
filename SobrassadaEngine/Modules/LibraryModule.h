@@ -66,7 +66,6 @@ class LibraryModule : public Module
     UID GetAnimUID(const std::string& animPath) const;
     UID GetStateMachineUID(const std::string& stMachPath) const;
 
-
     const std::string& GetResourceName(UID resourceID) const;
 
     const std::string& GetResourcePath(UID resourceID) const;
@@ -90,7 +89,7 @@ class LibraryModule : public Module
     std::unordered_map<std::string, UID> stateMachineMap;
 
     std::unordered_map<std::string, UID> animMap;
-     std::unordered_map<std::string, UID> fontMap;
+    std::unordered_map<std::string, UID> fontMap;
 
     // inversed map          | UID -> name
     std::unordered_map<UID, std::string> namesMap;

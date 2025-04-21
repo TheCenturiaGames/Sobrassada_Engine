@@ -231,9 +231,7 @@ UID LibraryModule::GetUIDFromMetaFile(const std::string& filePath) const
     if (FileSystem::GetFileExtension(filePath) == META_EXTENSION)
     {
         rapidjson::Document doc;
-        if (FileSystem::LoadJSON(filePath.c_str(), doc))
-            return doc["UID"].GetUint64();
-        
+        if (FileSystem::LoadJSON(filePath.c_str(), doc)) return doc["UID"].GetUint64();
     }
     return INVALID_UID;
 }

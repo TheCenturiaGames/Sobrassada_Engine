@@ -19,8 +19,7 @@ class MetaMesh : public MetaFile
 
     const float4x4& GetTransform() const { return transform; }
 
-private:
-    
+  private:
     uint32_t gltfMeshIndex;
     uint32_t gltfPrimitiveIndex;
     bool generateTangents;

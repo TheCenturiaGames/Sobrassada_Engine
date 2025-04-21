@@ -67,7 +67,7 @@ class MeshComponent : public Component
 
     std::string currentMaterialName   = "Not selected";
     ResourceMaterial* currentMaterial = nullptr;
-    bool bUsesMeshDefaultMaterial = true;
+    bool bUsesMeshDefaultMaterial     = true;
 
     std::vector<UID> bonesUIDs;
     std::vector<GameObject*> bones;

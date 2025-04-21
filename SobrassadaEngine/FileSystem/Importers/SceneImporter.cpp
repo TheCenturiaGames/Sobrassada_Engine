@@ -81,8 +81,8 @@ namespace SceneImporter
                     }
 
                     const UID meshUID = MeshImporter::ImportMesh(
-                        model, srcNode.mesh, primitiveCounter, name, defaultTransform, modelFilePath.c_str(), targetFilePath,
-                        INVALID_UID, matUID
+                        model, srcNode.mesh, primitiveCounter, name, defaultTransform, modelFilePath.c_str(),
+                        targetFilePath, INVALID_UID, matUID
                     );
                     primitiveCounter++;
 
@@ -103,15 +103,14 @@ namespace SceneImporter
     void CopyGLTF(const char* filePath, const std::string& targetFilePath, std::string& copiedFilePath)
     {
         const tinygltf::Model model = LoadModelGLTF(filePath);
-        
+
         // Copy gltf to Assets folder
-        copiedFilePath = targetFilePath + ASSETS_PATH + FileSystem::GetFileNameWithExtension(filePath);
-            
-        if (FileSystem::Exists(copiedFilePath.c_str()))
-            FileSystem::Delete(copiedFilePath.c_str());
-            
+        copiedFilePath              = targetFilePath + ASSETS_PATH + FileSystem::GetFileNameWithExtension(filePath);
+
+        if (FileSystem::Exists(copiedFilePath.c_str())) FileSystem::Delete(copiedFilePath.c_str());
+
         FileSystem::Copy(filePath, copiedFilePath.c_str());
-        
+
         const std::string path = FileSystem::GetFilePath(filePath);
 
         // Copy bin to Assets folder
@@ -119,8 +118,7 @@ namespace SceneImporter
         {
             std::string binPath     = path + srcBuffers.uri;
             std::string copyBinPath = targetFilePath + ASSETS_PATH + FileSystem::GetFileNameWithExtension(binPath);
-            if (FileSystem::Exists(copyBinPath.c_str()))
-                FileSystem::Delete(copyBinPath.c_str());
+            if (FileSystem::Exists(copyBinPath.c_str())) FileSystem::Delete(copyBinPath.c_str());
 
             FileSystem::Copy(binPath.c_str(), copyBinPath.c_str());
         }
@@ -150,7 +148,7 @@ namespace SceneImporter
                 GLOG("Failed to parse glTF\n");
             }
         }
-        
+
         return model;
     }
 
@@ -159,18 +157,14 @@ namespace SceneImporter
         const rapidjson::Value& importOptions, UID sourceUID
     )
     {
-        tinygltf::Model model             = LoadModelGLTF(filePath.c_str());
-        
-        uint32_t gltfMeshIndex      = 0;
-        if (importOptions.HasMember("gltfMeshIndex"))
-            gltfMeshIndex      = importOptions["gltfMeshIndex"].GetInt();
-        else
-            GLOG("Mesh %s does not have a gltfMeshIndex assigned. Using 0 as default", name.c_str());
+        tinygltf::Model model  = LoadModelGLTF(filePath.c_str());
+
+        uint32_t gltfMeshIndex = 0;
+        if (importOptions.HasMember("gltfMeshIndex")) gltfMeshIndex = importOptions["gltfMeshIndex"].GetInt();
+        else GLOG("Mesh %s does not have a gltfMeshIndex assigned. Using 0 as default", name.c_str());
         uint32_t gltfPrimitiveIndex = 0;
-        if (importOptions.HasMember("gltfMeshIndex"))
-            gltfPrimitiveIndex = importOptions["gltfPrimitiveIndex"].GetInt();
-        else
-            GLOG("Mesh %s does not have a gltfPrimitiveIndex assigned. Using 0 as default", name.c_str());
+        if (importOptions.HasMember("gltfMeshIndex")) gltfPrimitiveIndex = importOptions["gltfPrimitiveIndex"].GetInt();
+        else GLOG("Mesh %s does not have a gltfPrimitiveIndex assigned. Using 0 as default", name.c_str());
 
         MeshImporter::ImportMesh(
             model, gltfMeshIndex, gltfPrimitiveIndex, name, float4x4::identity, filePath.c_str(), targetFilePath,

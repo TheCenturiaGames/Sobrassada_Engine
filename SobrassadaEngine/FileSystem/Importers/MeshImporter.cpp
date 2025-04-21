@@ -317,24 +317,23 @@ namespace MeshImporter
         if (sourceUID == INVALID_UID)
         {
             // Importing mesh from gltf drag n drop
-            UID meshUID           = GenerateUID();
-            meshUID          = App->GetLibraryModule()->AssignFiletypeUID(meshUID, FileType::Mesh);
+            UID meshUID                = GenerateUID();
+            meshUID                    = App->GetLibraryModule()->AssignFiletypeUID(meshUID, FileType::Mesh);
 
-            std::string assetPath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
+            std::string assetPath      = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
 
-            UID prefix           = meshUID / UID_PREFIX_DIVISOR;
-            const std::string savePath = App->GetProjectModule()->GetLoadedProjectPath() + METADATA_PATH + std::to_string(prefix) +
-                                   FILENAME_SEPARATOR + name + META_EXTENSION;
+            UID prefix                 = meshUID / UID_PREFIX_DIVISOR;
+            const std::string savePath = App->GetProjectModule()->GetLoadedProjectPath() + METADATA_PATH +
+                                         std::to_string(prefix) + FILENAME_SEPARATOR + name + META_EXTENSION;
             finalMeshUID = App->GetLibraryModule()->GetUIDFromMetaFile(savePath);
-            if (finalMeshUID == INVALID_UID)
-                finalMeshUID = meshUID;
-            
+            if (finalMeshUID == INVALID_UID) finalMeshUID = meshUID;
+
             MetaMesh meta(
                 finalMeshUID, assetPath, generateTangents, meshTransform, defaultMatUID, meshIndex, primitiveIndex
             );
             meta.Save(name, assetPath);
         }
-        else finalMeshUID = sourceUID;  // Importing mesh for meta file
+        else finalMeshUID = sourceUID; // Importing mesh for meta file
 
         std::string saveFilePath  = targetFilePath + MESHES_PATH + std::to_string(finalMeshUID) + MESH_EXTENSION;
         unsigned int bytesWritten = (unsigned int)FileSystem::Save(saveFilePath.c_str(), fileBuffer, size, true);
