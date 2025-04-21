@@ -26,11 +26,13 @@
 #include "ResourcePrefab.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
+#include "PathfinderModule.h"
 #include "Standalone/AnimationComponent.h"
 #include "Standalone/Lights/DirectionalLightComponent.h"
 #include "Standalone/Lights/PointLightComponent.h"
 #include "Standalone/Lights/SpotLightComponent.h"
 #include "Standalone/MeshComponent.h"
+
 
 #include "SDL_mouse.h"
 #include "imgui.h"
@@ -142,6 +144,12 @@ void Scene::Init()
     lightsConfig->InitSkybox();
     lightsConfig->InitLightBuffers();
 
+    if (navmeshUID != INVALID_UID)
+    {
+        std::string navmeshName = App->GetLibraryModule()->GetResourceName(navmeshUID);
+        App->GetPathfinderModule()->LoadNavMesh(navmeshName);
+        GLOG("NavMesh loaded during scene Init: %s", navmeshName.c_str());
+    }
     // Call this after overriding the prefabs to avoid duplicates in gameObjectsToUpdate
     GetGameObjectByUID(gameObjectRootUID)->UpdateTransformForGOBranch();
 

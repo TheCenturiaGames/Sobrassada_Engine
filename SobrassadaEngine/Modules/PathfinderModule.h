@@ -29,6 +29,7 @@ class PathfinderModule : public Module
     void RenderCrowdEditor();
     ResourceNavMesh* GetNavMesh() { return tmpNavmesh; }
 
+    void ResetNavmesh();
     void SaveNavMesh(const std::string& name);
     void LoadNavMesh(const std::string& name);
     dtNavMeshQuery* GetDetourNavMeshQuery() const { return navQuery; }
