@@ -126,7 +126,8 @@ void MeshComponent::RenderEditorInspector()
 
     if (enabled)
     {
-        ImGui::SeparatorText("Mesh");
+        ImGui::SeparatorText("Mesh Component");
+
         ImGui::Text(currentMeshName.c_str());
         ImGui::SameLine();
         if (ImGui::Button("Select mesh"))
@@ -177,6 +178,10 @@ void MeshComponent::Render(float deltaTime)
     if (!IsEffectivelyEnabled()) return;
 }
 
+void MeshComponent::RenderDebug(float deltaTime)
+{
+}
+
 void MeshComponent::InitSkin()
 {
     if (bones.size() > 0) return;
@@ -196,9 +201,9 @@ void MeshComponent::AddMesh(UID resource, bool updateParent)
     if (newMesh != nullptr)
     {
         App->GetResourcesModule()->ReleaseResource(currentMesh);
-        currentMeshName    = newMesh->GetName();
-        currentMesh        = newMesh;
-        
+        currentMeshName = newMesh->GetName();
+        currentMesh     = newMesh;
+
         if (currentMaterial == nullptr)
         {
             const UID defaultMat = newMesh->GetDefaultMaterialUID();

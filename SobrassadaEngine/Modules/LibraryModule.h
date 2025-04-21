@@ -76,7 +76,7 @@ class LibraryModule : public Module
     const std::unordered_map<std::string, UID>& GetModelMap() const { return modelMap; }
     const std::unordered_map<std::string, UID>& GetAnimMap() const { return animMap; }
     const std::unordered_map<std::string, UID>& GetPrefabMap() const { return prefabMap; }
-    const std::unordered_map<std::string, UID>& GetStateMachinePath() const { return stateMachineMap; }
+    const std::unordered_map<std::string, UID>& GetStateMachineMap() const { return stateMachineMap; }
     const std::unordered_map<std::string, UID>& GetFontMap() const { return fontMap; }
     const std::unordered_map<std::string, UID>& GetNavmeshMap() const { return navmeshMap; }
 

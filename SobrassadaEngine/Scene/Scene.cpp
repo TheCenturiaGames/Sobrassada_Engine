@@ -26,6 +26,7 @@
 #include "ResourcePrefab.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
+#include "ScriptComponent.h"
 #include "PathfinderModule.h"
 #include "Standalone/AnimationComponent.h"
 #include "Standalone/Lights/DirectionalLightComponent.h"
@@ -89,6 +90,8 @@ Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUI
 
 Scene::~Scene()
 {
+    App->GetPhysicsModule()->EmptyWorld();
+
     for (auto it = gameObjectsContainer.begin(); it != gameObjectsContainer.end(); ++it)
     {
         delete it->second;
@@ -105,7 +108,6 @@ Scene::~Scene()
     sceneOctree  = nullptr;
     dynamicTree  = nullptr;
 
-    App->GetPhysicsModule()->EmptyWorld();
     GLOG("%s scene closed", sceneName.c_str());
 }
 
@@ -218,37 +220,27 @@ void Scene::Save(
     if (saveMode != SaveMode::SavePlayMode) App->GetProjectModule()->SetAsStartupScene(sceneName);
 }
 
-void Scene::LoadComponents() const
-{
-    lightsConfig->InitSkybox();
-    lightsConfig->InitLightBuffers();
-}
-
-void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects)
-{
-    for (auto it = gameObjectsContainer.begin(); it != gameObjectsContainer.end(); ++it)
-    {
-        delete it->second;
-    }
-    gameObjectsContainer.clear();
-    gameObjectsContainer.insert(loadedGameObjects.begin(), loadedGameObjects.end());
-
-    GameObject* root = GetGameObjectByUID(gameObjectRootUID);
-    if (root != nullptr)
-    {
-        GLOG("Init transform and AABB calculation");
-        root->UpdateTransformForGOBranch();
-    }
-
-    UpdateStaticSpatialStructure();
-    UpdateDynamicSpatialStructure();
-}
-
 update_status Scene::Update(float deltaTime)
 {
 #ifdef OPTICK
     OPTICK_CATEGORY("Scene::Update", Optick::Category::GameLogic)
 #endif
+
+    if (App->GetSceneModule()->GetOnlyOnceInPlayMode())
+    {
+        for (auto& gameObject : gameObjectsContainer)
+        {
+            std::unordered_map<ComponentType, Component*> componentList = gameObject.second->GetComponents();
+
+            for (auto& component : componentList)
+            {
+                if (component.first == ComponentType::COMPONENT_SCRIPT)
+                    dynamic_cast<ScriptComponent*>(component.second)->InitScriptInstances();
+            }
+        }
+        App->GetSceneModule()->ResetOnlyOnceInPlayMode();
+    }
+
     for (auto& gameObject : gameObjectsContainer)
     {
         std::unordered_map<ComponentType, Component*> componentList = gameObject.second->GetComponents();
@@ -267,9 +259,23 @@ update_status Scene::Update(float deltaTime)
 
 update_status Scene::Render(float deltaTime)
 {
-    if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
-        RenderScene(deltaTime, App->GetSceneModule()->GetScene()->GetMainCamera());
+    CameraComponent* mainCamera = App->GetSceneModule()->GetScene()->GetMainCamera();
+    if (App->GetSceneModule()->GetInPlayMode() && mainCamera != nullptr)
+    {
+        if (mainCamera->GetEnabled() && mainCamera->IsEffectivelyEnabled()) RenderScene(deltaTime, mainCamera);
+        else RenderScene(deltaTime, nullptr);
+    }
     else RenderScene(deltaTime, nullptr);
+
+    GameObject* selectedGameObject = App->GetSceneModule()->GetScene()->GetSelectedGameObject();
+    if (selectedGameObject != nullptr)
+    {
+        for (const auto& component : selectedGameObject->GetComponents())
+        {
+            component.second->RenderDebug(deltaTime);
+        }
+    }
+
     return UPDATE_CONTINUE;
 }
 
@@ -547,11 +553,9 @@ void Scene::RenderSceneToFrameBuffer()
     if (framebuffer->GetTextureWidth() != windowSize.x || framebuffer->GetTextureHeight() != windowSize.y)
     {
         float aspectRatio = windowSize.y / windowSize.x;
-        if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
-        {
+        if (App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
             App->GetSceneModule()->GetScene()->GetMainCamera()->SetAspectRatio(aspectRatio);
-        }
-        else App->GetCameraModule()->SetAspectRatio(aspectRatio);
+        App->GetCameraModule()->SetAspectRatio(aspectRatio);
         framebuffer->Resize((int)windowSize.x, (int)windowSize.y);
     }
 
@@ -730,7 +734,6 @@ void Scene::AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
         GameObject* selectedGameObjectParent = GetGameObjectByUID(selectedGameObjects[gameObject]);
 
         selectedGameObject->SetParent(selectedGameObjectParent->GetUID());
-        selectedGameObjectParent->AddGameObject(gameObject);
 
         if (selectedGameObjectParent->GetUID() != gameObjectRootUID)
         {
@@ -1157,6 +1160,10 @@ void Scene::LoadPrefab(const UID prefabUID, const ResourcePrefab* prefab, const 
                 MeshComponent* newMesh = newObjects[i]->GetMeshComponent();
                 newMesh->SetBones(newBonesObjects, newBonesUIDs);
             }
+
+            // If has animations, map them here
+            AnimationComponent* animComp = newObjects[i]->GetAnimationComponent();
+            if (animComp) animComp->SetBoneMapping();
         }
 
         if (prefab == nullptr) App->GetResourcesModule()->ReleaseResource(resourcePrefab);

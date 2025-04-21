@@ -1,18 +1,20 @@
 #include "AIAgentComponent.h"
+
 #include "Application.h"
 #include "EditorUIModule.h"
 #include "GameObject.h"
 #include "PathfinderModule.h"
 #include "ResourceNavmesh.h"
 #include "SceneModule.h"
+#include "Standalone/CharacterControllerComponent.h"
 
 #include "DetourCrowd.h"
 
 AIAgentComponent::AIAgentComponent(UID uid, GameObject* parent) : Component(uid, parent, "AI Agent", COMPONENT_AIAGENT)
 {
-    speed   = 3.5f;
-    radius  = 0.6f;
-    height  = 2.0f;
+    speed  = 3.5f;
+    radius = 0.6f;
+    height = 2.0f;
 
     RecreateAgent();
 }
@@ -20,7 +22,6 @@ AIAgentComponent::AIAgentComponent(UID uid, GameObject* parent) : Component(uid,
 AIAgentComponent::AIAgentComponent(const rapidjson::Value& initialState, GameObject* parent)
     : Component(initialState, parent)
 {
-
     if (initialState.HasMember("Speed")) speed = initialState["Speed"].GetFloat();
     if (initialState.HasMember("Radius")) radius = initialState["Radius"].GetFloat();
     if (initialState.HasMember("Height")) height = initialState["Height"].GetFloat();
@@ -32,7 +33,7 @@ AIAgentComponent::~AIAgentComponent()
 {
     if (agentId != -1)
     {
-        App->GetPathfinderModule()->RemoveAgent(agentId); // Step 1: Remove old agent
+        App->GetPathfinderModule()->RemoveAgent(agentId);
         agentId = -1;
     }
 }
@@ -40,7 +41,6 @@ AIAgentComponent::~AIAgentComponent()
 void AIAgentComponent::Update(float deltaTime)
 {
     if (!IsEffectivelyEnabled()) return;
-    if (!enabled) return;
 
     if (!App->GetSceneModule()->GetInPlayMode()) return;
 
@@ -61,12 +61,19 @@ void AIAgentComponent::Render(float deltaTime)
     if (!IsEffectivelyEnabled()) return;
 }
 
+void AIAgentComponent::RenderDebug(float deltaTime)
+{
+
+}
+
 void AIAgentComponent::RenderEditorInspector()
 {
     Component::RenderEditorInspector();
 
     if (enabled)
     {
+        ImGui::SeparatorText("AIAgent Component");
+
         if (ImGui::DragFloat("Speed", &speed, 0.1f, 0.1f, 200.f, "%.2f")) RecreateAgent();
         if (ImGui::DragFloat("Radius", &radius, 0.1f, 0.1f, 200.f, "%.2f")) RecreateAgent();
         if (ImGui::DragFloat("Height", &height, 0.1f, 0.1f, 200.f, "%.2f")) RecreateAgent();
@@ -100,15 +107,14 @@ void AIAgentComponent::Save(rapidjson::Value& targetState, rapidjson::Document::
     targetState.AddMember("Height", height, allocator);
 }
 
-// finds closest navmesh walkable trianle.
-void AIAgentComponent::setPath(const float3& destination) const
+// finds closest navmesh walkable triangle.
+bool AIAgentComponent::SetPathNavigation(const math::float3& destination) const
 {
-
-    if (agentId == -1) return;
+    if (agentId == -1) return false;
 
     PathfinderModule* pathfinder = App->GetPathfinderModule();
     dtNavMeshQuery* navQuery     = pathfinder->GetNavQuery();
-    if (!navQuery) return;
+    if (!navQuery) return false;
 
     // Prepare for finding the nearest poly
     dtQueryFilter filter;
@@ -120,7 +126,7 @@ void AIAgentComponent::setPath(const float3& destination) const
     if (dtStatusFailed(status) || targetRef == 0)
     {
         GLOG("Failed to find valid target poly for movement.");
-        return;
+        return false;
     }
 
     // Request move to destination
@@ -128,8 +134,11 @@ void AIAgentComponent::setPath(const float3& destination) const
     if (!result)
     {
         GLOG("Crowd agent failed to request movement.");
+        return false;
     }
+    return true;
 }
+
 void AIAgentComponent::AddToCrowd()
 {
     if (agentId != -1)

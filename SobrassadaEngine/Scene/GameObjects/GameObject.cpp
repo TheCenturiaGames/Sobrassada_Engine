@@ -11,6 +11,7 @@
 #include "Standalone/UI/Transform2DComponent.h"
 
 #include "imgui.h"
+#include <queue>
 #include <set>
 #include <stack>
 
@@ -405,6 +406,57 @@ Component* GameObject::GetComponentByType(ComponentType type) const
     return nullptr;
 }
 
+Component* GameObject::GetComponentChildByType(ComponentType componentType) const
+{
+    std::queue<UID> gameObjects;
+
+    for (UID child : this->GetChildren())
+    {
+        gameObjects.push(child);
+    }
+
+    Scene* scene         = App->GetSceneModule()->GetScene();
+    Component* component = nullptr;
+
+    while (!gameObjects.empty())
+    {
+        UID currentGameObject = gameObjects.front();
+        gameObjects.pop();
+
+        GameObject* current = scene->GetGameObjectByUID(currentGameObject);
+        component           = current->GetComponentByType(componentType);
+
+        if (component != nullptr) break;
+
+        for (UID child : current->GetChildren())
+        {
+            gameObjects.push(child);
+        }
+    }
+
+    return component;
+}
+
+Component* GameObject::GetComponentParentByType(ComponentType componentType) const
+{
+    UID currentUID       = parentUID;
+
+    Scene* scene         = App->GetSceneModule()->GetScene();
+    Component* component = nullptr;
+
+    while (currentUID != scene->GetGameObjectRootUID())
+    {
+        GameObject* current = scene->GetGameObjectByUID(currentUID);
+        component           = current->GetComponentByType(componentType);
+
+        if (component != nullptr) break;
+
+        currentUID = current->parentUID;
+    }
+
+    return component;
+}
+
 MeshComponent* GameObject::GetMeshComponent() const
 {
     if (components.find(COMPONENT_MESH) != components.end())
@@ -633,6 +685,8 @@ void GameObject::RenderContextMenu()
 
         const char* label = prefabUID == INVALID_UID ? "Create Prefab" : "Update Prefab";
         if (ImGui::MenuItem(label)) CreatePrefab();
+
+        if (prefabUID != INVALID_UID && ImGui::MenuItem("Unlink prefab")) prefabUID = INVALID_UID;
 
         if (uid != App->GetSceneModule()->GetScene()->GetGameObjectRootUID() && ImGui::MenuItem("Delete"))
         {
@@ -880,6 +934,7 @@ bool GameObject::CreateComponent(const ComponentType componentType)
         {
             components.insert({componentType, createdComponent});
             selectedComponentIndex = componentType;
+            OnAABBUpdated();
             return true;
         }
     }

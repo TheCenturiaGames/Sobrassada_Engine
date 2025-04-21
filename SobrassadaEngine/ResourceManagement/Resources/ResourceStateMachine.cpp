@@ -4,6 +4,8 @@
 #include "FileSystem.h"
 #include "LibraryModule.h"
 #include "MetaModel.h"
+#include <algorithm> 
+#include <cctype>
 
 ResourceStateMachine::ResourceStateMachine(UID uid, const std::string& name)
     : Resource(uid, name, ResourceType::Material)
@@ -26,8 +28,8 @@ void ResourceStateMachine::AddClip(UID animationResourceUID, const std::string& 
 
     Clip newClip;
     newClip.animationResourceUID = animationResourceUID;
-    newClip.clipName = hashName;
-    newClip.loop     = loopFlag;
+    newClip.clipName             = hashName;
+    newClip.loop                 = loopFlag;
     clips.push_back(newClip);
 }
 
@@ -57,7 +59,7 @@ bool ResourceStateMachine::EditClipInfo(
         if (clip.clipName == hashOld)
         {
             clip.animationResourceUID = newUID;
-            clip.loop    = newLoop;
+            clip.loop                 = newLoop;
 
             if (HashString(newName) != hashOld)
             {
@@ -101,16 +103,41 @@ void ResourceStateMachine::AddState(const std::string& stateName, const std::str
     newState.clipName = HashString(clipName);
 
     states.push_back(newState);
+
+    if (states.size() == 1)
+    {
+        defaultStateIndex = 0;
+        activeStateIndex  = 0;
+    }
 }
 
 bool ResourceStateMachine::RemoveState(const std::string& stateName)
 {
     HashString stateHash(stateName);
-    for (auto it = states.begin(); it != states.end(); ++it)
+    for (size_t i = 0; i < states.size(); ++i)
     {
-        if (it->name == stateHash)
+        if (states[i].name == stateHash)
         {
-            states.erase(it);
+            states.erase(states.begin() + i);
+
+            if ((int)i == defaultStateIndex)
+            {
+                defaultStateIndex = states.empty() ? -1 : 0;
+            }
+            else if (defaultStateIndex > (int)i)
+            {
+                defaultStateIndex--;
+            }
+
+            if ((int)i == activeStateIndex)
+            {
+                activeStateIndex = states.empty() ? -1 : 0;
+            }
+            else if (activeStateIndex > (int)i)
+            {
+                activeStateIndex--;
+            }
+
             return true;
         }
     }
@@ -269,4 +296,30 @@ bool ResourceStateMachine::ClipExists(const std::string& clipName) const
         if (clip.clipName == hashClip) return true;
     }
     return false;
+}
+
+bool ResourceStateMachine::UseTrigger(const std::string& triggerName)
+{
+    bool triggerExists = false;
+    std::string lowerTrigger = triggerName;
+    std::transform(lowerTrigger.begin(), lowerTrigger.end(), lowerTrigger.begin(), ::tolower);
+    for (const auto& transition :  transitions)
+    {
+        std::string transitionTrigger = transition.triggerName.GetString();
+        std::transform(transitionTrigger.begin(), transitionTrigger.end(), transitionTrigger.begin(), ::tolower);
+        if (transitionTrigger == lowerTrigger &&
+            transition.fromState.GetString() == GetActiveState()->name.GetString())
+        {
+            for (size_t i = 0; i < states.size(); ++i)
+            {
+                if (states[i].name.GetString() == transition.toState.GetString())
+                {
+                    SetActiveState(static_cast<int>(i));
+                    triggerExists = true;
+                    break;
+                }
+            }
+        }
+    }
+    return triggerExists;
 }

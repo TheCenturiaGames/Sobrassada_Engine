@@ -142,6 +142,9 @@ bool LibraryModule::LoadLibraryMaps(const std::string& projectPath)
             UID prefix            = assetUID / UID_PREFIX_DIVISOR;
             std::string libraryPath;
 
+            rapidjson::Value importOptions;
+            if (doc.HasMember("importOptions") && doc["importOptions"].IsObject()) importOptions = doc["importOptions"];
+
             switch (prefix)
             {
             case 11:
@@ -149,7 +152,7 @@ bool LibraryModule::LoadLibraryMaps(const std::string& projectPath)
                 AddName(assetName, assetUID);
                 libraryPath = projectPath + MESHES_PATH + std::to_string(assetUID) + MESH_EXTENSION;
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
-                else SceneImporter::ImportMeshFromMetadata(assetPath, projectPath, assetName, assetUID);
+                else SceneImporter::ImportMeshFromMetadata(assetPath, projectPath, assetName, importOptions, assetUID);
                 break;
             case 12:
                 AddTexture(assetUID, assetName);
@@ -216,7 +219,7 @@ bool LibraryModule::LoadLibraryMaps(const std::string& projectPath)
         }
     }
 
-    GLOG("MODELS MAP SIZE: %d", modelMap.size());
+    //GLOG("MODELS MAP SIZE: %d", modelMap.size());
 
     return true;
 }
