@@ -51,8 +51,8 @@ class ResourceNavMesh : public Resource
 
     void CreateDetourData(const rcPolyMesh* pmesh, const rcPolyMeshDetail* dmesh, const rcConfig& config);
     void SetDetourNavMesh(dtNavMesh* navMesh);
-    dtNavMesh* GetDetourNavMesh() const { return navMesh; }
-
+    const dtNavMesh* GetDetourNavMesh() const { return navMesh; }
+    dtNavMesh* GetDetourNavMesh() { return navMesh; }
   private:
     dtNavMesh* navMesh = nullptr;
 };

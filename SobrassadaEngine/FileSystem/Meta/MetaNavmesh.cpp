@@ -1,4 +1,5 @@
 #include "MetaNavmesh.h"
+
 #include "NavMeshConfig.h"
 
 MetaNavmesh::MetaNavmesh(UID uid, const std::string& assetPath, const NavMeshConfig& config)

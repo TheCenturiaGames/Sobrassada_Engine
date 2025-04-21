@@ -71,6 +71,7 @@ constexpr char DELIMITER = '/';
 constexpr const char* FILENAME_SEPARATOR              = "_";
 constexpr const char* DEFAULT_SCENE_NAME              = "New Scene";
 constexpr const char* DEFAULT_NODE_NAME               = "Unnamed Node";
+constexpr const char* DEFAULT_NAVMESH_NAME            = "New Navmesh";
 
 constexpr float DEFAULT_GL_CLEAR_COLOR_RED            = 0.5f;
 constexpr float DEFAULT_GL_CLEAR_COLOR_GREEN          = 0.5f;

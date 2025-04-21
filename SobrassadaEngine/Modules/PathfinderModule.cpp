@@ -2,7 +2,7 @@
 
 #include "Application.h"
 #include "CameraModule.h"
-#include "FileSystem/Importers/NavmeshImporter.h"
+#include "NavmeshImporter.h"
 #include "GameObject.h"
 #include "LibraryModule.h"
 #include "MetaNavmesh.h"
@@ -30,16 +30,16 @@ bool PathfinderModule::Init()
 
     if (!App->GetSceneModule()->GetScene()) return true;
 
-    UID sceneNavmeshUID = App->GetSceneModule()->GetScene()->GetNavmeshUID();
+    const UID sceneNavmeshUID = App->GetSceneModule()->GetScene()->GetNavmeshUID();
     if (sceneNavmeshUID != INVALID_UID)
     {
-        std::string navmeshName = App->GetLibraryModule()->GetResourceName(sceneNavmeshUID);
-        LoadNavMesh(navmeshName.c_str());
+        const std::string& navmeshName = App->GetLibraryModule()->GetResourceName(sceneNavmeshUID);
+        LoadNavMesh(navmeshName);
         GLOG("NavMesh loaded on Pathfinder Init: %s (UID: %llu)", navmeshName.c_str(), sceneNavmeshUID);
     }
     else
     {
-        tmpNavmesh = new ResourceNavMesh(15345456565, "dummyNavmesh");
+        tmpNavmesh = new ResourceNavMesh(GenerateUID(), DEFAULT_NAVMESH_NAME);
         GLOG("No scene navmesh UID found. Skipping navmesh load. Initializing with empty navmesh");
     }
 
@@ -123,7 +123,7 @@ void PathfinderModule::InitQuerySystem()
     navQuery = dtAllocNavMeshQuery();
     if (navQuery && tmpNavmesh->GetDetourNavMesh())
     {
-        navQuery->init(tmpNavmesh->GetDetourNavMesh(), 2048);
+        navQuery->init(tmpNavmesh->GetDetourNavMesh(), maxNodes);
     }
     else
     {

@@ -16,7 +16,7 @@ struct NavMeshSetHeader
     dtNavMeshParams params;
 };
 
-UID NavmeshImporter::SaveNavmesh(const char* name, ResourceNavMesh* resource, const NavMeshConfig& config)
+UID NavmeshImporter::SaveNavmesh(const char* name, const ResourceNavMesh* resource, const NavMeshConfig& config)
 {
 
     const int NAVMESHSET_MAGIC   = 'S' << 24 | 'O' << 16 | 'B' << 8 | 'R';
@@ -52,7 +52,7 @@ UID NavmeshImporter::SaveNavmesh(const char* name, ResourceNavMesh* resource, co
     UID navmeshUID = GenerateUID();
     navmeshUID     = App->GetLibraryModule()->AssignFiletypeUID(navmeshUID, FileType::Navmesh);
 
-    const std::string metaNavPath = NAVMESHES_PATH + std::string(name) + META_EXTENSION;
+    const std::string metaNavPath = ASSETS_PATH + std::string(name) + META_EXTENSION;
     const std::string navPath =
         App->GetProjectModule()->GetLoadedProjectPath() + NAVMESHES_PATH + std::string(name) + NAVMESH_EXTENSION;
 

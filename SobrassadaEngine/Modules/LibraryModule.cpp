@@ -433,7 +433,7 @@ const std::string& LibraryModule::GetResourcePath(UID resourceID) const
         // GLOG("obtained path: %s", it->second.c_str());
         return it->second;
     }
-    static const std::string emptyString = "";
+    const std::string emptyString = "";
     return emptyString;
 }
 
@@ -446,7 +446,7 @@ const std::string& LibraryModule::GetResourceName(UID resourceID) const
         // GLOG("obtained name: %s", it->second.c_str());
         return it->second;
     }
-    static const std::string emptyString = "";
+    const std::string emptyString = "";
     return emptyString;
 }
 

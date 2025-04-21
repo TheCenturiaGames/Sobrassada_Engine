@@ -422,8 +422,6 @@ void EditorUIModule::Navmesh(bool& navmesh)
 {
     if (!navmesh) return;
 
-    static bool showLoadDialog = false; // Made static so it persists across frames
-
     ImGui::Begin("NavMesh Creation", &navmesh, ImGuiWindowFlags_None);
 
     // Draw config UI
@@ -448,13 +446,13 @@ void EditorUIModule::Navmesh(bool& navmesh)
     // Load navmesh
     if (ImGui::Button("Load NavMesh"))
     {
-        showLoadDialog = true;
+        showNavLoadDialog = true;
     }
 
     ImGui::End(); // End NavMesh Creation
 
     // Load dialog window
-    if (showLoadDialog)
+    if (showNavLoadDialog)
     {
         ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_FirstUseEver);
         bool open = true;
@@ -474,7 +472,7 @@ void EditorUIModule::Navmesh(bool& navmesh)
                         if (ImGui::Selectable(pair.first.c_str(), selectedNavmesh == i))
                         {
                             selectedNavmesh = i;
-                            navmeshUID = pair.second;
+                            navmeshUID      = pair.second;
                         }
                     }
                 }
@@ -485,7 +483,7 @@ void EditorUIModule::Navmesh(bool& navmesh)
 
             if (ImGui::Button("Load"))
             {
-                if (navmeshUID != 0)
+                if (navmeshUID != INVALID_UID)
                 {
                     App->GetPathfinderModule()->LoadNavMesh(App->GetLibraryModule()->GetResourceName(navmeshUID));
                 }
@@ -499,14 +497,12 @@ void EditorUIModule::Navmesh(bool& navmesh)
                 open = false;
             }
 
-            ImGui::End(); // End Load NavMesh window
+            ImGui::End();
         }
 
-        if (!open)
-            showLoadDialog = false;
+        if (!open) showNavLoadDialog = false;
     }
 }
-
 
 void EditorUIModule::CrowdControl(bool& crowdControl)
 {

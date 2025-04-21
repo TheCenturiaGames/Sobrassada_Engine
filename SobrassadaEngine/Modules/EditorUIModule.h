@@ -202,6 +202,7 @@ class EditorUIModule : public Module
     char searchQueryFileDialog[32];
     char lastQueryFileDialog[32] = "default";
     bool showDrives              = false;
+    bool showNavLoadDialog          = false; 
     std::string inputFileDialog  = "";
     int selectedFileDialog       = -1;
     char navmeshName[64]         = "MyNavmesh";
