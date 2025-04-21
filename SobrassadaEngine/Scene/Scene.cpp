@@ -9,6 +9,7 @@
 #include "DebugDrawModule.h"
 #include "EditorUIModule.h"
 #include "Framebuffer.h"
+#include "GBuffer.h"
 #include "GameObject.h"
 #include "GameTimer.h"
 #include "GeometryBatch.h"
@@ -26,6 +27,7 @@
 #include "ResourcePrefab.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
+#include "ShaderModule.h"
 #include "ScriptComponent.h"
 #include "PathfinderModule.h"
 #include "Standalone/AnimationComponent.h"
@@ -36,6 +38,7 @@
 
 
 #include "SDL_mouse.h"
+#include "glew.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 // guizmo after imgui include
@@ -281,49 +284,22 @@ update_status Scene::Render(float deltaTime)
 
 void Scene::RenderScene(float deltaTime, CameraComponent* camera)
 {
-    if (!App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_WIREFRAME))
-    {
-        float4x4 projection;
-        float4x4 view;
-
-        if (camera == nullptr)
-            lightsConfig->RenderSkybox(
-                App->GetCameraModule()->GetProjectionMatrix(), App->GetCameraModule()->GetViewMatrix()
-            );
-        else
-        {
-            bool change = false;
-            // Cubemap does not support Ortographic projection
-            if (camera->GetType() == 1)
-            {
-                change = true;
-                camera->ChangeToPerspective();
-            }
-            lightsConfig->RenderSkybox(camera->GetProjectionMatrix(), camera->GetViewMatrix());
-            if (change) camera->ChangeToOrtographic();
-        }
-    }
-
-    lightsConfig->SetLightsShaderData();
+    GBuffer* gbuffer         = App->GetOpenGLModule()->GetGBuffer();
+    Framebuffer* framebuffer = App->GetSceneModule()->GetInPlayMode() ? App->GetOpenGLModule()->GetFramebuffer()
+                             : camera != nullptr                      ? camera->GetFramebuffer()
+                                                                      : App->GetOpenGLModule()->GetFramebuffer();
 
     std::vector<GameObject*> objectsToRender;
     CheckObjectsToRender(objectsToRender, camera);
 
-    {
 #ifdef OPTICK
-        OPTICK_CATEGORY("Scene::MeshesToRender", Optick::Category::GameLogic)
+    OPTICK_CATEGORY("Scene::MeshesToRender", Optick::Category::GameLogic)
 #endif
-        BatchManager* batchManager = App->GetResourcesModule()->GetBatchManager();
-        std::vector<MeshComponent*> meshesToRender;
+    glEnable(GL_STENCIL_TEST);
 
-        for (const auto& gameObject : objectsToRender)
-        {
-            MeshComponent* mesh = gameObject->GetMeshComponent();
-            if (mesh != nullptr && mesh->GetEnabled() && mesh->GetBatch() != nullptr) meshesToRender.push_back(mesh);
-        }
+    GeometryPassRender(objectsToRender, camera, gbuffer);
 
-        batchManager->Render(meshesToRender, camera);
-    }
+    LightingPassRender(objectsToRender, camera, gbuffer, framebuffer);
 
     {
 #ifdef OPTICK
@@ -458,7 +434,7 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
     if (ImGui::SliderFloat("Time scale", &timeScale, 0, 4)) gameTimer->SetTimeScale(timeScale);
 
     // RENDER OPTIONS
-    if (ImGui::Button("Render options"))
+    if (ImGui::Button("Render options") || App->GetInputModule()->GetKeyboard()[SDL_SCANCODE_F9])
     {
         ImGui::OpenPopup("RenderOptions");
     }
@@ -557,6 +533,7 @@ void Scene::RenderSceneToFrameBuffer()
             App->GetSceneModule()->GetScene()->GetMainCamera()->SetAspectRatio(aspectRatio);
         App->GetCameraModule()->SetAspectRatio(aspectRatio);
         framebuffer->Resize((int)windowSize.x, (int)windowSize.y);
+        App->GetOpenGLModule()->GetGBuffer()->Resize((int)windowSize.x, (int)windowSize.y);
     }
 
     ImVec2 windowPosition     = ImGui::GetWindowPos();
@@ -823,7 +800,7 @@ void Scene::CreateStaticSpatialDataStruct()
 {
     // PARAMETRIZED IN FUTURE
     float3 octreeCenter = float3::zero;
-    float octreeLength  = 200;
+    float octreeLength  = 2000;
     int nodeCapacity    = 10;
     sceneOctree         = new Octree(octreeCenter, octreeLength, nodeCapacity);
 
@@ -843,7 +820,7 @@ void Scene::CreateDynamicSpatialDataStruct()
 {
     // PARAMETRIZED IN FUTURE
     float3 center    = float3::zero;
-    float length     = 200;
+    float length     = 2000;
     int nodeCapacity = 5;
     dynamicTree      = new Quadtree(center, length, nodeCapacity);
 
@@ -898,6 +875,141 @@ void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects,
 
         if (frustumPlanes.Intersects(objectOBB)) outRenderGameObjects.push_back(gameObject);
     }
+}
+
+void Scene::GeometryPassRender(
+    const std::vector<GameObject*>& objectsToRender, CameraComponent* camera, GBuffer* gbuffer
+) const
+{
+    gbuffer->Bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);
+    glStencilMask(0xFF);
+
+    glDisable(GL_BLEND);
+
+    BatchManager* batchManager = App->GetResourcesModule()->GetBatchManager();
+    std::vector<MeshComponent*> meshesToRender;
+
+    for (const auto& gameObject : objectsToRender)
+    {
+        MeshComponent* mesh = gameObject->GetMeshComponent();
+        if (mesh != nullptr && mesh->GetEnabled() && mesh->GetBatch() != nullptr) meshesToRender.push_back(mesh);
+    }
+
+    batchManager->Render(meshesToRender, camera);
+    gbuffer->Unbind();
+
+    glEnable(GL_BLEND);
+}
+
+void Scene::LightingPassRender(
+    const std::vector<GameObject*>& renderGameObjects, CameraComponent* camera, GBuffer* gbuffer,
+    Framebuffer* framebuffer
+) const
+{
+    // LIGHTING PASS
+#ifndef GAME
+    framebuffer->Bind();
+#else
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
+
+    // SKYBOX
+    if (!App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_WIREFRAME))
+    {
+        float4x4 projection;
+        float4x4 view;
+
+        if (camera == nullptr)
+            lightsConfig->RenderSkybox(
+                App->GetCameraModule()->GetProjectionMatrix(), App->GetCameraModule()->GetViewMatrix()
+            );
+        else
+        {
+            bool change = false;
+            // Cubemap does not support Ortographic projection
+            if (camera->GetType() == 1)
+            {
+                change = true;
+                camera->ChangeToPerspective();
+            }
+            lightsConfig->RenderSkybox(camera->GetProjectionMatrix(), camera->GetViewMatrix());
+            if (change) camera->ChangeToOrtographic();
+        }
+    }
+
+    // COPYING DEPTH BUFFER AND STENCIL FROM GBUFFER TO RENDER FRAMEBUFFER
+    // TODO CHECK IF GAME RELEASE TO RENDER TO DEFAULT BUFFER INSTEAD OF FRAMEBUFFER
+    unsigned int width  = framebuffer->GetTextureWidth();
+    unsigned int height = framebuffer->GetTextureHeight();
+
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, gbuffer->gBufferObject);
+
+#ifndef GAME
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer->GetFramebufferID()); // write to default framebuffer
+#else
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+#endif
+
+    glBlitFramebuffer(
+        0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, GL_NEAREST
+    );
+
+#ifndef GAME
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->GetFramebufferID()); // write to default framebuffer
+#else
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
+
+    // SETTING STENCIL TEST FOR ONLY RENDER TO GBUFFER FRAGMENTS WRITES
+    glStencilFunc(GL_EQUAL, 1, 0xFF);
+    glStencilMask(0xFF);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, gbuffer->diffuseTexture);
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, gbuffer->specularTexture);
+
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, gbuffer->positionTexture);
+
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, gbuffer->normalTexture);
+
+    lightsConfig->SetLightsShaderData();
+
+    unsigned int lightingPassProgram = App->GetShaderModule()->GetLightingPassProgram();
+
+    glUseProgram(lightingPassProgram);
+
+    float3 cameraPos;
+    if (camera == nullptr) cameraPos = App->GetCameraModule()->GetCameraPosition();
+    else cameraPos = camera->GetCameraPosition();
+
+    glUniform3fv(glGetUniformLocation(lightingPassProgram, "cameraPos"), 1, &cameraPos[0]);
+
+    App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 3);
+
+    glDisable(GL_STENCIL_TEST);
+
+    // COPYING DEPTH BUFFER FROM GBUFFER TO RENDER FRAMEBUFFER
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, gbuffer->gBufferObject);
+
+#ifndef GAME
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer->GetFramebufferID()); // write to default framebuffer
+#else
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+#endif
+    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+
+#ifndef GAME
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->GetFramebufferID()); // write to default framebuffer
+#else
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
 }
 
 GameObject* Scene::GetGameObjectByUID(UID gameObjectUUID)

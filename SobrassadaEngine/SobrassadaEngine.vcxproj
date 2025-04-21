@@ -379,6 +379,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Utils\GBuffer.cpp" />
     <ClCompile Include="Utils\NavMeshConfig.cpp" />
     <ClCompile Include="Scene\Components\Standalone\Physics\CapsuleColliderComponent.cpp" />
     <ClCompile Include="Scene\Components\Standalone\Physics\SphereColliderComponent.cpp" />
@@ -594,6 +595,7 @@
     <ClInclude Include="Libs\Wwise\samples\SoundEngine\IO\stdafx.h" />
     <ClInclude Include="FileSystem\Meta\MetaNavmesh.h" />
     <ClInclude Include="Modules\AudioModule.h" />
+    <ClInclude Include="Utils\GBuffer.h" />
     <ClInclude Include="Utils\NavMeshConfig.h" />
     <ClInclude Include="Scene\Components\Standalone\Physics\CapsuleColliderComponent.h" />
     <ClInclude Include="Scene\Components\Standalone\UI\ButtonComponent.h" />

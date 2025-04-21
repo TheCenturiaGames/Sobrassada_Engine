@@ -519,6 +519,9 @@
     <ClCompile Include="Scene\Components\Standalone\AIAgentComponent.cpp">
       <Filter>Scene\Components</Filter>
     </ClCompile>
+    <ClCompile Include="Utils\GBuffer.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
     <ClCompile Include="FileSystem\Meta\MetaNavmesh.cpp">
       <Filter>FileSystem\Meta</Filter>
     </ClCompile>
@@ -1009,6 +1012,9 @@
     </ClInclude>
     <ClInclude Include="Libs\Wwise\samples\SoundEngine\IO\stdafx.h">
       <Filter>External\Wwise</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\GBuffer.h">
+      <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="FileSystem\Meta\MetaNavmesh.h">
       <Filter>FileSystem\Meta</Filter>

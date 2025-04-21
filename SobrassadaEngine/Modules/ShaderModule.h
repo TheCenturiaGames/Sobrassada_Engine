@@ -16,6 +16,9 @@ class ShaderModule : public Module
 
     int GetSpecularGlossinessProgram() const;
     int GetMetallicRoughnessProgram() const;
+    int GetMetallicGeometryPassProgram() const;
+    int GetSpecularGeometryPassProgram() const;
+    int GetLightingPassProgram() const;
     int GetUIWidgetProgram() const { return uiWidgetProgram; }
 
   private:
@@ -29,6 +32,10 @@ class ShaderModule : public Module
 
     int metallicRoughnessProgram       = -1;
     int metallicRoughnessProgramUnlit  = -1;
+
+    int metallicGeometryPassProgram    = -1;
+    int specularGeometryPassProgram    = -1;
+    int lightingPassProgram            = -1;
 
     int uiWidgetProgram                = -1;
 };
