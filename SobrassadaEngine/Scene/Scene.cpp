@@ -424,7 +424,7 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
     if (ImGui::SliderFloat("Time scale", &timeScale, 0, 4)) gameTimer->SetTimeScale(timeScale);
 
     // RENDER OPTIONS
-    if (ImGui::Button("Render options"))
+    if (ImGui::Button("Render options") || App->GetInputModule()->GetKeyboard()[SDL_SCANCODE_F9])
     {
         ImGui::OpenPopup("RenderOptions");
     }
