@@ -29,11 +29,13 @@
 #include "SceneModule.h"
 #include "ShaderModule.h"
 #include "ScriptComponent.h"
+#include "PathfinderModule.h"
 #include "Standalone/AnimationComponent.h"
 #include "Standalone/Lights/DirectionalLightComponent.h"
 #include "Standalone/Lights/PointLightComponent.h"
 #include "Standalone/Lights/SpotLightComponent.h"
 #include "Standalone/MeshComponent.h"
+
 
 #include "SDL_mouse.h"
 #include "glew.h"
@@ -62,6 +64,7 @@ Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUI
     this->sceneName       = initialState["Name"].GetString();
     gameObjectRootUID     = initialState["RootGameObject"].GetUint64();
     selectedGameObjectUID = gameObjectRootUID;
+    navmeshUID            = initialState["NavmeshUID"].GetUint64();
 
     App->GetPhysicsModule()->LoadLayerData(&initialState);
 
@@ -146,6 +149,12 @@ void Scene::Init()
     lightsConfig->InitSkybox();
     lightsConfig->InitLightBuffers();
 
+    //Load navmesh from scene.
+    if (navmeshUID != INVALID_UID)
+    {
+        std::string navmeshName = App->GetLibraryModule()->GetResourceName(navmeshUID);
+        App->GetPathfinderModule()->LoadNavMesh(navmeshName);
+    }
     // Call this after overriding the prefabs to avoid duplicates in gameObjectsToUpdate
     GetGameObjectByUID(gameObjectRootUID)->UpdateTransformForGOBranch();
 
@@ -174,6 +183,7 @@ void Scene::Save(
     targetState.AddMember("Name", rapidjson::Value(sceneName.c_str(), allocator), allocator);
 
     targetState.AddMember("RootGameObject", gameObjectRootUID, allocator);
+    targetState.AddMember("NavmeshUID", navmeshUID, allocator);
 
     App->GetPhysicsModule()->SaveLayerData(targetState, allocator);
 

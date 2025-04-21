@@ -366,6 +366,15 @@
     <ClCompile Include="ResourceManagement\Resources\ResourceAnimation.cpp">
       <Filter>Resources</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\UI\CanvasComponent.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\UI\UILabelComponent.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Components\Standalone\UI\Transform2DComponent.cpp">
+      <Filter>Scene\Components</Filter>
+    </ClCompile>
     <ClCompile Include="Utils\TextManager.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
@@ -417,7 +426,7 @@
     <ClCompile Include="FileSystem\Meta\MetaStateMachine.cpp">
       <Filter>FileSystem\Meta</Filter>
     </ClCompile>
-    <ClCompile Include="ResourceManagement\Resources\ResourceNavmesh.cpp">
+    <ClCompile Include="ResourceManagement\Resources\ResourceNavMesh.cpp">
       <Filter>Resources</Filter>
     </ClCompile>
     <ClCompile Include="FileSystem\Importers\NavmeshImporter.cpp">
@@ -511,6 +520,12 @@
       <Filter>Scene\Components</Filter>
     </ClCompile>
     <ClCompile Include="Utils\GBuffer.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\Meta\MetaNavmesh.cpp">
+      <Filter>FileSystem\Meta</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\NavMeshConfig.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
   </ItemGroup>
@@ -914,7 +929,7 @@
     <ClInclude Include="FileSystem\Meta\MetaStateMachine.h">
       <Filter>FileSystem\Meta</Filter>
     </ClInclude>
-    <ClInclude Include="ResourceManagement\Resources\ResourceNavmesh.h">
+    <ClInclude Include="ResourceManagement\Resources\ResourceNavMesh.h">
       <Filter>Resources</Filter>
     </ClInclude>
     <ClInclude Include="FileSystem\Importers\NavmeshImporter.h">
@@ -999,6 +1014,12 @@
       <Filter>External\Wwise</Filter>
     </ClInclude>
     <ClInclude Include="Utils\GBuffer.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\Meta\MetaNavmesh.h">
+      <Filter>FileSystem\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\NavMeshConfig.h">
       <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>

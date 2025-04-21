@@ -68,9 +68,10 @@ constexpr char DELIMITER = '\\';
 constexpr char DELIMITER = '/';
 #endif
 
-constexpr const char* FILENAME_SEPARATOR             = "_";
-constexpr const char* DEFAULT_SCENE_NAME             = "New Scene";
-constexpr const char* DEFAULT_NODE_NAME              = "Unnamed Node";
+constexpr const char* FILENAME_SEPARATOR              = "_";
+constexpr const char* DEFAULT_SCENE_NAME              = "New Scene";
+constexpr const char* DEFAULT_NODE_NAME               = "Unnamed Node";
+constexpr const char* DEFAULT_NAVMESH_NAME            = "New Navmesh";
 
 constexpr float DEFAULT_GL_CLEAR_COLOR_RED           = 0.f;
 constexpr float DEFAULT_GL_CLEAR_COLOR_GREEN         = 0.f;
@@ -94,24 +95,24 @@ constexpr const wchar_t* BANKNAME_MAIN               = L"main.bnk";
 constexpr const char* ENGINE_DEFAULT_ASSETS          = "EngineDefaults/";
 constexpr const char* ASSETS_PATH                    = "Assets/";
 constexpr const char* SCENES_PATH                    = "Assets/Scenes/";
-constexpr const char* NAVMESHES_PATH                 = "Assets/Navmeshes/";
 constexpr const char* METADATA_PATH                  = "Assets/Metadata/";
 constexpr const char* PREFABS_ASSETS_PATH            = "Assets/Prefabs/";
 constexpr const char* MODELS_ASSETS_PATH             = "Assets/Models/";
 constexpr const char* ANIMATIONS_ASSETS_PATH         = "Assets/Animations/";
 constexpr const char* STATEMACHINES_ASSETS_PATH      = "Assets/StateMachines/";
 
-constexpr const char* LIBRARY_PATH                   = "Library/";
-constexpr const char* ANIMATIONS_PATH                = "Library/Animations/";
-constexpr const char* AUDIO_PATH                     = "Library/Audio/";
-constexpr const char* MODELS_LIB_PATH                = "Library/Models/";
-constexpr const char* MESHES_PATH                    = "Library/Meshes/";
-constexpr const char* SCENES_PLAY_PATH               = "Library/Scenes/";
-constexpr const char* TEXTURES_PATH                  = "Library/Textures/";
-constexpr const char* MATERIALS_PATH                 = "Library/Materials/";
-constexpr const char* STATEMACHINES_LIB_PATH         = "Library/StateMachines/";
-constexpr const char* PREFABS_LIB_PATH               = "Library/Prefabs/";
-constexpr const char* FONTS_PATH                     = "Library/Fonts/";
+constexpr const char* LIBRARY_PATH                    = "Library/";
+constexpr const char* ANIMATIONS_PATH                 = "Library/Animations/";
+constexpr const char* AUDIO_PATH                      = "Library/Audio/";
+constexpr const char* MODELS_LIB_PATH                 = "Library/Models/";
+constexpr const char* MESHES_PATH                     = "Library/Meshes/";
+constexpr const char* SCENES_PLAY_PATH                = "Library/Scenes/";
+constexpr const char* TEXTURES_PATH                   = "Library/Textures/";
+constexpr const char* MATERIALS_PATH                  = "Library/Materials/";
+constexpr const char* STATEMACHINES_LIB_PATH          = "Library/StateMachines/";
+constexpr const char* PREFABS_LIB_PATH                = "Library/Prefabs/";
+constexpr const char* FONTS_PATH                      = "Library/Fonts/";
+constexpr const char* NAVMESHES_PATH                  = "Library/Navmeshes/";
 
 constexpr const char* ASSET_EXTENSION                = ".gltf";
 constexpr const char* MESH_EXTENSION                 = ".sobrassada";

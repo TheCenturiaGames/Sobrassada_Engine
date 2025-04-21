@@ -100,6 +100,8 @@ class Scene
     Quadtree* GetDynamicTree() const { return dynamicTree; }
     UID GetMultiselectUID() const;
     GameObject* GetMultiselectParent() const { return multiSelectParent; }
+    UID GetNavmeshUID() const { return navmeshUID; }
+    GameObject* GetMultiselectParent() { return multiSelectParent; }
     const std::map<UID, UID>& GetMultiselectedObjects() const { return selectedGameObjects; }
     const std::map<UID, MobilitySettings>& GetMultiselectedObjectsMobility() const
     {
@@ -108,7 +110,7 @@ class Scene
 
     void SetMainCamera(CameraComponent* camera) { mainCamera = camera; }
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
-
+    void SetNavmeshUID(UID navUID) { navmeshUID = navUID; }
     void SetStopPlaying(bool stop) { stopPlaying = stop; }
 
     void SetStaticModified() { staticModified = true; }
@@ -129,6 +131,7 @@ class Scene
   private:
     std::string sceneName                       = DEFAULT_SCENE_NAME;
     UID sceneUID                                = INVALID_UID;
+    UID navmeshUID                              = INVALID_UID;
     UID gameObjectRootUID                       = INVALID_UID;
     UID selectedGameObjectUID                   = INVALID_UID;
     CameraComponent* mainCamera                 = nullptr;
