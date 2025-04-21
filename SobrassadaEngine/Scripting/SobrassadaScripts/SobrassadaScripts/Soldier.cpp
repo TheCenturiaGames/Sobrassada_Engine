@@ -10,7 +10,7 @@
 #include "Standalone/AnimationComponent.h"
 #include "Standalone/CharacterControllerComponent.h"
 
-Soldier::Soldier(GameObject* parent) : Character(parent, 3, 1, 0.5f, 1.0f, 1.0f, 1.0f)
+Soldier::Soldier(GameObject* parent) : Character(parent, 3, 1, 0.5f, 1.0f, 1.0f, 1.0f, 2.0f, 10.0f)
 {
 }
 
@@ -18,7 +18,7 @@ bool Soldier::Init()
 {
     GLOG("Initiating Soldier");
 
-    currentState = SoldierStates::CHASE;
+    currentState = SoldierStates::PATROL;
 
     Character::Init();
 
@@ -37,6 +37,9 @@ bool Soldier::Init()
 
 void Soldier::Update(float deltaTime)
 {
+    if (character != nullptr && currentState != SoldierStates::PATROL)
+        agentAI->LookAtMovement(character->GetLastPosition(), deltaTime);
+
     Character::Update(deltaTime);
 }
 
@@ -60,7 +63,7 @@ void Soldier::PerformAttack()
     // TODO: trails, particles and animation
 }
 
-void Soldier::HandleState(float deltaTime)
+void Soldier::HandleState(float gameTime)
 {
     if (!animComponent) return;
 
@@ -68,7 +71,7 @@ void Soldier::HandleState(float deltaTime)
     {
     case SoldierStates::PATROL:
         // GLOG("Soldier Patrolling");
-        animComponent->UseTrigger("walk");
+        animComponent->UseTrigger("idle");
         PatrolAI();
         break;
     case SoldierStates::CHASE:
@@ -78,8 +81,9 @@ void Soldier::HandleState(float deltaTime)
         break;
     case SoldierStates::BASIC_ATTACK:
         // GLOG("Soldier Basic Attack");
-        animComponent->UseTrigger("Idle");
-        Attack(deltaTime);
+        animComponent->UseTrigger("attack");
+        Attack(gameTime);
+        if (CheckDistanceWithPlayer() != CLOSE) currentState = SoldierStates::CHASE;
         break;
     default:
         GLOG("No state provided to Soldier");
@@ -90,13 +94,16 @@ void Soldier::HandleState(float deltaTime)
 
 void Soldier::PatrolAI()
 {
+    if (CheckDistanceWithPlayer() == MEDIUM) currentState = SoldierStates::CHASE;
+    else if (CheckDistanceWithPlayer() == CLOSE) currentState = SoldierStates::BASIC_ATTACK;
 }
 
 void Soldier::ChaseAI()
 {
     if (character != nullptr)
     {
-        if (!agentAI->SetPathNavigation(character->GetLastPosition())) currentState = SoldierStates::PATROL;
+        if (CheckDistanceWithPlayer() == CLOSE) currentState = SoldierStates::BASIC_ATTACK;
+        else if (!agentAI->SetPathNavigation(character->GetLastPosition())) currentState = SoldierStates::PATROL;
     }
     else currentState = SoldierStates::PATROL;
 }
