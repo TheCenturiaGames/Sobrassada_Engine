@@ -16,7 +16,7 @@ namespace TextManager
 
 class CanvasComponent;
 
-class SOBRASADA_API_ENGINE GameUIModule : public Module
+class GameUIModule : public Module
 {
   public:
     GameUIModule();
