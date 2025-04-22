@@ -48,7 +48,7 @@
     <ClInclude Include="CuChulainn.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="TileFloatScript.h">
+    <ClInclude Include="TileFloat.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>
@@ -656,7 +656,7 @@
     <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\BroadphaseCollision\btAxisSweep3.cpp">
       <Filter>External</Filter>
     </ClCompile>
-    <ClCompile Include="TileFloatSacript.cpp">
+    <ClCompile Include="TileFloat.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
   </ItemGroup>

@@ -394,7 +394,7 @@
     <ClInclude Include="RotateGameObject.h" />
     <ClInclude Include="Script.h" />
     <ClInclude Include="Soldier.h" />
-    <ClInclude Include="TileFloatScript.h" />
+    <ClInclude Include="TileFloat.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\BroadphaseCollision\btAxisSweep3.cpp">
@@ -1755,7 +1755,7 @@
     <ClCompile Include="Script.cpp" />
     <ClCompile Include="ScriptExport.cpp" />
     <ClCompile Include="Soldier.cpp" />
-    <ClCompile Include="TileFloatSacript.cpp" />
+    <ClCompile Include="TileFloat.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
