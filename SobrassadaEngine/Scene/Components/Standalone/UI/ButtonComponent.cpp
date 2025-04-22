@@ -58,6 +58,7 @@ ButtonComponent::ButtonComponent(const rapidjson::Value& initialState, GameObjec
 
 ButtonComponent::~ButtonComponent()
 {
+    ClearAllCallbacks();
 }
 
 void ButtonComponent::Init()
@@ -217,15 +218,17 @@ bool ButtonComponent::IsWithinBounds(const float2& pos) const
     return abs(localRotated.x) <= transform2D->size.x * 0.5f && abs(localRotated.y) <= transform2D->size.y * 0.5f;
 }
 
-void ButtonComponent::AddOnClickCallback(Delegate<void>& newDelegate)
+std::list<Delegate<void>>::iterator ButtonComponent::AddOnClickCallback(Delegate<void> newDelegate)
 {
-    delegateID = onClickDispatcher.SubscribeCallback(std::move(newDelegate));
+    return onClickDispatcher.SubscribeCallback(std::move(newDelegate));
 }
 
-void ButtonComponent::RemoveOnClickCallback()
+
+void ButtonComponent::RemoveOnClickCallback(std::list<Delegate<void>>::iterator delegate)
 {
-    onClickDispatcher.RemoveCallback(delegateID);
+    onClickDispatcher.SafeRemoveCallback(delegate);
 }
+
 
 void ButtonComponent::OnInteractionChange() const
 {
@@ -233,4 +236,9 @@ void ButtonComponent::OnInteractionChange() const
 
     if (isInteractable) image->SetColor(defaultColor);
     else image->SetColor(disabledColor);
+}
+
+void ButtonComponent::ClearAllCallbacks()
+{
+    onClickDispatcher.Clear();
 }

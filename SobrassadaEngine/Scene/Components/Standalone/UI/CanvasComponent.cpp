@@ -150,6 +150,8 @@ void CanvasComponent::RenderUI()
 
     for (const GameObject* child : sortedChildren)
     {
+        if (!child->IsGloballyEnabled()) continue;
+
         // Only render UI components
         Component* uiWidget = child->GetComponentByType(COMPONENT_TRANSFORM_2D);
         if (uiWidget) static_cast<const Transform2DComponent*>(uiWidget)->RenderWidgets();
@@ -196,7 +198,6 @@ void CanvasComponent::OnWindowResize(const float width, const float height)
     {
         // Only render UI components
         Component* transform2D = child->GetComponentByType(COMPONENT_TRANSFORM_2D);
-        if (transform2D) static_cast<Transform2DComponent*>(transform2D)->AdaptToParentChanges();
     }
 }
 

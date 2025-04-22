@@ -24,6 +24,7 @@ ScriptComponent::ScriptComponent(const rapidjson::Value& initialState, GameObjec
     }
 }
 
+
 ScriptComponent::~ScriptComponent()
 {
     if (scriptInstance) DeleteScript();
@@ -35,6 +36,7 @@ void ScriptComponent::Save(rapidjson::Value& targetState, rapidjson::Document::A
     targetState.AddMember("Script Name", rapidjson::Value(scriptName.c_str(), allocator), allocator);
     if (scriptInstance != nullptr) scriptInstance->Save(targetState, allocator);
 }
+
 
 void ScriptComponent::Clone(const Component* other)
 {
@@ -53,6 +55,8 @@ void ScriptComponent::Clone(const Component* other)
 
 void ScriptComponent::Update(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
+
     if (App->GetSceneModule()->GetInPlayMode())
     {
         if (scriptInstance != nullptr)
@@ -129,14 +133,18 @@ void ScriptComponent::CreateScript(const std::string& scripString)
 
 void ScriptComponent::DeleteScript()
 {
-    App->GetScriptModule()->DestroyScript(scriptInstance);
-    scriptInstance = nullptr;
+    if (scriptInstance)
+    {
+        scriptInstance->OnDestroy();                          
+        App->GetScriptModule()->DestroyScript(scriptInstance);
+        scriptInstance = nullptr;
+    }
 }
 
 int ScriptComponent::SearchIdxForString(const std::string& scriptString) const
 {
     int idx = 0;
-    for (int i = 0; i < sizeof(scripts) / sizeof(scripts[0]); ++i)
+    for (int i = 0; i < SCRIPT_TYPE_COUNT; ++i)
     {
         if (scriptString == scripts[i])
         {

@@ -1,4 +1,7 @@
 #pragma once
+#include <rapidjson/document.h>
+#include "Math/float3.h"
+#include <vector>
 
 #include "Math/float3.h"
 #include "rapidjson/document.h"
@@ -52,6 +55,8 @@ class Script
     virtual void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator);
     virtual void Load(const rapidjson::Value& initialState);
     virtual void OnCollision(GameObject* otherObject, const float3& collisionNormal) {};
+    virtual void OnDestroy() {};
+
 
   protected:
     GameObject* parent;
