@@ -59,6 +59,8 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"AI Agent",             COMPONENT_AIAGENT             },
         {"UI Image",             COMPONENT_IMAGE               },
         {"UI Button",            COMPONENT_BUTTON              },
+        {"Audio Source",         COMPONENT_AUDIO_SOURCE        },
+        {"Audio Listener",       COMPONENT_AUDIO_LISTENER      },
     };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;
@@ -423,15 +425,92 @@ void EditorUIModule::Navmesh(bool& navmesh)
 
     ImGui::Begin("NavMesh Creation", &navmesh, ImGuiWindowFlags_None);
 
+    // Draw config UI
+    App->GetPathfinderModule()->GetNavMeshConfig().RenderEditorUI();
+
+    ImGui::InputText("NavMesh Name", navmeshName, IM_ARRAYSIZE(navmeshName));
+
+    // Create navmesh
     if (ImGui::Button("Create NavMesh"))
     {
-        App->GetResourcesModule()->CreateNavMesh();
+        App->GetPathfinderModule()->CreateNavMesh();
         ImGui::Text("NavMesh created!");
     }
 
-    App->GetResourcesModule()->GetNavMesh()->RenderNavmeshEditor();
+    // Save navmesh
+    if (ImGui::Button("Save NavMesh"))
+    {
+        App->GetPathfinderModule()->SaveNavMesh(navmeshName); // or ask user for name
+        ImGui::Text("NavMesh saved!");
+    }
 
-    ImGui::End();
+    // Load navmesh
+    if (ImGui::Button("Load NavMesh"))
+    {
+        showNavLoadDialog = true;
+    }
+
+    ImGui::End(); // End NavMesh Creation
+
+    // Load dialog window
+    if (showNavLoadDialog)
+    {
+        ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_FirstUseEver);
+        bool open = true;
+        if (ImGui::Begin("Load NavMesh", &open, ImGuiWindowFlags_NoCollapse))
+        {
+            ImGui::InputText("Search", searchTextNavmesh, IM_ARRAYSIZE(searchTextNavmesh));
+            ImGui::Separator();
+
+            if (ImGui::BeginListBox("##NavmeshList", ImVec2(-FLT_MIN, -40)))
+            {
+                int i = 0;
+                for (const auto& pair : App->GetLibraryModule()->GetNavmeshMap())
+                {
+                    if (pair.first.find(searchTextNavmesh) != std::string::npos)
+                    {
+                        ++i;
+                        if (ImGui::Selectable(pair.first.c_str(), selectedNavmesh == i))
+                        {
+                            selectedNavmesh = i;
+                            navmeshUID      = pair.second;
+                        }
+                    }
+                }
+                ImGui::EndListBox();
+            }
+
+            ImGui::Dummy(ImVec2(0, 3));
+
+            if (ImGui::Button("Load"))
+            {
+                if (navmeshUID != INVALID_UID)
+                {
+                    App->GetPathfinderModule()->LoadNavMesh(App->GetLibraryModule()->GetResourceName(navmeshUID));
+                }
+                open = false;
+            }
+
+            ImGui::SameLine();
+
+            if (ImGui::Button("Cancel"))
+            {
+                open = false;
+            }
+
+            ImGui::End();
+        }
+
+       if (!open)
+        {
+            showNavLoadDialog    = false;
+
+            // Reset search and selection
+            searchTextNavmesh[0] = '\0';
+            selectedNavmesh      = -1;          
+            navmeshUID           = INVALID_UID;
+        }
+    }
 }
 
 void EditorUIModule::CrowdControl(bool& crowdControl)
@@ -1003,7 +1082,9 @@ template ComponentType EditorUIModule::RenderResourceSelectDialog<ComponentType>
     const char* id, const std::unordered_map<std::string, ComponentType>& availableResources,
     const ComponentType& defaultResource
 );
-
+template uint32_t EditorUIModule::RenderResourceSelectDialog<uint32_t>(
+    const char* id, const std::unordered_map<std::string, uint32_t>& availableResources, const uint32_t& defaultResource
+);
 void EditorUIModule::RenderBasicTransformModifiers(
     float3& outputPosition, float3& outputRotation, float3& outputScale, bool& lockScaleAxis,
     bool& positionValueChanged, bool& rotationValueChanged, bool& scaleValueChanged

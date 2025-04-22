@@ -1,5 +1,8 @@
 #include "MetaMesh.h"
 
+#include "Application.h"
+#include "LibraryModule.h"
+
 MetaMesh::MetaMesh(
     UID uid, const std::string& assetPath, bool generateTangents, const float4x4& transform, UID defaultMaterialUID,
     uint32_t gltfMeshIndex, uint32_t gltfPrimitiveIndex

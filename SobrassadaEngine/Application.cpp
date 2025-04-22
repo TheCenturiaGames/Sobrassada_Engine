@@ -39,9 +39,9 @@ Application::Application()
     modules.push_back(inputModule = new InputModule());
     modules.push_back(shaderModule = new ShaderModule());
     modules.push_back(physicsModule = new PhysicsModule());
-    modules.push_back(pathModule = new PathfinderModule());
     modules.push_back(audioModule = new AudioModule());
     modules.push_back(sceneModule = new SceneModule());
+    modules.push_back(pathModule = new PathfinderModule());
     modules.push_back(gameUIModule = new GameUIModule());
     modules.push_back(cameraModule = new CameraModule());
     modules.push_back(debugDraw = new DebugDrawModule());

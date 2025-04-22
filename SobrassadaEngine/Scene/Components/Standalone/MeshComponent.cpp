@@ -25,13 +25,14 @@ MeshComponent::MeshComponent(const UID uid, GameObject* parent) : Component(uid,
 
 MeshComponent::MeshComponent(const rapidjson::Value& initialState, GameObject* parent) : Component(initialState, parent)
 {
+    if (initialState.HasMember("Material"))
+    {
+        UID materialUID = initialState["Material"].GetUint64();
+        if (materialUID != INVALID_UID) AddMaterial(materialUID);
+    }
     if (initialState.HasMember("Mesh"))
     {
         AddMesh(initialState["Mesh"].GetUint64(), false);
-    }
-    if (initialState.HasMember("Material"))
-    {
-        AddMaterial(initialState["Material"].GetUint64());
     }
     if (initialState.HasMember("Bones"))
     {
@@ -79,7 +80,10 @@ void MeshComponent::Save(rapidjson::Value& targetState, rapidjson::Document::All
     Component::Save(targetState, allocator);
 
     targetState.AddMember("Mesh", currentMesh != nullptr ? currentMesh->GetUID() : INVALID_UID, allocator);
-    targetState.AddMember("Material", currentMaterial != nullptr ? currentMaterial->GetUID() : INVALID_UID, allocator);
+    targetState.AddMember(
+        "Material", currentMaterial != nullptr && !bUsesMeshDefaultMaterial ? currentMaterial->GetUID() : INVALID_UID,
+        allocator
+    );
 
     if (bones.size() > 0) // Store the skin of the mesh as the UID of each bone
     {
@@ -207,7 +211,7 @@ void MeshComponent::AddMesh(UID resource, bool updateParent)
         if (currentMaterial == nullptr)
         {
             const UID defaultMat = newMesh->GetDefaultMaterialUID();
-            AddMaterial(defaultMat);
+            AddMaterial(defaultMat, true);
         }
 
         localComponentAABB = AABB(currentMesh->GetAABB());
@@ -217,9 +221,8 @@ void MeshComponent::AddMesh(UID resource, bool updateParent)
     }
 }
 
-void MeshComponent::AddMaterial(UID resource)
+void MeshComponent::AddMaterial(UID resource, bool setDefaultMaterial)
 {
-
     if (resource == INVALID_UID || App->GetResourcesModule()->RequestResource(resource) == nullptr)
     {
         resource = DEFAULT_MATERIAL_UID;
@@ -232,8 +235,9 @@ void MeshComponent::AddMaterial(UID resource)
     if (newMaterial != nullptr)
     {
         App->GetResourcesModule()->ReleaseResource(currentMaterial);
-        currentMaterial     = newMaterial;
-        currentMaterialName = currentMaterial->GetName();
+        currentMaterial          = newMaterial;
+        currentMaterialName      = currentMaterial->GetName();
+        bUsesMeshDefaultMaterial = setDefaultMaterial;
 
         if (batch) BatchEditorMode();
     }

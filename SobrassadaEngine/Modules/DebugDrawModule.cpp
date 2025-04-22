@@ -11,6 +11,7 @@
 #include "MathGeoLib.h"
 #include "Octree.h"
 #include "OpenGLModule.h"
+#include "PathfinderModule.h"
 #include "Quadtree.h"
 #include "ResourceNavmesh.h"
 #include "ResourcesModule.h"
@@ -629,11 +630,16 @@ update_status DebugDrawModule::Render(float deltaTime)
 
     if (App->GetSceneModule()->GetInPlayMode())
     {
-        CameraComponent* camera = App->GetSceneModule()->GetScene()->GetMainCamera();
-        auto framebuffer        = App->GetOpenGLModule()->GetFramebuffer();
-        const int width                   = framebuffer->GetTextureWidth();
-        const int height                  = framebuffer->GetTextureHeight();
-        Draw(camera->GetViewMatrix(), camera->GetProjectionMatrix(), width, height);
+        CameraComponent* camera    = App->GetSceneModule()->GetScene()->GetMainCamera();
+
+        const float4x4& viewMatrix = camera ? camera->GetViewMatrix() : App->GetCameraModule()->GetViewMatrix();
+        const float4x4& projectionMatrix =
+            camera ? camera->GetProjectionMatrix() : App->GetCameraModule()->GetProjectionMatrix();
+
+        auto framebuffer = App->GetOpenGLModule()->GetFramebuffer();
+        const int width  = framebuffer->GetTextureWidth();
+        const int height = framebuffer->GetTextureHeight();
+        Draw(viewMatrix, projectionMatrix, width, height);
     }
     else Draw();
     // Probably should go somewhere else, but must go after skybox and meshes
@@ -822,9 +828,12 @@ void DebugDrawModule::HandleDebugRenderOptions()
     }
     if (debugOptionValues[(int)DebugOptions::RENDER_NAVMESH])
     {
-        if (const ResourceNavMesh* navmesh = App->GetResourcesModule()->GetNavMesh())
+        if (const ResourceNavMesh* navmesh = App->GetPathfinderModule()->GetNavMesh())
         {
-            DrawNavMesh(navmesh->GetDetourNavMesh(), navmesh->GetDetourNavMeshQuery(), DRAWNAVMESH_COLOR_TILES);
+            DrawNavMesh(
+                navmesh->GetDetourNavMesh(), App->GetPathfinderModule()->GetDetourNavMeshQuery(),
+                DRAWNAVMESH_COLOR_TILES
+            );
         }
     }
 }

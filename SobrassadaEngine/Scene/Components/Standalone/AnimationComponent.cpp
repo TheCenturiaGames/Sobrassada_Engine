@@ -92,9 +92,7 @@ void AnimationComponent::OnPlay(bool isTransition)
                         if (clip.clipName.GetString() == activeState->clipName.GetString())
                         {
                             if (isTransition)
-                                animController->SetTargetAnimationResource(
-                                    clip.animationResourceUID, transitionTime, clip.loop
-                                );
+                                animController->SetTargetAnimationResource(clip.animationResourceUID, transitionTime, clip.loop);
                             else animController->Play(clip.animationResourceUID, clip.loop);
                             resource = clip.animationResourceUID;
                         }
@@ -352,6 +350,7 @@ void AnimationComponent::OnInspector()
         }
         ImGui::EndCombo();
     }
+
 
     if (resourceStateMachine)
     {

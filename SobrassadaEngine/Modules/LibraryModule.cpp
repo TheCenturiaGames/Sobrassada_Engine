@@ -182,7 +182,6 @@ bool LibraryModule::LoadLibraryMaps(const std::string& projectPath)
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 else SceneImporter::CopyModel(assetPath, projectPath, assetName, assetUID);
                 break;
-
             case 16:
                 AddPrefab(assetUID, assetName);
                 AddName(assetName, assetUID);
@@ -203,6 +202,16 @@ bool LibraryModule::LoadLibraryMaps(const std::string& projectPath)
                 libraryPath = projectPath + FONTS_PATH + std::to_string(assetUID) + FONT_EXTENSION;
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
                 else SceneImporter::CopyFont(assetPath, projectPath, assetName, assetUID);
+                break;
+            case 20:
+                AddNavmesh(assetUID, assetName);
+                AddName(assetName, assetUID);
+                libraryPath = projectPath + NAVMESHES_PATH + assetName + NAVMESH_EXTENSION;
+
+                if (FileSystem::Exists(libraryPath.c_str()))
+                    AddResource(libraryPath, assetUID); // Register for loading later
+                else GLOG("Navmesh binary missing for UID %llu (%s)", assetUID, assetName.c_str()); // Optional warning
+                break;
             default:
                 GLOG("Unknown UID prefix (%s) for: %s", std::to_string(prefix).c_str(), assetName.c_str());
                 continue;
@@ -224,6 +233,16 @@ void LibraryModule::GetImportOptions(UID uid, rapidjson::Document& doc, rapidjso
         const std::string& engineDefaultPath = ENGINE_DEFAULT_ASSETS;
         SearchImportOptionsFromUID(uid, engineDefaultPath, doc, outImportOptions);
     }
+}
+
+UID LibraryModule::GetUIDFromMetaFile(const std::string& filePath) const
+{
+    if (FileSystem::GetFileExtension(filePath) == META_EXTENSION)
+    {
+        rapidjson::Document doc;
+        if (FileSystem::LoadJSON(filePath.c_str(), doc)) return doc["UID"].GetUint64();
+    }
+    return INVALID_UID;
 }
 
 void LibraryModule::SearchImportOptionsFromUID(
@@ -277,6 +296,9 @@ UID LibraryModule::AssignFiletypeUID(UID originalUID, FileType fileType)
     case FileType::Font:
         prefix = 19;
         break;
+    case FileType::Navmesh:
+        prefix = 20;
+        break;
     default:
         GLOG("Category: Unknown File Type (10)");
         break;
@@ -321,6 +343,11 @@ void LibraryModule::AddPrefab(UID prefabUID, const std::string& prefabName)
 void LibraryModule::AddFont(UID fontUID, const std::string& fontName)
 {
     fontMap[fontName] = fontUID;
+}
+
+void LibraryModule::AddNavmesh(UID navmeshUID, const std::string& navmeshName)
+{
+    navmeshMap[navmeshName] = navmeshUID;
 }
 
 void LibraryModule::AddName(const std::string& resourceName, UID resourceUID)
@@ -400,6 +427,16 @@ UID LibraryModule::GetStateMachineUID(const std::string& stMachPath) const
     return INVALID_UID;
 }
 
+UID LibraryModule::GetNavmeshUID(const std::string& navmeshPath) const
+{
+    auto it = navmeshMap.find(navmeshPath);
+    if (it != navmeshMap.end())
+    {
+        return it->second;
+    }
+    return INVALID_UID;
+}
+
 const std::string& LibraryModule::GetResourcePath(UID resourceID) const
 {
     auto it = resourcePathsMap.find(resourceID);
@@ -409,7 +446,7 @@ const std::string& LibraryModule::GetResourcePath(UID resourceID) const
         // GLOG("obtained path: %s", it->second.c_str());
         return it->second;
     }
-    static const std::string emptyString = "";
+    const std::string emptyString = "";
     return emptyString;
 }
 
@@ -422,7 +459,7 @@ const std::string& LibraryModule::GetResourceName(UID resourceID) const
         // GLOG("obtained name: %s", it->second.c_str());
         return it->second;
     }
-    static const std::string emptyString = "";
+    const std::string emptyString = "";
     return emptyString;
 }
 

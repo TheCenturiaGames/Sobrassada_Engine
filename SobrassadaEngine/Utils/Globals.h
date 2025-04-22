@@ -68,9 +68,10 @@ constexpr char DELIMITER = '\\';
 constexpr char DELIMITER = '/';
 #endif
 
-constexpr const char* FILENAME_SEPARATOR             = "_";
-constexpr const char* DEFAULT_SCENE_NAME             = "New Scene";
-constexpr const char* DEFAULT_NODE_NAME              = "Unnamed Node";
+constexpr const char* FILENAME_SEPARATOR              = "_";
+constexpr const char* DEFAULT_SCENE_NAME              = "New Scene";
+constexpr const char* DEFAULT_NODE_NAME               = "Unnamed Node";
+constexpr const char* DEFAULT_NAVMESH_NAME            = "New Navmesh";
 
 constexpr float DEFAULT_GL_CLEAR_COLOR_RED           = 0.f;
 constexpr float DEFAULT_GL_CLEAR_COLOR_GREEN         = 0.f;
@@ -88,30 +89,27 @@ constexpr const char* GAME_PATH                      = "..\\Game";
 constexpr const char* DEBUG_DLL_PATH                 = "..\\SobrassadaEngine\\x64\\Debug\\SobrassadaScripts.dll";
 constexpr const char* RELEASE_DLL_PATH               = "..\\SobrassadaEngine\\x64\\Release\\SobrassadaScripts.dll";
 
-constexpr const wchar_t* BANKNAME_INIT               = L"Init.bnk";
-constexpr const wchar_t* BANKNAME_MAIN               = L"main.bnk";
-
 constexpr const char* ENGINE_DEFAULT_ASSETS          = "EngineDefaults/";
 constexpr const char* ASSETS_PATH                    = "Assets/";
 constexpr const char* SCENES_PATH                    = "Assets/Scenes/";
-constexpr const char* NAVMESHES_PATH                 = "Assets/Navmeshes/";
 constexpr const char* METADATA_PATH                  = "Assets/Metadata/";
 constexpr const char* PREFABS_ASSETS_PATH            = "Assets/Prefabs/";
 constexpr const char* MODELS_ASSETS_PATH             = "Assets/Models/";
 constexpr const char* ANIMATIONS_ASSETS_PATH         = "Assets/Animations/";
 constexpr const char* STATEMACHINES_ASSETS_PATH      = "Assets/StateMachines/";
 
-constexpr const char* LIBRARY_PATH                   = "Library/";
-constexpr const char* ANIMATIONS_PATH                = "Library/Animations/";
-constexpr const char* AUDIO_PATH                     = "Library/Audio/";
-constexpr const char* MODELS_LIB_PATH                = "Library/Models/";
-constexpr const char* MESHES_PATH                    = "Library/Meshes/";
-constexpr const char* SCENES_PLAY_PATH               = "Library/Scenes/";
-constexpr const char* TEXTURES_PATH                  = "Library/Textures/";
-constexpr const char* MATERIALS_PATH                 = "Library/Materials/";
-constexpr const char* STATEMACHINES_LIB_PATH         = "Library/StateMachines/";
-constexpr const char* PREFABS_LIB_PATH               = "Library/Prefabs/";
-constexpr const char* FONTS_PATH                     = "Library/Fonts/";
+constexpr const char* LIBRARY_PATH                    = "Library/";
+constexpr const char* ANIMATIONS_PATH                 = "Library/Animations/";
+constexpr const char* AUDIO_PATH                      = "Library/Audio/";
+constexpr const char* MODELS_LIB_PATH                 = "Library/Models/";
+constexpr const char* MESHES_PATH                     = "Library/Meshes/";
+constexpr const char* SCENES_PLAY_PATH                = "Library/Scenes/";
+constexpr const char* TEXTURES_PATH                   = "Library/Textures/";
+constexpr const char* MATERIALS_PATH                  = "Library/Materials/";
+constexpr const char* STATEMACHINES_LIB_PATH          = "Library/StateMachines/";
+constexpr const char* PREFABS_LIB_PATH                = "Library/Prefabs/";
+constexpr const char* FONTS_PATH                      = "Library/Fonts/";
+constexpr const char* NAVMESHES_PATH                  = "Library/Navmeshes/";
 
 constexpr const char* ASSET_EXTENSION                = ".gltf";
 constexpr const char* MESH_EXTENSION                 = ".sobrassada";
@@ -128,12 +126,17 @@ constexpr const char* NAVMESH_EXTENSION              = ".nav";
 
 constexpr int MAX_COMPONENT_NAME_LENGTH              = 64;
 
+// Soundbanks
+constexpr const char* WINDOWS_BANKS_PATH             = "Assets\\Soundbanks\\Windows\\";
+constexpr const wchar_t* BANKNAME_INIT               = L"Init.bnk";
+constexpr const wchar_t* BANKNAME_MAIN               = L"main.bnk";
+constexpr const char* BANKMETA_MAIN                  = "main.json";
+
 // SHADER PATHS
 constexpr const char* LIGHTS_VERTEX_SHADER_PATH      = "./EngineDefaults/Shader/Vertex/VertexShader.glsl";
 constexpr const char* SKYBOX_VERTEX_SHADER_PATH      = "./EngineDefaults/Shader/Vertex/SkyboxVertex.glsl";
 constexpr const char* UIWIDGET_VERTEX_SHADER_PATH    = "./EngineDefaults/Shader/Vertex/UIWidgetVertex.glsl";
 constexpr const char* QUAD_VERTEX_SHADER_PATH        = "./EngineDefaults/Shader/Vertex/QuadVertexShader.glsl";
-
 constexpr const char* UNLIT_FRAGMENT_SHADER_PATH     = "./EngineDefaults/Shader/Fragment/UnlitFragmentShader.glsl";
 constexpr const char* SKYBOX_FRAGMENT_SHADER_PATH    = "./EngineDefaults/Shader/Fragment/SkyboxFragment.glsl";
 constexpr const char* SPECULAR_FRAGMENT_SHADER_PATH  = "./EngineDefaults/Shader/Fragment/BRDFPhongFragmentShader.glsl";
@@ -166,6 +169,7 @@ constexpr const char* CONSTANT_SPECULAR_TEXTURE_SELECT_DIALOG_ID = "specular-tex
 constexpr const char* CONSTANT_NORMAL_TEXTURE_SELECT_DIALOG_ID   = "normal-texture-select";
 constexpr const char* CONSTANT_PREFAB_SELECT_DIALOG_ID           = "prefab-select";
 constexpr const char* CONSTANT_MODEL_SELECT_DIALOG_ID            = "model-select";
+constexpr const char* CONSTANT_EVENT_SELECT_DIALOG_ID            = "event-select";
 
 constexpr uint32_t CONSTANT_NO_MESH_UUID                         = 0;
 constexpr uint32_t CONSTANT_NO_TEXTURE_UUID                      = 0;

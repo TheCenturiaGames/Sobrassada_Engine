@@ -19,6 +19,7 @@
 #include "ModelImporter.h"
 #include "Octree.h"
 #include "OpenGLModule.h"
+#include "PathfinderModule.h"
 #include "PhysicsModule.h"
 #include "ProjectModule.h"
 #include "Quadtree.h"
@@ -27,8 +28,8 @@
 #include "ResourcePrefab.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
-#include "ShaderModule.h"
 #include "ScriptComponent.h"
+#include "ShaderModule.h"
 #include "Standalone/AnimationComponent.h"
 #include "Standalone/Lights/DirectionalLightComponent.h"
 #include "Standalone/Lights/PointLightComponent.h"
@@ -62,8 +63,17 @@ Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUI
     this->sceneName       = initialState["Name"].GetString();
     gameObjectRootUID     = initialState["RootGameObject"].GetUint64();
     selectedGameObjectUID = gameObjectRootUID;
+    if (initialState.HasMember("NavmeshUID"))
+        navmeshUID = initialState["NavmeshUID"].GetUint64();
 
     App->GetPhysicsModule()->LoadLayerData(&initialState);
+
+    // Load navmesh from scene.
+    if (navmeshUID != INVALID_UID)
+    {
+        std::string navmeshName = App->GetLibraryModule()->GetResourceName(navmeshUID);
+        App->GetPathfinderModule()->LoadNavMesh(navmeshName);
+    }
 
     // Deserialize GameObjects
     if (initialState.HasMember("GameObjects") && initialState["GameObjects"].IsArray())
@@ -113,11 +123,6 @@ Scene::~Scene()
 
 void Scene::Init()
 {
-    for (auto& gameObject : gameObjectsContainer)
-    {
-        gameObject.second->Init();
-    }
-    App->GetResourcesModule()->GetBatchManager()->LoadData();
 
     // When loading a scene, overrides all gameObjects that have a prefabUID. That is because if the prefab has been
     // modified, the scene file may have not, so the prefabs need to be updated when loading the scene again
@@ -142,6 +147,12 @@ void Scene::Init()
         MeshComponent* mesh = gameObject.second->GetMeshComponent();
         if (mesh != nullptr) mesh->InitSkin();
     }
+
+    for (auto& gameObject : gameObjectsContainer)
+    {
+        gameObject.second->Init();
+    }
+    App->GetResourcesModule()->GetBatchManager()->LoadData();
 
     lightsConfig->InitSkybox();
     lightsConfig->InitLightBuffers();
@@ -174,6 +185,7 @@ void Scene::Save(
     targetState.AddMember("Name", rapidjson::Value(sceneName.c_str(), allocator), allocator);
 
     targetState.AddMember("RootGameObject", gameObjectRootUID, allocator);
+    targetState.AddMember("NavmeshUID", navmeshUID, allocator);
 
     App->GetPhysicsModule()->SaveLayerData(targetState, allocator);
 
