@@ -46,3 +46,11 @@ ExitGameScript::~ExitGameScript()
         }
     }
 }
+
+void ExitGameScript::OnDestroy()
+{
+    GLOG("ExitGameScript::OnDestroy() called");
+
+    hasRegisteredCallback = false;
+    delegateID            = {};
+}

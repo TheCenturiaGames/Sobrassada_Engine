@@ -10,9 +10,12 @@ class VSyncToggleScript : public Script
     VSyncToggleScript(GameObject* parent) : Script(parent) {}
     ~VSyncToggleScript() override;
 
+
     bool Init() override;
     void Update(float deltaTime) override;
     void Inspector() override;
+    void OnDestroy() override;
+
 
     void OnClick();
 

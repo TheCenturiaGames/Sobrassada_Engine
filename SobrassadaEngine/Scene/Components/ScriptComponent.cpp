@@ -133,8 +133,12 @@ void ScriptComponent::CreateScript(const std::string& scripString)
 
 void ScriptComponent::DeleteScript()
 {
-    App->GetScriptModule()->DestroyScript(scriptInstance);
-    scriptInstance = nullptr;
+    if (scriptInstance)
+    {
+        scriptInstance->OnDestroy();                          
+        App->GetScriptModule()->DestroyScript(scriptInstance);
+        scriptInstance = nullptr;
+    }
 }
 
 int ScriptComponent::SearchIdxForString(const std::string& scriptString) const

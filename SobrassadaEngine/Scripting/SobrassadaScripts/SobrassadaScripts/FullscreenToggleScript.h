@@ -8,6 +8,7 @@ class FullscreenToggleScript : public Script
   public:
     FullscreenToggleScript(GameObject* parent) : Script(parent) {}
     ~FullscreenToggleScript() override;
+    void OnDestroy() override;
     bool Init() override;
     void Update(float deltaTime) override;
     void Inspector() override;

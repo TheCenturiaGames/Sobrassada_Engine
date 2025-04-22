@@ -45,3 +45,9 @@ VSyncToggleScript::~VSyncToggleScript()
         }
     }
 }
+
+void VSyncToggleScript::OnDestroy()
+{
+    hasRegisteredCallback = false;
+    delegateID            = {};
+}

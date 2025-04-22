@@ -8,6 +8,7 @@ class ExitGameScript : public Script
   public:
     ExitGameScript(GameObject* parent) : Script(parent) {}
     ~ExitGameScript() override;
+    void OnDestroy() override;
     bool Init() override;
     void Update(float deltaTime) override;
     void Inspector() override;

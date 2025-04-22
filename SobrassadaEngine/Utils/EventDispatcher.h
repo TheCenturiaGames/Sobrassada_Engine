@@ -82,6 +82,9 @@ template <> class EventDispatcher<void>
         }
     }
 
+    void Clear() { subscribedCallbacks.clear(); }
+
+
 
   private:
     std::list<Delegate<void>> subscribedCallbacks;

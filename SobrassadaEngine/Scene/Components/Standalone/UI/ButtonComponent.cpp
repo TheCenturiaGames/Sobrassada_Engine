@@ -58,6 +58,7 @@ ButtonComponent::ButtonComponent(const rapidjson::Value& initialState, GameObjec
 
 ButtonComponent::~ButtonComponent()
 {
+    ClearAllCallbacks();
 }
 
 void ButtonComponent::Init()
@@ -225,7 +226,7 @@ std::list<Delegate<void>>::iterator ButtonComponent::AddOnClickCallback(Delegate
 
 void ButtonComponent::RemoveOnClickCallback(std::list<Delegate<void>>::iterator delegate)
 {
-    onClickDispatcher.RemoveCallback(delegate);
+    onClickDispatcher.SafeRemoveCallback(delegate);
 }
 
 
@@ -235,4 +236,9 @@ void ButtonComponent::OnInteractionChange() const
 
     if (isInteractable) image->SetColor(defaultColor);
     else image->SetColor(disabledColor);
+}
+
+void ButtonComponent::ClearAllCallbacks()
+{
+    onClickDispatcher.Clear();
 }

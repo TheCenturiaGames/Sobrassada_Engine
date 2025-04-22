@@ -12,7 +12,13 @@ bool FullscreenToggleScript::Init()
 
     if (button)
     {
-        std::function<void(void)> function = std::bind(&FullscreenToggleScript::OnClick, this);
+        FullscreenToggleScript* self   = this;
+
+        std::function<void()> function = [self]()
+        {
+            if (self) self->OnClick();
+        };
+
         Delegate<void> delegate(function);
         delegateID            = static_cast<ButtonComponent*>(button)->AddOnClickCallback(delegate);
         hasRegisteredCallback = true;
@@ -20,6 +26,7 @@ bool FullscreenToggleScript::Init()
 
     return true;
 }
+
 
 void FullscreenToggleScript::Update(float deltaTime)
 {
@@ -44,4 +51,10 @@ FullscreenToggleScript::~FullscreenToggleScript()
             static_cast<ButtonComponent*>(button)->RemoveOnClickCallback(delegateID);
         }
     }
+}
+
+void FullscreenToggleScript::OnDestroy()
+{
+    hasRegisteredCallback = false;
+    delegateID            = {};
 }

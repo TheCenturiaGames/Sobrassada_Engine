@@ -124,3 +124,9 @@ void ButtonScript::Load(const rapidjson::Value& initialState)
         panelToShowName = initialState["PanelToShow"].GetString();
     }
 }
+
+void ButtonScript::OnDestroy()
+{
+    hasRegisteredCallback = false;
+    delegateID            = {};
+}
