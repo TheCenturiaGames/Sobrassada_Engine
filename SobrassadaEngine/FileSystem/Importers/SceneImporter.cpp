@@ -39,7 +39,9 @@ namespace SceneImporter
 
     void ImportGLTF(const char* filePath, const std::string& targetFilePath)
     {
-        tinygltf::Model model = LoadModelGLTF(filePath, targetFilePath);
+        std::string modelFilePath;
+        CopyGLTF(filePath, targetFilePath, modelFilePath);
+        tinygltf::Model model = LoadModelGLTF(modelFilePath.c_str());
 
         std::vector<std::vector<std::pair<UID, UID>>> gltfMeshes;
         std::unordered_map<int, UID> matIndices;
@@ -58,7 +60,7 @@ namespace SceneImporter
 
                 for (const auto& primitive : srcMesh.primitives)
                 {
-                    std::string name = srcNode.name + "_" + srcMesh.name;
+                    std::string name = srcNode.name;
                     if (primitiveCounter > 0) name += "_" + std::to_string(primitiveCounter);
 
                     UID matUID = INVALID_UID;
@@ -79,8 +81,8 @@ namespace SceneImporter
                     }
 
                     const UID meshUID = MeshImporter::ImportMesh(
-                        model, srcNode.mesh, primitiveCounter, name, defaultTransform, filePath, targetFilePath,
-                        INVALID_UID, matUID
+                        model, srcNode.mesh, primitiveCounter, name, defaultTransform, modelFilePath.c_str(),
+                        targetFilePath, INVALID_UID, matUID
                     );
                     primitiveCounter++;
 
@@ -98,7 +100,31 @@ namespace SceneImporter
         ModelImporter::ImportModel(model, gltfMeshes, filePath, targetFilePath);
     }
 
-    tinygltf::Model LoadModelGLTF(const char* filePath, const std::string& targetFilePath)
+    void CopyGLTF(const char* filePath, const std::string& targetFilePath, std::string& copiedFilePath)
+    {
+        const tinygltf::Model model = LoadModelGLTF(filePath);
+
+        // Copy gltf to Assets folder
+        copiedFilePath              = targetFilePath + ASSETS_PATH + FileSystem::GetFileNameWithExtension(filePath);
+
+        if (FileSystem::Exists(copiedFilePath.c_str())) FileSystem::Delete(copiedFilePath.c_str());
+
+        FileSystem::Copy(filePath, copiedFilePath.c_str());
+
+        const std::string path = FileSystem::GetFilePath(filePath);
+
+        // Copy bin to Assets folder
+        for (const auto& srcBuffers : model.buffers)
+        {
+            std::string binPath     = path + srcBuffers.uri;
+            std::string copyBinPath = targetFilePath + ASSETS_PATH + FileSystem::GetFileNameWithExtension(binPath);
+            if (FileSystem::Exists(copyBinPath.c_str())) FileSystem::Delete(copyBinPath.c_str());
+
+            FileSystem::Copy(binPath.c_str(), copyBinPath.c_str());
+        }
+    }
+
+    tinygltf::Model LoadModelGLTF(const char* filePath)
     {
         tinygltf::TinyGLTF gltfContext;
         tinygltf::Model model;
@@ -123,23 +149,6 @@ namespace SceneImporter
             }
         }
 
-        {
-            // Copy gltf to Assets folder
-            std::string copyPath = targetFilePath + ASSETS_PATH + FileSystem::GetFileNameWithExtension(filePath);
-            if (!FileSystem::Exists(copyPath.c_str())) FileSystem::Copy(filePath, copyPath.c_str());
-        }
-        {
-            std::string path = FileSystem::GetFilePath(filePath);
-
-            // Copy bin to Assets folder
-            for (const auto& srcBuffers : model.buffers)
-            {
-                std::string binPath     = path + srcBuffers.uri;
-                std::string copyBinPath = targetFilePath + ASSETS_PATH + FileSystem::GetFileNameWithExtension(binPath);
-                if (!FileSystem::Exists(copyBinPath.c_str())) FileSystem::Copy(binPath.c_str(), copyBinPath.c_str());
-            }
-        }
-
         return model;
     }
 
@@ -148,10 +157,14 @@ namespace SceneImporter
         const rapidjson::Value& importOptions, UID sourceUID
     )
     {
-        tinygltf::Model model             = LoadModelGLTF(filePath.c_str(), targetFilePath);
+        tinygltf::Model model  = LoadModelGLTF(filePath.c_str());
 
-        const uint32_t gltfMeshIndex      = importOptions["gltfMeshIndex"].GetInt();
-        const uint32_t gltfPrimitiveIndex = importOptions["gltfPrimitiveIndex"].GetInt();
+        uint32_t gltfMeshIndex = 0;
+        if (importOptions.HasMember("gltfMeshIndex")) gltfMeshIndex = importOptions["gltfMeshIndex"].GetInt();
+        else GLOG("Mesh %s does not have a gltfMeshIndex assigned. Using 0 as default", name.c_str());
+        uint32_t gltfPrimitiveIndex = 0;
+        if (importOptions.HasMember("gltfMeshIndex")) gltfPrimitiveIndex = importOptions["gltfPrimitiveIndex"].GetInt();
+        else GLOG("Mesh %s does not have a gltfPrimitiveIndex assigned. Using 0 as default", name.c_str());
 
         MeshImporter::ImportMesh(
             model, gltfMeshIndex, gltfPrimitiveIndex, name, float4x4::identity, filePath.c_str(), targetFilePath,
@@ -163,7 +176,7 @@ namespace SceneImporter
         const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID
     )
     {
-        tinygltf::Model model = LoadModelGLTF(filePath.c_str(), targetFilePath);
+        tinygltf::Model model = LoadModelGLTF(filePath.c_str());
 
         // find material name that equals to name
         for (int i = 0; i < model.materials.size(); i++)
@@ -180,7 +193,7 @@ namespace SceneImporter
         const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID
     )
     {
-        tinygltf::Model model = LoadModelGLTF(filePath.c_str(), targetFilePath);
+        tinygltf::Model model = LoadModelGLTF(filePath.c_str());
 
         // find material name that equals to name
         for (int i = 0; i < model.animations.size(); i++)
