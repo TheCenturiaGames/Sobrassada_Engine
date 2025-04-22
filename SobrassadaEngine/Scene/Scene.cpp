@@ -63,7 +63,8 @@ Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUI
     this->sceneName       = initialState["Name"].GetString();
     gameObjectRootUID     = initialState["RootGameObject"].GetUint64();
     selectedGameObjectUID = gameObjectRootUID;
-    navmeshUID            = initialState["NavmeshUID"].GetUint64();
+    if (initialState.HasMember("NavmeshUID"))
+        navmeshUID = initialState["NavmeshUID"].GetUint64();
 
     App->GetPhysicsModule()->LoadLayerData(&initialState);
 
@@ -122,11 +123,6 @@ Scene::~Scene()
 
 void Scene::Init()
 {
-    for (auto& gameObject : gameObjectsContainer)
-    {
-        gameObject.second->Init();
-    }
-    App->GetResourcesModule()->GetBatchManager()->LoadData();
 
     // When loading a scene, overrides all gameObjects that have a prefabUID. That is because if the prefab has been
     // modified, the scene file may have not, so the prefabs need to be updated when loading the scene again
@@ -151,6 +147,12 @@ void Scene::Init()
         MeshComponent* mesh = gameObject.second->GetMeshComponent();
         if (mesh != nullptr) mesh->InitSkin();
     }
+
+    for (auto& gameObject : gameObjectsContainer)
+    {
+        gameObject.second->Init();
+    }
+    App->GetResourcesModule()->GetBatchManager()->LoadData();
 
     lightsConfig->InitSkybox();
     lightsConfig->InitLightBuffers();
