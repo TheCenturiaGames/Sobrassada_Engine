@@ -235,8 +235,8 @@ void SceneModule::HandleObjectDuplication()
 
     if (loadedScene->IsMultiselecting())
     {
-        const std::map<UID, UID> selectedGameObjects = loadedScene->GetMultiselectedObjects();
 
+        const std::map<UID, UID> selectedGameObjects = loadedScene->GetMultiselectedObjects();
         for (auto& childToDuplicate : selectedGameObjects)
         {
             objectsToDuplicate.push_back(childToDuplicate);
@@ -329,12 +329,17 @@ void SceneModule::HandleObjectDuplication()
     if (loadedScene->IsMultiselecting())
     {
         const std::map<UID, MobilitySettings> originalObjectMobility = loadedScene->GetMultiselectedObjectsMobility();
+        const std::map<UID, float4x4> originalObjectLocals           = loadedScene->GetMultiselectedObjectsLocals();
 
         for (int i = 0; i < objectsToDuplicate.size(); ++i)
         {
             MobilitySettings originalMobility = originalObjectMobility.find(objectsToDuplicate[i].first)->second;
-            loadedScene->GetGameObjectByUID(remappingTable[objectsToDuplicate[i].first])
-                ->UpdateMobilityHierarchy(originalMobility);
+            const float4x4& ogLocal           = originalObjectLocals.find(objectsToDuplicate[i].first)->second;
+
+            GameObject* currentGameObject =
+                loadedScene->GetGameObjectByUID(remappingTable[objectsToDuplicate[i].first]);
+            currentGameObject->SetLocalTransform(ogLocal);
+            currentGameObject->UpdateMobilityHierarchy(originalMobility);
         }
     }
 }

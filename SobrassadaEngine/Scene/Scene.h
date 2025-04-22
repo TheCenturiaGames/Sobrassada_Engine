@@ -107,6 +107,7 @@ class Scene
     {
         return selectedGameObjectsMobility;
     }
+    const std::map<UID, float4x4>& GetMultiselectedObjectsLocals() const { return selectedGameObjectsOgLocals; }
 
     void SetMainCamera(CameraComponent* camera) { mainCamera = camera; }
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
@@ -129,17 +130,17 @@ class Scene
     ) const;
 
   private:
-    std::string sceneName                       = DEFAULT_SCENE_NAME;
-    UID sceneUID                                = INVALID_UID;
-    UID navmeshUID                              = INVALID_UID;
-    UID gameObjectRootUID                       = INVALID_UID;
-    UID selectedGameObjectUID                   = INVALID_UID;
-    CameraComponent* mainCamera                 = nullptr;
-    bool stopPlaying                            = false;
-    bool doInputs                               = false;
-    bool doMouseInputs                          = false;
-    bool sceneVisible                           = false;
-    bool isFocused                              = false;
+    std::string sceneName       = DEFAULT_SCENE_NAME;
+    UID sceneUID                = INVALID_UID;
+    UID navmeshUID              = INVALID_UID;
+    UID gameObjectRootUID       = INVALID_UID;
+    UID selectedGameObjectUID   = INVALID_UID;
+    CameraComponent* mainCamera = nullptr;
+    bool stopPlaying            = false;
+    bool doInputs               = false;
+    bool doMouseInputs          = false;
+    bool sceneVisible           = false;
+    bool isFocused              = false;
 
     std::unordered_map<UID, GameObject*> gameObjectsContainer;
 
@@ -160,4 +161,5 @@ class Scene
     GameObject* multiSelectParent = nullptr;
     std::map<UID, UID> selectedGameObjects;
     std::map<UID, MobilitySettings> selectedGameObjectsMobility;
+    std::map<UID, float4x4> selectedGameObjectsOgLocals;
 };
