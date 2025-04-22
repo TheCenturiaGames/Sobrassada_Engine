@@ -1,4 +1,5 @@
 #include "ScriptModule.h"
+
 #include "Application.h"
 #include "Component.h"
 #include "SceneModule.h"
@@ -49,6 +50,7 @@ void ScriptModule::LoadDLL()
     createScriptFunc  = (CreateScriptFunc)GetProcAddress(dllHandle, "CreateScript");
     destroyScriptFunc = (DestroyScriptFunc)GetProcAddress(dllHandle, "DestroyScript");
     freeScriptFunc    = (FreeSobrassadaScripts)GetProcAddress(dllHandle, "FreeSobrassadaScripts");
+
 
     if (!startScriptFunc || !createScriptFunc || !destroyScriptFunc)
     {

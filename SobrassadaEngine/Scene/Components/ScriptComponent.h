@@ -20,7 +20,7 @@ namespace math
 class Script;
 class GameObject;
 
-constexpr const char* scripts[] = {"RotateGameObject", "ButtonScript", "GodMode", "CuChulainn", "Soldier"};
+constexpr const char* scripts[] = {"RotateGameObject", "ButtonScript", "GodMode", "CuChulainn", "Soldier", "TileFloat"};
 
 class ScriptComponent : public Component
 {

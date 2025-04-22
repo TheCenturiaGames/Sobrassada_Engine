@@ -1,3 +1,13 @@
+#include "pch.h"
+#include "TileFloat.h"
+#include "Globals.h"
+
+#include "Application.h"
+#include "CameraModule.h"
+#include "EditorUIModule.h"
+#include "GameObject.h"
+#include "ImGui.h"
+#include "Math/float4x4.h"
 #include "TileFloat.h"
 #include "Globals.h"
 
@@ -11,6 +21,24 @@ TileFloat::TileFloat(GameObject* parent) : Script(parent)
 
 bool TileFloat::Init()
 {
+    initialY = parent->GetLocalTransform().TranslatePart().y;
     GLOG("Initiating TileFloatScript");
     return true;
+}
+
+void TileFloat::Update(float deltaTime)
+{
+    float currentY      = parent->GetLocalTransform().TranslatePart().y;
+    float distanceRisen = currentY - initialY;
+
+    if (distanceRisen < maxRiseDistance)
+    {
+        float riseStep    = speed * deltaTime;
+        float clampedRise = (distanceRisen + riseStep > maxRiseDistance) ? (maxRiseDistance - distanceRisen) : riseStep;
+
+        float4x4 newTransform = parent->GetLocalTransform();
+        newTransform.TransformPos(0.0f, clampedRise, 0.0f);
+        parent->SetLocalTransform(newTransform);
+        parent->UpdateTransformForGOBranch();
+    }
 }
