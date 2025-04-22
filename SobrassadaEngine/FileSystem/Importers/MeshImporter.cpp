@@ -5,6 +5,7 @@
 #include "LibraryModule.h"
 #include "Mesh.h"
 #include "MetaMesh.h"
+#include "ProjectModule.h"
 #include "ResourceMesh.h"
 
 #include "Math/Quat.h"
@@ -315,16 +316,24 @@ namespace MeshImporter
         UID finalMeshUID;
         if (sourceUID == INVALID_UID)
         {
-            UID meshUID           = GenerateUID();
-            finalMeshUID          = App->GetLibraryModule()->AssignFiletypeUID(meshUID, FileType::Mesh);
+            // Importing mesh from gltf drag n drop
+            UID meshUID                = GenerateUID();
+            meshUID                    = App->GetLibraryModule()->AssignFiletypeUID(meshUID, FileType::Mesh);
 
-            std::string assetPath = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
+            std::string assetPath      = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
+
+            UID prefix                 = meshUID / UID_PREFIX_DIVISOR;
+            const std::string savePath = App->GetProjectModule()->GetLoadedProjectPath() + METADATA_PATH +
+                                         std::to_string(prefix) + FILENAME_SEPARATOR + name + META_EXTENSION;
+            finalMeshUID = App->GetLibraryModule()->GetUIDFromMetaFile(savePath);
+            if (finalMeshUID == INVALID_UID) finalMeshUID = meshUID;
+
             MetaMesh meta(
                 finalMeshUID, assetPath, generateTangents, meshTransform, defaultMatUID, meshIndex, primitiveIndex
             );
             meta.Save(name, assetPath);
         }
-        else finalMeshUID = sourceUID;
+        else finalMeshUID = sourceUID; // Importing mesh for meta file
 
         std::string saveFilePath  = targetFilePath + MESHES_PATH + std::to_string(finalMeshUID) + MESH_EXTENSION;
         unsigned int bytesWritten = (unsigned int)FileSystem::Save(saveFilePath.c_str(), fileBuffer, size, true);
@@ -336,6 +345,8 @@ namespace MeshImporter
             GLOG("Failed to save mesh file: %s", saveFilePath.c_str());
             return 0;
         }
+
+        // TODO Reload mesh resource so changes are viewable immediately in the scene
 
         // added mesh to meshes map
         App->GetLibraryModule()->AddMesh(finalMeshUID, name);

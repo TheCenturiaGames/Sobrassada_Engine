@@ -140,7 +140,7 @@ bool SceneModule::ShutDown()
 void SceneModule::CreateScene()
 {
     CloseScene();
-
+    App->GetPathfinderModule()->ResetNavmesh();
     loadedScene = new Scene(DEFAULT_SCENE_NAME);
     loadedScene->Init();
 }
@@ -192,7 +192,11 @@ void SceneModule::SwitchPlayMode(bool play)
     }
     else
     {
-        if (App->GetLibraryModule()->SaveScene("", SaveMode::SavePlayMode)) inPlayMode = true;
+        if (App->GetLibraryModule()->SaveScene("", SaveMode::SavePlayMode))
+        {
+            inPlayMode       = true;
+            onlyOncePlayMode = true;
+        }
     }
 }
 

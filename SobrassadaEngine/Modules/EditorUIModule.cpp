@@ -19,6 +19,7 @@
 #include "SceneImporter.h"
 
 #include "SceneModule.h"
+#include "Script.h"
 #include "ScriptModule.h"
 #include "StateMachineEditor.h"
 #include "TextureEditor.h"
@@ -58,6 +59,8 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"AI Agent",             COMPONENT_AIAGENT             },
         {"UI Image",             COMPONENT_IMAGE               },
         {"UI Button",            COMPONENT_BUTTON              },
+        {"Audio Source",         COMPONENT_AUDIO_SOURCE        },
+        {"Audio Listener",       COMPONENT_AUDIO_LISTENER      },
     };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;
@@ -174,9 +177,7 @@ update_status EditorUIModule::PostUpdate(float deltaTime)
 
 bool EditorUIModule::ShutDown()
 {
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
-    ImGui::DestroyContext();
+    App->GetScriptModule()->close();
 
     framerate.clear();
     frametime.clear();
@@ -424,15 +425,92 @@ void EditorUIModule::Navmesh(bool& navmesh)
 
     ImGui::Begin("NavMesh Creation", &navmesh, ImGuiWindowFlags_None);
 
+    // Draw config UI
+    App->GetPathfinderModule()->GetNavMeshConfig().RenderEditorUI();
+
+    ImGui::InputText("NavMesh Name", navmeshName, IM_ARRAYSIZE(navmeshName));
+
+    // Create navmesh
     if (ImGui::Button("Create NavMesh"))
     {
-        App->GetResourcesModule()->CreateNavMesh();
+        App->GetPathfinderModule()->CreateNavMesh();
         ImGui::Text("NavMesh created!");
     }
 
-    App->GetResourcesModule()->GetNavMesh()->RenderNavmeshEditor();
+    // Save navmesh
+    if (ImGui::Button("Save NavMesh"))
+    {
+        App->GetPathfinderModule()->SaveNavMesh(navmeshName); // or ask user for name
+        ImGui::Text("NavMesh saved!");
+    }
 
-    ImGui::End();
+    // Load navmesh
+    if (ImGui::Button("Load NavMesh"))
+    {
+        showNavLoadDialog = true;
+    }
+
+    ImGui::End(); // End NavMesh Creation
+
+    // Load dialog window
+    if (showNavLoadDialog)
+    {
+        ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_FirstUseEver);
+        bool open = true;
+        if (ImGui::Begin("Load NavMesh", &open, ImGuiWindowFlags_NoCollapse))
+        {
+            ImGui::InputText("Search", searchTextNavmesh, IM_ARRAYSIZE(searchTextNavmesh));
+            ImGui::Separator();
+
+            if (ImGui::BeginListBox("##NavmeshList", ImVec2(-FLT_MIN, -40)))
+            {
+                int i = 0;
+                for (const auto& pair : App->GetLibraryModule()->GetNavmeshMap())
+                {
+                    if (pair.first.find(searchTextNavmesh) != std::string::npos)
+                    {
+                        ++i;
+                        if (ImGui::Selectable(pair.first.c_str(), selectedNavmesh == i))
+                        {
+                            selectedNavmesh = i;
+                            navmeshUID      = pair.second;
+                        }
+                    }
+                }
+                ImGui::EndListBox();
+            }
+
+            ImGui::Dummy(ImVec2(0, 3));
+
+            if (ImGui::Button("Load"))
+            {
+                if (navmeshUID != INVALID_UID)
+                {
+                    App->GetPathfinderModule()->LoadNavMesh(App->GetLibraryModule()->GetResourceName(navmeshUID));
+                }
+                open = false;
+            }
+
+            ImGui::SameLine();
+
+            if (ImGui::Button("Cancel"))
+            {
+                open = false;
+            }
+
+            ImGui::End();
+        }
+
+       if (!open)
+        {
+            showNavLoadDialog    = false;
+
+            // Reset search and selection
+            searchTextNavmesh[0] = '\0';
+            selectedNavmesh      = -1;          
+            navmeshUID           = INVALID_UID;
+        }
+    }
 }
 
 void EditorUIModule::CrowdControl(bool& crowdControl)
@@ -792,6 +870,53 @@ std::string EditorUIModule::RenderFileDialog(bool& window, const char* windowTit
     return importPath;
 }
 
+void EditorUIModule::DrawScriptInspector(const std::vector<InspectorField>& fields)
+{
+
+    for (auto& field : fields)
+    {
+        switch (field.type)
+        {
+        case InspectorField::FieldType::Text:
+            ImGui::Text(static_cast<const char*>(field.data));
+            break;
+        case InspectorField::FieldType::Float:
+            ImGui::SliderFloat(field.name, (float*)field.data, field.minValue, field.maxValue);
+            break;
+        case InspectorField::FieldType::Bool:
+            ImGui::Checkbox(field.name, (bool*)field.data);
+            break;
+        case InspectorField::FieldType::Int:
+            ImGui::InputInt(field.name, (int*)field.data);
+            break;
+        case InspectorField::FieldType::Vec2:
+        {
+            float* vec2Data = reinterpret_cast<float*>(field.data);
+            ImGui::SliderFloat2(field.name, vec2Data, field.minValue, field.maxValue);
+            break;
+        }
+        case InspectorField::FieldType::Vec3:
+        {
+            float* vec3Data = reinterpret_cast<float*>(field.data);
+            ImGui::SliderFloat3(field.name, vec3Data, field.minValue, field.maxValue);
+            break;
+        }
+        case InspectorField::FieldType::Vec4:
+        {
+            float* vec4Data = reinterpret_cast<float*>(field.data);
+            ImGui::SliderFloat4(field.name, vec4Data, field.minValue, field.maxValue);
+            break;
+        }
+        case InspectorField::FieldType::Color:
+        {
+            ImColor* color = (ImColor*)field.data;
+            ImGui::ColorEdit3(field.name, (float*)&color->Value);
+            break;
+        }
+        }
+    }
+}
+
 void EditorUIModule::ImportDialog(bool& import)
 {
     const std::string resultingPath = RenderFileDialog(import, "Import Asset");
@@ -809,9 +934,21 @@ void EditorUIModule::Console(bool& consoleMenu) const
         return;
     }
 
+    int index = 0;
     for (const char* log : *Logs)
     {
-        ImGui::TextUnformatted(log);
+        std::string label = std::string(log) + "##" + std::to_string(index);
+        ImGui::Selectable(label.c_str());
+
+        if (ImGui::BeginPopupContextItem())
+        {
+            if (ImGui::MenuItem("Copy Text"))
+            {
+                ImGui::SetClipboardText(log);
+            }
+            ImGui::EndPopup();
+        }
+        ++index;
     }
 
     // Autoscroll only if the scroll is in the bottom position
@@ -945,7 +1082,9 @@ template ComponentType EditorUIModule::RenderResourceSelectDialog<ComponentType>
     const char* id, const std::unordered_map<std::string, ComponentType>& availableResources,
     const ComponentType& defaultResource
 );
-
+template uint32_t EditorUIModule::RenderResourceSelectDialog<uint32_t>(
+    const char* id, const std::unordered_map<std::string, uint32_t>& availableResources, const uint32_t& defaultResource
+);
 void EditorUIModule::RenderBasicTransformModifiers(
     float3& outputPosition, float3& outputRotation, float3& outputScale, bool& lockScaleAxis,
     bool& positionValueChanged, bool& rotationValueChanged, bool& scaleValueChanged
@@ -1216,7 +1355,8 @@ EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
         return new NodeEditor("NodeEditor_" + std::to_string(uid), uid);
 
     case EditorType::ANIMATION:
-        return new StateMachineEditor("StateMachineEditor_" + std::to_string(uid), uid, stateMachine);
+        return stateMachineEditor =
+                   new StateMachineEditor("StateMachineEditor_" + std::to_string(uid), uid, stateMachine);
 
     case EditorType::TEXTURE:
         return new TextureEditor("TextureEditor_" + std::to_string(uid), uid);
