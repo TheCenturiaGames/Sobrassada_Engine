@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "TileFloat.h"
-#include "Globals.h"
 
 #include "Application.h"
 #include "CameraModule.h"
@@ -8,8 +7,8 @@
 #include "GameObject.h"
 #include "ImGui.h"
 #include "Math/float4x4.h"
-#include "TileFloat.h"
-#include "Globals.h"
+
+
 
 TileFloat::TileFloat(GameObject* parent) : Script(parent)
 {
