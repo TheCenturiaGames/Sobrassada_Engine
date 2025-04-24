@@ -253,7 +253,7 @@ void PathfinderModule::CreateNavMesh()
         for (const auto& pair : gameObjects)
         {
             GameObject* gameObject = pair.second;
-            if (!gameObject || !gameObject->IsGloballyEnabled()) continue;
+            if (!gameObject || !gameObject->IsGloballyEnabled() || !gameObject->IsNavMeshValid()) continue;
             {
                 const MeshComponent* meshComponent = gameObject->GetMeshComponent();
                 const float4x4& globalMatrix       = gameObject->GetGlobalTransform();

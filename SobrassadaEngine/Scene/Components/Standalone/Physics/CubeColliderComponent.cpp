@@ -236,8 +236,9 @@ void CubeColliderComponent::OnCollision(GameObject* otherObject, float3 collisio
 {
     if (!enabled) return;
 
-    dynamic_cast<ScriptComponent*>(parent->GetComponentByType(COMPONENT_SCRIPT))
-        ->OnCollision(otherObject, collisionNormal);
+    auto script = dynamic_cast<ScriptComponent*>(parent->GetComponentByType(COMPONENT_SCRIPT));
+    
+    if (script) script->OnCollision(otherObject, collisionNormal);
 }
 
 void CubeColliderComponent::DeleteRigidBody()

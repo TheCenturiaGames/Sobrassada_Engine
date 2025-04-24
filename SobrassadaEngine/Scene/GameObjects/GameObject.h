@@ -37,6 +37,7 @@ class SOBRASADA_API_ENGINE GameObject
 
     bool IsStatic() const { return mobilitySettings == MobilitySettings::STATIC; };
     bool IsTopParent() const { return isTopParent; };
+    bool IsNavMeshValid() const { return navMeshValid; };
 
     bool AddGameObject(UID gameObjectUID);
     bool RemoveGameObject(UID gameObjectUID);
@@ -155,4 +156,5 @@ class SOBRASADA_API_ENGINE GameObject
     bool isTopParent                     = false;
     bool willUpdate                      = false;
     bool enabled                         = true;
+    bool navMeshValid                    = false;
 };

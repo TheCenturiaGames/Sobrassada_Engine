@@ -65,6 +65,7 @@ GameObject::GameObject(UID parentUID, GameObject* refObject)
     rotation         = refObject->rotation;
     scale            = refObject->scale;
     prefabUID        = refObject->prefabUID;
+    navMeshValid     = refObject->navMeshValid;
 
     // Must make a copy of each manually
     for (const auto& component : refObject->components)
@@ -89,6 +90,7 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
     if (initialState.HasMember("IsTopParent")) isTopParent = initialState["IsTopParent"].GetBool();
 
     if (initialState.HasMember("PrefabUID")) prefabUID = initialState["PrefabUID"].GetUint64();
+    if (initialState.HasMember("NavmeshValid")) navMeshValid = initialState["NavmeshValid"].GetBool();
 
     if (initialState.HasMember("LocalTransform") && initialState["LocalTransform"].IsArray() &&
         initialState["LocalTransform"].Size() == 16)
@@ -185,6 +187,7 @@ void GameObject::Save(rapidjson::Value& targetState, rapidjson::Document::Alloca
     targetState.AddMember("Mobility", mobilitySettings, allocator);
     targetState.AddMember("IsTopParent", isTopParent, allocator);
     targetState.AddMember("Enabled", enabled, allocator);
+    targetState.AddMember("NavmeshValid", navMeshValid, allocator);
 
     if (prefabUID != INVALID_UID) targetState.AddMember("PrefabUID", prefabUID, allocator);
 
@@ -253,8 +256,10 @@ void GameObject::RenderEditorInspector()
     {
         ImGui::SameLine();
         if (ImGui::Checkbox("Draw nodes", &drawNodes)) OnDrawConnectionsToggle();
-        ImGui::SameLine();
         ImGui::Checkbox("Is top parent", &isTopParent);
+        ImGui::SameLine();
+        ImGui::Checkbox("Navmesh valid", &navMeshValid);
+
         if (ImGui::Button("Add Component"))
         {
             ImGui::OpenPopup("ComponentSelection");
