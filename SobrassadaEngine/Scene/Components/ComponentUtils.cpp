@@ -2,6 +2,7 @@
 
 #include "CameraComponent.h"
 #include "Component.h"
+#include "GameObject.h"
 #include "ScriptComponent.h"
 #include "Standalone/AIAgentComponent.h"
 #include "Standalone/AnimationComponent.h"
@@ -26,73 +27,149 @@
 Component* ComponentUtils::CreateEmptyComponent(const ComponentType type, const UID uid, GameObject* parent)
 {
     Component* generatedComponent;
+    auto& componentTuple = parent->GetComponentsTupleRef();
     switch (type)
     {
     case COMPONENT_NONE:
         return nullptr;
     case COMPONENT_MESH:
-        generatedComponent = new MeshComponent(uid, parent);
+    {
+        MeshComponent* mesh                      = new MeshComponent(uid, parent);
+        std::get<MeshComponent*>(componentTuple) = mesh;
+        generatedComponent                       = mesh;
         break;
+    }
     case COMPONENT_POINT_LIGHT:
-        generatedComponent = new PointLightComponent(uid, parent);
+    {
+        PointLightComponent* pointLight                = new PointLightComponent(uid, parent);
+        std::get<PointLightComponent*>(componentTuple) = pointLight;
+        generatedComponent                             = pointLight;
         break;
+    }
     case COMPONENT_SPOT_LIGHT:
-        generatedComponent = new SpotLightComponent(uid, parent);
+    {
+        SpotLightComponent* spotLight                 = new SpotLightComponent(uid, parent);
+        std::get<SpotLightComponent*>(componentTuple) = spotLight;
+        generatedComponent                            = spotLight;
         break;
+    }
     case COMPONENT_DIRECTIONAL_LIGHT:
-        generatedComponent = new DirectionalLightComponent(uid, parent);
+    {
+        DirectionalLightComponent* directionalLight          = new DirectionalLightComponent(uid, parent);
+        std::get<DirectionalLightComponent*>(componentTuple) = directionalLight;
+        generatedComponent                                   = directionalLight;
         break;
+    }
     case COMPONENT_CHARACTER_CONTROLLER:
-        generatedComponent = new CharacterControllerComponent(uid, parent);
+    {
+        CharacterControllerComponent* characterController       = new CharacterControllerComponent(uid, parent);
+        std::get<CharacterControllerComponent*>(componentTuple) = characterController;
+        generatedComponent                                      = characterController;
         break;
+    }
     case COMPONENT_TRANSFORM_2D:
-        generatedComponent = new Transform2DComponent(uid, parent);
+    {
+        Transform2DComponent* transform2d               = new Transform2DComponent(uid, parent);
+        std::get<Transform2DComponent*>(componentTuple) = transform2d;
+        generatedComponent                              = transform2d;
         break;
+    }
     case COMPONENT_CANVAS:
-        generatedComponent = new CanvasComponent(uid, parent);
+    {
+        CanvasComponent* canvas                    = new CanvasComponent(uid, parent);
+        std::get<CanvasComponent*>(componentTuple) = canvas;
+        generatedComponent                         = canvas;
         break;
+    }
     case COMPONENT_LABEL:
-        generatedComponent = new UILabelComponent(uid, parent);
+    {
+        UILabelComponent* uiLabel                   = new UILabelComponent(uid, parent);
+        std::get<UILabelComponent*>(componentTuple) = uiLabel;
+        generatedComponent                          = uiLabel;
         break;
+    }
     case COMPONENT_CAMERA:
-        generatedComponent = new CameraComponent(uid, parent);
+    {
+        CameraComponent* camera                    = new CameraComponent(uid, parent);
+        std::get<CameraComponent*>(componentTuple) = camera;
+        generatedComponent                         = camera;
         break;
+    }
     case COMPONENT_SCRIPT:
-        generatedComponent = new ScriptComponent(uid, parent);
+    {
+        ScriptComponent* script                    = new ScriptComponent(uid, parent);
+        std::get<ScriptComponent*>(componentTuple) = script;
+        generatedComponent                         = script;
         break;
+    }
     case COMPONENT_CUBE_COLLIDER:
-        generatedComponent = new CubeColliderComponent(uid, parent);
+    {
+        CubeColliderComponent* cube                      = new CubeColliderComponent(uid, parent);
+        std::get<CubeColliderComponent*>(componentTuple) = cube;
+        generatedComponent                               = cube;
         break;
+    }
     case COMPONENT_SPHERE_COLLIDER:
-        generatedComponent = new SphereColliderComponent(uid, parent);
+    {
+        SphereColliderComponent* sphere                    = new SphereColliderComponent(uid, parent);
+        std::get<SphereColliderComponent*>(componentTuple) = sphere;
+        generatedComponent                                 = sphere;
         break;
+    }
     case COMPONENT_CAPSULE_COLLIDER:
-        generatedComponent = new CapsuleColliderComponent(uid, parent);
+    {
+        CapsuleColliderComponent* capsule                   = new CapsuleColliderComponent(uid, parent);
+        std::get<CapsuleColliderComponent*>(componentTuple) = capsule;
+        generatedComponent                                  = capsule;
         break;
+    }
     case COMPONENT_ANIMATION:
-        generatedComponent = new AnimationComponent(uid, parent);
+    {
+        AnimationComponent* animation                 = new AnimationComponent(uid, parent);
+        std::get<AnimationComponent*>(componentTuple) = animation;
+        generatedComponent                            = animation;
         break;
+    }
     case COMPONENT_AIAGENT:
-        generatedComponent = new AIAgentComponent(uid, parent);
+    {
+        AIAgentComponent* aiAgent                   = new AIAgentComponent(uid, parent);
+        std::get<AIAgentComponent*>(componentTuple) = aiAgent;
+        generatedComponent                          = aiAgent;
         break;
+    }
     case COMPONENT_IMAGE:
-        generatedComponent = new ImageComponent(uid, parent);
+    {
+        ImageComponent* image                     = new ImageComponent(uid, parent);
+        std::get<ImageComponent*>(componentTuple) = image;
+        generatedComponent                        = image;
         break;
+    }
     case COMPONENT_BUTTON:
-        generatedComponent = new ButtonComponent(uid, parent);
+    {
+        ButtonComponent* button                    = new ButtonComponent(uid, parent);
+        std::get<ButtonComponent*>(componentTuple) = button;
+        generatedComponent                         = button;
         break;
+    }
     case COMPONENT_AUDIO_SOURCE:
-        generatedComponent = new AudioSourceComponent(uid, parent);
+    {
+        AudioSourceComponent* audioSource               = new AudioSourceComponent(uid, parent);
+        std::get<AudioSourceComponent*>(componentTuple) = audioSource;
+        generatedComponent                              = audioSource;
         break;
+    }
     case COMPONENT_AUDIO_LISTENER:
-        generatedComponent = new AudioListenerComponent(uid, parent);
+    {
+        AudioListenerComponent* audioListener             = new AudioListenerComponent(uid, parent);
+        std::get<AudioListenerComponent*>(componentTuple) = audioListener;
+        generatedComponent                                = audioListener;
         break;
+    }
     default:
         return nullptr;
     }
 
     generatedComponent->Init();
-
     return generatedComponent;
 }
 
@@ -100,48 +177,125 @@ Component* ComponentUtils::CreateExistingComponent(const rapidjson::Value& initi
 {
     if (initialState.HasMember("Type"))
     {
+        auto& componentTuple = parent->GetComponentsTupleRef();
         switch (initialState["Type"].GetInt())
         {
         case COMPONENT_NONE:
             return nullptr;
         case COMPONENT_MESH:
-            return new MeshComponent(initialState, parent);
+        {
+            MeshComponent* mesh                      = new MeshComponent(initialState, parent);
+            std::get<MeshComponent*>(componentTuple) = mesh;
+            return mesh;
+        }
         case COMPONENT_POINT_LIGHT:
-            return new PointLightComponent(initialState, parent);
+        {
+            PointLightComponent* pointLight                = new PointLightComponent(initialState, parent);
+            std::get<PointLightComponent*>(componentTuple) = pointLight;
+            return pointLight;
+        }
         case COMPONENT_SPOT_LIGHT:
-            return new SpotLightComponent(initialState, parent);
+        {
+            SpotLightComponent* spotLight                 = new SpotLightComponent(initialState, parent);
+            std::get<SpotLightComponent*>(componentTuple) = spotLight;
+            return spotLight;
+        }
         case COMPONENT_DIRECTIONAL_LIGHT:
-            return new DirectionalLightComponent(initialState, parent);
+        {
+            DirectionalLightComponent* directionalLight          = new DirectionalLightComponent(initialState, parent);
+            std::get<DirectionalLightComponent*>(componentTuple) = directionalLight;
+            return directionalLight;
+        }
         case COMPONENT_CHARACTER_CONTROLLER:
-            return new CharacterControllerComponent(initialState, parent);
+        {
+            CharacterControllerComponent* characterController = new CharacterControllerComponent(initialState, parent);
+            std::get<CharacterControllerComponent*>(componentTuple) = characterController;
+            return characterController;
+        }
         case COMPONENT_TRANSFORM_2D:
-            return new Transform2DComponent(initialState, parent);
+        {
+            Transform2DComponent* transform2d               = new Transform2DComponent(initialState, parent);
+            std::get<Transform2DComponent*>(componentTuple) = transform2d;
+            return transform2d;
+        }
         case COMPONENT_CANVAS:
-            return new CanvasComponent(initialState, parent);
+        {
+            CanvasComponent* canvas                    = new CanvasComponent(initialState, parent);
+            std::get<CanvasComponent*>(componentTuple) = canvas;
+            return canvas;
+        }
         case COMPONENT_LABEL:
-            return new UILabelComponent(initialState, parent);
+        {
+            UILabelComponent* uiLabel                   = new UILabelComponent(initialState, parent);
+            std::get<UILabelComponent*>(componentTuple) = uiLabel;
+            return uiLabel;
+        }
         case COMPONENT_CAMERA:
-            return new CameraComponent(initialState, parent);
+        {
+            CameraComponent* camera                    = new CameraComponent(initialState, parent);
+            std::get<CameraComponent*>(componentTuple) = camera;
+            return camera;
+        }
         case COMPONENT_SCRIPT:
-            return new ScriptComponent(initialState, parent);
+        {
+            ScriptComponent* script                    = new ScriptComponent(initialState, parent);
+            std::get<ScriptComponent*>(componentTuple) = script;
+            return script;
+        }
         case COMPONENT_CUBE_COLLIDER:
-            return new CubeColliderComponent(initialState, parent);
+        {
+            CubeColliderComponent* cube                      = new CubeColliderComponent(initialState, parent);
+            std::get<CubeColliderComponent*>(componentTuple) = cube;
+            return cube;
+        }
         case COMPONENT_SPHERE_COLLIDER:
-            return new SphereColliderComponent(initialState, parent);
+        {
+            SphereColliderComponent* sphere                    = new SphereColliderComponent(initialState, parent);
+            std::get<SphereColliderComponent*>(componentTuple) = sphere;
+            return sphere;
+        }
         case COMPONENT_CAPSULE_COLLIDER:
-            return new CapsuleColliderComponent(initialState, parent);
+        {
+            CapsuleColliderComponent* capsule                   = new CapsuleColliderComponent(initialState, parent);
+            std::get<CapsuleColliderComponent*>(componentTuple) = capsule;
+            return capsule;
+        }
         case COMPONENT_ANIMATION:
-            return new AnimationComponent(initialState, parent);
+        {
+            AnimationComponent* animation                 = new AnimationComponent(initialState, parent);
+            std::get<AnimationComponent*>(componentTuple) = animation;
+            return animation;
+        }
         case COMPONENT_AIAGENT:
-            return new AIAgentComponent(initialState, parent);
+        {
+            AIAgentComponent* aiAgent                   = new AIAgentComponent(initialState, parent);
+            std::get<AIAgentComponent*>(componentTuple) = aiAgent;
+            return aiAgent;
+        }
         case COMPONENT_IMAGE:
-            return new ImageComponent(initialState, parent);
+        {
+            ImageComponent* image                     = new ImageComponent(initialState, parent);
+            std::get<ImageComponent*>(componentTuple) = image;
+            return image;
+        }
         case COMPONENT_BUTTON:
-            return new ButtonComponent(initialState, parent);
+        {
+            ButtonComponent* button                    = new ButtonComponent(initialState, parent);
+            std::get<ButtonComponent*>(componentTuple) = button;
+            return button;
+        }
         case COMPONENT_AUDIO_SOURCE:
-            return new AudioSourceComponent(initialState, parent);
+        {
+            AudioSourceComponent* audioSource               = new AudioSourceComponent(initialState, parent);
+            std::get<AudioSourceComponent*>(componentTuple) = audioSource;
+            return audioSource;
+        }
         case COMPONENT_AUDIO_LISTENER:
-            return new AudioListenerComponent(initialState, parent);
+        {
+            AudioListenerComponent* audioListener             = new AudioListenerComponent(initialState, parent);
+            std::get<AudioListenerComponent*>(componentTuple) = audioListener;
+            return audioListener;
+        }
         default:
             return nullptr;
         }

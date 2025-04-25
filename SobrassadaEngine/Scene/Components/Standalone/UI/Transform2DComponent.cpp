@@ -1,14 +1,14 @@
 #include "Transform2DComponent.h"
 
 #include "Application.h"
+#include "ButtonComponent.h"
 #include "CanvasComponent.h"
 #include "DebugDrawModule.h"
 #include "GameObject.h"
+#include "ImageComponent.h"
 #include "Scene.h"
 #include "SceneModule.h"
 #include "UILabelComponent.h"
-#include "ImageComponent.h"
-#include "ButtonComponent.h"
 
 #include "imgui.h"
 #include <queue>
@@ -57,14 +57,14 @@ Transform2DComponent::~Transform2DComponent()
 {
     if (parentTransform != nullptr) parentTransform->RemoveChild(this);
 
-    Component* widget = parent->GetComponentByType(COMPONENT_LABEL);
-    if (widget) static_cast<UILabelComponent*>(widget)->RemoveTransform();
-    
-    widget = parent->GetComponentByType(COMPONENT_IMAGE);
-    if (widget) static_cast<ImageComponent*>(widget)->RemoveTransform();
-    
-    widget = parent->GetComponentByType(COMPONENT_BUTTON);
-    if (widget) static_cast<ButtonComponent*>(widget)->RemoveTransform();
+    UILabelComponent* uiLabel = parent->GetComponent<UILabelComponent*>();
+    if (uiLabel) uiLabel->RemoveTransform();
+
+    ImageComponent* image = parent->GetComponent<ImageComponent*>();
+    if (image) image->RemoveTransform();
+
+    ButtonComponent* button = parent->GetComponent<ButtonComponent*>();
+    if (button) button->RemoveTransform();
 
     for (const auto& child : childTransforms)
     {
@@ -84,10 +84,11 @@ void Transform2DComponent::Init()
 
     if (!IsRootTransform2D())
     {
-        parentTransform = static_cast<Transform2DComponent*>(App->GetSceneModule()
-                                                                 ->GetScene()
-                                                                 ->GetGameObjectByUID(parent->GetParent())
-                                                                 ->GetComponentByType(COMPONENT_TRANSFORM_2D));
+        parentTransform = App->GetSceneModule()
+                              ->GetScene()
+                              ->GetGameObjectByUID(parent->GetParent())
+                              ->GetComponent<Transform2DComponent*>();
+
         parentTransform->AddChildTransform(this);
     }
 }
@@ -140,7 +141,6 @@ void Transform2DComponent::Clone(const Component* other)
 
 void Transform2DComponent::RenderDebug(float deltaTime)
 {
-
 }
 
 void Transform2DComponent::RenderEditorInspector()
@@ -338,7 +338,9 @@ float2 Transform2DComponent::GetGlobalPosition() const
 
 float2 Transform2DComponent::GetCenterPosition() const
 {
-    return float2(GetGlobalPosition().x + (size.x * (0.5f - pivot.x)), GetGlobalPosition().y + (size.y * (0.5f - pivot.y)));
+    return float2(
+        GetGlobalPosition().x + (size.x * (0.5f - pivot.x)), GetGlobalPosition().y + (size.y * (0.5f - pivot.y))
+    );
 };
 
 void Transform2DComponent::GetCanvas()
@@ -355,7 +357,7 @@ void Transform2DComponent::GetCanvas()
 
         if (currentParent == nullptr) break; // If parent null it has reached the scene root
 
-        CanvasComponent* canvas = static_cast<CanvasComponent*>(currentParent->GetComponentByType(COMPONENT_CANVAS));
+        CanvasComponent* canvas = currentParent->GetComponent<CanvasComponent*>();
         if (canvas != nullptr)
         {
             parentCanvas = canvas;
@@ -554,10 +556,10 @@ void Transform2DComponent::OnParentChange()
 
     if (parentCanvas && !IsRootTransform2D())
     {
-        parentTransform = static_cast<Transform2DComponent*>(App->GetSceneModule()
-                                                                 ->GetScene()
-                                                                 ->GetGameObjectByUID(parent->GetParent())
-                                                                 ->GetComponentByType(COMPONENT_TRANSFORM_2D));
+        parentTransform = App->GetSceneModule()
+                              ->GetScene()
+                              ->GetGameObjectByUID(parent->GetParent())
+                              ->GetComponent<Transform2DComponent*>();
 
         if (parentTransform) parentTransform->AddChildTransform(this);
         else GLOG("[WARNING] You are assigning a Transform2D as a child of a gameObject with no Transform2D");

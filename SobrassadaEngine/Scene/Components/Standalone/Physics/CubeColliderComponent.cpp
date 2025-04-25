@@ -236,7 +236,7 @@ void CubeColliderComponent::OnCollision(GameObject* otherObject, float3 collisio
 {
     if (!enabled) return;
 
-    auto script = dynamic_cast<ScriptComponent*>(parent->GetComponentByType(COMPONENT_SCRIPT));
+    auto script = parent->GetComponent<ScriptComponent*>();
     
     if (script) script->OnCollision(otherObject, collisionNormal);
 }

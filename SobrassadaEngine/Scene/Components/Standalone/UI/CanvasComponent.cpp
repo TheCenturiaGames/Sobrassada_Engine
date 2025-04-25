@@ -153,14 +153,14 @@ void CanvasComponent::RenderUI()
         if (!child->IsGloballyEnabled()) continue;
 
         // Only render UI components
-        Component* uiWidget = child->GetComponentByType(COMPONENT_TRANSFORM_2D);
-        if (uiWidget) static_cast<const Transform2DComponent*>(uiWidget)->RenderWidgets();
+        Transform2DComponent* transform = child->GetComponent<Transform2DComponent*>();
+        if (transform) transform->RenderWidgets();
 
-        uiWidget = child->GetComponentByType(COMPONENT_LABEL);
-        if (uiWidget) static_cast<const UILabelComponent*>(uiWidget)->RenderUI(view, proj);
+        UILabelComponent* uiLabel = child->GetComponent<UILabelComponent*>();
+        if (uiLabel) uiLabel->RenderUI(view, proj);
 
-        uiWidget = child->GetComponentByType(COMPONENT_IMAGE);
-        if (uiWidget) static_cast<const ImageComponent*>(uiWidget)->RenderUI(view, proj);
+        ImageComponent* image = child->GetComponent<ImageComponent*>();
+        if (image) image->RenderUI(view, proj);
     }
 }
 
@@ -191,14 +191,6 @@ void CanvasComponent::OnWindowResize(const float width, const float height)
             parent->GetGlobalTransform().TranslatePart().y + (height / 4.0f), 0
         )
     );
-
-    // parent->UpdateTransformForGOBranch();
-
-    for (const GameObject* child : sortedChildren)
-    {
-        // Only render UI components
-        Component* transform2D = child->GetComponentByType(COMPONENT_TRANSFORM_2D);
-    }
 }
 
 void CanvasComponent::UpdateChildren()
@@ -242,15 +234,11 @@ void CanvasComponent::UpdateMousePosition(const float2& mousePos)
     for (int i = (int)sortedChildren.size() - 1; i >= 0; --i)
     {
         // Update all buttons
-        Component* button = sortedChildren[i]->GetComponentByType(COMPONENT_BUTTON);
-        if (button)
+        ButtonComponent* currentButton = sortedChildren[i]->GetComponent<ButtonComponent*>();
+        if (currentButton && currentButton->UpdateMousePosition(mousePos, buttonFound))
         {
-            ButtonComponent* currentButton = static_cast<ButtonComponent*>(button);
-            if (currentButton->UpdateMousePosition(mousePos, buttonFound))
-            {
-                hoveredButton = currentButton;
-                buttonFound   = true;
-            }
+            hoveredButton = currentButton;
+            buttonFound   = true;
         }
     }
 }

@@ -22,14 +22,22 @@ bool Soldier::Init()
 
     Character::Init();
 
-    Component* agent = parent->GetComponentByType(COMPONENT_AIAGENT);
+    /*Component* agent = parent->GetComponentByType(COMPONENT_AIAGENT);
     if (!agent)
     {
         GLOG("AIAgent component not found for Soldier");
         return false;
     }
 
-    agentAI = dynamic_cast<AIAgentComponent*>(agent);
+    agentAI = dynamic_cast<AIAgentComponent*>(agent);*/
+
+    agentAI = parent->GetComponent<AIAgentComponent*>();
+    if (!agentAI)
+    {
+        GLOG("AIAgent component not found for Soldier");
+        return false;
+    }
+
     agentAI->SetSpeed(speed);
 
     return true;

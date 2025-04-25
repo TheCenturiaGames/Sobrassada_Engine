@@ -9,12 +9,21 @@
 
 bool ExitGameScript::Init()
 {
-    Component* button = parent->GetComponentByType(COMPONENT_BUTTON);
+    // Component* button = parent->GetComponentByType(COMPONENT_BUTTON);
+    // if (button)
+    //{
+    //     std::function<void(void)> function = std::bind(&ExitGameScript::OnClick, this);
+    //     Delegate<void> delegate(function);
+    //     delegateID            = static_cast<ButtonComponent*>(button)->AddOnClickCallback(delegate);
+    //     hasRegisteredCallback = true;
+    // }
+
+    ButtonComponent* button = parent->GetComponent<ButtonComponent*>();
     if (button)
     {
         std::function<void(void)> function = std::bind(&ExitGameScript::OnClick, this);
         Delegate<void> delegate(function);
-        delegateID            = static_cast<ButtonComponent*>(button)->AddOnClickCallback(delegate);
+        delegateID            = button->AddOnClickCallback(delegate);
         hasRegisteredCallback = true;
     }
 
@@ -39,11 +48,14 @@ ExitGameScript::~ExitGameScript()
 {
     if (hasRegisteredCallback)
     {
-        Component* button = parent->GetComponentByType(COMPONENT_BUTTON);
+        /*Component* button = parent->GetComponentByType(COMPONENT_BUTTON);
         if (button)
         {
             static_cast<ButtonComponent*>(button)->RemoveOnClickCallback(delegateID);
-        }
+        }*/
+
+        ButtonComponent* button = parent->GetComponent<ButtonComponent*>();
+        if (button) button->RemoveOnClickCallback(delegateID);
     }
 }
 

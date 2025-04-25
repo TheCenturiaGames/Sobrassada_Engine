@@ -23,12 +23,21 @@ bool ButtonScript::Init()
         return false;
     }
 
-    Component* button = parent->GetComponentByType(COMPONENT_BUTTON);
+    //Component* button = parent->GetComponentByType(COMPONENT_BUTTON);
+    ButtonComponent* button = parent->GetComponent<ButtonComponent*>();
+    //if (button)
+    //{
+    //    std::function<void(void)> function = std::bind(&ButtonScript::OnClick, this);
+    //    Delegate<void> delegate(function);
+    //    delegateID            = static_cast<ButtonComponent*>(button)->AddOnClickCallback(delegate);
+    //    hasRegisteredCallback = true;
+    //}
+    
     if (button)
     {
         std::function<void(void)> function = std::bind(&ButtonScript::OnClick, this);
         Delegate<void> delegate(function);
-        delegateID            = static_cast<ButtonComponent*>(button)->AddOnClickCallback(delegate);
+        delegateID            = button->AddOnClickCallback(delegate);
         hasRegisteredCallback = true;
     }
 
@@ -40,11 +49,14 @@ ButtonScript::~ButtonScript()
 {
     if (hasRegisteredCallback)
     {
-        Component* button = parent->GetComponentByType(COMPONENT_BUTTON);
-        if (button)
-        {
-            static_cast<ButtonComponent*>(button)->RemoveOnClickCallback(delegateID);
-        }
+        //Component* button = parent->GetComponentByType(COMPONENT_BUTTON);
+        //if (button)
+        //{
+        //    static_cast<ButtonComponent*>(button)->RemoveOnClickCallback(delegateID);
+        //}
+
+        ButtonComponent* button = parent->GetComponent<ButtonComponent*>();
+        if (button) button->RemoveOnClickCallback(delegateID);
     }
 }
 

@@ -661,15 +661,15 @@ void LightsConfig::GetAllSceneLights()
         Scene* scene          = App->GetSceneModule()->GetScene();
 
         // Directional
-        const auto& dirLights = scene->GetEnabledComponentsOfType<DirectionalLightComponent>();
+        const auto& dirLights = scene->GetEnabledComponentsOfType<DirectionalLightComponent*>();
         directionalLight      = dirLights.empty() ? nullptr : dirLights[0];
 
         // Point
-        pointLights           = scene->GetEnabledComponentsOfType<PointLightComponent>();
+        pointLights           = scene->GetEnabledComponentsOfType<PointLightComponent*>();
         // GLOG("Point lights count: %d", pointLights.size());
 
         // Spot
-        spotLights            = scene->GetEnabledComponentsOfType<SpotLightComponent>();
+        spotLights            = scene->GetEnabledComponentsOfType<SpotLightComponent*>();
         // GLOG("Spot lights count: %d", spotLights.size());
 
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, pointBufferId);

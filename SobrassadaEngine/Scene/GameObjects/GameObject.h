@@ -1,17 +1,39 @@
 #pragma once
 
+#include "Application.h"
 #include "ComponentUtils.h"
 #include "Globals.h"
+#include "SceneModule.h"
 
 #include "Geometry/AABB.h"
 #include "Geometry/OBB.h"
 #include "rapidjson/document.h"
+#include <bitset>
+#include <queue>
 #include <string>
+#include <tuple>
 #include <unordered_map>
 #include <vector>
 
 class MeshComponent;
+class PointLightComponent;
+class SpotLightComponent;
+class DirectionalLightComponent;
+class CharacterControllerComponent;
+class Transform2DComponent;
+class CanvasComponent;
+class UILabelComponent;
+class CameraComponent;
+class ScriptComponent;
+class CubeColliderComponent;
+class SphereColliderComponent;
+class CapsuleColliderComponent;
 class AnimationComponent;
+class AIAgentComponent;
+class ImageComponent;
+class ButtonComponent;
+class AudioSourceComponent;
+class AudioListenerComponent;
 
 enum MobilitySettings
 {
@@ -38,6 +60,7 @@ class SOBRASADA_API_ENGINE GameObject
     bool IsStatic() const { return mobilitySettings == MobilitySettings::STATIC; };
     bool IsTopParent() const { return isTopParent; };
     bool IsNavMeshValid() const { return navMeshValid; };
+    bool IsComponentCreated(int i) const { return createdComponents[i]; };
 
     bool AddGameObject(UID gameObjectUID);
     bool RemoveGameObject(UID gameObjectUID);
@@ -81,6 +104,8 @@ class SOBRASADA_API_ENGINE GameObject
     bool CreateComponent(ComponentType componentType);
     bool RemoveComponent(ComponentType componentType);
 
+    template <typename T> bool RemoveComponent();
+
     // Updates the transform for this game object and all descending children
     void UpdateTransformForGOBranch();
     void UpdateMobilityHierarchy(MobilitySettings type);
@@ -89,18 +114,16 @@ class SOBRASADA_API_ENGINE GameObject
     bool WillUpdate() const { return willUpdate; };
 
     const std::unordered_map<ComponentType, Component*>& GetComponents() const { return components; }
-    Component* GetComponentByType(ComponentType type) const;
-    Component* GetComponentChildByType(ComponentType componentType) const;
-    Component* GetComponentParentByType(ComponentType componentType) const;
 
-    MeshComponent* GetMeshComponent() const;
-
-    AnimationComponent* GetAnimationComponent() const;
+    template <typename T> T GetComponent() const { return std::get<T>(compTuple); }
+    template <typename T> T GetComponentChild(Application* app) const;
+    template <typename T> T GetComponentParent(Application* app) const;
 
     const float3& GetPosition() const { return position; }
     const float3& GetRotation() const { return rotation; }
     const float3& GetScale() const { return scale; }
     AABB GetHierarchyAABB();
+    std::tuple<COMPONENTS>& GetComponentsTupleRef() { return compTuple; }
 
     void SetLocalTransform(const float4x4& newTransform);
     void DrawGizmos() const;
@@ -157,4 +180,71 @@ class SOBRASADA_API_ENGINE GameObject
     bool willUpdate                      = false;
     bool enabled                         = true;
     bool navMeshValid                    = false;
+
+    std::tuple<COMPONENTS> compTuple     = std::make_tuple(COMPONENTS_NULLPTR);
+    std::bitset<std::tuple_size<decltype(compTuple)>::value> createdComponents;
 };
+
+// TODO, IF ALL IMPLEMENTED MANAGE THE DELETION OF POINTERS HERE
+template <typename T> inline bool GameObject::RemoveComponent()
+{
+    std::get<T>(compTuple) = nullptr;
+
+    return true;
+}
+
+template <typename T> inline T GameObject::GetComponentChild(Application* app) const
+{
+    T component = nullptr;
+
+    std::queue<UID> gameObjects;
+
+    component = this->GetComponent<T>();
+    
+    if (component) return component;
+
+    for (UID child : this->GetChildren())
+    {
+        gameObjects.push(child);
+    }
+
+    Scene* scene = app->GetSceneModule()->GetScene();
+
+    while (!gameObjects.empty())
+    {
+        UID currentGameObject = gameObjects.front();
+        gameObjects.pop();
+
+        GameObject* current = scene->GetGameObjectByUID(currentGameObject);
+        component           = current->GetComponent<T>();
+
+        if (component) break;
+
+        for (UID child : current->GetChildren())
+        {
+            gameObjects.push(child);
+        }
+    }
+
+    return component;
+}
+
+template <typename T> inline T GameObject::GetComponentParent(Application* app) const
+{
+    T component          = nullptr;
+    UID currentUID       = parentUID;
+
+    Scene* scene         = app->GetSceneModule()->GetScene();
+
+    while (currentUID != scene->GetGameObjectRootUID())
+    {
+        GameObject* current = scene->GetGameObjectByUID(currentUID);
+        component           = current->GetComponent<T>();
+
+        if (component) break;
+
+        currentUID = current->parentUID;
+    }
+
+    return component;
+}

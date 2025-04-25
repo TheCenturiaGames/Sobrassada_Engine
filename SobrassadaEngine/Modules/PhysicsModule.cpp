@@ -109,6 +109,7 @@ bool PhysicsModule::ShutDown()
     delete broadPhase;
     delete dispatcher;
     delete collisionConfiguration;
+    delete debugDraw;
 
     return true;
 }

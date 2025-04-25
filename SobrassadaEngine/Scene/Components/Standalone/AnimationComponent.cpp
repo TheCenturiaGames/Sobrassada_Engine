@@ -193,7 +193,7 @@ void AnimationComponent::OnInspector()
         {
             ImGui::Text("Selected Object: %s", selectedObj->GetName().c_str());
 
-            currentAnimComp = static_cast<AnimationComponent*>(selectedObj->GetAnimationComponent());
+            currentAnimComp = selectedObj->GetComponent<AnimationComponent*>();
 
             if (currentAnimComp)
             {

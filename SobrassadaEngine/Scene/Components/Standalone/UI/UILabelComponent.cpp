@@ -73,16 +73,11 @@ UILabelComponent::~UILabelComponent()
 
 void UILabelComponent::Init()
 {
-    Transform2DComponent* transform =
-        static_cast<Transform2DComponent*>(parent->GetComponentByType(COMPONENT_TRANSFORM_2D));
-    if (transform == nullptr)
+    transform2D  = parent->GetComponent<Transform2DComponent*>();
+    if (transform2D == nullptr)
     {
         parent->CreateComponent(COMPONENT_TRANSFORM_2D);
-        transform2D = static_cast<Transform2DComponent*>(parent->GetComponentByType(COMPONENT_TRANSFORM_2D));
-    }
-    else
-    {
-        transform2D = transform;
+        transform2D = parent->GetComponent<Transform2DComponent*>();
     }
 
     parentCanvas = transform2D->GetParentCanvas();

@@ -86,7 +86,7 @@ class SOBRASADA_API_ENGINE Scene
     LightsConfig* GetLightsConfig() const { return lightsConfig; }
     CameraComponent* GetMainCamera() const { return mainCamera; }
 
-    template <typename T> std::vector<T*> GetEnabledComponentsOfType() const;
+    template <typename T> std::vector<T> GetEnabledComponentsOfType() const;
 
     bool GetDoInputs() const { return doInputs; }
     bool GetDoMouseInputs() const { return doMouseInputs; }

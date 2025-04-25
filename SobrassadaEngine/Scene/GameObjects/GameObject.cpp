@@ -6,17 +6,53 @@
 #include "EditorUIModule.h"
 #include "PrefabManager.h"
 #include "SceneModule.h"
+
+#include "CameraComponent.h"
+#include "ScriptComponent.h"
+#include "Standalone/AIAgentComponent.h"
 #include "Standalone/AnimationComponent.h"
+#include "Standalone/Audio/AudioListenerComponent.h"
+#include "Standalone/Audio/AudioSourceComponent.h"
+#include "Standalone/CharacterControllerComponent.h"
+#include "Standalone/Lights/DirectionalLightComponent.h"
+#include "Standalone/Lights/PointLightComponent.h"
+#include "Standalone/Lights/SpotLightComponent.h"
 #include "Standalone/MeshComponent.h"
+#include "Standalone/Physics/CapsuleColliderComponent.h"
+#include "Standalone/Physics/CubeColliderComponent.h"
+#include "Standalone/Physics/SphereColliderComponent.h"
+#include "Standalone/UI/ButtonComponent.h"
+#include "Standalone/UI/CanvasComponent.h"
+#include "Standalone/UI/ImageComponent.h"
 #include "Standalone/UI/Transform2DComponent.h"
+#include "Standalone/UI/UILabelComponent.h"
 
 #include "imgui.h"
 #include <queue>
 #include <set>
 #include <stack>
 
+template <std::size_t I = 0, typename... Tp>
+inline typename std::enable_if<I == sizeof...(Tp), void>::type
+duplicateComponents(std::tuple<Tp...>& tDuplicate, std::tuple<Tp...>& tOriginal)
+{
+}
+
+template <std::size_t I = 0, typename... Tp>
+    inline typename std::enable_if <
+    I<sizeof...(Tp), void>::type duplicateComponents(std::tuple<Tp...>& tDuplicate, std::tuple<Tp...>& tOriginal)
+{
+    if (std::get<I>(tOriginal))
+    {
+        std::get<I>(tDuplicate)->Clone(std::get<I>(tOriginal));
+    }
+    duplicateComponents<I + 1, Tp...>(tDuplicate, tOriginal);
+}
+
 GameObject::GameObject(const std::string& name) : name(name)
 {
+    compTuple = std::make_tuple(COMPONENTS_NULLPTR);
+
     uid       = GenerateUID();
     parentUID = INVALID_UID;
 
@@ -25,10 +61,14 @@ GameObject::GameObject(const std::string& name) : name(name)
 
     globalOBB  = OBB(localAABB);
     globalAABB = AABB(globalOBB);
+
+    createdComponents.reset();
 }
 
 GameObject::GameObject(UID parentUID, const std::string& name) : parentUID(parentUID), name(name)
 {
+    compTuple = std::make_tuple(COMPONENTS_NULLPTR);
+
     uid       = GenerateUID();
 
     localAABB = AABB();
@@ -36,21 +76,30 @@ GameObject::GameObject(UID parentUID, const std::string& name) : parentUID(paren
 
     globalOBB  = OBB(localAABB);
     globalAABB = AABB(globalOBB);
+
+    createdComponents.reset();
 }
 
 GameObject::GameObject(UID parentUID, const std::string& name, UID uid) : parentUID(parentUID), name(name), uid(uid)
 {
+    compTuple = std::make_tuple(COMPONENTS_NULLPTR);
+
     localAABB = AABB();
     localAABB.SetNegativeInfinity();
 
     globalOBB  = OBB(localAABB);
     globalAABB = AABB(globalOBB);
+
+    createdComponents.reset();
 }
 
 GameObject::GameObject(UID parentUID, GameObject* refObject)
     : parentUID(parentUID), name(refObject->name), localTransform(refObject->localTransform),
       globalTransform(refObject->globalTransform)
 {
+    compTuple = std::make_tuple(COMPONENTS_NULLPTR);
+    createdComponents.reset();
+
     uid       = GenerateUID();
 
     localAABB = AABB();
@@ -68,18 +117,21 @@ GameObject::GameObject(UID parentUID, GameObject* refObject)
     navMeshValid     = refObject->navMeshValid;
 
     // Must make a copy of each manually
-    for (const auto& component : refObject->components)
+    for (int i = 0; i < std::tuple_size<decltype(compTuple)>::value; ++i)
     {
-        CreateComponent(component.first);
-        Component* newComponent = GetComponentByType(component.first);
-        newComponent->Clone(component.second);
+        if (refObject->IsComponentCreated(i)) CreateComponent(ComponentType(i + 1));
     }
+
+    duplicateComponents(compTuple, refObject->GetComponentsTupleRef());
 
     OnAABBUpdated();
 }
 
 GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState["UID"].GetUint64())
 {
+    compTuple              = std::make_tuple(COMPONENTS_NULLPTR);
+    createdComponents.reset();
+
     parentUID              = initialState["ParentUID"].GetUint64();
     name                   = initialState["Name"].GetString();
     selectedComponentIndex = COMPONENT_NONE;
@@ -124,6 +176,7 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
 
             if (newComponent != nullptr)
             {
+                createdComponents[newComponent->GetType() - 1] = true;
                 components.insert({newComponent->GetType(), newComponent});
             }
         }
@@ -402,91 +455,14 @@ void GameObject::UpdateTransformForGOBranch()
     }
 }
 
-Component* GameObject::GetComponentByType(ComponentType type) const
-{
-    if (components.find(type) != components.end())
-    {
-        return components.at(type);
-    }
-    return nullptr;
-}
-
-Component* GameObject::GetComponentChildByType(ComponentType componentType) const
-{
-    std::queue<UID> gameObjects;
-
-    for (UID child : this->GetChildren())
-    {
-        gameObjects.push(child);
-    }
-
-    Scene* scene         = App->GetSceneModule()->GetScene();
-    Component* component = nullptr;
-
-    while (!gameObjects.empty())
-    {
-        UID currentGameObject = gameObjects.front();
-        gameObjects.pop();
-
-        GameObject* current = scene->GetGameObjectByUID(currentGameObject);
-        component           = current->GetComponentByType(componentType);
-
-        if (component != nullptr) break;
-
-        for (UID child : current->GetChildren())
-        {
-            gameObjects.push(child);
-        }
-    }
-
-    return component;
-}
-
-Component* GameObject::GetComponentParentByType(ComponentType componentType) const
-{
-    UID currentUID       = parentUID;
-
-    Scene* scene         = App->GetSceneModule()->GetScene();
-    Component* component = nullptr;
-
-    while (currentUID != scene->GetGameObjectRootUID())
-    {
-        GameObject* current = scene->GetGameObjectByUID(currentUID);
-        component           = current->GetComponentByType(componentType);
-
-        if (component != nullptr) break;
-
-        currentUID = current->parentUID;
-    }
-
-    return component;
-}
-
-MeshComponent* GameObject::GetMeshComponent() const
-{
-    if (components.find(COMPONENT_MESH) != components.end())
-    {
-        return dynamic_cast<MeshComponent*>(components.at(COMPONENT_MESH));
-    }
-    return nullptr;
-}
-
-AnimationComponent* GameObject::GetAnimationComponent() const
-{
-    if (components.find(COMPONENT_ANIMATION) != components.end())
-    {
-        return dynamic_cast<AnimationComponent*>(components.at(COMPONENT_ANIMATION));
-    }
-    return nullptr;
-}
-
 void GameObject::OnTransformUpdated()
 {
     globalTransform              = GetParentGlobalTransform() * localTransform;
     globalOBB                    = globalTransform * OBB(localAABB);
     globalAABB                   = AABB(globalOBB);
 
-    MeshComponent* meshComponent = GetMeshComponent();
+    // MeshComponent* meshComponent = GetMeshComponent();
+    MeshComponent* meshComponent = GetComponent<MeshComponent*>();
     if (meshComponent != nullptr)
     {
         meshComponent->OnTransformUpdated();
@@ -768,8 +744,8 @@ void GameObject::UpdateGameObjectHierarchy(UID sourceUID)
         UID oldParentUID = sourceGameObject->GetParent();
         sourceGameObject->SetParent(uid);
 
-        Component* transform2D = sourceGameObject->GetComponentByType(COMPONENT_TRANSFORM_2D);
-        if (transform2D) static_cast<Transform2DComponent*>(transform2D)->OnParentChange();
+        Transform2DComponent* transform2D = sourceGameObject->GetComponent<Transform2DComponent*>();
+        if (transform2D) transform2D->OnParentChange();
 
         GameObject* oldParentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(oldParentUID);
 
@@ -932,12 +908,14 @@ void GameObject::UpdateMobilityHierarchy(MobilitySettings type)
 
 bool GameObject::CreateComponent(const ComponentType componentType)
 {
+
     if (components.find(componentType) == components.end())
     // TODO Allow override of components after displaying an info box
     {
         Component* createdComponent = ComponentUtils::CreateEmptyComponent(componentType, GenerateUID(), this);
         if (createdComponent != nullptr)
         {
+            createdComponents[componentType - 1] = true;
             components.insert({componentType, createdComponent});
             selectedComponentIndex = componentType;
             OnAABBUpdated();
@@ -955,6 +933,30 @@ bool GameObject::RemoveComponent(ComponentType componentType)
         delete components.at(componentType);
         components.erase(componentType);
         selectedComponentIndex = COMPONENT_NONE;
+        createdComponents[componentType - 1] = false;
+        // TODO JUST TO CHECK EVERYTHING IS WORKING WITH MESH COMPONENT
+        if (componentType == ComponentType::COMPONENT_MESH) RemoveComponent<MeshComponent*>();
+        else if (componentType == ComponentType::COMPONENT_POINT_LIGHT) RemoveComponent<PointLightComponent*>();
+        else if (componentType == ComponentType::COMPONENT_SPOT_LIGHT) RemoveComponent<SpotLightComponent*>();
+        else if (componentType == ComponentType::COMPONENT_DIRECTIONAL_LIGHT)
+            RemoveComponent<DirectionalLightComponent*>();
+        else if (componentType == ComponentType::COMPONENT_CHARACTER_CONTROLLER)
+            RemoveComponent<CharacterControllerComponent*>();
+        else if (componentType == ComponentType::COMPONENT_TRANSFORM_2D) RemoveComponent<Transform2DComponent*>();
+        else if (componentType == ComponentType::COMPONENT_CANVAS) RemoveComponent<CanvasComponent*>();
+        else if (componentType == ComponentType::COMPONENT_LABEL) RemoveComponent<UILabelComponent*>();
+        else if (componentType == ComponentType::COMPONENT_CAMERA) RemoveComponent<CameraComponent*>();
+        else if (componentType == ComponentType::COMPONENT_SCRIPT) RemoveComponent<ScriptComponent*>();
+        else if (componentType == ComponentType::COMPONENT_CUBE_COLLIDER) RemoveComponent<CubeColliderComponent*>();
+        else if (componentType == ComponentType::COMPONENT_SPHERE_COLLIDER) RemoveComponent<SphereColliderComponent*>();
+        else if (componentType == ComponentType::COMPONENT_CAPSULE_COLLIDER)
+            RemoveComponent<CapsuleColliderComponent*>();
+        else if (componentType == ComponentType::COMPONENT_ANIMATION) RemoveComponent<AnimationComponent*>();
+        else if (componentType == ComponentType::COMPONENT_AIAGENT) RemoveComponent<AIAgentComponent*>();
+        else if (componentType == ComponentType::COMPONENT_IMAGE) RemoveComponent<ImageComponent*>();
+        else if (componentType == ComponentType::COMPONENT_BUTTON) RemoveComponent<ButtonComponent*>();
+        else if (componentType == ComponentType::COMPONENT_AUDIO_SOURCE) RemoveComponent<AudioSourceComponent*>();
+        else if (componentType == ComponentType::COMPONENT_AUDIO_LISTENER) RemoveComponent<AudioListenerComponent*>();
 
         OnAABBUpdated();
     }
