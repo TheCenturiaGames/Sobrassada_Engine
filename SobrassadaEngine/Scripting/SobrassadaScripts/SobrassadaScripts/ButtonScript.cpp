@@ -1,15 +1,15 @@
 #include "pch.h"
 
-#include "ButtonScript.h"
 #include "Application.h"
-#include "EditorUIModule.h"
+#include "ButtonScript.h"
 #include "Component.h"
+#include "Delegate.h"
+#include "EditorUIModule.h"
 #include "GameObject.h"
 #include "GameUIModule.h"
-#include "SceneModule.h"
 #include "Scene.h"
+#include "SceneModule.h"
 #include "Standalone/UI/ButtonComponent.h"
-#include "Delegate.h"
 #include <imgui.h>
 #include <string>
 
@@ -23,16 +23,8 @@ bool ButtonScript::Init()
         return false;
     }
 
-    //Component* button = parent->GetComponentByType(COMPONENT_BUTTON);
     ButtonComponent* button = parent->GetComponent<ButtonComponent*>();
-    //if (button)
-    //{
-    //    std::function<void(void)> function = std::bind(&ButtonScript::OnClick, this);
-    //    Delegate<void> delegate(function);
-    //    delegateID            = static_cast<ButtonComponent*>(button)->AddOnClickCallback(delegate);
-    //    hasRegisteredCallback = true;
-    //}
-    
+
     if (button)
     {
         std::function<void(void)> function = std::bind(&ButtonScript::OnClick, this);
@@ -44,22 +36,15 @@ bool ButtonScript::Init()
     return true;
 }
 
-
 ButtonScript::~ButtonScript()
 {
     if (hasRegisteredCallback)
     {
-        //Component* button = parent->GetComponentByType(COMPONENT_BUTTON);
-        //if (button)
-        //{
-        //    static_cast<ButtonComponent*>(button)->RemoveOnClickCallback(delegateID);
-        //}
 
         ButtonComponent* button = parent->GetComponent<ButtonComponent*>();
         if (button) button->RemoveOnClickCallback(delegateID);
     }
 }
-
 
 void ButtonScript::Update(float deltaTime)
 {
@@ -123,7 +108,7 @@ std::string ButtonScript::GetCurrentPanelName() const
     return "";
 }
 
-//To save and Load the values input in PANELS
+// To save and Load the values input in PANELS
 void ButtonScript::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator)
 {
     targetState.AddMember("PanelToShow", rapidjson::Value(panelToShowName.c_str(), allocator), allocator);

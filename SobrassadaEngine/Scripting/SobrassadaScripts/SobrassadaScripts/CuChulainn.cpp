@@ -24,15 +24,6 @@ bool CuChulainn::Init()
 
     Character::Init();
 
-    // Component* agent = parent->GetComponentByType(COMPONENT_CHARACTER_CONTROLLER);
-    // if (!agent)
-    //{
-    //     GLOG("CharacterController component not found for CuChulainn");
-    //     return false;
-    // }
-
-    // character = dynamic_cast<CharacterControllerComponent*>(agent);
-
     character = parent->GetComponent<CharacterControllerComponent*>();
     if (!character)
     {

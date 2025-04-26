@@ -96,14 +96,6 @@ void ScriptModule::DeleteAllScripts()
 {
     if (App->GetSceneModule()->GetScene())
     {
-        /*for (auto* component : App->GetSceneModule()->GetScene()->GetAllComponents())
-        {
-            if (component->GetType() == ComponentType::COMPONENT_SCRIPT)
-            {
-                ScriptComponent* scriptComponent = static_cast<ScriptComponent*>(component);
-                scriptComponent->DeleteScript();
-            }
-        }*/
 
         for (auto& gameObject : App->GetSceneModule()->GetScene()->GetAllGameObjects())
         {
@@ -119,14 +111,6 @@ void ScriptModule::RecreateAllScripts()
 {
     if (App->GetSceneModule()->GetScene())
     {
-        // for (auto* component : App->GetSceneModule()->GetScene()->GetAllComponents())
-        //{
-        //     if (component->GetType() == ComponentType::COMPONENT_SCRIPT)
-        //     {
-        //         ScriptComponent* scriptComponent = static_cast<ScriptComponent*>(component);
-        //         scriptComponent->CreateScript(scriptComponent->GetScriptName());
-        //     }
-        // }
 
         for (auto& gameObject : App->GetSceneModule()->GetScene()->GetAllGameObjects())
         {

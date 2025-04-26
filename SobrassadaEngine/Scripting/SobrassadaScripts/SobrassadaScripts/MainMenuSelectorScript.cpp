@@ -55,11 +55,6 @@ void MainMenuSelectorScript::Update(float deltaTime)
     if (keys[SDL_SCANCODE_RETURN] == KEY_DOWN || keys[SDL_SCANCODE_SPACE] == KEY_DOWN)
     {
         GameObject* selectedItem = menuItems[selectedIndex];
-        /*Component* button        = selectedItem->GetComponentByType(COMPONENT_BUTTON);
-        if (button)
-        {
-            static_cast<ButtonComponent*>(button)->OnClick();
-        }*/
 
         ButtonComponent* button  = selectedItem->GetComponent<ButtonComponent*>();
         if (button) button->OnClick();

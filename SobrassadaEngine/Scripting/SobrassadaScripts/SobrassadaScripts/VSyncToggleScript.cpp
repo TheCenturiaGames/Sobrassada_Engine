@@ -9,15 +9,6 @@
 
 bool VSyncToggleScript::Init()
 {
-    // Component* button = parent->GetComponentByType(COMPONENT_BUTTON);
-    // if (button)
-    //{
-    //     std::function<void(void)> function = std::bind(&VSyncToggleScript::OnClick, this);
-    //     Delegate<void> delegate(function);
-    //     delegateID            = static_cast<ButtonComponent*>(button)->AddOnClickCallback(delegate);
-    //     hasRegisteredCallback = true;
-    // }
-
     ButtonComponent* button = parent->GetComponent<ButtonComponent*>();
     if (button)
     {
@@ -47,12 +38,6 @@ VSyncToggleScript::~VSyncToggleScript()
 {
     if (hasRegisteredCallback)
     {
-        /*Component* button = parent->GetComponentByType(COMPONENT_BUTTON);
-        if (button)
-        {
-            static_cast<ButtonComponent*>(button)->RemoveOnClickCallback(delegateID);
-        }*/
-
         ButtonComponent* button = parent->GetComponent<ButtonComponent*>();
         if (button) button->RemoveOnClickCallback(delegateID);
     }

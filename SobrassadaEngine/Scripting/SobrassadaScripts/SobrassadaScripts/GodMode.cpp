@@ -10,8 +10,6 @@
 
 bool GodMode::Init()
 {
-    //characterController =
-    //    dynamic_cast<CharacterControllerComponent*>(parent->GetComponentByType(COMPONENT_CHARACTER_CONTROLLER));
     characterController = parent->GetComponent<CharacterControllerComponent*>();
     if (!characterController)
     {
@@ -19,7 +17,6 @@ bool GodMode::Init()
         return false;
     }
 
-    //godCamera = dynamic_cast<CameraComponent*>(parent->GetComponentChildByType(COMPONENT_CAMERA));
     godCamera = parent->GetComponentChild<CameraComponent*>(AppEngine);
     if (!godCamera)
     {

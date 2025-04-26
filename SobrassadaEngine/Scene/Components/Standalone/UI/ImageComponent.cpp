@@ -58,7 +58,6 @@ ImageComponent::~ImageComponent()
 
 void ImageComponent::Init()
 {
-    // Component* transform = parent->GetComponentByType(COMPONENT_TRANSFORM_2D);
     transform2D = parent->GetComponent<Transform2DComponent*>();
 
     if (transform2D == nullptr)
