@@ -132,6 +132,24 @@ template <std::size_t I = 0, typename... Tp>
     SaveComponentsTuple<I + 1, Tp...>(tuple, componentsJSON, allocator);
 }
 
+// EDITOR INSPECTOR COMPONENTS
+template <std::size_t I = 0, typename... Tp>
+inline typename std::enable_if<I == sizeof...(Tp), void>::type
+RenderEditorComponentsTuple(std::tuple<Tp...>& tuple, ComponentType selectedType)
+{
+}
+
+template <std::size_t I = 0, typename... Tp>
+    inline typename std::enable_if <
+    I<sizeof...(Tp), void>::type RenderEditorComponentsTuple(std::tuple<Tp...>& tuple, ComponentType selectedType)
+{
+    if (std::get<I>(tuple) && std::get<I>(tuple)->GetType() == selectedType)
+    {
+        std::get<I>(tuple)->RenderEditorInspector();
+    }
+    RenderEditorComponentsTuple<I + 1, Tp...>(tuple, selectedType);
+}
+
 GameObject::GameObject(const std::string& name) : name(name)
 {
     compTuple = std::make_tuple(COMPONENTS_NULLPTR);
@@ -473,10 +491,7 @@ void GameObject::RenderEditorInspector()
             "ComponentInspectorWrapper", ImVec2(0, 50), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeY
         );
 
-        if (components.find(selectedComponentIndex) != components.end())
-        {
-            components.at(selectedComponentIndex)->RenderEditorInspector();
-        }
+        RenderEditorComponentsTuple(compTuple, selectedComponentIndex);
 
         ImGui::EndChild();
         ImGui::PopStyleVar();
