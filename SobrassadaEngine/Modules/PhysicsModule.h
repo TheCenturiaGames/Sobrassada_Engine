@@ -22,7 +22,7 @@ constexpr float DEFAULT_GRAVITY = -9.81f;
 
 typedef std::bitset<sizeof(ColliderLayerStrings) / sizeof(char*)> LayerBitset;
 
-class PhysicsModule : public Module
+class SOBRASADA_API_ENGINE PhysicsModule : public Module
 {
   public:
     PhysicsModule();

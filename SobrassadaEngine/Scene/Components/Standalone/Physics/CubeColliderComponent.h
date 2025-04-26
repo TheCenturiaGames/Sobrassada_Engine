@@ -25,10 +25,13 @@ class CubeColliderComponent : public Component
 
     void Update(float deltaTime) override;
     void Render(float deltaTime) override;
+    void RenderDebug(float deltaTime) override;
 
     void ParentUpdated() override;
 
-    void OnCollision(GameObject* otherObject, float3 collisionNormal);
+    void SOBRASADA_API_ENGINE OnCollision(GameObject* otherObject, float3 collisionNormal);
+
+    void SOBRASADA_API_ENGINE DeleteRigidBody();
 
   private:
     void CalculateCollider();

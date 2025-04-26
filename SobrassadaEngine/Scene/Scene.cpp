@@ -1,4 +1,4 @@
-﻿#include "Scene.h"
+#include "Scene.h"
 
 #include "Application.h"
 #include "BatchManager.h"
@@ -9,6 +9,7 @@
 #include "DebugDrawModule.h"
 #include "EditorUIModule.h"
 #include "Framebuffer.h"
+#include "GBuffer.h"
 #include "GameObject.h"
 #include "GameTimer.h"
 #include "GeometryBatch.h"
@@ -18,6 +19,7 @@
 #include "ModelImporter.h"
 #include "Octree.h"
 #include "OpenGLModule.h"
+#include "PathfinderModule.h"
 #include "PhysicsModule.h"
 #include "ProjectModule.h"
 #include "Quadtree.h"
@@ -26,6 +28,8 @@
 #include "ResourcePrefab.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
+#include "ScriptComponent.h"
+#include "ShaderModule.h"
 #include "Standalone/AnimationComponent.h"
 #include "Standalone/Lights/DirectionalLightComponent.h"
 #include "Standalone/Lights/PointLightComponent.h"
@@ -33,6 +37,7 @@
 #include "Standalone/MeshComponent.h"
 
 #include "SDL_mouse.h"
+#include "glew.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 // guizmo after imgui include
@@ -58,8 +63,16 @@ Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUI
     this->sceneName       = initialState["Name"].GetString();
     gameObjectRootUID     = initialState["RootGameObject"].GetUint64();
     selectedGameObjectUID = gameObjectRootUID;
+    if (initialState.HasMember("NavmeshUID")) navmeshUID = initialState["NavmeshUID"].GetUint64();
 
     App->GetPhysicsModule()->LoadLayerData(&initialState);
+
+    // Load navmesh from scene.
+    if (navmeshUID != INVALID_UID)
+    {
+        std::string navmeshName = App->GetLibraryModule()->GetResourceName(navmeshUID);
+        App->GetPathfinderModule()->LoadNavMesh(navmeshName);
+    }
 
     // Deserialize GameObjects
     if (initialState.HasMember("GameObjects") && initialState["GameObjects"].IsArray())
@@ -86,6 +99,8 @@ Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUI
 
 Scene::~Scene()
 {
+    App->GetPhysicsModule()->EmptyWorld();
+
     for (auto it = gameObjectsContainer.begin(); it != gameObjectsContainer.end(); ++it)
     {
         delete it->second;
@@ -102,7 +117,6 @@ Scene::~Scene()
     sceneOctree  = nullptr;
     dynamicTree  = nullptr;
 
-    App->GetPhysicsModule()->EmptyWorld();
     GLOG("%s scene closed", sceneName.c_str());
 }
 
@@ -110,10 +124,8 @@ void Scene::Init()
 {
     for (auto& gameObject : gameObjectsContainer)
     {
-        if (gameObject.second->GetParent() == gameObjectRootUID) 
-            gameObject.second->InitHierarchy();
+        if (gameObject.second->GetParent() == gameObjectRootUID) gameObject.second->InitHierarchy();
     }
-    App->GetResourcesModule()->GetBatchManager()->LoadData();
 
     // When loading a scene, overrides all gameObjects that have a prefabUID. That is because if the prefab has been
     // modified, the scene file may have not, so the prefabs need to be updated when loading the scene again
@@ -132,6 +144,8 @@ void Scene::Init()
         OverridePrefabs(prefab);
     }
 
+    App->GetResourcesModule()->GetBatchManager()->LoadData();
+
     // Initialize the skinning for all the gameObjects that need it
     for (const auto& gameObject : gameObjectsContainer)
     {
@@ -142,6 +156,12 @@ void Scene::Init()
     lightsConfig->InitSkybox();
     lightsConfig->InitLightBuffers();
 
+    // Load navmesh from scene.
+    if (navmeshUID != INVALID_UID)
+    {
+        std::string navmeshName = App->GetLibraryModule()->GetResourceName(navmeshUID);
+        App->GetPathfinderModule()->LoadNavMesh(navmeshName);
+    }
     // Call this after overriding the prefabs to avoid duplicates in gameObjectsToUpdate
     GetGameObjectByUID(gameObjectRootUID)->UpdateTransformForGOBranch();
 
@@ -170,6 +190,7 @@ void Scene::Save(
     targetState.AddMember("Name", rapidjson::Value(sceneName.c_str(), allocator), allocator);
 
     targetState.AddMember("RootGameObject", gameObjectRootUID, allocator);
+    targetState.AddMember("NavmeshUID", navmeshUID, allocator);
 
     App->GetPhysicsModule()->SaveLayerData(targetState, allocator);
 
@@ -209,37 +230,27 @@ void Scene::Save(
     if (saveMode != SaveMode::SavePlayMode) App->GetProjectModule()->SetAsStartupScene(sceneName);
 }
 
-void Scene::LoadComponents() const
-{
-    lightsConfig->InitSkybox();
-    lightsConfig->InitLightBuffers();
-}
-
-void Scene::LoadGameObjects(const std::unordered_map<UID, GameObject*>& loadedGameObjects)
-{
-    for (auto it = gameObjectsContainer.begin(); it != gameObjectsContainer.end(); ++it)
-    {
-        delete it->second;
-    }
-    gameObjectsContainer.clear();
-    gameObjectsContainer.insert(loadedGameObjects.begin(), loadedGameObjects.end());
-
-    GameObject* root = GetGameObjectByUID(gameObjectRootUID);
-    if (root != nullptr)
-    {
-        GLOG("Init transform and AABB calculation");
-        root->UpdateTransformForGOBranch();
-    }
-
-    UpdateStaticSpatialStructure();
-    UpdateDynamicSpatialStructure();
-}
-
 update_status Scene::Update(float deltaTime)
 {
 #ifdef OPTICK
     OPTICK_CATEGORY("Scene::Update", Optick::Category::GameLogic)
 #endif
+
+    if (App->GetSceneModule()->GetOnlyOnceInPlayMode())
+    {
+        for (auto& gameObject : gameObjectsContainer)
+        {
+            std::unordered_map<ComponentType, Component*> componentList = gameObject.second->GetComponents();
+
+            for (auto& component : componentList)
+            {
+                if (component.first == ComponentType::COMPONENT_SCRIPT)
+                    dynamic_cast<ScriptComponent*>(component.second)->InitScriptInstances();
+            }
+        }
+        App->GetSceneModule()->ResetOnlyOnceInPlayMode();
+    }
+
     for (auto& gameObject : gameObjectsContainer)
     {
         std::unordered_map<ComponentType, Component*> componentList = gameObject.second->GetComponents();
@@ -258,57 +269,44 @@ update_status Scene::Update(float deltaTime)
 
 update_status Scene::Render(float deltaTime)
 {
-    if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
-        RenderScene(deltaTime, App->GetSceneModule()->GetScene()->GetMainCamera());
+    CameraComponent* mainCamera = App->GetSceneModule()->GetScene()->GetMainCamera();
+    if (App->GetSceneModule()->GetInPlayMode() && mainCamera != nullptr)
+    {
+        if (mainCamera->GetEnabled() && mainCamera->IsEffectivelyEnabled()) RenderScene(deltaTime, mainCamera);
+        else RenderScene(deltaTime, nullptr);
+    }
     else RenderScene(deltaTime, nullptr);
+
+    GameObject* selectedGameObject = App->GetSceneModule()->GetScene()->GetSelectedGameObject();
+    if (selectedGameObject != nullptr)
+    {
+        for (const auto& component : selectedGameObject->GetComponents())
+        {
+            component.second->RenderDebug(deltaTime);
+        }
+    }
+
     return UPDATE_CONTINUE;
 }
 
 void Scene::RenderScene(float deltaTime, CameraComponent* camera)
 {
-    if (!App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_WIREFRAME))
-    {
-        float4x4 projection;
-        float4x4 view;
-
-        if (camera == nullptr)
-            lightsConfig->RenderSkybox(
-                App->GetCameraModule()->GetProjectionMatrix(), App->GetCameraModule()->GetViewMatrix()
-            );
-        else
-        {
-            bool change = false;
-            // Cubemap does not support Ortographic projection
-            if (camera->GetType() == 1)
-            {
-                change = true;
-                camera->ChangeToPerspective();
-            }
-            lightsConfig->RenderSkybox(camera->GetProjectionMatrix(), camera->GetViewMatrix());
-            if (change) camera->ChangeToOrtographic();
-        }
-    }
-
-    lightsConfig->SetLightsShaderData();
+    GBuffer* gbuffer         = App->GetOpenGLModule()->GetGBuffer();
+    Framebuffer* framebuffer = App->GetSceneModule()->GetInPlayMode() ? App->GetOpenGLModule()->GetFramebuffer()
+                             : camera != nullptr                      ? camera->GetFramebuffer()
+                                                                      : App->GetOpenGLModule()->GetFramebuffer();
 
     std::vector<GameObject*> objectsToRender;
     CheckObjectsToRender(objectsToRender, camera);
 
-    {
 #ifdef OPTICK
-        OPTICK_CATEGORY("Scene::MeshesToRender", Optick::Category::GameLogic)
+    OPTICK_CATEGORY("Scene::MeshesToRender", Optick::Category::GameLogic)
 #endif
-        BatchManager* batchManager = App->GetResourcesModule()->GetBatchManager();
-        std::vector<MeshComponent*> meshesToRender;
+    glEnable(GL_STENCIL_TEST);
 
-        for (const auto& gameObject : objectsToRender)
-        {
-            MeshComponent* mesh = gameObject->GetMeshComponent();
-            if (mesh != nullptr && mesh->GetEnabled() && mesh->GetBatch() != nullptr) meshesToRender.push_back(mesh);
-        }
+    GeometryPassRender(objectsToRender, camera, gbuffer);
 
-        batchManager->Render(meshesToRender, camera);
-    }
+    LightingPassRender(objectsToRender, camera, gbuffer, framebuffer);
 
     {
 #ifdef OPTICK
@@ -443,7 +441,7 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
     if (ImGui::SliderFloat("Time scale", &timeScale, 0, 4)) gameTimer->SetTimeScale(timeScale);
 
     // RENDER OPTIONS
-    if (ImGui::Button("Render options"))
+    if (ImGui::Button("Render options") || App->GetInputModule()->GetKeyboard()[SDL_SCANCODE_F9])
     {
         ImGui::OpenPopup("RenderOptions");
     }
@@ -538,12 +536,11 @@ void Scene::RenderSceneToFrameBuffer()
     if (framebuffer->GetTextureWidth() != windowSize.x || framebuffer->GetTextureHeight() != windowSize.y)
     {
         float aspectRatio = windowSize.y / windowSize.x;
-        if (App->GetSceneModule()->GetInPlayMode() && App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
-        {
+        if (App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
             App->GetSceneModule()->GetScene()->GetMainCamera()->SetAspectRatio(aspectRatio);
-        }
-        else App->GetCameraModule()->SetAspectRatio(aspectRatio);
+        App->GetCameraModule()->SetAspectRatio(aspectRatio);
         framebuffer->Resize((int)windowSize.x, (int)windowSize.y);
+        App->GetOpenGLModule()->GetGBuffer()->Resize((int)windowSize.x, (int)windowSize.y);
     }
 
     ImVec2 windowPosition     = ImGui::GetWindowPos();
@@ -692,11 +689,16 @@ void Scene::ClearGameObjectsToUpdate()
 
 void Scene::AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
 {
-    auto pairResult = selectedGameObjects.insert({gameObject, gameObjectParent});
+    GameObject* selectedGameObject = GetGameObjectByUID(gameObject);
+    auto pairResult                = selectedGameObjects.insert({gameObject, gameObjectParent});
+
+    MobilitySettings gameObjectMobility =
+        selectedGameObject->IsStatic() ? MobilitySettings::STATIC : MobilitySettings::DYNAMIC;
+
+    auto pairResultMobility = selectedGameObjectsMobility.insert({gameObject, gameObjectMobility});
 
     if (pairResult.second)
     {
-        GameObject* selectedGameObject       = GetGameObjectByUID(gameObject);
         GameObject* selectedGameObjectParent = GetGameObjectByUID(gameObjectParent);
 
         // selectedGameObjectParent->RemoveGameObject(gameObject);
@@ -713,11 +715,9 @@ void Scene::AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
     {
         multiSelectParent->RemoveGameObject(gameObject);
 
-        GameObject* selectedGameObject       = GetGameObjectByUID(gameObject);
         GameObject* selectedGameObjectParent = GetGameObjectByUID(selectedGameObjects[gameObject]);
 
         selectedGameObject->SetParent(selectedGameObjectParent->GetUID());
-        selectedGameObjectParent->AddGameObject(gameObject);
 
         if (selectedGameObjectParent->GetUID() != gameObjectRootUID)
         {
@@ -726,6 +726,7 @@ void Scene::AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
         }
 
         selectedGameObjects.erase(pairResult.first);
+        selectedGameObjectsMobility.erase(pairResultMobility.first);
     }
 }
 
@@ -745,7 +746,15 @@ void Scene::ClearObjectSelection()
         currentGameObject->UpdateTransformForGOBranch();
     }
 
+    // UPDATE TO LET ORIGINAL GAME OBJECTS WITH THEIR ORIGINAL MOBILITY
+    for (auto& pairGameObject : selectedGameObjectsMobility)
+    {
+        GameObject* currentGameObject = GetGameObjectByUID(pairGameObject.first);
+        currentGameObject->UpdateMobilityHierarchy(pairGameObject.second);
+    }
+
     selectedGameObjects.clear();
+    selectedGameObjectsMobility.clear();
 }
 
 void Scene::DeleteMultiselection()
@@ -763,6 +772,7 @@ void Scene::DeleteMultiselection()
         RemoveGameObjectHierarchy(pairGameObject.first);
     }
     selectedGameObjects.clear();
+    selectedGameObjectsMobility.clear();
     ClearGameObjectsToUpdate();
 }
 
@@ -797,7 +807,7 @@ void Scene::CreateStaticSpatialDataStruct()
 {
     // PARAMETRIZED IN FUTURE
     float3 octreeCenter = float3::zero;
-    float octreeLength  = 200;
+    float octreeLength  = 2000;
     int nodeCapacity    = 10;
     sceneOctree         = new Octree(octreeCenter, octreeLength, nodeCapacity);
 
@@ -817,7 +827,7 @@ void Scene::CreateDynamicSpatialDataStruct()
 {
     // PARAMETRIZED IN FUTURE
     float3 center    = float3::zero;
-    float length     = 200;
+    float length     = 2000;
     int nodeCapacity = 5;
     dynamicTree      = new Quadtree(center, length, nodeCapacity);
 
@@ -872,6 +882,141 @@ void Scene::CheckObjectsToRender(std::vector<GameObject*>& outRenderGameObjects,
 
         if (frustumPlanes.Intersects(objectOBB)) outRenderGameObjects.push_back(gameObject);
     }
+}
+
+void Scene::GeometryPassRender(
+    const std::vector<GameObject*>& objectsToRender, CameraComponent* camera, GBuffer* gbuffer
+) const
+{
+    gbuffer->Bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);
+    glStencilMask(0xFF);
+
+    glDisable(GL_BLEND);
+
+    BatchManager* batchManager = App->GetResourcesModule()->GetBatchManager();
+    std::vector<MeshComponent*> meshesToRender;
+
+    for (const auto& gameObject : objectsToRender)
+    {
+        MeshComponent* mesh = gameObject->GetMeshComponent();
+        if (mesh != nullptr && mesh->GetEnabled() && mesh->GetBatch() != nullptr) meshesToRender.push_back(mesh);
+    }
+
+    batchManager->Render(meshesToRender, camera);
+    gbuffer->Unbind();
+
+    glEnable(GL_BLEND);
+}
+
+void Scene::LightingPassRender(
+    const std::vector<GameObject*>& renderGameObjects, CameraComponent* camera, GBuffer* gbuffer,
+    Framebuffer* framebuffer
+) const
+{
+    // LIGHTING PASS
+#ifndef GAME
+    framebuffer->Bind();
+#else
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
+
+    // SKYBOX
+    if (!App->GetDebugDrawModule()->GetDebugOptionValue((int)DebugOptions::RENDER_WIREFRAME))
+    {
+        float4x4 projection;
+        float4x4 view;
+
+        if (camera == nullptr)
+            lightsConfig->RenderSkybox(
+                App->GetCameraModule()->GetProjectionMatrix(), App->GetCameraModule()->GetViewMatrix()
+            );
+        else
+        {
+            bool change = false;
+            // Cubemap does not support Ortographic projection
+            if (camera->GetType() == 1)
+            {
+                change = true;
+                camera->ChangeToPerspective();
+            }
+            lightsConfig->RenderSkybox(camera->GetProjectionMatrix(), camera->GetViewMatrix());
+            if (change) camera->ChangeToOrtographic();
+        }
+    }
+
+    // COPYING DEPTH BUFFER AND STENCIL FROM GBUFFER TO RENDER FRAMEBUFFER
+    // TODO CHECK IF GAME RELEASE TO RENDER TO DEFAULT BUFFER INSTEAD OF FRAMEBUFFER
+    unsigned int width  = framebuffer->GetTextureWidth();
+    unsigned int height = framebuffer->GetTextureHeight();
+
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, gbuffer->gBufferObject);
+
+#ifndef GAME
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer->GetFramebufferID()); // write to default framebuffer
+#else
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+#endif
+
+    glBlitFramebuffer(
+        0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, GL_NEAREST
+    );
+
+#ifndef GAME
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->GetFramebufferID()); // write to default framebuffer
+#else
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
+
+    // SETTING STENCIL TEST FOR ONLY RENDER TO GBUFFER FRAGMENTS WRITES
+    glStencilFunc(GL_EQUAL, 1, 0xFF);
+    glStencilMask(0xFF);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, gbuffer->diffuseTexture);
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, gbuffer->specularTexture);
+
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, gbuffer->positionTexture);
+
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, gbuffer->normalTexture);
+
+    lightsConfig->SetLightsShaderData();
+
+    unsigned int lightingPassProgram = App->GetShaderModule()->GetLightingPassProgram();
+
+    glUseProgram(lightingPassProgram);
+
+    float3 cameraPos;
+    if (camera == nullptr) cameraPos = App->GetCameraModule()->GetCameraPosition();
+    else cameraPos = camera->GetCameraPosition();
+
+    glUniform3fv(glGetUniformLocation(lightingPassProgram, "cameraPos"), 1, &cameraPos[0]);
+
+    App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 3);
+
+    glDisable(GL_STENCIL_TEST);
+
+    // COPYING DEPTH BUFFER FROM GBUFFER TO RENDER FRAMEBUFFER
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, gbuffer->gBufferObject);
+
+#ifndef GAME
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer->GetFramebufferID()); // write to default framebuffer
+#else
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+#endif
+    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+
+#ifndef GAME
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->GetFramebufferID()); // write to default framebuffer
+#else
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
 }
 
 GameObject* Scene::GetGameObjectByUID(UID gameObjectUUID)
@@ -1134,6 +1279,10 @@ void Scene::LoadPrefab(const UID prefabUID, const ResourcePrefab* prefab, const 
                 MeshComponent* newMesh = newObjects[i]->GetMeshComponent();
                 newMesh->SetBones(newBonesObjects, newBonesUIDs);
             }
+
+            // If has animations, map them here
+            AnimationComponent* animComp = newObjects[i]->GetAnimationComponent();
+            if (animComp) animComp->SetBoneMapping();
         }
 
         if (prefab == nullptr) App->GetResourcesModule()->ReleaseResource(resourcePrefab);

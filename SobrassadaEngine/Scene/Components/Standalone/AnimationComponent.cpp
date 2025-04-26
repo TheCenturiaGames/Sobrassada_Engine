@@ -4,15 +4,21 @@
 #include "Application.h"
 #include "CameraModule.h"
 #include "EditorUIModule.h"
+#include "FileSystem.h"
 #include "GameObject.h"
 #include "LibraryModule.h"
+#include "ProjectModule.h"
 #include "Resource.h"
 #include "ResourceAnimation.h"
+#include "ResourceModel.h"
+#include "ResourceStateMachine.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
+#include "StateMachineEditor.h"
 
 #include "Math/Quat.h"
 #include "imgui.h"
+#include <set>
 
 AnimationComponent::AnimationComponent(const UID uid, GameObject* parent)
     : Component(uid, parent, "Animation", COMPONENT_ANIMATION)
@@ -26,11 +32,22 @@ AnimationComponent::AnimationComponent(const rapidjson::Value& initialState, Gam
     animController = new AnimController();
     if (initialState.HasMember("Animations") && initialState["Animations"].IsUint64())
     {
-        resource = initialState["Animations"].GetUint64();
+        resource            = initialState["Animations"].GetUint64();
+        currentAnimResource = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
     }
     else
     {
         resource = INVALID_UID;
+    }
+
+    if (initialState.HasMember("StateMachine") && initialState["StateMachine"].IsUint64())
+    {
+        UID smUID            = initialState["StateMachine"].GetUint64();
+        resourceStateMachine = static_cast<ResourceStateMachine*>(App->GetResourcesModule()->RequestResource(smUID));
+    }
+    else
+    {
+        resourceStateMachine = nullptr;
     }
 }
 
@@ -41,16 +58,53 @@ AnimationComponent::~AnimationComponent()
     App->GetResourcesModule()->ReleaseResource(currentAnimResource);
 }
 
-void AnimationComponent::OnPlay()
+void AnimationComponent::Init()
 {
-    if (animController != nullptr && resource != 0)
+    currentAnimResource = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
+    currentAnimName     = App->GetLibraryModule()->GetResourceName(resource);
+}
+
+void AnimationComponent::OnPlay(bool isTransition)
+{
+    playing                 = true;
+    unsigned transitionTime = 0;
+    if (animController != nullptr)
     {
-        animController->Play(resource, true);
+        if (resourceStateMachine)
+        {
+            const State* activeState = resourceStateMachine->GetActiveState();
+            for (const auto& state : resourceStateMachine->states)
+            {
+                if (state.name.GetString() == activeState->name.GetString())
+                {
+                    for (const auto& transition : resourceStateMachine->transitions)
+                    {
+                        if (state.name.GetString() == transition.toState.GetString())
+                        {
+                            transitionTime = transition.interpolationTime;
+                        }
+                    }
+                    for (const auto& clip : resourceStateMachine->clips)
+                    {
+                        if (clip.clipName.GetString() == activeState->clipName.GetString())
+                        {
+                            if (isTransition)
+                                animController->SetTargetAnimationResource(clip.animationResourceUID, transitionTime, clip.loop);
+                            else animController->Play(clip.animationResourceUID, clip.loop);
+                            resource = clip.animationResourceUID;
+                        }
+                    }
+                }
+            }
+        }
+        else animController->Play(resource, true);
     }
 }
 
 void AnimationComponent::OnStop()
 {
+    playing     = false;
+    currentTime = 0.0f;
     if (animController != nullptr)
     {
         animController->Stop();
@@ -59,6 +113,7 @@ void AnimationComponent::OnStop()
 
 void AnimationComponent::OnPause()
 {
+    playing = false;
     if (animController != nullptr)
     {
         animController->Pause();
@@ -67,6 +122,7 @@ void AnimationComponent::OnPause()
 
 void AnimationComponent::OnResume()
 {
+    playing = true;
     if (animController != nullptr)
     {
         animController->Resume();
@@ -78,14 +134,11 @@ void AnimationComponent::OnInspector()
     std::string originAnimation = "";
     if (resource != 0)
     {
-        currentAnimResource = dynamic_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
-        const std::string animationName = App->GetLibraryModule()->GetResourceName(resource);
-
-        const size_t underscorePos      = animationName.find('_');
-        if (underscorePos != std::string::npos) originAnimation = animationName.substr(0, underscorePos);
+        const size_t underscorePos = currentAnimName.find('_');
+        if (underscorePos != std::string::npos) originAnimation = currentAnimName.substr(0, underscorePos);
         if (currentAnimResource != nullptr)
         {
-            ImGui::Text("Animation: %s", animationName.c_str());
+            ImGui::Text("Animation: %s", currentAnimName.c_str());
             ImGui::Text("Duration: %.2f seconds", currentAnimResource->GetDuration());
 
             if (animController != nullptr && ImGui::TreeNode("Channels"))
@@ -130,7 +183,6 @@ void AnimationComponent::OnInspector()
 
     if (ImGui::CollapsingHeader("Object Selection", ImGuiTreeNodeFlags_DefaultOpen))
     {
-
         GameObject* selectedObj = App->GetSceneModule()->GetScene()->GetSelectedGameObject();
         if (selectedObj && selectedObj == parent) currentAnimComp = this;
 
@@ -157,15 +209,13 @@ void AnimationComponent::OnInspector()
 
                     if (ImGui::Button("Play"))
                     {
-                        playing = true;
-                        currentAnimComp->OnPlay();
+                        currentAnimComp->OnPlay(false);
                     }
 
                     ImGui::SameLine();
 
                     if (ImGui::Button("Pause"))
                     {
-                        playing = false;
                         currentAnimComp->OnPause();
                     }
 
@@ -173,14 +223,11 @@ void AnimationComponent::OnInspector()
 
                     if (ImGui::Button("Stop"))
                     {
-                        playing     = false;
-                        currentTime = 0.0f;
                         currentAnimComp->OnStop();
                     }
 
                     if (ImGui::Button("Resume"))
                     {
-                        playing = true;
                         currentAnimComp->OnResume();
                     }
 
@@ -198,7 +245,6 @@ void AnimationComponent::OnInspector()
                     {
                         if (currentAnimComp)
                         {
-
                             const auto& boneMap = currentAnimComp->GetBoneMapping();
 
                             if (boneMap.empty())
@@ -278,9 +324,56 @@ void AnimationComponent::OnInspector()
         }
     }
 
+    ImGui::Separator();
+    ImGui::Text("Associated State Machine");
+
+    const std::unordered_map<std::string, UID>& stateMap = App->GetLibraryModule()->GetStateMachineMap();
+
+    std::string currentName                              = "None";
+    if (resourceStateMachine) currentName = resourceStateMachine->GetName();
+
+    if (ImGui::BeginCombo("##StateMachineCombo", currentName.c_str()))
+    {
+        for (const auto& [name, uid] : stateMap)
+        {
+            const bool isSelected = (resourceStateMachine && resourceStateMachine->GetUID() == uid);
+            if (ImGui::Selectable(name.c_str(), isSelected))
+            {
+                if (resourceStateMachine) App->GetResourcesModule()->ReleaseResource(resourceStateMachine);
+                resourceStateMachine =
+                    static_cast<ResourceStateMachine*>(App->GetResourcesModule()->RequestResource(uid));
+            }
+            if (isSelected) ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndCombo();
+    }
+
+
+    if (resourceStateMachine)
+    {
+        ImGui::Separator();
+        ImGui::Text("Available Triggers:");
+
+        for (const std::string& triggerName : resourceStateMachine->availableTriggers)
+        {
+            if (ImGui::Button(triggerName.c_str()))
+            {
+                GLOG("Trigger selected: %s", triggerName.c_str());
+                bool triggerAvailable = false;
+                if (IsPlaying())
+                {
+                    triggerAvailable = resourceStateMachine->UseTrigger(triggerName);
+                    if (triggerAvailable)
+                    {
+                        OnPlay(true);
+                    }
+                }
+            }
+        }
+    }
+
     if (playing && currentAnimComp && currentAnimComp->GetAnimationController())
     {
-
         currentTime = currentAnimComp->GetAnimationController()->GetTime();
 
         if (currentTime >= animationDuration)
@@ -295,13 +388,34 @@ void AnimationComponent::Render(float deltaTime)
     if (!IsEffectivelyEnabled()) return;
 }
 
+void AnimationComponent::RenderDebug(float deltaTime)
+{
+}
+
+void AnimationComponent::RenderEditorInspector()
+{
+    Component::RenderEditorInspector();
+    if (enabled)
+    {
+        OnInspector();
+    }
+}
+
 void AnimationComponent::Clone(const Component* other)
 {
     if (other->GetType() == ComponentType::COMPONENT_ANIMATION)
     {
         const AnimationComponent* otherAnimation = static_cast<const AnimationComponent*>(other);
+        enabled                                  = otherAnimation->enabled;
 
-        if (otherAnimation->currentAnimResource) AddAnimation(otherAnimation->currentAnimResource->GetUID());
+        resource                                 = otherAnimation->resource;
+        AddAnimation(resource);
+
+        if (otherAnimation->resourceStateMachine)
+        {
+            resourceStateMachine = otherAnimation->resourceStateMachine;
+            resourceStateMachine->AddReference();
+        }
     }
     else
     {
@@ -321,24 +435,66 @@ void AnimationComponent::Update(float deltaTime)
 
     animController->Update(deltaTime);
 
+    std::set<GameObject*> modifiedBones;
+
     for (auto& channel : currentAnimResource->channels)
     {
         const std::string& boneName = channel.first;
-
         auto boneIt                 = boneMapping.find(boneName);
 
         if (boneIt != boneMapping.end())
         {
-            GameObject* bone = boneIt->second;
-            float3 position  = bone->GetLocalTransform().TranslatePart();
-            Quat rotation    = Quat(bone->GetLocalTransform().RotatePart());
+            GameObject* bone          = boneIt->second;
 
+            // Get current transform components
+            // if the animation doesn't provide values
+            float4x4 currentTransform = bone->GetLocalTransform();
+            float3 position           = currentTransform.TranslatePart();
+            Quat rotation             = Quat(currentTransform.RotatePart());
+            float3 scale              = currentTransform.GetScale();
+
+            // Pass CURRENT values to GetTransform - it will only modify them
+            // if the animation has data for that channel type
             animController->GetTransform(boneName, position, rotation);
+            rotation.Normalize();
 
-            float4x4 transformMatrix = float4x4::FromTRS(position, rotation, float3(1.0, 1.0, 1.0));
+            float4x4 transformMatrix = float4x4::FromTRS(position, rotation, scale);
             bone->SetLocalTransform(transformMatrix);
-            bone->OnTransformUpdated();
+            modifiedBones.insert(bone);
         }
+    }
+
+    // Second pass: Update hierarchical transforms from root to leaves
+
+    std::vector<GameObject*> rootBones;
+    for (auto& bone : modifiedBones)
+    {
+        bool isRoot   = true;
+        UID parentUID = bone->GetParent();
+        if (parentUID != 0)
+        {
+            GameObject* parent = App->GetSceneModule()->GetScene()->GetGameObjectByUID(parentUID);
+            // Check if parent is also in our bone mapping
+            for (auto& mapping : boneMapping)
+            {
+                if (mapping.second == parent)
+                {
+                    isRoot = false;
+                    break;
+                }
+            }
+        }
+
+        if (isRoot)
+        {
+            rootBones.push_back(bone);
+        }
+    }
+
+    // Process hierarchy from roots
+    for (auto rootBone : rootBones)
+    {
+        UpdateBoneHierarchy(rootBone);
     }
 }
 
@@ -348,6 +504,9 @@ void AnimationComponent::Save(rapidjson::Value& targetState, rapidjson::Document
 
     targetState.AddMember(
         "Animations", currentAnimResource != nullptr ? currentAnimResource->GetUID() : INVALID_UID, allocator
+    );
+    targetState.AddMember(
+        "StateMachine", resourceStateMachine != nullptr ? resourceStateMachine->GetUID() : INVALID_UID, allocator
     );
 }
 
@@ -369,6 +528,11 @@ void AnimationComponent::AddAnimation(UID animationUID)
     }
 }
 
+bool AnimationComponent::IsPlaying() const
+{
+    return animController ? animController->IsPlaying() : false;
+}
+
 void AnimationComponent::SetAnimationResource(UID animResource)
 {
     resource = animResource;
@@ -376,20 +540,41 @@ void AnimationComponent::SetAnimationResource(UID animResource)
     GLOG("Setting animation resource: %llu", resource);
 }
 
+void AnimationComponent::UpdateBoneHierarchy(GameObject* bone)
+{
+    if (!bone) return;
+
+    // global transform is updated
+    bone->OnTransformUpdated();
+
+    // Debug output to see what's happening
+    GLOG("Updated bone %s global transform", bone->GetName().c_str());
+
+    for (const UID childUID : bone->GetChildren())
+    {
+        GameObject* child = App->GetSceneModule()->GetScene()->GetGameObjectByUID(childUID);
+        if (child)
+        {
+            UpdateBoneHierarchy(child);
+        }
+    }
+}
+
 void AnimationComponent::SetBoneMapping()
 {
     boneMapping.clear();
+    bindPoseTransforms.clear();
 
     std::function<void(GameObject*)> mapBones = [this, &mapBones](GameObject* obj)
     {
         if (obj == nullptr) return;
 
-        boneMapping[obj->GetName()] = obj;
+        boneMapping[obj->GetName()]        = obj;
+        bindPoseTransforms[obj->GetName()] = obj->GetLocalTransform(); // Store bind pose
 
         for (const UID childUID : obj->GetChildren())
         {
             GameObject* child = App->GetSceneModule()->GetScene()->GetGameObjectByUID(childUID);
-
             if (child != nullptr)
             {
                 mapBones(child);
@@ -397,13 +582,25 @@ void AnimationComponent::SetBoneMapping()
         }
     };
     mapBones(parent);
+
+    GLOG("Bone mapping completed: %zu bones mapped", boneMapping.size());
 }
 
-void AnimationComponent::RenderEditorInspector()
+bool AnimationComponent::IsFinished() const
 {
-    Component::RenderEditorInspector();
-    if (enabled)
+    return animController->IsFinished();
+}
+
+bool AnimationComponent::UseTrigger(const std::string& triggerName)
+{
+    bool triggerDone = false;
+    if (resourceStateMachine)
     {
-        OnInspector();
+        triggerDone = resourceStateMachine->UseTrigger(triggerName);
+        if (triggerDone)
+        {
+            OnPlay(true);
+        }
     }
+    return triggerDone;
 }

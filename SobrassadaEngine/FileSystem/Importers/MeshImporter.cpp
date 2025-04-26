@@ -12,15 +12,14 @@
 #include "rapidjson/document.h"
 #include "tiny_gltf.h"
 #include <algorithm>
-#include <memory>
 #include <vector>
 
 namespace MeshImporter
 {
 
     UID ImportMesh(
-        const tinygltf::Model& model, const tinygltf::Mesh& mesh, const tinygltf::Primitive& primitive,
-        const std::string& name, const float4x4& meshTransform, const char* sourceFilePath, const std::string& targetFilePath, UID sourceUID,
+        const tinygltf::Model& model, const uint32_t meshIndex, const uint32_t primitiveIndex, const std::string& name,
+        const float4x4& meshTransform, const char* sourceFilePath, const std::string& targetFilePath, UID sourceUID,
         UID defaultMatUID
     )
     {
@@ -31,12 +30,14 @@ namespace MeshImporter
         std::vector<unsigned short> indexBufferShort;
         std::vector<unsigned int> indexBufferInt;
         size_t posStride = 0, tanStride = 0, texStride = 0, normStride = 0, jointStride = 0, weightsStride = 0;
-        float3 minPos         = {0.0f, 0.0f, 0.0f};
-        float3 maxPos         = {0.0f, 0.0f, 0.0f};
-        bool generateTangents = false;
+        float3 minPos                        = {0.0f, 0.0f, 0.0f};
+        float3 maxPos                        = {0.0f, 0.0f, 0.0f};
+        bool generateTangents                = false;
+
+        const tinygltf::Primitive& primitive = model.meshes[meshIndex].primitives[primitiveIndex];
 
         // First get the indices, the type is needed for the joints later
-        const auto& itIndices = primitive.indices;
+        const auto& itIndices                = primitive.indices;
         if (itIndices != -1)
         {
             const tinygltf::Accessor& indexAcc      = model.accessors[itIndices];
@@ -315,14 +316,24 @@ namespace MeshImporter
         UID finalMeshUID;
         if (sourceUID == INVALID_UID)
         {
-            UID meshUID           = GenerateUID();
-            finalMeshUID          = App->GetLibraryModule()->AssignFiletypeUID(meshUID, FileType::Mesh);
-            
-            std::string assetPath         = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
-            MetaMesh meta(finalMeshUID, assetPath, generateTangents, meshTransform, defaultMatUID);
+            // Importing mesh from gltf drag n drop
+            UID meshUID                = GenerateUID();
+            meshUID                    = App->GetLibraryModule()->AssignFiletypeUID(meshUID, FileType::Mesh);
+
+            std::string assetPath      = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
+
+            UID prefix                 = meshUID / UID_PREFIX_DIVISOR;
+            const std::string savePath = App->GetProjectModule()->GetLoadedProjectPath() + METADATA_PATH +
+                                         std::to_string(prefix) + FILENAME_SEPARATOR + name + META_EXTENSION;
+            finalMeshUID = App->GetLibraryModule()->GetUIDFromMetaFile(savePath);
+            if (finalMeshUID == INVALID_UID) finalMeshUID = meshUID;
+
+            MetaMesh meta(
+                finalMeshUID, assetPath, generateTangents, meshTransform, defaultMatUID, meshIndex, primitiveIndex
+            );
             meta.Save(name, assetPath);
         }
-        else finalMeshUID = sourceUID;
+        else finalMeshUID = sourceUID; // Importing mesh for meta file
 
         std::string saveFilePath  = targetFilePath + MESHES_PATH + std::to_string(finalMeshUID) + MESH_EXTENSION;
         unsigned int bytesWritten = (unsigned int)FileSystem::Save(saveFilePath.c_str(), fileBuffer, size, true);
@@ -334,6 +345,8 @@ namespace MeshImporter
             GLOG("Failed to save mesh file: %s", saveFilePath.c_str());
             return 0;
         }
+
+        // TODO Reload mesh resource so changes are viewable immediately in the scene
 
         // added mesh to meshes map
         App->GetLibraryModule()->AddMesh(finalMeshUID, name);

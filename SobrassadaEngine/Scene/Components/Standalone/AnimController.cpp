@@ -6,22 +6,25 @@
 #include "ResourcesModule.h"
 
 AnimController::AnimController()
-    : resource(0), currentTime(0), loop(false), playAnimation(false), playbackSpeed(1.0f), animation(nullptr)
+    : resource(0), currentTime(0), loop(false), playAnimation(false), playbackSpeed(1.0f), currentAnimation(nullptr)
 {
 }
 
 AnimController::~AnimController()
 {
-    App->GetResourcesModule()->ReleaseResource(animation);
+    App->GetResourcesModule()->ReleaseResource(currentAnimation);
 }
 
 void AnimController::Play(UID newResource, bool shouldLoop)
 {
-    resource      = newResource;
-    currentTime   = 0;
-    loop          = shouldLoop;
-    animation     = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
-    playAnimation = true;
+    if (currentAnimation == nullptr) Stop();
+    resource         = newResource;
+    currentTime      = 0.0f;
+    loop             = shouldLoop;
+    currentAnimation = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
+    playAnimation    = true;
+    playAnimation    = true;
+    animationFinished = false;
 }
 
 void AnimController::Stop()
@@ -29,10 +32,10 @@ void AnimController::Stop()
     playAnimation = false;
     currentTime   = 0.0f;
 
-    if (animation != nullptr)
+    if (currentAnimation != nullptr)
     {
-        App->GetResourcesModule()->ReleaseResource(animation);
-        animation = nullptr;
+        App->GetResourcesModule()->ReleaseResource(currentAnimation);
+        currentAnimation = nullptr;
     }
 }
 
@@ -42,43 +45,57 @@ Quat AnimController::Interpolate(Quat& first, Quat& second, float lambda)
     else return Quat::Lerp(first, second.Neg(), lambda).Normalized();
 }
 
+
+
 update_status AnimController::Update(float deltaTime)
 {
-    if (!playAnimation || resource == 0) return UPDATE_CONTINUE;
+    if (!playAnimation || resource == INVALID_UID) return UPDATE_CONTINUE;
 
     deltaTime          *= playbackSpeed;
-
-    /*GLOG(
-        "Raw delta time: %f, Capped delta: %f, Playback speed: %f", App->GetEngineTimer()->GetTime(), rawDeltaTime,
-        playbackSpeed
-    );*/
 
     float previousTime  = currentTime;
     currentTime        += deltaTime;
 
-    if (animation == nullptr) return UPDATE_CONTINUE;
+    if (currentAnimation == nullptr) return UPDATE_CONTINUE;
 
-    const float duration = animation->GetDuration();
-    // GLOG("Animation time update: %f -> %f (duration: %f)", previousTime, currentTime, duration);
+    const float duration = currentAnimation->GetDuration();
 
     if (currentTime > duration)
     {
         if (loop)
         {
             currentTime = fmod(currentTime, duration);
-            // GLOG("Animation looped: new time = %f", currentTime);
         }
         else
         {
             currentTime   = duration;
-            // GLOG("Animation reached end: time = %f", currentTime);
             playAnimation = false;
+            animationFinished = true;
 
-            if (animation != nullptr)
-            {
-                App->GetResourcesModule()->ReleaseResource(animation);
-                animation = nullptr;
-            }
+            //if (currentAnimation != nullptr)
+            //{
+            //    App->GetResourcesModule()->ReleaseResource(currentAnimation);
+            //    currentAnimation = nullptr;
+            //}
+        }
+    }
+
+    if (targetAnimation != nullptr)
+    {
+        currentTargetTime          += deltaTime;
+        const float targetDuration  = targetAnimation->GetDuration();
+        if (currentTargetTime > targetDuration) currentTargetTime = fmod(currentTargetTime, targetDuration);
+
+        fadeTime += deltaTime;
+
+        if (fadeTime >= transitionTime)
+        {
+            App->GetResourcesModule()->ReleaseResource(currentAnimation);
+            currentAnimation  = targetAnimation;
+            targetAnimation   = nullptr;
+            currentTime       = currentTargetTime;
+            fadeTime          = 0;
+            currentTargetTime = 0;
         }
     }
 
@@ -87,25 +104,116 @@ update_status AnimController::Update(float deltaTime)
 
 void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat& rot)
 {
-    if (!playAnimation || resource == 0 || animation == nullptr) return;
+    if (!playAnimation || resource == INVALID_UID || currentAnimation == nullptr) return;
 
-    Channel* animChannel = animation->GetChannel(nodeName);
-    if (animChannel == nullptr) return;
+    if (targetAnimation == nullptr)
+    {
+        Channel* animChannel = currentAnimation->GetChannel(nodeName);
+        if (animChannel == nullptr)
+        {
+            GLOG("No channel for node %s", nodeName.c_str());
+            return; // IMPORTANT: Don't modify pos/rot if no channel exists
+        }
 
-    float animDuration = animation->GetDuration();
-    // GLOG("Animation duration: %f, Current time: %f", animDuration, currentTime);
+        // CRITICAL: Only modify position if there's position data
+        // Otherwise leave the input position unchanged
+        if (animChannel->numPositions > 0)
+        {
+            GetChannelPosition(animChannel, pos, currentTime);
+        }
 
+        // CRITICAL: Only modify rotation if there's rotation data
+        // Otherwise leave the input rotation unchanged
+        if (animChannel->numRotations > 0)
+        {
+            GetChannelRotation(animChannel, rot, currentTime);
+        }
+    }
+    else
+    {
+        float weight               = transitionTime != 0 ? fadeTime / transitionTime : 1;
+        Channel* animChannel       = currentAnimation->GetChannel(nodeName);
+        Channel* targetAnimChannel = targetAnimation->GetChannel(nodeName);
+
+        if (animChannel == nullptr && targetAnimChannel == nullptr)
+        {
+            GLOG("No channel for node %s in either animation", nodeName.c_str());
+            return; // Don't modify pos/rot if no channel exists in either animation
+        }
+
+        float3 animPos = float3(pos);
+        Quat animQuat  = Quat(rot);
+
+        // Only get transforms from animation channels if they exist
+        if (animChannel)
+        {
+            if (animChannel->numPositions > 0)
+            {
+                GetChannelPosition(animChannel, animPos, currentTime);
+            }
+            if (animChannel->numRotations > 0)
+            {
+                GetChannelRotation(animChannel, animQuat, currentTime);
+            }
+        }
+
+        float3 targetAnimPos = float3(pos);
+        Quat targetAnimQuat  = Quat(rot);
+
+        // Only get transforms from target animation channels if they exist
+        if (targetAnimChannel)
+        {
+            if (targetAnimChannel->numPositions > 0)
+            {
+                GetChannelPosition(targetAnimChannel, targetAnimPos, currentTargetTime);
+            }
+            if (targetAnimChannel->numRotations > 0)
+            {
+                GetChannelRotation(targetAnimChannel, targetAnimQuat, currentTargetTime);
+            }
+        }
+
+        // Blend the animations
+        bool hasPositions = (animChannel && animChannel->numPositions > 0) ||
+                            (targetAnimChannel && targetAnimChannel->numPositions > 0);
+        bool hasRotations = (animChannel && animChannel->numRotations > 0) ||
+                            (targetAnimChannel && targetAnimChannel->numRotations > 0);
+
+        // Only blend if there's actual data to blend
+        if (hasPositions)
+        {
+            pos = animPos.Lerp(targetAnimPos, weight);
+        }
+        if (hasRotations)
+        {
+            rot = Quat::Slerp(animQuat, targetAnimQuat, weight);
+        }
+    }
+}
+
+
+
+void AnimController::SetTargetAnimationResource(UID uid, unsigned timeTransition, bool shouldLoop)
+{
+    targetAnimation = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(uid));
+    transitionTime  = static_cast<float>(timeTransition) / 1000;
+    loop            = shouldLoop;
+    playAnimation     = true;
+    animationFinished = false;
+}
+
+void AnimController::GetChannelPosition(const Channel* animChannel, float3& pos, const float time) const
+{
     if (animChannel->numPositions > 0)
     {
         if (animChannel->numPositions == 1)
         {
             pos = animChannel->positions[0];
-            // GLOG("Single position keyframe: (%f,%f,%f)", pos.x, pos.y, pos.z);
         }
         else
         {
             size_t nextIndex = 0;
-            while (nextIndex < animChannel->numPositions && animChannel->posTimeStamps[nextIndex] <= currentTime)
+            while (nextIndex < animChannel->numPositions && animChannel->posTimeStamps[nextIndex] <= time)
             {
                 nextIndex++;
             }
@@ -115,12 +223,10 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
             if (nextIndex >= animChannel->numPositions)
             {
                 pos = animChannel->positions[animChannel->numPositions - 1];
-                // GLOG("Past last position keyframe: (%f,%f,%f)", pos.x, pos.y, pos.z);
             }
             else if (nextIndex == 0)
             {
                 pos = animChannel->positions[0];
-                // GLOG("Before first position keyframe: (%f,%f,%f)", pos.x, pos.y, pos.z);
             }
             else
             {
@@ -128,30 +234,37 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
                 const float endTime   = animChannel->posTimeStamps[nextIndex];
                 const float timeDiff  = endTime - startTime;
 
-                float lambda          = (timeDiff > 0.0001f) ? (currentTime - startTime) / timeDiff : 0.0f;
+                float lambda          = (timeDiff > 0.0001f) ? (time - startTime) / timeDiff : 0.0f;
 
                 lambda                = (lambda < 0) ? 0 : (lambda > 1) ? 1 : lambda;
 
                 pos = float3::Lerp(animChannel->positions[prevIndex], animChannel->positions[nextIndex], lambda);
-                /*GLOG(
-                    "Position interpolation: (%f,%f,%f), Lambda: %f, Times: %f to %f", pos.x, pos.y, pos.z, lambda,
-                    startTime, endTime
-                );*/
+
+                //GLOG(
+                //    "Position interpolation: From (%.2f,%.2f,%.2f) to (%.2f,%.2f,%.2f) with lambda %.2f = "
+                //    "(%.2f,%.2f,%.2f)",
+                //    animChannel->positions[prevIndex].x, animChannel->positions[prevIndex].y,
+                //    animChannel->positions[prevIndex].z, animChannel->positions[nextIndex].x,
+                //    animChannel->positions[nextIndex].y, animChannel->positions[nextIndex].z, lambda, pos.x, pos.y,
+                //    pos.z
+                //);
             }
         }
     }
+}
 
+void AnimController::GetChannelRotation(Channel* animChannel, Quat& rot, const float time)
+{
     if (animChannel->numRotations > 0)
     {
         if (animChannel->numRotations == 1)
         {
             rot = animChannel->rotations[0].Normalized();
-            GLOG("Single rotation keyframe: (%f,%f,%f,%f)", rot.x, rot.y, rot.z, rot.w);
         }
         else
         {
             size_t nextIndex = 0;
-            while (nextIndex < animChannel->numRotations && animChannel->rotTimeStamps[nextIndex] <= currentTime)
+            while (nextIndex < animChannel->numRotations && animChannel->rotTimeStamps[nextIndex] <= time)
             {
                 nextIndex++;
             }
@@ -161,12 +274,10 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
             if (nextIndex >= animChannel->numRotations)
             {
                 rot = animChannel->rotations[animChannel->numRotations - 1].Normalized();
-                // GLOG("Past last rotation keyframe: (%f,%f,%f,%f)", rot.x, rot.y, rot.z, rot.w);
             }
             else if (nextIndex == 0)
             {
                 rot = animChannel->rotations[0].Normalized();
-                // GLOG("Before first rotation keyframe: (%f,%f,%f,%f)", rot.x, rot.y, rot.z, rot.w);
             }
             else
             {
@@ -174,17 +285,14 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
                 const float endTime   = animChannel->rotTimeStamps[nextIndex];
                 const float timeDiff  = endTime - startTime;
 
-                float lambda          = (timeDiff > 0.0001f) ? (currentTime - startTime) / timeDiff : 0.0f;
+                float lambda          = (timeDiff > 0.0001f) ? (time - startTime) / timeDiff : 0.0f;
 
                 lambda                = (lambda < 0) ? 0 : (lambda > 1) ? 1 : lambda;
 
                 rot = Interpolate(animChannel->rotations[prevIndex], animChannel->rotations[nextIndex], lambda);
-
-                /*GLOG(
-                    "Rotation interpolation: (%f,%f,%f,%f), Lambda: %f, Times: %f to %f", rot.x, rot.y, rot.z, rot.w,
-                    lambda, startTime, endTime
-                );*/
             }
         }
     }
 }
+
+

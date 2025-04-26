@@ -3,8 +3,10 @@
 #include "Application.h"
 #include "DebugDrawModule.h"
 #include "Framebuffer.h"
+#include "GBuffer.h"
 #include "GameObject.h"
 #include "InputModule.h"
+#include "Math/Quat.h"
 #include "OpenGLModule.h"
 #include "SceneModule.h"
 
@@ -14,25 +16,25 @@
 
 CameraComponent::CameraComponent(UID uid, GameObject* parent) : Component(uid, parent, "Camera", COMPONENT_CAMERA)
 {
-    float4x4 globalTransform  = GetGlobalTransform();
-    camera.type               = FrustumType::PerspectiveFrustum;
-    camera.pos                = float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
-    camera.front              = -float3(globalTransform[0][2], globalTransform[1][2], globalTransform[2][2]);
-    camera.up                 = float3(globalTransform[0][1], globalTransform[1][1], globalTransform[2][1]);
+    const float4x4 globalTransform = GetGlobalTransform();
+    camera.type                    = FrustumType::PerspectiveFrustum;
+    camera.pos                     = float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
+    camera.front                   = -float3(globalTransform[0][2], globalTransform[1][2], globalTransform[2][2]);
+    camera.up                      = float3(globalTransform[0][1], globalTransform[1][1], globalTransform[2][1]);
 
-    camera.nearPlaneDistance  = perspectiveNearPlane;
-    camera.farPlaneDistance   = perspectiveFarPlane;
+    camera.nearPlaneDistance       = perspectiveNearPlane;
+    camera.farPlaneDistance        = perspectiveFarPlane;
 
-    camera.horizontalFov      = (float)HFOV * DEGREE_RAD_CONV;
+    camera.horizontalFov           = (float)HFOV * DEGREE_RAD_CONV;
 
-    auto framebuffer          = App->GetOpenGLModule()->GetFramebuffer();
-    int width                 = framebuffer->GetTextureWidth();
-    int height                = framebuffer->GetTextureHeight();
+    auto framebuffer               = App->GetOpenGLModule()->GetFramebuffer();
+    const int width                = framebuffer->GetTextureWidth();
+    const int height               = framebuffer->GetTextureHeight();
 
-    camera.verticalFov        = 2.0f * atanf(tanf(camera.horizontalFov * 0.5f) * ((float)height / (float)width));
+    camera.verticalFov             = 2.0f * atanf(tanf(camera.horizontalFov * 0.5f) * ((float)height / (float)width));
 
-    matrices.viewMatrix       = camera.ViewMatrix();
-    matrices.projectionMatrix = camera.ProjectionMatrix();
+    matrices.viewMatrix            = camera.ViewMatrix();
+    matrices.projectionMatrix      = camera.ProjectionMatrix();
 
     glGenBuffers(1, &ubo);
     glBindBuffer(GL_UNIFORM_BUFFER, ubo);
@@ -230,7 +232,8 @@ void CameraComponent::RenderEditorInspector()
 
     if (enabled)
     {
-        ImGui::SeparatorText("Camera");
+        ImGui::SeparatorText("Camera Component");
+
         if (App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
             isMainCamera = (App->GetSceneModule()->GetScene()->GetMainCamera()->GetUbo() == ubo);
         if (ImGui::Checkbox("Main Camera", &isMainCamera))
@@ -296,14 +299,17 @@ void CameraComponent::Update(float deltaTime)
     if (isMainCamera && App->GetSceneModule()->GetScene()->GetMainCamera() == nullptr)
         App->GetSceneModule()->GetScene()->SetMainCamera(this);
 
-    float4x4 globalTransform = GetGlobalTransform();
-    camera.pos               = float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
-    camera.front     = -float3(globalTransform[0][2], globalTransform[1][2], globalTransform[2][2]).Normalized();
-    camera.up        = float3(globalTransform[0][1], globalTransform[1][1], globalTransform[2][1]).Normalized();
+    if (!freeCamera)
+    {
+        const float4x4 globalTransform = GetGlobalTransform();
+        camera.pos                     = float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
+        camera.front = -float3(globalTransform[0][2], globalTransform[1][2], globalTransform[2][2]).Normalized();
+        camera.up    = float3(globalTransform[0][1], globalTransform[1][1], globalTransform[2][1]).Normalized();
+    }
 
     auto framebuffer = App->GetOpenGLModule()->GetFramebuffer();
-    int width        = framebuffer->GetTextureWidth();
-    int height       = framebuffer->GetTextureHeight();
+    const int width  = framebuffer->GetTextureWidth();
+    const int height = framebuffer->GetTextureHeight();
     SetAspectRatio((float)height / (float)width);
 
     matrices.projectionMatrix = camera.ProjectionMatrix();
@@ -316,48 +322,66 @@ void CameraComponent::Update(float deltaTime)
     frustumPlanes.UpdateFrustumPlanes(camera.ViewMatrix(), camera.ProjectionMatrix());
 
     if (App->GetSceneModule()->GetScene()->GetSelectedGameObject() == parent && seePreview) previewEnabled = true;
-    else previewEnabled = false;
+    else
+    {
+        firstFrame     = true;
+        previewEnabled = false;
+    }
 }
 
 void CameraComponent::RenderCameraPreview(float deltaTime)
 {
-    int mainFramebufferWidth  = App->GetOpenGLModule()->GetFramebuffer()->GetTextureWidth();
-    int mainFramebufferHeight = App->GetOpenGLModule()->GetFramebuffer()->GetTextureHeight();
+    const int mainFramebufferWidth  = App->GetOpenGLModule()->GetFramebuffer()->GetTextureWidth();
+    const int mainFramebufferHeight = App->GetOpenGLModule()->GetFramebuffer()->GetTextureHeight();
 
-    float scaleFactor         = 0.2f;
-    previewWidth  = static_cast<int>(mainFramebufferWidth * scaleFactor);
-    previewHeight = static_cast<int>(previewWidth / camera.AspectRatio());
+    float scaleFactor               = 0.2f;
+    previewWidth                    = static_cast<int>(mainFramebufferWidth * scaleFactor);
+    previewHeight                   = static_cast<int>(previewWidth / camera.AspectRatio());
 
     if (!autorendering)
     {
         previewFramebuffer->Resize(previewWidth, previewHeight);
         previewFramebuffer->CheckResize();
 
-        glViewport(0, 0, previewWidth, previewHeight);
+        App->GetOpenGLModule()->GetGBuffer()->Resize(previewWidth, previewHeight);
+        App->GetOpenGLModule()->GetGBuffer()->CheckResize();
+
+            glViewport(0, 0, previewWidth, previewHeight);
 
         previewFramebuffer->Bind();
         autorendering = true;
         App->GetSceneModule()->GetScene()->RenderScene(deltaTime, this);
         autorendering = false;
 
+        App->GetOpenGLModule()->GetGBuffer()->Resize(mainFramebufferWidth, mainFramebufferHeight);
+        App->GetOpenGLModule()->GetGBuffer()->CheckResize();
+
         App->GetOpenGLModule()->GetFramebuffer()->Bind();
+
 
         glViewport(0, 0, mainFramebufferWidth, mainFramebufferHeight);
     }
 
-    static bool open          = true;
-    ImVec2 pos(
-        static_cast<float>(mainFramebufferWidth - previewWidth + 200),
-        static_cast<float>(mainFramebufferHeight - previewHeight + 50)
-    );
+    static bool open = true;
+
+    if (firstFrame)
+    {
+        ImVec2 pos(
+            static_cast<float>(mainFramebufferWidth - previewWidth + 200),
+            static_cast<float>(mainFramebufferHeight - previewHeight + 50)
+        );
+        ImGui::SetNextWindowPos(pos);
+        firstFrame = false;
+    }
 
     // Set the size of the preview window
-    ImGui::SetNextWindowSize(ImVec2(static_cast<float>(previewWidth + 16), static_cast<float>(previewHeight + 16)));
-    ImGui::SetNextWindowPos(pos);
+    ImGui::SetNextWindowSize(ImVec2(static_cast<float>(previewWidth + 16), static_cast<float>(previewHeight + 36)));
 
     if (ImGui::Begin(
             "Camera Preview", &open,
-            ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse
+            ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |
+                ImGuiWindowFlags_NoDocking
+
         ))
     {
         ImTextureID texID = (ImTextureID)(intptr_t)previewFramebuffer->GetTextureID();
@@ -372,7 +396,32 @@ void CameraComponent::RenderCameraPreview(float deltaTime)
     ImGui::End();
 }
 
+void CameraComponent::Translate(const float3& direction)
+{
+    camera.pos += direction;
+}
+
+void SOBRASADA_API_ENGINE CameraComponent::Rotate(float yaw, float pitch)
+{
+    const Quat yawRotation = Quat::RotateY(yaw);
+    camera.front           = yawRotation.Mul(camera.front).Normalized();
+    camera.up              = yawRotation.Mul(camera.up).Normalized();
+
+    if ((currentPitchAngle + pitch) > maximumNegativePitch && (currentPitchAngle + pitch) < maximumPositivePitch)
+    {
+        currentPitchAngle        += pitch;
+        const Quat pitchRotation  = Quat::RotateAxisAngle(camera.WorldRight(), pitch);
+        camera.front              = pitchRotation.Mul(camera.front).Normalized();
+        camera.up                 = pitchRotation.Mul(camera.up).Normalized();
+    }
+}
+
 void CameraComponent::Render(float deltaTime)
+{
+    if (!IsEffectivelyEnabled()) return;
+}
+
+void CameraComponent::RenderDebug(float deltaTime)
 {
     if (!IsEffectivelyEnabled()) return;
     if (!enabled || !drawGizmos || App->GetSceneModule()->GetInPlayMode()) return;

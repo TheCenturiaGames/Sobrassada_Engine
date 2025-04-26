@@ -36,8 +36,8 @@ bool CameraModule::Init()
 
     camera.horizontalFov             = (float)HFOV / RAD_DEGREE_CONV;
 
-    int width                        = App->GetWindowModule()->GetWidth();
-    int height                       = App->GetWindowModule()->GetHeight();
+    const int width                  = App->GetWindowModule()->GetWidth();
+    const int height                 = App->GetWindowModule()->GetHeight();
 
     camera.verticalFov               = 2.0f * atanf(tanf(camera.horizontalFov * 0.5f) * ((float)height / (float)width));
 
@@ -126,16 +126,16 @@ void CameraModule::Controls(float deltaTime)
     const KeyState* keyboard     = inputModule->GetKeyboard();
     const KeyState* mouseButtons = inputModule->GetMouseButtons();
     const float2& mouseMotion    = inputModule->GetMouseMotion();
-    int mouseWheel               = inputModule->GetMouseWheel();
+    const int mouseWheel         = inputModule->GetMouseWheel();
 
     float scaleFactor            = movementScaleFactor;
     if (keyboard[SDL_SCANCODE_LSHIFT]) scaleFactor *= 2;
 
-    float finalCameraSpeed       = cameraMoveSpeed * scaleFactor * deltaTime;
-    float finalRotateSensitivity = rotateSensitivity * scaleFactor;
-    float finalDragSensitivity   = dragSensitivity * scaleFactor;
-    float finalWheelSensitivity  = wheelSensitivity * scaleFactor;
-    float finalZoomSensitivity   = zoomSensitivity * scaleFactor;
+    const float finalCameraSpeed       = cameraMoveSpeed * scaleFactor * deltaTime;
+    const float finalRotateSensitivity = rotateSensitivity * scaleFactor;
+    const float finalDragSensitivity   = dragSensitivity * scaleFactor;
+    const float finalWheelSensitivity  = wheelSensitivity * scaleFactor;
+    const float finalZoomSensitivity   = zoomSensitivity * scaleFactor;
 
     if (mouseButtons[SDL_BUTTON_RIGHT - 1])
     {
@@ -190,9 +190,9 @@ void CameraModule::Controls(float deltaTime)
         else
         {
             // ROTATION WITH MOUSE
-            float mouseX             = mouseMotion.x;
-            float mouseY             = mouseMotion.y;
-            float deltaRotationAngle = cameraRotationAngle * finalRotateSensitivity;
+            const float mouseX             = mouseMotion.x;
+            const float mouseY             = mouseMotion.y;
+            const float deltaRotationAngle = cameraRotationAngle * finalRotateSensitivity;
             RotateCamera(-mouseX * deltaRotationAngle, -mouseY * deltaRotationAngle);
         }
     }
@@ -229,9 +229,9 @@ void CameraModule::Controls(float deltaTime)
     // ORBIT
     if (mouseButtons[SDL_BUTTON_LEFT - 1] && keyboard[SDL_SCANCODE_LALT])
     {
-        float mouseX             = mouseMotion.x;
-        float mouseY             = mouseMotion.y;
-        float deltaRotationAngle = cameraRotationAngle * finalRotateSensitivity;
+        const float mouseX             = mouseMotion.x;
+        const float mouseY             = mouseMotion.y;
+        const float deltaRotationAngle = cameraRotationAngle * finalRotateSensitivity;
 
         RotateCamera(-mouseX * deltaRotationAngle, -mouseY * deltaRotationAngle);
 
@@ -329,8 +329,8 @@ void CameraModule::FocusCamera()
 
     if (distance == 0 || distance == FLOAT_INF || distance == -FLOAT_INF) distance = 1;
 
-    float3 direction   = camera.front.Normalized();
-    float3 newPosition = center - direction * (float)distance;
+    const float3 direction   = camera.front.Normalized();
+    const float3 newPosition = center - direction * (float)distance;
 
     camera.pos         = newPosition;
     camera.front       = (center - newPosition).Normalized();

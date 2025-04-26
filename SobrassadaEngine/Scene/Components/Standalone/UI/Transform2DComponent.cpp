@@ -138,6 +138,11 @@ void Transform2DComponent::Clone(const Component* other)
     }
 }
 
+void Transform2DComponent::RenderDebug(float deltaTime)
+{
+
+}
+
 void Transform2DComponent::RenderEditorInspector()
 {
     Component::RenderEditorInspector();

@@ -1,11 +1,14 @@
 #include "ScriptComponent.h"
+
 #include "Application.h"
-#include "ImGui.h"
+#include "EditorUIModule.h"
+#include "GameObject.h"
 #include "SceneModule.h"
 #include "Script.h"
 #include "ScriptModule.h"
 
-// Do script of object rotating
+#include "ImGui.h"
+#include "Math/float3.h"
 
 ScriptComponent::ScriptComponent(UID uid, GameObject* parent) : Component(uid, parent, "Script", COMPONENT_SCRIPT)
 {
@@ -17,8 +20,10 @@ ScriptComponent::ScriptComponent(const rapidjson::Value& initialState, GameObjec
     if (initialState.HasMember("Script Name"))
     {
         CreateScript(initialState["Script Name"].GetString());
+        scriptInstance->Load(initialState);
     }
 }
+
 
 ScriptComponent::~ScriptComponent()
 {
@@ -29,7 +34,9 @@ void ScriptComponent::Save(rapidjson::Value& targetState, rapidjson::Document::A
 {
     Component::Save(targetState, allocator);
     targetState.AddMember("Script Name", rapidjson::Value(scriptName.c_str(), allocator), allocator);
+    if (scriptInstance != nullptr) scriptInstance->Save(targetState, allocator);
 }
+
 
 void ScriptComponent::Clone(const Component* other)
 {
@@ -48,22 +55,22 @@ void ScriptComponent::Clone(const Component* other)
 
 void ScriptComponent::Update(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
+
     if (App->GetSceneModule()->GetInPlayMode())
     {
         if (scriptInstance != nullptr)
         {
-            if (!startScript)
-            {
-                scriptInstance->Init();
-                startScript = true;
-            }
             scriptInstance->Update(deltaTime);
         }
     }
-    else startScript = false;
 }
 
 void ScriptComponent::Render(float deltaTime)
+{
+}
+
+void ScriptComponent::RenderDebug(float deltaTime)
 {
 }
 
@@ -81,28 +88,69 @@ void ScriptComponent::RenderEditorInspector()
         }
         if (ImGui::BeginPopup("Select Script"))
         {
-            for (const auto& scriptType : scripts)
+            for (int i = 0; i < sizeof(scripts) / sizeof(char*); i++)
             {
-                if (ImGui::Selectable(scriptType.c_str()))
+                if (ImGui::Selectable(scripts[i]))
                 {
                     if (scriptInstance != nullptr) DeleteScript();
-                    CreateScript(scriptType);
+                    CreateScript(scripts[i]);
                 }
             }
             ImGui::EndPopup();
         }
+        if (scriptInstance != nullptr)
+        {
+            ImGui::Separator();
+            scriptInstance->Inspector();
+        }
     }
 }
 
-void ScriptComponent::CreateScript(const std::string& scriptType)
+void ScriptComponent::InitScriptInstances()
 {
-    scriptName     = scriptType;
-    scriptInstance = App->GetScriptModule()->CreateScript(scriptType, parent);
+    if (scriptInstance != nullptr)
+    {
+        scriptInstance->Init();
+    }
+}
+
+void ScriptComponent::OnCollision(GameObject* otherObject, const float3& collisionNormal)
+{
+    if (scriptInstance != nullptr)
+    {
+        scriptInstance->OnCollision(otherObject, collisionNormal);
+    }
+}
+
+void ScriptComponent::CreateScript(const std::string& scripString)
+{
+    scriptName     = scripString;
+    scriptInstance = App->GetScriptModule()->CreateScript(scripString, parent);
     if (scriptInstance == nullptr) scriptName = "Not selected";
+
+    scriptType = ScriptType(SearchIdxForString(scriptName));
 }
 
 void ScriptComponent::DeleteScript()
 {
-    App->GetScriptModule()->DestroyScript(scriptInstance);
-    scriptInstance = nullptr;
+    if (scriptInstance)
+    {
+        scriptInstance->OnDestroy();                          
+        App->GetScriptModule()->DestroyScript(scriptInstance);
+        scriptInstance = nullptr;
+    }
+}
+
+int ScriptComponent::SearchIdxForString(const std::string& scriptString) const
+{
+    int idx = 0;
+    for (int i = 0; i < SCRIPT_TYPE_COUNT; ++i)
+    {
+        if (scriptString == scripts[i])
+        {
+            idx = i;
+            break;
+        }
+    }
+    return idx;
 }
