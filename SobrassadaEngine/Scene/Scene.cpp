@@ -240,25 +240,14 @@ update_status Scene::Update(float deltaTime)
     {
         for (auto& gameObject : gameObjectsContainer)
         {
-            std::unordered_map<ComponentType, Component*> componentList = gameObject.second->GetComponents();
-
-            for (auto& component : componentList)
-            {
-                if (component.first == ComponentType::COMPONENT_SCRIPT)
-                    dynamic_cast<ScriptComponent*>(component.second)->InitScriptInstances();
-            }
+            ScriptComponent* script = gameObject.second->GetComponent<ScriptComponent*>();
+            if (script) script->InitScriptInstances();
         }
         App->GetSceneModule()->ResetOnlyOnceInPlayMode();
     }
 
     for (auto& gameObject : gameObjectsContainer)
-    {
-        std::unordered_map<ComponentType, Component*> componentList = gameObject.second->GetComponents();
-        for (auto& component : componentList)
-        {
-            component.second->Update(deltaTime);
-        }
-    }
+        gameObject.second->UpdateComponents(deltaTime);
 
     ImGuiWindow* window = ImGui::FindWindowByName(sceneName.c_str());
     if (window && !(window->Hidden || window->Collapsed)) sceneVisible = true;
@@ -278,13 +267,7 @@ update_status Scene::Render(float deltaTime)
     else RenderScene(deltaTime, nullptr);
 
     GameObject* selectedGameObject = App->GetSceneModule()->GetScene()->GetSelectedGameObject();
-    if (selectedGameObject != nullptr)
-    {
-        for (const auto& component : selectedGameObject->GetComponents())
-        {
-            component.second->RenderDebug(deltaTime);
-        }
-    }
+    if (selectedGameObject != nullptr) selectedGameObject->RenderDebugComponents(deltaTime);
 
     return UPDATE_CONTINUE;
 }
@@ -675,7 +658,7 @@ void Scene::UpdateGameObjects()
     {
         if (gameObject)
         {
-            gameObject->UpdateComponents();
+            gameObject->ParentUpdatedComponents();
             gameObject->SetWillUpdate(false);
         }
     }
@@ -774,22 +757,6 @@ void Scene::DeleteMultiselection()
     selectedGameObjects.clear();
     selectedGameObjectsMobility.clear();
     ClearGameObjectsToUpdate();
-}
-
-const std::vector<Component*> Scene::GetAllComponents() const
-{
-    std::vector<Component*> collectedComponents;
-    for (const auto& pair : gameObjectsContainer)
-    {
-        if (pair.second != nullptr)
-        {
-            for (const auto& component : pair.second->GetComponents())
-            {
-                collectedComponents.push_back(component.second);
-            }
-        }
-    }
-    return collectedComponents;
 }
 
 UID Scene::GetMultiselectUID() const

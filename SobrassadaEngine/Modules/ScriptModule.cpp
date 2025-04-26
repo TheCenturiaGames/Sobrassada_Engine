@@ -1,6 +1,7 @@
 #include "ScriptModule.h"
 #include "Application.h"
 #include "Component.h"
+#include "GameObject.h"
 #include "SceneModule.h"
 #include "Script.h"
 #include "ScriptComponent.h"
@@ -95,14 +96,21 @@ void ScriptModule::DeleteAllScripts()
 {
     if (App->GetSceneModule()->GetScene())
     {
-        for (auto* component : App->GetSceneModule()->GetScene()->GetAllComponents())
+        /*for (auto* component : App->GetSceneModule()->GetScene()->GetAllComponents())
         {
             if (component->GetType() == ComponentType::COMPONENT_SCRIPT)
             {
                 ScriptComponent* scriptComponent = static_cast<ScriptComponent*>(component);
                 scriptComponent->DeleteScript();
             }
+        }*/
+
+        for (auto& gameObject : App->GetSceneModule()->GetScene()->GetAllGameObjects())
+        {
+            ScriptComponent* scriptComponent = gameObject.second->GetComponent<ScriptComponent*>();
+            if (scriptComponent) scriptComponent->DeleteScript();
         }
+
         freeScriptFunc();
     }
 }
@@ -111,13 +119,19 @@ void ScriptModule::RecreateAllScripts()
 {
     if (App->GetSceneModule()->GetScene())
     {
-        for (auto* component : App->GetSceneModule()->GetScene()->GetAllComponents())
+        // for (auto* component : App->GetSceneModule()->GetScene()->GetAllComponents())
+        //{
+        //     if (component->GetType() == ComponentType::COMPONENT_SCRIPT)
+        //     {
+        //         ScriptComponent* scriptComponent = static_cast<ScriptComponent*>(component);
+        //         scriptComponent->CreateScript(scriptComponent->GetScriptName());
+        //     }
+        // }
+
+        for (auto& gameObject : App->GetSceneModule()->GetScene()->GetAllGameObjects())
         {
-            if (component->GetType() == ComponentType::COMPONENT_SCRIPT)
-            {
-                ScriptComponent* scriptComponent = static_cast<ScriptComponent*>(component);
-                scriptComponent->CreateScript(scriptComponent->GetScriptName());
-            }
+            ScriptComponent* scriptComponent = gameObject.second->GetComponent<ScriptComponent*>();
+            if (scriptComponent) scriptComponent->CreateScript(scriptComponent->GetScriptName());
         }
     }
 }

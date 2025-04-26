@@ -401,6 +401,6 @@ void PhysicsModule::RebuildWorld()
 
     for (const auto& gameObject : allGameObjects)
     {
-        gameObject.second->UpdateComponents();
+        gameObject.second->ParentUpdatedComponents();
     }
 }

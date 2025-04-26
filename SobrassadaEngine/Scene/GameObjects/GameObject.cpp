@@ -32,21 +32,60 @@
 #include <set>
 #include <stack>
 
+// SECTION FOR TUPLE ITERATION
+
+// DUPLICATE COMPONENTS
 template <std::size_t I = 0, typename... Tp>
 inline typename std::enable_if<I == sizeof...(Tp), void>::type
-duplicateComponents(std::tuple<Tp...>& tDuplicate, std::tuple<Tp...>& tOriginal)
+DuplicateComponents(std::tuple<Tp...>& tDuplicate, std::tuple<Tp...>& tOriginal)
 {
 }
 
 template <std::size_t I = 0, typename... Tp>
     inline typename std::enable_if <
-    I<sizeof...(Tp), void>::type duplicateComponents(std::tuple<Tp...>& tDuplicate, std::tuple<Tp...>& tOriginal)
+    I<sizeof...(Tp), void>::type DuplicateComponents(std::tuple<Tp...>& tDuplicate, std::tuple<Tp...>& tOriginal)
 {
     if (std::get<I>(tOriginal))
     {
         std::get<I>(tDuplicate)->Clone(std::get<I>(tOriginal));
     }
-    duplicateComponents<I + 1, Tp...>(tDuplicate, tOriginal);
+    DuplicateComponents<I + 1, Tp...>(tDuplicate, tOriginal);
+}
+
+// UPDATE COMPONENTS
+template <std::size_t I = 0, typename... Tp>
+inline typename std::enable_if<I == sizeof...(Tp), void>::type
+UpdateComponentsTuple(std::tuple<Tp...>& tuple, float deltaTime)
+{
+}
+
+template <std::size_t I = 0, typename... Tp>
+    inline typename std::enable_if <
+    I<sizeof...(Tp), void>::type UpdateComponentsTuple(std::tuple<Tp...>& tuple, float deltaTime)
+{
+    if (std::get<I>(tuple))
+    {
+        std::get<I>(tuple)->Update(deltaTime);
+    }
+    UpdateComponentsTuple<I + 1, Tp...>(tuple, deltaTime);
+}
+
+//RENDER DEBUG
+template <std::size_t I = 0, typename... Tp>
+inline typename std::enable_if<I == sizeof...(Tp), void>::type
+RenderDebugComponentsTuple(std::tuple<Tp...>& tuple, float deltaTime)
+{
+}
+
+template <std::size_t I = 0, typename... Tp>
+    inline typename std::enable_if <
+    I<sizeof...(Tp), void>::type RenderDebugComponentsTuple(std::tuple<Tp...>& tuple, float deltaTime)
+{
+    if (std::get<I>(tuple))
+    {
+        std::get<I>(tuple)->RenderDebug(deltaTime);
+    }
+    RenderDebugComponentsTuple<I + 1, Tp...>(tuple, deltaTime);
 }
 
 GameObject::GameObject(const std::string& name) : name(name)
@@ -122,14 +161,14 @@ GameObject::GameObject(UID parentUID, GameObject* refObject)
         if (refObject->IsComponentCreated(i)) CreateComponent(ComponentType(i + 1));
     }
 
-    duplicateComponents(compTuple, refObject->GetComponentsTupleRef());
+    DuplicateComponents(compTuple, refObject->GetComponentsTupleRef());
 
     OnAABBUpdated();
 }
 
 GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState["UID"].GetUint64())
 {
-    compTuple              = std::make_tuple(COMPONENTS_NULLPTR);
+    compTuple = std::make_tuple(COMPONENTS_NULLPTR);
     createdComponents.reset();
 
     parentUID              = initialState["ParentUID"].GetUint64();
@@ -479,7 +518,7 @@ void GameObject::OnTransformUpdated()
     else App->GetSceneModule()->GetScene()->SetDynamicModified();
 }
 
-void GameObject::UpdateComponents()
+void GameObject::ParentUpdatedComponents()
 {
     if (!IsGloballyEnabled()) return;
     for (const auto& component : components)
@@ -735,6 +774,16 @@ bool GameObject::TargetIsChildren(UID uidTarget)
     return false;
 }
 
+void GameObject::UpdateComponents(float deltaTime)
+{
+    UpdateComponentsTuple(compTuple, deltaTime);
+}
+
+void GameObject::RenderDebugComponents(float deltaTime)
+{
+    RenderDebugComponentsTuple(compTuple, deltaTime);
+}
+
 void GameObject::UpdateGameObjectHierarchy(UID sourceUID)
 {
     GameObject* sourceGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(sourceUID);
@@ -932,7 +981,7 @@ bool GameObject::RemoveComponent(ComponentType componentType)
     {
         delete components.at(componentType);
         components.erase(componentType);
-        selectedComponentIndex = COMPONENT_NONE;
+        selectedComponentIndex               = COMPONENT_NONE;
         createdComponents[componentType - 1] = false;
         // TODO JUST TO CHECK EVERYTHING IS WORKING WITH MESH COMPONENT
         if (componentType == ComponentType::COMPONENT_MESH) RemoveComponent<MeshComponent*>();

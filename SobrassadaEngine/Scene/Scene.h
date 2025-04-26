@@ -79,7 +79,6 @@ class SOBRASADA_API_ENGINE Scene
     UID GetSelectedGameObjectUID() const { return selectedGameObjectUID; }
 
     const std::unordered_map<UID, GameObject*>& GetAllGameObjects() const { return gameObjectsContainer; }
-    const std::vector<Component*> GetAllComponents() const;
 
     GameObject* GetGameObjectByUID(UID gameObjectUID); // TODO: Change when filesystem defined
 
@@ -129,17 +128,17 @@ class SOBRASADA_API_ENGINE Scene
     ) const;
 
   private:
-    std::string sceneName                       = DEFAULT_SCENE_NAME;
-    UID sceneUID                                = INVALID_UID;
-    UID navmeshUID                              = INVALID_UID;
-    UID gameObjectRootUID                       = INVALID_UID;
-    UID selectedGameObjectUID                   = INVALID_UID;
-    CameraComponent* mainCamera                 = nullptr;
-    bool stopPlaying                            = false;
-    bool doInputs                               = false;
-    bool doMouseInputs                          = false;
-    bool sceneVisible                           = false;
-    bool isFocused                              = false;
+    std::string sceneName       = DEFAULT_SCENE_NAME;
+    UID sceneUID                = INVALID_UID;
+    UID navmeshUID              = INVALID_UID;
+    UID gameObjectRootUID       = INVALID_UID;
+    UID selectedGameObjectUID   = INVALID_UID;
+    CameraComponent* mainCamera = nullptr;
+    bool stopPlaying            = false;
+    bool doInputs               = false;
+    bool doMouseInputs          = false;
+    bool sceneVisible           = false;
+    bool isFocused              = false;
 
     std::unordered_map<UID, GameObject*> gameObjectsContainer;
 

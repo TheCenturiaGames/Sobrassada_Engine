@@ -75,6 +75,8 @@ class SOBRASADA_API_ENGINE GameObject
     void UpdateGameObjectHierarchy(UID sourceUID);
     void RenameGameObjectHierarchy();
     bool TargetIsChildren(UID uidTarget);
+    void UpdateComponents(float deltaTime);
+    void RenderDebugComponents(float deltaTime);
 
     const std::string& GetName() const { return name; }
     void SetName(const std::string& newName) { name = newName; }
@@ -132,7 +134,7 @@ class SOBRASADA_API_ENGINE GameObject
     bool IsGloballyEnabled() const;
     UID GetPrefabUID() const { return prefabUID; }
     void SetPrefabUID(const UID uid) { prefabUID = uid; }
-    void UpdateComponents();
+    void ParentUpdatedComponents();
     void OnTransformUpdated();
     void SetPosition(float3& newPosition) { position = newPosition; };
     void SetWillUpdate(bool willUpdate) { this->willUpdate = willUpdate; };
