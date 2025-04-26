@@ -3,8 +3,6 @@
 #include "ComponentUtils.h"
 #include "Globals.h"
 #include "Module.h"
-#include "ComponentUtils.h"
-#include "Globals.h"
 #include "NodeEditor.h"
 
 #include "Math/float3.h"
@@ -28,7 +26,7 @@ enum EditorType
 {
     BASE,
     NODE,
-    TEXTURE, 
+    TEXTURE,
     ANIMATION
 };
 
@@ -85,8 +83,11 @@ class EditorUIModule : public Module
     GizmoTransform& GetTransformType() { return transformType; }
     float3& GetSnapValues() { return snapValues; }
     GizmoDragState GetImGuizmoDragState() const { return guizmoDragState; };
-    void SOBRASADA_API_ENGINE DrawScriptInspector(const std::vector<InspectorField>& fields);
+    SOBRASADA_API_ENGINE void DrawScriptInspector(const std::vector<InspectorField>& fields);
+    SOBRASADA_API_ENGINE  void DrawScriptInspector(std::function<void()> callback);
+
     StateMachineEditor* GetStateMachine() { return stateMachineEditor; }
+    SOBRASADA_API_ENGINE ImGuiContext* GetImGuiContext() { return context; }
 
     const std::unordered_map<std::string, ComponentType>& GetStandaloneComponents() const
     {
@@ -94,6 +95,10 @@ class EditorUIModule : public Module
     }
 
     void SetFileDialogCurrentPath(char* newProjectPath) { fileDialogCurrentPath = newProjectPath; }
+
+    SOBRASADA_API_ENGINE void RequestExit();
+    SOBRASADA_API_ENGINE void ToggleFullscreen();
+    SOBRASADA_API_ENGINE void ToggleVSync();
 
   private:
     void RenderBasicTransformModifiers(
@@ -128,6 +133,7 @@ class EditorUIModule : public Module
     void About(bool& aboutMenu);
     void Navmesh(bool& navmesh);
     void CrowdControl(bool& crowdControl);
+
     std::string FormatWithCommas(unsigned int number) const;
 
     void OpenEditor(EngineEditorBase* editorToOpen);
@@ -135,6 +141,9 @@ class EditorUIModule : public Module
     EngineEditorBase* CreateEditor(EditorType type);
 
     void UpdateGizmoDragState();
+    
+   
+
 
   public:
     bool editorControlMenu = true;
@@ -233,6 +242,8 @@ class EditorUIModule : public Module
     float lastTimeOpenGL         = 0.f;
     std::string tpsStr;
     std::unordered_map<std::string, ComponentType> standaloneComponents;
+
+    ImGuiContext* context;
 
     StateMachineEditor* stateMachineEditor = nullptr;
 };

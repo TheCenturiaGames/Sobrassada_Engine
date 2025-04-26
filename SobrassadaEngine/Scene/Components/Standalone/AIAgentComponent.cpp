@@ -179,7 +179,6 @@ bool AIAgentComponent::SetPathNavigation(const math::float3& destination)
         GLOG("Crowd agent failed to request movement.");
         return false;
     }
-
     return true;
 }
 

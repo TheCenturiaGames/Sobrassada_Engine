@@ -25,6 +25,7 @@
 #include "TextureEditor.h"
 #include "TextureImporter.h"
 #include "WindowModule.h"
+#include "ScriptModule.h"
 
 #include "Math/Quat.h"
 #include "SDL.h"
@@ -82,7 +83,7 @@ EditorUIModule::~EditorUIModule()
 
 bool EditorUIModule::Init()
 {
-    ImGuiContext* context = ImGui::CreateContext();
+    context = ImGui::CreateContext();
     ImGuizmo::SetImGuiContext(context);
     ImGuiIO& io     = ImGui::GetIO();
     io.ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
@@ -99,6 +100,15 @@ bool EditorUIModule::Init()
     fileDialogCurrentPath = App->GetProjectModule()->GetLoadedProjectPath();
 
     return true;
+}
+
+void EditorUIModule::DrawScriptInspector(std::function<void()> callback)
+{
+    ImGui::SetNextItemOpen(true, ImGuiCond_Always);
+    if (ImGui::CollapsingHeader("Script Inspector", ImGuiTreeNodeFlags_None))
+    {
+        callback();
+    }
 }
 
 update_status EditorUIModule::PreUpdate(float deltaTime)
@@ -1812,4 +1822,21 @@ std::string EditorUIModule::FormatWithCommas(unsigned int number) const
     ss.imbue(std::locale("en_US.UTF-8")); // use commas
     ss << number;
     return ss.str();
+}
+
+void EditorUIModule::RequestExit()
+{
+    closeApplication = true;
+}
+
+void EditorUIModule::ToggleFullscreen()
+{
+    const bool current = App->GetWindowModule()->GetFullscreen();
+    App->GetWindowModule()->SetFullscreen(!current);
+}
+
+void EditorUIModule::ToggleVSync()
+{
+    const bool current = App->GetWindowModule()->GetVsync();
+    App->GetWindowModule()->SetVsync(!current);
 }
