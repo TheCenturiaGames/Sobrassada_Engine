@@ -32,7 +32,10 @@
 #include <set>
 #include <stack>
 
-// SECTION FOR TUPLE ITERATION
+// ---------- SECTION FOR TUPLE ITERATION ----------
+
+// YES, NOTHING, ABSOLUTELY BEAUTIFUL, NOTHINGNESS
+// (Used in std apply for being able to use the ternary operator for nullptr's)
 static void Nothing()
 {
 }
@@ -53,58 +56,6 @@ template <std::size_t I = 0, typename... Tp>
         std::get<I>(tDuplicate)->Clone(std::get<I>(tOriginal));
     }
     DuplicateComponents<I + 1, Tp...>(tDuplicate, tOriginal);
-}
-
-// UPDATE COMPONENTS
-template <std::size_t I = 0, typename... Tp>
-inline typename std::enable_if<I == sizeof...(Tp), void>::type
-UpdateComponentsTuple(std::tuple<Tp...>& tuple, float deltaTime)
-{
-}
-
-template <std::size_t I = 0, typename... Tp>
-    inline typename std::enable_if <
-    I<sizeof...(Tp), void>::type UpdateComponentsTuple(std::tuple<Tp...>& tuple, float deltaTime)
-{
-    if (std::get<I>(tuple))
-    {
-        std::get<I>(tuple)->Update(deltaTime);
-    }
-    UpdateComponentsTuple<I + 1, Tp...>(tuple, deltaTime);
-}
-
-// RENDER DEBUG
-template <std::size_t I = 0, typename... Tp>
-inline typename std::enable_if<I == sizeof...(Tp), void>::type
-RenderDebugComponentsTuple(std::tuple<Tp...>& tuple, float deltaTime)
-{
-}
-
-template <std::size_t I = 0, typename... Tp>
-    inline typename std::enable_if <
-    I<sizeof...(Tp), void>::type RenderDebugComponentsTuple(std::tuple<Tp...>& tuple, float deltaTime)
-{
-    if (std::get<I>(tuple))
-    {
-        std::get<I>(tuple)->RenderDebug(deltaTime);
-    }
-    RenderDebugComponentsTuple<I + 1, Tp...>(tuple, deltaTime);
-}
-
-// INIT COMPONENTS
-template <std::size_t I = 0, typename... Tp>
-inline typename std::enable_if<I == sizeof...(Tp), void>::type InitComponentsTuple(std::tuple<Tp...>& tuple)
-{
-}
-
-template <std::size_t I = 0, typename... Tp>
-    inline typename std::enable_if < I<sizeof...(Tp), void>::type InitComponentsTuple(std::tuple<Tp...>& tuple)
-{
-    if (std::get<I>(tuple))
-    {
-        std::get<I>(tuple)->Init();
-    }
-    InitComponentsTuple<I + 1, Tp...>(tuple);
 }
 
 // SAVE COMPONENTS
@@ -146,9 +97,67 @@ template <std::size_t I = 0, typename... Tp>
     if (std::get<I>(tuple) && std::get<I>(tuple)->GetType() == selectedType)
     {
         std::get<I>(tuple)->RenderEditorInspector();
+        return;
     }
     RenderEditorComponentsTuple<I + 1, Tp...>(tuple, selectedType);
 }
+
+// EDITOR HIERARCHY COMPONENTS
+template <std::size_t I = 0, typename... Tp>
+inline typename std::enable_if<I == sizeof...(Tp), void>::type
+RenderHierarchyComponentsTuple(std::tuple<Tp...>& tuple, ComponentType& selectedType, ImGuiTreeNodeFlags baseFlags)
+{
+}
+
+template <std::size_t I = 0, typename... Tp>
+    inline typename std::enable_if <
+    I<sizeof...(Tp), void>::type
+    RenderHierarchyComponentsTuple(std::tuple<Tp...>& tuple, ComponentType& selectedType, ImGuiTreeNodeFlags baseFlags)
+{
+    if (std::get<I>(tuple))
+    {
+        ImGuiTreeNodeFlags node_flag = baseFlags;
+        if (selectedType == std::get<I>(tuple)->GetType())
+        {
+            node_flag |= ImGuiTreeNodeFlags_Selected;
+        }
+        if (ImGui::TreeNodeEx((void*)std::get<I>(tuple)->GetUID(), node_flag, std::get<I>(tuple)->GetName()))
+        {
+            if (ImGui::IsItemClicked())
+            {
+                selectedType == std::get<I>(tuple)->GetType()
+                    ? selectedType = COMPONENT_NONE
+                    : selectedType = ComponentType(std::get<I>(tuple)->GetType());
+            }
+            ImGui::TreePop();
+        }
+    }
+    RenderHierarchyComponentsTuple<I + 1, Tp...>(tuple, selectedType, baseFlags);
+}
+
+// REMOVE COMPONENT
+template <std::size_t I = 0, typename... Tp>
+inline typename std::enable_if<I == sizeof...(Tp), void>::type
+RemoveComponentsTuple(std::tuple<Tp...>& tuple, ComponentType selectedType, GameObject* parent)
+{
+}
+
+template <std::size_t I = 0, typename... Tp>
+    inline typename std::enable_if <
+    I<sizeof...(Tp), void>::type
+    RemoveComponentsTuple(std::tuple<Tp...>& tuple, ComponentType selectedType, GameObject* parent)
+{
+    if (std::get<I>(tuple) && std::get<I>(tuple)->GetType() == selectedType)
+    {
+        delete std::get<I>(tuple);
+        std::get<I>(tuple) = nullptr;
+        parent->SetComponentRemoved(selectedType - 1);
+        return;
+    }
+    RemoveComponentsTuple<I + 1, Tp...>(tuple, selectedType, parent);
+}
+
+// ---------- END SECTION FOR TUPLE ITERATION ----------
 
 GameObject::GameObject(const std::string& name) : name(name)
 {
@@ -273,13 +282,7 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
         {
             const rapidjson::Value& jsonComponent = jsonComponents[i];
 
-            Component* newComponent               = ComponentUtils::CreateExistingComponent(jsonComponent, this);
-
-            if (newComponent != nullptr)
-            {
-                createdComponents[newComponent->GetType() - 1] = true;
-                components.insert({newComponent->GetType(), newComponent});
-            }
+            ComponentUtils::CreateExistingComponent(jsonComponent, this);
         }
     }
 
@@ -303,7 +306,7 @@ void GameObject::Init()
 {
     globalTransform = GetParentGlobalTransform() * localTransform;
 
-    InitComponentsTuple(compTuple);
+    std::apply([](auto&... pointer) { ((pointer ? pointer->Init() : Nothing()), ...); }, compTuple);
 }
 
 bool GameObject::AddGameObject(UID gameObjectUID)
@@ -461,23 +464,7 @@ void GameObject::RenderEditorInspector()
         ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick |
                                         ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Leaf;
 
-        for (const auto& component : components)
-        {
-            ImGuiTreeNodeFlags node_flag = base_flags;
-            if (selectedComponentIndex == component.first)
-            {
-                node_flag |= ImGuiTreeNodeFlags_Selected;
-            }
-            if (ImGui::TreeNodeEx((void*)component.second->GetUID(), node_flag, component.second->GetName()))
-            {
-                if (ImGui::IsItemClicked())
-                {
-                    selectedComponentIndex == component.first ? selectedComponentIndex = COMPONENT_NONE
-                                                              : selectedComponentIndex = component.first;
-                }
-                ImGui::TreePop();
-            }
-        }
+        RenderHierarchyComponentsTuple(compTuple, selectedComponentIndex, base_flags);
 
         ImGui::EndChild();
         ImGui::PopStyleVar();
@@ -812,12 +799,16 @@ bool GameObject::TargetIsChildren(UID uidTarget)
 
 void GameObject::UpdateComponents(float deltaTime)
 {
-    UpdateComponentsTuple(compTuple, deltaTime);
+    std::apply(
+        [&deltaTime](auto&... pointer) { ((pointer ? pointer->Update(deltaTime) : Nothing()), ...); }, compTuple
+    );
 }
 
 void GameObject::RenderDebugComponents(float deltaTime)
 {
-    RenderDebugComponentsTuple(compTuple, deltaTime);
+    std::apply(
+        [&deltaTime](auto&... pointer) { ((pointer ? pointer->RenderDebug(deltaTime) : Nothing()), ...); }, compTuple
+    );
 }
 
 void GameObject::UpdateGameObjectHierarchy(UID sourceUID)
@@ -996,14 +987,12 @@ void GameObject::UpdateMobilityHierarchy(MobilitySettings type)
 bool GameObject::CreateComponent(const ComponentType componentType)
 {
 
-    if (components.find(componentType) == components.end())
+    if (!createdComponents[componentType - 1])
     // TODO Allow override of components after displaying an info box
     {
-        Component* createdComponent = ComponentUtils::CreateEmptyComponent(componentType, GenerateUID(), this);
-        if (createdComponent != nullptr)
+        ComponentUtils::CreateEmptyComponent(componentType, GenerateUID(), this);
+        if (createdComponents[componentType - 1])
         {
-            createdComponents[componentType - 1] = true;
-            components.insert({componentType, createdComponent});
             selectedComponentIndex = componentType;
             OnAABBUpdated();
             return true;
@@ -1015,37 +1004,16 @@ bool GameObject::CreateComponent(const ComponentType componentType)
 
 bool GameObject::RemoveComponent(ComponentType componentType)
 {
-    if (components.find(componentType) != components.end())
+    if (createdComponents[componentType - 1])
     {
-        delete components.at(componentType);
-        components.erase(componentType);
-        selectedComponentIndex               = COMPONENT_NONE;
-        createdComponents[componentType - 1] = false;
-        // TODO JUST TO CHECK EVERYTHING IS WORKING WITH MESH COMPONENT
-        if (componentType == ComponentType::COMPONENT_MESH) RemoveComponent<MeshComponent*>();
-        else if (componentType == ComponentType::COMPONENT_POINT_LIGHT) RemoveComponent<PointLightComponent*>();
-        else if (componentType == ComponentType::COMPONENT_SPOT_LIGHT) RemoveComponent<SpotLightComponent*>();
-        else if (componentType == ComponentType::COMPONENT_DIRECTIONAL_LIGHT)
-            RemoveComponent<DirectionalLightComponent*>();
-        else if (componentType == ComponentType::COMPONENT_CHARACTER_CONTROLLER)
-            RemoveComponent<CharacterControllerComponent*>();
-        else if (componentType == ComponentType::COMPONENT_TRANSFORM_2D) RemoveComponent<Transform2DComponent*>();
-        else if (componentType == ComponentType::COMPONENT_CANVAS) RemoveComponent<CanvasComponent*>();
-        else if (componentType == ComponentType::COMPONENT_LABEL) RemoveComponent<UILabelComponent*>();
-        else if (componentType == ComponentType::COMPONENT_CAMERA) RemoveComponent<CameraComponent*>();
-        else if (componentType == ComponentType::COMPONENT_SCRIPT) RemoveComponent<ScriptComponent*>();
-        else if (componentType == ComponentType::COMPONENT_CUBE_COLLIDER) RemoveComponent<CubeColliderComponent*>();
-        else if (componentType == ComponentType::COMPONENT_SPHERE_COLLIDER) RemoveComponent<SphereColliderComponent*>();
-        else if (componentType == ComponentType::COMPONENT_CAPSULE_COLLIDER)
-            RemoveComponent<CapsuleColliderComponent*>();
-        else if (componentType == ComponentType::COMPONENT_ANIMATION) RemoveComponent<AnimationComponent*>();
-        else if (componentType == ComponentType::COMPONENT_AIAGENT) RemoveComponent<AIAgentComponent*>();
-        else if (componentType == ComponentType::COMPONENT_IMAGE) RemoveComponent<ImageComponent*>();
-        else if (componentType == ComponentType::COMPONENT_BUTTON) RemoveComponent<ButtonComponent*>();
-        else if (componentType == ComponentType::COMPONENT_AUDIO_SOURCE) RemoveComponent<AudioSourceComponent*>();
-        else if (componentType == ComponentType::COMPONENT_AUDIO_LISTENER) RemoveComponent<AudioListenerComponent*>();
+        RemoveComponentsTuple(compTuple, componentType, this);
+        if (!createdComponents[componentType - 1])
+        {
+            selectedComponentIndex = COMPONENT_NONE;
+            OnAABBUpdated();
 
-        OnAABBUpdated();
+            return true;
+        }
     }
     return false;
 }

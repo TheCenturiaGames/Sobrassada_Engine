@@ -64,9 +64,9 @@ typedef Delegate<void, GameObject*, float3> CollisionDelegate;
 class ComponentUtils
 {
   public:
-    static Component* CreateEmptyComponent(ComponentType type, UID uid, GameObject* parent);
+    static void CreateEmptyComponent(ComponentType type, UID uid, GameObject* parent);
 
-    static Component* CreateExistingComponent(const rapidjson::Value& initialState, GameObject* parent);
+    static void CreateExistingComponent(const rapidjson::Value& initialState, GameObject* parent);
 };
 
 #define COMPONENTS                                                                                                     \

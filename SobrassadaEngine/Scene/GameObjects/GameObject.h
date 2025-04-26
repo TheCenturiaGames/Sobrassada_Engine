@@ -106,16 +106,12 @@ class SOBRASADA_API_ENGINE GameObject
     bool CreateComponent(ComponentType componentType);
     bool RemoveComponent(ComponentType componentType);
 
-    template <typename T> bool RemoveComponent();
-
     // Updates the transform for this game object and all descending children
     void UpdateTransformForGOBranch();
     void UpdateMobilityHierarchy(MobilitySettings type);
     void UpdateLocalTransform(const float4x4& parentGlobalTransform);
 
     bool WillUpdate() const { return willUpdate; };
-
-    const std::unordered_map<ComponentType, Component*>& GetComponents() const { return components; }
 
     template <typename T> T GetComponent() const { return std::get<T>(compTuple); }
     template <typename T> T GetComponentChild(Application* app) const;
@@ -140,6 +136,8 @@ class SOBRASADA_API_ENGINE GameObject
     void SetWillUpdate(bool willUpdate) { this->willUpdate = willUpdate; };
     bool IsEnabled() const { return enabled; }
     void SetEnabled(bool state) { enabled = state; }
+    void SetComponentCreated(int position) { createdComponents[position] = true; }
+    void SetComponentRemoved(int position) { createdComponents[position] = false; }
 
   private:
     void DrawNodes() const;
@@ -156,8 +154,6 @@ class SOBRASADA_API_ENGINE GameObject
     std::vector<UID> children;
 
     std::string name;
-
-    std::unordered_map<ComponentType, Component*> components;
 
     AABB localAABB;
     AABB globalAABB;
@@ -187,23 +183,11 @@ class SOBRASADA_API_ENGINE GameObject
     std::bitset<std::tuple_size<decltype(compTuple)>::value> createdComponents;
 };
 
-// TODO, IF ALL IMPLEMENTED MANAGE THE DELETION OF POINTERS HERE
-template <typename T> inline bool GameObject::RemoveComponent()
-{
-    std::get<T>(compTuple) = nullptr;
-
-    return true;
-}
-
 template <typename T> inline T GameObject::GetComponentChild(Application* app) const
 {
     T component = nullptr;
 
     std::queue<UID> gameObjects;
-
-    component = this->GetComponent<T>();
-    
-    if (component) return component;
 
     for (UID child : this->GetChildren())
     {
@@ -233,10 +217,10 @@ template <typename T> inline T GameObject::GetComponentChild(Application* app) c
 
 template <typename T> inline T GameObject::GetComponentParent(Application* app) const
 {
-    T component          = nullptr;
-    UID currentUID       = parentUID;
+    T component    = nullptr;
+    UID currentUID = parentUID;
 
-    Scene* scene         = app->GetSceneModule()->GetScene();
+    Scene* scene   = app->GetSceneModule()->GetScene();
 
     while (currentUID != scene->GetGameObjectRootUID())
     {
