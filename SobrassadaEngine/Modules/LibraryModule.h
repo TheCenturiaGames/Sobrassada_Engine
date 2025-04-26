@@ -98,4 +98,6 @@ class LibraryModule : public Module
 
     // filled on load and import
     std::unordered_map<UID, std::string> resourcePathsMap; // UID -> library path
+
+    const std::string emptyString = "";
 };
