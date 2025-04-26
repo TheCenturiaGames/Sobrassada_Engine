@@ -70,7 +70,7 @@ template <std::size_t I = 0, typename... Tp>
     UpdateComponentsTuple<I + 1, Tp...>(tuple, deltaTime);
 }
 
-//RENDER DEBUG
+// RENDER DEBUG
 template <std::size_t I = 0, typename... Tp>
 inline typename std::enable_if<I == sizeof...(Tp), void>::type
 RenderDebugComponentsTuple(std::tuple<Tp...>& tuple, float deltaTime)
@@ -86,6 +86,47 @@ template <std::size_t I = 0, typename... Tp>
         std::get<I>(tuple)->RenderDebug(deltaTime);
     }
     RenderDebugComponentsTuple<I + 1, Tp...>(tuple, deltaTime);
+}
+
+// INIT COMPONENTS
+template <std::size_t I = 0, typename... Tp>
+inline typename std::enable_if<I == sizeof...(Tp), void>::type InitComponentsTuple(std::tuple<Tp...>& tuple)
+{
+}
+
+template <std::size_t I = 0, typename... Tp>
+    inline typename std::enable_if < I<sizeof...(Tp), void>::type InitComponentsTuple(std::tuple<Tp...>& tuple)
+{
+    if (std::get<I>(tuple))
+    {
+        std::get<I>(tuple)->Init();
+    }
+    InitComponentsTuple<I + 1, Tp...>(tuple);
+}
+
+// SAVE COMPONENTS
+template <std::size_t I = 0, typename... Tp>
+inline typename std::enable_if<I == sizeof...(Tp), void>::type SaveComponentsTuple(
+    const std::tuple<Tp...>& tuple, rapidjson::Value& componentsJSON, rapidjson::Document::AllocatorType& allocator
+)
+{
+}
+
+template <std::size_t I = 0, typename... Tp>
+    inline typename std::enable_if <
+    I<sizeof...(Tp), void>::type SaveComponentsTuple(
+        const std::tuple<Tp...>& tuple, rapidjson::Value& componentsJSON, rapidjson::Document::AllocatorType& allocator
+    )
+{
+    if (std::get<I>(tuple))
+    {
+        rapidjson::Value componentJSON(rapidjson::kObjectType);
+
+        std::get<I>(tuple)->Save(componentJSON, allocator);
+
+        componentsJSON.PushBack(componentJSON, allocator);
+    }
+    SaveComponentsTuple<I + 1, Tp...>(tuple, componentsJSON, allocator);
 }
 
 GameObject::GameObject(const std::string& name) : name(name)
@@ -234,21 +275,14 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
 
 GameObject::~GameObject()
 {
-    for (auto& component : components)
-    {
-        delete component.second;
-    }
-    components.clear();
+    std::apply([](auto&... tupleVar) { ((delete tupleVar, tupleVar = nullptr), ...); }, compTuple);
 }
 
 void GameObject::Init()
 {
     globalTransform = GetParentGlobalTransform() * localTransform;
 
-    for (auto& component : components)
-    {
-        component.second->Init();
-    }
+    InitComponentsTuple(compTuple);
 }
 
 bool GameObject::AddGameObject(UID gameObjectUID)
@@ -305,18 +339,7 @@ void GameObject::Save(rapidjson::Value& targetState, rapidjson::Document::Alloca
 
     // Serialize Components
     rapidjson::Value componentsJSON(rapidjson::kArrayType);
-
-    for (auto it = components.begin(); it != components.end(); ++it)
-    {
-        if (it->second != nullptr)
-        {
-            rapidjson::Value componentJSON(rapidjson::kObjectType);
-
-            it->second->Save(componentJSON, allocator);
-
-            componentsJSON.PushBack(componentJSON, allocator);
-        }
-    }
+    SaveComponentsTuple(compTuple, componentsJSON, allocator);
 
     // Add components to scene
     targetState.AddMember("Components", componentsJSON, allocator);
