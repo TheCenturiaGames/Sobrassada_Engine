@@ -33,6 +33,9 @@
 #include <stack>
 
 // SECTION FOR TUPLE ITERATION
+static void Nothing()
+{
+}
 
 // DUPLICATE COMPONENTS
 template <std::size_t I = 0, typename... Tp>
@@ -531,11 +534,8 @@ void GameObject::OnTransformUpdated()
     }
 
     // If the gameObject has a transform2D, update it
-    if (components.find(COMPONENT_TRANSFORM_2D) != components.end())
-    {
-        Transform2DComponent* transform2D = static_cast<Transform2DComponent*>(components.at(COMPONENT_TRANSFORM_2D));
-        transform2D->OnTransform3DUpdated(globalTransform);
-    }
+    Transform2DComponent* transform2D = GetComponent<Transform2DComponent*>();
+    if (transform2D) transform2D->OnTransform3DUpdated(globalTransform);
 
     if (mobilitySettings == STATIC) App->GetSceneModule()->GetScene()->SetStaticModified();
     else App->GetSceneModule()->GetScene()->SetDynamicModified();
@@ -544,10 +544,8 @@ void GameObject::OnTransformUpdated()
 void GameObject::ParentUpdatedComponents()
 {
     if (!IsGloballyEnabled()) return;
-    for (const auto& component : components)
-    {
-        if (component.second) component.second->ParentUpdated();
-    }
+
+    std::apply([](auto&... pointer) { ((pointer ? pointer->ParentUpdated() : Nothing()), ...); }, compTuple);
 }
 
 AABB GameObject::GetHierarchyAABB()
@@ -838,20 +836,22 @@ void GameObject::OnAABBUpdated()
     localAABB = localAABB;
     localAABB.SetNegativeInfinity();
 
-    for (auto& component : components)
-    {
-        localAABB.Enclose(component.second->GetLocalAABB());
-    }
+    AABB temp;
+    temp.SetNegativeInfinity();
 
+    std::apply(
+        [&temp](auto&... pointer) { ((pointer ? temp.Enclose(pointer->GetLocalAABB()) : Nothing()), ...); }, compTuple
+    );
+
+    localAABB = temp;
     OnTransformUpdated();
 }
 
 void GameObject::Render(float deltaTime) const
 {
-    for (auto& component : components)
-    {
-        component.second->Render(deltaTime);
-    }
+    std::apply(
+        [&deltaTime](auto&... pointer) { ((pointer ? pointer->Render(deltaTime) : Nothing()), ...); }, compTuple
+    );
 }
 
 void GameObject::RenderEditor()
