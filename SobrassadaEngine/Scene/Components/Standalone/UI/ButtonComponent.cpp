@@ -63,8 +63,8 @@ ButtonComponent::~ButtonComponent()
 
 void ButtonComponent::Init()
 {
-    Transform2DComponent* transform = parent->GetComponent<Transform2DComponent*>();
-    if (transform == nullptr)
+    transform2D = parent->GetComponent<Transform2DComponent*>();
+    if (transform2D == nullptr)
     {
         parent->CreateComponent(COMPONENT_TRANSFORM_2D);
         transform2D = parent->GetComponent<Transform2DComponent*>();
@@ -82,8 +82,8 @@ void ButtonComponent::Init()
     }
 
     // Get the image
-    ImageComponent* linkedImage = parent->GetComponent<ImageComponent*>();
-    if (linkedImage == nullptr)
+    image = parent->GetComponent<ImageComponent*>();
+    if (image == nullptr)
     {
         parent->CreateComponent(COMPONENT_IMAGE);
         image = parent->GetComponent<ImageComponent*>();
