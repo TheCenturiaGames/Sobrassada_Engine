@@ -149,7 +149,6 @@ GameObject::~GameObject()
 
 void GameObject::Init()
 {
-    if (name == "CH_MC_Chu_V02") int x = 0;
     globalTransform = GetParentGlobalTransform() * localTransform;
 
     for (auto& component : components)
