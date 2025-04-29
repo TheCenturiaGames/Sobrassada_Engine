@@ -25,6 +25,5 @@ class CameraMovement : public Script
     float2 desiredPosition;
     float smoothVelocity = 10;
 
-    bool mouseOffset;
-    float2 positionOffset;
+    float mouseOffsetIntensity = 0;
 };

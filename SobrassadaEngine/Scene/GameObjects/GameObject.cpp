@@ -337,34 +337,6 @@ void GameObject::InitHierarchy()
     }
 }
 
-void GameObject::InitHierarchy()
-{
-    Init();
-    std::queue<UID> gameObjects;
-
-    for (UID child : this->GetChildren())
-    {
-        gameObjects.push(child);
-    }
-
-    Scene* scene = App->GetSceneModule()->GetScene();
-
-    while (!gameObjects.empty())
-    {
-        UID currentGameObject = gameObjects.front();
-        gameObjects.pop();
-
-        GameObject* current = scene->GetGameObjectByUID(currentGameObject);
-
-        current->Init();
-
-        for (UID child : current->GetChildren())
-        {
-            gameObjects.push(child);
-        }
-    }
-}
-
 bool GameObject::AddGameObject(UID gameObjectUID)
 {
     if (std::find(children.begin(), children.end(), gameObjectUID) == children.end())
