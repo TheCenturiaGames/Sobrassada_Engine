@@ -68,10 +68,10 @@ constexpr char DELIMITER = '\\';
 constexpr char DELIMITER = '/';
 #endif
 
-constexpr const char* FILENAME_SEPARATOR              = "_";
-constexpr const char* DEFAULT_SCENE_NAME              = "New Scene";
-constexpr const char* DEFAULT_NODE_NAME               = "Unnamed Node";
-constexpr const char* DEFAULT_NAVMESH_NAME            = "New Navmesh";
+constexpr const char* FILENAME_SEPARATOR             = "_";
+constexpr const char* DEFAULT_SCENE_NAME             = "New Scene";
+constexpr const char* DEFAULT_NODE_NAME              = "Unnamed Node";
+constexpr const char* DEFAULT_NAVMESH_NAME           = "New Navmesh";
 
 constexpr float DEFAULT_GL_CLEAR_COLOR_RED           = 0.f;
 constexpr float DEFAULT_GL_CLEAR_COLOR_GREEN         = 0.f;
@@ -98,18 +98,18 @@ constexpr const char* MODELS_ASSETS_PATH             = "Assets/Models/";
 constexpr const char* ANIMATIONS_ASSETS_PATH         = "Assets/Animations/";
 constexpr const char* STATEMACHINES_ASSETS_PATH      = "Assets/StateMachines/";
 
-constexpr const char* LIBRARY_PATH                    = "Library/";
-constexpr const char* ANIMATIONS_PATH                 = "Library/Animations/";
-constexpr const char* AUDIO_PATH                      = "Library/Audio/";
-constexpr const char* MODELS_LIB_PATH                 = "Library/Models/";
-constexpr const char* MESHES_PATH                     = "Library/Meshes/";
-constexpr const char* SCENES_PLAY_PATH                = "Library/Scenes/";
-constexpr const char* TEXTURES_PATH                   = "Library/Textures/";
-constexpr const char* MATERIALS_PATH                  = "Library/Materials/";
-constexpr const char* STATEMACHINES_LIB_PATH          = "Library/StateMachines/";
-constexpr const char* PREFABS_LIB_PATH                = "Library/Prefabs/";
-constexpr const char* FONTS_PATH                      = "Library/Fonts/";
-constexpr const char* NAVMESHES_PATH                  = "Library/Navmeshes/";
+constexpr const char* LIBRARY_PATH                   = "Library/";
+constexpr const char* ANIMATIONS_PATH                = "Library/Animations/";
+constexpr const char* AUDIO_PATH                     = "Library/Audio/";
+constexpr const char* MODELS_LIB_PATH                = "Library/Models/";
+constexpr const char* MESHES_PATH                    = "Library/Meshes/";
+constexpr const char* SCENES_PLAY_PATH               = "Library/Scenes/";
+constexpr const char* TEXTURES_PATH                  = "Library/Textures/";
+constexpr const char* MATERIALS_PATH                 = "Library/Materials/";
+constexpr const char* STATEMACHINES_LIB_PATH         = "Library/StateMachines/";
+constexpr const char* PREFABS_LIB_PATH               = "Library/Prefabs/";
+constexpr const char* FONTS_PATH                     = "Library/Fonts/";
+constexpr const char* NAVMESHES_PATH                 = "Library/Navmeshes/";
 
 constexpr const char* ASSET_EXTENSION                = ".gltf";
 constexpr const char* MESH_EXTENSION                 = ".sobrassada";
@@ -149,20 +149,22 @@ constexpr const char* PREFILTERED_FRAGMENT_SHADER_PATH =
     "./EngineDefaults/Shader/Fragment/PreFilteredEnvironmentFragment.glsl";
 constexpr const char* ENVIRONMENTBRDF_FRAGMENT_SHADER_PATH =
     "./EngineDefaults/Shader/Fragment/EnvironmentBRDFFragment.glsl";
-constexpr const char* GBUFFER_METALLIC_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader/Fragment/gBufferMetallicFragment.glsl";
-constexpr const char* GBUFFER_SPECULAR_FRAGMENT_SHADER_PATH = "./EngineDefaults/Shader/Fragment/gBufferSpecularFragment.glsl";
-constexpr const char* LIGHTINGPASS_FRAGMENT_SHADER_PATH     = "./EngineDefaults/Shader/Fragment/IBLLightingPass.glsl";
+constexpr const char* GBUFFER_METALLIC_FRAGMENT_SHADER_PATH =
+    "./EngineDefaults/Shader/Fragment/gBufferMetallicFragment.glsl";
+constexpr const char* GBUFFER_SPECULAR_FRAGMENT_SHADER_PATH =
+    "./EngineDefaults/Shader/Fragment/gBufferSpecularFragment.glsl";
+constexpr const char* LIGHTINGPASS_FRAGMENT_SHADER_PATH  = "./EngineDefaults/Shader/Fragment/IBLLightingPass.glsl";
 
-using UID                                                   = uint64_t;
+using UID                                                = uint64_t;
 
-constexpr UID INVALID_UID                                   = 0;
-constexpr UID UID_PREFIX_DIVISOR                            = 100000000000000;
-constexpr UID FALLBACK_TEXTURE_UID                          = 1200000000000000;
-constexpr UID DEFAULT_MATERIAL_UID                          = 1300000000000000;
+constexpr UID INVALID_UID                                = 0;
+constexpr UID UID_PREFIX_DIVISOR                         = 100000000000000;
+constexpr UID FALLBACK_TEXTURE_UID                       = 1200000000000000;
+constexpr UID DEFAULT_MATERIAL_UID                       = 1300000000000000;
 
-constexpr const char* CONSTANT_MESH_SELECT_DIALOG_ID        = "mesh-select";
-constexpr const char* CONSTANT_MATERIAL_SELECT_DIALOG_ID    = "material-select";
-constexpr const char* CONSTANT_TEXTURE_SELECT_DIALOG_ID     = "texture-select";
+constexpr const char* CONSTANT_MESH_SELECT_DIALOG_ID     = "mesh-select";
+constexpr const char* CONSTANT_MATERIAL_SELECT_DIALOG_ID = "material-select";
+constexpr const char* CONSTANT_TEXTURE_SELECT_DIALOG_ID  = "texture-select";
 constexpr const char* CONSTANT_DIFFUSE_TEXTURE_SELECT_DIALOG_ID  = "diffuse-texture-select";
 constexpr const char* CONSTANT_METALLIC_TEXTURE_SELECT_DIALOG_ID = "metallic-texture-select";
 constexpr const char* CONSTANT_SPECULAR_TEXTURE_SELECT_DIALOG_ID = "specular-texture-select";

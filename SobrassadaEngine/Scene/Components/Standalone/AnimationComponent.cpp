@@ -53,11 +53,8 @@ AnimationComponent::AnimationComponent(const rapidjson::Value& initialState, Gam
 
 AnimationComponent::~AnimationComponent()
 {
-    if (animController != nullptr)
-    {
-        delete animController;
-        animController = nullptr;
-    }
+
+    delete animController;
     App->GetResourcesModule()->ReleaseResource(currentAnimResource);
 }
 
