@@ -679,6 +679,7 @@ void Scene::AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
         selectedGameObject->IsStatic() ? MobilitySettings::STATIC : MobilitySettings::DYNAMIC;
 
     auto pairResultMobility = selectedGameObjectsMobility.insert({gameObject, gameObjectMobility});
+    auto pairResultLocals   = selectedGameObjectsOgLocals.insert({gameObject, selectedGameObject->GetLocalTransform()});
 
     if (pairResult.second)
     {
@@ -710,6 +711,7 @@ void Scene::AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
 
         selectedGameObjects.erase(pairResult.first);
         selectedGameObjectsMobility.erase(pairResultMobility.first);
+        selectedGameObjectsOgLocals.erase(pairResultLocals.first);
     }
 }
 
@@ -738,6 +740,7 @@ void Scene::ClearObjectSelection()
 
     selectedGameObjects.clear();
     selectedGameObjectsMobility.clear();
+    selectedGameObjectsOgLocals.clear();
 }
 
 void Scene::DeleteMultiselection()

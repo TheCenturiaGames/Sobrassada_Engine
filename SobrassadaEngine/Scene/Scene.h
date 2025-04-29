@@ -106,6 +106,7 @@ class SOBRASADA_API_ENGINE Scene
     {
         return selectedGameObjectsMobility;
     }
+    const std::map<UID, float4x4>& GetMultiselectedObjectsLocals() const { return selectedGameObjectsOgLocals; }
 
     void SetMainCamera(CameraComponent* camera) { mainCamera = camera; }
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
@@ -159,4 +160,5 @@ class SOBRASADA_API_ENGINE Scene
     GameObject* multiSelectParent = nullptr;
     std::map<UID, UID> selectedGameObjects;
     std::map<UID, MobilitySettings> selectedGameObjectsMobility;
+    std::map<UID, float4x4> selectedGameObjectsOgLocals;
 };
