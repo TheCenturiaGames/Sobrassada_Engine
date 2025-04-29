@@ -23,6 +23,8 @@ class CameraMovement : public Script
     const GameObject* target = nullptr;
 
     float2 desiredPosition;
-    float smoothness = 10;
-    float lookAhead = 0;
+    float smoothVelocity = 10;
+
+    bool mouseOffset;
+    float2 positionOffset;
 };
