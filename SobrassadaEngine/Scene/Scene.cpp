@@ -122,11 +122,6 @@ Scene::~Scene()
 
 void Scene::Init()
 {
-    for (auto& gameObject : gameObjectsContainer)
-    {
-        if (gameObject.second->GetParent() == gameObjectRootUID) gameObject.second->InitHierarchy();
-    }
-
     // When loading a scene, overrides all gameObjects that have a prefabUID. That is because if the prefab has been
     // modified, the scene file may have not, so the prefabs need to be updated when loading the scene again
     std::vector<UID> prefabs;
@@ -142,6 +137,11 @@ void Scene::Init()
     for (const UID prefab : prefabs)
     {
         OverridePrefabs(prefab);
+    }
+
+    for (auto& gameObject : gameObjectsContainer)
+    {
+        if (gameObject.second->GetParent() == gameObjectRootUID) gameObject.second->InitHierarchy();
     }
 
     App->GetResourcesModule()->GetBatchManager()->LoadData();
