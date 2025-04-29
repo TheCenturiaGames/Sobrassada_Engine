@@ -69,6 +69,10 @@
     <ClInclude Include="Soldier.h">
       <Filter>Characters</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="CameraMovement.h">
+      <Filter>Characters</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Time\Clock.cpp">
@@ -695,5 +699,11 @@
     <ClCompile Include="ScriptExport.cpp">
       <Filter>Scripting Config</Filter>
     </ClCompile>
+    <ClCompile Include="CameraMovement.cpp">
+      <Filter>Characters</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SobrassadaScripts.rc" />
   </ItemGroup>
 </Project>

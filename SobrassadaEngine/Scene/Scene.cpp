@@ -35,6 +35,7 @@
 #include "Standalone/Lights/PointLightComponent.h"
 #include "Standalone/Lights/SpotLightComponent.h"
 #include "Standalone/MeshComponent.h"
+#include "HashString.h"
 
 
 #include "SDL_mouse.h"
@@ -1027,6 +1028,20 @@ GameObject* Scene::GetGameObjectByUID(UID gameObjectUUID)
     {
         return gameObjectsContainer[gameObjectUUID];
     }
+    return nullptr;
+}
+
+GameObject* Scene::GetGameObjectByName(const std::string& name)
+{
+    // TODO: Replace gameObject name to a HashString, I've seen it is also compared in some scripts and would improve performance
+
+    // Returns the first object with that name, if there are more they are ignored
+    for (const auto& obj : gameObjectsContainer)
+    {
+        if (obj.second->GetName() == name) return obj.second;
+    }
+
+    GLOG("[WARNING] No gameObject found with name %s", name.c_str());
     return nullptr;
 }
 

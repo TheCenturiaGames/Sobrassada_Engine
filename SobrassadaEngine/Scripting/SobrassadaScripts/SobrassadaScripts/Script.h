@@ -21,7 +21,8 @@ struct InspectorField
         Vec2,
         Vec3,
         Vec4,
-        Color
+        Color,
+        InputText
     };
 
     const char* name;

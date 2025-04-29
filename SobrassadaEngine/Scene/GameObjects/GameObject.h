@@ -102,6 +102,7 @@ class SOBRASADA_API_ENGINE GameObject
     AABB GetHierarchyAABB();
 
     void SetLocalTransform(const float4x4& newTransform);
+    void SetLocalPosition(const float3& newPos);
     void DrawGizmos() const;
 
     void CreatePrefab();

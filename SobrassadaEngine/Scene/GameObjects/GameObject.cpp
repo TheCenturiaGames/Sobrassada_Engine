@@ -822,6 +822,14 @@ void GameObject::SetLocalTransform(const float4x4& newTransform)
     UpdateTransformForGOBranch();
 }
 
+void GameObject::SetLocalPosition(const float3& newPos)
+{
+    // Helper function to set only the position, to avoid having to copy the whole transform and modify it outside
+    localTransform.SetTranslatePart(newPos);
+    position = localTransform.TranslatePart();
+    UpdateTransformForGOBranch();
+}
+
 void GameObject::DrawGizmos() const
 {
     if (!IsGloballyEnabled()) return;

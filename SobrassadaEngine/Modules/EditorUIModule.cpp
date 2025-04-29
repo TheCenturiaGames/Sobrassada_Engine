@@ -25,7 +25,6 @@
 #include "TextureEditor.h"
 #include "TextureImporter.h"
 #include "WindowModule.h"
-#include "ScriptModule.h"
 
 #include "Math/Quat.h"
 #include "SDL.h"
@@ -511,13 +510,13 @@ void EditorUIModule::Navmesh(bool& navmesh)
             ImGui::End();
         }
 
-       if (!open)
+        if (!open)
         {
             showNavLoadDialog    = false;
 
             // Reset search and selection
             searchTextNavmesh[0] = '\0';
-            selectedNavmesh      = -1;          
+            selectedNavmesh      = -1;
             navmeshUID           = INVALID_UID;
         }
     }
@@ -921,6 +920,28 @@ void EditorUIModule::DrawScriptInspector(const std::vector<InspectorField>& fiel
         {
             ImColor* color = (ImColor*)field.data;
             ImGui::ColorEdit3(field.name, (float*)&color->Value);
+            break;
+        }
+        case InspectorField::FieldType::InputText:
+        {
+            // Use InputText with strings (I don't know how this works)
+            std::string* str = static_cast<std::string*>(field.data);
+            ImGui::InputText(
+                field.name,
+                str->data(), 
+                str->capacity() + 1,
+                ImGuiInputTextFlags_CallbackResize,
+                [](ImGuiInputTextCallbackData* data) -> int
+                {
+                    if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
+                    {
+                        std::string* str = static_cast<std::string*>(data->UserData);
+                        str->resize(data->BufTextLen);
+                    }
+                    return 0;
+                },
+                static_cast<void*>(str)
+            );
             break;
         }
         }

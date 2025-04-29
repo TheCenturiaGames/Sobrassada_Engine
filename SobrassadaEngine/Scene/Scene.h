@@ -82,6 +82,7 @@ class SOBRASADA_API_ENGINE Scene
     const std::vector<Component*> GetAllComponents() const;
 
     GameObject* GetGameObjectByUID(UID gameObjectUID); // TODO: Change when filesystem defined
+    GameObject* GetGameObjectByName(const std::string& name);
 
     LightsConfig* GetLightsConfig() const { return lightsConfig; }
     CameraComponent* GetMainCamera() const { return mainCamera; }
