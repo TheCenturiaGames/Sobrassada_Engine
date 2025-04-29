@@ -302,7 +302,7 @@ void SceneModule::HandleObjectDuplication()
         // ITERATE OVER ALL GAME OBJECTS TO CHECK IF ANY REMAPING IS NEEDED
         for (int i = 0; i < createdGameObjects.size(); ++i)
         {
-            MeshComponent* originalMeshComp = originalGameObjects[i]->GetMeshComponent();
+            MeshComponent* originalMeshComp = originalGameObjects[i]->GetComponent<MeshComponent*>();
             if (originalMeshComp && originalMeshComp->GetHasBones())
             {
                 // Remap the bones references
@@ -317,11 +317,11 @@ void SceneModule::HandleObjectDuplication()
                     newBonesObjects.push_back(loadedScene->GetGameObjectByUID(uid));
                 }
 
-                MeshComponent* newMesh = createdGameObjects[i]->GetMeshComponent();
+                MeshComponent* newMesh = createdGameObjects[i]->GetComponent<MeshComponent*>();
                 newMesh->SetBones(newBonesObjects, newBonesUIDs);
             }
 
-            AnimationComponent* animComp = createdGameObjects[i]->GetAnimationComponent();
+            AnimationComponent* animComp = createdGameObjects[i]->GetComponent<AnimationComponent*>();
             if (animComp) animComp->SetBoneMapping();
         }
     }

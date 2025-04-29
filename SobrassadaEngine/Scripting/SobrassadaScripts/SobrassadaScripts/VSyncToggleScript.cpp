@@ -1,20 +1,20 @@
 #include "pch.h"
 
-#include "VSyncToggleScript.h"
 #include "Application.h"
 #include "EditorUIModule.h"
 #include "GameObject.h"
 #include "Scene/Components/Standalone/UI/ButtonComponent.h"
 #include "Utils/Delegate.h"
+#include "VSyncToggleScript.h"
 
 bool VSyncToggleScript::Init()
 {
-    Component* button = parent->GetComponentByType(COMPONENT_BUTTON);
+    ButtonComponent* button = parent->GetComponent<ButtonComponent*>();
     if (button)
     {
         std::function<void(void)> function = std::bind(&VSyncToggleScript::OnClick, this);
         Delegate<void> delegate(function);
-        delegateID            = static_cast<ButtonComponent*>(button)->AddOnClickCallback(delegate);
+        delegateID            = button->AddOnClickCallback(delegate);
         hasRegisteredCallback = true;
     }
 
@@ -38,11 +38,8 @@ VSyncToggleScript::~VSyncToggleScript()
 {
     if (hasRegisteredCallback)
     {
-        Component* button = parent->GetComponentByType(COMPONENT_BUTTON);
-        if (button)
-        {
-            static_cast<ButtonComponent*>(button)->RemoveOnClickCallback(delegateID);
-        }
+        ButtonComponent* button = parent->GetComponent<ButtonComponent*>();
+        if (button) button->RemoveOnClickCallback(delegateID);
     }
 }
 

@@ -6,17 +6,163 @@
 #include "EditorUIModule.h"
 #include "PrefabManager.h"
 #include "SceneModule.h"
+
+#include "CameraComponent.h"
+#include "ScriptComponent.h"
+#include "Standalone/AIAgentComponent.h"
 #include "Standalone/AnimationComponent.h"
+#include "Standalone/Audio/AudioListenerComponent.h"
+#include "Standalone/Audio/AudioSourceComponent.h"
+#include "Standalone/CharacterControllerComponent.h"
+#include "Standalone/Lights/DirectionalLightComponent.h"
+#include "Standalone/Lights/PointLightComponent.h"
+#include "Standalone/Lights/SpotLightComponent.h"
 #include "Standalone/MeshComponent.h"
+#include "Standalone/Physics/CapsuleColliderComponent.h"
+#include "Standalone/Physics/CubeColliderComponent.h"
+#include "Standalone/Physics/SphereColliderComponent.h"
+#include "Standalone/UI/ButtonComponent.h"
+#include "Standalone/UI/CanvasComponent.h"
+#include "Standalone/UI/ImageComponent.h"
 #include "Standalone/UI/Transform2DComponent.h"
+#include "Standalone/UI/UILabelComponent.h"
 
 #include "imgui.h"
 #include <queue>
 #include <set>
 #include <stack>
 
+// ---------- SECTION FOR TUPLE ITERATION ----------
+
+// YES, NOTHING, ABSOLUTELY BEAUTIFUL, NOTHINGNESS
+// (Used in std apply for being able to use the ternary operator for nullptr's)
+static void Nothing()
+{
+}
+
+// DUPLICATE COMPONENTS
+template <std::size_t I = 0, typename... Tp>
+inline typename std::enable_if<I == sizeof...(Tp), void>::type
+DuplicateComponents(std::tuple<Tp...>& tDuplicate, std::tuple<Tp...>& tOriginal)
+{
+}
+
+template <std::size_t I = 0, typename... Tp>
+    inline typename std::enable_if <
+    I<sizeof...(Tp), void>::type DuplicateComponents(std::tuple<Tp...>& tDuplicate, std::tuple<Tp...>& tOriginal)
+{
+    if (std::get<I>(tOriginal))
+    {
+        std::get<I>(tDuplicate)->Clone(std::get<I>(tOriginal));
+    }
+    DuplicateComponents<I + 1, Tp...>(tDuplicate, tOriginal);
+}
+
+// SAVE COMPONENTS
+template <std::size_t I = 0, typename... Tp>
+inline typename std::enable_if<I == sizeof...(Tp), void>::type SaveComponentsTuple(
+    const std::tuple<Tp...>& tuple, rapidjson::Value& componentsJSON, rapidjson::Document::AllocatorType& allocator
+)
+{
+}
+
+template <std::size_t I = 0, typename... Tp>
+    inline typename std::enable_if <
+    I<sizeof...(Tp), void>::type SaveComponentsTuple(
+        const std::tuple<Tp...>& tuple, rapidjson::Value& componentsJSON, rapidjson::Document::AllocatorType& allocator
+    )
+{
+    if (std::get<I>(tuple))
+    {
+        rapidjson::Value componentJSON(rapidjson::kObjectType);
+
+        std::get<I>(tuple)->Save(componentJSON, allocator);
+
+        componentsJSON.PushBack(componentJSON, allocator);
+    }
+    SaveComponentsTuple<I + 1, Tp...>(tuple, componentsJSON, allocator);
+}
+
+// EDITOR INSPECTOR COMPONENTS
+template <std::size_t I = 0, typename... Tp>
+inline typename std::enable_if<I == sizeof...(Tp), void>::type
+RenderEditorComponentsTuple(std::tuple<Tp...>& tuple, ComponentType selectedType)
+{
+}
+
+template <std::size_t I = 0, typename... Tp>
+    inline typename std::enable_if <
+    I<sizeof...(Tp), void>::type RenderEditorComponentsTuple(std::tuple<Tp...>& tuple, ComponentType selectedType)
+{
+    if (std::get<I>(tuple) && std::get<I>(tuple)->GetType() == selectedType)
+    {
+        std::get<I>(tuple)->RenderEditorInspector();
+        return;
+    }
+    RenderEditorComponentsTuple<I + 1, Tp...>(tuple, selectedType);
+}
+
+// EDITOR HIERARCHY COMPONENTS
+template <std::size_t I = 0, typename... Tp>
+inline typename std::enable_if<I == sizeof...(Tp), void>::type
+RenderHierarchyComponentsTuple(std::tuple<Tp...>& tuple, ComponentType& selectedType, ImGuiTreeNodeFlags baseFlags)
+{
+}
+
+template <std::size_t I = 0, typename... Tp>
+    inline typename std::enable_if <
+    I<sizeof...(Tp), void>::type
+    RenderHierarchyComponentsTuple(std::tuple<Tp...>& tuple, ComponentType& selectedType, ImGuiTreeNodeFlags baseFlags)
+{
+    if (std::get<I>(tuple))
+    {
+        ImGuiTreeNodeFlags node_flag = baseFlags;
+        if (selectedType == std::get<I>(tuple)->GetType())
+        {
+            node_flag |= ImGuiTreeNodeFlags_Selected;
+        }
+        if (ImGui::TreeNodeEx((void*)std::get<I>(tuple)->GetUID(), node_flag, std::get<I>(tuple)->GetName()))
+        {
+            if (ImGui::IsItemClicked())
+            {
+                selectedType == std::get<I>(tuple)->GetType()
+                    ? selectedType = COMPONENT_NONE
+                    : selectedType = ComponentType(std::get<I>(tuple)->GetType());
+            }
+            ImGui::TreePop();
+        }
+    }
+    RenderHierarchyComponentsTuple<I + 1, Tp...>(tuple, selectedType, baseFlags);
+}
+
+// REMOVE COMPONENT
+template <std::size_t I = 0, typename... Tp>
+inline typename std::enable_if<I == sizeof...(Tp), void>::type
+RemoveComponentsTuple(std::tuple<Tp...>& tuple, ComponentType selectedType, GameObject* parent)
+{
+}
+
+template <std::size_t I = 0, typename... Tp>
+    inline typename std::enable_if <
+    I<sizeof...(Tp), void>::type
+    RemoveComponentsTuple(std::tuple<Tp...>& tuple, ComponentType selectedType, GameObject* parent)
+{
+    if (std::get<I>(tuple) && std::get<I>(tuple)->GetType() == selectedType)
+    {
+        delete std::get<I>(tuple);
+        std::get<I>(tuple) = nullptr;
+        parent->SetComponentRemoved(selectedType - 1);
+        return;
+    }
+    RemoveComponentsTuple<I + 1, Tp...>(tuple, selectedType, parent);
+}
+
+// ---------- END SECTION FOR TUPLE ITERATION ----------
+
 GameObject::GameObject(const std::string& name) : name(name)
 {
+    compTuple = std::make_tuple(COMPONENTS_NULLPTR);
+
     uid       = GenerateUID();
     parentUID = INVALID_UID;
 
@@ -25,10 +171,14 @@ GameObject::GameObject(const std::string& name) : name(name)
 
     globalOBB  = OBB(localAABB);
     globalAABB = AABB(globalOBB);
+
+    createdComponents.reset();
 }
 
 GameObject::GameObject(UID parentUID, const std::string& name) : parentUID(parentUID), name(name)
 {
+    compTuple = std::make_tuple(COMPONENTS_NULLPTR);
+
     uid       = GenerateUID();
 
     localAABB = AABB();
@@ -36,21 +186,30 @@ GameObject::GameObject(UID parentUID, const std::string& name) : parentUID(paren
 
     globalOBB  = OBB(localAABB);
     globalAABB = AABB(globalOBB);
+
+    createdComponents.reset();
 }
 
 GameObject::GameObject(UID parentUID, const std::string& name, UID uid) : parentUID(parentUID), name(name), uid(uid)
 {
+    compTuple = std::make_tuple(COMPONENTS_NULLPTR);
+
     localAABB = AABB();
     localAABB.SetNegativeInfinity();
 
     globalOBB  = OBB(localAABB);
     globalAABB = AABB(globalOBB);
+
+    createdComponents.reset();
 }
 
 GameObject::GameObject(UID parentUID, GameObject* refObject)
     : parentUID(parentUID), name(refObject->name), localTransform(refObject->localTransform),
       globalTransform(refObject->globalTransform)
 {
+    compTuple = std::make_tuple(COMPONENTS_NULLPTR);
+    createdComponents.reset();
+
     uid       = GenerateUID();
 
     localAABB = AABB();
@@ -65,20 +224,24 @@ GameObject::GameObject(UID parentUID, GameObject* refObject)
     rotation         = refObject->rotation;
     scale            = refObject->scale;
     prefabUID        = refObject->prefabUID;
+    navMeshValid     = refObject->navMeshValid;
 
     // Must make a copy of each manually
-    for (const auto& component : refObject->components)
+    for (int i = 0; i < std::tuple_size<decltype(compTuple)>::value; ++i)
     {
-        CreateComponent(component.first);
-        Component* newComponent = GetComponentByType(component.first);
-        newComponent->Clone(component.second);
+        if (refObject->IsComponentCreated(i)) CreateComponent(ComponentType(i + 1));
     }
+
+    DuplicateComponents(compTuple, refObject->GetComponentsTupleRef());
 
     OnAABBUpdated();
 }
 
 GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState["UID"].GetUint64())
 {
+    compTuple = std::make_tuple(COMPONENTS_NULLPTR);
+    createdComponents.reset();
+
     parentUID              = initialState["ParentUID"].GetUint64();
     name                   = initialState["Name"].GetString();
     selectedComponentIndex = COMPONENT_NONE;
@@ -89,6 +252,7 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
     if (initialState.HasMember("IsTopParent")) isTopParent = initialState["IsTopParent"].GetBool();
 
     if (initialState.HasMember("PrefabUID")) prefabUID = initialState["PrefabUID"].GetUint64();
+    if (initialState.HasMember("NavmeshValid")) navMeshValid = initialState["NavmeshValid"].GetBool();
 
     if (initialState.HasMember("LocalTransform") && initialState["LocalTransform"].IsArray() &&
         initialState["LocalTransform"].Size() == 16)
@@ -118,12 +282,7 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
         {
             const rapidjson::Value& jsonComponent = jsonComponents[i];
 
-            Component* newComponent               = ComponentUtils::CreateExistingComponent(jsonComponent, this);
-
-            if (newComponent != nullptr)
-            {
-                components.insert({newComponent->GetType(), newComponent});
-            }
+            ComponentUtils::CreateExistingComponent(jsonComponent, this);
         }
     }
 
@@ -140,21 +299,14 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
 
 GameObject::~GameObject()
 {
-    for (auto& component : components)
-    {
-        delete component.second;
-    }
-    components.clear();
+    std::apply([](auto&... tupleVar) { ((delete tupleVar, tupleVar = nullptr), ...); }, compTuple);
 }
 
 void GameObject::Init()
 {
     globalTransform = GetParentGlobalTransform() * localTransform;
 
-    for (auto& component : components)
-    {
-        component.second->Init();
-    }
+    std::apply([](auto&... pointer) { ((pointer ? pointer->Init() : Nothing()), ...); }, compTuple);
 }
 
 void GameObject::InitHierarchy()
@@ -213,6 +365,7 @@ void GameObject::Save(rapidjson::Value& targetState, rapidjson::Document::Alloca
     targetState.AddMember("Mobility", mobilitySettings, allocator);
     targetState.AddMember("IsTopParent", isTopParent, allocator);
     targetState.AddMember("Enabled", enabled, allocator);
+    targetState.AddMember("NavmeshValid", navMeshValid, allocator);
 
     if (prefabUID != INVALID_UID) targetState.AddMember("PrefabUID", prefabUID, allocator);
 
@@ -238,18 +391,7 @@ void GameObject::Save(rapidjson::Value& targetState, rapidjson::Document::Alloca
 
     // Serialize Components
     rapidjson::Value componentsJSON(rapidjson::kArrayType);
-
-    for (auto it = components.begin(); it != components.end(); ++it)
-    {
-        if (it->second != nullptr)
-        {
-            rapidjson::Value componentJSON(rapidjson::kObjectType);
-
-            it->second->Save(componentJSON, allocator);
-
-            componentsJSON.PushBack(componentJSON, allocator);
-        }
-    }
+    SaveComponentsTuple(compTuple, componentsJSON, allocator);
 
     // Add components to scene
     targetState.AddMember("Components", componentsJSON, allocator);
@@ -281,8 +423,10 @@ void GameObject::RenderEditorInspector()
     {
         ImGui::SameLine();
         if (ImGui::Checkbox("Draw nodes", &drawNodes)) OnDrawConnectionsToggle();
-        ImGui::SameLine();
         ImGui::Checkbox("Is top parent", &isTopParent);
+        ImGui::SameLine();
+        ImGui::Checkbox("Navmesh valid", &navMeshValid);
+
         if (ImGui::Button("Add Component"))
         {
             ImGui::OpenPopup("ComponentSelection");
@@ -348,23 +492,7 @@ void GameObject::RenderEditorInspector()
         ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick |
                                         ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Leaf;
 
-        for (const auto& component : components)
-        {
-            ImGuiTreeNodeFlags node_flag = base_flags;
-            if (selectedComponentIndex == component.first)
-            {
-                node_flag |= ImGuiTreeNodeFlags_Selected;
-            }
-            if (ImGui::TreeNodeEx((void*)component.second->GetUID(), node_flag, component.second->GetName()))
-            {
-                if (ImGui::IsItemClicked())
-                {
-                    selectedComponentIndex == component.first ? selectedComponentIndex = COMPONENT_NONE
-                                                              : selectedComponentIndex = component.first;
-                }
-                ImGui::TreePop();
-            }
-        }
+        RenderHierarchyComponentsTuple(compTuple, selectedComponentIndex, base_flags);
 
         ImGui::EndChild();
         ImGui::PopStyleVar();
@@ -378,10 +506,7 @@ void GameObject::RenderEditorInspector()
             "ComponentInspectorWrapper", ImVec2(0, 50), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeY
         );
 
-        if (components.find(selectedComponentIndex) != components.end())
-        {
-            components.at(selectedComponentIndex)->RenderEditorInspector();
-        }
+        RenderEditorComponentsTuple(compTuple, selectedComponentIndex);
 
         ImGui::EndChild();
         ImGui::PopStyleVar();
@@ -425,114 +550,32 @@ void GameObject::UpdateTransformForGOBranch()
     }
 }
 
-Component* GameObject::GetComponentByType(ComponentType type) const
-{
-    if (components.find(type) != components.end())
-    {
-        return components.at(type);
-    }
-    return nullptr;
-}
-
-Component* GameObject::GetComponentChildByType(ComponentType componentType) const
-{
-    std::queue<UID> gameObjects;
-
-    for (UID child : this->GetChildren())
-    {
-        gameObjects.push(child);
-    }
-
-    Scene* scene         = App->GetSceneModule()->GetScene();
-    Component* component = nullptr;
-
-    while (!gameObjects.empty())
-    {
-        UID currentGameObject = gameObjects.front();
-        gameObjects.pop();
-
-        GameObject* current = scene->GetGameObjectByUID(currentGameObject);
-        component           = current->GetComponentByType(componentType);
-
-        if (component != nullptr) break;
-
-        for (UID child : current->GetChildren())
-        {
-            gameObjects.push(child);
-        }
-    }
-
-    return component;
-}
-
-Component* GameObject::GetComponentParentByType(ComponentType componentType) const
-{
-    UID currentUID       = parentUID;
-
-    Scene* scene         = App->GetSceneModule()->GetScene();
-    Component* component = nullptr;
-
-    while (currentUID != scene->GetGameObjectRootUID())
-    {
-        GameObject* current = scene->GetGameObjectByUID(currentUID);
-        component           = current->GetComponentByType(componentType);
-
-        if (component != nullptr) break;
-
-        currentUID = current->parentUID;
-    }
-
-    return component;
-}
-
-MeshComponent* GameObject::GetMeshComponent() const
-{
-    if (components.find(COMPONENT_MESH) != components.end())
-    {
-        return dynamic_cast<MeshComponent*>(components.at(COMPONENT_MESH));
-    }
-    return nullptr;
-}
-
-AnimationComponent* GameObject::GetAnimationComponent() const
-{
-    if (components.find(COMPONENT_ANIMATION) != components.end())
-    {
-        return dynamic_cast<AnimationComponent*>(components.at(COMPONENT_ANIMATION));
-    }
-    return nullptr;
-}
-
 void GameObject::OnTransformUpdated()
 {
     globalTransform = GetParentGlobalTransform() * localTransform;
     globalOBB       = globalTransform * OBB(localAABB);
     globalAABB      = AABB(globalOBB);
 
-    MeshComponent* meshComponent = GetMeshComponent();
+    // MeshComponent* meshComponent = GetMeshComponent();
+    MeshComponent* meshComponent = GetComponent<MeshComponent*>();
     if (meshComponent != nullptr)
     {
         meshComponent->OnTransformUpdated();
     }
 
     // If the gameObject has a transform2D, update it
-    if (components.find(COMPONENT_TRANSFORM_2D) != components.end())
-    {
-        Transform2DComponent* transform2D = static_cast<Transform2DComponent*>(components.at(COMPONENT_TRANSFORM_2D));
-        transform2D->OnTransform3DUpdated(globalTransform);
-    }
+    Transform2DComponent* transform2D = GetComponent<Transform2DComponent*>();
+    if (transform2D) transform2D->OnTransform3DUpdated(globalTransform);
 
     if (mobilitySettings == STATIC) App->GetSceneModule()->GetScene()->SetStaticModified();
     else App->GetSceneModule()->GetScene()->SetDynamicModified();
 }
 
-void GameObject::UpdateComponents()
+void GameObject::ParentUpdatedComponents()
 {
     if (!IsGloballyEnabled()) return;
-    for (const auto& component : components)
-    {
-        if (component.second) component.second->ParentUpdated();
-    }
+
+    std::apply([](auto&... pointer) { ((pointer ? pointer->ParentUpdated() : Nothing()), ...); }, compTuple);
 }
 
 AABB GameObject::GetHierarchyAABB()
@@ -782,6 +825,20 @@ bool GameObject::TargetIsChildren(UID uidTarget)
     return false;
 }
 
+void GameObject::UpdateComponents(float deltaTime)
+{
+    std::apply(
+        [&deltaTime](auto&... pointer) { ((pointer ? pointer->Update(deltaTime) : Nothing()), ...); }, compTuple
+    );
+}
+
+void GameObject::RenderDebugComponents(float deltaTime)
+{
+    std::apply(
+        [&deltaTime](auto&... pointer) { ((pointer ? pointer->RenderDebug(deltaTime) : Nothing()), ...); }, compTuple
+    );
+}
+
 void GameObject::UpdateGameObjectHierarchy(UID sourceUID)
 {
     GameObject* sourceGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(sourceUID);
@@ -791,8 +848,8 @@ void GameObject::UpdateGameObjectHierarchy(UID sourceUID)
         UID oldParentUID = sourceGameObject->GetParent();
         sourceGameObject->SetParent(uid);
 
-        Component* transform2D = sourceGameObject->GetComponentByType(COMPONENT_TRANSFORM_2D);
-        if (transform2D) static_cast<Transform2DComponent*>(transform2D)->OnParentChange();
+        Transform2DComponent* transform2D = sourceGameObject->GetComponent<Transform2DComponent*>();
+        if (transform2D) transform2D->OnParentChange();
 
         GameObject* oldParentGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(oldParentUID);
 
@@ -813,20 +870,22 @@ void GameObject::OnAABBUpdated()
     localAABB = localAABB;
     localAABB.SetNegativeInfinity();
 
-    for (auto& component : components)
-    {
-        localAABB.Enclose(component.second->GetLocalAABB());
-    }
+    AABB temp;
+    temp.SetNegativeInfinity();
 
+    std::apply(
+        [&temp](auto&... pointer) { ((pointer ? temp.Enclose(pointer->GetLocalAABB()) : Nothing()), ...); }, compTuple
+    );
+
+    localAABB = temp;
     OnTransformUpdated();
 }
 
 void GameObject::Render(float deltaTime) const
 {
-    for (auto& component : components)
-    {
-        component.second->Render(deltaTime);
-    }
+    std::apply(
+        [&deltaTime](auto&... pointer) { ((pointer ? pointer->Render(deltaTime) : Nothing()), ...); }, compTuple
+    );
 }
 
 void GameObject::RenderEditor()
@@ -955,13 +1014,13 @@ void GameObject::UpdateMobilityHierarchy(MobilitySettings type)
 
 bool GameObject::CreateComponent(const ComponentType componentType)
 {
-    if (components.find(componentType) == components.end())
+
+    if (!createdComponents[componentType - 1])
     // TODO Allow override of components after displaying an info box
     {
-        Component* createdComponent = ComponentUtils::CreateEmptyComponent(componentType, GenerateUID(), this);
-        if (createdComponent != nullptr)
+        ComponentUtils::CreateEmptyComponent(componentType, GenerateUID(), this);
+        if (createdComponents[componentType - 1])
         {
-            components.insert({componentType, createdComponent});
             selectedComponentIndex = componentType;
             OnAABBUpdated();
             return true;
@@ -973,13 +1032,16 @@ bool GameObject::CreateComponent(const ComponentType componentType)
 
 bool GameObject::RemoveComponent(ComponentType componentType)
 {
-    if (components.find(componentType) != components.end())
+    if (createdComponents[componentType - 1])
     {
-        delete components.at(componentType);
-        components.erase(componentType);
-        selectedComponentIndex = COMPONENT_NONE;
+        RemoveComponentsTuple(compTuple, componentType, this);
+        if (!createdComponents[componentType - 1])
+        {
+            selectedComponentIndex = COMPONENT_NONE;
+            OnAABBUpdated();
 
-        OnAABBUpdated();
+            return true;
+        }
     }
     return false;
 }

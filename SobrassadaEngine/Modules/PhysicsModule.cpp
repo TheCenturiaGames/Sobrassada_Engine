@@ -109,6 +109,7 @@ bool PhysicsModule::ShutDown()
     delete broadPhase;
     delete dispatcher;
     delete collisionConfiguration;
+    delete debugDraw;
 
     return true;
 }
@@ -400,6 +401,6 @@ void PhysicsModule::RebuildWorld()
 
     for (const auto& gameObject : allGameObjects)
     {
-        gameObject.second->UpdateComponents();
+        gameObject.second->ParentUpdatedComponents();
     }
 }

@@ -1,17 +1,39 @@
 #pragma once
 
+#include "Application.h"
 #include "ComponentUtils.h"
 #include "Globals.h"
+#include "SceneModule.h"
 
 #include "Geometry/AABB.h"
 #include "Geometry/OBB.h"
 #include "rapidjson/document.h"
+#include <bitset>
+#include <queue>
 #include <string>
+#include <tuple>
 #include <unordered_map>
 #include <vector>
 
 class MeshComponent;
+class PointLightComponent;
+class SpotLightComponent;
+class DirectionalLightComponent;
+class CharacterControllerComponent;
+class Transform2DComponent;
+class CanvasComponent;
+class UILabelComponent;
+class CameraComponent;
+class ScriptComponent;
+class CubeColliderComponent;
+class SphereColliderComponent;
+class CapsuleColliderComponent;
 class AnimationComponent;
+class AIAgentComponent;
+class ImageComponent;
+class ButtonComponent;
+class AudioSourceComponent;
+class AudioListenerComponent;
 
 enum MobilitySettings
 {
@@ -38,6 +60,8 @@ class SOBRASADA_API_ENGINE GameObject
 
     bool IsStatic() const { return mobilitySettings == MobilitySettings::STATIC; };
     bool IsTopParent() const { return isTopParent; };
+    bool IsNavMeshValid() const { return navMeshValid; };
+    bool IsComponentCreated(int i) const { return createdComponents[i]; };
 
     bool AddGameObject(UID gameObjectUID);
     bool RemoveGameObject(UID gameObjectUID);
@@ -52,6 +76,8 @@ class SOBRASADA_API_ENGINE GameObject
     void UpdateGameObjectHierarchy(UID sourceUID);
     void RenameGameObjectHierarchy();
     bool TargetIsChildren(UID uidTarget);
+    void UpdateComponents(float deltaTime);
+    void RenderDebugComponents(float deltaTime);
 
     const std::string& GetName() const { return name; }
     void SetName(const std::string& newName) { name = newName; }
@@ -88,19 +114,15 @@ class SOBRASADA_API_ENGINE GameObject
 
     bool WillUpdate() const { return willUpdate; };
 
-    const std::unordered_map<ComponentType, Component*>& GetComponents() const { return components; }
-    Component* GetComponentByType(ComponentType type) const;
-    Component* GetComponentChildByType(ComponentType componentType) const;
-    Component* GetComponentParentByType(ComponentType componentType) const;
-
-    MeshComponent* GetMeshComponent() const;
-
-    AnimationComponent* GetAnimationComponent() const;
+    template <typename T> T GetComponent() const { return std::get<T>(compTuple); }
+    template <typename T> T GetComponentChild(Application* app) const;
+    template <typename T> T GetComponentParent(Application* app) const;
 
     const float3& GetPosition() const { return position; }
     const float3& GetRotation() const { return rotation; }
     const float3& GetScale() const { return scale; }
     AABB GetHierarchyAABB();
+    std::tuple<COMPONENTS>& GetComponentsTupleRef() { return compTuple; }
 
     void SetLocalTransform(const float4x4& newTransform);
     void DrawGizmos() const;
@@ -109,12 +131,14 @@ class SOBRASADA_API_ENGINE GameObject
     bool IsGloballyEnabled() const;
     UID GetPrefabUID() const { return prefabUID; }
     void SetPrefabUID(const UID uid) { prefabUID = uid; }
-    void UpdateComponents();
+    void ParentUpdatedComponents();
     void OnTransformUpdated();
     void SetPosition(float3& newPosition) { position = newPosition; };
     void SetWillUpdate(bool willUpdate) { this->willUpdate = willUpdate; };
     bool IsEnabled() const { return enabled; }
     void SetEnabled(bool state) { enabled = state; }
+    void SetComponentCreated(int position) { createdComponents[position] = true; }
+    void SetComponentRemoved(int position) { createdComponents[position] = false; }
 
   private:
     void DrawNodes() const;
@@ -131,8 +155,6 @@ class SOBRASADA_API_ENGINE GameObject
     std::vector<UID> children;
 
     std::string name;
-
-    std::unordered_map<ComponentType, Component*> components;
 
     AABB localAABB;
     AABB globalAABB;
@@ -156,4 +178,60 @@ class SOBRASADA_API_ENGINE GameObject
     bool isTopParent                     = false;
     bool willUpdate                      = false;
     bool enabled                         = true;
+    bool navMeshValid                    = false;
+
+    std::tuple<COMPONENTS> compTuple     = std::make_tuple(COMPONENTS_NULLPTR);
+    std::bitset<std::tuple_size<decltype(compTuple)>::value> createdComponents;
 };
+
+template <typename T> inline T GameObject::GetComponentChild(Application* app) const
+{
+    T component = nullptr;
+
+    std::queue<UID> gameObjects;
+
+    for (UID child : this->GetChildren())
+    {
+        gameObjects.push(child);
+    }
+
+    Scene* scene = app->GetSceneModule()->GetScene();
+
+    while (!gameObjects.empty())
+    {
+        UID currentGameObject = gameObjects.front();
+        gameObjects.pop();
+
+        GameObject* current = scene->GetGameObjectByUID(currentGameObject);
+        component           = current->GetComponent<T>();
+
+        if (component) break;
+
+        for (UID child : current->GetChildren())
+        {
+            gameObjects.push(child);
+        }
+    }
+
+    return component;
+}
+
+template <typename T> inline T GameObject::GetComponentParent(Application* app) const
+{
+    T component    = nullptr;
+    UID currentUID = parentUID;
+
+    Scene* scene   = app->GetSceneModule()->GetScene();
+
+    while (currentUID != scene->GetGameObjectRootUID())
+    {
+        GameObject* current = scene->GetGameObjectByUID(currentUID);
+        component           = current->GetComponent<T>();
+
+        if (component) break;
+
+        currentUID = current->parentUID;
+    }
+
+    return component;
+}
