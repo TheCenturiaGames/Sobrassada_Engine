@@ -24,14 +24,13 @@ bool CuChulainn::Init()
 
     Character::Init();
 
-    Component* agent = parent->GetComponentByType(COMPONENT_CHARACTER_CONTROLLER);
-    if (!agent)
+    character = parent->GetComponent<CharacterControllerComponent*>();
+    if (!character)
     {
         GLOG("CharacterController component not found for CuChulainn");
         return false;
     }
 
-    character = dynamic_cast<CharacterControllerComponent*>(agent);
     character->SetSpeed(speed);
 
     return true;
@@ -101,7 +100,6 @@ void CuChulainn::HandleState(float time)
         {
             animComponent->UseTrigger("idle");
         }
-
     }
     // If(Input de dash){
     // stateMachine->UseTrigger("Dash");

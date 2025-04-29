@@ -58,15 +58,12 @@ ImageComponent::~ImageComponent()
 
 void ImageComponent::Init()
 {
-    Component* transform = parent->GetComponentByType(COMPONENT_TRANSFORM_2D);
-    if (transform == nullptr)
+    transform2D = parent->GetComponent<Transform2DComponent*>();
+
+    if (transform2D == nullptr)
     {
         parent->CreateComponent(COMPONENT_TRANSFORM_2D);
-        transform2D = static_cast<Transform2DComponent*>(parent->GetComponentByType(COMPONENT_TRANSFORM_2D));
-    }
-    else
-    {
-        transform2D = static_cast<Transform2DComponent*>(transform);
+        transform2D = parent->GetComponent<Transform2DComponent*>();
     }
 
     parentCanvas = transform2D->GetParentCanvas();
@@ -117,14 +114,12 @@ void ImageComponent::Clone(const Component* other)
 
 void ImageComponent::RenderDebug(float deltaTime)
 {
-
 }
 
 void ImageComponent::Update(float deltaTime)
 {
     if (matchParentSize) MatchParentSize();
 }
-
 
 void ImageComponent::RenderEditorInspector()
 {
@@ -263,12 +258,11 @@ void ImageComponent::MatchParentSize()
 {
     if (transform2D == nullptr) return;
 
-    const UID parentUID        = parent->GetParent();
+    const UID parentUID  = parent->GetParent();
     GameObject* parentGO = App->GetSceneModule()->GetScene()->GetGameObjectByUID(parentUID);
 
     // Check if parent has transform 2D
-    if (Transform2DComponent* parentT2D =
-            static_cast<Transform2DComponent*>(parentGO->GetComponentByType(COMPONENT_TRANSFORM_2D)))
+    if (Transform2DComponent* parentT2D = parentGO->GetComponent<Transform2DComponent*>())
     {
         transform2D->size     = parentT2D->size;
         transform2D->position = float2(0, 0);
@@ -276,7 +270,7 @@ void ImageComponent::MatchParentSize()
     }
 
     // Check if parent is a canvas
-    if (CanvasComponent* canvas = static_cast<CanvasComponent*>(parentGO->GetComponentByType(COMPONENT_CANVAS)))
+    if (CanvasComponent* canvas = parentGO->GetComponent<CanvasComponent*>())
     {
         transform2D->size     = float2(canvas->GetWidth(), canvas->GetHeight());
         transform2D->position = float2(0, 0);

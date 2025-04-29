@@ -63,15 +63,11 @@ ButtonComponent::~ButtonComponent()
 
 void ButtonComponent::Init()
 {
-    Component* transform = parent->GetComponentByType(COMPONENT_TRANSFORM_2D);
-    if (transform == nullptr)
+    transform2D = parent->GetComponent<Transform2DComponent*>();
+    if (transform2D == nullptr)
     {
         parent->CreateComponent(COMPONENT_TRANSFORM_2D);
-        transform2D = static_cast<Transform2DComponent*>(parent->GetComponentByType(COMPONENT_TRANSFORM_2D));
-    }
-    else
-    {
-        transform2D = static_cast<Transform2DComponent*>(transform);
+        transform2D = parent->GetComponent<Transform2DComponent*>();
     }
 
     parentCanvas = transform2D->GetParentCanvas();
@@ -86,15 +82,11 @@ void ButtonComponent::Init()
     }
 
     // Get the image
-    Component* linkedImage = parent->GetComponentByType(COMPONENT_IMAGE);
-    if (linkedImage == nullptr)
+    image = parent->GetComponent<ImageComponent*>();
+    if (image == nullptr)
     {
         parent->CreateComponent(COMPONENT_IMAGE);
-        image = static_cast<ImageComponent*>(parent->GetComponentByType(COMPONENT_IMAGE));
-    }
-    else
-    {
-        image = static_cast<ImageComponent*>(linkedImage);
+        image = parent->GetComponent<ImageComponent*>();
     }
 }
 

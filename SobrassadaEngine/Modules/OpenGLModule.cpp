@@ -181,6 +181,7 @@ bool OpenGLModule::ShutDown()
 
     SDL_GL_DeleteContext(App->GetWindowModule()->window);
     delete framebuffer;
+    delete gBuffer;
     return true;
 }
 

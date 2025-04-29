@@ -2,19 +2,18 @@
 
 #include "ButtonScript.h"
 #include "CuChulainn.h"
-#include "Globals.h"
-#include "ButtonScript.h"
 #include "ExitGameScript.h"
 #include "FullscreenToggleScript.h"
-#include "VSyncToggleScript.h"
-#include "PauseMenuScript.h"
-#include "OptionsMenuSwitcherScript.h"
-#include "MainMenuSelectorScript.h"
-#include "PressAnyKeyScript.h"
+#include "Globals.h"
 #include "GodMode.h"
+#include "MainMenuSelectorScript.h"
+#include "OptionsMenuSwitcherScript.h"
+#include "PauseMenuScript.h"
+#include "PressAnyKeyScript.h"
 #include "RotateGameObject.h"
 #include "Soldier.h"
 #include "CameraMovement.h"
+#include "VSyncToggleScript.h"
 
 #include <string>
 

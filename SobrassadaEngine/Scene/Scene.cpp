@@ -35,7 +35,6 @@
 #include "Standalone/Lights/PointLightComponent.h"
 #include "Standalone/Lights/SpotLightComponent.h"
 #include "Standalone/MeshComponent.h"
-#include "HashString.h"
 
 #include "SDL_mouse.h"
 #include "glew.h"
@@ -150,8 +149,8 @@ void Scene::Init()
     // Initialize the skinning for all the gameObjects that need it
     for (const auto& gameObject : gameObjectsContainer)
     {
-        MeshComponent* mesh = gameObject.second->GetMeshComponent();
-        if (mesh != nullptr) mesh->InitSkin();
+        MeshComponent* mesh = gameObject.second->GetComponent<MeshComponent*>();
+        if (mesh) mesh->InitSkin();
     }
 
     lightsConfig->InitSkybox();
@@ -241,25 +240,14 @@ update_status Scene::Update(float deltaTime)
     {
         for (auto& gameObject : gameObjectsContainer)
         {
-            std::unordered_map<ComponentType, Component*> componentList = gameObject.second->GetComponents();
-
-            for (auto& component : componentList)
-            {
-                if (component.first == ComponentType::COMPONENT_SCRIPT)
-                    dynamic_cast<ScriptComponent*>(component.second)->InitScriptInstances();
-            }
+            ScriptComponent* script = gameObject.second->GetComponent<ScriptComponent*>();
+            if (script) script->InitScriptInstances();
         }
         App->GetSceneModule()->ResetOnlyOnceInPlayMode();
     }
 
     for (auto& gameObject : gameObjectsContainer)
-    {
-        std::unordered_map<ComponentType, Component*> componentList = gameObject.second->GetComponents();
-        for (auto& component : componentList)
-        {
-            component.second->Update(deltaTime);
-        }
-    }
+        gameObject.second->UpdateComponents(deltaTime);
 
     ImGuiWindow* window = ImGui::FindWindowByName(sceneName.c_str());
     if (window && !(window->Hidden || window->Collapsed)) sceneVisible = true;
@@ -279,13 +267,7 @@ update_status Scene::Render(float deltaTime)
     else RenderScene(deltaTime, nullptr);
 
     GameObject* selectedGameObject = App->GetSceneModule()->GetScene()->GetSelectedGameObject();
-    if (selectedGameObject != nullptr)
-    {
-        for (const auto& component : selectedGameObject->GetComponents())
-        {
-            component.second->RenderDebug(deltaTime);
-        }
-    }
+    if (selectedGameObject != nullptr) selectedGameObject->RenderDebugComponents(deltaTime);
 
     return UPDATE_CONTINUE;
 }
@@ -676,7 +658,7 @@ void Scene::UpdateGameObjects()
     {
         if (gameObject)
         {
-            gameObject->UpdateComponents();
+            gameObject->ParentUpdatedComponents();
             gameObject->SetWillUpdate(false);
         }
     }
@@ -697,6 +679,7 @@ void Scene::AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
         selectedGameObject->IsStatic() ? MobilitySettings::STATIC : MobilitySettings::DYNAMIC;
 
     auto pairResultMobility = selectedGameObjectsMobility.insert({gameObject, gameObjectMobility});
+    auto pairResultLocals   = selectedGameObjectsOgLocals.insert({gameObject, selectedGameObject->GetLocalTransform()});
 
     if (pairResult.second)
     {
@@ -728,6 +711,7 @@ void Scene::AddGameObjectToSelection(UID gameObject, UID gameObjectParent)
 
         selectedGameObjects.erase(pairResult.first);
         selectedGameObjectsMobility.erase(pairResultMobility.first);
+        selectedGameObjectsOgLocals.erase(pairResultLocals.first);
     }
 }
 
@@ -756,6 +740,7 @@ void Scene::ClearObjectSelection()
 
     selectedGameObjects.clear();
     selectedGameObjectsMobility.clear();
+    selectedGameObjectsOgLocals.clear();
 }
 
 void Scene::DeleteMultiselection()
@@ -775,22 +760,6 @@ void Scene::DeleteMultiselection()
     selectedGameObjects.clear();
     selectedGameObjectsMobility.clear();
     ClearGameObjectsToUpdate();
-}
-
-const std::vector<Component*> Scene::GetAllComponents() const
-{
-    std::vector<Component*> collectedComponents;
-    for (const auto& pair : gameObjectsContainer)
-    {
-        if (pair.second != nullptr)
-        {
-            for (const auto& component : pair.second->GetComponents())
-            {
-                collectedComponents.push_back(component.second);
-            }
-        }
-    }
-    return collectedComponents;
 }
 
 UID Scene::GetMultiselectUID() const
@@ -902,7 +871,7 @@ void Scene::GeometryPassRender(
 
     for (const auto& gameObject : objectsToRender)
     {
-        MeshComponent* mesh = gameObject->GetMeshComponent();
+        MeshComponent* mesh = gameObject->GetComponent<MeshComponent*>();
         if (mesh != nullptr && mesh->GetEnabled() && mesh->GetBatch() != nullptr) meshesToRender.push_back(mesh);
     }
 
@@ -1170,7 +1139,7 @@ void Scene::LoadModel(const UID modelUID)
                                 AddGameObject(meshObject->GetUID(), meshObject);
                             }
 
-                            MeshComponent* meshComponent = meshObject->GetMeshComponent();
+                            MeshComponent* meshComponent = meshObject->GetComponent<MeshComponent*>();
                             meshComponent->SetModelUID(modelUID);
                             meshComponent->AddMesh(mesh.first, false);
                             meshComponent->AddMaterial(mesh.second);
@@ -1210,7 +1179,7 @@ void Scene::LoadModel(const UID modelUID)
             if (!animUIDs.empty())
             {
                 rootGameObject->CreateComponent(COMPONENT_ANIMATION);
-                AnimationComponent* animComponent = rootGameObject->GetAnimationComponent();
+                AnimationComponent* animComponent = rootGameObject->GetComponent<AnimationComponent*>();
 
                 GLOG("Model has %zu animations", animUIDs.size());
                 for (UID uid : animUIDs)
@@ -1275,7 +1244,7 @@ void Scene::LoadPrefab(const UID prefabUID, const ResourcePrefab* prefab, const 
         // Then do a second loop to update all components UIDs reference (ex. skinning)
         for (int i = 0; i < newObjects.size(); ++i)
         {
-            MeshComponent* mesh = referenceObjects[i]->GetMeshComponent();
+            MeshComponent* mesh = referenceObjects[i]->GetComponent<MeshComponent*>();
             if (mesh != nullptr && mesh->GetBones().size() > 0)
             {
                 // Remap the bones references
@@ -1291,12 +1260,12 @@ void Scene::LoadPrefab(const UID prefabUID, const ResourcePrefab* prefab, const 
                 }
 
                 // This should never be nullptr
-                MeshComponent* newMesh = newObjects[i]->GetMeshComponent();
+                MeshComponent* newMesh = newObjects[i]->GetComponent<MeshComponent*>();
                 newMesh->SetBones(newBonesObjects, newBonesUIDs);
             }
 
             // If has animations, map them here
-            AnimationComponent* animComp = newObjects[i]->GetAnimationComponent();
+            AnimationComponent* animComp = newObjects[i]->GetComponent<AnimationComponent*>();
             if (animComp) animComp->SetBoneMapping();
         }
 
@@ -1352,24 +1321,24 @@ void Scene::OverridePrefabs(const UID prefabUID)
     App->GetResourcesModule()->ReleaseResource(prefab);
 }
 
-template <typename T> std::vector<T*> Scene::GetEnabledComponentsOfType() const
+template <typename T> std::vector<T> Scene::GetEnabledComponentsOfType() const
 {
-    std::vector<T*> result;
+    std::vector<T> result;
 
     for (const auto& [uid, go] : gameObjectsContainer)
     {
         if (!go || !go->IsGloballyEnabled()) continue;
 
-        Component* comp = go->GetComponentByType(T::STATIC_TYPE);
+        T comp = go->GetComponent<T>();
         if (comp && comp->GetEnabled())
         {
-            result.push_back(static_cast<T*>(comp));
+            result.push_back(comp);
         }
     }
 
     return result;
 }
 
-template std::vector<DirectionalLightComponent*> Scene::GetEnabledComponentsOfType<DirectionalLightComponent>() const;
-template std::vector<PointLightComponent*> Scene::GetEnabledComponentsOfType<PointLightComponent>() const;
-template std::vector<SpotLightComponent*> Scene::GetEnabledComponentsOfType<SpotLightComponent>() const;
+template std::vector<DirectionalLightComponent*> Scene::GetEnabledComponentsOfType<DirectionalLightComponent*>() const;
+template std::vector<PointLightComponent*> Scene::GetEnabledComponentsOfType<PointLightComponent*>() const;
+template std::vector<SpotLightComponent*> Scene::GetEnabledComponentsOfType<SpotLightComponent*>() const;

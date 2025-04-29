@@ -1,15 +1,14 @@
 #include "pch.h"
 
-#include "FullscreenToggleScript.h"
 #include "Application.h"
 #include "EditorUIModule.h"
+#include "FullscreenToggleScript.h"
 #include "GameObject.h"
 #include "Standalone/UI/ButtonComponent.h"
 
 bool FullscreenToggleScript::Init()
 {
-    Component* button = parent->GetComponentByType(COMPONENT_BUTTON);
-
+    ButtonComponent* button = parent->GetComponent<ButtonComponent*>();
     if (button)
     {
         FullscreenToggleScript* self   = this;
@@ -20,13 +19,12 @@ bool FullscreenToggleScript::Init()
         };
 
         Delegate<void> delegate(function);
-        delegateID            = static_cast<ButtonComponent*>(button)->AddOnClickCallback(delegate);
+        delegateID            = button->AddOnClickCallback(delegate);
         hasRegisteredCallback = true;
     }
 
     return true;
 }
-
 
 void FullscreenToggleScript::Update(float deltaTime)
 {
@@ -45,11 +43,8 @@ FullscreenToggleScript::~FullscreenToggleScript()
 {
     if (hasRegisteredCallback)
     {
-        Component* button = parent->GetComponentByType(COMPONENT_BUTTON);
-        if (button)
-        {
-            static_cast<ButtonComponent*>(button)->RemoveOnClickCallback(delegateID);
-        }
+        ButtonComponent* button = parent->GetComponent<ButtonComponent*>();
+        if (button) button->RemoveOnClickCallback(delegateID);
     }
 }
 
