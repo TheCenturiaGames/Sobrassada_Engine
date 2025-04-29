@@ -37,7 +37,6 @@
 #include "Standalone/MeshComponent.h"
 #include "HashString.h"
 
-
 #include "SDL_mouse.h"
 #include "glew.h"
 #include "imgui.h"
@@ -65,8 +64,7 @@ Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUI
     this->sceneName       = initialState["Name"].GetString();
     gameObjectRootUID     = initialState["RootGameObject"].GetUint64();
     selectedGameObjectUID = gameObjectRootUID;
-    if (initialState.HasMember("NavmeshUID"))
-        navmeshUID = initialState["NavmeshUID"].GetUint64();
+    if (initialState.HasMember("NavmeshUID")) navmeshUID = initialState["NavmeshUID"].GetUint64();
 
     App->GetPhysicsModule()->LoadLayerData(&initialState);
 
@@ -125,7 +123,6 @@ Scene::~Scene()
 
 void Scene::Init()
 {
-
     // When loading a scene, overrides all gameObjects that have a prefabUID. That is because if the prefab has been
     // modified, the scene file may have not, so the prefabs need to be updated when loading the scene again
     std::vector<UID> prefabs;
@@ -143,6 +140,13 @@ void Scene::Init()
         OverridePrefabs(prefab);
     }
 
+    for (auto& gameObject : gameObjectsContainer)
+    {
+        if (gameObject.second->GetParent() == gameObjectRootUID) gameObject.second->InitHierarchy();
+    }
+
+    App->GetResourcesModule()->GetBatchManager()->LoadData();
+
     // Initialize the skinning for all the gameObjects that need it
     for (const auto& gameObject : gameObjectsContainer)
     {
@@ -150,16 +154,10 @@ void Scene::Init()
         if (mesh != nullptr) mesh->InitSkin();
     }
 
-    for (auto& gameObject : gameObjectsContainer)
-    {
-        gameObject.second->Init();
-    }
-    App->GetResourcesModule()->GetBatchManager()->LoadData();
-
     lightsConfig->InitSkybox();
     lightsConfig->InitLightBuffers();
 
-    //Load navmesh from scene.
+    // Load navmesh from scene.
     if (navmeshUID != INVALID_UID)
     {
         std::string navmeshName = App->GetLibraryModule()->GetResourceName(navmeshUID);
@@ -1174,7 +1172,7 @@ void Scene::LoadModel(const UID modelUID)
 
                             MeshComponent* meshComponent = meshObject->GetMeshComponent();
                             meshComponent->SetModelUID(modelUID);
-                            meshComponent->AddMesh(mesh.first);
+                            meshComponent->AddMesh(mesh.first, false);
                             meshComponent->AddMaterial(mesh.second);
 
                             // Add skin to meshComponent
@@ -1220,7 +1218,7 @@ void Scene::LoadModel(const UID modelUID)
                     GLOG("Setting aimation resource with UID %llu ", uid);
                     animComponent->SetAnimationResource(uid);
 
-                    GLOG("Animation UID: %d", uid);
+                    GLOG("Animation UID: %llu", uid);
                 }
             }
             else
