@@ -25,6 +25,7 @@
 #include "TextureEditor.h"
 #include "TextureImporter.h"
 #include "WindowModule.h"
+#include "ScriptModule.h"
 
 #include "Math/Quat.h"
 #include "SDL.h"
