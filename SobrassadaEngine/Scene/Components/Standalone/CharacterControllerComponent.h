@@ -59,5 +59,5 @@ class SOBRASADA_API_ENGINE CharacterControllerComponent : public Component
     bool isRotating              = false;
     float3 targetLookDirection;
 
-   float3 mouseWorldPos;
+   float3 mouseDirection;
 };
