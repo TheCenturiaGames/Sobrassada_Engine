@@ -432,10 +432,8 @@ const LineSegment& CameraComponent::CastCameraRay()
     float percentageX    = (std::get<0>(mousePos) - windowMinX) / (windowMaxX - windowMinX);
     float percentageY    = (std::get<1>(mousePos) - windowMinY) / (windowMaxY - windowMinY);
 
-    float normalizedX    = Lerp(-1.0f, 1.0f, percentageX);
-    float normalizedY    = Lerp(1.0f, -1.0f, percentageY);
-
-    LineSegment ray;
+    float normalizedX    = Clamp(Lerp(-1.0f, 1.0f, percentageX), -1.0f, 1.0f);
+    float normalizedY    = Clamp(Lerp(1.0f, -1.0f, percentageY), -1.0f, 1.0f);
 
     return camera.UnProjectLineSegment(normalizedX, normalizedY);
 }

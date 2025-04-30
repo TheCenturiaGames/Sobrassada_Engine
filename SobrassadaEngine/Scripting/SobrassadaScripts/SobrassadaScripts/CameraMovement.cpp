@@ -16,8 +16,11 @@
 CameraMovement::CameraMovement(GameObject* parent) : Script(parent)
 {
     fields.push_back({"Target", InspectorField::FieldType::InputText, &targetName});
-    fields.push_back({"Smoothness", InspectorField::FieldType::Float, &smoothVelocity, 0, 100});
-    fields.push_back({"Offset Intensity", InspectorField::FieldType::Float, &mouseOffsetIntensity, 0, 1});
+    fields.push_back({"Smoothness", InspectorField::FieldType::Float, &followSmoothness, 0, 100});
+    fields.push_back({"Mouse Offset Intensity", InspectorField::FieldType::Float, &mouseOffsetIntensity, 0, 1});
+    fields.push_back({"Mouse Offset Smoothness", InspectorField::FieldType::Float, &mouseSmoothness, 0, 100});
+    fields.push_back({"Look Ahead Intensity", InspectorField::FieldType::Float, &lookAheadIntensity, 0, 10});
+    fields.push_back({"Look Ahead Smoothness", InspectorField::FieldType::Float, &lookAheadSmoothness, 0, 100});
 }
 
 bool CameraMovement::Init()
@@ -30,32 +33,37 @@ bool CameraMovement::Init()
 
 void CameraMovement::Update(float deltaTime)
 {
-    FollowTarget(deltaTime);
+   FollowTarget(deltaTime);
 }
 
 void CameraMovement::FollowTarget(float deltaTime)
 {
     if (!target) return;
 
-    const float2 mousePos           = AppEngine->GetInputModule()->GetMousePosition();
-
-    const float4x4& parentTransform = parent->GetGlobalTransform();
-    const float2 localPos = mousePos - float2(parentTransform.TranslatePart().x, parentTransform.TranslatePart().y);
-
-    const float3 worldPos = AppEngine->GetSceneModule()->GetScene()->GetMainCamera()->ScreenPointToXZ(
-        parent->GetGlobalTransform().TranslatePart().y
-    );
-    GLOG("Mouse position: %f, %f", mousePos.x, mousePos.y);
-    GLOG("Local position: %f, %f", localPos.x, localPos.y);
-    GLOG("World position: %f, %f, %f", worldPos.x, worldPos.y, worldPos.z);
-
-    const float3 clampPos        = worldPos.Clamp(-20, 20); 
-    GLOG("Clamped position: %f, %f, %f", clampPos.x, clampPos.y, clampPos.z);
-
-    const float3 desiredPosition = target->GetGlobalTransform().TranslatePart() + clampPos * 0.5f  * mouseOffsetIntensity;
+    float3 desiredPosition = target->GetGlobalTransform().TranslatePart();
     const float3 currentPosition = parent->GetGlobalTransform().TranslatePart();
 
-    const float3 finalPosition   = Lerp(currentPosition, desiredPosition, (smoothVelocity * deltaTime));
+    if (mouseOffsetEnabled)
+    {
+        const float3 mouseWorldPos = AppEngine->GetSceneModule()->GetScene()->GetMainCamera()->ScreenPointToXZ(
+            parent->GetGlobalTransform().TranslatePart().y
+        );
+        desiredPosition += mouseWorldPos * 0.5f * mouseOffsetIntensity;
+
+        finalPosition    = Lerp(currentPosition, desiredPosition, mouseSmoothness * deltaTime);
+    }
+    else if (lookAheadEnabled)
+    {
+        const float3 targetRotation  = target->GetGlobalTransform().Col3(2);
+        const float3 targetDir       = float3(targetRotation.x, 0, targetRotation.z).Normalized();
+        desiredPosition += targetDir * lookAheadIntensity;
+
+        finalPosition                 = Lerp(currentPosition, desiredPosition, lookAheadSmoothness * deltaTime);
+    }
+    else
+    {
+        finalPosition = Lerp(currentPosition, desiredPosition, followSmoothness * deltaTime);
+    }
 
     parent->SetLocalPosition(finalPosition);
 }

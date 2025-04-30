@@ -22,8 +22,14 @@ class CameraMovement : public Script
     std::string targetName;
     const GameObject* target = nullptr;
 
-    float2 desiredPosition;
-    float smoothVelocity = 10;
+    float3 finalPosition;
+    float followSmoothness     = 10;
 
+    bool mouseOffsetEnabled = false;
     float mouseOffsetIntensity = 0;
+    float mouseSmoothness      = 0;
+
+    bool lookAheadEnabled = false;
+    float lookAheadIntensity   = 0;
+    float lookAheadSmoothness  = 0;
 };
