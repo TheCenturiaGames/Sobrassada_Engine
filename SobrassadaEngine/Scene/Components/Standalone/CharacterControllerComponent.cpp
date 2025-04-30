@@ -408,10 +408,9 @@ void CharacterControllerComponent::HandleInput(float deltaTime)
     //     //TODO: StateMachine IDLE
     // }
 
-    if (mouseButtons[SDL_BUTTON_LEFT - 1] && !isRotating)
+if (mouseButtons[SDL_BUTTON_LEFT - 1] == KEY_DOWN && !isRotating)
     {
         isRotating = true;
-        //LookAtMouse(deltaTime);
     }
 }
 
