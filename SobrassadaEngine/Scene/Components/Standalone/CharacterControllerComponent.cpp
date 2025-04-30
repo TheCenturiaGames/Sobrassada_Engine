@@ -340,6 +340,7 @@ void CharacterControllerComponent::LookAtMovement(const float3& moveDir, float d
     if (fabs(angle) < 0.0001f)
     {
         isRotating = false;
+        if (isAttacking) isAttacking = false;
         return;
     }
 
@@ -397,8 +398,12 @@ void CharacterControllerComponent::HandleInput(float deltaTime)
             targetDirection = direction;
 
             Move(direction, deltaTime);
-            rotateDirection = direction;
-            isRotating      = true;
+            if (!isAttacking)
+            {
+                rotateDirection = direction;
+                isRotating      = true;
+            }
+
         }
 
         if (fabs(rotationDir) > 0.0001f)
@@ -430,8 +435,9 @@ void CharacterControllerComponent::HandleInput(float deltaTime)
         isAiming = false;
     }
 
-    if (mouseButtons[SDL_BUTTON_LEFT - 1] == KEY_DOWN && !isRotating)
+    if (mouseButtons[SDL_BUTTON_LEFT - 1] == KEY_DOWN)
     {
+        isAttacking = true;
         isRotating                 = true;
         const float3 mouseWorldPos = App->GetSceneModule()->GetScene()->GetMainCamera()->ScreenPointToXZ(
             parent->GetGlobalTransform().TranslatePart().y
