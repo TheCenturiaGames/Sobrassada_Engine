@@ -29,7 +29,6 @@ class SOBRASADA_API_ENGINE CharacterControllerComponent : public Component
     void LookAtMovement(const float3& moveDir, float deltaTime);
     void Rotate(float rotationDirection, float deltaTime);
     void HandleInput(float deltaTime);
-    void LookAtMouse(float deltaTime);
 
     const float3& GetTargetDirection() const { return targetDirection; }
     const float3& GetLastPosition() const { return lastPosition; }
@@ -59,4 +58,6 @@ class SOBRASADA_API_ENGINE CharacterControllerComponent : public Component
     bool inputDown               = true;
     bool isRotating              = false;
     float3 targetLookDirection;
+
+   float3 mouseWorldPos;
 };

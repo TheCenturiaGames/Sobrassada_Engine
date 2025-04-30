@@ -166,7 +166,7 @@ void CharacterControllerComponent::Update(float deltaTime) // SO many navmesh ge
 
     if (isRotating)
     {
-        LookAtMouse(deltaTime);
+        LookAtMovement(mouseWorldPos, deltaTime);
     }
 
     if (inputDown) HandleInput(deltaTime);
@@ -408,20 +408,21 @@ void CharacterControllerComponent::HandleInput(float deltaTime)
     //     //TODO: StateMachine IDLE
     // }
 
-if (mouseButtons[SDL_BUTTON_LEFT - 1] == KEY_DOWN && !isRotating)
+    if (mouseButtons[SDL_BUTTON_RIGHT - 1]/* == KEY_DOWN*/ && !isRotating)
     {
         isRotating = true;
+        mouseWorldPos = App->GetSceneModule()->GetScene()->GetMainCamera()->ScreenPointToXZ(
+            parent->GetGlobalTransform().TranslatePart().y
+        );
+    }
+
+    if (mouseButtons[SDL_BUTTON_LEFT - 1]  == KEY_DOWN && !isRotating)
+    {
+        isRotating = true;
+        mouseWorldPos = App->GetSceneModule()->GetScene()->GetMainCamera()->ScreenPointToXZ(
+            parent->GetGlobalTransform().TranslatePart().y
+        );
     }
 }
 
-void CharacterControllerComponent::LookAtMouse(float deltaTime)
-{
-    GLOG("Looking at mouse");
-    if (!App->GetCameraModule()) return;
 
-
-    const float3 mouseWorldPos = App->GetSceneModule()->GetScene()->GetMainCamera()->ScreenPointToXZ(
-        parent->GetGlobalTransform().TranslatePart().y
-    );
-    LookAtMovement(mouseWorldPos, deltaTime);
-}
