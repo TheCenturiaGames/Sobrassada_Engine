@@ -417,7 +417,7 @@ void SOBRASADA_API_ENGINE CameraComponent::Rotate(float yaw, float pitch)
     }
 }
 
-const LineSegment& CameraComponent::CastCameraRay()
+const LineSegment CameraComponent::CastCameraRay()
 {
     auto& windowPosition = App->GetSceneModule()->GetScene()->GetWindowPosition();
     auto& windowSize     = App->GetSceneModule()->GetScene()->GetWindowSize();
@@ -438,7 +438,7 @@ const LineSegment& CameraComponent::CastCameraRay()
     return camera.UnProjectLineSegment(normalizedX, normalizedY);
 }
 
-const float3& CameraComponent::ScreenPointToXZ(const float y)
+const float3 CameraComponent::ScreenPointToXZ(const float y)
 {
     // Converts the mouse position to a world position in the XZ plane, to the given height
     const Ray ray         = CastCameraRay().ToRay();

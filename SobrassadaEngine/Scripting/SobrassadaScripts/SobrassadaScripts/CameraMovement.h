@@ -23,13 +23,13 @@ class CameraMovement : public Script
     const GameObject* target = nullptr;
 
     float3 finalPosition;
-    float followSmoothness     = 10;
+    float smoothnessVelocity   = 10;
 
-    bool mouseOffsetEnabled = false;
+    bool mouseOffsetEnabled    = false;
     float mouseOffsetIntensity = 0;
-    float mouseSmoothness      = 0;
 
-    bool lookAheadEnabled = false;
+    bool lookAheadEnabled      = false;
     float lookAheadIntensity   = 0;
+    float currentLookAhead     = 0;
     float lookAheadSmoothness  = 0;
 };
