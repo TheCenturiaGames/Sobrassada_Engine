@@ -1,6 +1,7 @@
 #include "CharacterControllerComponent.h"
 
 #include "Application.h"
+#include "CameraComponent.h"
 #include "CameraModule.h"
 #include "DetourNavMeshQuery.h"
 #include "EditorUIModule.h"
@@ -10,7 +11,6 @@
 #include "ResourceNavMesh.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
-#include "CameraComponent.h"
 
 #include "Geometry/LineSegment.h"
 #include "Geometry/Plane.h"
@@ -166,7 +166,7 @@ void CharacterControllerComponent::Update(float deltaTime) // SO many navmesh ge
 
     if (isRotating)
     {
-        LookAtMovement(mouseDirection, deltaTime);
+        LookAtMovement(rotateDirection, deltaTime);
     }
 
     if (inputDown) HandleInput(deltaTime);
@@ -379,57 +379,65 @@ void CharacterControllerComponent::HandleInput(float deltaTime)
     const KeyState* mouseButtons = App->GetInputModule()->GetMouseButtons();
 
     float3 direction(0.0f, 0.0f, 0.0f);
-
-    if (keyboard[SDL_SCANCODE_W] == KEY_REPEAT) direction.z -= 1.0f;
-    if (keyboard[SDL_SCANCODE_S] == KEY_REPEAT) direction.z += 1.0f;
-    if (keyboard[SDL_SCANCODE_A] == KEY_REPEAT) direction.x -= 1.0f;
-    if (keyboard[SDL_SCANCODE_D] == KEY_REPEAT) direction.x += 1.0f;
-
-    float rotationDir = 0.0f;
-
-    if (keyboard[SDL_SCANCODE_Q] == KEY_REPEAT) rotationDir += 1.0f;
-    if (keyboard[SDL_SCANCODE_E] == KEY_REPEAT) rotationDir -= 1.0f;
-
-    if (direction.LengthSq() > 0.0001f)
+    if (!isAiming)
     {
-        direction.Normalize();
-        targetDirection = direction;
+        if (keyboard[SDL_SCANCODE_W] == KEY_REPEAT) direction.z -= 1.0f;
+        if (keyboard[SDL_SCANCODE_S] == KEY_REPEAT) direction.z += 1.0f;
+        if (keyboard[SDL_SCANCODE_A] == KEY_REPEAT) direction.x -= 1.0f;
+        if (keyboard[SDL_SCANCODE_D] == KEY_REPEAT) direction.x += 1.0f;
 
-        Move(direction, deltaTime);
-        LookAtMovement(direction, deltaTime);
+        float rotationDir = 0.0f;
+
+        if (keyboard[SDL_SCANCODE_Q] == KEY_REPEAT) rotationDir += 1.0f;
+        if (keyboard[SDL_SCANCODE_E] == KEY_REPEAT) rotationDir -= 1.0f;
+
+        if (direction.LengthSq() > 0.0001f)
+        {
+            direction.Normalize();
+            targetDirection = direction;
+
+            Move(direction, deltaTime);
+            rotateDirection = direction;
+            isRotating      = true;
+        }
+
+        if (fabs(rotationDir) > 0.0001f)
+        {
+            Rotate(rotationDir, deltaTime);
+        }
+        // else
+        //{
+        //     //TODO: StateMachine IDLE
+        // }
     }
 
-    if (fabs(rotationDir) > 0.0001f)
+    if (mouseButtons[SDL_BUTTON_RIGHT - 1] /* == KEY_DOWN*/ )
     {
-        Rotate(rotationDir, deltaTime);
+        if (!isRotating)
+        {
+            isRotating                 = true;
+            const float3 mouseWorldPos = App->GetSceneModule()->GetScene()->GetMainCamera()->ScreenPointToXZ(
+                parent->GetGlobalTransform().TranslatePart().y
+            );
+            rotateDirection   = mouseWorldPos - parent->GetPosition();
+            rotateDirection.y = 0;
+            rotateDirection.Normalize();
+        }
+        isAiming = true;
     }
-    // else
-    //{
-    //     //TODO: StateMachine IDLE
-    // }
-
-    if (mouseButtons[SDL_BUTTON_RIGHT - 1]/* == KEY_DOWN*/ && !isRotating)
+    else
     {
-        isRotating = true;
+        isAiming = false;
+    }
+
+    if (mouseButtons[SDL_BUTTON_LEFT - 1] == KEY_DOWN && !isRotating)
+    {
+        isRotating                 = true;
         const float3 mouseWorldPos = App->GetSceneModule()->GetScene()->GetMainCamera()->ScreenPointToXZ(
             parent->GetGlobalTransform().TranslatePart().y
         );
-        mouseDirection = mouseWorldPos - parent->GetPosition();
-        mouseDirection.y = 0;
-        mouseDirection.Normalize();
-
-    }
-
-    if (mouseButtons[SDL_BUTTON_LEFT - 1]  == KEY_DOWN && !isRotating)
-    {
-        isRotating = true;
-        const float3 mouseWorldPos = App->GetSceneModule()->GetScene()->GetMainCamera()->ScreenPointToXZ(
-            parent->GetGlobalTransform().TranslatePart().y
-        );
-        mouseDirection   = mouseWorldPos - parent->GetPosition();
-        mouseDirection.y = 0;
-        mouseDirection.Normalize();
+        rotateDirection   = mouseWorldPos - parent->GetPosition();
+        rotateDirection.y = 0;
+        rotateDirection.Normalize();
     }
 }
-
-

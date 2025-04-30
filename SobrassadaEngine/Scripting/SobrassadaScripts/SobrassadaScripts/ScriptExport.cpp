@@ -43,8 +43,8 @@ extern "C" SOBRASSADA_API Script* CreateScript(const std::string& scriptType, Ga
     if (scriptType == "PressAnyKeyScript") return new PressAnyKeyScript(parent);
 
     /* Characters */
-    if (scriptType == "CuChulainn") return new CuChulainn(parent);
-    if (scriptType == "Soldier") return new Soldier(parent);
+    if (scriptType == "CuChulainnScript") return new CuChulainn(parent);
+    if (scriptType == "SoldierScript") return new Soldier(parent);
     if (scriptType == "CameraMovement") return new CameraMovement(parent);
 
     /* Utils */
