@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Globals.h"
 #include "LightsConfig.h"
@@ -23,7 +23,7 @@ class Framebuffer;
 enum class SaveMode;
 enum MobilitySettings;
 
-class Scene
+class SOBRASADA_API_ENGINE Scene
 {
   public:
     Scene(const char* sceneName);
@@ -79,14 +79,13 @@ class Scene
     UID GetSelectedGameObjectUID() const { return selectedGameObjectUID; }
 
     const std::unordered_map<UID, GameObject*>& GetAllGameObjects() const { return gameObjectsContainer; }
-    const std::vector<Component*> GetAllComponents() const;
 
     GameObject* GetGameObjectByUID(UID gameObjectUID); // TODO: Change when filesystem defined
 
     LightsConfig* GetLightsConfig() const { return lightsConfig; }
     CameraComponent* GetMainCamera() const { return mainCamera; }
 
-    template <typename T> std::vector<T*> GetEnabledComponentsOfType() const;
+    template <typename T> std::vector<T> GetEnabledComponentsOfType() const;
 
     bool GetDoInputs() const { return doInputs; }
     bool GetDoMouseInputs() const { return doMouseInputs; }
@@ -107,6 +106,7 @@ class Scene
     {
         return selectedGameObjectsMobility;
     }
+    const std::map<UID, float4x4>& GetMultiselectedObjectsLocals() const { return selectedGameObjectsOgLocals; }
 
     void SetMainCamera(CameraComponent* camera) { mainCamera = camera; }
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
@@ -129,17 +129,17 @@ class Scene
     ) const;
 
   private:
-    std::string sceneName                       = DEFAULT_SCENE_NAME;
-    UID sceneUID                                = INVALID_UID;
-    UID navmeshUID                              = INVALID_UID;
-    UID gameObjectRootUID                       = INVALID_UID;
-    UID selectedGameObjectUID                   = INVALID_UID;
-    CameraComponent* mainCamera                 = nullptr;
-    bool stopPlaying                            = false;
-    bool doInputs                               = false;
-    bool doMouseInputs                          = false;
-    bool sceneVisible                           = false;
-    bool isFocused                              = false;
+    std::string sceneName       = DEFAULT_SCENE_NAME;
+    UID sceneUID                = INVALID_UID;
+    UID navmeshUID              = INVALID_UID;
+    UID gameObjectRootUID       = INVALID_UID;
+    UID selectedGameObjectUID   = INVALID_UID;
+    CameraComponent* mainCamera = nullptr;
+    bool stopPlaying            = false;
+    bool doInputs               = false;
+    bool doMouseInputs          = false;
+    bool sceneVisible           = false;
+    bool isFocused              = false;
 
     std::unordered_map<UID, GameObject*> gameObjectsContainer;
 
@@ -160,4 +160,5 @@ class Scene
     GameObject* multiSelectParent = nullptr;
     std::map<UID, UID> selectedGameObjects;
     std::map<UID, MobilitySettings> selectedGameObjectsMobility;
+    std::map<UID, float4x4> selectedGameObjectsOgLocals;
 };

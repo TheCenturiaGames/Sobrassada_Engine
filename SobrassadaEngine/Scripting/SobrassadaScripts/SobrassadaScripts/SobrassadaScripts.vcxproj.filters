@@ -1,67 +1,76 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Archivos de origen">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Archivos de encabezado">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="Archivos de recursos">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="External">
       <UniqueIdentifier>{21386770-963b-4862-a4df-9c3230b0137f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{4af144ed-585d-4113-bb2e-943efe3d2a47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{2f3e5b48-11e8-4b75-bb3a-701ce27dd8a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripting Config">
+      <UniqueIdentifier>{a3ee9634-2aab-4026-9049-f2aa48361204}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Characters">
+      <UniqueIdentifier>{5b6dfe3e-5b52-4bec-9eca-0933a138341c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h">
-      <Filter>Archivos de encabezado</Filter>
+    <ClInclude Include="PressAnyKeyScript.h">
+      <Filter>UI</Filter>
     </ClInclude>
-    <ClInclude Include="pch.h">
-      <Filter>Archivos de encabezado</Filter>
+    <ClInclude Include="ExitGameScript.h">
+      <Filter>UI</Filter>
     </ClInclude>
-    <ClInclude Include="Script.h">
-      <Filter>Archivos de encabezado</Filter>
+    <ClInclude Include="FullscreenToggleScript.h">
+      <Filter>UI</Filter>
     </ClInclude>
-    <ClInclude Include="RotateGameObject.h">
-      <Filter>Archivos de encabezado</Filter>
+    <ClInclude Include="MainMenuSelectorScript.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionsMenuSwitcherScript.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="PauseMenuScript.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="VSyncToggleScript.h">
+      <Filter>UI</Filter>
     </ClInclude>
     <ClInclude Include="ButtonScript.h">
-      <Filter>Archivos de encabezado</Filter>
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="RotateGameObject.h">
+      <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="GodMode.h">
-      <Filter>Archivos de encabezado</Filter>
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Script.h">
+      <Filter>Scripting Config</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Scripting Config</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>Scripting Config</Filter>
     </ClInclude>
     <ClInclude Include="Character.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Soldier.h">
-      <Filter>Archivos de encabezado</Filter>
+      <Filter>Characters</Filter>
     </ClInclude>
     <ClInclude Include="CuChulainn.h">
-      <Filter>Archivos de encabezado</Filter>
+      <Filter>Characters</Filter>
+    </ClInclude>
+    <ClInclude Include="Soldier.h">
+      <Filter>Characters</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
-    <ClCompile Include="pch.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
-    <ClCompile Include="ScriptExport.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
-    <ClCompile Include="RotateGameObject.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Time\Clock.cpp">
       <Filter>External</Filter>
     </ClCompile>
@@ -158,9 +167,6 @@
     <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Algorithm\Random\LCG.cpp">
       <Filter>External</Filter>
     </ClCompile>
-    <ClCompile Include="ButtonScript.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Libs\ImGui\imgui.cpp">
       <Filter>External</Filter>
     </ClCompile>
@@ -178,21 +184,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Libs\ImGui\imgui_widgets.cpp">
       <Filter>External</Filter>
-    </ClCompile>
-    <ClCompile Include="GodMode.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
-    <ClCompile Include="Script.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
-    <ClCompile Include="Character.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
-    <ClCompile Include="Soldier.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
-    <ClCompile Include="CuChulainn.cpp">
-      <Filter>Archivos de origen</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Libs\bullet\include\LinearMath\btVector3.cpp">
       <Filter>External</Filter>
@@ -652,6 +643,57 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\BroadphaseCollision\btAxisSweep3.cpp">
       <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="ExitGameScript.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="FullscreenToggleScript.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="MainMenuSelectorScript.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="OptionsMenuSwitcherScript.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="PauseMenuScript.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="PressAnyKeyScript.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="VSyncToggleScript.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="ButtonScript.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="RotateGameObject.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="GodMode.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Script.cpp">
+      <Filter>Scripting Config</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Scripting Config</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Scripting Config</Filter>
+    </ClCompile>
+    <ClCompile Include="Character.cpp">
+      <Filter>Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="CuChulainn.cpp">
+      <Filter>Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="Soldier.cpp">
+      <Filter>Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptExport.cpp">
+      <Filter>Scripting Config</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

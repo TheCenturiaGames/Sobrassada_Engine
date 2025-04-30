@@ -9,7 +9,16 @@ enum ScriptType
     SCRIPT_BUTTON,
     SCRIPT_GOD_MODE,
     SCRIPT_CU_CHULAINN,
-    SCRIPT_SOLDIER
+    SCRIPT_SOLDIER,
+    SCRIPT_EXIT_GAME,
+    SCRIPT_FULLSCREEN_TOGGLE,
+    SCRIPT_VSYNC_TOGGLE,
+    SCRIPT_PAUSE_MENU,
+    SCRIPT_OPTIONS_MENU_SWITCHER,
+    SCRIPT_MAIN_MENU_SELECTOR,
+    SCRIPT_PRESS_ANY_KEY,
+
+    SCRIPT_TYPE_COUNT //Add at the end
 };
 
 namespace math
@@ -20,7 +29,24 @@ namespace math
 class Script;
 class GameObject;
 
-constexpr const char* scripts[] = {"RotateGameObject", "ButtonScript", "GodMode", "CuChulainn", "Soldier"};
+constexpr const char* scripts[] = {
+    "RotateGameObject",          // SCRIPT_ROTATE_GAME_OBJECT
+    "ButtonScript",              // SCRIPT_BUTTON
+    "GodMode",                   // SCRIPT_GOD_MODE
+    "CuChulainnScript",          // SCRIPT_CU_CHULAINN
+    "SoldierScript",             // SCRIPT_SOLDIER
+    "ExitGameScript",            // SCRIPT_EXIT_GAME
+    "FullscreenToggleScript",    // SCRIPT_FULLSCREEN_TOGGLE
+    "VSyncToggleScript",         // SCRIPT_VSYNC_TOGGLE
+    "PauseMenuScript",           // SCRIPT_PAUSE_MENU
+    "OptionsMenuSwitcherScript", // SCRIPT_OPTIONS_MENU_SWITCHER
+    "MainMenuSelectorScript",    // SCRIPT_MAIN_MENU_SELECTOR
+    "PressAnyKeyScript"          // SCRIPT_PRESS_ANY_KEY
+};
+
+static_assert(
+    SCRIPT_TYPE_COUNT == sizeof(scripts) / sizeof(scripts[0]), "ScriptType enum and scripts[] size mismatch!"
+);
 
 class ScriptComponent : public Component
 {
@@ -48,9 +74,8 @@ class ScriptComponent : public Component
 
   private:
     int SearchIdxForString(const std::string& name) const;
-
-  private:
     std::string scriptName = "Not selected";
     Script* scriptInstance = nullptr;
+    bool startScript       = false;
     ScriptType scriptType  = SCRIPT_ROTATE_GAME_OBJECT;
 };

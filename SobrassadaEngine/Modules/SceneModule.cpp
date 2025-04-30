@@ -235,8 +235,8 @@ void SceneModule::HandleObjectDuplication()
 
     if (loadedScene->IsMultiselecting())
     {
-        const std::map<UID, UID> selectedGameObjects = loadedScene->GetMultiselectedObjects();
 
+        const std::map<UID, UID> selectedGameObjects = loadedScene->GetMultiselectedObjects();
         for (auto& childToDuplicate : selectedGameObjects)
         {
             objectsToDuplicate.push_back(childToDuplicate);
@@ -302,7 +302,7 @@ void SceneModule::HandleObjectDuplication()
         // ITERATE OVER ALL GAME OBJECTS TO CHECK IF ANY REMAPING IS NEEDED
         for (int i = 0; i < createdGameObjects.size(); ++i)
         {
-            MeshComponent* originalMeshComp = originalGameObjects[i]->GetMeshComponent();
+            MeshComponent* originalMeshComp = originalGameObjects[i]->GetComponent<MeshComponent*>();
             if (originalMeshComp && originalMeshComp->GetHasBones())
             {
                 // Remap the bones references
@@ -317,11 +317,11 @@ void SceneModule::HandleObjectDuplication()
                     newBonesObjects.push_back(loadedScene->GetGameObjectByUID(uid));
                 }
 
-                MeshComponent* newMesh = createdGameObjects[i]->GetMeshComponent();
+                MeshComponent* newMesh = createdGameObjects[i]->GetComponent<MeshComponent*>();
                 newMesh->SetBones(newBonesObjects, newBonesUIDs);
             }
 
-            AnimationComponent* animComp = createdGameObjects[i]->GetAnimationComponent();
+            AnimationComponent* animComp = createdGameObjects[i]->GetComponent<AnimationComponent*>();
             if (animComp) animComp->SetBoneMapping();
         }
     }
@@ -329,12 +329,17 @@ void SceneModule::HandleObjectDuplication()
     if (loadedScene->IsMultiselecting())
     {
         const std::map<UID, MobilitySettings> originalObjectMobility = loadedScene->GetMultiselectedObjectsMobility();
+        const std::map<UID, float4x4> originalObjectLocals           = loadedScene->GetMultiselectedObjectsLocals();
 
         for (int i = 0; i < objectsToDuplicate.size(); ++i)
         {
             MobilitySettings originalMobility = originalObjectMobility.find(objectsToDuplicate[i].first)->second;
-            loadedScene->GetGameObjectByUID(remappingTable[objectsToDuplicate[i].first])
-                ->UpdateMobilityHierarchy(originalMobility);
+            const float4x4& ogLocal           = originalObjectLocals.find(objectsToDuplicate[i].first)->second;
+
+            GameObject* currentGameObject =
+                loadedScene->GetGameObjectByUID(remappingTable[objectsToDuplicate[i].first]);
+            currentGameObject->SetLocalTransform(ogLocal);
+            currentGameObject->UpdateMobilityHierarchy(originalMobility);
         }
     }
 }
