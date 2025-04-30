@@ -1,19 +1,22 @@
 #include "CharacterControllerComponent.h"
 
 #include "Application.h"
+#include "CameraModule.h"
 #include "DetourNavMeshQuery.h"
 #include "EditorUIModule.h"
 #include "GameObject.h"
 #include "InputModule.h"
-#include "SceneModule.h"
-#include "DetourNavMeshQuery.h"
 #include "PathfinderModule.h"
 #include "ResourceNavMesh.h"
 #include "ResourcesModule.h"
 #include "SceneModule.h"
+#include "CameraComponent.h"
 
+#include "Geometry/LineSegment.h"
+#include "Geometry/Plane.h"
 #include "Math/float3.h"
 #include "Math/float4x4.h"
+#include <SDL_mouse.h>
 #include <algorithm>
 #include <cmath>
 
@@ -97,7 +100,7 @@ void CharacterControllerComponent::Clone(const Component* other)
     }
 }
 
-void CharacterControllerComponent::Update(float deltaTime) //SO many navmesh getters!!!! Memo to rethink this
+void CharacterControllerComponent::Update(float deltaTime) // SO many navmesh getters!!!! Memo to rethink this
 {
     if (!IsEffectivelyEnabled()) return;
 
@@ -110,7 +113,6 @@ void CharacterControllerComponent::Update(float deltaTime) //SO many navmesh get
     dtNavMeshQuery* tmpQuery = App->GetPathfinderModule()->GetDetourNavMeshQuery();
 
     if (!dtNav) return;
-
 
     if (!tmpQuery || !dtNav) return;
 
@@ -162,7 +164,12 @@ void CharacterControllerComponent::Update(float deltaTime) //SO many navmesh get
     parent->SetLocalTransform(finalLocal);
     parent->UpdateTransformForGOBranch();
 
-    if(inputDown) HandleInput(deltaTime);
+    if (isRotating)
+    {
+        LookAtMouse(deltaTime);
+    }
+
+    if (inputDown) HandleInput(deltaTime);
 }
 
 void CharacterControllerComponent::Render(float deltaTime)
@@ -172,7 +179,6 @@ void CharacterControllerComponent::Render(float deltaTime)
 
 void CharacterControllerComponent::RenderDebug(float deltaTime)
 {
-
 }
 
 void CharacterControllerComponent::RenderEditorInspector()
@@ -264,23 +270,23 @@ void CharacterControllerComponent::Move(const float3& direction, float deltaTime
     if (!navMeshQuery || currentPolyRef == 0) return;
     if (direction.LengthSq() < 0.0001f) return;
 
-    float4x4 globalTr  = parent->GetGlobalTransform();
-    float3 currentPos  = globalTr.TranslatePart();
+    float4x4 globalTr = parent->GetGlobalTransform();
+    float3 currentPos = globalTr.TranslatePart();
 
-    float finalSpeed   = std::min(speed, maxLinearSpeed);
+    float finalSpeed  = std::min(speed, maxLinearSpeed);
 
-    float3 forward      = globalTr.WorldZ().Normalized();
+    float3 forward    = globalTr.WorldZ().Normalized();
     float3 right      = globalTr.WorldX().Normalized();
 
-    float3 moveDir        = right * direction.x + forward * (-direction.z);
+    float3 moveDir    = right * direction.x + forward * (-direction.z);
     if (moveDir.LengthSq() < 1e-6f) return;
     moveDir.Normalize();
 
-    float3 offsetXZ    = direction * finalSpeed * deltaTime;
+    float3 offsetXZ   = direction * finalSpeed * deltaTime;
     float3 desiredPos = currentPos + offsetXZ;
 
-    //desiredPos.x      += offsetXZ.x;
-    //desiredPos.z      += offsetXZ.z;
+    // desiredPos.x      += offsetXZ.x;
+    // desiredPos.z      += offsetXZ.z;
 
     dtQueryFilter filter;
     filter.setIncludeFlags(SAMPLE_POLYFLAGS_WALK);
@@ -326,14 +332,18 @@ void CharacterControllerComponent::LookAtMovement(const float3& moveDir, float d
     forward.y       = 0.0f;
     forward.Normalize();
 
-    float angle = atan2(forward.Cross(desired).y, forward.Dot(desired));
+    float angle   = atan2(forward.Cross(desired).y, forward.Dot(desired));
 
     float maxStep = maxAngularSpeed * deltaTime;
     angle         = std::clamp(angle, -maxStep, maxStep);
 
-    if (fabs(angle) < 0.0001f) return;
+    if (fabs(angle) < 0.0001f)
+    {
+        isRotating = false;
+        return;
+    }
 
-    float4x4 rotY = float4x4::FromEulerXYZ(0.0f, angle, 0.0f);
+    float4x4 rotY  = float4x4::FromEulerXYZ(0.0f, angle, 0.0f);
     float4x4 local = parent->GetGlobalTransform() * rotY;
 
     parent->SetLocalTransform(local);
@@ -365,7 +375,8 @@ void CharacterControllerComponent::Rotate(float rotationDirection, float deltaTi
 
 void CharacterControllerComponent::HandleInput(float deltaTime)
 {
-    const KeyState* keyboard = App->GetInputModule()->GetKeyboard();
+    const KeyState* keyboard     = App->GetInputModule()->GetKeyboard();
+    const KeyState* mouseButtons = App->GetInputModule()->GetMouseButtons();
 
     float3 direction(0.0f, 0.0f, 0.0f);
 
@@ -396,4 +407,22 @@ void CharacterControllerComponent::HandleInput(float deltaTime)
     //{
     //     //TODO: StateMachine IDLE
     // }
+
+    if (mouseButtons[SDL_BUTTON_LEFT - 1] && !isRotating)
+    {
+        isRotating = true;
+        //LookAtMouse(deltaTime);
+    }
+}
+
+void CharacterControllerComponent::LookAtMouse(float deltaTime)
+{
+    GLOG("Looking at mouse");
+    if (!App->GetCameraModule()) return;
+
+
+    const float3 mouseWorldPos = App->GetSceneModule()->GetScene()->GetMainCamera()->ScreenPointToXZ(
+        parent->GetGlobalTransform().TranslatePart().y
+    );
+    LookAtMovement(mouseWorldPos, deltaTime);
 }
