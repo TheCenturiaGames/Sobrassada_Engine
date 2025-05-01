@@ -14,6 +14,7 @@
 
 #include "Geometry/LineSegment.h"
 #include "Geometry/Plane.h"
+#include "Math/Mathfunc.h"
 #include "Math/float3.h"
 #include "Math/float4x4.h"
 #include <SDL_mouse.h>
@@ -23,11 +24,9 @@
 CharacterControllerComponent::CharacterControllerComponent(UID uid, GameObject* parent)
     : Component(uid, parent, "Character Controller", COMPONENT_CHARACTER_CONTROLLER)
 {
-    speed           = 1;
-    maxLinearSpeed  = 10;
     maxAngularSpeed = 90 / RAD_DEGREE_CONV;
     isRadians       = true;
-    targetDirection.Set(0.0f, 0.0f, 1.0f);
+    targetDirection.Set(0.0f, 0.0f, 0.0f);
 }
 
 CharacterControllerComponent::CharacterControllerComponent(const rapidjson::Value& initialState, GameObject* parent)
@@ -47,11 +46,11 @@ CharacterControllerComponent::CharacterControllerComponent(const rapidjson::Valu
     }
     if (initialState.HasMember("Speed"))
     {
-        speed = initialState["Speed"].GetFloat();
+        maxSpeed = initialState["Speed"].GetFloat();
     }
-    if (initialState.HasMember("MaxLinearSpeed"))
+    if (initialState.HasMember("Acceleration"))
     {
-        maxLinearSpeed = initialState["MaxLinearSpeed"].GetFloat();
+        acceleration = initialState["Acceleration"].GetFloat();
     }
     if (initialState.HasMember("MaxAngularSpeed"))
     {
@@ -75,8 +74,8 @@ void CharacterControllerComponent::Save(rapidjson::Value& targetState, rapidjson
     targetState.AddMember("TargetDirectionX", targetDirection.x, allocator);
     targetState.AddMember("TargetDirectionY", targetDirection.y, allocator);
     targetState.AddMember("TargetDirectionZ", targetDirection.z, allocator);
-    targetState.AddMember("Speed", speed, allocator);
-    targetState.AddMember("MaxLinearSpeed", maxLinearSpeed, allocator);
+    targetState.AddMember("Speed", maxSpeed, allocator);
+    targetState.AddMember("Acceleration", acceleration, allocator);
     targetState.AddMember("MaxAngularSpeed", maxAngularSpeed, allocator);
     targetState.AddMember("isRadians", isRadians, allocator);
 }
@@ -88,8 +87,8 @@ void CharacterControllerComponent::Clone(const Component* other)
         const CharacterControllerComponent* otherCharacter = static_cast<const CharacterControllerComponent*>(other);
         enabled                                            = otherCharacter->enabled;
 
-        speed                                              = otherCharacter->speed;
-        maxLinearSpeed                                     = otherCharacter->maxLinearSpeed;
+        maxSpeed                                           = otherCharacter->maxSpeed;
+        acceleration                                       = otherCharacter->acceleration;
         maxAngularSpeed                                    = otherCharacter->maxAngularSpeed;
 
         isRadians                                          = otherCharacter->isRadians;
@@ -169,7 +168,11 @@ void CharacterControllerComponent::Update(float deltaTime) // SO many navmesh ge
         LookAtMovement(rotateDirection, deltaTime);
     }
 
-    if (inputDown) HandleInput(deltaTime);
+    if (inputDown)
+    {
+        HandleInput(deltaTime);
+        Move(deltaTime);
+    }
 }
 
 void CharacterControllerComponent::Render(float deltaTime)
@@ -194,10 +197,8 @@ void CharacterControllerComponent::RenderEditorInspector()
         ImGui::Separator();
         ImGui::Text("Character Controller");
 
-        ImGui::DragFloat("Speed", &speed, 0.1f, 0.0f, maxLinearSpeed, "%.3f", ImGuiSliderFlags_AlwaysClamp);
-        ImGui::DragFloat("Max Linear Speed", &maxLinearSpeed, 0.1f, 0.0f, 100.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
-
-        if (speed > maxLinearSpeed) speed = maxLinearSpeed;
+        ImGui::DragFloat("Max Speed", &maxSpeed, 0.1f, 0.0f, 100.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+        ImGui::DragFloat("Acceleration", &acceleration, 0.1f, 0.0f, 100.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
 
         float dragStep = isRadians ? 1.0f / RAD_DEGREE_CONV : 1.0f;
         float minVal   = 0.0f;
@@ -265,24 +266,24 @@ void CharacterControllerComponent::AdjustHeightToNavMesh(float3& currentPos)
     }
 }
 
-void CharacterControllerComponent::Move(const float3& direction, float deltaTime)
+void CharacterControllerComponent::Move(float deltaTime)
 {
+    if (isAiming || isAttacking)
+    {
+        currentSpeed = 0;
+        return;
+    }
     if (!navMeshQuery || currentPolyRef == 0) return;
-    if (direction.LengthSq() < 0.0001f) return;
 
     float4x4 globalTr = parent->GetGlobalTransform();
     float3 currentPos = globalTr.TranslatePart();
 
-    float finalSpeed  = std::min(speed, maxLinearSpeed);
-
+    currentSpeed      = targetDirection.LengthSq() > 0.001f ? Lerp(currentSpeed, maxSpeed, acceleration * deltaTime)
+                                                            : Lerp(currentSpeed, 0, acceleration * deltaTime);
     float3 forward    = globalTr.WorldZ().Normalized();
     float3 right      = globalTr.WorldX().Normalized();
 
-    float3 moveDir    = right * direction.x + forward * (-direction.z);
-    if (moveDir.LengthSq() < 1e-6f) return;
-    moveDir.Normalize();
-
-    float3 offsetXZ   = direction * finalSpeed * deltaTime;
+    float3 offsetXZ   = rotateDirection * currentSpeed * deltaTime;
     float3 desiredPos = currentPos + offsetXZ;
 
     // desiredPos.x      += offsetXZ.x;
@@ -392,18 +393,20 @@ void CharacterControllerComponent::HandleInput(float deltaTime)
         if (keyboard[SDL_SCANCODE_Q] == KEY_REPEAT) rotationDir += 1.0f;
         if (keyboard[SDL_SCANCODE_E] == KEY_REPEAT) rotationDir -= 1.0f;
 
-        if (direction.LengthSq() > 0.0001f)
+        targetDirection = direction;
+        if (direction.LengthSq() > 0.001f)
         {
             direction.Normalize();
             targetDirection = direction;
 
-            Move(direction, deltaTime);
-            if (!isAttacking)
+            if (direction.LengthSq() > 0.0001f)
             {
-                rotateDirection = direction;
-                isRotating      = true;
+                if (!isAttacking)
+                {
+                    rotateDirection = direction;
+                    isRotating      = true;
+                }
             }
-
         }
 
         if (fabs(rotationDir) > 0.0001f)
@@ -416,7 +419,8 @@ void CharacterControllerComponent::HandleInput(float deltaTime)
         // }
     }
 
-    if (mouseButtons[SDL_BUTTON_RIGHT - 1] /* == KEY_DOWN*/ )
+    // Ranged attack
+    if (mouseButtons[SDL_BUTTON_RIGHT - 1] /* == KEY_DOWN*/)
     {
         if (!isRotating)
         {
@@ -435,9 +439,10 @@ void CharacterControllerComponent::HandleInput(float deltaTime)
         isAiming = false;
     }
 
+    // Melee attack
     if (mouseButtons[SDL_BUTTON_LEFT - 1] == KEY_DOWN)
     {
-        isAttacking = true;
+        isAttacking                = true;
         isRotating                 = true;
         const float3 mouseWorldPos = App->GetSceneModule()->GetScene()->GetMainCamera()->ScreenPointToXZ(
             parent->GetGlobalTransform().TranslatePart().y

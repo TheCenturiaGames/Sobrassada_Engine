@@ -5,6 +5,7 @@
 #include "Math/float2.h"
 
 class GameObject;
+class CharacterControllerComponent;
 
 class CameraMovement : public Script
 {
@@ -20,16 +21,20 @@ class CameraMovement : public Script
 
   private:
     std::string targetName;
-    const GameObject* target = nullptr;
+    const GameObject* target                       = nullptr;
+    const CharacterControllerComponent* controller = nullptr;
 
     float3 finalPosition;
-    float smoothnessVelocity   = 10;
+    float smoothnessVelocity      = 10;
 
-    bool mouseOffsetEnabled    = false;
-    float mouseOffsetIntensity = 0;
+    bool mouseOffsetEnabled       = false;
+    float mouseOffsetIntensity    = 0;
 
-    bool lookAheadEnabled      = false;
-    float lookAheadIntensity   = 0;
-    float currentLookAhead     = 0;
-    float lookAheadSmoothness  = 0;
+    bool lookAheadEnabled         = false;
+    float lookAheadIntensity      = 0;
+    float currentLookAhead        = 0;
+    float lookAheadSmoothness     = 0;
+
+    float followDistanceThreshold = 0;
+    bool isFollowing              = false;
 };
