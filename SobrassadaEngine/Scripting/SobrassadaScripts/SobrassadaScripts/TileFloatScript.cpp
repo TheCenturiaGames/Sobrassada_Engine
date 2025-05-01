@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "TileFloat.h"
+#include "TileFloatScript.h"
 
 #include "Application.h"
 #include "CameraModule.h"
@@ -10,7 +10,7 @@
 
 
 
-TileFloat::TileFloat(GameObject* parent) : Script(parent)
+TileFloatScript::TileFloatScript(GameObject* parent) : Script(parent)
 {
     // Using ImGui in the dll cause problems, so we need to call ImGui outside the dll
     fields.push_back({InspectorField::FieldType::Text, (void*)"Test"});
@@ -18,14 +18,14 @@ TileFloat::TileFloat(GameObject* parent) : Script(parent)
 
 }
 
-bool TileFloat::Init()
+bool TileFloatScript::Init()
 {
     initialY = parent->GetLocalTransform().TranslatePart().y;
     GLOG("Initiating TileFloatScript");
     return true;
 }
 
-void TileFloat::Update(float deltaTime)
+void TileFloatScript::Update(float deltaTime)
 {
     float currentY      = parent->GetLocalTransform().TranslatePart().y;
     float distanceRisen = currentY - initialY;

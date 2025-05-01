@@ -1,10 +1,10 @@
 #pragma once
 #include "Script.h"
 
-class TileFloat : public Script
+class TileFloatScript : public Script
 {
   public:
-    TileFloat(GameObject* parent);
+    TileFloatScript(GameObject* parent);
     bool Init() override;
     void Update(float deltaTime) override;
 

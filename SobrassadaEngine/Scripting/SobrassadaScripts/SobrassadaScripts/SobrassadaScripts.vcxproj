@@ -405,7 +405,7 @@
     <ClInclude Include="Script.h" />
     <ClInclude Include="VSyncToggleScript.h" />
     <ClInclude Include="Soldier.h" />
-    <ClInclude Include="TileFloat.h" />
+    <ClInclude Include="TileFloatScript.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Libs\bullet\include\BulletCollision\BroadphaseCollision\btAxisSweep3.cpp">
@@ -1773,7 +1773,7 @@
     <ClCompile Include="ScriptExport.cpp" />
     <ClCompile Include="VSyncToggleScript.cpp" />
     <ClCompile Include="Soldier.cpp" />
-    <ClCompile Include="TileFloat.cpp" />
+    <ClCompile Include="TileFloatScript.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SobrassadaScripts.rc" />

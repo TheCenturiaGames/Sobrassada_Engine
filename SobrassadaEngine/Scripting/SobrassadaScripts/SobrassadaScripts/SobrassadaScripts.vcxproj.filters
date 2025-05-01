@@ -16,6 +16,9 @@
     <Filter Include="Characters">
       <UniqueIdentifier>{5b6dfe3e-5b52-4bec-9eca-0933a138341c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Environment">
+      <UniqueIdentifier>{9afcd9ac-fa5f-45af-ac0b-16d450c5873d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
@@ -68,6 +71,10 @@
     </ClInclude>
     <ClInclude Include="Soldier.h">
       <Filter>Characters</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="TileFloatScript.h">
+      <Filter>Environment</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -695,5 +702,11 @@
     <ClCompile Include="ScriptExport.cpp">
       <Filter>Scripting Config</Filter>
     </ClCompile>
+    <ClCompile Include="TileFloatScript.cpp">
+      <Filter>Environment</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SobrassadaScripts.rc" />
   </ItemGroup>
 </Project>
