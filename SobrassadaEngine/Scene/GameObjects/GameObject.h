@@ -59,7 +59,7 @@ class SOBRASADA_API_ENGINE GameObject
     const float4x4& GetParentGlobalTransform() const;
 
     bool IsStatic() const { return mobilitySettings == MobilitySettings::STATIC; };
-    bool IsTopParent() const { return isTopParent; };
+    bool HasSelectParent() const { return selectParent; };
     bool IsNavMeshValid() const { return navMeshValid; };
     bool IsComponentCreated(int i) const { return createdComponents[i]; };
 
@@ -139,6 +139,7 @@ class SOBRASADA_API_ENGINE GameObject
     void SetEnabled(bool state) { enabled = state; }
     void SetComponentCreated(int position) { createdComponents[position] = true; }
     void SetComponentRemoved(int position) { createdComponents[position] = false; }
+    void SetSelectParent(bool newSelectParent) { selectParent = newSelectParent; }
 
   private:
     void DrawNodes() const;
@@ -175,7 +176,7 @@ class SOBRASADA_API_ENGINE GameObject
 
     ComponentType selectedComponentIndex = COMPONENT_NONE;
     int mobilitySettings                 = STATIC;
-    bool isTopParent                     = false;
+    bool selectParent                    = false;
     bool willUpdate                      = false;
     bool enabled                         = true;
     bool navMeshValid                    = false;

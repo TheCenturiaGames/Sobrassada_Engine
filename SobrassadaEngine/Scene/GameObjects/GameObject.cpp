@@ -217,7 +217,7 @@ GameObject::GameObject(UID parentUID, GameObject* refObject)
 
     globalOBB        = OBB(localAABB);
     globalAABB       = AABB(globalOBB);
-    isTopParent      = refObject->isTopParent;
+    selectParent      = refObject->selectParent;
     mobilitySettings = refObject->mobilitySettings;
 
     position         = refObject->position;
@@ -249,7 +249,7 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
 
     if (initialState.HasMember("Enabled")) enabled = initialState["Enabled"].GetBool();
 
-    if (initialState.HasMember("IsTopParent")) isTopParent = initialState["IsTopParent"].GetBool();
+    if (initialState.HasMember("SelectParent")) selectParent = initialState["SelectParent"].GetBool();
 
     if (initialState.HasMember("PrefabUID")) prefabUID = initialState["PrefabUID"].GetUint64();
     if (initialState.HasMember("NavmeshValid")) navMeshValid = initialState["NavmeshValid"].GetBool();
@@ -363,7 +363,7 @@ void GameObject::Save(rapidjson::Value& targetState, rapidjson::Document::Alloca
     targetState.AddMember("ParentUID", parentUID, allocator);
     targetState.AddMember("Name", rapidjson::Value(name.c_str(), allocator), allocator);
     targetState.AddMember("Mobility", mobilitySettings, allocator);
-    targetState.AddMember("IsTopParent", isTopParent, allocator);
+    targetState.AddMember("SelectParent", selectParent, allocator);
     targetState.AddMember("Enabled", enabled, allocator);
     targetState.AddMember("NavmeshValid", navMeshValid, allocator);
 
@@ -423,7 +423,7 @@ void GameObject::RenderEditorInspector()
     {
         ImGui::SameLine();
         if (ImGui::Checkbox("Draw nodes", &drawNodes)) OnDrawConnectionsToggle();
-        ImGui::Checkbox("Is top parent", &isTopParent);
+        ImGui::Checkbox("Select parent", &selectParent);
         ImGui::SameLine();
         ImGui::Checkbox("Navmesh valid", &navMeshValid);
 

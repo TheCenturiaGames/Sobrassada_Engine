@@ -1111,6 +1111,8 @@ void Scene::LoadModel(const UID modelUID)
                                 currentGameObject->GetName() + " Mesh " + std::to_string(meshNum)
                             );
                             ++meshNum;
+
+                            gameObjectsArray.push_back(meshObject);
                         }
                         else
                         {
@@ -1181,6 +1183,12 @@ void Scene::LoadModel(const UID modelUID)
                 GLOG("No animations found for this model");
             }
             rootGameObject->UpdateTransformForGOBranch();
+        }
+
+        // SET CHILD GAME OBJECTS TO SELECT THE PARENT
+        for (int i = 1; i < gameObjectsArray.size(); ++i)
+        {
+            gameObjectsArray[i]->SetSelectParent(true);
         }
     }
 }
