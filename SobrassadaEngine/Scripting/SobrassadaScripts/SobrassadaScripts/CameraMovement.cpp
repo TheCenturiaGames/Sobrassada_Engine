@@ -18,9 +18,9 @@ CameraMovement::CameraMovement(GameObject* parent) : Script(parent)
     fields.push_back({"Target", InspectorField::FieldType::InputText, &targetName});
     fields.push_back({"Smoothness Velocity", InspectorField::FieldType::Float, &smoothnessVelocity, 0, 100});
     fields.push_back({"Enable Mouse Offset", InspectorField::FieldType::Bool, &mouseOffsetEnabled});
-    fields.push_back({"Mouse Offset Intensity", InspectorField::FieldType::Float, &mouseOffsetIntensity, 0, 100});
-    fields.push_back({"Enable Look Ahead", InspectorField::FieldType::Bool, &lookAheadEnabled});
+    fields.push_back({"Mouse Offset Intensity", InspectorField::FieldType::Float, &mouseOffsetIntensity, 0, 1});
     fields.push_back({"Look Ahead Intensity", InspectorField::FieldType::Float, &lookAheadIntensity, 0, 10});
+    fields.push_back({"Look Ahead Smoothness", InspectorField::FieldType::Float, &lookAheadSmoothness, 0, 100});
 }
 
 bool CameraMovement::Init()
@@ -45,14 +45,13 @@ void CameraMovement::FollowTarget(float deltaTime)
 
     if (mouseOffsetEnabled)
     {
-        lookAheadEnabled           = false;
         currentLookAhead           = 0;
         const float3 mouseWorldPos = AppEngine->GetSceneModule()->GetScene()->GetMainCamera()->ScreenPointToXZ(
             parent->GetGlobalTransform().TranslatePart().y
         );
         desiredPosition += mouseWorldPos * 0.5f * mouseOffsetIntensity;
     }
-    else if (lookAheadEnabled)
+    else if (lookAheadIntensity > 0)
     {
         // TODO: Get player speed and increase currentLookAhead only if its moving
         currentLookAhead             = Lerp(currentLookAhead, lookAheadIntensity, lookAheadSmoothness * deltaTime);
