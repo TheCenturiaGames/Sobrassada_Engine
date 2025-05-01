@@ -96,11 +96,10 @@ void ScriptModule::DeleteAllScripts()
 {
     if (App->GetSceneModule()->GetScene())
     {
-
         for (auto& gameObject : App->GetSceneModule()->GetScene()->GetAllGameObjects())
         {
             ScriptComponent* scriptComponent = gameObject.second->GetComponent<ScriptComponent*>();
-            if (scriptComponent) scriptComponent->DeleteScript();
+            if (scriptComponent) scriptComponent->DeleteAllScripts();
         }
 
         freeScriptFunc();

@@ -18,7 +18,7 @@ enum ScriptType
     SCRIPT_MAIN_MENU_SELECTOR,
     SCRIPT_PRESS_ANY_KEY,
 
-    SCRIPT_TYPE_COUNT //Add at the end
+    SCRIPT_TYPE_COUNT // Add at the end
 };
 
 namespace math
@@ -66,16 +66,14 @@ class ScriptComponent : public Component
     void InitScriptInstances();
     void OnCollision(GameObject* otherObject, const float3& collisionNormal);
     void CreateScript(const std::string& scriptType);
-    void DeleteScript();
-
-    const std::string& GetScriptName() const { return scriptName; }
-    Script* GetScriptInstance() const { return scriptInstance; }
-    const ScriptType GetScriptType() const { return scriptType; }
+    void DeleteScript(const int index);
+    void DeleteAllScripts();
 
   private:
     int SearchIdxForString(const std::string& name) const;
-    std::string scriptName = "Not selected";
-    Script* scriptInstance = nullptr;
     bool startScript       = false;
-    ScriptType scriptType  = SCRIPT_ROTATE_GAME_OBJECT;
+
+    std::vector<std::string> scriptNames;
+    std::vector<Script*> scriptInstances;
+    std::vector<ScriptType> scriptTypes;
 };
