@@ -109,6 +109,7 @@ bool PhysicsModule::ShutDown()
     delete broadPhase;
     delete dispatcher;
     delete collisionConfiguration;
+    delete debugDraw;
 
     return true;
 }
@@ -211,7 +212,7 @@ void PhysicsModule::CreateCapsuleRigidBody(CapsuleColliderComponent* colliderCom
     const bool isDynamic             = (colliderComponent->mass != 0.f);
 
     // Inertia
-    btVector3 localInertia(0, 0, 0);
+    btVector3 localInertia(0.f, 0.f, 0.f);
     if (isDynamic) collisionShape->calculateLocalInertia(colliderComponent->mass, localInertia);
 
     // MotionState for RENDER AND
@@ -262,7 +263,7 @@ void PhysicsModule::AddRigidBody(btRigidBody* rigidBody, ColliderType colliderTy
     case ColliderType::KINEMATIC:
         rigidBody->setCollisionFlags(rigidBody->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
         rigidBody->setActivationState(DISABLE_DEACTIVATION);
-        rigidBody->setCustomDebugColor(btVector3(0.859, 0.196, 0.784)); // COLOR TO NOT BE RED, COLORBLIND ISSUE
+        rigidBody->setCustomDebugColor(btVector3(0.859f, 0.196f, 0.784f)); // COLOR TO NOT BE RED, COLORBLIND ISSUE
         break;
     case ColliderType::TRIGGER:
         rigidBody->setCollisionFlags(
@@ -400,6 +401,6 @@ void PhysicsModule::RebuildWorld()
 
     for (const auto& gameObject : allGameObjects)
     {
-        gameObject.second->UpdateComponents();
+        gameObject.second->ParentUpdatedComponents();
     }
 }

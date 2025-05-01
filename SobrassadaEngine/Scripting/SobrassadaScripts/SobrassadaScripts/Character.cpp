@@ -26,7 +26,7 @@ Character::Character(
 
 bool Character::Init()
 {
-    animComponent = parent->GetAnimationComponent();
+    animComponent = parent->GetComponent<AnimationComponent*>();
     if (!animComponent)
     {
         GLOG("Animation component not found for %s", parent->GetName().c_str());
@@ -34,14 +34,14 @@ bool Character::Init()
     }
     animComponent->OnPlay(false);
 
-    characterCollider = dynamic_cast<CapsuleColliderComponent*>(parent->GetComponentByType(COMPONENT_CAPSULE_COLLIDER));
+    characterCollider = parent->GetComponent<CapsuleColliderComponent*>();
     if (!characterCollider)
     {
         GLOG("Character capsule collider component not found for %s", parent->GetName().c_str());
         return false;
     }
 
-    weaponCollider = dynamic_cast<CubeColliderComponent*>(parent->GetComponentChildByType(COMPONENT_CUBE_COLLIDER));
+    weaponCollider = parent->GetComponentChild<CubeColliderComponent*>(AppEngine);
     if (!weaponCollider)
     {
         GLOG("Weapon cube collider component not found for %s", parent->GetName().c_str());
@@ -98,10 +98,10 @@ void Character::OnCollision(GameObject* otherObject, const float3& collisionNorm
 {
     // cube collider should be only if is enabled here already checked by OnCollision of cubeColliderComponent
     // GLOG("COLLISION %s with %s", parent->GetName().c_str(), otherObject->GetName().c_str())
-    CubeColliderComponent* enemyWeapon =
-        dynamic_cast<CubeColliderComponent*>(otherObject->GetComponentByType(COMPONENT_CUBE_COLLIDER));
-    ScriptComponent* enemyScriptComponent =
-        dynamic_cast<ScriptComponent*>(otherObject->GetComponentParentByType(COMPONENT_SCRIPT));
+
+    CubeColliderComponent* enemyWeapon    = otherObject->GetComponent<CubeColliderComponent*>();
+
+    ScriptComponent* enemyScriptComponent = otherObject->GetComponentParent<ScriptComponent*>(AppEngine);
 
     if (!isInvulnerable && enemyScriptComponent != nullptr && enemyWeapon != nullptr && enemyWeapon->GetEnabled())
     {

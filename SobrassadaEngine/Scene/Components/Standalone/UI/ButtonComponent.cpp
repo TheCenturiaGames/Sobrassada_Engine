@@ -58,19 +58,16 @@ ButtonComponent::ButtonComponent(const rapidjson::Value& initialState, GameObjec
 
 ButtonComponent::~ButtonComponent()
 {
+    ClearAllCallbacks();
 }
 
 void ButtonComponent::Init()
 {
-    Component* transform = parent->GetComponentByType(COMPONENT_TRANSFORM_2D);
-    if (transform == nullptr)
+    transform2D = parent->GetComponent<Transform2DComponent*>();
+    if (transform2D == nullptr)
     {
         parent->CreateComponent(COMPONENT_TRANSFORM_2D);
-        transform2D = static_cast<Transform2DComponent*>(parent->GetComponentByType(COMPONENT_TRANSFORM_2D));
-    }
-    else
-    {
-        transform2D = static_cast<Transform2DComponent*>(transform);
+        transform2D = parent->GetComponent<Transform2DComponent*>();
     }
 
     parentCanvas = transform2D->GetParentCanvas();
@@ -85,15 +82,11 @@ void ButtonComponent::Init()
     }
 
     // Get the image
-    Component* linkedImage = parent->GetComponentByType(COMPONENT_IMAGE);
-    if (linkedImage == nullptr)
+    image = parent->GetComponent<ImageComponent*>();
+    if (image == nullptr)
     {
         parent->CreateComponent(COMPONENT_IMAGE);
-        image = static_cast<ImageComponent*>(parent->GetComponentByType(COMPONENT_IMAGE));
-    }
-    else
-    {
-        image = static_cast<ImageComponent*>(linkedImage);
+        image = parent->GetComponent<ImageComponent*>();
     }
 }
 
@@ -217,15 +210,17 @@ bool ButtonComponent::IsWithinBounds(const float2& pos) const
     return abs(localRotated.x) <= transform2D->size.x * 0.5f && abs(localRotated.y) <= transform2D->size.y * 0.5f;
 }
 
-void ButtonComponent::AddOnClickCallback(Delegate<void>& newDelegate)
+std::list<Delegate<void>>::iterator ButtonComponent::AddOnClickCallback(Delegate<void> newDelegate)
 {
-    delegateID = onClickDispatcher.SubscribeCallback(std::move(newDelegate));
+    return onClickDispatcher.SubscribeCallback(std::move(newDelegate));
 }
 
-void ButtonComponent::RemoveOnClickCallback()
+
+void ButtonComponent::RemoveOnClickCallback(std::list<Delegate<void>>::iterator delegate)
 {
-    onClickDispatcher.RemoveCallback(delegateID);
+    onClickDispatcher.SafeRemoveCallback(delegate);
 }
+
 
 void ButtonComponent::OnInteractionChange() const
 {
@@ -233,4 +228,9 @@ void ButtonComponent::OnInteractionChange() const
 
     if (isInteractable) image->SetColor(defaultColor);
     else image->SetColor(disabledColor);
+}
+
+void ButtonComponent::ClearAllCallbacks()
+{
+    onClickDispatcher.Clear();
 }
