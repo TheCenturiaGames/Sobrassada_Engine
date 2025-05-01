@@ -573,6 +573,8 @@ void EditorUIModule::LoadPrefabDialog(bool& loadPrefab)
 
     if (ImGui::Button("Cancel", ImVec2(0, 0))) loadPrefab = false;
 
+    if (ImGui::Button("DELETE!", ImVec2(0, 0))) App->GetLibraryModule()->DeletePrefabFiles(prefabUID);
+
     ImGui::End();
 
     if (!loadPrefab) searchTextPrefab[0] = '\0';
