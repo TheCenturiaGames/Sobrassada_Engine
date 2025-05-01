@@ -23,8 +23,8 @@ bool GodMode::Init()
         GLOG("GodMode camera component not found for %s", parent->GetName().c_str());
         return false;
     }
-
     return true;
+    
 }
 
 void GodMode::Update(float deltaTime)

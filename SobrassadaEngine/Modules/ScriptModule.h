@@ -2,11 +2,13 @@
 
 #include "Globals.h"
 #include "Module.h"
+#include "rapidjson/document.h"
 
 #include <atomic>
 #include <filesystem>
 #include <thread>
 #include <windows.h>
+#include <unordered_map>
 
 class Application;
 class Script;
@@ -48,6 +50,8 @@ class ScriptModule : public Module
     CreateScriptFunc createScriptFunc      = nullptr;
     DestroyScriptFunc destroyScriptFunc    = nullptr;
     FreeSobrassadaScripts freeScriptFunc   = nullptr;
+
+    std::unordered_map<UID, std::vector<rapidjson::Document>> scriptStates;
 
     fs::file_time_type lastWriteTime;
     std::atomic<bool> running = true;

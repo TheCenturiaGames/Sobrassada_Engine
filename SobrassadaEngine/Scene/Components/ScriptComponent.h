@@ -69,6 +69,9 @@ class ScriptComponent : public Component
     void DeleteScript(const int index);
     void DeleteAllScripts();
 
+    const std::vector<Script*>& GetScriptInstances() const { return scriptInstances; }
+    const std::vector<std::string>& GetAllScriptNames() const { return scriptNames; }
+
   private:
     int SearchIdxForString(const std::string& name) const;
     bool startScript       = false;

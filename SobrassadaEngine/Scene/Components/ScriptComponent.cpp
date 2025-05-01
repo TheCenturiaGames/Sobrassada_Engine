@@ -97,8 +97,6 @@ void ScriptComponent::RenderEditorInspector()
     if (enabled)
     {
         ImGui::SeparatorText("Script Component");
-        ImGui::Text(scriptName.c_str());
-        ImGui::SameLine();
         if (ImGui::Button("Select script"))
         {
             ImGui::OpenPopup("Select Script");
@@ -116,6 +114,7 @@ void ScriptComponent::RenderEditorInspector()
         }
         for (int i = 0; i < scriptInstances.size(); ++i)
         {
+            ImGui::Separator();
             ImGui::PushID(static_cast<int>(i));
 
             ImGui::Text(scriptNames[i].c_str());
@@ -132,7 +131,6 @@ void ScriptComponent::RenderEditorInspector()
                 scriptInstances[i]->Inspector();
             }
 
-            ImGui::Separator();
             ImGui::PopID();
         }
     }
@@ -168,8 +166,7 @@ void ScriptComponent::DeleteScript(const int index)
 {
     if (index >= scriptInstances.size()) return;
 
-    if (scriptInstances[index])
-        App->GetScriptModule()->DestroyScript(scriptInstances[index]);
+    if (scriptInstances[index]) App->GetScriptModule()->DestroyScript(scriptInstances[index]);
 
     scriptInstances.erase(scriptInstances.begin() + index);
     scriptNames.erase(scriptNames.begin() + index);

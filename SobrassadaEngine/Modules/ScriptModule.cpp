@@ -99,6 +99,23 @@ void ScriptModule::DeleteAllScripts()
         for (auto& gameObject : App->GetSceneModule()->GetScene()->GetAllGameObjects())
         {
             ScriptComponent* scriptComponent = gameObject.second->GetComponent<ScriptComponent*>();
+
+            if (!scriptComponent) continue;
+
+            const auto& instances = scriptComponent->GetScriptInstances();
+
+            std::vector<rapidjson::Document> savedStates;
+            for (Script* script : instances)
+            {
+                rapidjson::Document state;
+                state.SetObject();
+                rapidjson::Document::AllocatorType& allocator = state.GetAllocator();
+                script->Save(state, allocator);
+                savedStates.push_back(std::move(state));
+            }
+
+            scriptStates[gameObject.first] = std::move(savedStates);
+
             if (scriptComponent) scriptComponent->DeleteAllScripts();
         }
 
@@ -110,11 +127,21 @@ void ScriptModule::RecreateAllScripts()
 {
     if (App->GetSceneModule()->GetScene())
     {
-
         for (auto& gameObject : App->GetSceneModule()->GetScene()->GetAllGameObjects())
         {
             ScriptComponent* scriptComponent = gameObject.second->GetComponent<ScriptComponent*>();
-            if (scriptComponent) scriptComponent->CreateScript(scriptComponent->GetScriptName());
+            if (!scriptComponent) continue;
+
+            
+            const auto& savedStates = scriptStates[gameObject.first];
+            const auto& names = scriptComponent->GetAllScriptNames();
+
+            for (size_t i = 0; i < savedStates.size(); ++i)
+            {
+                scriptComponent->CreateScript(names[i]);
+                Script* instance = scriptComponent->GetScriptInstances()[i];
+                instance->Load(savedStates[i]);
+            }
         }
     }
 }
@@ -130,6 +157,7 @@ void ScriptModule::ReloadDLLIfUpdated()
             if (currentWriteTime != lastWriteTime)
             {
                 lastWriteTime = currentWriteTime;
+
                 DeleteAllScripts();
 
                 UnloadDLL();
