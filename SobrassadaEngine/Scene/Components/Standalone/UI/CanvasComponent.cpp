@@ -41,17 +41,15 @@ void CanvasComponent::Init()
 {
     App->GetGameUIModule()->AddCanvas(this);
 
+    float originX      = IsInWorldSpace() ? parent->GetGlobalTransform().TranslatePart().x : 0.0f;
+    float originY      = IsInWorldSpace() ? parent->GetGlobalTransform().TranslatePart().y : 0.0f;
+
     localComponentAABB = AABB(
-        float3(
-            parent->GetGlobalTransform().TranslatePart().x - (width / 4.0f),
-            parent->GetGlobalTransform().TranslatePart().y - (height / 4.0f), 0
-        ),
-        float3(
-            parent->GetGlobalTransform().TranslatePart().x + (width / 4.0f),
-            parent->GetGlobalTransform().TranslatePart().y + (height / 4.0f), 0
-        )
+        float3(originX - (width / 2.0f), originY - (height / 2.0f), 0),
+        float3(originX + (width / 2.0f), originY + (height / 2.0f), 0)
     );
 }
+
 
 void CanvasComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
 {
@@ -251,4 +249,16 @@ void CanvasComponent::OnMouseButtonPressed() const
 void CanvasComponent::OnMouseButtonReleased() const
 {
     if (hoveredButton) hoveredButton->OnRelease();
+}
+
+bool CanvasComponent::IsInWorldSpace() const
+{
+    return App->GetSceneModule()->GetInPlayMode() ? isInWorldSpaceGame : isInWorldSpaceEditor;
+}
+
+float CanvasComponent::GetScreenScale() const
+{
+    float scaleX = width / referenceWidth;
+    float scaleY = height / referenceHeight;
+    return std::min(scaleX, scaleY);
 }

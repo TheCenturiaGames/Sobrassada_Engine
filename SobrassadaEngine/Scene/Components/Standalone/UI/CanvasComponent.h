@@ -37,6 +37,8 @@ class CanvasComponent : public Component
     void UpdateMousePosition(const float2& mousePos);
     void OnMouseButtonPressed() const;
     void OnMouseButtonReleased() const;
+    bool IsInWorldSpace() const;
+    float GetScreenScale() const;
 
     bool IsInWorldSpaceEditor() const { return isInWorldSpaceEditor; }
     bool IsInWorldSpaceGame() const { return isInWorldSpaceGame; }
@@ -48,6 +50,9 @@ class CanvasComponent : public Component
     float height              = SCREEN_HEIGHT;
     bool isInWorldSpaceEditor = false;
     bool isInWorldSpaceGame   = true;
+
+    float referenceWidth      = 1920.0f;
+    float referenceHeight     = 1080.0f;
 
     std::vector<const GameObject*> sortedChildren;
     ButtonComponent* hoveredButton = nullptr;
