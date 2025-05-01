@@ -55,7 +55,8 @@ class ScriptComponent : public Component
     ScriptComponent(const rapidjson::Value& initialState, GameObject* parent);
     ~ScriptComponent() override;
 
-    void Load(const rapidjson::Value& initialState, GameObject* parent);
+    void Load(const rapidjson::Value& initialState);
+    void LoadScripts();
 
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
     void Clone(const Component* other) override;

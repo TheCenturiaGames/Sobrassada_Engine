@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "EditorUIModule.h"
+#include "GameObject.h"
 #include "Math/float2.h"
 #include "Math/float3.h"
 #include "Math/float4.h"
@@ -59,6 +60,13 @@ void Script::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorT
             targetState.AddMember(name, arr, allocator);
             break;
         }
+        case InspectorField::FieldType::GameObject:
+        {
+            GameObject* go = *(GameObject**)field.data;
+            UID uid        = go ? go->GetUID() : 0;
+            targetState.AddMember(name, uid, allocator);
+            break;
+        }
         }
     }
 }
@@ -113,6 +121,15 @@ void Script::Load(const rapidjson::Value& initialState)
                 vec->y      = value[1].GetFloat();
                 vec->z      = value[2].GetFloat();
                 vec->w      = value[3].GetFloat();
+            }
+            break;
+        case InspectorField::FieldType::GameObject:
+            if (value.IsUint64())
+            {
+                UID uid = value.GetUint64();
+                if (uid == 0) return;
+                GameObject* go            = AppEngine->GetSceneModule()->GetScene()->GetGameObjectByUID(uid);
+                *(GameObject**)field.data = go;
             }
             break;
         }

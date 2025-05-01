@@ -24,7 +24,6 @@ bool GodMode::Init()
         return false;
     }
     return true;
-    ;
 }
 
 void GodMode::Update(float deltaTime)

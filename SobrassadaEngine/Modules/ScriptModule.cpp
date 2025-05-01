@@ -109,7 +109,7 @@ void ScriptModule::SaveScriptsToFile(const std::string& filename, const rapidjso
     // Usar PrettyWriter para guardar el JSON de forma legible
     rapidjson::StringBuffer buffer;
     rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-    doc.Accept(writer);  // Convertir el documento JSON a texto
+    doc.Accept(writer); // Convertir el documento JSON a texto
 
     // Guardar el texto JSON en el archivo
     outFile << buffer.GetString();
@@ -145,7 +145,6 @@ void ScriptModule::DeleteAllScripts()
         doc.AddMember("Scripts", scriptsArray, allocator);
 
         SaveScriptsToFile("scripts_state.json", doc);
-        GLOG("All scripts deleted\n");
         freeScriptFunc();
     }
 }
@@ -179,8 +178,9 @@ void ScriptModule::RecreateAllScripts()
 {
     if (App->GetSceneModule()->GetScene())
     {
-       rapidjson::Document doc;
-        if (!LoadScriptsFromFile("scripts_state.json", doc))
+        rapidjson::Document doc;
+        const char* filename = "scripts_state.json";
+        if (!LoadScriptsFromFile(filename, doc))
         {
             GLOG("Failed to load scripts state from file.\n");
             return;
@@ -196,7 +196,7 @@ void ScriptModule::RecreateAllScripts()
         const rapidjson::Value& scriptsArray = doc["Scripts"];
 
         // Iterar sobre todos los objetos del juego
-        auto scriptIt = scriptsArray.Begin();
+        auto scriptIt                        = scriptsArray.Begin();
         for (auto& gameObject : App->GetSceneModule()->GetScene()->GetAllGameObjects())
         {
             ScriptComponent* scriptComponent = gameObject.second->GetComponent<ScriptComponent*>();
@@ -208,10 +208,15 @@ void ScriptModule::RecreateAllScripts()
                 const rapidjson::Value& scriptState = *scriptIt;
 
                 // Llamar a Load para restaurar el estado del script
-                scriptComponent->Load(scriptState, gameObject.second);
+                scriptComponent->Load(scriptState);
 
                 ++scriptIt;
             }
+        }
+
+        if (std::remove(filename) != 0)
+        {
+            GLOG("Error deleting the JSON file: %s\n", filename);
         }
     }
 }

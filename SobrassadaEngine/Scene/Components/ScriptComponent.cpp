@@ -31,7 +31,7 @@ ScriptComponent::ScriptComponent(const rapidjson::Value& initialState, GameObjec
     }
 }
 
-void ScriptComponent::Load(const rapidjson::Value& initialState, GameObject* parent)
+void ScriptComponent::Load(const rapidjson::Value& initialState)
 {
     if (initialState.HasMember("Scripts") && initialState["Scripts"].IsArray())
     {
