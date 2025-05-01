@@ -27,27 +27,24 @@ Character::Character(
 bool Character::Init()
 {
     animComponent = parent->GetComponent<AnimationComponent*>();
-    if (!animComponent)
+    if (animComponent == nullptr)
     {
         GLOG("Animation component not found for %s", parent->GetName().c_str());
-        return false;
     }
-    animComponent->OnPlay(false);
+    else animComponent->OnPlay(false);
 
     characterCollider = parent->GetComponent<CapsuleColliderComponent*>();
-    if (!characterCollider)
+    if (characterCollider == nullptr)
     {
         GLOG("Character capsule collider component not found for %s", parent->GetName().c_str());
-        return false;
     }
 
     weaponCollider = parent->GetComponentChild<CubeColliderComponent*>(AppEngine);
-    if (!weaponCollider)
+    if (weaponCollider == nullptr)
     {
         GLOG("Weapon cube collider component not found for %s", parent->GetName().c_str());
-        return false;
     }
-    weaponCollider->SetEnabled(false);
+    else weaponCollider->SetEnabled(false);
 
     lastAttackTime = -1.0f;
     lastTimeHit    = -1.0f;
@@ -60,7 +57,7 @@ void Character::Update(float deltaTime)
     if (isDead) return;
 
     float gameTime = AppEngine->GetGameTimer()->GetTime() / 1000.0f;
-    if (weaponCollider->GetEnabled() && isAttacking && gameTime - lastAttackTime >= attackDuration)
+    if (isAttacking && weaponCollider->GetEnabled() && gameTime - lastAttackTime >= attackDuration)
     {
         // GLOG("Not Attacking %.3f", gameTime);
         weaponCollider->SetEnabled(false);
@@ -105,8 +102,11 @@ void Character::OnCollision(GameObject* otherObject, const float3& collisionNorm
 
     if (!isInvulnerable && enemyScriptComponent != nullptr && enemyWeapon != nullptr && enemyWeapon->GetEnabled())
     {
-        Script* enemyScript       = enemyScriptComponent->GetScriptInstance();
-        // ScriptType scriptType = enemyScriptComponent->GetScriptType(); // not needed for now
+        Script* enemyScript = enemyScriptComponent->GetScriptInstance();
+
+        if (enemyScript == nullptr) GLOG("%s script instance not setted.", otherObject->GetName().c_str()); // we want to crash?
+
+        // ScriptType scriptType = enemyScriptComponent->GetScriptType(); // not needed for now, type of script for casting
         Character* enemyCharacter = dynamic_cast<Character*>(enemyScript);
         if (!enemyCharacter->isAttacking) return;
 
