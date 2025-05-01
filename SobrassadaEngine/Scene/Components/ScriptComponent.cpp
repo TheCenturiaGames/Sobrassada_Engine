@@ -31,6 +31,22 @@ ScriptComponent::ScriptComponent(const rapidjson::Value& initialState, GameObjec
     }
 }
 
+void ScriptComponent::Load(const rapidjson::Value& initialState, GameObject* parent)
+{
+    if (initialState.HasMember("Scripts") && initialState["Scripts"].IsArray())
+    {
+        for (const auto& scriptData : initialState["Scripts"].GetArray())
+        {
+            if (scriptData.HasMember("Script Name"))
+            {
+                const char* name = scriptData["Script Name"].GetString();
+                CreateScript(name);
+                scriptInstances.back()->Load(scriptData);
+            }
+        }
+    }
+}
+
 ScriptComponent::~ScriptComponent()
 {
     DeleteAllScripts();

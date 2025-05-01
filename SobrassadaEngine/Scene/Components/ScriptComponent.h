@@ -55,6 +55,8 @@ class ScriptComponent : public Component
     ScriptComponent(const rapidjson::Value& initialState, GameObject* parent);
     ~ScriptComponent() override;
 
+    void Load(const rapidjson::Value& initialState, GameObject* parent);
+
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
     void Clone(const Component* other) override;
 
@@ -74,7 +76,7 @@ class ScriptComponent : public Component
 
   private:
     int SearchIdxForString(const std::string& name) const;
-    bool startScript       = false;
+    bool startScript = false;
 
     std::vector<std::string> scriptNames;
     std::vector<Script*> scriptInstances;

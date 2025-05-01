@@ -1,4 +1,5 @@
 #pragma once
+#pragma once
 
 #include "Globals.h"
 #include "Module.h"
@@ -7,8 +8,8 @@
 #include <atomic>
 #include <filesystem>
 #include <thread>
-#include <windows.h>
 #include <unordered_map>
+#include <windows.h>
 
 class Application;
 class Script;
@@ -38,6 +39,9 @@ class ScriptModule : public Module
     void RecreateAllScripts();
     bool IsFileLocked(const std::filesystem::path& filePath);
 
+    void SaveScriptsToFile(const std::string& filename, const rapidjson::Document& doc);
+    bool LoadScriptsFromFile(const std::string& filename, rapidjson::Document& doc);
+
   private:
     HMODULE dllHandle = nullptr;
 
@@ -50,8 +54,6 @@ class ScriptModule : public Module
     CreateScriptFunc createScriptFunc      = nullptr;
     DestroyScriptFunc destroyScriptFunc    = nullptr;
     FreeSobrassadaScripts freeScriptFunc   = nullptr;
-
-    std::unordered_map<UID, std::vector<rapidjson::Document>> scriptStates;
 
     fs::file_time_type lastWriteTime;
     std::atomic<bool> running = true;

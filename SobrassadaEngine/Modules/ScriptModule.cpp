@@ -92,55 +92,125 @@ bool ScriptModule::IsFileLocked(const std::filesystem::path& filePath)
     return false;
 }
 
+#include <fstream>
+#include <rapidjson/prettywriter.h>
+#include <rapidjson/stringbuffer.h>
+
+void ScriptModule::SaveScriptsToFile(const std::string& filename, const rapidjson::Document& doc)
+{
+    std::ofstream outFile(filename, std::ios::out | std::ios::trunc);
+
+    if (!outFile.is_open())
+    {
+        GLOG("Error opening file to save scripts.\n");
+        return;
+    }
+
+    // Usar PrettyWriter para guardar el JSON de forma legible
+    rapidjson::StringBuffer buffer;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+    doc.Accept(writer);  // Convertir el documento JSON a texto
+
+    // Guardar el texto JSON en el archivo
+    outFile << buffer.GetString();
+    outFile.close();
+
+    GLOG("Scripts saved successfully to '%s'.\n", filename.c_str());
+}
+
 void ScriptModule::DeleteAllScripts()
 {
     if (App->GetSceneModule()->GetScene())
     {
+        rapidjson::Document doc;
+        doc.SetObject();
+        rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
+        rapidjson::Value scriptsArray(rapidjson::kArrayType);
+
+        // Iterar sobre todos los objetos del juego
         for (auto& gameObject : App->GetSceneModule()->GetScene()->GetAllGameObjects())
         {
             ScriptComponent* scriptComponent = gameObject.second->GetComponent<ScriptComponent*>();
 
             if (!scriptComponent) continue;
 
-            const auto& instances = scriptComponent->GetScriptInstances();
-
-            std::vector<rapidjson::Document> savedStates;
-            for (Script* script : instances)
-            {
-                rapidjson::Document state;
-                state.SetObject();
-                rapidjson::Document::AllocatorType& allocator = state.GetAllocator();
-                script->Save(state, allocator);
-                savedStates.push_back(std::move(state));
-            }
-
-            scriptStates[gameObject.first] = std::move(savedStates);
-
-            if (scriptComponent) scriptComponent->DeleteAllScripts();
+            rapidjson::Value targetState(rapidjson::kObjectType);
+            scriptComponent->Save(targetState, allocator);
+            scriptsArray.PushBack(targetState, allocator);
+            // Eliminar todos los scripts del ScriptComponent
+            scriptComponent->DeleteAllScripts();
         }
 
+        // Agregar el array de scripts al documento JSON
+        doc.AddMember("Scripts", scriptsArray, allocator);
+
+        SaveScriptsToFile("scripts_state.json", doc);
+        GLOG("All scripts deleted\n");
         freeScriptFunc();
     }
+}
+
+bool ScriptModule::LoadScriptsFromFile(const std::string& filename, rapidjson::Document& doc)
+{
+    std::ifstream inFile(filename, std::ios::in);
+    if (!inFile.is_open())
+    {
+        GLOG("Error opening file to load scripts.\n");
+        return false;
+    }
+
+    // Leer todo el contenido del archivo
+    std::string fileContent((std::istreambuf_iterator<char>(inFile)), std::istreambuf_iterator<char>());
+    inFile.close();
+
+    // Parsear el contenido a un documento JSON
+    doc.Parse(fileContent.c_str());
+
+    if (doc.HasParseError())
+    {
+        GLOG("Error parsing JSON file.\n");
+        return false;
+    }
+
+    return true;
 }
 
 void ScriptModule::RecreateAllScripts()
 {
     if (App->GetSceneModule()->GetScene())
     {
+       rapidjson::Document doc;
+        if (!LoadScriptsFromFile("scripts_state.json", doc))
+        {
+            GLOG("Failed to load scripts state from file.\n");
+            return;
+        }
+
+        // Asegurarse de que el JSON tiene la estructura correcta
+        if (!doc.IsObject() || !doc.HasMember("Scripts") || !doc["Scripts"].IsArray())
+        {
+            GLOG("Invalid script state format in JSON file.\n");
+            return;
+        }
+
+        const rapidjson::Value& scriptsArray = doc["Scripts"];
+
+        // Iterar sobre todos los objetos del juego
+        auto scriptIt = scriptsArray.Begin();
         for (auto& gameObject : App->GetSceneModule()->GetScene()->GetAllGameObjects())
         {
             ScriptComponent* scriptComponent = gameObject.second->GetComponent<ScriptComponent*>();
             if (!scriptComponent) continue;
 
-            
-            const auto& savedStates = scriptStates[gameObject.first];
-            const auto& names = scriptComponent->GetAllScriptNames();
-
-            for (size_t i = 0; i < savedStates.size(); ++i)
+            // Verificar si hay un estado guardado para este gameObject
+            if (scriptIt != scriptsArray.End())
             {
-                scriptComponent->CreateScript(names[i]);
-                Script* instance = scriptComponent->GetScriptInstances()[i];
-                instance->Load(savedStates[i]);
+                const rapidjson::Value& scriptState = *scriptIt;
+
+                // Llamar a Load para restaurar el estado del script
+                scriptComponent->Load(scriptState, gameObject.second);
+
+                ++scriptIt;
             }
         }
     }
