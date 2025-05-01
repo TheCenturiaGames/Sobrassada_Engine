@@ -56,4 +56,10 @@ class SOBRASADA_API_ENGINE CharacterControllerComponent : public Component
     float maxFallSpeed           = -20.0f;
 
     bool inputDown               = true;
+    bool isRotating              = false;
+    float3 targetLookDirection;
+
+    float3 rotateDirection;
+    bool isAiming    = false;
+    bool isAttacking = false;
 };
