@@ -101,7 +101,7 @@ update_status AnimController::Update(float deltaTime)
 
 void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat& rot)
 {
-    GLOG("GetTransform called for %s at time %.2f", nodeName.c_str(), currentTime);
+    //GLOG("GetTransform called for %s at time %.2f", nodeName.c_str(), currentTime);
 
     if (!playAnimation || resource == INVALID_UID || currentAnimation == nullptr) return;
 
@@ -110,11 +110,11 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
         Channel* animChannel = currentAnimation->GetChannel(nodeName);
         if (animChannel == nullptr)
         {
-            GLOG("No channel for node %s", nodeName.c_str());
+            //GLOG("No channel for node %s", nodeName.c_str());
             return; // IMPORTANT: Don't modify pos/rot if no channel exists
         }
 
-        GLOG("Channel found with %d positions and %d rotations", animChannel->numPositions, animChannel->numRotations);
+        //GLOG("Channel found with %d positions and %d rotations", animChannel->numPositions, animChannel->numRotations);
 
         // CRITICAL: Only modify position if there's position data
         // Otherwise leave the input position unchanged
@@ -130,10 +130,10 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
             GetChannelRotation(animChannel, rot, currentTime);
         }
 
-        GLOG(
+        /*GLOG(
             "Applying transform for %s: pos=(%.2f,%.2f,%.2f) rot=(%.2f,%.2f,%.2f,%.2f)", nodeName.c_str(), pos.x, pos.y,
             pos.z, rot.x, rot.y, rot.z, rot.w
-        );
+        );*/
     }
     else
     {
@@ -143,7 +143,7 @@ void AnimController::GetTransform(const std::string& nodeName, float3& pos, Quat
 
         if (animChannel == nullptr && targetAnimChannel == nullptr)
         {
-            GLOG("No channel for node %s in either animation", nodeName.c_str());
+            //GLOG("No channel for node %s in either animation", nodeName.c_str());
             return; // Don't modify pos/rot if no channel exists in either animation
         }
 

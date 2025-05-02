@@ -31,19 +31,36 @@ AnimationComponent::AnimationComponent(const rapidjson::Value& initialState, Gam
     : Component(initialState, parent)
 {
     animController = new AnimController();
+
+   
     if (initialState.HasMember("Animations") && initialState["Animations"].IsUint64())
     {
         resource = initialState["Animations"].GetUint64();
+        if (resource != INVALID_UID)
+        {
+            currentAnimResource = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
+            if (currentAnimResource)
+            {
+                currentAnimName = currentAnimResource->GetName();
+                
+                SetBoneMapping();
+            }
+        }
     }
     else
     {
         resource = 0;
     }
 
+   
     if (initialState.HasMember("StateMachine") && initialState["StateMachine"].IsUint64())
     {
-        UID smUID            = initialState["StateMachine"].GetUint64();
-        resourceStateMachine = static_cast<ResourceStateMachine*>(App->GetResourcesModule()->RequestResource(smUID));
+        UID smUID = initialState["StateMachine"].GetUint64();
+        if (smUID != INVALID_UID)
+        {
+            resourceStateMachine =
+                static_cast<ResourceStateMachine*>(App->GetResourcesModule()->RequestResource(smUID));
+        }
     }
     else
     {
@@ -63,6 +80,32 @@ AnimationComponent::~AnimationComponent()
 
 void AnimationComponent::OnPlay(bool isTransition)
 {
+    if (resource != INVALID_UID && currentAnimResource == nullptr)
+    {
+        currentAnimResource = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
+        if (currentAnimResource)
+        {
+            currentAnimName = currentAnimResource->GetName();
+            //GLOG("Loaded animation resource: %s", currentAnimName.c_str());
+        }
+    }
+
+    if (animController == nullptr || resource == INVALID_UID || currentAnimResource == nullptr)
+    {
+        /*GLOG(
+            "Cannot play: controller=%p, resource=%llu, currentAnim=%p", animController, resource, currentAnimResource
+        );*/
+        return;
+    }
+
+  
+    SetBoneMapping();
+
+    if (boneMapping.empty())
+    {
+        //GLOG("ERROR: No bones mapped after SetBoneMapping!");
+        return;
+    }
     StateMachineEditor* stateMachine = nullptr;
     unsigned transitionTime          = 0;
     if (animController != nullptr && resource != INVALID_UID)
@@ -85,7 +128,7 @@ void AnimationComponent::OnPlay(bool isTransition)
                     {
                         if (clip.clipName.GetString() == activeState->clipName.GetString())
                         {
-                            GLOG("TransitionTime: %f", transitionTime);
+                            //GLOG("TransitionTime: %f", transitionTime);
                             if (isTransition)
                                 animController->SetTargetAnimationResource(
                                     clip.animationResourceUID, transitionTime, clip.loop
@@ -97,7 +140,13 @@ void AnimationComponent::OnPlay(bool isTransition)
                 }
             }
         }
-        else animController->Play(resource, true);
+        else
+        {
+            animController->Play(resource, true);
+            playing = true;
+           // GLOG("Playing animation: %s (UID: %llu)", currentAnimResource->GetName().c_str(), resource);
+        }
+        
     }
 }
 
@@ -121,7 +170,7 @@ void AnimationComponent::OnResume()
 {
     if (animController != nullptr)
     {
-        animController->Resume();
+        animController->Play(resource, true);
     }
 }
 
@@ -202,14 +251,23 @@ void AnimationComponent::OnInspector()
                     ImGui::Text("Current Animation: %s", anim->GetName().c_str());
                     animationDuration = anim->GetDuration();
 
-                    // Display animation controls
+                   
                     ImGui::Separator();
                     ImGui::Text("Animation Controls");
 
                     if (ImGui::Button("Play"))
                     {
+                        if (currentAnimComp == nullptr)
+                        {
+                            currentAnimComp = this;
+                        }
+
                         playing = true;
                         currentAnimComp->OnPlay(false);
+                      /*  GLOG(
+                            "Play button pressed for animation: %s",
+                            currentAnimResource ? currentAnimResource->GetName().c_str() : "Unknown"
+                        );*/
                     }
 
                     ImGui::SameLine();
@@ -237,44 +295,45 @@ void AnimationComponent::OnInspector()
 
                     if (ImGui::SliderFloat("Timeline", &currentTime, 0.0f, animationDuration, "%.2f sec"))
                     {
-                        // When user manually changes the time, update the animation controller
+                        
                         if (currentAnimComp->GetAnimationController())
                         {
                             currentAnimComp->GetAnimationController()->SetTime(currentTime);
                         }
                     }
 
-                    // Bone visualization
+                   
                     if (ImGui::TreeNode("Bone Mapping"))
                     {
-                        if (currentAnimComp)
+                        ImGui::Text("Total bones mapped: %zu", boneMapping.size());
+
+                        
+
+                        ImGui::Separator();
+
+                        
+                        ImGui::Text("GameObject Hierarchy:");
+                        std::function<void(GameObject*, int)> showHierarchy = [&](GameObject* obj, int depth)
                         {
-                            const auto& boneMap = currentAnimComp->GetBoneMapping();
+                            if (!obj) return;
 
-                            if (boneMap.empty())
+                            ImGui::Indent(depth * 20.0f);
+                            ImGui::Text("%s (UID: %llu)", obj->GetName().c_str(), obj->GetUID());
+                            ImGui::Unindent(depth * 20.0f);
+
+                            for (const UID childUID : obj->GetChildren())
                             {
-                                ImGui::Text("No bones mapped. Animation might not apply correctly.");
-                            }
-                            else
-                            {
-                                ImGui::Text("%d bones mapped:", boneMap.size());
-                                for (const auto& pair : boneMap)
+                                GameObject* child = App->GetSceneModule()->GetScene()->GetGameObjectByUID(childUID);
+                                if (child)
                                 {
-                                    bool foundInAnimation = false;
-
-                                    if (currentAnimComp->GetCurrentAnimation())
-                                    {
-                                        foundInAnimation =
-                                            currentAnimComp->GetCurrentAnimation()->channels.find(pair.first) !=
-                                            currentAnimComp->GetCurrentAnimation()->channels.end();
-                                    }
-
-                                    ImGui::TextColored(
-                                        foundInAnimation ? ImVec4(0, 1, 0, 1) : ImVec4(1, 0, 0, 1), "%s -> %s",
-                                        pair.first.c_str(), pair.second ? pair.second->GetName().c_str() : "NULL"
-                                    );
+                                    showHierarchy(child, depth + 1);
                                 }
                             }
+                        };
+
+                        if (parent)
+                        {
+                            showHierarchy(parent, 0);
                         }
                         ImGui::TreePop();
                     }
@@ -322,7 +381,7 @@ void AnimationComponent::OnInspector()
                         currentAnimComp->OnStop();
                     }
 
-                    GLOG("Selected animation: %s (UID: %llu)", animationName.c_str(), resource);
+                    //GLOG("Selected animation: %s (UID: %llu)", animationName.c_str(), resource);
                 }
             }
         }
@@ -432,49 +491,67 @@ void AnimationComponent::Clone(const Component* other)
 void AnimationComponent::Update(float deltaTime)
 {
     if (!IsEffectivelyEnabled()) return;
+
+   
+     if (App->GetSceneModule()->GetInPlayMode() && !animController->IsPlaying() && !hasStartedPlayMode)
+    {
+       
+        OnPlay(false);
+        hasStartedPlayMode = true;
+        
+    }
+
+    
+    if (!App->GetSceneModule()->GetInPlayMode() && hasStartedPlayMode)
+    {
+        hasStartedPlayMode = false;
+    }
+
+   
     if (!animController->IsPlaying()) return;
 
+   
     if (boneMapping.empty())
     {
         SetBoneMapping();
+        if (boneMapping.empty())
+        {
+            return;
+        }
     }
 
+   
     animController->Update(deltaTime);
 
-    
+   
     std::set<GameObject*> modifiedBones;
 
-    
     for (auto& channel : currentAnimResource->channels)
     {
         const std::string& boneName = channel.first;
         auto boneIt                 = boneMapping.find(boneName);
 
-        if (boneIt != boneMapping.end())
+        if (boneIt != boneMapping.end() && boneIt->second != nullptr)
         {
             GameObject* bone          = boneIt->second;
 
-            // Get current transform components 
-            // if the animation doesn't provide values
             float4x4 currentTransform = bone->GetLocalTransform();
             float3 position           = currentTransform.TranslatePart();
             Quat rotation             = Quat(currentTransform.RotatePart());
             float3 scale              = currentTransform.GetScale();
 
-            // Pass CURRENT values to GetTransform - it will only modify them
-            // if the animation has data for that channel type
+            
             animController->GetTransform(boneName, position, rotation);
             rotation.Normalize();
 
-            
+           
             float4x4 transformMatrix = float4x4::FromTRS(position, rotation, scale);
             bone->SetLocalTransform(transformMatrix);
             modifiedBones.insert(bone);
         }
     }
 
-    // Second pass: Update hierarchical transforms from root to leaves
-  
+    
     std::vector<GameObject*> rootBones;
     for (auto& bone : modifiedBones)
     {
@@ -483,7 +560,6 @@ void AnimationComponent::Update(float deltaTime)
         if (parentUID != 0)
         {
             GameObject* parent = App->GetSceneModule()->GetScene()->GetGameObjectByUID(parentUID);
-            // Check if parent is also in our bone mapping
             for (auto& mapping : boneMapping)
             {
                 if (mapping.second == parent)
@@ -500,7 +576,6 @@ void AnimationComponent::Update(float deltaTime)
         }
     }
 
-    // Process hierarchy from roots
     for (auto rootBone : rootBones)
     {
         UpdateBoneHierarchy(rootBone);
@@ -529,13 +604,25 @@ void AnimationComponent::AddAnimation(UID animationUID)
 
     if (newAnimation != nullptr)
     {
-        App->GetResourcesModule()->ReleaseResource(currentAnimResource);
+        
+        if (currentAnimResource != nullptr)
+        {
+            App->GetResourcesModule()->ReleaseResource(currentAnimResource);
+        }
+
         currentAnimResource = newAnimation;
         currentAnimName     = currentAnimResource->GetName();
         resource            = animationUID;
         SetBoneMapping();
+
+        //GLOG("Animation added successfully: %s (UID: %llu)", currentAnimName.c_str(), animationUID);
+    }
+    else
+    {
+        //GLOG("Failed to load animation resource with UID: %llu", animationUID);
     }
 }
+
 
 bool AnimationComponent::IsPlaying() const
 {
@@ -553,11 +640,10 @@ void AnimationComponent::UpdateBoneHierarchy(GameObject* bone)
 {
     if (!bone) return;
 
-    // global transform is updated
+   
     bone->OnTransformUpdated();
 
-    // Debug output to see what's happening
-    GLOG("Updated bone %s global transform", bone->GetName().c_str());
+    //GLOG("Updated bone %s global transform", bone->GetName().c_str());
 
     
     for (const UID childUID : bone->GetChildren())
@@ -573,15 +659,25 @@ void AnimationComponent::UpdateBoneHierarchy(GameObject* bone)
 void AnimationComponent::SetBoneMapping()
 {
     boneMapping.clear();
-    bindPoseTransforms.clear(); 
+    bindPoseTransforms.clear();
+
+    
+    if (parent == nullptr)
+    {
+        //GLOG("Cannot set bone mapping: parent is null");
+        return;
+    }
 
     std::function<void(GameObject*)> mapBones = [this, &mapBones](GameObject* obj)
     {
         if (obj == nullptr) return;
 
+       
         boneMapping[obj->GetName()]        = obj;
-        bindPoseTransforms[obj->GetName()] = obj->GetLocalTransform(); // Store bind pose
+        bindPoseTransforms[obj->GetName()] = obj->GetLocalTransform();
+        //GLOG("Mapped bone: %s", obj->GetName().c_str());
 
+       
         for (const UID childUID : obj->GetChildren())
         {
             GameObject* child = App->GetSceneModule()->GetScene()->GetGameObjectByUID(childUID);
@@ -591,7 +687,15 @@ void AnimationComponent::SetBoneMapping()
             }
         }
     };
+
+   
     mapBones(parent);
 
-    GLOG("Bone mapping completed: %zu bones mapped", boneMapping.size());
+    //GLOG("Bone mapping completed: %zu bones mapped", boneMapping.size());
+
+   
+    for (const auto& pair : boneMapping)
+    {
+        //GLOG("Bone: %s -> GameObject: %s", pair.first.c_str(), pair.second ? pair.second->GetName().c_str() : "NULL");
+    }
 }

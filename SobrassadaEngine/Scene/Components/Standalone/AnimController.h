@@ -14,7 +14,7 @@ class AnimController
     void Play(UID resource, bool loop);
     void Stop();
     void Pause() { playAnimation = false; }
-    void Resume() { playAnimation = true; }
+    
 
     void GetTransform(const std::string& nodeName, float3& pos, Quat& rot);
 

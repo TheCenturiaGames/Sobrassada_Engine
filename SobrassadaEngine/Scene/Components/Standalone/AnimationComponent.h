@@ -33,6 +33,7 @@ class AnimationComponent : public Component
     void OnResume();
     void OnInspector();
     void AddAnimation(UID resource);
+   
 
     UID GetAnimationResource() const { GLOG("Resource AnimUID  is: %d", resource) return resource; }
     ResourceAnimation* GetCurrentAnimation() const { return currentAnimResource; }
@@ -43,6 +44,7 @@ class AnimationComponent : public Component
     void SetAnimationResource(UID animResource);
     void UpdateBoneHierarchy(GameObject* bone);
     void SetBoneMapping();
+   
 
   private:
     UID resource                               = INVALID_UID;
@@ -60,4 +62,6 @@ class AnimationComponent : public Component
     bool playing            = false;
     float currentTime       = 0.0f;
     float fadeTime          = 0.0f;
+
+    bool hasStartedPlayMode = false;
 };
