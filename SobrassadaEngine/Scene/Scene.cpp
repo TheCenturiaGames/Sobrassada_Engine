@@ -77,13 +77,17 @@ Scene::Scene(const rapidjson::Value& initialState, UID loadedSceneUID) : sceneUI
     // Deserialize GameObjects
     if (initialState.HasMember("GameObjects") && initialState["GameObjects"].IsArray())
     {
+        // Create GameObjects
         const rapidjson::Value& gameObjects = initialState["GameObjects"];
+
         for (rapidjson::SizeType i = 0; i < gameObjects.Size(); i++)
         {
             const rapidjson::Value& gameObject = gameObjects[i];
 
             GameObject* newGameObject          = new GameObject(gameObject);
             gameObjectsContainer.insert({newGameObject->GetUID(), newGameObject});
+
+            gameObjectDataMap[newGameObject->GetUID()] = &gameObject;
         }
     }
 
@@ -122,6 +126,13 @@ Scene::~Scene()
 
 void Scene::Init()
 {
+    // Init data
+    for (const auto& pair : gameObjectDataMap)
+    {
+        GameObject* gameObjectToLoad = GetGameObjectByUID(pair.first);
+        gameObjectToLoad->LoadData(*pair.second);
+    }
+    gameObjectDataMap.clear();
     // When loading a scene, overrides all gameObjects that have a prefabUID. That is because if the prefab has been
     // modified, the scene file may have not, so the prefabs need to be updated when loading the scene again
     std::vector<UID> prefabs;
@@ -226,7 +237,8 @@ void Scene::Save(
 
     else GLOG("Light Config not found");
 
-    // TODO Convert to parameter which can be set later manually instead of saving a scene as default "on scene save"
+    // TODO Convert to parameter which can be set later manually instead of saving a scene as default "on scene
+    // save"
     if (saveMode != SaveMode::SavePlayMode) App->GetProjectModule()->SetAsStartupScene(sceneName);
 }
 

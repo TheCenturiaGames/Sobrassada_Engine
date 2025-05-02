@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "EditorUIModule.h"
+#include "GameObject.h"
 #include "Math/float2.h"
 #include "Math/float3.h"
 #include "Math/float4.h"
@@ -60,9 +61,18 @@ void Script::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorT
             break;
         }
         case InspectorField::FieldType::InputText:
+        {
             std::string* str = static_cast<std::string*>(field.data);
             targetState.AddMember(name, rapidjson::Value(str->c_str(), allocator), allocator);
             break;
+        }
+        case InspectorField::FieldType::GameObject:
+        {
+            GameObject* go = *(GameObject**)field.data;
+            UID uid        = go ? go->GetUID() : 0;
+            targetState.AddMember(name, uid, allocator);
+            break;
+        }
         }
     }
 }
@@ -120,7 +130,21 @@ void Script::Load(const rapidjson::Value& initialState)
             }
             break;
         case InspectorField::FieldType::InputText:
-            if (value.IsString()) *(std::string*)field.data = value.GetString();
+        {
+            if (value.IsString())
+            {
+                *(std::string*)field.data = value.GetString();
+            } 
+            break;
+        }
+        case InspectorField::FieldType::GameObject:
+            if (value.IsUint64())
+            {
+                UID uid = value.GetUint64();
+                if (uid == 0) return;
+                GameObject* go            = AppEngine->GetSceneModule()->GetScene()->GetGameObjectByUID(uid);
+                *(GameObject**)field.data = go;
+            }
             break;
         }
     }

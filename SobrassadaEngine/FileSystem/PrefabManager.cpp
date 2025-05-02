@@ -162,6 +162,7 @@ namespace PrefabManager
             {
                 const rapidjson::Value& gameObject = gameObjects[i];
                 GameObject* newObject              = new GameObject(gameObject);
+                newObject->LoadData(gameObject);
 
                 int index                          = 0;
                 for (const GameObject* obj : loadedGameObjects)

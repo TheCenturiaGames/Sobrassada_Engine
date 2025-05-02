@@ -50,7 +50,6 @@ extern "C" SOBRASSADA_API Script* CreateScript(const std::string& scriptType, Ga
     /* Utils */
     if (scriptType == "RotateGameObject") return new RotateGameObject(parent);
     if (scriptType == "GodMode") return new GodMode(parent);
-
     return nullptr;
 }
 
