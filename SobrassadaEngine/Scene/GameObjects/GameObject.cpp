@@ -631,7 +631,7 @@ void GameObject::UpdateOpenNodeHierarchy(bool openValue)
 
     while (!gameObjectsToVisit.empty())
     {
-        UID currentUID = gameObjectsToVisit.top();
+        const UID currentUID = gameObjectsToVisit.top();
         gameObjectsToVisit.pop();
 
         GameObject* gameObjectToUpdate = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentUID);
