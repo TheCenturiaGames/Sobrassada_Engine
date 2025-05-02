@@ -4,7 +4,7 @@
 #include "FileSystem.h"
 #include "LibraryModule.h"
 #include "MetaModel.h"
-#include <algorithm> 
+#include <algorithm>
 #include <cctype>
 
 ResourceStateMachine::ResourceStateMachine(UID uid, const std::string& name)
@@ -288,6 +288,11 @@ const Transition* ResourceStateMachine::GetTransition(const std::string& fromSta
     return nullptr;
 }
 
+void ResourceStateMachine::ChangeCurrentState(int newStateIndex, State* currentState)
+{
+    if (newStateIndex >= 0 && newStateIndex < (int)states.size()) currentState = &states[activeStateIndex];
+}
+
 bool ResourceStateMachine::ClipExists(const std::string& clipName) const
 {
     HashString hashClip(clipName);
@@ -300,21 +305,43 @@ bool ResourceStateMachine::ClipExists(const std::string& clipName) const
 
 bool ResourceStateMachine::UseTrigger(const std::string& triggerName)
 {
-    bool triggerExists = false;
+    bool triggerExists       = false;
     std::string lowerTrigger = triggerName;
     std::transform(lowerTrigger.begin(), lowerTrigger.end(), lowerTrigger.begin(), ::tolower);
-    for (const auto& transition :  transitions)
+    for (const auto& transition : transitions)
     {
         std::string transitionTrigger = transition.triggerName.GetString();
         std::transform(transitionTrigger.begin(), transitionTrigger.end(), transitionTrigger.begin(), ::tolower);
-        if (transitionTrigger == lowerTrigger &&
-            transition.fromState.GetString() == GetActiveState()->name.GetString())
+        if (transitionTrigger == lowerTrigger && transition.fromState.GetString() == GetActiveState()->name.GetString())
         {
             for (size_t i = 0; i < states.size(); ++i)
             {
                 if (states[i].name.GetString() == transition.toState.GetString())
                 {
                     SetActiveState(static_cast<int>(i));
+                    triggerExists = true;
+                    break;
+                }
+            }
+        }
+    }
+    return triggerExists;
+}
+
+bool ResourceStateMachine::UseTrigger(const std::string& triggerName, State* currentAnimState)
+{
+    bool triggerExists = false;
+    HashString incomingTrigger(triggerName);
+
+    for (const auto& transition : transitions)
+    {
+        if (transition.triggerName == incomingTrigger && transition.fromState == currentAnimState->name)
+        {
+            for (size_t i = 0; i < states.size(); ++i)
+            {
+                if (states[i].name == transition.toState)
+                {
+                    ChangeCurrentState((int)i, currentAnimState);
                     triggerExists = true;
                     break;
                 }

@@ -56,6 +56,7 @@ class SOBRASADA_API_ENGINE ResourceStateMachine : public Resource
     );
 
     bool UseTrigger(const std::string& triggerName);
+    bool UseTrigger(const std::string& triggerName, State* currentAnimState);
 
     const Clip* GetClip(const std::string& name) const;
     const State* GetState(const std::string& name) const;
@@ -70,6 +71,8 @@ class SOBRASADA_API_ENGINE ResourceStateMachine : public Resource
         if (activeStateIndex >= 0 && activeStateIndex < (int)states.size()) return &states[activeStateIndex];
         return nullptr;
     }
+
+    void ChangeCurrentState(int newStateIndex, State* currentState);
 
     void SetDefaultState(int state) { defaultStateIndex = state; }
     void SetActiveState(int state) { activeStateIndex = state; }
