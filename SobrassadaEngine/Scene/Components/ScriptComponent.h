@@ -17,6 +17,7 @@ enum ScriptType
     SCRIPT_OPTIONS_MENU_SWITCHER,
     SCRIPT_MAIN_MENU_SELECTOR,
     SCRIPT_PRESS_ANY_KEY,
+    SCRIPT_TILEFLOAT,
 
     SCRIPT_TYPE_COUNT //Add at the end
 };
@@ -41,7 +42,7 @@ constexpr const char* scripts[] = {
     "PauseMenuScript",           // SCRIPT_PAUSE_MENU
     "OptionsMenuSwitcherScript", // SCRIPT_OPTIONS_MENU_SWITCHER
     "MainMenuSelectorScript",    // SCRIPT_MAIN_MENU_SELECTOR
-    "PressAnyKeyScript"          // SCRIPT_PRESS_ANY_KEY
+    "PressAnyKeyScript",         // SCRIPT_PRESS_ANY_KEY
     "TileFloatScript"            // SCRIPT_TILE_FLOAT
 };
 

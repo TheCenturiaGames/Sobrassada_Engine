@@ -9,13 +9,32 @@
 #include "Math/float4x4.h"
 
 
-
-TileFloatScript::TileFloatScript(GameObject* parent) : Script(parent)
+void TileFloatScript::Inspector()
 {
-    // Using ImGui in the dll cause problems, so we need to call ImGui outside the dll
-    fields.push_back({InspectorField::FieldType::Text, (void*)"Test"});
-    fields.push_back({"Speed", InspectorField::FieldType::Float, &speed, 0.0f, 2.0f});
+    ImGui::SetCurrentContext(AppEngine->GetEditorUIModule()->GetImGuiContext());
+    AppEngine->GetEditorUIModule()->DrawScriptInspector(
+        [this]()
+        {
+            ImGui::InputFloat("Speed", &speed, 0.1f, 1.0f); 
 
+            ImGui::InputFloat("Max Rise Distance", &maxRiseDistance, 0.1f, 1.0f);
+
+            ImGui::Text("Initial Y: %.2f", initialY);
+        }
+    );
+}
+
+void TileFloatScript::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator)
+{
+    targetState.AddMember("Speed", speed, allocator);
+}
+
+void TileFloatScript::Load(const rapidjson::Value& initialState)
+{
+    if (initialState.HasMember("Speed") && initialState["Speed"].IsFloat())
+    {
+        speed = initialState["Speed"].GetFloat();
+    }
 }
 
 bool TileFloatScript::Init()
