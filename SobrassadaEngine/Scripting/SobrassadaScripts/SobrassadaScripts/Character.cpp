@@ -27,23 +27,15 @@ Character::Character(
 bool Character::Init()
 {
     animComponent = parent->GetComponent<AnimationComponent*>();
-    if (animComponent == nullptr)
-    {
-        GLOG("Animation component not found for %s", parent->GetName().c_str());
-    }
+    if (animComponent == nullptr) GLOG("Animation component not found for %s", parent->GetName().c_str())
     else animComponent->OnPlay(false);
 
     characterCollider = parent->GetComponent<CapsuleColliderComponent*>();
     if (characterCollider == nullptr)
-    {
-        GLOG("Character capsule collider component not found for %s", parent->GetName().c_str());
-    }
+        GLOG("Character capsule collider component not found for %s", parent->GetName().c_str())
 
     weaponCollider = parent->GetComponentChild<CubeColliderComponent*>(AppEngine);
-    if (weaponCollider == nullptr)
-    {
-        GLOG("Weapon cube collider component not found for %s", parent->GetName().c_str());
-    }
+    if (weaponCollider == nullptr) GLOG("Weapon cube collider component not found for %s", parent->GetName().c_str())
     else weaponCollider->SetEnabled(false);
 
     lastAttackTime = -1.0f;
@@ -55,6 +47,8 @@ bool Character::Init()
 void Character::Update(float deltaTime)
 {
     if (isDead) return;
+
+    if (characterCollider == nullptr || weaponCollider == nullptr) return;
 
     float gameTime = AppEngine->GetGameTimer()->GetTime() / 1000.0f;
     if (isAttacking && weaponCollider->GetEnabled() && gameTime - lastAttackTime >= attackDuration)
@@ -104,9 +98,10 @@ void Character::OnCollision(GameObject* otherObject, const float3& collisionNorm
     {
         Script* enemyScript = enemyScriptComponent->GetScriptInstance();
 
-        if (enemyScript == nullptr) GLOG("%s script instance not setted.", otherObject->GetName().c_str()); // we want to crash?
+        if (enemyScript == nullptr)
+            GLOG("%s script instance not setted.", otherObject->GetName().c_str()); // we want to crash?
 
-        // ScriptType scriptType = enemyScriptComponent->GetScriptType(); // not needed for now, type of script for casting
+        // ScriptType scriptType = enemyScriptComponent->GetScriptType(); // type of script for casting
         Character* enemyCharacter = dynamic_cast<Character*>(enemyScript);
         if (!enemyCharacter->isAttacking) return;
 
@@ -170,11 +165,17 @@ void Character::Die()
     isDead = true;
     OnDeath();
 
-    characterCollider->DeleteRigidBody();
-    characterCollider->SetEnabled(false);
+    if (characterCollider != nullptr)
+    {
+        characterCollider->DeleteRigidBody();
+        characterCollider->SetEnabled(false);
+    }
 
-    weaponCollider->DeleteRigidBody();
-    weaponCollider->SetEnabled(false);
+    if (weaponCollider != nullptr)
+    {
+        weaponCollider->DeleteRigidBody();
+        weaponCollider->SetEnabled(false);
+    }
 
     parent->SetEnabled(false);
 }

@@ -23,23 +23,20 @@ bool Soldier::Init()
     Character::Init();
 
     agentAI = parent->GetComponent<AIAgentComponent*>();
-    if (!agentAI)
-    {
-        GLOG("AIAgent component not found for Soldier");
-        return false;
-    }
-
-    agentAI->SetSpeed(speed);
+    if (agentAI == nullptr) GLOG("AIAgent component not found for Soldier")
+    else agentAI->SetSpeed(speed);
 
     return true;
 }
 
 void Soldier::Update(float deltaTime)
 {
+    Character::Update(deltaTime);
+
+    if (agentAI == nullptr) return;
+
     if (character != nullptr && currentState != SoldierStates::PATROL)
         agentAI->LookAtMovement(character->GetLastPosition(), deltaTime);
-
-    Character::Update(deltaTime);
 }
 
 void Soldier::OnDeath()

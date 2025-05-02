@@ -25,13 +25,8 @@ bool CuChulainn::Init()
     Character::Init();
 
     character = parent->GetComponent<CharacterControllerComponent*>();
-    if (!character)
-    {
-        GLOG("CharacterController component not found for CuChulainn");
-        return false;
-    }
-
-    character->SetSpeed(speed);
+    if (character == nullptr) GLOG("CharacterController component not found for CuChulainn")
+    else character->SetSpeed(speed);
 
     return true;
 }
@@ -65,7 +60,7 @@ void CuChulainn::PerformAttack()
     // TODO: activate and disable the box collider located on one on the gameobjects bones
 }
 
-void CuChulainn::HandleState(float time)
+void CuChulainn::HandleState(float gameTime)
 {
     if (!animComponent) return;
 
@@ -74,10 +69,10 @@ void CuChulainn::HandleState(float time)
     const bool move =
         keyboard[SDL_SCANCODE_W] || keyboard[SDL_SCANCODE_D] || keyboard[SDL_SCANCODE_A] || keyboard[SDL_SCANCODE_S];
 
-    if (mouse[SDL_BUTTON_LEFT - 1] && CanAttack(time))
+    if (mouse[SDL_BUTTON_LEFT - 1] && CanAttack(gameTime))
     {
         animComponent->UseTrigger("attack");
-        Attack(time);
+        Attack(gameTime);
     }
     else if (move && !runActive)
     {
