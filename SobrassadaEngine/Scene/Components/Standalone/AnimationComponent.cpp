@@ -73,11 +73,9 @@ void AnimationComponent::OnPlay(bool isTransition)
     {
         if (resourceStateMachine)
         {
-            //const State* activeState = resourceStateMachine->GetActiveState();
-            const State* activeState = currentState;
             for (const auto& state : resourceStateMachine->states)
             {
-                if (state.name == activeState->name)
+                if (state.name == currentState->name)
                 {
                     for (const auto& transition : resourceStateMachine->transitions)
                     {
@@ -88,7 +86,7 @@ void AnimationComponent::OnPlay(bool isTransition)
                     }
                     for (const auto& clip : resourceStateMachine->clips)
                     {
-                        if (clip.clipName == activeState->clipName)
+                        if (clip.clipName == currentState->clipName)
                         {
                             if (isTransition)
                                 animController->SetTargetAnimationResource(clip.animationResourceUID, transitionTime, clip.loop);
@@ -419,6 +417,7 @@ void AnimationComponent::Clone(const Component* other)
         {
             resourceStateMachine = otherAnimation->resourceStateMachine;
             resourceStateMachine->AddReference();
+            currentState = resourceStateMachine->GetDefaultState();
         }
     }
     else

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Globals.h"
 #include "EngineEditorBase.h"
+#include "Globals.h"
 #include "ImNodeFlow.h"
 
 class ResourceStateMachine;
@@ -14,7 +14,6 @@ class StateMachineEditor : public EngineEditorBase
     StateMachineEditor(const std::string& editorName, UID uid, ResourceStateMachine* stateMachine);
     ~StateMachineEditor() override;
     ResourceStateMachine* GetLoadedStateMachine() { return resource; }
-    void SetAnimComponent(AnimationComponent* animComponent) { this->animComponent = animComponent; }
 
   private:
     bool RenderEditor() override;
@@ -31,21 +30,18 @@ class StateMachineEditor : public EngineEditorBase
     void ShowTriggers();
     void ShowTriggersPopup();
 
-
   private:
     UID uid;
     int stateCont                  = 0;
     ResourceStateMachine* resource = nullptr;
-    AnimationComponent* animComponent = nullptr;
     std::unique_ptr<ImFlow::ImNodeFlow> graph;
     std::vector<std::string> availableClips;
     std::vector<std::shared_ptr<StateNode>> nodes;
     char stateMachineName[128] = "";
     bool alreadySaved          = false;
-    StateNode* selectedNode = nullptr;
-    bool saveInitialized    = false;
-    int selectedIndex = -1;
+    StateNode* selectedNode    = nullptr;
+    bool saveInitialized       = false;
+    int selectedIndex          = -1;
     std::vector<std::string> allStateMachineNames;
     char newTriggerName[64] = "";
-
 };

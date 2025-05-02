@@ -107,7 +107,6 @@ void ResourceStateMachine::AddState(const std::string& stateName, const std::str
     if (states.size() == 1)
     {
         defaultStateIndex = 0;
-        activeStateIndex  = 0;
     }
 }
 
@@ -127,15 +126,6 @@ bool ResourceStateMachine::RemoveState(const std::string& stateName)
             else if (defaultStateIndex > (int)i)
             {
                 defaultStateIndex--;
-            }
-
-            if ((int)i == activeStateIndex)
-            {
-                activeStateIndex = states.empty() ? -1 : 0;
-            }
-            else if (activeStateIndex > (int)i)
-            {
-                activeStateIndex--;
             }
 
             return true;
@@ -290,10 +280,7 @@ const Transition* ResourceStateMachine::GetTransition(const std::string& fromSta
 
 void ResourceStateMachine::ChangeCurrentState(int newStateIndex, const State*& currentState)
 {
-    if (newStateIndex >= 0 && newStateIndex < (int)states.size()) 
-        currentState = &states[newStateIndex];
-
-    int x = 0;
+    if (newStateIndex >= 0 && newStateIndex < (int)states.size()) currentState = &states[newStateIndex];
 }
 
 bool ResourceStateMachine::ClipExists(const std::string& clipName) const
@@ -304,31 +291,6 @@ bool ResourceStateMachine::ClipExists(const std::string& clipName) const
         if (clip.clipName == hashClip) return true;
     }
     return false;
-}
-
-bool ResourceStateMachine::UseTrigger(const std::string& triggerName)
-{
-    bool triggerExists       = false;
-    std::string lowerTrigger = triggerName;
-    std::transform(lowerTrigger.begin(), lowerTrigger.end(), lowerTrigger.begin(), ::tolower);
-    for (const auto& transition : transitions)
-    {
-        std::string transitionTrigger = transition.triggerName.GetString();
-        std::transform(transitionTrigger.begin(), transitionTrigger.end(), transitionTrigger.begin(), ::tolower);
-        if (transitionTrigger == lowerTrigger && transition.fromState.GetString() == GetActiveState()->name.GetString())
-        {
-            for (size_t i = 0; i < states.size(); ++i)
-            {
-                if (states[i].name.GetString() == transition.toState.GetString())
-                {
-                    SetActiveState(static_cast<int>(i));
-                    triggerExists = true;
-                    break;
-                }
-            }
-        }
-    }
-    return triggerExists;
 }
 
 bool ResourceStateMachine::UseTrigger(const std::string& triggerName, const State*& currentAnimState)

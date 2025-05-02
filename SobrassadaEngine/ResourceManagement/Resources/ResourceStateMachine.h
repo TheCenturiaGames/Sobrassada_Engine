@@ -54,7 +54,6 @@ class SOBRASADA_API_ENGINE ResourceStateMachine : public Resource
         unsigned newInterpolationTime
     );
 
-    bool UseTrigger(const std::string& triggerName);
     bool UseTrigger(const std::string& triggerName, const State*& currentAnimState);
 
     const Clip* GetClip(const std::string& name) const;
@@ -65,16 +64,10 @@ class SOBRASADA_API_ENGINE ResourceStateMachine : public Resource
         if (defaultStateIndex >= 0 && defaultStateIndex < (int)states.size()) return &states[defaultStateIndex];
         return nullptr;
     }
-    const State* GetActiveState()
-    {
-        if (activeStateIndex >= 0 && activeStateIndex < (int)states.size()) return &states[activeStateIndex];
-        return nullptr;
-    }
 
     void ChangeCurrentState(int newStateIndex, const State*& currentState);
 
     void SetDefaultState(int state) { defaultStateIndex = state; }
-    void SetActiveState(int state) { activeStateIndex = state; }
 
   public:
     std::vector<Clip> clips;
@@ -84,5 +77,4 @@ class SOBRASADA_API_ENGINE ResourceStateMachine : public Resource
 
   private:
     int defaultStateIndex = -1;
-    int activeStateIndex  = -1;
 };
