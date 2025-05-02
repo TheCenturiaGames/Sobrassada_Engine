@@ -25,7 +25,6 @@
 #include "TextureEditor.h"
 #include "TextureImporter.h"
 #include "WindowModule.h"
-#include "ScriptModule.h"
 
 #include "Math/Quat.h"
 #include "SDL.h"
@@ -511,13 +510,13 @@ void EditorUIModule::Navmesh(bool& navmesh)
             ImGui::End();
         }
 
-       if (!open)
+        if (!open)
         {
             showNavLoadDialog    = false;
 
             // Reset search and selection
             searchTextNavmesh[0] = '\0';
-            selectedNavmesh      = -1;          
+            selectedNavmesh      = -1;
             navmeshUID           = INVALID_UID;
         }
     }
@@ -547,7 +546,7 @@ void EditorUIModule::LoadPrefabDialog(bool& loadPrefab)
     ImGui::InputText("Search", searchTextPrefab, IM_ARRAYSIZE(searchTextPrefab));
 
     ImGui::Separator();
-    if (ImGui::BeginListBox("##PrefabsList", ImVec2(-FLT_MIN, -40)))
+    if (ImGui::BeginListBox("##PrefabsList", ImVec2(-FLT_MIN, -65)))
     {
         int i = 0;
         for (const auto& valuePair : App->GetLibraryModule()->GetPrefabMap())
@@ -572,6 +571,8 @@ void EditorUIModule::LoadPrefabDialog(bool& loadPrefab)
     ImGui::SameLine();
 
     if (ImGui::Button("Cancel", ImVec2(0, 0))) loadPrefab = false;
+
+    ImGui::Dummy(ImVec2(0, 5));
 
     if (ImGui::Button("DELETE!", ImVec2(0, 0))) App->GetLibraryModule()->DeletePrefabFiles(prefabUID);
 
