@@ -55,31 +55,26 @@ void CameraMovement::FollowTarget(float deltaTime)
 
     if (mouseOffsetEnabled)
     {
-        currentLookAhead           = 0;
-        const float3 mouseWorldPos = AppEngine->GetSceneModule()->GetScene()->GetMainCamera()->ScreenPointToXZ(
-            parent->GetPosition().y
-        );
+        currentLookAhead = 0;
+        const float3 mouseWorldPos =
+            AppEngine->GetSceneModule()->GetScene()->GetMainCamera()->ScreenPointToXZ(parent->GetPosition().y);
         desiredPosition += mouseWorldPos * 0.5f * mouseOffsetIntensity;
     }
     else if (lookAheadIntensity > 0 && controller)
     {
-        currentLookAhead             = controller->GetSpeed() > 6.0f
-                                         ? Lerp(currentLookAhead, lookAheadIntensity, lookAheadSmoothness * deltaTime)
-                                         : Lerp(currentLookAhead, 0, lookAheadSmoothness * deltaTime);
+        currentLookAhead = Lerp(
+            currentLookAhead, lookAheadIntensity * (controller->GetSpeed() / controller->GetMaxSpeed()),
+            lookAheadSmoothness * deltaTime
+        );
 
-        //const float3 targetRotation  = target->GetGlobalTransform().Col3(2);
-        const float3 targetDir       = controller->GetFrontDirection();
-        desiredPosition             += targetDir * currentLookAhead;
+        // const float3 targetRotation  = target->GetGlobalTransform().Col3(2);
+        const float3 targetDir  = controller->GetFrontDirection();
+        desiredPosition        += targetDir * currentLookAhead;
+
+        // Clamp to position because lerp sometimes never does
+        if (isFollowing && distanceToTarget < 0.1f && controller->GetSpeed() < 0.1f) isFollowing = false;
     }
     finalPosition = Lerp(currentPosition, desiredPosition, smoothnessVelocity * deltaTime);
-
-    // Clamp to position because lerp sometimes never does
-    if (isFollowing && distanceToTarget < 0.01f && controller->GetSpeed() < 0.1f)
-    {
-        GLOG("I AM");
-        isFollowing = false;
-        finalPosition = desiredPosition;
-    }
 
     parent->SetLocalPosition(finalPosition);
 }

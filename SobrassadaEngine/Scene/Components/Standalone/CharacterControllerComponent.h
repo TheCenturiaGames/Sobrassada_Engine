@@ -34,6 +34,7 @@ class SOBRASADA_API_ENGINE CharacterControllerComponent : public Component
     const float3& GetFrontDirection() const { return rotateDirection; }
     const float3& GetLastPosition() const { return lastPosition; }
     const float& GetSpeed() const { return currentSpeed; }
+    const float& GetMaxSpeed() const { return maxSpeed; }
 
     void SetTargetDirection(float3 newTargetDirection) { targetDirection = newTargetDirection; }
     void SetMaxSpeed(float newSpeed) { maxSpeed = newSpeed; }
