@@ -17,6 +17,7 @@
 #include "ResourceStateMachine.h"
 #include "ResourcesModule.h"
 #include "SceneImporter.h"
+#include "GameObject.h"
 
 #include "SceneModule.h"
 #include "Script.h"
@@ -25,7 +26,6 @@
 #include "TextureEditor.h"
 #include "TextureImporter.h"
 #include "WindowModule.h"
-#include "ScriptModule.h"
 
 #include "Math/Quat.h"
 #include "SDL.h"
@@ -511,13 +511,13 @@ void EditorUIModule::Navmesh(bool& navmesh)
             ImGui::End();
         }
 
-       if (!open)
+        if (!open)
         {
             showNavLoadDialog    = false;
 
             // Reset search and selection
             searchTextNavmesh[0] = '\0';
-            selectedNavmesh      = -1;          
+            selectedNavmesh      = -1;
             navmeshUID           = INVALID_UID;
         }
     }
@@ -921,6 +921,36 @@ void EditorUIModule::DrawScriptInspector(const std::vector<InspectorField>& fiel
         {
             ImColor* color = (ImColor*)field.data;
             ImGui::ColorEdit3(field.name, (float*)&color->Value);
+            break;
+        }
+        case InspectorField::FieldType::GameObject:
+        {
+            GameObject** selectedGO = (GameObject**)field.data;
+            const char* currentName = (*selectedGO) ? (*selectedGO)->GetName().c_str() : "None";
+
+            if (ImGui::BeginCombo(field.name, currentName))
+            {
+                if (ImGui::Selectable("None", *selectedGO == nullptr))
+                {
+                    *selectedGO = nullptr;
+                }
+
+                for (const auto& pair : App->GetSceneModule()->GetScene()->GetAllGameObjects())
+                {
+                    GameObject* go          = pair.second;
+                    const std::string& name = go->GetName();
+
+                    if (name == "SceneModule GameObject" || name == "MULTISELECT_DUMMY") continue;
+
+                    std::string label = name + "##" + std::to_string(go->GetUID());
+                    bool isSelected   = (*selectedGO == go);
+                    if (ImGui::Selectable(label.c_str(), isSelected)) *selectedGO = go;
+
+                    if (isSelected) ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndCombo();
+            }
+
             break;
         }
         }

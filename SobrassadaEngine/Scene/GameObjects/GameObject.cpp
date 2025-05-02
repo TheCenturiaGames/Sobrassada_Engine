@@ -237,8 +237,20 @@ GameObject::GameObject(UID parentUID, GameObject* refObject)
     OnAABBUpdated();
 }
 
-GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState["UID"].GetUint64())
+
+
+GameObject::GameObject(const rapidjson::Value& initialState)
+    : uid(initialState["UID"].GetUint64())
 {
+    
+}
+
+GameObject::~GameObject()
+{
+    std::apply([](auto&... tupleVar) { ((delete tupleVar, tupleVar = nullptr), ...); }, compTuple);
+}
+
+void GameObject::LoadData(const rapidjson::Value& initialState){
     compTuple = std::make_tuple(COMPONENTS_NULLPTR);
     createdComponents.reset();
 
@@ -295,11 +307,6 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
             children.push_back(initChildren[i].GetUint64());
         }
     }
-}
-
-GameObject::~GameObject()
-{
-    std::apply([](auto&... tupleVar) { ((delete tupleVar, tupleVar = nullptr), ...); }, compTuple);
 }
 
 void GameObject::Init()
@@ -552,9 +559,9 @@ void GameObject::UpdateTransformForGOBranch()
 
 void GameObject::OnTransformUpdated()
 {
-    globalTransform = GetParentGlobalTransform() * localTransform;
-    globalOBB       = globalTransform * OBB(localAABB);
-    globalAABB      = AABB(globalOBB);
+    globalTransform              = GetParentGlobalTransform() * localTransform;
+    globalOBB                    = globalTransform * OBB(localAABB);
+    globalAABB                   = AABB(globalOBB);
 
     // MeshComponent* meshComponent = GetMeshComponent();
     MeshComponent* meshComponent = GetComponent<MeshComponent*>();

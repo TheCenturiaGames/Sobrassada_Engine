@@ -1,11 +1,14 @@
 #pragma once
+#pragma once
 
 #include "Globals.h"
 #include "Module.h"
+#include "rapidjson/document.h"
 
 #include <atomic>
 #include <filesystem>
 #include <thread>
+#include <unordered_map>
 #include <windows.h>
 
 class Application;
@@ -32,9 +35,12 @@ class ScriptModule : public Module
     void LoadDLL();
     void UnloadDLL();
     void ReloadDLLIfUpdated();
-    void DeleteAllScripts();
+    void DeleteAllScripts(bool saveJson);
     void RecreateAllScripts();
     bool IsFileLocked(const std::filesystem::path& filePath);
+
+    void SaveScriptsToFile(const std::string& filename, const rapidjson::Document& doc);
+    bool LoadScriptsFromFile(const std::string& filename, rapidjson::Document& doc);
 
   private:
     HMODULE dllHandle = nullptr;

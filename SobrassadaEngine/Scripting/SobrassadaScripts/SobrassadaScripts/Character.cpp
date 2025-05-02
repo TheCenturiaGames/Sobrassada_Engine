@@ -105,7 +105,7 @@ void Character::OnCollision(GameObject* otherObject, const float3& collisionNorm
 
     if (!isInvulnerable && enemyScriptComponent != nullptr && enemyWeapon != nullptr && enemyWeapon->GetEnabled())
     {
-        Script* enemyScript       = enemyScriptComponent->GetScriptInstance();
+        Script* enemyScript = enemyScriptComponent->GetScriptInstances()[0]; //TODO: CHANGE THIS
         // ScriptType scriptType = enemyScriptComponent->GetScriptType(); // not needed for now
         Character* enemyCharacter = dynamic_cast<Character*>(enemyScript);
         if (!enemyCharacter->isAttacking) return;

@@ -18,7 +18,7 @@ enum ScriptType
     SCRIPT_MAIN_MENU_SELECTOR,
     SCRIPT_PRESS_ANY_KEY,
 
-    SCRIPT_TYPE_COUNT //Add at the end
+    SCRIPT_TYPE_COUNT // Add at the end
 };
 
 namespace math
@@ -55,6 +55,9 @@ class ScriptComponent : public Component
     ScriptComponent(const rapidjson::Value& initialState, GameObject* parent);
     ~ScriptComponent() override;
 
+    void Load(const rapidjson::Value& initialState);
+    void LoadScripts();
+
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
     void Clone(const Component* other) override;
 
@@ -66,16 +69,17 @@ class ScriptComponent : public Component
     void InitScriptInstances();
     void OnCollision(GameObject* otherObject, const float3& collisionNormal);
     void CreateScript(const std::string& scriptType);
-    void DeleteScript();
+    void DeleteScript(const int index);
+    void DeleteAllScripts();
 
-    const std::string& GetScriptName() const { return scriptName; }
-    Script* GetScriptInstance() const { return scriptInstance; }
-    const ScriptType GetScriptType() const { return scriptType; }
+    const std::vector<Script*>& GetScriptInstances() const { return scriptInstances; }
+    const std::vector<std::string>& GetAllScriptNames() const { return scriptNames; }
 
   private:
     int SearchIdxForString(const std::string& name) const;
-    std::string scriptName = "Not selected";
-    Script* scriptInstance = nullptr;
-    bool startScript       = false;
-    ScriptType scriptType  = SCRIPT_ROTATE_GAME_OBJECT;
+    bool startScript = false;
+
+    std::vector<std::string> scriptNames;
+    std::vector<Script*> scriptInstances;
+    std::vector<ScriptType> scriptTypes;
 };

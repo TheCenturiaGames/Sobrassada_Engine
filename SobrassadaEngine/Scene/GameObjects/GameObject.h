@@ -53,6 +53,8 @@ class SOBRASADA_API_ENGINE GameObject
 
     ~GameObject();
 
+    void LoadData(const rapidjson::Value& initialState);
+
     void Init();
     void InitHierarchy();
 
@@ -123,6 +125,7 @@ class SOBRASADA_API_ENGINE GameObject
     const float3& GetScale() const { return scale; }
     AABB GetHierarchyAABB();
     std::tuple<COMPONENTS>& GetComponentsTupleRef() { return compTuple; }
+    const bool HasScriptsToLoad() const { return hasScriptsToLoad; }
 
     void SetLocalTransform(const float4x4& newTransform);
     void DrawGizmos() const;
@@ -182,6 +185,8 @@ class SOBRASADA_API_ENGINE GameObject
 
     std::tuple<COMPONENTS> compTuple     = std::make_tuple(COMPONENTS_NULLPTR);
     std::bitset<std::tuple_size<decltype(compTuple)>::value> createdComponents;
+
+    bool hasScriptsToLoad = false;
 };
 
 template <typename T> inline T GameObject::GetComponentChild(Application* app) const
