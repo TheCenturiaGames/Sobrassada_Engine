@@ -108,6 +108,7 @@ void AnimationComponent::OnStop()
     if (animController != nullptr)
     {
         animController->Stop();
+        if (resourceStateMachine) currentState = resourceStateMachine->GetDefaultState();
     }
 }
 
