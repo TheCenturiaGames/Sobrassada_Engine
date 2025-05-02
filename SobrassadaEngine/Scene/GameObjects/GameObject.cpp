@@ -237,12 +237,8 @@ GameObject::GameObject(UID parentUID, GameObject* refObject)
     OnAABBUpdated();
 }
 
-
-
-GameObject::GameObject(const rapidjson::Value& initialState)
-    : uid(initialState["UID"].GetUint64())
+GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState["UID"].GetUint64())
 {
-    
 }
 
 GameObject::~GameObject()
@@ -250,7 +246,8 @@ GameObject::~GameObject()
     std::apply([](auto&... tupleVar) { ((delete tupleVar, tupleVar = nullptr), ...); }, compTuple);
 }
 
-void GameObject::LoadData(const rapidjson::Value& initialState){
+void GameObject::LoadData(const rapidjson::Value& initialState)
+{
     compTuple = std::make_tuple(COMPONENTS_NULLPTR);
     createdComponents.reset();
 
@@ -424,7 +421,10 @@ void GameObject::RenderEditorInspector()
     ImGui::Text(name.c_str());
 
     ImGui::SameLine();
-    ImGui::Checkbox("Enabled", &enabled);
+    if (ImGui::Checkbox("Enabled", &enabled))
+    {
+        std::apply([&](auto&... pointer) { ((pointer ? pointer->SetEnabled(enabled) : Nothing()), ...); }, compTuple);
+    }
 
     if (uid != App->GetSceneModule()->GetScene()->GetGameObjectRootUID())
     {
