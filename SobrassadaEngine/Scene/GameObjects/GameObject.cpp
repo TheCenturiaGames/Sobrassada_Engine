@@ -217,7 +217,7 @@ GameObject::GameObject(UID parentUID, GameObject* refObject)
 
     globalOBB        = OBB(localAABB);
     globalAABB       = AABB(globalOBB);
-    selectParent      = refObject->selectParent;
+    selectParent     = refObject->selectParent;
     mobilitySettings = refObject->mobilitySettings;
 
     position         = refObject->position;
@@ -552,9 +552,9 @@ void GameObject::UpdateTransformForGOBranch()
 
 void GameObject::OnTransformUpdated()
 {
-    globalTransform = GetParentGlobalTransform() * localTransform;
-    globalOBB       = globalTransform * OBB(localAABB);
-    globalAABB      = AABB(globalOBB);
+    globalTransform              = GetParentGlobalTransform() * localTransform;
+    globalOBB                    = globalTransform * OBB(localAABB);
+    globalAABB                   = AABB(globalOBB);
 
     // MeshComponent* meshComponent = GetMeshComponent();
     MeshComponent* meshComponent = GetComponent<MeshComponent*>();
@@ -621,11 +621,41 @@ void GameObject::UpdateLocalTransform(const float4x4& parentGlobalTransform)
     localTransform = parentGlobalTransform.Inverted() * globalTransform;
 }
 
+void GameObject::UpdateOpenNodeHierarchy(bool openValue)
+{
+    openHierarchyNode = openValue;
+
+    std::stack<UID> gameObjectsToVisit;
+
+    if (parentUID != INVALID_UID) gameObjectsToVisit.push(parentUID);
+
+    while (!gameObjectsToVisit.empty())
+    {
+        UID currentUID = gameObjectsToVisit.top();
+        gameObjectsToVisit.pop();
+
+        GameObject* gameObjectToUpdate = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentUID);
+
+        if (gameObjectToUpdate)
+        {
+            gameObjectToUpdate->UpdateOpenNodeHierarchy(openValue);
+            if (gameObjectToUpdate->GetParent() != INVALID_UID)
+                gameObjectsToVisit.push(gameObjectToUpdate->GetParent());
+        }
+    }
+}
+
 void GameObject::RenderHierarchyNode(UID& selectedGameObjectUUID)
 {
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+    if (openHierarchyNode)
+    {
+        ImGui::SetNextItemOpen(openHierarchyNode);
+        flags |= ImGuiTreeNodeFlags_DefaultOpen;
+    }
+    
 
-    bool hasChildren         = !children.empty();
+    bool hasChildren = !children.empty();
 
     if (!hasChildren) flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
     if (selectedGameObjectUUID == uid) flags |= ImGuiTreeNodeFlags_Selected;
@@ -685,6 +715,8 @@ void GameObject::HandleNodeClick(UID& selectedGameObjectUUID)
     if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
     {
         selectedGameObjectUUID = uid;
+        openHierarchyNode      = !openHierarchyNode;
+        UpdateOpenNodeHierarchy(openHierarchyNode);
     }
 
     if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right))

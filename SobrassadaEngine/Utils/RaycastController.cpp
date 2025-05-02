@@ -93,6 +93,9 @@ namespace RaycastController
             }
         }
 
+        if (selectedGameObject && !App->GetSceneModule()->GetScene()->IsMultiselecting())
+            selectedGameObject->UpdateOpenNodeHierarchy(true);
+
         return selectedGameObject;
     }
 } // namespace RaycastController

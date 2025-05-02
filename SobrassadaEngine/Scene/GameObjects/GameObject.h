@@ -111,6 +111,7 @@ class SOBRASADA_API_ENGINE GameObject
     void UpdateTransformForGOBranch();
     void UpdateMobilityHierarchy(MobilitySettings type);
     void UpdateLocalTransform(const float4x4& parentGlobalTransform);
+    void UpdateOpenNodeHierarchy(bool openValue);
 
     bool WillUpdate() const { return willUpdate; };
 
@@ -140,6 +141,7 @@ class SOBRASADA_API_ENGINE GameObject
     void SetComponentCreated(int position) { createdComponents[position] = true; }
     void SetComponentRemoved(int position) { createdComponents[position] = false; }
     void SetSelectParent(bool newSelectParent) { selectParent = newSelectParent; }
+    void SetOpenHierarchyNode(bool newOpen) { openHierarchyNode = newOpen; }
 
   private:
     void DrawNodes() const;
@@ -180,6 +182,7 @@ class SOBRASADA_API_ENGINE GameObject
     bool willUpdate                      = false;
     bool enabled                         = true;
     bool navMeshValid                    = false;
+    bool openHierarchyNode               = false;
 
     std::tuple<COMPONENTS> compTuple     = std::make_tuple(COMPONENTS_NULLPTR);
     std::bitset<std::tuple_size<decltype(compTuple)>::value> createdComponents;
