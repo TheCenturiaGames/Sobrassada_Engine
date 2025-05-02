@@ -67,11 +67,9 @@ void CameraMovement::FollowTarget(float deltaTime)
             lookAheadSmoothness * deltaTime
         );
 
-        // const float3 targetRotation  = target->GetGlobalTransform().Col3(2);
         const float3 targetDir  = controller->GetFrontDirection();
         desiredPosition        += targetDir * currentLookAhead;
 
-        // Clamp to position because lerp sometimes never does
         if (isFollowing && distanceToTarget < 0.1f && controller->GetSpeed() < 0.1f) isFollowing = false;
     }
     finalPosition = Lerp(currentPosition, desiredPosition, smoothnessVelocity * deltaTime);
