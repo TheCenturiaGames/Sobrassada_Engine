@@ -4,14 +4,15 @@
 #include "Globals.h"
 
 #include "rapidjson/document.h"
-#include <unordered_map>
 #include <map>
+#include <unordered_map>
 
 class ResourceAnimation;
 class ResourceStateMachine;
 class AnimController;
 class GameObject;
 
+struct State;
 
 class SOBRASADA_API_ENGINE AnimationComponent : public Component
 {
@@ -56,6 +57,7 @@ class SOBRASADA_API_ENGINE AnimationComponent : public Component
     AnimController* animController             = nullptr;
     ResourceAnimation* currentAnimResource     = nullptr;
     ResourceStateMachine* resourceStateMachine = nullptr;
+    const State* currentState                  = nullptr;
 
     std::unordered_map<std::string, GameObject*> boneMapping;
     std::map<std::string, float4x4> bindPoseTransforms;

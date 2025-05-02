@@ -1,13 +1,12 @@
 #pragma once
 
-#include "Resource.h"
 #include "HashString.h"
+#include "Resource.h"
 
 #include "Math/float2.h"
 #include "imgui.h"
 #include <string>
 #include <vector>
-
 
 struct Clip
 {
@@ -56,7 +55,7 @@ class SOBRASADA_API_ENGINE ResourceStateMachine : public Resource
     );
 
     bool UseTrigger(const std::string& triggerName);
-    bool UseTrigger(const std::string& triggerName, State* currentAnimState);
+    bool UseTrigger(const std::string& triggerName, const State*& currentAnimState);
 
     const Clip* GetClip(const std::string& name) const;
     const State* GetState(const std::string& name) const;
@@ -66,13 +65,13 @@ class SOBRASADA_API_ENGINE ResourceStateMachine : public Resource
         if (defaultStateIndex >= 0 && defaultStateIndex < (int)states.size()) return &states[defaultStateIndex];
         return nullptr;
     }
-    const State* GetActiveState() const
+    const State* GetActiveState()
     {
         if (activeStateIndex >= 0 && activeStateIndex < (int)states.size()) return &states[activeStateIndex];
         return nullptr;
     }
 
-    void ChangeCurrentState(int newStateIndex, State* currentState);
+    void ChangeCurrentState(int newStateIndex, const State*& currentState);
 
     void SetDefaultState(int state) { defaultStateIndex = state; }
     void SetActiveState(int state) { activeStateIndex = state; }

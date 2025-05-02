@@ -288,9 +288,12 @@ const Transition* ResourceStateMachine::GetTransition(const std::string& fromSta
     return nullptr;
 }
 
-void ResourceStateMachine::ChangeCurrentState(int newStateIndex, State* currentState)
+void ResourceStateMachine::ChangeCurrentState(int newStateIndex, const State*& currentState)
 {
-    if (newStateIndex >= 0 && newStateIndex < (int)states.size()) currentState = &states[activeStateIndex];
+    if (newStateIndex >= 0 && newStateIndex < (int)states.size()) 
+        currentState = &states[newStateIndex];
+
+    int x = 0;
 }
 
 bool ResourceStateMachine::ClipExists(const std::string& clipName) const
@@ -328,7 +331,7 @@ bool ResourceStateMachine::UseTrigger(const std::string& triggerName)
     return triggerExists;
 }
 
-bool ResourceStateMachine::UseTrigger(const std::string& triggerName, State* currentAnimState)
+bool ResourceStateMachine::UseTrigger(const std::string& triggerName, const State*& currentAnimState)
 {
     bool triggerExists = false;
     HashString incomingTrigger(triggerName);
