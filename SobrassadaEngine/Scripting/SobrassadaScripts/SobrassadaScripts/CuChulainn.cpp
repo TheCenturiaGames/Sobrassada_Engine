@@ -31,7 +31,7 @@ bool CuChulainn::Init()
         return false;
     }
 
-    character->SetSpeed(speed);
+    character->SetMaxSpeed(speed);
 
     return true;
 }

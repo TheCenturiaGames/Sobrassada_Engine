@@ -7,6 +7,7 @@
 #include "GameObject.h"
 #include "InputModule.h"
 #include "Math/Quat.h"
+#include "Math/MathFunc.h"
 #include "OpenGLModule.h"
 #include "SceneModule.h"
 
@@ -414,6 +415,36 @@ void SOBRASADA_API_ENGINE CameraComponent::Rotate(float yaw, float pitch)
         camera.front              = pitchRotation.Mul(camera.front).Normalized();
         camera.up                 = pitchRotation.Mul(camera.up).Normalized();
     }
+}
+
+const LineSegment CameraComponent::CastCameraRay()
+{
+    auto& windowPosition = App->GetSceneModule()->GetScene()->GetWindowPosition();
+    auto& windowSize     = App->GetSceneModule()->GetScene()->GetWindowSize();
+    auto& mousePos       = App->GetSceneModule()->GetScene()->GetMousePosition();
+
+    float windowMinX     = std::get<0>(windowPosition);
+    float windowMaxX     = std::get<0>(windowPosition) + std::get<0>(windowSize);
+
+    float windowMinY     = std::get<1>(windowPosition);
+    float windowMaxY     = std::get<1>(windowPosition) + std::get<1>(windowSize);
+
+    float percentageX    = (std::get<0>(mousePos) - windowMinX) / (windowMaxX - windowMinX);
+    float percentageY    = (std::get<1>(mousePos) - windowMinY) / (windowMaxY - windowMinY);
+
+    float normalizedX    = Clamp(Lerp(-1.0f, 1.0f, percentageX), -1.0f, 1.0f);
+    float normalizedY    = Clamp(Lerp(1.0f, -1.0f, percentageY), -1.0f, 1.0f);
+
+    return camera.UnProjectLineSegment(normalizedX, normalizedY);
+}
+
+const float3 CameraComponent::ScreenPointToXZ(const float y)
+{
+    // Converts the mouse position to a world position in the XZ plane, to the given height
+    const Ray ray         = CastCameraRay().ToRay();
+    const float t         = (y - ray.pos.y) / ray.dir.y;
+    const float3 worldPos = ray.pos + ray.dir * t;
+    return worldPos;
 }
 
 void CameraComponent::Render(float deltaTime)

@@ -128,6 +128,7 @@ class SOBRASADA_API_ENGINE GameObject
     const bool HasScriptsToLoad() const { return hasScriptsToLoad; }
 
     void SetLocalTransform(const float4x4& newTransform);
+    void SetLocalPosition(const float3& newPos);
     void DrawGizmos() const;
 
     void CreatePrefab();

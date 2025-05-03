@@ -22,6 +22,7 @@ struct InspectorField
         Vec3,
         Vec4,
         Color,
+        InputText,
         GameObject
     };
 

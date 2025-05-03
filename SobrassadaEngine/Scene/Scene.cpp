@@ -1010,6 +1010,20 @@ GameObject* Scene::GetGameObjectByUID(UID gameObjectUUID)
     return nullptr;
 }
 
+GameObject* Scene::GetGameObjectByName(const std::string& name)
+{
+    // TODO: Replace gameObject name to a HashString, I've seen it is also compared in some scripts and would improve performance
+
+    // Returns the first object with that name, if there are more they are ignored
+    for (const auto& obj : gameObjectsContainer)
+    {
+        if (obj.second->GetName() == name) return obj.second;
+    }
+
+    GLOG("[WARNING] No gameObject found with name %s", name.c_str());
+    return nullptr;
+}
+
 void Scene::LoadModel(const UID modelUID)
 {
     if (modelUID != INVALID_UID)

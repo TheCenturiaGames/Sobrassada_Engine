@@ -60,6 +60,12 @@ void Script::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorT
             targetState.AddMember(name, arr, allocator);
             break;
         }
+        case InspectorField::FieldType::InputText:
+        {
+            std::string* str = static_cast<std::string*>(field.data);
+            targetState.AddMember(name, rapidjson::Value(str->c_str(), allocator), allocator);
+            break;
+        }
         case InspectorField::FieldType::GameObject:
         {
             GameObject* go = *(GameObject**)field.data;
@@ -123,6 +129,14 @@ void Script::Load(const rapidjson::Value& initialState)
                 vec->w      = value[3].GetFloat();
             }
             break;
+        case InspectorField::FieldType::InputText:
+        {
+            if (value.IsString())
+            {
+                *(std::string*)field.data = value.GetString();
+            } 
+            break;
+        }
         case InspectorField::FieldType::GameObject:
             if (value.IsUint64())
             {
