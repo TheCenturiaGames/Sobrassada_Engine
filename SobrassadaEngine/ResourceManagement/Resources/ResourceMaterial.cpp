@@ -4,13 +4,12 @@
 #include "EditorUIModule.h"
 #include "FileSystem/Material.h"
 #include "LibraryModule.h"
-#include "Material.h"
+
 #include "ResourceTexture.h"
 #include "TextureImporter.h"
 
 #include "glew.h"
 #include "imgui.h"
-#include <unordered_set>
 
 ResourceMaterial::ResourceMaterial(UID uid, const std::string& name, const rapidjson::Value& importOptions)
     : Resource(uid, name, ResourceType::Material)

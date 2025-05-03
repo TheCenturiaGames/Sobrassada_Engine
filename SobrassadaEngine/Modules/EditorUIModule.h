@@ -12,9 +12,11 @@
 #include <unordered_map>
 #include <vector>
 
+
 class EngineEditorBase;
 struct InspectorField;
 class StateMachineEditor;
+struct HashString;
 
 namespace ImGuizmo
 {
@@ -74,7 +76,7 @@ class EditorUIModule : public Module
 
     template <typename T>
     T RenderResourceSelectDialog(
-        const char* id, const std::unordered_map<std::string, T>& availableResources, const T& defaultResource
+        const char* id, const std::unordered_map<HashString, T>& availableResources, const T& defaultResource
     );
 
     std::string RenderFileDialog(bool& window, const char* windowTitle, bool selectFolder = false);
@@ -89,7 +91,7 @@ class EditorUIModule : public Module
     StateMachineEditor* GetStateMachine() { return stateMachineEditor; }
     SOBRASADA_API_ENGINE ImGuiContext* GetImGuiContext() { return context; }
 
-    const std::unordered_map<std::string, ComponentType>& GetStandaloneComponents() const
+    const std::unordered_map<HashString, ComponentType>& GetStandaloneComponents() const
     {
         return standaloneComponents;
     }
@@ -241,7 +243,7 @@ class EditorUIModule : public Module
     int frontFaceMode            = 0;
     float lastTimeOpenGL         = 0.f;
     std::string tpsStr;
-    std::unordered_map<std::string, ComponentType> standaloneComponents;
+    std::unordered_map<HashString, ComponentType> standaloneComponents;
 
     ImGuiContext* context;
 

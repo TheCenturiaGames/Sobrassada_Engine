@@ -7,6 +7,7 @@
 #include "FileSystem.h"
 #include "ImGui.h"
 #include "WindowModule.h"
+#include "HashString.h"
 
 #include <direct.h>
 #include <filesystem>

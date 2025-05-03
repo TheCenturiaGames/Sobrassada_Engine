@@ -25,7 +25,6 @@
 #include "btVector3.h"
 #include "glew.h"
 #include "imgui.h"
-#include <unordered_map>
 
 class DDRenderInterfaceCoreGL final : public dd::RenderInterface
 {

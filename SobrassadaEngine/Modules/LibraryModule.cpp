@@ -10,6 +10,7 @@
 #include "SceneImporter.h"
 #include "SceneModule.h"
 #include "TextureImporter.h"
+#include "HashString_hash.h"
 
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
@@ -444,7 +445,7 @@ const std::string& LibraryModule::GetResourcePath(UID resourceID) const
     {
         // GLOG("requested uid: %llu", resourceID);
         // GLOG("obtained path: %s", it->second.c_str());
-        return it->second;
+        return it->second.GetString();
     }
 
     return emptyString;
@@ -457,7 +458,7 @@ const std::string& LibraryModule::GetResourceName(UID resourceID) const
     {
         // GLOG("requested uid: %llu", resourceID);
         // GLOG("obtained name: %s", it->second.c_str());
-        return it->second;
+        return it->second.GetString();
     }
     
     return emptyString;

@@ -14,10 +14,10 @@
 #include "ProjectModule.h"
 #include "ResourceNavmesh.h"
 
+#include "GameObject.h"
 #include "ResourceStateMachine.h"
 #include "ResourcesModule.h"
 #include "SceneImporter.h"
-#include "GameObject.h"
 
 #include "SceneModule.h"
 #include "Script.h"
@@ -26,6 +26,7 @@
 #include "TextureEditor.h"
 #include "TextureImporter.h"
 #include "WindowModule.h"
+#include "HashString_hash.h"
 
 #include "Math/Quat.h"
 #include "SDL.h"
@@ -43,25 +44,25 @@
 EditorUIModule::EditorUIModule() : width(0), height(0)
 {
     standaloneComponents = {
-        {"Mesh",                 COMPONENT_MESH                },
-        {"Point Light",          COMPONENT_POINT_LIGHT         },
-        {"Spot Light",           COMPONENT_SPOT_LIGHT          },
-        {"Directional Light",    COMPONENT_DIRECTIONAL_LIGHT   },
-        {"Character Controller", COMPONENT_CHARACTER_CONTROLLER},
-        {"Animation",            COMPONENT_ANIMATION           },
-        {"Transform 2D",         COMPONENT_TRANSFORM_2D        },
-        {"UI Canvas",            COMPONENT_CANVAS              },
-        {"UI Label",             COMPONENT_LABEL               },
-        {"Camera",               COMPONENT_CAMERA              },
-        {"Cube Collider",        COMPONENT_CUBE_COLLIDER       },
-        {"Sphere Collider",      COMPONENT_SPHERE_COLLIDER     },
-        {"Capsule Collider",     COMPONENT_CAPSULE_COLLIDER    },
-        {"Script",               COMPONENT_SCRIPT              },
-        {"AI Agent",             COMPONENT_AIAGENT             },
-        {"UI Image",             COMPONENT_IMAGE               },
-        {"UI Button",            COMPONENT_BUTTON              },
-        {"Audio Source",         COMPONENT_AUDIO_SOURCE        },
-        {"Audio Listener",       COMPONENT_AUDIO_LISTENER      },
+        {HashString("Mesh"),                 COMPONENT_MESH                },
+        {HashString("Point Light"),          COMPONENT_POINT_LIGHT         },
+        {HashString("Spot Light"),           COMPONENT_SPOT_LIGHT          },
+        {HashString("Directional Light"),    COMPONENT_DIRECTIONAL_LIGHT   },
+        {HashString("Character Controller"), COMPONENT_CHARACTER_CONTROLLER},
+        {HashString("Animation"),            COMPONENT_ANIMATION           },
+        {HashString("Transform 2D"),         COMPONENT_TRANSFORM_2D        },
+        {HashString("UI Canvas"),            COMPONENT_CANVAS              },
+        {HashString("UI Label"),             COMPONENT_LABEL               },
+        {HashString("Camera"),               COMPONENT_CAMERA              },
+        {HashString("Cube Collider"),        COMPONENT_CUBE_COLLIDER       },
+        {HashString("Sphere Collider"),      COMPONENT_SPHERE_COLLIDER     },
+        {HashString("Capsule Collider"),     COMPONENT_CAPSULE_COLLIDER    },
+        {HashString("Script"),               COMPONENT_SCRIPT              },
+        {HashString("AI Agent"),             COMPONENT_AIAGENT             },
+        {HashString("UI Image"),             COMPONENT_IMAGE               },
+        {HashString("UI Button"),            COMPONENT_BUTTON              },
+        {HashString("Audio Source"),         COMPONENT_AUDIO_SOURCE        },
+        {HashString("Audio Listener"),       COMPONENT_AUDIO_LISTENER      },
     };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;
@@ -477,7 +478,7 @@ void EditorUIModule::Navmesh(bool& navmesh)
                 int i = 0;
                 for (const auto& pair : App->GetLibraryModule()->GetNavmeshMap())
                 {
-                    if (pair.first.find(searchTextNavmesh) != std::string::npos)
+                    if (pair.first.GetString().find(searchTextNavmesh) != std::string::npos)
                     {
                         ++i;
                         if (ImGui::Selectable(pair.first.c_str(), selectedNavmesh == i))
@@ -553,7 +554,7 @@ void EditorUIModule::LoadPrefabDialog(bool& loadPrefab)
         for (const auto& valuePair : App->GetLibraryModule()->GetPrefabMap())
         {
             ++i;
-            if (valuePair.first.find(searchTextPrefab) != std::string::npos)
+            if (valuePair.first.GetString().find(searchTextPrefab) != std::string::npos)
             {
                 if (ImGui::Selectable(valuePair.first.c_str(), selectedPrefab == i))
                 {
@@ -597,7 +598,7 @@ void EditorUIModule::LoadModelDialog(bool& loadModel)
         for (const auto& valuePair : App->GetLibraryModule()->GetModelMap())
         {
             ++i;
-            if (valuePair.first.find(searchTextModel) != std::string::npos)
+            if (valuePair.first.GetString().find(searchTextModel) != std::string::npos)
             {
                 if (ImGui::Selectable(valuePair.first.c_str(), selectedModel == i))
                 {
@@ -1116,14 +1117,14 @@ bool EditorUIModule::RenderImGuizmo(
 }
 
 template UID EditorUIModule::RenderResourceSelectDialog<UID>(
-    const char* id, const std::unordered_map<std::string, UID>& availableResources, const UID& defaultResource
+    const char* id, const std::unordered_map<HashString, UID>& availableResources, const UID& defaultResource
 );
 template ComponentType EditorUIModule::RenderResourceSelectDialog<ComponentType>(
-    const char* id, const std::unordered_map<std::string, ComponentType>& availableResources,
+    const char* id, const std::unordered_map<HashString, ComponentType>& availableResources,
     const ComponentType& defaultResource
 );
 template uint32_t EditorUIModule::RenderResourceSelectDialog<uint32_t>(
-    const char* id, const std::unordered_map<std::string, uint32_t>& availableResources, const uint32_t& defaultResource
+    const char* id, const std::unordered_map<HashString, uint32_t>& availableResources, const uint32_t& defaultResource
 );
 void EditorUIModule::RenderBasicTransformModifiers(
     float3& outputPosition, float3& outputRotation, float3& outputScale, bool& lockScaleAxis,
@@ -1145,7 +1146,7 @@ void EditorUIModule::RenderBasicTransformModifiers(
 
 template <typename T>
 T EditorUIModule::RenderResourceSelectDialog(
-    const char* id, const std::unordered_map<std::string, T>& availableResources, const T& defaultResource
+    const char* id, const std::unordered_map<HashString, T>& availableResources, const T& defaultResource
 )
 {
     T result = defaultResource;

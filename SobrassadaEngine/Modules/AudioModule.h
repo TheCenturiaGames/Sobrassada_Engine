@@ -8,6 +8,7 @@
 
 class AudioSourceComponent;
 class AudioListenerComponent;
+struct HashString;
 
 class AudioModule : public Module
 {
@@ -31,7 +32,7 @@ class AudioModule : public Module
     bool AddAudioListener(AudioListenerComponent* newListener);
     void RemoveAudioListener(AudioListenerComponent* newListener);
 
-    const std::unordered_map<std::string, uint32_t>& GetEventsMap() const { return eventsMap; }
+    const std::unordered_map<HashString, uint32_t>& GetEventsMap() const { return eventsMap; }
 
   private:
     void ParseEvents();
@@ -46,5 +47,5 @@ class AudioModule : public Module
 
     std::vector<AudioSourceComponent*> sources;
     AudioListenerComponent* listener;
-    std::unordered_map<std::string, uint32_t> eventsMap;
+    std::unordered_map<HashString, uint32_t> eventsMap;
 };

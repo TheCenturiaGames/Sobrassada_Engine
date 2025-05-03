@@ -15,6 +15,7 @@
 #include "ResourcesModule.h"
 #include "SceneModule.h"
 #include "StateMachineEditor.h"
+#include "HashString.h"
 
 #include "Math/Quat.h"
 #include "imgui.h"
@@ -297,11 +298,11 @@ void AnimationComponent::OnInspector()
         std::string selectedZombunnyAnim = "";
 
         ImGui::Text("Available Animations:");
-        const std::unordered_map<std::string, UID>& animationMap = App->GetLibraryModule()->GetAnimMap();
+        const std::unordered_map<HashString, UID>& animationMap = App->GetLibraryModule()->GetAnimMap();
 
         for (const auto& pair : animationMap)
         {
-            const std::string& animationName = pair.first;
+            const std::string& animationName = pair.first.GetString();
 
             if (animationName.rfind(originAnimation, 0) == 0)
             {
@@ -328,7 +329,7 @@ void AnimationComponent::OnInspector()
     ImGui::Separator();
     ImGui::Text("Associated State Machine");
 
-    const std::unordered_map<std::string, UID>& stateMap = App->GetLibraryModule()->GetStateMachineMap();
+    const std::unordered_map<HashString, UID>& stateMap = App->GetLibraryModule()->GetStateMachineMap();
 
     std::string currentName                              = "None";
     if (resourceStateMachine) currentName = resourceStateMachine->GetName();

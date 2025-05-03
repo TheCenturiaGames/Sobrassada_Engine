@@ -6,6 +6,7 @@
 #include "FileSystem.h"
 #include "Globals.h"
 #include "ProjectModule.h"
+#include "HashString.h"
 
 #include "AK/IBytes.h"
 #include "AK/MusicEngine/Common/AkMusicEngine.h"

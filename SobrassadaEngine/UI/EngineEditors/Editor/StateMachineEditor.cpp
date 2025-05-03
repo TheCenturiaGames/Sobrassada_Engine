@@ -275,7 +275,7 @@ void StateMachineEditor::ShowInspector()
 
     for (const auto& [name, uid] : animMap)
     {
-        animationNames.push_back(name);
+        animationNames.push_back(name.GetString());
     }
 
     int currentClipIndex        = -1;
