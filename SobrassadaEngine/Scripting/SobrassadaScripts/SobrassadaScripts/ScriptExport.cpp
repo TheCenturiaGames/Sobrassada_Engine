@@ -12,6 +12,7 @@
 #include "PressAnyKeyScript.h"
 #include "RotateGameObject.h"
 #include "Soldier.h"
+#include "TileFloatScript.h"
 #include "VSyncToggleScript.h"
 
 #include <string>
@@ -40,6 +41,7 @@ extern "C" SOBRASSADA_API Script* CreateScript(const std::string& scriptType, Ga
     if (scriptType == "OptionsMenuSwitcherScript") return new OptionsMenuSwitcherScript(parent);
     if (scriptType == "MainMenuSelectorScript") return new MainMenuSelectorScript(parent);
     if (scriptType == "PressAnyKeyScript") return new PressAnyKeyScript(parent);
+    if (scriptType == "TileFloatScript") return new TileFloatScript(parent);
 
     if (scriptType == "GodMode") return new GodMode(parent);
     if (scriptType == "CuChulainn") return new CuChulainn(parent);

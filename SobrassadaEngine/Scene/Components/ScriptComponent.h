@@ -43,7 +43,7 @@ constexpr const char* scripts[] = {
     "OptionsMenuSwitcherScript", // SCRIPT_OPTIONS_MENU_SWITCHER
     "MainMenuSelectorScript",    // SCRIPT_MAIN_MENU_SELECTOR
     "PressAnyKeyScript",         // SCRIPT_PRESS_ANY_KEY
-    "TileFloatScript"            // SCRIPT_TILE_FLOAT
+    "TileFloatScript"            // SCRIPT_TILEFLOAT
 };
 
 static_assert(

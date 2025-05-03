@@ -13,6 +13,6 @@ class TileFloatScript : public Script
 
   private:
     float speed           = 0.5f;
-    float maxRiseDistance = 2.0f;
+    float maxRiseDistance = 15.0f;
     float initialY        = 0.0f;
 };

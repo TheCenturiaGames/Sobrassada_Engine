@@ -11,17 +11,6 @@
 
 void TileFloatScript::Inspector()
 {
-    ImGui::SetCurrentContext(AppEngine->GetEditorUIModule()->GetImGuiContext());
-    AppEngine->GetEditorUIModule()->DrawScriptInspector(
-        [this]()
-        {
-            ImGui::InputFloat("Speed", &speed, 0.1f, 1.0f); 
-
-            ImGui::InputFloat("Max Rise Distance", &maxRiseDistance, 0.1f, 1.0f);
-
-            ImGui::Text("Initial Y: %.2f", initialY);
-        }
-    );
 }
 
 void TileFloatScript::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator)
@@ -55,7 +44,8 @@ void TileFloatScript::Update(float deltaTime)
         float clampedRise = (distanceRisen + riseStep > maxRiseDistance) ? (maxRiseDistance - distanceRisen) : riseStep;
 
         float4x4 newTransform = parent->GetLocalTransform();
-        newTransform.TransformPos(0.0f, clampedRise, 0.0f);
+        float3 currentPos     = parent->GetLocalTransform().TranslatePart();
+        newTransform.SetTranslatePart(currentPos.x, currentPos.y + clampedRise, currentPos.z);
         parent->SetLocalTransform(newTransform);
         parent->UpdateTransformForGOBranch();
     }
