@@ -48,7 +48,6 @@ ImageComponent::ImageComponent(const rapidjson::Value& initialState, GameObject*
         color.z                           = initColor[2].GetFloat();
     }
 
-    if (initialState.HasMember("MatchParentSize")) matchParentSize = initialState["MatchParentSize"].GetBool();
 }
 
 ImageComponent::~ImageComponent()
@@ -84,7 +83,6 @@ void ImageComponent::Save(rapidjson::Value& targetState, rapidjson::Document::Al
     Component::Save(targetState, allocator);
 
     targetState.AddMember("TextureUID", texture->GetUID(), allocator);
-    targetState.AddMember("MatchParentSize", matchParentSize, allocator);
 
     rapidjson::Value valColor(rapidjson::kArrayType);
     valColor.PushBack(color.x, allocator);
@@ -118,7 +116,7 @@ void ImageComponent::RenderDebug(float deltaTime)
 
 void ImageComponent::Update(float deltaTime)
 {
-    if (matchParentSize) MatchParentSize();
+
 }
 
 void ImageComponent::RenderEditorInspector()
@@ -130,8 +128,6 @@ void ImageComponent::RenderEditorInspector()
     ImGui::Text("Source texture: ");
     ImGui::SameLine();
     ImGui::Text(texture->GetName().c_str());
-
-    ImGui::Checkbox("Match Parent Size", &matchParentSize);
 
     if (ImGui::Button("Select texture"))
     {
@@ -151,14 +147,25 @@ void ImageComponent::RenderUI(const float4x4& view, const float4x4& proj) const
 {
     if (parentCanvas == nullptr || transform2D == nullptr || !IsEffectivelyEnabled()) return;
 
-    const float3 startPos =
-        float3(transform2D->GetRenderingPosition(), 0) - parent->GetGlobalTransform().TranslatePart();
+    float2 renderPos  = transform2D->GetRenderingPosition();
+    float2 scaledSize = transform2D->size;
+
+    // Apply only in screen space
+    if (!parentCanvas->IsInWorldSpace())
+    {
+        float scale  = parentCanvas->GetUIScale();
+        renderPos   *= scale;
+        scaledSize  *= scale;
+    }
+
+    const float3 startPos = float3(renderPos, 0.0f) - parent->GetGlobalTransform().TranslatePart();
+
     glUniformMatrix4fv(0, 1, GL_TRUE, parent->GetGlobalTransform().ptr());
     glUniformMatrix4fv(1, 1, GL_TRUE, view.ptr());
     glUniformMatrix4fv(2, 1, GL_TRUE, proj.ptr());
 
     glUniform3fv(3, 1, color.ptr());
-    glUniform1ui(5, 1); // Tell the shader this widget is an image = 1
+    glUniform1ui(5, 1); // 1 = Image type
 
     glBindVertexArray(vao);
 
@@ -169,29 +176,29 @@ void ImageComponent::RenderUI(const float4x4& view, const float4x4& proj) const
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
     const float vertices[] = {
-        startPos.x,
-        startPos.y,
+        renderPos.x,
+        renderPos.y,
         0.0f,
         0.0f,
-        startPos.x,
-        startPos.y - transform2D->size.y,
+        renderPos.x,
+        renderPos.y - scaledSize.y,
         0.0f,
         1.0f,
-        startPos.x + transform2D->size.x,
-        startPos.y - transform2D->size.y,
+        renderPos.x + scaledSize.x,
+        renderPos.y - scaledSize.y,
         1.0f,
         1.0f,
 
-        startPos.x + transform2D->size.x,
-        startPos.y,
+        renderPos.x + scaledSize.x,
+        renderPos.y,
         1.0f,
         0.0f,
-        startPos.x,
-        startPos.y,
+        renderPos.x,
+        renderPos.y,
         0.0f,
         0.0f,
-        startPos.x + transform2D->size.x,
-        startPos.y - transform2D->size.y,
+        renderPos.x + scaledSize.x,
+        renderPos.y - scaledSize.y,
         1.0f,
         1.0f
     };
@@ -199,10 +206,10 @@ void ImageComponent::RenderUI(const float4x4& view, const float4x4& proj) const
     const GLuint lower  = static_cast<GLuint>(bindlessUID & 0xFFFFFFFF);
     const GLuint higher = static_cast<GLuint>(bindlessUID >> 32);
     glUniform2ui(4, lower, higher);
+
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
     App->GetOpenGLModule()->DrawArrays(GL_TRIANGLES, 0, 6);
 
-    // glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
 }
 
@@ -251,29 +258,5 @@ void ImageComponent::ChangeTexture(const UID textureUID)
         texture     = static_cast<ResourceTexture*>(newTexture);
         bindlessUID = glGetTextureHandleARB(texture->GetTextureID());
         glMakeTextureHandleResidentARB(bindlessUID);
-    }
-}
-
-void ImageComponent::MatchParentSize()
-{
-    if (transform2D == nullptr) return;
-
-    const UID parentUID  = parent->GetParent();
-    GameObject* parentGO = App->GetSceneModule()->GetScene()->GetGameObjectByUID(parentUID);
-
-    // Check if parent has transform 2D
-    if (Transform2DComponent* parentT2D = parentGO->GetComponent<Transform2DComponent*>())
-    {
-        transform2D->size     = parentT2D->size;
-        transform2D->position = float2(0, 0);
-        return;
-    }
-
-    // Check if parent is a canvas
-    if (CanvasComponent* canvas = parentGO->GetComponent<CanvasComponent*>())
-    {
-        transform2D->size     = float2(canvas->GetWidth(), canvas->GetHeight());
-        transform2D->position = float2(0, 0);
-        return;
     }
 }

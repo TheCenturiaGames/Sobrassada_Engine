@@ -93,6 +93,15 @@ void Transform2DComponent::Init()
     }
 }
 
+void Transform2DComponent::Update(float deltaTime)
+{
+    if (stretchToParent)
+    {
+        StretchToParent();
+    }
+}
+
+
 void Transform2DComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
 {
     Component::Save(targetState, allocator);
@@ -218,6 +227,24 @@ void Transform2DComponent::RenderEditorInspector()
         ImGui::Separator();
         ImGui::InputFloat2("Debug pos", &position.x);
         ImGui::InputFloat2("Debug size", &size.x);
+
+        if (ImGui::Button("Stretch to Parent (Unity-style)"))
+        {
+            StretchToParent();
+        }
+
+        ImGui::SeparatorText("Anchor Presets");
+
+        if (ImGui::Button("Top Left")) ApplyAnchorPreset(AnchorPreset::TopLeft);
+        ImGui::SameLine();
+        if (ImGui::Button("Center")) ApplyAnchorPreset(AnchorPreset::Center);
+        ImGui::SameLine();
+        if (ImGui::Button("Stretch Both")) ApplyAnchorPreset(AnchorPreset::StretchBoth);
+
+        if (ImGui::Button("Stretch Horizontal")) ApplyAnchorPreset(AnchorPreset::StretchHorizontal);
+        ImGui::SameLine();
+        if (ImGui::Button("Stretch Vertical")) ApplyAnchorPreset(AnchorPreset::StretchVertical);
+
     }
 }
 
@@ -230,7 +257,7 @@ void Transform2DComponent::RenderWidgets() const
 
     if (parentCanvas && !parentCanvas->IsInWorldSpace())
     {
-        float scale  = parentCanvas->GetScreenScale();
+        float scale  = parentCanvas->GetUIScale();
         renderPos   *= scale;
         renderSize  *= scale;
     }
@@ -251,7 +278,7 @@ void Transform2DComponent::RenderWidgets() const
     // Draw anchor points when selected
     if (App->GetSceneModule()->GetScene()->GetSelectedGameObject()->GetUID() == parent->GetUID())
     {
-        const float scale = (parentCanvas && !parentCanvas->IsInWorldSpace()) ? parentCanvas->GetScreenScale() : 1.0f;
+        const float scale = (parentCanvas && !parentCanvas->IsInWorldSpace()) ? parentCanvas->GetUIScale() : 1.0f;
 
         // Top-left
         const float3 x1   = float3(GetAnchorXPos(anchorsX.x) * scale, GetAnchorYPos(anchorsY.y) * scale, 0);
@@ -339,7 +366,7 @@ float2 Transform2DComponent::GetRenderingPosition() const
 
     if (parentCanvas && !parentCanvas->IsInWorldSpace())
     {
-        float scale  = parentCanvas->GetScreenScale();
+        float scale  = parentCanvas->GetUIScale();
         pos         *= scale;
     }
 
@@ -352,7 +379,7 @@ float2 Transform2DComponent::GetGlobalPosition() const
     if (parentCanvas && !parentCanvas->IsInWorldSpace())
     {
         float2 pos  = float2(0.0f, 0.0f);
-        float scale = parentCanvas->GetScreenScale();
+        float scale = parentCanvas->GetUIScale();
         return pos * scale;
     }
 
@@ -401,79 +428,73 @@ bool Transform2DComponent::IsRootTransform2D() const
 
 float Transform2DComponent::GetAnchorXPos(const float anchor) const
 {
-    // Gets the anchor global position
-    float anchorPos = 0;
-
     if (parentCanvas == nullptr) return 0.0f;
 
     if (parentCanvas->IsInWorldSpace())
     {
         if (IsRootTransform2D())
         {
-            // 0.5f because canvas pivot is always in the middle
-            anchorPos =
-                parent->GetParentGlobalTransform().TranslatePart().x + (parentCanvas->GetWidth() * (anchor - 0.5f));
+            // Canvas pivot is assumed at 0.5 (center)
+            return parent->GetParentGlobalTransform().TranslatePart().x + (parentCanvas->GetWidth() * (anchor - 0.5f));
         }
         else if (parentTransform)
         {
-            anchorPos = parentTransform->GetGlobalPosition().x +
-                        (parentTransform->size.x * (anchor - parentTransform->pivot.x));
+            float parentLeft =
+                parentTransform->GetGlobalPosition().x - (parentTransform->size.x * parentTransform->pivot.x);
+            return parentLeft + (parentTransform->size.x * anchor);
         }
     }
     else
     {
-        // Screen space: assume canvas is centered at (0,0)
         if (IsRootTransform2D())
         {
-            anchorPos = parentCanvas->GetWidth() * (anchor - 0.5f);
+            return parentCanvas->GetWidth() * (anchor - 0.5f);
         }
         else if (parentTransform)
         {
-            anchorPos = parentTransform->GetGlobalPosition().x +
-                        (parentTransform->size.x * (anchor - parentTransform->pivot.x));
+            float parentLeft =
+                parentTransform->GetGlobalPosition().x - (parentTransform->size.x * parentTransform->pivot.x);
+            return parentLeft + (parentTransform->size.x * anchor);
         }
     }
 
-    return anchorPos;
+    return 0.0f;
 }
 
 float Transform2DComponent::GetAnchorYPos(const float anchor) const
 {
-    // Gets the anchor global position
-    float anchorPos = 0;
-
     if (parentCanvas == nullptr) return 0.0f;
 
     if (parentCanvas->IsInWorldSpace())
     {
         if (IsRootTransform2D())
         {
-            // 0.5f because canvas pivot is always in the middle
-            anchorPos =
-                parent->GetParentGlobalTransform().TranslatePart().y + (parentCanvas->GetHeight() * (anchor - 0.5f));
+            return parent->GetParentGlobalTransform().TranslatePart().y + (parentCanvas->GetHeight() * (anchor - 0.5f));
         }
         else if (parentTransform)
         {
-            anchorPos = parentTransform->GetGlobalPosition().y +
-                        (parentTransform->size.y * (anchor - parentTransform->pivot.y));
+            float parentBottom =
+                parentTransform->GetGlobalPosition().y - (parentTransform->size.y * parentTransform->pivot.y);
+            return parentBottom + (parentTransform->size.y * anchor);
         }
     }
     else
     {
-        // Screen space: assume canvas is centered at (0,0)
         if (IsRootTransform2D())
         {
-            anchorPos = parentCanvas->GetHeight() * (anchor - 0.5f);
+            return parentCanvas->GetHeight() * (anchor - 0.5f);
         }
         else if (parentTransform)
         {
-            anchorPos = parentTransform->GetGlobalPosition().y +
-                        (parentTransform->size.y * (anchor - parentTransform->pivot.y));
+            float parentBottom =
+                parentTransform->GetGlobalPosition().y - (parentTransform->size.y * parentTransform->pivot.y);
+            return parentBottom + (parentTransform->size.y * anchor);
         }
     }
 
-    return anchorPos;
+    return 0.0f;
 }
+
 
 void Transform2DComponent::OnAnchorsUpdated()
 {
@@ -504,6 +525,7 @@ void Transform2DComponent::OnSizeChanged()
 
 void Transform2DComponent::AdaptToParentChanges()
 {
+
     OnAnchorsUpdated();
 
     if (anchorsX.x == anchorsX.y)
@@ -634,4 +656,70 @@ void Transform2DComponent::OnParentChange()
         if (parentTransform) parentTransform->AddChildTransform(this);
         else GLOG("[WARNING] You are assigning a Transform2D as a child of a gameObject with no Transform2D");
     }
+}
+
+void Transform2DComponent::AdaptToParentChangesRecursive()
+{
+    AdaptToParentChanges();
+
+    for (Transform2DComponent* child : childTransforms)
+    {
+        child->AdaptToParentChangesRecursive();
+    }
+}
+
+
+void Transform2DComponent::StretchToParent()
+{
+    anchorsX = float2(0.0f, 1.0f);
+    anchorsY = float2(0.0f, 1.0f);
+    pivot    = float2(0.5f, 0.5f);
+    position = float2(0.0f, 0.0f);
+    margins  = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
+    AdaptToParentChanges();
+}
+
+void Transform2DComponent::ApplyAnchorPreset(AnchorPreset preset)
+{
+    switch (preset)
+    {
+    case AnchorPreset::TopLeft:
+        anchorsX = float2(0.0f, 0.0f);
+        anchorsY = float2(0.0f, 0.0f);
+        pivot    = float2(0.0f, 1.0f);
+        margins  = float4(0, 0, 0, 0);
+        break;
+
+    case AnchorPreset::Center:
+        anchorsX = float2(0.5f, 0.5f);
+        anchorsY = float2(0.5f, 0.5f);
+        pivot    = float2(0.5f, 0.5f);
+        margins  = float4(0, 0, 0, 0);
+        break;
+
+    case AnchorPreset::StretchHorizontal:
+        anchorsX = float2(0.0f, 1.0f);
+        anchorsY = float2(0.0f, 0.0f);
+        pivot    = float2(0.5f, 1.0f);
+        margins  = float4(0, 0, 0, 0);
+        break;
+
+    case AnchorPreset::StretchVertical:
+        anchorsX = float2(0.0f, 0.0f);
+        anchorsY = float2(0.0f, 1.0f);
+        pivot    = float2(0.0f, 0.5f);
+        margins  = float4(0, 0, 0, 0);
+        break;
+
+    case AnchorPreset::StretchBoth:
+        anchorsX = float2(0.0f, 1.0f);
+        anchorsY = float2(0.0f, 1.0f);
+        pivot    = float2(0.5f, 0.5f);
+        margins  = float4(0, 0, 0, 0);
+        break;
+    }
+
+    position = float2(0.0f, 0.0f);
+    AdaptToParentChanges();
 }
