@@ -24,7 +24,12 @@ bool Soldier::Init()
 
     agentAI = parent->GetComponent<AIAgentComponent*>();
     if (agentAI == nullptr) GLOG("AIAgent component not found for Soldier")
-    else agentAI->SetSpeed(speed);
+    else
+    {
+        agentAI->RecreateAgent();
+        agentAI->SetSpeed(speed);
+    }
+
 
     return true;
 }
@@ -61,23 +66,23 @@ void Soldier::PerformAttack()
 
 void Soldier::HandleState(float gameTime)
 {
-    if (!animComponent) return;
+    //if (!animComponent) return;
 
     switch (currentState)
     {
     case SoldierStates::PATROL:
         // GLOG("Soldier Patrolling");
-        animComponent->UseTrigger("idle");
+        //animComponent->UseTrigger("idle");
         PatrolAI();
         break;
     case SoldierStates::CHASE:
         // GLOG("Soldier Chasing");
-        animComponent->UseTrigger("Run");
+        //animComponent->UseTrigger("Run");
         ChaseAI();
         break;
     case SoldierStates::BASIC_ATTACK:
         // GLOG("Soldier Basic Attack");
-        animComponent->UseTrigger("attack");
+        //animComponent->UseTrigger("attack");
         Attack(gameTime);
         if (CheckDistanceWithPlayer() != CLOSE) currentState = SoldierStates::CHASE;
         break;
