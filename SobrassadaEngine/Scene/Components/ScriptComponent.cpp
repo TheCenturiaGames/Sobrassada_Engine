@@ -6,6 +6,7 @@
 #include "SceneModule.h"
 #include "Script.h"
 #include "ScriptModule.h"
+#include "GameTimer.h"
 
 #include "ImGui.h"
 #include "Math/float3.h"
@@ -92,9 +93,10 @@ void ScriptComponent::Update(float deltaTime)
 
     if (App->GetSceneModule()->GetInPlayMode())
     {
+        float gameTime = App->GetGameTimer()->GetDeltaTime() / 1000.0f;
         for (auto& script : scriptInstances)
         {
-            script->Update(deltaTime);
+            script->Update(gameTime);
         }
     }
 }

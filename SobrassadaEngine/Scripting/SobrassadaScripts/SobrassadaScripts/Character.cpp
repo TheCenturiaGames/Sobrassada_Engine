@@ -19,7 +19,7 @@ Character::Character(
     float rangeAIAttack, float rangeAIChase
 )
     : Script(parent), maxHealth(maxHealth), damage(damage), attackDuration(attackDuration), speed(speed),
-      cooldown(cooldown), range(range), rangeAIAttack(rangeAIAttack), rangeAIChase(rangeAIChase)
+      attackCooldown(cooldown), range(range), rangeAIAttack(rangeAIAttack), rangeAIChase(rangeAIChase)
 {
     currentHealth = maxHealth;
 }
@@ -60,10 +60,10 @@ void Character::Update(float deltaTime)
     if (isDead) return;
 
     float gameTime = AppEngine->GetGameTimer()->GetTime() / 1000.0f;
-    if (weaponCollider->GetEnabled() && isAttacking && gameTime - lastAttackTime >= attackDuration)
+    if (isAttacking && gameTime - lastAttackTime >= attackDuration)
     {
         // GLOG("Not Attacking %.3f", gameTime);
-        weaponCollider->SetEnabled(false);
+        if (weaponCollider && weaponCollider->GetEnabled()) weaponCollider->SetEnabled(false);
         isAttacking = false;
     }
     if (isInvulnerable && gameTime - lastTimeHit >= invulnerableDuration)
@@ -87,7 +87,7 @@ void Character::Inspector()
         fields.push_back({"Damage", InspectorField::FieldType::Int, &damage, 0, 3});
         fields.push_back({"Attack Duration", InspectorField::FieldType::Float, &attackDuration, 0.0f, 1.0f});
         fields.push_back({"Speed", InspectorField::FieldType::Float, &speed, 0.0f, 10.0f});
-        fields.push_back({"Attack Cooldown", InspectorField::FieldType::Float, &cooldown, 0.0f, 2.0f});
+        fields.push_back({"Attack Cooldown", InspectorField::FieldType::Float, &attackCooldown, 0.0f, 2.0f});
         fields.push_back({"Attack Range", InspectorField::FieldType::Float, &range, 0.0f, 3.0f});
     }
 
@@ -105,7 +105,7 @@ void Character::OnCollision(GameObject* otherObject, const float3& collisionNorm
 
     if (!isInvulnerable && enemyScriptComponent != nullptr && enemyWeapon != nullptr && enemyWeapon->GetEnabled())
     {
-        Script* enemyScript = enemyScriptComponent->GetScriptInstances()[0]; //TODO: CHANGE THIS
+        Script* enemyScript       = enemyScriptComponent->GetScriptInstances()[0]; // TODO: CHANGE THIS
         // ScriptType scriptType = enemyScriptComponent->GetScriptType(); // not needed for now
         Character* enemyCharacter = dynamic_cast<Character*>(enemyScript);
         if (!enemyCharacter->isAttacking) return;
@@ -124,7 +124,7 @@ void Character::Attack(float time)
         // GLOG("ATTACK");
         isAttacking    = true;
         lastAttackTime = time;
-        weaponCollider->SetEnabled(true);
+        if (weaponCollider) weaponCollider->SetEnabled(true);
         PerformAttack();
     }
 }
@@ -148,7 +148,7 @@ void Character::Heal(int amount)
 
 bool Character::CanAttack(float time)
 {
-    if (!isAttacking && time - lastAttackTime >= cooldown) return true;
+    if (!isAttacking && time - lastAttackTime >= attackCooldown) return true;
 
     return false;
 }

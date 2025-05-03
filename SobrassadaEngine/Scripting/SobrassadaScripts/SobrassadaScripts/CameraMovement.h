@@ -16,6 +16,8 @@ class CameraMovement : public Script
     bool Init() override;
     void Update(float deltaTime) override;
 
+    void EnableMouseOffset(bool enable) { mouseOffsetEnabled = enable; }
+
   private:
     void FollowTarget(float deltaTime);
 

@@ -268,18 +268,19 @@ void CharacterControllerComponent::AdjustHeightToNavMesh(float3& currentPos)
 
 void CharacterControllerComponent::Move(float deltaTime)
 {
-    if (isAiming || isAttacking)
+    if (!movementEnabled)
     {
         currentSpeed = 0;
         return;
     }
+
     if (!navMeshQuery || currentPolyRef == 0) return;
 
     float4x4 globalTr = parent->GetGlobalTransform();
     float3 currentPos = globalTr.TranslatePart();
 
     currentSpeed      = targetDirection.LengthSq() > 0.001f ? Lerp(currentSpeed, maxSpeed, acceleration * deltaTime)
-                                                            : Lerp(currentSpeed, 0, acceleration * deltaTime);
+                                                            : Lerp(currentSpeed, 0, 100 * deltaTime);
     float3 forward    = globalTr.WorldZ().Normalized();
     float3 right      = globalTr.WorldX().Normalized();
 
@@ -341,7 +342,6 @@ void CharacterControllerComponent::LookAtMovement(const float3& moveDir, float d
     if (fabs(angle) < 0.0001f)
     {
         isRotating = false;
-        if (isAttacking) isAttacking = false;
         return;
     }
 
@@ -377,78 +377,44 @@ void CharacterControllerComponent::Rotate(float rotationDirection, float deltaTi
 
 void CharacterControllerComponent::HandleInput(float deltaTime)
 {
+    if (!movementEnabled) return;
+
     const KeyState* keyboard     = App->GetInputModule()->GetKeyboard();
     const KeyState* mouseButtons = App->GetInputModule()->GetMouseButtons();
 
     float3 direction(0.0f, 0.0f, 0.0f);
-    if (!isAiming)
+
+    if (keyboard[SDL_SCANCODE_W] == KEY_REPEAT) direction.z -= 1.0f;
+    if (keyboard[SDL_SCANCODE_S] == KEY_REPEAT) direction.z += 1.0f;
+    if (keyboard[SDL_SCANCODE_A] == KEY_REPEAT) direction.x -= 1.0f;
+    if (keyboard[SDL_SCANCODE_D] == KEY_REPEAT) direction.x += 1.0f;
+
+    float rotationDir = 0.0f;
+
+    if (keyboard[SDL_SCANCODE_Q] == KEY_REPEAT) rotationDir += 1.0f;
+    if (keyboard[SDL_SCANCODE_E] == KEY_REPEAT) rotationDir -= 1.0f;
+
+    targetDirection = direction;
+    if (direction.LengthSq() > 0.001f)
     {
-        if (keyboard[SDL_SCANCODE_W] == KEY_REPEAT) direction.z -= 1.0f;
-        if (keyboard[SDL_SCANCODE_S] == KEY_REPEAT) direction.z += 1.0f;
-        if (keyboard[SDL_SCANCODE_A] == KEY_REPEAT) direction.x -= 1.0f;
-        if (keyboard[SDL_SCANCODE_D] == KEY_REPEAT) direction.x += 1.0f;
-
-        float rotationDir = 0.0f;
-
-        if (keyboard[SDL_SCANCODE_Q] == KEY_REPEAT) rotationDir += 1.0f;
-        if (keyboard[SDL_SCANCODE_E] == KEY_REPEAT) rotationDir -= 1.0f;
-
+        direction.Normalize();
         targetDirection = direction;
-        if (direction.LengthSq() > 0.001f)
+
+        if (direction.LengthSq() > 0.0001f)
         {
-            direction.Normalize();
-            targetDirection = direction;
-
-            if (direction.LengthSq() > 0.0001f)
-            {
-                if (!isAttacking)
-                {
-                    rotateDirection = direction;
-                    isRotating      = true;
-                }
-            }
+            rotateDirection = direction;
+            isRotating      = true;
         }
-
-        if (fabs(rotationDir) > 0.0001f)
-        {
-            Rotate(rotationDir, deltaTime);
-        }
-        // else
-        //{
-        //     //TODO: StateMachine IDLE
-        // }
     }
 
-    // Ranged attack
-    if (mouseButtons[SDL_BUTTON_RIGHT - 1] /* == KEY_DOWN*/)
+    if (fabs(rotationDir) > 0.0001f)
     {
-        if (!isRotating)
-        {
-            isRotating                 = true;
-            const float3 mouseWorldPos = App->GetSceneModule()->GetScene()->GetMainCamera()->ScreenPointToXZ(
-                parent->GetGlobalTransform().TranslatePart().y
-            );
-            rotateDirection   = mouseWorldPos - parent->GetPosition();
-            rotateDirection.y = 0;
-            rotateDirection.Normalize();
-        }
-        isAiming = true;
+        Rotate(rotationDir, deltaTime);
     }
-    else
-    {
-        isAiming = false;
-    }
+}
 
-    // Melee attack
-    if (mouseButtons[SDL_BUTTON_LEFT - 1] == KEY_DOWN)
-    {
-        isAttacking                = true;
-        isRotating                 = true;
-        const float3 mouseWorldPos = App->GetSceneModule()->GetScene()->GetMainCamera()->ScreenPointToXZ(
-            parent->GetGlobalTransform().TranslatePart().y
-        );
-        rotateDirection   = mouseWorldPos - parent->GetPosition();
-        rotateDirection.y = 0;
-        rotateDirection.Normalize();
-    }
+void CharacterControllerComponent::LookAt(const float3& direction)
+{
+    isRotating = true;
+    rotateDirection = direction;
 }

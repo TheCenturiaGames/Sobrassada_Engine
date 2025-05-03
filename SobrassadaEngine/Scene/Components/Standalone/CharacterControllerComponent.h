@@ -29,6 +29,7 @@ class SOBRASADA_API_ENGINE CharacterControllerComponent : public Component
     void LookAtMovement(const float3& moveDir, float deltaTime);
     void Rotate(float rotationDirection, float deltaTime);
     void HandleInput(float deltaTime);
+    void LookAt(const float3& direction);
 
     const float3& GetTargetDirection() const { return targetDirection; }
     const float3& GetFrontDirection() const { return rotateDirection; }
@@ -39,14 +40,15 @@ class SOBRASADA_API_ENGINE CharacterControllerComponent : public Component
     void SetTargetDirection(float3 newTargetDirection) { targetDirection = newTargetDirection; }
     void SetMaxSpeed(float newSpeed) { maxSpeed = newSpeed; }
     void SetInputDown(bool input) { inputDown = input; }
+    void EnableMovement(bool enable) { movementEnabled = enable; }
 
   private:
-    float3 targetDirection       = float3::zero;
-    float3 lastPosition          = float3::zero;
+    float3 targetDirection = float3::zero;
+    float3 lastPosition    = float3::zero;
 
-    float maxSpeed               = 10.0f;
-    float maxAngularSpeed        = 0.0f;
-    float acceleration           = 10.0f;
+    float maxSpeed         = 10.0f;
+    float maxAngularSpeed  = 0.0f;
+    float acceleration     = 10.0f;
     float currentSpeed;
 
     bool isRadians               = false;
@@ -63,6 +65,5 @@ class SOBRASADA_API_ENGINE CharacterControllerComponent : public Component
     float3 targetLookDirection;
 
     float3 rotateDirection;
-    bool isAiming    = false;
-    bool isAttacking = false;
+    bool movementEnabled = true;
 };

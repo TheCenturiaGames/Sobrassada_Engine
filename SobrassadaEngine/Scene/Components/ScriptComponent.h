@@ -77,6 +77,17 @@ class ScriptComponent : public Component
     const std::vector<Script*>& GetScriptInstances() const { return scriptInstances; }
     const std::vector<std::string>& GetAllScriptNames() const { return scriptNames; }
 
+    template <typename T> T* GetScriptByType()
+    {
+        for (Script* script : scriptInstances)
+        {
+            T* currentScript = dynamic_cast<T*>(script);
+            if (currentScript) return currentScript;
+        }
+
+        return nullptr;
+    }
+
   private:
     int SearchIdxForString(const std::string& name) const;
     bool startScript = false;
