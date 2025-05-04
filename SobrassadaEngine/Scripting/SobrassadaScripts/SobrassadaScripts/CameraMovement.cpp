@@ -46,10 +46,6 @@ void CameraMovement::FollowTarget(float deltaTime)
 {
     if (!target) return;
 
-    const float distanceToTarget = target->GetPosition().Distance(parent->GetPosition());
-    if (!isFollowing && distanceToTarget < followDistanceThreshold) return;
-
-    isFollowing                  = true;
     float3 desiredPosition       = target->GetPosition();
     const float3 currentPosition = parent->GetPosition();
 
@@ -58,10 +54,17 @@ void CameraMovement::FollowTarget(float deltaTime)
         currentLookAhead = 0;
         const float3 mouseWorldPos =
             AppEngine->GetSceneModule()->GetScene()->GetMainCamera()->ScreenPointToXZ(parent->GetPosition().y);
-        desiredPosition += mouseWorldPos * 0.5f * mouseOffsetIntensity;
+        const float3 mouseOffset = (desiredPosition + (mouseWorldPos)) * 0.5f - desiredPosition;
+        desiredPosition          += mouseOffset * mouseOffsetIntensity;
+        GLOG("Mouse world pos: %f, %f", mouseWorldPos.x, mouseWorldPos.z);
     }
     else if (lookAheadIntensity > 0 && controller)
     {
+        const float distanceToTarget = desiredPosition.Distance(currentPosition);
+        if (!isFollowing && distanceToTarget < followDistanceThreshold) return;
+
+        isFollowing      = true;
+
         currentLookAhead = Lerp(
             currentLookAhead, lookAheadIntensity * (controller->GetSpeed() / controller->GetMaxSpeed()),
             lookAheadSmoothness * deltaTime
