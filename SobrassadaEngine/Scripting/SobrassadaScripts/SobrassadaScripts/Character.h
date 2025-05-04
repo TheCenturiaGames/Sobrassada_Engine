@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Script.h"
+
 #include <vector>
 
 class GameObject;
@@ -16,12 +17,19 @@ enum AIStates
     FAR_AWAY
 };
 
+enum class CharacterType
+{
+    None,
+    CuChulainn,
+    Soldier,
+};
+
 class Character : public Script
 {
   public:
     Character(
         GameObject* parent, int maxHealth, int damage, float attackDuration, float speed, float cooldown, float range,
-        float rangeAIAttack, float rangeAIChase
+        float rangeAIAttack, float rangeAIChase, const std::vector<float3>& patrolPoints
     );
     virtual ~Character() noexcept override { parent = nullptr; };
 
@@ -66,7 +74,11 @@ class Character : public Script
     const float invulnerableDuration            = 0.7f;
     bool isAttacking                            = false;
 
+    CharacterType type                          = CharacterType::None;
+
     // AI
-    float rangeAIAttack                         = 0.0f;
     float rangeAIChase                          = 0.0f;
+    float rangeAIAttack                         = 0.0f;
+    int patrolPointsCont                              = 0;
+    std::vector<float3> patrolPoints;
 };

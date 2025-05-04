@@ -16,12 +16,14 @@
 
 Character::Character(
     GameObject* parent, int maxHealth, int damage, float attackDuration, float speed, float cooldown, float range,
-    float rangeAIAttack, float rangeAIChase
+    float rangeAIAttack, float rangeAIChase, const std::vector<float3>& patrolPoints
 )
     : Script(parent), maxHealth(maxHealth), damage(damage), attackDuration(attackDuration), speed(speed),
-      cooldown(cooldown), range(range), rangeAIAttack(rangeAIAttack), rangeAIChase(rangeAIChase)
+      cooldown(cooldown), range(range), rangeAIAttack(rangeAIAttack), rangeAIChase(rangeAIChase),
+      patrolPoints(patrolPoints)
 {
     currentHealth = maxHealth;
+    type          = CharacterType::None;
 }
 
 bool Character::Init()
@@ -80,6 +82,19 @@ void Character::Inspector()
         fields.push_back({"Speed", InspectorField::FieldType::Float, &speed, 0.0f, 10.0f});
         fields.push_back({"Attack Cooldown", InspectorField::FieldType::Float, &cooldown, 0.0f, 2.0f});
         fields.push_back({"Attack Range", InspectorField::FieldType::Float, &range, 0.0f, 3.0f});
+
+        if (type != CharacterType::CuChulainn)
+        {
+            fields.push_back({"AI Chase Range", InspectorField::FieldType::Float, &rangeAIChase, 0.0f, 20.0f});
+            fields.push_back({"AI Attack Range", InspectorField::FieldType::Float, &rangeAIAttack, 0.0f, 5.0f});
+
+            fields.push_back({"AI Patrol Points", InspectorField::FieldType::Int, &patrolPointsCont, 0, 5});
+            for (int i = 0; i < patrolPointsCont; i++)
+            {
+                std::string fieldName = std::to_string(i) + " Patrol Point";
+                fields.push_back({fieldName.c_str(), InspectorField::FieldType::Vec3, &patrolPoints[i]});
+            }
+        }
     }
 
     AppEngine->GetEditorUIModule()->DrawScriptInspector(fields);
@@ -99,7 +114,7 @@ void Character::OnCollision(GameObject* otherObject, const float3& collisionNorm
         Script* enemyScript = enemyScriptComponent->GetScriptInstance();
 
         if (enemyScript == nullptr)
-            GLOG("%s script instance not setted.", otherObject->GetName().c_str()); // we want to crash?
+            GLOG("%s script instance not setted.", otherObject->GetName().c_str()) // we want to crash?
 
         // ScriptType scriptType = enemyScriptComponent->GetScriptType(); // type of script for casting
         Character* enemyCharacter = dynamic_cast<Character*>(enemyScript);
