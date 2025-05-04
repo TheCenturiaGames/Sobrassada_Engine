@@ -219,6 +219,11 @@ void CameraComponent::Clone(const Component* other)
 
         firstTime                          = otherCamera->firstTime;
         seePreview                         = otherCamera->seePreview;
+
+        glGenBuffers(1, &ubo);
+        glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(CameraMatrices), nullptr, GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
     else
     {
@@ -346,7 +351,7 @@ void CameraComponent::RenderCameraPreview(float deltaTime)
         App->GetOpenGLModule()->GetGBuffer()->Resize(previewWidth, previewHeight);
         App->GetOpenGLModule()->GetGBuffer()->CheckResize();
 
-            glViewport(0, 0, previewWidth, previewHeight);
+        glViewport(0, 0, previewWidth, previewHeight);
 
         previewFramebuffer->Bind();
         autorendering = true;
@@ -357,7 +362,6 @@ void CameraComponent::RenderCameraPreview(float deltaTime)
         App->GetOpenGLModule()->GetGBuffer()->CheckResize();
 
         App->GetOpenGLModule()->GetFramebuffer()->Bind();
-
 
         glViewport(0, 0, mainFramebufferWidth, mainFramebufferHeight);
     }
