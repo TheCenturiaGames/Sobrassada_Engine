@@ -47,6 +47,7 @@ class LibraryModule : public Module
         UID uid, const std::string& path, rapidjson::Document& doc, rapidjson::Value& importOptions
     ) const;
     UID AssignFiletypeUID(UID originalUID, FileType fileType);
+    void DeletePrefabFiles(UID prefabUID);
 
     void AddTexture(UID textureUID, const std::string& ddsPath);
     void AddMesh(UID meshUID, const std::string& matPath);
