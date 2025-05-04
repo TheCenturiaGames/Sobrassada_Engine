@@ -16,6 +16,7 @@ class Projectile : public Script
     void Update(float deltaTime) override;
 
     void Shoot(const float3& origin, const float3& direction);
+    void OnCollision(GameObject* otherObject, const float3& collisionNormal) override;
 
   private:
     void Move(float deltaTime);
@@ -28,4 +29,6 @@ class Projectile : public Script
 
     float range = 10;
     float3 startPos;
+
+    int damage = 1;
 };
