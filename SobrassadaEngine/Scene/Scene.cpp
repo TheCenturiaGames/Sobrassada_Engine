@@ -1251,6 +1251,7 @@ void Scene::LoadPrefab(const UID prefabUID, const ResourcePrefab* prefab, const 
             newObjects[parentIndices[i]]->AddGameObject(newObjects[i]->GetUID());
             AddGameObject(newObjects[i]->GetUID(), newObjects[i]);
             remappingTable.insert({referenceObjects[i]->GetUID(), newObjects[i]->GetUID()});
+            newObjects[i]->SetEnabled(referenceObjects[i]->IsEnabled());
         }
 
         // Then do a second loop to update all components UIDs reference (ex. skinning)
