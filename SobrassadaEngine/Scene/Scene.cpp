@@ -1299,7 +1299,8 @@ void Scene::OverridePrefabs(const UID prefabUID)
     {
         for (const auto& gameObject : gameObjectsContainer)
         {
-            if (gameObject.second != nullptr) gameObject.second->SetPrefabUID(INVALID_UID);
+            if (gameObject.second != nullptr && gameObject.second->GetPrefabUID() == prefabUID)
+                gameObject.second->SetPrefabUID(INVALID_UID);
         }
         return;
     }
@@ -1315,7 +1316,7 @@ void Scene::OverridePrefabs(const UID prefabUID)
             if (gameObject.second->GetPrefabUID() == prefabUID)
             {
                 updatedObjects.push_back(gameObject.first);
-                transforms.emplace_back(gameObject.second->GetGlobalTransform());
+                transforms.emplace_back(gameObject.second->GetLocalTransform());
             }
         }
     }

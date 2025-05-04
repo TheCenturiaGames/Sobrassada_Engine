@@ -7,6 +7,7 @@
 #include "FileSystem/StateMachineManager.h"
 #include "GameObject.h"
 #include "ProjectModule.h"
+#include "Resource.h"
 #include "SceneImporter.h"
 #include "SceneModule.h"
 #include "TextureImporter.h"
@@ -219,7 +220,7 @@ bool LibraryModule::LoadLibraryMaps(const std::string& projectPath)
         }
     }
 
-    //GLOG("MODELS MAP SIZE: %d", modelMap.size());
+    // GLOG("MODELS MAP SIZE: %d", modelMap.size());
 
     return true;
 }
@@ -308,6 +309,30 @@ UID LibraryModule::AssignFiletypeUID(UID originalUID, FileType fileType)
     UID final = (prefix * UID_PREFIX_DIVISOR) + (originalUID % UID_PREFIX_DIVISOR);
     GLOG("%llu", final);
     return final;
+}
+
+void LibraryModule::DeletePrefabFiles(UID prefabUID)
+{
+    const std::string metaPath = App->GetProjectModule()->GetLoadedProjectPath() + METADATA_PATH +
+                           std::to_string((int)ResourceType::Prefab) + FILENAME_SEPARATOR + GetResourceName(prefabUID) +
+                           META_EXTENSION;
+    
+    FileSystem::Delete(metaPath.c_str());
+
+    const std::string assetPath = App->GetProjectModule()->GetLoadedProjectPath() + PREFABS_ASSETS_PATH +
+                            GetResourceName(prefabUID) + PREFAB_EXTENSION;
+    
+    FileSystem::Delete(assetPath.c_str());
+
+    const std::string& resourcePath = App->GetProjectModule()->GetLoadedProjectPath() + PREFABS_LIB_PATH +
+                                      std::to_string(prefabUID) + PREFAB_EXTENSION;
+    FileSystem::Delete(resourcePath.c_str());
+
+    prefabMap.erase(GetResourceName(prefabUID));
+    namesMap.erase(prefabUID);
+    resourcePathsMap.erase(prefabUID);
+
+    App->GetSceneModule()->GetScene()->OverridePrefabs(prefabUID);
 }
 
 void LibraryModule::AddTexture(UID textureUID, const std::string& textureName)
@@ -459,7 +484,7 @@ const std::string& LibraryModule::GetResourceName(UID resourceID) const
         // GLOG("obtained name: %s", it->second.c_str());
         return it->second;
     }
-    
+
     return emptyString;
 }
 
