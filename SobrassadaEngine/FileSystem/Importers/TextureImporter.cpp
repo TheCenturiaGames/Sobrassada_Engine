@@ -168,7 +168,7 @@ namespace TextureImporter
 
         const std::string& filename = App->GetLibraryModule()->GetResourceName(textureUID);
 
-        unsigned int textureID      = 0;
+        unsigned int textureID;
         const std::wstring& wPath   = std::wstring(path.begin(), path.end());
 
         DirectX::ScratchImage scratchImage;

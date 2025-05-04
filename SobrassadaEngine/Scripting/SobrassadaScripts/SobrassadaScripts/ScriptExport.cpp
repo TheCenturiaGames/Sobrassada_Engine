@@ -44,8 +44,8 @@ extern "C" SOBRASSADA_API Script* CreateScript(const std::string& scriptType, Ga
     if (scriptType == "TileFloatScript") return new TileFloatScript(parent);
 
     if (scriptType == "GodMode") return new GodMode(parent);
-    if (scriptType == "CuChulainn") return new CuChulainn(parent);
-    if (scriptType == "Soldier") return new Soldier(parent);
+    if (scriptType == "CuChulainnScript") return new CuChulainn(parent);
+    if (scriptType == "SoldierScript") return new Soldier(parent);
     return nullptr;
 }
 

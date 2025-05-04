@@ -108,8 +108,11 @@ void MeshComponent::Clone(const Component* other)
         const MeshComponent* otherMesh = static_cast<const MeshComponent*>(other);
         enabled                        = otherMesh->enabled;
 
-        AddMesh(otherMesh->currentMesh->GetUID());
-        AddMaterial(otherMesh->currentMaterial->GetUID());
+        UID otherMeshUID               = otherMesh->currentMesh ? otherMesh->currentMesh->GetUID() : INVALID_UID;
+        UID otherMatUID = otherMesh->currentMaterial ? otherMesh->currentMaterial->GetUID() : INVALID_UID;
+
+        AddMesh(otherMeshUID);
+        AddMaterial(otherMatUID);
 
         modelUID     = otherMesh->modelUID;
         skinIndex    = otherMesh->skinIndex;
