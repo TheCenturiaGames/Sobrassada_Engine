@@ -919,7 +919,7 @@ void Scene::LightingPassRender(
         {
             bool change = false;
             // Cubemap does not support Ortographic projection
-            if (camera->GetType() == 1)
+            if (camera->GetFrustumType() == 1)
             {
                 change = true;
                 camera->ChangeToPerspective();
