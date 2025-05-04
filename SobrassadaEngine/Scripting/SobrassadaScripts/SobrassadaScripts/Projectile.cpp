@@ -36,15 +36,14 @@ void Projectile::Shoot(const float3& origin, const float3& direction)
     GLOG("Shoot to dir: %f %f %f", direction.x, direction.y, direction.z);
     startPos        = origin;
     this->direction = direction;
-
-    parent->SetEnabled(true); 
+    frames          = 0;
+    parent->SetEnabled(true);
 
     // Rotate spear object
     const float3 scale = parent->GetLocalTransform().ExtractScale();
     Quat rotation      = Quat::LookAt(float3::unitZ, direction, float3::unitY, float3::unitY);
     float4x4 transform = float4x4::FromTRS(origin, rotation, scale);
     parent->SetLocalTransform(transform);
-    collider->ParentUpdated();
 }
 
 void Projectile::OnCollision(GameObject* otherObject, const float3& collisionNormal)
@@ -59,11 +58,17 @@ void Projectile::OnCollision(GameObject* otherObject, const float3& collisionNor
         if (Character* character = script->GetScriptByType<Character>()) character->TakeDamage(damage);
     }
 
+    collider->SetEnabled(false);
     parent->SetEnabled(false);
 }
 
 void Projectile::Move(float deltaTime)
 {
+    // Let 20 frames pass before enabling the collider, so it doesn't collide with the previous collided element.
+    // TODO: Try to change this
+    frames += 1;
+    if (frames > 20 && !collider->GetEnabled()) collider->SetEnabled(true);
+
     float3 currentPos  = parent->GetPosition();
     currentPos        += direction * speed * deltaTime;
     parent->SetLocalPosition(currentPos);

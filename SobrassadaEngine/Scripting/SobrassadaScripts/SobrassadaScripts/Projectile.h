@@ -31,4 +31,5 @@ class Projectile : public Script
     float3 startPos;
 
     int damage = 1;
+    float frames = 0;
 };

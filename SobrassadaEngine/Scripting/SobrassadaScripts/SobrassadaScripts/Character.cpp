@@ -173,11 +173,18 @@ void Character::Die()
     isDead = true;
     OnDeath();
 
-    characterCollider->DeleteRigidBody();
-    characterCollider->SetEnabled(false);
-
-    weaponCollider->DeleteRigidBody();
-    weaponCollider->SetEnabled(false);
+    if (characterCollider)
+    {
+        characterCollider->DeleteRigidBody();
+        characterCollider->SetEnabled(false);
+    }
+    
+    if (weaponCollider)
+    {
+        weaponCollider->DeleteRigidBody();
+        weaponCollider->SetEnabled(false);
+    }
+    
 
     parent->SetEnabled(false);
 }
