@@ -15,6 +15,7 @@ RotateGameObject::RotateGameObject(GameObject* parent) : Script(parent)
     fields.push_back({"Speed", InspectorField::FieldType::Float, &speed, 0.0f, 2.0f});
     fields.push_back({"Vec2 Test", InspectorField::FieldType::Vec2, &prueba});
     fields.push_back({"Color Test", InspectorField::FieldType::Color, &color});
+    fields.push_back({"Target", InspectorField::FieldType::GameObject, &target});
 }
 
 bool RotateGameObject::Init()
@@ -25,9 +26,18 @@ bool RotateGameObject::Init()
 
 void RotateGameObject::Update(float deltaTime)
 {
-    float4x4 newTransform = parent->GetLocalTransform();
-    newTransform          = newTransform * float4x4::RotateX(speed * deltaTime);
-    parent->SetLocalTransform(newTransform);
-    parent->UpdateTransformForGOBranch();
-    GLOG("%f", AppEngine->GetCameraModule()->GetCameraPosition().y);
+    if (target != nullptr)
+    {
+        float4x4 newTransform = target->GetLocalTransform();
+        newTransform          = newTransform * float4x4::RotateX(speed * deltaTime);
+        target->SetLocalTransform(newTransform);
+        target->UpdateTransformForGOBranch();
+    }
+    else
+    {
+        float4x4 newTransform = parent->GetLocalTransform();
+        newTransform          = newTransform * float4x4::RotateX(speed * deltaTime);
+        parent->SetLocalTransform(newTransform);
+        parent->UpdateTransformForGOBranch();
+    }
 }

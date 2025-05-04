@@ -161,4 +161,6 @@ class SOBRASADA_API_ENGINE Scene
     std::map<UID, UID> selectedGameObjects;
     std::map<UID, MobilitySettings> selectedGameObjectsMobility;
     std::map<UID, float4x4> selectedGameObjectsOgLocals;
+
+    std::unordered_map<uint64_t, const rapidjson::Value*> gameObjectDataMap;
 };

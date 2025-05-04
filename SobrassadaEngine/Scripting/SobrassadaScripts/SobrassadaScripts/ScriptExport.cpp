@@ -31,7 +31,7 @@ extern "C" SOBRASSADA_API void InitSobrassadaScripts(Application* App)
 
 extern "C" SOBRASSADA_API Script* CreateScript(const std::string& scriptType, GameObject* parent)
 {
-    if (scriptType == "RotateGameObject") return new RotateGameObject(parent);
+    if (scriptType == "RotateGameObjectScript") return new RotateGameObject(parent);
     if (scriptType == "ButtonScript") return new ButtonScript(parent);
     if (scriptType == "ExitGameScript") return new ExitGameScript(parent);
     if (scriptType == "FullscreenToggleScript") return new FullscreenToggleScript(parent);
@@ -41,9 +41,9 @@ extern "C" SOBRASSADA_API Script* CreateScript(const std::string& scriptType, Ga
     if (scriptType == "MainMenuSelectorScript") return new MainMenuSelectorScript(parent);
     if (scriptType == "PressAnyKeyScript") return new PressAnyKeyScript(parent);
 
-    if (scriptType == "GodMode") return new GodMode(parent);
-    if (scriptType == "CuChulainn") return new CuChulainn(parent);
-    if (scriptType == "Soldier") return new Soldier(parent);
+    if (scriptType == "GodModeScript") return new GodMode(parent);
+    if (scriptType == "CuChulainnScript") return new CuChulainn(parent);
+    if (scriptType == "SoldierScript") return new Soldier(parent);
     return nullptr;
 }
 

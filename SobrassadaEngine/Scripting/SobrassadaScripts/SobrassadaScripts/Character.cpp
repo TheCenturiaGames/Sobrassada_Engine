@@ -15,36 +15,52 @@
 #include <string>
 
 Character::Character(
-    GameObject* parent, int maxHealth, int damage, float attackDuration, float cooldown, float range,
-    float rangeAIAttack, float rangeAIChase, const std::vector<float3>& patrolPoints
+    GameObject* parent, int newMaxHealth, int newDamage, float newAttackDuration, float newCooldown, float newRange,
+    float newRangeAIAttack, float newRangeAIChase, const std::vector<float3>& newPatrolPoints
 )
     : Script(parent)
 {
-    currentHealth = maxHealth;
-    type          = CharacterType::None;
-
-    // Using ImGui in the dll cause problems, so we need to call ImGui outside the dll
-    fields.push_back({"Max Health", InspectorField::FieldType::Int, &maxHealth, 0, 10});
-    fields.push_back({"Current Health", InspectorField::FieldType::Int, &currentHealth, 0, 10});
-    fields.push_back({"Invulnerable", InspectorField::FieldType::Bool, &isInvulnerable, true, false});
-    fields.push_back({"Dead", InspectorField::FieldType::Bool, &isDead, true, false});
-    fields.push_back({"Damage", InspectorField::FieldType::Int, &damage, 0, 3});
-    fields.push_back({"Attack Duration", InspectorField::FieldType::Float, &attackDuration, 0.0f, 1.0f});
-    fields.push_back({"Attack Cooldown", InspectorField::FieldType::Float, &cooldown, 0.0f, 2.0f});
-    fields.push_back({"Attack Range", InspectorField::FieldType::Float, &range, 0.0f, 3.0f});
-
-    if (type != CharacterType::CuChulainn)
+    if (fields.empty())
     {
-        fields.push_back({"AI Chase Range", InspectorField::FieldType::Float, &rangeAIChase, 0.0f, 20.0f});
-        fields.push_back({"AI Attack Range", InspectorField::FieldType::Float, &rangeAIAttack, 0.0f, 5.0f});
+        // Using ImGui in the dll cause problems, so we need to call ImGui outside the dll
+        fields.push_back({"Max Health", InspectorField::FieldType::Int, &maxHealth, 0, 10});
+        fields.push_back({"Current Health", InspectorField::FieldType::Int, &currentHealth, 0, 10});
+        fields.push_back({"Invulnerable", InspectorField::FieldType::Bool, &isInvulnerable, true, false});
+        fields.push_back({"Dead", InspectorField::FieldType::Bool, &isDead, true, false});
+        fields.push_back({"Damage", InspectorField::FieldType::Int, &damage, 0, 3});
+        fields.push_back({"Attack Duration", InspectorField::FieldType::Float, &attackDuration, 0.0f, 1.0f});
+        fields.push_back({"Attack Cooldown", InspectorField::FieldType::Float, &cooldown, 0.0f, 2.0f});
+        fields.push_back({"Attack Range", InspectorField::FieldType::Float, &range, 0.0f, 3.0f});
 
-        fields.push_back({"AI Patrol Points", InspectorField::FieldType::Int, &patrolPointsCont, 0, 5});
-        for (int i = 0; i < patrolPointsCont; i++)
+        if (type != CharacterType::CuChulainn)
         {
-            std::string fieldName = std::to_string(i) + " Patrol Point";
-            fields.push_back({fieldName.c_str(), InspectorField::FieldType::Vec3, &patrolPoints[i]});
+            fields.push_back({"AI Chase Range", InspectorField::FieldType::Float, &rangeAIChase, 0.0f, 20.0f});
+            fields.push_back({"AI Attack Range", InspectorField::FieldType::Float, &rangeAIAttack, 0.0f, 5.0f});
+
+            fields.push_back({"AI Patrol Points", InspectorField::FieldType::Int, &patrolPointsCont, 0, 5});
+            for (int i = 0; i < patrolPointsCont; i++)
+            {
+                std::string fieldName = std::to_string(i) + " Patrol Point";
+                fields.push_back({fieldName.c_str(), InspectorField::FieldType::Vec3, &patrolPoints[i]});
+            }
         }
     }
+    else
+    {
+        
+    }
+    maxHealth = newMaxHealth;
+    damage    = newDamage;
+    newAttackDuration;
+    cooldown      = newCooldown;
+    range         = newRange;
+
+    rangeAIChase  = newRangeAIChase;
+    rangeAIAttack = newRangeAIAttack;
+    patrolPoints  = newPatrolPoints;
+
+    currentHealth = maxHealth;
+    type          = CharacterType::None;
 }
 
 bool Character::Init()
@@ -100,12 +116,12 @@ void Character::OnCollision(GameObject* otherObject, const float3& collisionNorm
 
     if (!isInvulnerable && enemyScriptComponent != nullptr && enemyWeapon != nullptr && enemyWeapon->GetEnabled())
     {
-        Script* enemyScript = enemyScriptComponent->GetScriptInstance();
-
+        Script* enemyScript = enemyScriptComponent->GetScriptInstances()[0]; // TODO: CHANGE THIS
         if (enemyScript == nullptr)
             GLOG("%s script instance not setted.", otherObject->GetName().c_str()) // we want to crash?
 
-        // ScriptType scriptType = enemyScriptComponent->GetScriptType(); // type of script for casting
+        // ScriptType scriptType = enemyScriptComponent->GetScriptType(); // not needed for now
+
         Character* enemyCharacter = dynamic_cast<Character*>(enemyScript);
         if (!enemyCharacter->isAttacking) return;
 

@@ -44,6 +44,7 @@ AnimationComponent::AnimationComponent(const rapidjson::Value& initialState, Gam
     {
         UID smUID            = initialState["StateMachine"].GetUint64();
         resourceStateMachine = static_cast<ResourceStateMachine*>(App->GetResourcesModule()->RequestResource(smUID));
+        if (resourceStateMachine) currentState = resourceStateMachine->GetDefaultState();
     }
     else
     {
@@ -72,21 +73,20 @@ void AnimationComponent::OnPlay(bool isTransition)
     {
         if (resourceStateMachine)
         {
-            const State* activeState = resourceStateMachine->GetActiveState();
             for (const auto& state : resourceStateMachine->states)
             {
-                if (state.name.GetString() == activeState->name.GetString())
+                if (state.name == currentState->name)
                 {
                     for (const auto& transition : resourceStateMachine->transitions)
                     {
-                        if (state.name.GetString() == transition.toState.GetString())
+                        if (state.name == transition.toState)
                         {
                             transitionTime = transition.interpolationTime;
                         }
                     }
                     for (const auto& clip : resourceStateMachine->clips)
                     {
-                        if (clip.clipName.GetString() == activeState->clipName.GetString())
+                        if (clip.clipName == currentState->clipName)
                         {
                             if (isTransition)
                                 animController->SetTargetAnimationResource(clip.animationResourceUID, transitionTime, clip.loop);
@@ -108,6 +108,7 @@ void AnimationComponent::OnStop()
     if (animController != nullptr)
     {
         animController->Stop();
+        if (resourceStateMachine) currentState = resourceStateMachine->GetDefaultState();
     }
 }
 
@@ -342,6 +343,7 @@ void AnimationComponent::OnInspector()
                 if (resourceStateMachine) App->GetResourcesModule()->ReleaseResource(resourceStateMachine);
                 resourceStateMachine =
                     static_cast<ResourceStateMachine*>(App->GetResourcesModule()->RequestResource(uid));
+                if (resourceStateMachine) currentState = resourceStateMachine->GetDefaultState();
             }
             if (isSelected) ImGui::SetItemDefaultFocus();
         }
@@ -362,7 +364,8 @@ void AnimationComponent::OnInspector()
                 bool triggerAvailable = false;
                 if (IsPlaying())
                 {
-                    triggerAvailable = resourceStateMachine->UseTrigger(triggerName);
+                    //triggerAvailable = resourceStateMachine->UseTrigger(triggerName);
+                    triggerAvailable = resourceStateMachine->UseTrigger(triggerName, currentState);
                     if (triggerAvailable)
                     {
                         OnPlay(true);
@@ -415,6 +418,7 @@ void AnimationComponent::Clone(const Component* other)
         {
             resourceStateMachine = otherAnimation->resourceStateMachine;
             resourceStateMachine->AddReference();
+            currentState = resourceStateMachine->GetDefaultState();
         }
     }
     else
@@ -596,7 +600,8 @@ bool AnimationComponent::UseTrigger(const std::string& triggerName)
     bool triggerDone = false;
     if (resourceStateMachine)
     {
-        triggerDone = resourceStateMachine->UseTrigger(triggerName);
+        //triggerDone = resourceStateMachine->UseTrigger(triggerName);
+        triggerDone = resourceStateMachine->UseTrigger(triggerName, currentState);
         if (triggerDone)
         {
             OnPlay(true);
