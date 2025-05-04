@@ -5,7 +5,7 @@
 class GameObject;
 class CharacterControllerComponent;
 class CameraMovement;
-
+class Projectile;
 
 enum class CharacterStates
 {
@@ -32,25 +32,36 @@ class CuChulainn : public Character
     void OnHealed(int amount) override;
     void PerformAttack() override;
     void HandleState(float deltaTime) override;
-    void SetAnimations();
+
+    bool CanDash();
     bool CanAttack(float deltaTime) override;
     bool CanAim() const;
     void GetInputs();
     void UpdateTimers(float deltaTime);
     void LookAtMouse();
+
     void ThrowSpear();
+    void Attack(float time) override;
+    void Dash();
+    void Aim();
+    void Move();
 
   private:
     std::string cameraName;
     CameraMovement* camera = nullptr;
 
+    std::string spearName;
+    Projectile* spear       = nullptr;
+
     bool isDashing          = false;
     float dashCooldown      = 2.0f;
+    float dashTimer         = 0;
     bool desiredDash        = false;
     float dashBufferTimer   = 0;
     float dashBuffer        = 0.5f;
 
     bool desiredAttack      = false;
+    float attackTimer       = 0;
     float attackBufferTimer = 0;
     float attackBuffer      = 0.5f;
 

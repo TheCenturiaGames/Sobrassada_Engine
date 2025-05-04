@@ -124,8 +124,11 @@ void Character::Attack(float time)
         // GLOG("ATTACK");
         isAttacking    = true;
         lastAttackTime = time;
-        if (weaponCollider) weaponCollider->SetEnabled(true);
-        PerformAttack();
+
+        // TODO: The enable and disable of the collider should be managed by each palyer and enemy, 
+        // depending on the timings of their attack animations as we don't have Animation Events (I think)
+        //if (weaponCollider) weaponCollider->SetEnabled(true);
+        //PerformAttack();
     }
 }
 

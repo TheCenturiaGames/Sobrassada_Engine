@@ -33,7 +33,7 @@ class Character : public Script
     void TakeDamage(int amount);
 
   protected:
-    void Attack(float deltaTime);
+    virtual void Attack(float deltaTime);
     void Heal(int amount);
     virtual bool CanAttack(float deltaTime);
     AIStates CheckDistanceWithPlayer() const;

@@ -1,5 +1,4 @@
 #include "pch.h"
-
 #include "CameraMovement.h"
 
 #include "Application.h"
@@ -56,7 +55,6 @@ void CameraMovement::FollowTarget(float deltaTime)
             AppEngine->GetSceneModule()->GetScene()->GetMainCamera()->ScreenPointToXZ(parent->GetPosition().y);
         const float3 mouseOffset = (desiredPosition + (mouseWorldPos)) * 0.5f - desiredPosition;
         desiredPosition          += mouseOffset * mouseOffsetIntensity;
-        GLOG("Mouse world pos: %f, %f", mouseWorldPos.x, mouseWorldPos.z);
     }
     else if (lookAheadIntensity > 0 && controller)
     {

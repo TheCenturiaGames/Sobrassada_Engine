@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "ButtonScript.h"
+#include "CameraMovement.h"
 #include "CuChulainn.h"
 #include "ExitGameScript.h"
 #include "FullscreenToggleScript.h"
@@ -10,9 +11,9 @@
 #include "OptionsMenuSwitcherScript.h"
 #include "PauseMenuScript.h"
 #include "PressAnyKeyScript.h"
+#include "Projectile.h"
 #include "RotateGameObject.h"
 #include "Soldier.h"
-#include "CameraMovement.h"
 #include "VSyncToggleScript.h"
 
 #include <string>
@@ -46,6 +47,7 @@ extern "C" SOBRASSADA_API Script* CreateScript(const std::string& scriptType, Ga
     if (scriptType == "CuChulainnScript") return new CuChulainn(parent);
     if (scriptType == "SoldierScript") return new Soldier(parent);
     if (scriptType == "CameraMovement") return new CameraMovement(parent);
+    if (scriptType == "Projectile") return new Projectile(parent);
 
     /* Utils */
     if (scriptType == "RotateGameObject") return new RotateGameObject(parent);
