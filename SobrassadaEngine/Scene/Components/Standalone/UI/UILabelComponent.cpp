@@ -139,7 +139,12 @@ void UILabelComponent::Clone(const Component* other)
 
 void UILabelComponent::RenderDebug(float deltaTime)
 {
-
+    CanvasComponent* canvas = parent->GetComponentParent<CanvasComponent*>(App);
+    if (canvas != nullptr)
+    {
+        float3 highlightColor = float3(0.0f, 0.0f, 0.0f);
+        canvas->RenderDebug(deltaTime, highlightColor);
+    }
 }
 
 void UILabelComponent::RenderUI(const float4x4& view, const float4x4 proj) const
