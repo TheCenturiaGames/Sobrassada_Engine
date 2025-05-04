@@ -534,9 +534,6 @@
     <ClCompile Include="Utils\NavMeshConfig.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Components\Standalone\UI\UIScaler.cpp">
-      <Filter>Scene\Components\UI</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Modules">
@@ -1045,9 +1042,6 @@
     </ClInclude>
     <ClInclude Include="Utils\HashString.h">
       <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="UIScaler.h">
-      <Filter>Scene\Components\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

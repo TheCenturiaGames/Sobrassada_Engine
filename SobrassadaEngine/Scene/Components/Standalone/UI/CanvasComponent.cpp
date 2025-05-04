@@ -12,7 +12,6 @@
 #include "Transform2DComponent.h"
 #include "UILabelComponent.h"
 #include "WindowModule.h"
-#include "UIScaler.h"
 
 #include "glew.h"
 #include "imgui.h"
@@ -29,43 +28,26 @@ CanvasComponent::CanvasComponent(const rapidjson::Value& initialState, GameObjec
 {
     width                = initialState["Width"].GetFloat();
     height               = initialState["Height"].GetFloat();
-    isInWorldSpace       = initialState["IsInWorldSpace"].GetBool();
-
-    if (initialState.HasMember("ScaleMode") && initialState["ScaleMode"].IsInt())
-    {
-        scaleMode = static_cast<UIScaleMode>(initialState["ScaleMode"].GetInt());
-    }
-
-    if (initialState.HasMember("MatchFactor") && initialState["MatchFactor"].IsNumber())
-    {
-        matchFactor = initialState["MatchFactor"].GetFloat();
-    }
+    isInWorldSpaceEditor = initialState["IsInWorldSpaceEditor"].GetBool();
+    isInWorldSpaceGame   = initialState["IsInWorldSpaceGame"].GetBool();
 }
 
 CanvasComponent::~CanvasComponent()
 {
     App->GetGameUIModule()->RemoveCanvas(this);
-    if (uiScaler) delete uiScaler;
 }
 
 void CanvasComponent::Init()
 {
-    if (!IsEffectivelyEnabled()) return;
+    App->GetGameUIModule()->AddCanvas(this);
 
-    transform2D = parent->GetComponent<Transform2DComponent*>();
-    if (transform2D == nullptr)
-    {
-        parent->CreateComponent(COMPONENT_TRANSFORM_2D);
-        transform2D = parent->GetComponent<Transform2DComponent*>();
-    }
+    float originX      = IsInWorldSpace() ? parent->GetGlobalTransform().TranslatePart().x : 0.0f;
+    float originY      = IsInWorldSpace() ? parent->GetGlobalTransform().TranslatePart().y : 0.0f;
 
-    if (!inWorldSpace && transform2D)
-    {
-        const int width = App->GetWindowModule()->GetWidth();
-        const int height = App->GetWindowModule()->GetHeight();
-        transform2D->size = float2(static_cast<float>(width), static_cast<float>(height));
-        transform2D->position = float2(0.0f, 0.0f);
-    }
+    localComponentAABB = AABB(
+        float3(originX - (width / 2.0f), originY - (height / 2.0f), 0),
+        float3(originX + (width / 2.0f), originY + (height / 2.0f), 0)
+    );
 }
 
 
@@ -75,9 +57,8 @@ void CanvasComponent::Save(rapidjson::Value& targetState, rapidjson::Document::A
 
     targetState.AddMember("Width", width, allocator);
     targetState.AddMember("Height", height, allocator);
-    targetState.AddMember("IsInWorldSpace", isInWorldSpace, allocator);
-    targetState.AddMember("ScaleMode", static_cast<int>(scaleMode), allocator);
-    targetState.AddMember("MatchFactor", matchFactor, allocator);
+    targetState.AddMember("IsInWorldSpaceEditor", isInWorldSpaceEditor, allocator);
+    targetState.AddMember("IsInWorldSpaceGame", isInWorldSpaceGame, allocator);
 }
 
 void CanvasComponent::Clone(const Component* other)
@@ -88,8 +69,8 @@ void CanvasComponent::Clone(const Component* other)
         width                              = otherCanvas->width;
         height                             = otherCanvas->height;
 
-        isInWorldSpace                     = otherCanvas->isInWorldSpace;
-
+        isInWorldSpaceEditor               = otherCanvas->isInWorldSpaceEditor;
+        isInWorldSpaceGame                 = otherCanvas->isInWorldSpaceGame;
     }
     else
     {
@@ -161,9 +142,9 @@ void CanvasComponent::RenderUI()
     }
     glUseProgram(uiProgram);
 
-   const float4x4& view = isInWorldSpace ? App->GetCameraModule()->GetViewMatrix() : float4x4::identity;
-    const float4x4& proj =
-        isInWorldSpace ? App->GetCameraModule()->GetProjectionMatrix() : float4x4::D3DOrthoProjLH(-1, 1, width, height);
+    const float4x4& view = isInWorldSpaceEditor ? App->GetCameraModule()->GetViewMatrix() : float4x4::identity;
+    const float4x4& proj = isInWorldSpaceEditor ? App->GetCameraModule()->GetProjectionMatrix()
+                                                : float4x4::D3DOrthoProjLH(-1, 1, width, height);
 
     for (const GameObject* child : sortedChildren)
     {
@@ -189,30 +170,7 @@ void CanvasComponent::RenderEditorInspector()
     {
         ImGui::Text("Canvas");
 
-        ImGui::Checkbox("Show in world space", &isInWorldSpace);
-    }
-
-    ImGui::SeparatorText("Canvas Scaling");
-
-    // Select scale mode
-    const char* scaleModeNames[] = {"Match Width", "Match Height", "Expand", "Shrink", "Match Width Or Height"};
-
-    int currentMode              = static_cast<int>(scaleMode);
-    if (ImGui::Combo("UI Scale Mode", &currentMode, scaleModeNames, IM_ARRAYSIZE(scaleModeNames)))
-    {
-        scaleMode = static_cast<UIScaleMode>(currentMode);
-    }
-
-    // Slider only visible if the mode is MatchWidthOrHeight
-    if (scaleMode == UIScaleMode::MatchWidthOrHeight)
-    {
-        ImGui::SliderFloat("Match Factor", &matchFactor, 0.0f, 1.0f, "%.2f");
-        ImGui::TextUnformatted("0 = Width, 1 = Height");
-    }
-
-    if (ImGui::Button("Debug Transform2D Hierarchy"))
-    {
-        PrintTransform2DDebugInfo();
+        ImGui::Checkbox("Show in world space", &isInWorldSpaceEditor);
     }
 }
 
@@ -231,21 +189,6 @@ void CanvasComponent::OnWindowResize(const float width, const float height)
             parent->GetGlobalTransform().TranslatePart().y + (height / 4.0f), 0
         )
     );
-
-    // Check play-mode before resize
-    if (App->GetSceneModule()->GetInPlayMode())
-    {
-        for (const GameObject* child : sortedChildren)
-        {
-            if (Transform2DComponent* t2d = const_cast<GameObject*>(child)->GetComponent<Transform2DComponent*>())
-            {
-                t2d->AdaptToParentChangesRecursive();
-            }
-        }
-    }
-
-    if (uiScaler) delete uiScaler;
-    uiScaler = new UIScaler(referenceWidth, referenceHeight, scaleMode, matchFactor);
 }
 
 void CanvasComponent::UpdateChildren()
@@ -281,7 +224,7 @@ void CanvasComponent::UpdateMousePosition(const float2& mousePos)
     if (!IsEffectivelyEnabled()) return;
 
     // Only interact with elements if canvas is in screen mode
-    if (isInWorldSpace) return;
+    if (isInWorldSpaceEditor) return;
 
     hoveredButton    = nullptr;
     bool buttonFound = false;
@@ -308,42 +251,14 @@ void CanvasComponent::OnMouseButtonReleased() const
     if (hoveredButton) hoveredButton->OnRelease();
 }
 
-void CanvasComponent::PrintTransform2DDebugInfo() const
+bool CanvasComponent::IsInWorldSpace() const
 {
-    GLOG("=== Transform2D Hierarchy Debug ===");
-
-    for (const GameObject* child : sortedChildren)
-    {
-        if (Transform2DComponent* t2d = const_cast<GameObject*>(child)->GetComponent<Transform2DComponent*>())
-        {
-            PrintTransform2DRecursive(t2d, 0);
-        }
-    }
-
-    GLOG("===================================");
+    return App->GetSceneModule()->GetInPlayMode() ? isInWorldSpaceGame : isInWorldSpaceEditor;
 }
 
-void CanvasComponent::PrintTransform2DRecursive(Transform2DComponent* t2d, int depth) const
+float CanvasComponent::GetScreenScale() const
 {
-    std::string indent(depth * 2, ' ');
-    const std::string& name = t2d->GetParent()->GetName(); // assuming GameObject::GetName()
-
-    GLOG(
-        "%s[%s] pos=(%.1f, %.1f) size=(%.1f, %.1f) pivot=(%.2f, %.2f) anchorsX=(%.2f, %.2f) anchorsY=(%.2f, %.2f) "
-        "parent=%s",
-        indent.c_str(), name.c_str(), t2d->GetLocalPosition().x, t2d->GetLocalPosition().y, t2d->GetSize().x,
-        t2d->GetSize().y, t2d->GetPivot().x, t2d->GetPivot().y, t2d->GetAnchorsX().x, t2d->GetAnchorsX().y,
-        t2d->GetAnchorsY().x, t2d->GetAnchorsY().y, t2d->HasParentTransform() ? "yes" : "no"
-    );
-
-    for (Transform2DComponent* child : t2d->GetChildTransforms())
-    {
-        PrintTransform2DRecursive(child, depth + 1);
-    }
-}
-
-
-float CanvasComponent::GetUIScale() const
-{
-    return uiScaler ? uiScaler->GetScale(width, height) : 1.0f;
+    float scaleX = width / referenceWidth;
+    float scaleY = height / referenceHeight;
+    return std::min(scaleX, scaleY);
 }

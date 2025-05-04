@@ -24,13 +24,12 @@ class ImageComponent : public Component
     void RenderUI(const float4x4& view, const float4x4& proj) const;
     void RemoveTransform() { transform2D = nullptr; }
     void SetColor(const float3& newColor) { color = newColor; }
-    Transform2DComponent* GetTransform2D() const { return transform2D; }
-
 
   private:
     void InitBuffers();
     void ClearBuffers() const;
     void ChangeTexture(const UID textureUID);
+    void MatchParentSize();
 
   private:
     Transform2DComponent* transform2D;
@@ -41,5 +40,6 @@ class ImageComponent : public Component
 
     unsigned int vbo     = 0;
     unsigned int vao     = 0;
+    bool matchParentSize = false;
     UID bindlessUID;
 };

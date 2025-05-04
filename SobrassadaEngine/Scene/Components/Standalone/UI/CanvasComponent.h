@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Component.h"
-#include "UIScaler.h"
 
 #include <vector>
 
@@ -13,8 +12,6 @@ namespace Math
 class Transform2DComponent;
 class GameObject;
 class ButtonComponent;
-class UIScaler;
-
 
 class CanvasComponent : public Component
 {
@@ -40,34 +37,23 @@ class CanvasComponent : public Component
     void UpdateMousePosition(const float2& mousePos);
     void OnMouseButtonPressed() const;
     void OnMouseButtonReleased() const;
-    bool IsInWorldSpace() const { return isInWorldSpace; }
+    bool IsInWorldSpace() const;
+    float GetScreenScale() const;
 
-
+    bool IsInWorldSpaceEditor() const { return isInWorldSpaceEditor; }
+    bool IsInWorldSpaceGame() const { return isInWorldSpaceGame; }
     float GetWidth() const { return width; }
     float GetHeight() const { return height; }
-    float GetUIScale() const;
-
-    void PrintTransform2DDebugInfo() const;
-    void PrintTransform2DRecursive(Transform2DComponent* t2d, int depth) const;
-
 
   private:
     float width               = SCREEN_WIDTH;
     float height              = SCREEN_HEIGHT;
-    bool isInWorldSpace;
-
+    bool isInWorldSpaceEditor = false;
+    bool isInWorldSpaceGame   = true;
 
     float referenceWidth      = 1920.0f;
     float referenceHeight     = 1080.0f;
 
-    UIScaleMode scaleMode     = UIScaleMode::MatchWidthOrHeight;
-    float matchFactor         = 0.5f; // Only when scaleMode == MatchWidthOrHeight
-
-
     std::vector<const GameObject*> sortedChildren;
     ButtonComponent* hoveredButton = nullptr;
-    UIScaler* uiScaler             = nullptr;
-    bool inWorldSpace                 = false;
-    Transform2DComponent* transform2D = nullptr;
-
 };
