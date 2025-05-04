@@ -1,13 +1,16 @@
 #include "pch.h"
+
 #include "TileFloatScript.h"
 
 #include "Application.h"
 #include "CameraModule.h"
+#include "CuChulainn.h"
 #include "EditorUIModule.h"
 #include "GameObject.h"
 #include "ImGui.h"
+#include "LibraryModule.h"
 #include "Math/float4x4.h"
-
+#include "Standalone/CharacterControllerComponent.h"
 
 void TileFloatScript::Inspector()
 {
@@ -28,6 +31,12 @@ void TileFloatScript::Load(const rapidjson::Value& initialState)
 
 bool TileFloatScript::Init()
 {
+    character->GetLastPosition();
+    if (!character)
+    {
+        GLOG("CharacterController component not found for CuChulainn");
+        return false;
+    }
     initialY = parent->GetLocalTransform().TranslatePart().y;
     GLOG("Initiating TileFloatScript");
     return true;
@@ -35,18 +44,28 @@ bool TileFloatScript::Init()
 
 void TileFloatScript::Update(float deltaTime)
 {
-    float currentY      = parent->GetLocalTransform().TranslatePart().y;
-    float distanceRisen = currentY - initialY;
+    
+    if (character == nullptr) return;
+    float currentY = parent->GetLocalTransform().TranslatePart().y;
+    if (currentY == maxRiseDistance) return;
 
-    if (distanceRisen < maxRiseDistance)
+    float distance = character->GetLastPosition().Distance(parent->GetPosition());
+    if (distance <= 2.0f)
     {
-        float riseStep    = speed * deltaTime;
-        float clampedRise = (distanceRisen + riseStep > maxRiseDistance) ? (maxRiseDistance - distanceRisen) : riseStep;
+        float currentY      = parent->GetLocalTransform().TranslatePart().y;
+        float distanceRisen = currentY - initialY;
 
-        float4x4 newTransform = parent->GetLocalTransform();
-        float3 currentPos     = parent->GetLocalTransform().TranslatePart();
-        newTransform.SetTranslatePart(currentPos.x, currentPos.y + clampedRise, currentPos.z);
-        parent->SetLocalTransform(newTransform);
-        parent->UpdateTransformForGOBranch();
+        if (distanceRisen < maxRiseDistance)
+        {
+            float riseStep = speed * deltaTime;
+            float clampedRise =
+                (distanceRisen + riseStep > maxRiseDistance) ? (maxRiseDistance - distanceRisen) : riseStep;
+
+            float4x4 newTransform = parent->GetLocalTransform();
+            float3 currentPos     = parent->GetLocalTransform().TranslatePart();
+            newTransform.SetTranslatePart(currentPos.x, currentPos.y + clampedRise, currentPos.z);
+            parent->SetLocalTransform(newTransform);
+            parent->UpdateTransformForGOBranch();
+        }
     }
 }
