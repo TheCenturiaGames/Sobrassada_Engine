@@ -14,10 +14,10 @@
 #include "ProjectModule.h"
 #include "ResourceNavmesh.h"
 
+#include "GameObject.h"
 #include "ResourceStateMachine.h"
 #include "ResourcesModule.h"
 #include "SceneImporter.h"
-#include "GameObject.h"
 
 #include "SceneModule.h"
 #include "Script.h"
@@ -932,10 +932,7 @@ void EditorUIModule::DrawScriptInspector(const std::vector<InspectorField>& fiel
             // Use InputText with strings (I don't know how this works)
             std::string* str = static_cast<std::string*>(field.data);
             ImGui::InputText(
-                field.name,
-                str->data(), 
-                str->capacity() + 1,
-                ImGuiInputTextFlags_CallbackResize,
+                field.name, str->data(), str->capacity() + 1, ImGuiInputTextFlags_CallbackResize,
                 [](ImGuiInputTextCallbackData* data) -> int
                 {
                     if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
@@ -953,7 +950,6 @@ void EditorUIModule::DrawScriptInspector(const std::vector<InspectorField>& fiel
         {
             GameObject** selectedGO = (GameObject**)field.data;
             const char* currentName = (*selectedGO) ? (*selectedGO)->GetName().c_str() : "None";
-
             if (ImGui::BeginCombo(field.name, currentName))
             {
                 if (ImGui::Selectable("None", *selectedGO == nullptr))

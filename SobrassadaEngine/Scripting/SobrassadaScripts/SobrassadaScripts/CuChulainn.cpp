@@ -221,12 +221,12 @@ void CuChulainn::Attack(float time)
     // TODO: play basicAttack sound
 
     GLOG("ATTACK");
-
+    
     if (state == CharacterStates::AIM) camera->EnableMouseOffset(false);
     desiredAttack = false;
     state         = CharacterStates::BASIC_ATTACK;
     character->EnableMovement(false);
-
+    
     Character::Attack(time);
     LookAtMouse();
     if (animComponent) animComponent->UseTrigger("attack");

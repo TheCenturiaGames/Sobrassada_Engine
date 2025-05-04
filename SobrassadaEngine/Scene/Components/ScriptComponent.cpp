@@ -3,10 +3,10 @@
 #include "Application.h"
 #include "EditorUIModule.h"
 #include "GameObject.h"
+#include "GameTimer.h"
 #include "SceneModule.h"
 #include "Script.h"
 #include "ScriptModule.h"
-#include "GameTimer.h"
 
 #include "ImGui.h"
 #include "Math/float3.h"
@@ -79,6 +79,8 @@ void ScriptComponent::Clone(const Component* other)
         for (size_t i = 0; i < otherScript->scriptNames.size(); ++i)
         {
             CreateScript(otherScript->scriptNames[i]);
+            const auto& a = otherScript->scriptInstances[i]->GetFields();
+            scriptInstances.back()->CloneFields(a);
         }
     }
     else

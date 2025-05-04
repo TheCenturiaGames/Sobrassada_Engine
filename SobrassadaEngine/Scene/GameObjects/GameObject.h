@@ -158,7 +158,7 @@ class SOBRASADA_API_ENGINE GameObject
     UID uid;
     std::vector<UID> children;
 
-    std::string name;
+    std::string name = "";
 
     AABB localAABB;
     AABB globalAABB;
