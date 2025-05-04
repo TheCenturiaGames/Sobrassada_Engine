@@ -34,8 +34,8 @@ constexpr const char* scripts[] = {
     "RotateGameObject",          // SCRIPT_ROTATE_GAME_OBJECT
     "ButtonScript",              // SCRIPT_BUTTON
     "GodMode",                   // SCRIPT_GOD_MODE
-    "CuChulainnScript",          // SCRIPT_CU_CHULAINN
-    "SoldierScript",             // SCRIPT_SOLDIER
+    "CuChulainn",          // SCRIPT_CU_CHULAINN
+    "Soldier",             // SCRIPT_SOLDIER
     "ExitGameScript",            // SCRIPT_EXIT_GAME
     "FullscreenToggleScript",    // SCRIPT_FULLSCREEN_TOGGLE
     "VSyncToggleScript",         // SCRIPT_VSYNC_TOGGLE

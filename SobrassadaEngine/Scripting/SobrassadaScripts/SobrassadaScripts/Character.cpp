@@ -16,38 +16,29 @@
 
 Character::Character(
     GameObject* parent, int maxHealth, int damage, float attackDuration, float speed, float cooldown, float range,
-    float rangeAIAttack, float rangeAIChase
+    float rangeAIAttack, float rangeAIChase, const std::vector<float3>& patrolPoints
 )
     : Script(parent), maxHealth(maxHealth), damage(damage), attackDuration(attackDuration), speed(speed),
-      cooldown(cooldown), range(range), rangeAIAttack(rangeAIAttack), rangeAIChase(rangeAIChase)
+      cooldown(cooldown), range(range), rangeAIAttack(rangeAIAttack), rangeAIChase(rangeAIChase),
+      patrolPoints(patrolPoints)
 {
     currentHealth = maxHealth;
+    type          = CharacterType::None;
 }
 
 bool Character::Init()
 {
     animComponent = parent->GetComponent<AnimationComponent*>();
-    if (!animComponent)
-    {
-        GLOG("Animation component not found for %s", parent->GetName().c_str());
-        return false;
-    }
-    animComponent->OnPlay(false);
+    if (animComponent == nullptr) GLOG("Animation component not found for %s", parent->GetName().c_str())
+    else animComponent->OnPlay(false);
 
     characterCollider = parent->GetComponent<CapsuleColliderComponent*>();
-    if (!characterCollider)
-    {
-        GLOG("Character capsule collider component not found for %s", parent->GetName().c_str());
-        return false;
-    }
+    if (characterCollider == nullptr)
+        GLOG("Character capsule collider component not found for %s", parent->GetName().c_str())
 
     weaponCollider = parent->GetComponentChild<CubeColliderComponent*>(AppEngine);
-    if (!weaponCollider)
-    {
-        GLOG("Weapon cube collider component not found for %s", parent->GetName().c_str());
-        return false;
-    }
-    weaponCollider->SetEnabled(false);
+    if (weaponCollider == nullptr) GLOG("Weapon cube collider component not found for %s", parent->GetName().c_str())
+    else weaponCollider->SetEnabled(false);
 
     lastAttackTime = -1.0f;
     lastTimeHit    = -1.0f;
@@ -59,8 +50,10 @@ void Character::Update(float deltaTime)
 {
     if (isDead) return;
 
+    if (characterCollider == nullptr || weaponCollider == nullptr) return;
+
     float gameTime = AppEngine->GetGameTimer()->GetTime() / 1000.0f;
-    if (weaponCollider->GetEnabled() && isAttacking && gameTime - lastAttackTime >= attackDuration)
+    if (isAttacking && weaponCollider->GetEnabled() && gameTime - lastAttackTime >= attackDuration)
     {
         // GLOG("Not Attacking %.3f", gameTime);
         weaponCollider->SetEnabled(false);
@@ -89,6 +82,19 @@ void Character::Inspector()
         fields.push_back({"Speed", InspectorField::FieldType::Float, &speed, 0.0f, 10.0f});
         fields.push_back({"Attack Cooldown", InspectorField::FieldType::Float, &cooldown, 0.0f, 2.0f});
         fields.push_back({"Attack Range", InspectorField::FieldType::Float, &range, 0.0f, 3.0f});
+
+        if (type != CharacterType::CuChulainn)
+        {
+            fields.push_back({"AI Chase Range", InspectorField::FieldType::Float, &rangeAIChase, 0.0f, 20.0f});
+            fields.push_back({"AI Attack Range", InspectorField::FieldType::Float, &rangeAIAttack, 0.0f, 5.0f});
+
+            fields.push_back({"AI Patrol Points", InspectorField::FieldType::Int, &patrolPointsCont, 0, 5});
+            for (int i = 0; i < patrolPointsCont; i++)
+            {
+                std::string fieldName = std::to_string(i) + " Patrol Point";
+                fields.push_back({fieldName.c_str(), InspectorField::FieldType::Vec3, &patrolPoints[i]});
+            }
+        }
     }
 
     AppEngine->GetEditorUIModule()->DrawScriptInspector(fields);
@@ -105,8 +111,12 @@ void Character::OnCollision(GameObject* otherObject, const float3& collisionNorm
 
     if (!isInvulnerable && enemyScriptComponent != nullptr && enemyWeapon != nullptr && enemyWeapon->GetEnabled())
     {
-        Script* enemyScript = enemyScriptComponent->GetScriptInstances()[0]; //TODO: CHANGE THIS
-        // ScriptType scriptType = enemyScriptComponent->GetScriptType(); // not needed for now
+        Script* enemyScript = enemyScriptComponent->GetScriptInstance();
+
+        if (enemyScript == nullptr)
+            GLOG("%s script instance not setted.", otherObject->GetName().c_str()) // we want to crash?
+
+        // ScriptType scriptType = enemyScriptComponent->GetScriptType(); // type of script for casting
         Character* enemyCharacter = dynamic_cast<Character*>(enemyScript);
         if (!enemyCharacter->isAttacking) return;
 
@@ -170,11 +180,17 @@ void Character::Die()
     isDead = true;
     OnDeath();
 
-    characterCollider->DeleteRigidBody();
-    characterCollider->SetEnabled(false);
+    if (characterCollider != nullptr)
+    {
+        characterCollider->DeleteRigidBody();
+        characterCollider->SetEnabled(false);
+    }
 
-    weaponCollider->DeleteRigidBody();
-    weaponCollider->SetEnabled(false);
+    if (weaponCollider != nullptr)
+    {
+        weaponCollider->DeleteRigidBody();
+        weaponCollider->SetEnabled(false);
+    }
 
     parent->SetEnabled(false);
 }

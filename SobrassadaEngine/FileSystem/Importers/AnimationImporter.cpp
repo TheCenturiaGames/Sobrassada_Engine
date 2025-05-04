@@ -250,12 +250,12 @@ namespace AnimationImporter
     ResourceAnimation* LoadAnimation(UID animationUID)
     {
         const std::string path = App->GetLibraryModule()->GetResourcePath(animationUID);
-        GLOG("Attempting to load animation from: %s", path.c_str());
+        // GLOG("Attempting to load animation from: %s", path.c_str());
 
         char* buffer                = nullptr;
         const unsigned int fileSize = FileSystem::Load(path.c_str(), &buffer);
 
-        GLOG("Load result: fileSize=%u, buffer=%p", fileSize, buffer);
+        // GLOG("Load result: fileSize=%u, buffer=%p", fileSize, buffer);
 
         if (fileSize == 0 || buffer == nullptr)
         {
@@ -278,7 +278,7 @@ namespace AnimationImporter
         memcpy(&channelCount, cursor, sizeof(uint32_t));
         cursor += sizeof(uint32_t);
 
-        GLOG("Loading animation with %d channels from %s", channelCount, path.c_str());
+        // GLOG("Loading animation with %d channels from %s", channelCount, path.c_str());
 
        
         ResourceAnimation* animation =
@@ -447,7 +447,7 @@ namespace AnimationImporter
 
         animation->SetDuration();
 
-        GLOG("Animation duration: %f", animation->GetDuration());
+        // GLOG("Animation duration: %f", animation->GetDuration());
 
         return animation;
     }

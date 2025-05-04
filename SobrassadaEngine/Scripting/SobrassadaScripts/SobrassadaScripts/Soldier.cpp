@@ -10,8 +10,9 @@
 #include "Standalone/AnimationComponent.h"
 #include "Standalone/CharacterControllerComponent.h"
 
-Soldier::Soldier(GameObject* parent) : Character(parent, 3, 1, 0.5f, 1.0f, 1.0f, 1.0f, 2.0f, 10.0f)
+Soldier::Soldier(GameObject* parent) : Character(parent, 3, 1, 0.5f, 1.0f, 1.0f, 1.0f, 2.0f, 10.0f, patrolPoints)
 {
+    type = CharacterType::Soldier;
 }
 
 bool Soldier::Init()
@@ -23,23 +24,24 @@ bool Soldier::Init()
     Character::Init();
 
     agentAI = parent->GetComponent<AIAgentComponent*>();
-    if (!agentAI)
+    if (agentAI == nullptr) GLOG("AIAgent component not found for Soldier")
+    else
     {
-        GLOG("AIAgent component not found for Soldier");
-        return false;
+        agentAI->RecreateAgent();
+        agentAI->SetSpeed(speed);
     }
-
-    agentAI->SetSpeed(speed);
 
     return true;
 }
 
 void Soldier::Update(float deltaTime)
 {
+    Character::Update(deltaTime);
+
+    if (agentAI == nullptr) return;
+
     if (character != nullptr && currentState != SoldierStates::PATROL)
         agentAI->LookAtMovement(character->GetLastPosition(), deltaTime);
-
-    Character::Update(deltaTime);
 }
 
 void Soldier::OnDeath()
@@ -64,23 +66,23 @@ void Soldier::PerformAttack()
 
 void Soldier::HandleState(float gameTime)
 {
-    if (!animComponent) return;
+    // if (!animComponent) return;
 
     switch (currentState)
     {
     case SoldierStates::PATROL:
         // GLOG("Soldier Patrolling");
-        animComponent->UseTrigger("idle");
+        // animComponent->UseTrigger("idle");
         PatrolAI();
         break;
     case SoldierStates::CHASE:
         // GLOG("Soldier Chasing");
-        animComponent->UseTrigger("Run");
+        // animComponent->UseTrigger("Run");
         ChaseAI();
         break;
     case SoldierStates::BASIC_ATTACK:
         // GLOG("Soldier Basic Attack");
-        animComponent->UseTrigger("attack");
+        // animComponent->UseTrigger("attack");
         Attack(gameTime);
         if (CheckDistanceWithPlayer() != CLOSE) currentState = SoldierStates::CHASE;
         break;

@@ -52,12 +52,19 @@ AIAgentComponent::~AIAgentComponent()
 void AIAgentComponent::Update(float deltaTime)
 {
     if (!IsEffectivelyEnabled()) return;
-
     if (!App->GetSceneModule()->GetInPlayMode()) return;
+
+    dtCrowd* crowd = App->GetPathfinderModule()->GetCrowd();
+    
+    if (!crowd) return;
+
+    if (agentId == -1 ||
+        agentId >= crowd->getAgentCount() || 
+        crowd->getAgent(agentId) == nullptr) RecreateAgent();
 
     if (agentId == -1) return;
 
-    const dtCrowdAgent* ag = App->GetPathfinderModule()->GetCrowd()->getAgent(agentId);
+    const dtCrowdAgent* ag = crowd->getAgent(agentId);
     if (ag && ag->active)
     {
         float3 newPos(ag->npos[0], ag->npos[1], ag->npos[2]);
@@ -209,16 +216,16 @@ void AIAgentComponent::RecreateAgent()
     AddToCrowd();
 }
 
-void AIAgentComponent::LookAtMovement(const float3& moveDir, float deltaTime)
+void AIAgentComponent::LookAtMovement(const float3& targetPos, float deltaTime)
 {
-    if (moveDir.LengthSq() < 0.0001f) return;
+    float3 selfPos = parent->GetGlobalTransform().TranslatePart();
+    float3 desired = targetPos - selfPos; 
+    desired.y = 0.0f;
 
-    float3 desired = moveDir;
-    desired.y      = 0.0f;
+    if (desired.LengthSq() < 0.0001f) return;
     desired.Normalize();
 
-    float4x4 global = parent->GetGlobalTransform();
-    float3 forward  = global.WorldZ();
+    float3 forward  = parent->GetGlobalTransform().WorldZ();
     forward.y       = 0.0f;
     forward.Normalize();
 
@@ -230,8 +237,10 @@ void AIAgentComponent::LookAtMovement(const float3& moveDir, float deltaTime)
     if (fabs(angle) < 0.0001f) return;
 
     float4x4 rotY  = float4x4::FromEulerXYZ(0.0f, angle, 0.0f);
-    float4x4 local = parent->GetGlobalTransform() * rotY;
+    float4x4 newGlobal = parent->GetGlobalTransform() * rotY;
+    
+    float4x4 newlocal = parent->GetParentGlobalTransform().Transposed() * newGlobal;
 
-    parent->SetLocalTransform(local);
+    parent->SetLocalTransform(newlocal);
     parent->UpdateTransformForGOBranch();
 }

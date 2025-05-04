@@ -587,7 +587,7 @@ void AnimationComponent::SetBoneMapping()
     };
     mapBones(parent);
 
-    GLOG("Bone mapping completed: %zu bones mapped", boneMapping.size());
+    // GLOG("Bone mapping completed: %zu bones mapped", boneMapping.size());
 }
 
 bool AnimationComponent::IsFinished() const
