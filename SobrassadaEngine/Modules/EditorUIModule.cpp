@@ -14,10 +14,10 @@
 #include "ProjectModule.h"
 #include "ResourceNavmesh.h"
 
+#include "GameObject.h"
 #include "ResourceStateMachine.h"
 #include "ResourcesModule.h"
 #include "SceneImporter.h"
-#include "GameObject.h"
 
 #include "SceneModule.h"
 #include "Script.h"
