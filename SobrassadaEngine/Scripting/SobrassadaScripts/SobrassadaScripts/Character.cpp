@@ -15,15 +15,36 @@
 #include <string>
 
 Character::Character(
-    GameObject* parent, int maxHealth, int damage, float attackDuration, float speed, float cooldown, float range,
+    GameObject* parent, int maxHealth, int damage, float attackDuration, float cooldown, float range,
     float rangeAIAttack, float rangeAIChase, const std::vector<float3>& patrolPoints
 )
-    : Script(parent), maxHealth(maxHealth), damage(damage), attackDuration(attackDuration), speed(speed),
-      cooldown(cooldown), range(range), rangeAIAttack(rangeAIAttack), rangeAIChase(rangeAIChase),
-      patrolPoints(patrolPoints)
+    : Script(parent)
 {
     currentHealth = maxHealth;
     type          = CharacterType::None;
+
+    // Using ImGui in the dll cause problems, so we need to call ImGui outside the dll
+    fields.push_back({"Max Health", InspectorField::FieldType::Int, &maxHealth, 0, 10});
+    fields.push_back({"Current Health", InspectorField::FieldType::Int, &currentHealth, 0, 10});
+    fields.push_back({"Invulnerable", InspectorField::FieldType::Bool, &isInvulnerable, true, false});
+    fields.push_back({"Dead", InspectorField::FieldType::Bool, &isDead, true, false});
+    fields.push_back({"Damage", InspectorField::FieldType::Int, &damage, 0, 3});
+    fields.push_back({"Attack Duration", InspectorField::FieldType::Float, &attackDuration, 0.0f, 1.0f});
+    fields.push_back({"Attack Cooldown", InspectorField::FieldType::Float, &cooldown, 0.0f, 2.0f});
+    fields.push_back({"Attack Range", InspectorField::FieldType::Float, &range, 0.0f, 3.0f});
+
+    if (type != CharacterType::CuChulainn)
+    {
+        fields.push_back({"AI Chase Range", InspectorField::FieldType::Float, &rangeAIChase, 0.0f, 20.0f});
+        fields.push_back({"AI Attack Range", InspectorField::FieldType::Float, &rangeAIAttack, 0.0f, 5.0f});
+
+        fields.push_back({"AI Patrol Points", InspectorField::FieldType::Int, &patrolPointsCont, 0, 5});
+        for (int i = 0; i < patrolPointsCont; i++)
+        {
+            std::string fieldName = std::to_string(i) + " Patrol Point";
+            fields.push_back({fieldName.c_str(), InspectorField::FieldType::Vec3, &patrolPoints[i]});
+        }
+    }
 }
 
 bool Character::Init()
@@ -66,38 +87,6 @@ void Character::Update(float deltaTime)
     }
 
     HandleState(gameTime);
-}
-
-void Character::Inspector()
-{
-    // Using ImGui in the dll cause problems, so we need to call ImGui outside the dll
-    if (fields.empty())
-    {
-        fields.push_back({"Max Health", InspectorField::FieldType::Int, &maxHealth, 0, 10});
-        fields.push_back({"Current Health", InspectorField::FieldType::Int, &currentHealth, 0, 10});
-        fields.push_back({"Invulnerable", InspectorField::FieldType::Bool, &isInvulnerable, true, false});
-        fields.push_back({"Dead", InspectorField::FieldType::Bool, &isDead, true, false});
-        fields.push_back({"Damage", InspectorField::FieldType::Int, &damage, 0, 3});
-        fields.push_back({"Attack Duration", InspectorField::FieldType::Float, &attackDuration, 0.0f, 1.0f});
-        fields.push_back({"Speed", InspectorField::FieldType::Float, &speed, 0.0f, 10.0f});
-        fields.push_back({"Attack Cooldown", InspectorField::FieldType::Float, &cooldown, 0.0f, 2.0f});
-        fields.push_back({"Attack Range", InspectorField::FieldType::Float, &range, 0.0f, 3.0f});
-
-        if (type != CharacterType::CuChulainn)
-        {
-            fields.push_back({"AI Chase Range", InspectorField::FieldType::Float, &rangeAIChase, 0.0f, 20.0f});
-            fields.push_back({"AI Attack Range", InspectorField::FieldType::Float, &rangeAIAttack, 0.0f, 5.0f});
-
-            fields.push_back({"AI Patrol Points", InspectorField::FieldType::Int, &patrolPointsCont, 0, 5});
-            for (int i = 0; i < patrolPointsCont; i++)
-            {
-                std::string fieldName = std::to_string(i) + " Patrol Point";
-                fields.push_back({fieldName.c_str(), InspectorField::FieldType::Vec3, &patrolPoints[i]});
-            }
-        }
-    }
-
-    AppEngine->GetEditorUIModule()->DrawScriptInspector(fields);
 }
 
 void Character::OnCollision(GameObject* otherObject, const float3& collisionNormal)

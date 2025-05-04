@@ -10,7 +10,7 @@
 #include "Standalone/AnimationComponent.h"
 #include "Standalone/CharacterControllerComponent.h"
 
-Soldier::Soldier(GameObject* parent) : Character(parent, 3, 1, 0.5f, 1.0f, 1.0f, 1.0f, 2.0f, 10.0f, patrolPoints)
+Soldier::Soldier(GameObject* parent) : Character(parent, 3, 1, 0.5f, 1.0f, 1.0f, 2.0f, 10.0f, patrolPoints)
 {
     type = CharacterType::Soldier;
 }
@@ -28,7 +28,7 @@ bool Soldier::Init()
     else
     {
         agentAI->RecreateAgent();
-        agentAI->SetSpeed(speed);
+        speed = agentAI->GetSpeed();
     }
 
     return true;

@@ -28,14 +28,13 @@ class Character : public Script
 {
   public:
     Character(
-        GameObject* parent, int maxHealth, int damage, float attackDuration, float speed, float cooldown, float range,
+        GameObject* parent, int maxHealth, int damage, float attackDuration, float cooldown, float range,
         float rangeAIAttack, float rangeAIChase, const std::vector<float3>& patrolPoints
     );
     virtual ~Character() noexcept override { parent = nullptr; };
 
     virtual bool Init() override;
     virtual void Update(float deltaTime) override;
-    void Inspector() override;
     void OnCollision(GameObject* otherObject, const float3& collisionNormal) override;
 
     void TakeDamage(int amount);
@@ -79,6 +78,6 @@ class Character : public Script
     // AI
     float rangeAIChase                          = 0.0f;
     float rangeAIAttack                         = 0.0f;
-    int patrolPointsCont                              = 0;
+    int patrolPointsCont                        = 0;
     std::vector<float3> patrolPoints;
 };

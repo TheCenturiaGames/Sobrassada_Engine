@@ -2,10 +2,11 @@
 
 #include "Application.h"
 #include "EditorUIModule.h"
+#include "Script.h"
+
 #include "Math/float2.h"
 #include "Math/float3.h"
 #include "Math/float4.h"
-#include "Script.h"
 
 void Script::Inspector()
 {
