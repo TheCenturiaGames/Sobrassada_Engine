@@ -14,7 +14,7 @@
 CharacterControllerComponent* character = nullptr;
 
 CuChulainn::CuChulainn(GameObject* parent)
-    : Character(parent, 5, 1, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, std::vector<float3>())
+    : Character(parent, 5, 1, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, patrolPoint)
 {
     currentHealth = 3; // mainChar starts low hp
     type          = CharacterType::CuChulainn;

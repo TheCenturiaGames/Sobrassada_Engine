@@ -16,51 +16,29 @@
 
 Character::Character(
     GameObject* parent, int newMaxHealth, int newDamage, float newAttackDuration, float newCooldown, float newRange,
-    float newRangeAIAttack, float newRangeAIChase, const std::vector<float3>& newPatrolPoints
+    float newRangeAIAttack, float newRangeAIChase, const float3& newPatrolPoint
 )
-    : Script(parent)
+    : Script(parent), maxHealth(newMaxHealth), damage(newDamage), attackDuration(newAttackDuration),
+      cooldown(newCooldown), range(newRange), rangeAIAttack(newRangeAIAttack), rangeAIChase(newRangeAIChase),
+      patrolPoint(newPatrolPoint)
 {
-    if (fields.empty())
-    {
-        // Using ImGui in the dll cause problems, so we need to call ImGui outside the dll
-        fields.push_back({"Max Health", InspectorField::FieldType::Int, &maxHealth, 0, 10});
-        fields.push_back({"Current Health", InspectorField::FieldType::Int, &currentHealth, 0, 10});
-        fields.push_back({"Invulnerable", InspectorField::FieldType::Bool, &isInvulnerable, true, false});
-        fields.push_back({"Dead", InspectorField::FieldType::Bool, &isDead, true, false});
-        fields.push_back({"Damage", InspectorField::FieldType::Int, &damage, 0, 3});
-        fields.push_back({"Attack Duration", InspectorField::FieldType::Float, &attackDuration, 0.0f, 1.0f});
-        fields.push_back({"Attack Cooldown", InspectorField::FieldType::Float, &cooldown, 0.0f, 2.0f});
-        fields.push_back({"Attack Range", InspectorField::FieldType::Float, &range, 0.0f, 3.0f});
-
-        if (type != CharacterType::CuChulainn)
-        {
-            fields.push_back({"AI Chase Range", InspectorField::FieldType::Float, &rangeAIChase, 0.0f, 20.0f});
-            fields.push_back({"AI Attack Range", InspectorField::FieldType::Float, &rangeAIAttack, 0.0f, 5.0f});
-
-            fields.push_back({"AI Patrol Points", InspectorField::FieldType::Int, &patrolPointsCont, 0, 5});
-            for (int i = 0; i < patrolPointsCont; i++)
-            {
-                std::string fieldName = std::to_string(i) + " Patrol Point";
-                fields.push_back({fieldName.c_str(), InspectorField::FieldType::Vec3, &patrolPoints[i]});
-            }
-        }
-    }
-    else
-    {
-        
-    }
-    maxHealth = newMaxHealth;
-    damage    = newDamage;
-    newAttackDuration;
-    cooldown      = newCooldown;
-    range         = newRange;
-
-    rangeAIChase  = newRangeAIChase;
-    rangeAIAttack = newRangeAIAttack;
-    patrolPoints  = newPatrolPoints;
-
     currentHealth = maxHealth;
-    type          = CharacterType::None;
+
+    fields.push_back({"Max Health", InspectorField::FieldType::Int, &maxHealth, 0, 10});
+    fields.push_back({"Current Health", InspectorField::FieldType::Int, &currentHealth, 0, 10});
+    fields.push_back({"Invulnerable", InspectorField::FieldType::Bool, &isInvulnerable, true, false});
+    fields.push_back({"Dead", InspectorField::FieldType::Bool, &isDead, true, false});
+    fields.push_back({"Damage", InspectorField::FieldType::Int, &damage, 0, 3});
+    fields.push_back({"Attack Duration", InspectorField::FieldType::Float, &attackDuration, 0.0f, 1.0f});
+    fields.push_back({"Attack Cooldown", InspectorField::FieldType::Float, &cooldown, 0.0f, 2.0f});
+    fields.push_back({"Attack Range", InspectorField::FieldType::Float, &range, 0.0f, 3.0f});
+
+    if (type != CharacterType::CuChulainn)
+    {
+        fields.push_back({"AI Chase Range", InspectorField::FieldType::Float, &rangeAIChase, 0.0f, 20.0f});
+        fields.push_back({"AI Attack Range", InspectorField::FieldType::Float, &rangeAIAttack, 0.0f, 5.0f});
+        fields.push_back({"AI Patrol Point", InspectorField::FieldType::Vec3, &patrolPoint});
+    }
 }
 
 bool Character::Init()
@@ -177,6 +155,13 @@ AIStates Character::CheckDistanceWithPlayer() const
         else if (distance <= rangeAIChase) return MEDIUM;
     }
     return FAR_AWAY;
+}
+
+bool Character::CheckDistanceWithPoint(const float3& point) const
+{
+    float distance = parent->GetPosition().Distance(point);
+    if (distance <= 1.0f) return true;
+    return false;
 }
 
 void Character::Die()
