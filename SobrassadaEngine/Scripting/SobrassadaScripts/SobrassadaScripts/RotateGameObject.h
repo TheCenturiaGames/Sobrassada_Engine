@@ -15,4 +15,5 @@ class RotateGameObject : public Script
     float speed   = 0.5f;
     float2 prueba = {0.0f, 0.0f};
     float3 color  = {1.0f, 0.0f, 0.0f};
+    GameObject* target = nullptr;
 };

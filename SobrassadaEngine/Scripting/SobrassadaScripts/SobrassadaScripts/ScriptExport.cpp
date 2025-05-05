@@ -3,6 +3,7 @@
 #include "ButtonScript.h"
 #include "CuChulainn.h"
 #include "ExitGameScript.h"
+#include "FreeCamera.h"
 #include "FullscreenToggleScript.h"
 #include "Globals.h"
 #include "GodMode.h"
@@ -40,10 +41,11 @@ extern "C" SOBRASSADA_API Script* CreateScript(const std::string& scriptType, Ga
     if (scriptType == "OptionsMenuSwitcherScript") return new OptionsMenuSwitcherScript(parent);
     if (scriptType == "MainMenuSelectorScript") return new MainMenuSelectorScript(parent);
     if (scriptType == "PressAnyKeyScript") return new PressAnyKeyScript(parent);
+    if (scriptType == "FreeCamera") return new FreeCamera(parent);
 
     if (scriptType == "GodMode") return new GodMode(parent);
-    if (scriptType == "CuChulainn") return new CuChulainn(parent);
-    if (scriptType == "Soldier") return new Soldier(parent);
+    if (scriptType == "CuChulainnScript") return new CuChulainn(parent);
+    if (scriptType == "SoldierScript") return new Soldier(parent);
     return nullptr;
 }
 
