@@ -269,19 +269,12 @@ void CharacterControllerComponent::Move(float deltaTime)
 
     if (!navMeshQuery || currentPolyRef == 0) return;
 
-    float4x4 globalTr       = parent->GetGlobalTransform();
-    const float3 currentPos = globalTr.TranslatePart();
-
+    const float3& currentPos = parent->GetPosition();
     currentSpeed          = targetDirection.LengthSq() > 0.001f ? Lerp(currentSpeed, maxSpeed, acceleration * deltaTime)
                                                                 : Lerp(currentSpeed, 0, 100 * deltaTime);
-    const float3 forward  = globalTr.WorldZ().Normalized();
-    const float3 right    = globalTr.WorldX().Normalized();
 
     const float3 offsetXZ = rotateDirection * currentSpeed * deltaTime;
     float3 desiredPos     = currentPos + offsetXZ;
-
-    // desiredPos.x      += offsetXZ.x;
-    // desiredPos.z      += offsetXZ.z;
 
     dtQueryFilter filter;
     filter.setIncludeFlags(SAMPLE_POLYFLAGS_WALK);
@@ -307,26 +300,23 @@ void CharacterControllerComponent::Move(float deltaTime)
     desiredPos.x   = nearest[0];
     desiredPos.z   = nearest[2];
 
-    globalTr.SetTranslatePart(desiredPos);
-    const float4x4 finalLocal = parent->GetParentGlobalTransform().Transposed() * globalTr;
-
-    parent->SetLocalTransform(finalLocal);
+    parent->SetLocalPosition(desiredPos);
 }
 
 void CharacterControllerComponent::LookAtMovement(const float3& moveDir, float deltaTime)
 {
     if (moveDir.LengthSq() < 0.0001f) return;
 
-    float3 desired = moveDir;
-    desired.y      = 0.0f;
-    desired.Normalize();
+    float3 desiredDir = moveDir;
+    desiredDir.y      = 0.0f;
+    desiredDir.Normalize();
 
-    float4x4 global = parent->GetGlobalTransform();
-    float3 forward  = global.WorldZ();
-    forward.y       = 0.0f;
+    const float4x4& localTransform = parent->GetLocalTransform();
+    float3 forward                 = localTransform.WorldZ();
+    forward.y                      = 0.0f;
     forward.Normalize();
 
-    float angle   = atan2(forward.Cross(desired).y, forward.Dot(desired));
+    float angle   = atan2(forward.Cross(desiredDir).y, forward.Dot(desiredDir));
 
     float maxStep = maxAngularSpeed * deltaTime;
     angle         = std::clamp(angle, -maxStep, maxStep);
@@ -337,11 +327,8 @@ void CharacterControllerComponent::LookAtMovement(const float3& moveDir, float d
         return;
     }
 
-    float4x4 rotY  = float4x4::FromEulerXYZ(0.0f, angle, 0.0f);
-    float4x4 local = parent->GetGlobalTransform() * rotY;
-
-    parent->SetLocalTransform(local);
-    parent->UpdateTransformForGOBranch();
+    const float4x4 rotated = localTransform * float4x4::FromEulerXYZ(0.0f, angle, 0.0f);
+    parent->SetLocalTransform(rotated);
 }
 
 void CharacterControllerComponent::Rotate(float rotationDirection, float deltaTime)
