@@ -18,6 +18,13 @@ class CanvasComponent : public Component
   public:
     static const ComponentType STATIC_TYPE = ComponentType::COMPONENT_CANVAS;
 
+
+       enum class CanvasRenderMode
+    {
+        ScreenSpaceOverlay,
+        WorldSpace
+    };
+
     CanvasComponent(UID uid, GameObject* parent);
     CanvasComponent(const rapidjson::Value& initialState, GameObject* parent);
     ~CanvasComponent() override;
@@ -34,31 +41,27 @@ class CanvasComponent : public Component
     void OnWindowResize(const float width, const float height);
 
     void UpdateChildren();
+    void RenderEditorInspector() override;
+
     void UpdateMousePosition(const float2& mousePos);
     void OnMouseButtonPressed() const;
     void OnMouseButtonReleased() const;
 
-    void RenderEditorInspector() override;
-
     bool IsInWorldSpace() const;
     float GetScreenScale() const;
-    float GetWidth() const { return width; }
-    float GetHeight() const { return height; }
+    void UpdateBoundingBox();
+    void SetRenderMode(CanvasRenderMode newMode);
+    float GetWidth() const;
+    float GetHeight() const;
 
   private:
-    enum class CanvasRenderMode
-    {
-        ScreenSpaceOverlay,
-        WorldSpace
-    };
 
-    float width                 = SCREEN_WIDTH;
-    float height                = SCREEN_HEIGHT;
-
+    // Reference resolution
     float referenceWidth        = 1920.0f;
     float referenceHeight       = 1080.0f;
 
     CanvasRenderMode renderMode = CanvasRenderMode::ScreenSpaceOverlay;
+    Transform2DComponent* transform2D = nullptr;
 
     std::vector<const GameObject*> sortedChildren;
     ButtonComponent* hoveredButton = nullptr;
