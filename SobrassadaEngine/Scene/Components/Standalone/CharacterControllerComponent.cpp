@@ -148,20 +148,13 @@ void CharacterControllerComponent::Update(float deltaTime) // SO many navmesh ge
     verticalSpeed     += gravity * deltaTime;
     verticalSpeed      = std::max(verticalSpeed, maxFallSpeed); // Clamp fall speed
 
-    float4x4 globalTr  = parent->GetGlobalTransform();
-    float3 currentPos  = globalTr.TranslatePart();
-
+    float3 currentPos  = parent->GetPosition();
     currentPos.y      += (verticalSpeed * deltaTime);
 
     AdjustHeightToNavMesh(currentPos);
 
     lastPosition = currentPos;
-
-    globalTr.SetTranslatePart(currentPos);
-    float4x4 finalLocal = parent->GetParentGlobalTransform().Transposed() * globalTr;
-
-    parent->SetLocalTransform(finalLocal);
-    parent->UpdateTransformForGOBranch();
+    parent->SetLocalPosition(currentPos);
 
     if (isRotating)
     {
@@ -318,7 +311,6 @@ void CharacterControllerComponent::Move(float deltaTime)
     const float4x4 finalLocal = parent->GetParentGlobalTransform().Transposed() * globalTr;
 
     parent->SetLocalTransform(finalLocal);
-    parent->UpdateTransformForGOBranch();
 }
 
 void CharacterControllerComponent::LookAtMovement(const float3& moveDir, float deltaTime)
