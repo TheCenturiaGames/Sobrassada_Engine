@@ -13,7 +13,7 @@ Projectile::Projectile(GameObject* parent) : Script(parent)
 {
     fields.push_back({"Speed", InspectorField::FieldType::Float, &speed, 0, 100});
     fields.push_back({"Range", InspectorField::FieldType::Float, &range, 0, 100});
-    fields.push_back({"Range", InspectorField::FieldType::Int, &damage, 0, 10});
+    fields.push_back({"Damage", InspectorField::FieldType::Int, &damage, 0, 10});
 }
 
 bool Projectile::Init()
@@ -24,6 +24,7 @@ bool Projectile::Init()
         GLOG("[WARNING: Projectile Init()] Couldn't find the collider component");
         return false;
     }
+    return true;
 }
 
 void Projectile::Update(float deltaTime)
