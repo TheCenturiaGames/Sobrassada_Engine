@@ -51,14 +51,6 @@ void Projectile::OnCollision(GameObject* otherObject, const float3& collisionNor
 {
     GLOG("COLLISION IN PROJECTILE with: %s", otherObject->GetName().c_str());
 
-    ScriptComponent* script = otherObject->GetComponent<ScriptComponent*>();
-
-    if (script)
-    {
-        // In the future there may be more interactions with other scripts
-        if (Character* character = script->GetScriptByType<Character>()) character->TakeDamage(damage);
-    }
-
     collider->SetEnabled(false);
     parent->SetEnabled(false);
 }

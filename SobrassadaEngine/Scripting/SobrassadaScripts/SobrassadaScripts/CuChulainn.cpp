@@ -23,18 +23,11 @@ CuChulainn::CuChulainn(GameObject* parent) : Character(parent, 5, 1, 0.5f, 2.0f,
 {
     currentHealth = 3; // mainChar starts low hp
 
-    fields.push_back({"Max Health", InspectorField::FieldType::Int, &maxHealth, 0, 10});
-    fields.push_back({"Current Health", InspectorField::FieldType::Int, &currentHealth, 0, 10});
-    fields.push_back({"Invulnerable", InspectorField::FieldType::Bool, &isInvulnerable, true, false});
-    fields.push_back({"Dead", InspectorField::FieldType::Bool, &isDead, true, false});
-    fields.push_back({"Damage", InspectorField::FieldType::Int, &damage, 0, 3});
-    fields.push_back({"Attack Duration", InspectorField::FieldType::Float, &attackDuration, 0.0f, 1.0f});
-    fields.push_back({"Attack Cooldown", InspectorField::FieldType::Float, &attackCooldown, 0.0f, 2.0f});
-    fields.push_back({"Attack Range", InspectorField::FieldType::Float, &range, 0.0f, 3.0f});
-
     // TODO: Replace target names by gameObjects when overriding prefabs doesn't break the link
     fields.push_back({"Camera Object Name", InspectorField::FieldType::InputText, &cameraName});
-    fields.push_back({"Spear Object Name", InspectorField::FieldType::InputText, &spearName});
+    fields.push_back({"Spear Projectile Name", InspectorField::FieldType::InputText, &spearName});
+    fields.push_back({"Weapon Name", InspectorField::FieldType::InputText, &weaponName});
+    fields.push_back({"Range attack cooldown", InspectorField::FieldType::Float, &throwCooldown, 0.0f, 2.0f});
 }
 
 bool CuChulainn::Init()
@@ -62,6 +55,13 @@ bool CuChulainn::Init()
     {
         spear = spearObj->GetComponent<ScriptComponent*>()->GetScriptByType<Projectile>();
         if (!spear) GLOG("[WARNING] No projectile found by the name %s", spearName.c_str());
+    }
+
+    weapon = AppEngine->GetSceneModule()->GetScene()->GetGameObjectByName(weaponName);
+    if (!weapon)
+    {
+        GLOG("[WARNING] No weapon found by the name %s", weaponName.c_str());
+        return false;
     }
 
     return true;
@@ -172,7 +172,11 @@ void CuChulainn::UpdateTimers(float deltaTime)
     // Ranged attack timers
     desiredAim  = false;
     throwTimer -= deltaTime;
-    if (throwTimer < 0) throwTimer = 0;
+    if (throwTimer < 0)
+    {
+        if (weapon && !weapon->IsEnabled()) weapon->SetEnabled(true);
+        throwTimer = 0;
+    }
 }
 
 void CuChulainn::LookAtMouse()
@@ -188,16 +192,17 @@ void CuChulainn::LookAtMouse()
 
 void CuChulainn::ThrowSpear()
 {
-    camera->EnableMouseOffset(false);
+    if (camera) camera->EnableMouseOffset(false);
     GLOG("THROW SPEAR");
     throwTimer = throwCooldown;
+    if (weapon) weapon->SetEnabled(false);
 
     spear->Shoot(parent->GetPosition(), character->GetFrontDirection());
 }
 
 void CuChulainn::Dash()
 {
-    if (state == CharacterStates::AIM) camera->EnableMouseOffset(false);
+    if (state == CharacterStates::AIM && camera) camera->EnableMouseOffset(false);
     desiredDash = false;
     state       = CharacterStates::DASH;
 
@@ -221,12 +226,12 @@ void CuChulainn::Attack(float time)
     // TODO: play basicAttack sound
 
     GLOG("ATTACK");
-    
-    if (state == CharacterStates::AIM) camera->EnableMouseOffset(false);
+
+    if (state == CharacterStates::AIM && camera) camera->EnableMouseOffset(false);
     desiredAttack = false;
     state         = CharacterStates::BASIC_ATTACK;
     character->EnableMovement(false);
-    
+
     Character::Attack(time);
     LookAtMouse();
     if (animComponent) animComponent->UseTrigger("attack");
@@ -234,9 +239,11 @@ void CuChulainn::Attack(float time)
 
 void CuChulainn::Aim()
 {
+    if (!spear) return;
+
     if (state != CharacterStates::AIM)
     {
-        camera->EnableMouseOffset(true);
+        if (camera) camera->EnableMouseOffset(true);
         state = CharacterStates::AIM;
         character->EnableMovement(false);
     }

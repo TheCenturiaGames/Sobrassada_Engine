@@ -18,6 +18,8 @@ class Projectile : public Script
     void Shoot(const float3& origin, const float3& direction);
     void OnCollision(GameObject* otherObject, const float3& collisionNormal) override;
 
+    int GetDamage() const { return damage; }
+
   private:
     void Move(float deltaTime);
 

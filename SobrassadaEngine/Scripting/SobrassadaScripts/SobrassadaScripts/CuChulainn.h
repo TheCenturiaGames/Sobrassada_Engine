@@ -47,11 +47,14 @@ class CuChulainn : public Character
     void Move();
 
   private:
-    std::string cameraName;
-    CameraMovement* camera = nullptr;
+    std::string cameraName  = "";
+    CameraMovement* camera  = nullptr;
 
-    std::string spearName;
+    std::string spearName   = "";
     Projectile* spear       = nullptr;
+
+    std::string weaponName  = "";
+    GameObject* weapon      = nullptr;
 
     bool isDashing          = false;
     float dashCooldown      = 2.0f;

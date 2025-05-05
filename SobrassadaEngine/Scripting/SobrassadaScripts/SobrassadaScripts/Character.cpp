@@ -6,6 +6,7 @@
 #include "EditorUIModule.h"
 #include "GameObject.h"
 #include "GameTimer.h"
+#include "Projectile.h"
 #include "ScriptComponent.h"
 #include "Standalone/AnimationComponent.h"
 #include "Standalone/CharacterControllerComponent.h"
@@ -22,6 +23,15 @@ Character::Character(
       attackCooldown(cooldown), range(range), rangeAIAttack(rangeAIAttack), rangeAIChase(rangeAIChase)
 {
     currentHealth = maxHealth;
+
+    fields.push_back({"Max Health", InspectorField::FieldType::Int, &this->maxHealth, 0, 10});
+    fields.push_back({"Current Health", InspectorField::FieldType::Int, &currentHealth, 0, 10});
+    fields.push_back({"Invulnerable", InspectorField::FieldType::Bool, &isInvulnerable, true, false});
+    fields.push_back({"Dead", InspectorField::FieldType::Bool, &isDead, true, false});
+    fields.push_back({"Damage", InspectorField::FieldType::Int, &this->damage, 0, 3});
+    fields.push_back({"Attack Duration", InspectorField::FieldType::Float, &this->attackDuration, 0.0f, 1.0f});
+    fields.push_back({"Attack Cooldown", InspectorField::FieldType::Float, &attackCooldown, 0.0f, 2.0f});
+    fields.push_back({"Attack Range", InspectorField::FieldType::Float, &this->range, 0.0f, 3.0f});
 }
 
 bool Character::Init()
@@ -30,9 +40,11 @@ bool Character::Init()
     if (!animComponent)
     {
         GLOG("Animation component not found for %s", parent->GetName().c_str());
-        return false;
     }
-    animComponent->OnPlay(false);
+    else
+    {
+        animComponent->OnPlay(false);
+    }
 
     characterCollider = parent->GetComponent<CapsuleColliderComponent*>();
     if (!characterCollider)
@@ -75,45 +87,27 @@ void Character::Update(float deltaTime)
     HandleState(gameTime);
 }
 
-void Character::Inspector()
-{
-    // Using ImGui in the dll cause problems, so we need to call ImGui outside the dll
-    if (fields.empty())
-    {
-        fields.push_back({"Max Health", InspectorField::FieldType::Int, &maxHealth, 0, 10});
-        fields.push_back({"Current Health", InspectorField::FieldType::Int, &currentHealth, 0, 10});
-        fields.push_back({"Invulnerable", InspectorField::FieldType::Bool, &isInvulnerable, true, false});
-        fields.push_back({"Dead", InspectorField::FieldType::Bool, &isDead, true, false});
-        fields.push_back({"Damage", InspectorField::FieldType::Int, &damage, 0, 3});
-        fields.push_back({"Attack Duration", InspectorField::FieldType::Float, &attackDuration, 0.0f, 1.0f});
-        fields.push_back({"Speed", InspectorField::FieldType::Float, &speed, 0.0f, 10.0f});
-        fields.push_back({"Attack Cooldown", InspectorField::FieldType::Float, &attackCooldown, 0.0f, 2.0f});
-        fields.push_back({"Attack Range", InspectorField::FieldType::Float, &range, 0.0f, 3.0f});
-    }
-
-    AppEngine->GetEditorUIModule()->DrawScriptInspector(fields);
-}
-
 void Character::OnCollision(GameObject* otherObject, const float3& collisionNormal)
 {
     // cube collider should be only if is enabled here already checked by OnCollision of cubeColliderComponent
     // GLOG("COLLISION %s with %s", parent->GetName().c_str(), otherObject->GetName().c_str())
 
-    CubeColliderComponent* enemyWeapon    = otherObject->GetComponent<CubeColliderComponent*>();
+    CubeColliderComponent* otherWeapon = otherObject->GetComponent<CubeColliderComponent*>();
+    ScriptComponent* otherScript       = otherObject->GetComponentParent<ScriptComponent*>(AppEngine);
 
-    ScriptComponent* enemyScriptComponent = otherObject->GetComponentParent<ScriptComponent*>(AppEngine);
-
-    if (!isInvulnerable && enemyScriptComponent != nullptr && enemyWeapon != nullptr && enemyWeapon->GetEnabled())
+    if (!isInvulnerable && otherScript != nullptr)
     {
-        Script* enemyScript       = enemyScriptComponent->GetScriptInstances()[0]; // TODO: CHANGE THIS
-        // ScriptType scriptType = enemyScriptComponent->GetScriptType(); // not needed for now
-        Character* enemyCharacter = dynamic_cast<Character*>(enemyScript);
-        if (!enemyCharacter->isAttacking) return;
+        if (otherWeapon != nullptr && otherWeapon->GetEnabled())
+        {
+            Character* enemyScript = otherScript->GetScriptByType<Character>();
+            if (enemyScript = otherScript->GetScriptByType<Character>())
+            {
+                if (!enemyScript->isAttacking) return;
+                TakeDamage(enemyScript->damage);
+            }
+        }
 
-        TakeDamage(enemyCharacter->damage);
-        isInvulnerable     = true;
-        float newDeltaTime = AppEngine->GetGameTimer()->GetTime() / 1000.0f;
-        lastTimeHit        = newDeltaTime;
+        if (Projectile* projectile = otherScript->GetScriptByType<Projectile>()) TakeDamage(projectile->GetDamage());
     }
 }
 
@@ -125,16 +119,20 @@ void Character::Attack(float time)
         isAttacking    = true;
         lastAttackTime = time;
 
-        // TODO: The enable and disable of the collider should be managed by each palyer and enemy, 
+        // TODO: The enable and disable of the collider should be managed by each palyer and enemy,
         // depending on the timings of their attack animations as we don't have Animation Events (I think)
-        //if (weaponCollider) weaponCollider->SetEnabled(true);
-        //PerformAttack();
+        if (weaponCollider) weaponCollider->SetEnabled(true);
+        PerformAttack();
     }
 }
 
 void Character::TakeDamage(int amount)
 {
-    currentHealth -= amount;
+    currentHealth      -= amount;
+
+    isInvulnerable      = true;
+    float newDeltaTime  = AppEngine->GetGameTimer()->GetTime() / 1000.0f;
+    lastTimeHit         = newDeltaTime;
 
     if (currentHealth <= 0) Die();
     else OnDamageTaken(amount);
@@ -178,13 +176,12 @@ void Character::Die()
         characterCollider->DeleteRigidBody();
         characterCollider->SetEnabled(false);
     }
-    
+
     if (weaponCollider)
     {
         weaponCollider->DeleteRigidBody();
         weaponCollider->SetEnabled(false);
     }
-    
 
     parent->SetEnabled(false);
 }
