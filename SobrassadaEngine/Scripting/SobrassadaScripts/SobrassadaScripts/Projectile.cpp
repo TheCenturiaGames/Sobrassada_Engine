@@ -40,9 +40,9 @@ void Projectile::Shoot(const float3& origin, const float3& direction)
     parent->SetEnabled(true);
 
     // Rotate spear object
-    const float3 scale = parent->GetLocalTransform().ExtractScale();
-    Quat rotation      = Quat::LookAt(float3::unitZ, direction, float3::unitY, float3::unitY);
-    float4x4 transform = float4x4::FromTRS(origin, rotation, scale);
+    const float3 scale       = parent->GetLocalTransform().ExtractScale();
+    const Quat rotation      = Quat::LookAt(float3::unitZ, direction, float3::unitY, float3::unitY);
+    const float4x4 transform = float4x4::FromTRS(origin, rotation, scale);
     parent->SetLocalTransform(transform);
 }
 
