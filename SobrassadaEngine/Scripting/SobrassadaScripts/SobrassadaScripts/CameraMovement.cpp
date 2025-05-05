@@ -1,4 +1,5 @@
 #include "pch.h"
+
 #include "CameraMovement.h"
 
 #include "Application.h"
@@ -16,12 +17,14 @@
 CameraMovement::CameraMovement(GameObject* parent) : Script(parent)
 {
     fields.push_back({"Target", InspectorField::FieldType::InputText, &targetName});
-    fields.push_back({"Smoothness Velocity", InspectorField::FieldType::Float, &smoothnessVelocity, 0, 20});
+    fields.push_back({"Smoothness Velocity", InspectorField::FieldType::Float, &smoothnessVelocity, 0.0f, 20.0f});
     fields.push_back({"Enable Mouse Offset", InspectorField::FieldType::Bool, &mouseOffsetEnabled});
-    fields.push_back({"Mouse Offset Intensity", InspectorField::FieldType::Float, &mouseOffsetIntensity, 0, 1});
-    fields.push_back({"Look Ahead Intensity", InspectorField::FieldType::Float, &lookAheadIntensity, 0, 10});
-    fields.push_back({"Look Ahead Smoothness", InspectorField::FieldType::Float, &lookAheadSmoothness, 0, 20});
-    fields.push_back({"Follow Distance Threshold", InspectorField::FieldType::Float, &followDistanceThreshold, 0, 10});
+    fields.push_back({"Mouse Offset Intensity", InspectorField::FieldType::Float, &mouseOffsetIntensity, 0.0f, 1.0f});
+    fields.push_back({"Look Ahead Intensity", InspectorField::FieldType::Float, &lookAheadIntensity, 0.0f, 10.0f});
+    fields.push_back({"Look Ahead Smoothness", InspectorField::FieldType::Float, &lookAheadSmoothness, 0.0f, 20.0f});
+    fields.push_back(
+        {"Follow Distance Threshold", InspectorField::FieldType::Float, &followDistanceThreshold, 0.0f, 10.0f}
+    );
 }
 
 bool CameraMovement::Init()
@@ -45,15 +48,15 @@ void CameraMovement::FollowTarget(float deltaTime)
 {
     if (!target) return;
 
-    float3 desiredPosition       = target->GetPosition();
-    const float3 currentPosition = parent->GetPosition();
+    float3 desiredPosition        = target->GetPosition();
+    const float3& currentPosition = parent->GetPosition();
 
     if (mouseOffsetEnabled)
     {
         currentLookAhead = 0;
         const float3 mouseWorldPos =
             AppEngine->GetSceneModule()->GetScene()->GetMainCamera()->ScreenPointToXZ(parent->GetPosition().y);
-        const float3 mouseOffset = (desiredPosition + (mouseWorldPos)) * 0.5f - desiredPosition;
+        const float3 mouseOffset  = (desiredPosition + (mouseWorldPos)) * 0.5f - desiredPosition;
         desiredPosition          += mouseOffset * mouseOffsetIntensity;
     }
     else if (lookAheadIntensity > 0 && controller)
@@ -68,8 +71,8 @@ void CameraMovement::FollowTarget(float deltaTime)
             lookAheadSmoothness * deltaTime
         );
 
-        const float3 targetDir  = controller->GetFrontDirection();
-        desiredPosition        += targetDir * currentLookAhead;
+        const float3& targetDir  = controller->GetFrontDirection();
+        desiredPosition         += targetDir * currentLookAhead;
 
         if (isFollowing && distanceToTarget < 0.1f && controller->GetSpeed() < 0.1f) isFollowing = false;
     }

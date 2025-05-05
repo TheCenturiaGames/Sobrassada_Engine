@@ -276,16 +276,16 @@ void CharacterControllerComponent::Move(float deltaTime)
 
     if (!navMeshQuery || currentPolyRef == 0) return;
 
-    float4x4 globalTr = parent->GetGlobalTransform();
-    float3 currentPos = globalTr.TranslatePart();
+    float4x4 globalTr       = parent->GetGlobalTransform();
+    const float3 currentPos = globalTr.TranslatePart();
 
-    currentSpeed      = targetDirection.LengthSq() > 0.001f ? Lerp(currentSpeed, maxSpeed, acceleration * deltaTime)
-                                                            : Lerp(currentSpeed, 0, 100 * deltaTime);
-    float3 forward    = globalTr.WorldZ().Normalized();
-    float3 right      = globalTr.WorldX().Normalized();
+    currentSpeed          = targetDirection.LengthSq() > 0.001f ? Lerp(currentSpeed, maxSpeed, acceleration * deltaTime)
+                                                                : Lerp(currentSpeed, 0, 100 * deltaTime);
+    const float3 forward  = globalTr.WorldZ().Normalized();
+    const float3 right    = globalTr.WorldX().Normalized();
 
-    float3 offsetXZ   = rotateDirection * currentSpeed * deltaTime;
-    float3 desiredPos = currentPos + offsetXZ;
+    const float3 offsetXZ = rotateDirection * currentSpeed * deltaTime;
+    float3 desiredPos     = currentPos + offsetXZ;
 
     // desiredPos.x      += offsetXZ.x;
     // desiredPos.z      += offsetXZ.z;
@@ -315,7 +315,7 @@ void CharacterControllerComponent::Move(float deltaTime)
     desiredPos.z   = nearest[2];
 
     globalTr.SetTranslatePart(desiredPos);
-    float4x4 finalLocal = parent->GetParentGlobalTransform().Transposed() * globalTr;
+    const float4x4 finalLocal = parent->GetParentGlobalTransform().Transposed() * globalTr;
 
     parent->SetLocalTransform(finalLocal);
     parent->UpdateTransformForGOBranch();
@@ -415,6 +415,6 @@ void CharacterControllerComponent::HandleInput(float deltaTime)
 
 void CharacterControllerComponent::LookAt(const float3& direction)
 {
-    isRotating = true;
+    isRotating      = true;
     rotateDirection = direction;
 }

@@ -6,12 +6,12 @@
 #include "GBuffer.h"
 #include "GameObject.h"
 #include "InputModule.h"
-#include "Math/Quat.h"
-#include "Math/MathFunc.h"
 #include "OpenGLModule.h"
 #include "SceneModule.h"
 
 #include "ImGui.h"
+#include "Math/MathFunc.h"
+#include "Math/Quat.h"
 #include "glew.h"
 #include <vector>
 
@@ -423,21 +423,21 @@ void SOBRASADA_API_ENGINE CameraComponent::Rotate(float yaw, float pitch)
 
 const LineSegment CameraComponent::CastCameraRay()
 {
-    auto& windowPosition = App->GetSceneModule()->GetScene()->GetWindowPosition();
-    auto& windowSize     = App->GetSceneModule()->GetScene()->GetWindowSize();
-    auto& mousePos       = App->GetSceneModule()->GetScene()->GetMousePosition();
+    const auto& windowPosition = App->GetSceneModule()->GetScene()->GetWindowPosition();
+    const auto& windowSize     = App->GetSceneModule()->GetScene()->GetWindowSize();
+    const auto& mousePos       = App->GetSceneModule()->GetScene()->GetMousePosition();
 
-    float windowMinX     = std::get<0>(windowPosition);
-    float windowMaxX     = std::get<0>(windowPosition) + std::get<0>(windowSize);
+    const float windowMinX     = std::get<0>(windowPosition);
+    const float windowMaxX     = std::get<0>(windowPosition) + std::get<0>(windowSize);
 
-    float windowMinY     = std::get<1>(windowPosition);
-    float windowMaxY     = std::get<1>(windowPosition) + std::get<1>(windowSize);
+    const float windowMinY     = std::get<1>(windowPosition);
+    const float windowMaxY     = std::get<1>(windowPosition) + std::get<1>(windowSize);
 
-    float percentageX    = (std::get<0>(mousePos) - windowMinX) / (windowMaxX - windowMinX);
-    float percentageY    = (std::get<1>(mousePos) - windowMinY) / (windowMaxY - windowMinY);
+    const float percentageX    = (std::get<0>(mousePos) - windowMinX) / (windowMaxX - windowMinX);
+    const float percentageY    = (std::get<1>(mousePos) - windowMinY) / (windowMaxY - windowMinY);
 
-    float normalizedX    = Clamp(Lerp(-1.0f, 1.0f, percentageX), -1.0f, 1.0f);
-    float normalizedY    = Clamp(Lerp(1.0f, -1.0f, percentageY), -1.0f, 1.0f);
+    const float normalizedX    = Clamp(Lerp(-1.0f, 1.0f, percentageX), -1.0f, 1.0f);
+    const float normalizedY    = Clamp(Lerp(1.0f, -1.0f, percentageY), -1.0f, 1.0f);
 
     return camera.UnProjectLineSegment(normalizedX, normalizedY);
 }

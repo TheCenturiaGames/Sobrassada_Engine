@@ -2,8 +2,6 @@
 
 #include "Script.h"
 
-#include "Math/float3.h"
-
 class GameObject;
 class CharacterControllerComponent;
 
@@ -26,17 +24,17 @@ class CameraMovement : public Script
     const GameObject* target                       = nullptr;
     const CharacterControllerComponent* controller = nullptr;
 
-    float3 finalPosition;
-    float smoothnessVelocity      = 10;
+    float3 finalPosition                           = float3::zero;
+    float smoothnessVelocity                       = 10.0f;
 
-    bool mouseOffsetEnabled       = false;
-    float mouseOffsetIntensity    = 0;
+    bool mouseOffsetEnabled                        = false;
+    float mouseOffsetIntensity                     = 0.0f;
 
-    bool lookAheadEnabled         = false;
-    float lookAheadIntensity      = 0;
-    float currentLookAhead        = 0;
-    float lookAheadSmoothness     = 0;
+    bool lookAheadEnabled                          = false;
+    float lookAheadIntensity                       = 0.0f;
+    float currentLookAhead                         = 0.0f;
+    float lookAheadSmoothness                      = 0.0f;
 
-    float followDistanceThreshold = 0;
-    bool isFollowing              = false;
+    float followDistanceThreshold                  = 0.0f;
+    bool isFollowing                               = false;
 };

@@ -24,12 +24,12 @@ class Projectile : public Script
   private:
     CubeColliderComponent* collider = nullptr;
 
-    float3 direction;
-    float speed = 10;
+    float3 direction                = float3::zero;
+    float speed                     = 10.0f;
 
-    float range = 10;
-    float3 startPos;
+    float range                     = 10.0f;
+    float3 startPos                 = float3::zero;
 
-    int damage = 1;
-    float frames = 0;
+    int damage                      = 1;
+    float frames                    = 0.0f;
 };

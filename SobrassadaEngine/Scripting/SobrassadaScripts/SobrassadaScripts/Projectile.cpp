@@ -11,8 +11,8 @@
 
 Projectile::Projectile(GameObject* parent) : Script(parent)
 {
-    fields.push_back({"Speed", InspectorField::FieldType::Float, &speed, 0, 100});
-    fields.push_back({"Range", InspectorField::FieldType::Float, &range, 0, 100});
+    fields.push_back({"Speed", InspectorField::FieldType::Float, &speed, 0.0f, 100.0f});
+    fields.push_back({"Range", InspectorField::FieldType::Float, &range, 0.0f, 100.0f});
     fields.push_back({"Damage", InspectorField::FieldType::Int, &damage, 0, 10});
 }
 

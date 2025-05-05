@@ -43,13 +43,13 @@ class SOBRASADA_API_ENGINE CharacterControllerComponent : public Component
     void EnableMovement(bool enable) { movementEnabled = enable; }
 
   private:
-    float3 targetDirection = float3::zero;
-    float3 lastPosition    = float3::zero;
+    float3 targetDirection       = float3::zero;
+    float3 lastPosition          = float3::zero;
 
-    float maxSpeed         = 10.0f;
-    float maxAngularSpeed  = 0.0f;
-    float acceleration     = 10.0f;
-    float currentSpeed;
+    float maxSpeed               = 10.0f;
+    float maxAngularSpeed        = 0.0f;
+    float acceleration           = 10.0f;
+    float currentSpeed           = 0.0f;
 
     bool isRadians               = false;
 
@@ -62,8 +62,8 @@ class SOBRASADA_API_ENGINE CharacterControllerComponent : public Component
 
     bool inputDown               = true;
     bool isRotating              = false;
-    float3 targetLookDirection;
+    float3 targetLookDirection   = float3::zero;
 
-    float3 rotateDirection;
-    bool movementEnabled = true;
+    float3 rotateDirection       = float3::zero;
+    bool movementEnabled         = true;
 };

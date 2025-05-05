@@ -55,18 +55,18 @@ class CuChulainn : public Character
 
     bool isDashing          = false;
     float dashCooldown      = 2.0f;
-    float dashTimer         = 0;
+    float dashTimer         = 0.0f;
     bool desiredDash        = false;
-    float dashBufferTimer   = 0;
+    float dashBufferTimer   = 0.0f;
     float dashBuffer        = 0.5f;
 
     bool desiredAttack      = false;
-    float attackTimer       = 0;
-    float attackBufferTimer = 0;
+    float attackTimer       = 0.0f;
+    float attackBufferTimer = 0.0f;
     float attackBuffer      = 0.5f;
 
     bool desiredAim         = false;
-    float throwTimer        = 0;
+    float throwTimer        = 0.0f;
     float throwCooldown     = 1.0f;
 
     CharacterStates state   = CharacterStates::IDLE;
