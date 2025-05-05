@@ -92,21 +92,25 @@ void Character::OnCollision(GameObject* otherObject, const float3& collisionNorm
     // cube collider should be only if is enabled here already checked by OnCollision of cubeColliderComponent
     // GLOG("COLLISION %s with %s", parent->GetName().c_str(), otherObject->GetName().c_str())
 
+    // Melee check
     CubeColliderComponent* otherWeapon = otherObject->GetComponent<CubeColliderComponent*>();
     ScriptComponent* otherScript       = otherObject->GetComponentParent<ScriptComponent*>(AppEngine);
 
+    if (!isInvulnerable && otherScript != nullptr && otherWeapon != nullptr && otherWeapon->GetEnabled())
+    {
+        Character* enemyScript = otherScript->GetScriptByType<Character>();
+        if (enemyScript = otherScript->GetScriptByType<Character>())
+        {
+            if (!enemyScript->isAttacking) return;
+            TakeDamage(enemyScript->damage);
+        }
+    }
+
+    // Projectile check
+    otherScript = otherObject->GetComponent<ScriptComponent*>();
+
     if (!isInvulnerable && otherScript != nullptr)
     {
-        if (otherWeapon != nullptr && otherWeapon->GetEnabled())
-        {
-            Character* enemyScript = otherScript->GetScriptByType<Character>();
-            if (enemyScript = otherScript->GetScriptByType<Character>())
-            {
-                if (!enemyScript->isAttacking) return;
-                TakeDamage(enemyScript->damage);
-            }
-        }
-
         if (Projectile* projectile = otherScript->GetScriptByType<Projectile>()) TakeDamage(projectile->GetDamage());
     }
 }
