@@ -1043,9 +1043,6 @@
     <ClInclude Include="Utils\HashString.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="Utils\HashString_hash.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Libs\MathGeoLib\include\Geometry\TriangleMesh_IntersectRay_CPP.inl">

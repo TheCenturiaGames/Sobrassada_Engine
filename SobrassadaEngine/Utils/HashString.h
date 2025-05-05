@@ -1,23 +1,23 @@
 #pragma once
-#pragma message("Incluyendo HashString.h")
+#pragma message("Including HashString.h")
 
 #include <string>
 
 struct HashString
 {
-    size_t hash_size = 0;
+    size_t hash = 0;
     std::string original;
 
     HashString() = default;
     HashString(const std::string& str)
     {
         original = str;
-        hash_size     = std::hash<std::string> {}(str);
+        hash     = std::hash<std::string> {}(str);
     }
 
-    bool operator==(const HashString& other) const { return hash_size == other.hash_size; }
+    bool operator==(const HashString& other) const { return hash == other.hash; }
     bool operator!=(const HashString& other) const { return !(*this == other); }
-    bool operator<(const HashString& other) const { return hash_size < other.hash_size; }
+    bool operator<(const HashString& other) const { return hash < other.hash; }
     const std::string& GetString() const { return original; }
     std::string& GetString() { return original; }
     const bool empty() const { return original.empty(); }
