@@ -52,12 +52,18 @@ UID NavmeshImporter::SaveNavmesh(const char* name, const ResourceNavMesh* resour
     UID navmeshUID = GenerateUID();
     navmeshUID     = App->GetLibraryModule()->AssignFiletypeUID(navmeshUID, FileType::Navmesh);
 
+    UID prefix                 = navmeshUID / UID_PREFIX_DIVISOR;
+    const std::string savePath = App->GetProjectModule()->GetLoadedProjectPath() + METADATA_PATH +
+                                 std::to_string(prefix) + FILENAME_SEPARATOR + name + META_EXTENSION;
+    UID finalNavmeshUID = App->GetLibraryModule()->GetUIDFromMetaFile(savePath);
+    if (finalNavmeshUID == INVALID_UID) finalNavmeshUID = navmeshUID;
+    
     const std::string metaNavPath = ASSETS_PATH + std::string(name) + META_EXTENSION;
     const std::string navPath =
         App->GetProjectModule()->GetLoadedProjectPath() + NAVMESHES_PATH + std::string(name) + NAVMESH_EXTENSION;
 
     // Save metadata
-    MetaNavmesh meta(navmeshUID, metaNavPath, config);
+    MetaNavmesh meta(finalNavmeshUID, metaNavPath, config);
     meta.Save(name, metaNavPath);
 
     // Write binary navmesh
@@ -66,13 +72,13 @@ UID NavmeshImporter::SaveNavmesh(const char* name, const ResourceNavMesh* resour
 
     delete[] fileBuffer;
 
-    App->GetLibraryModule()->AddNavmesh(navmeshUID, name);
-    App->GetLibraryModule()->AddResource(navPath, navmeshUID);
-    App->GetLibraryModule()->AddName(name, navmeshUID);
+    App->GetLibraryModule()->AddNavmesh(finalNavmeshUID, name);
+    App->GetLibraryModule()->AddResource(navPath, finalNavmeshUID);
+    App->GetLibraryModule()->AddName(name, finalNavmeshUID);
 
     GLOG("%s saved navmesh binary.", name);
 
-    return navmeshUID;
+    return finalNavmeshUID;
 }
 
 

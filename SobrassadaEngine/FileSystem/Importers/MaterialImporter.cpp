@@ -176,13 +176,19 @@ UID MaterialImporter::ImportMaterial(
     if (sourceUID == INVALID_UID)
     {
         UID materialUID           = GenerateUID();
-        finalMaterialUID          = App->GetLibraryModule()->AssignFiletypeUID(materialUID, FileType::Material);
+        materialUID          = App->GetLibraryModule()->AssignFiletypeUID(materialUID, FileType::Material);
 
+        UID prefix                 = materialUID / UID_PREFIX_DIVISOR;
+        const std::string savePath = App->GetProjectModule()->GetLoadedProjectPath() + METADATA_PATH +
+                                     std::to_string(prefix) + FILENAME_SEPARATOR + materialName + META_EXTENSION;
+        finalMaterialUID = App->GetLibraryModule()->GetUIDFromMetaFile(savePath);
+        if (finalMaterialUID == INVALID_UID) finalMaterialUID = materialUID;
+        
         // replace "" with shader used (example)
         UID tmpName               = GenerateUID();
         std::string tmpNameString = std::to_string(tmpName);
 
-        if (materialName.empty()) materialName = "MaterialType_" + std::to_string(finalMaterialUID);
+        if (materialName.empty()) materialName = "MaterialType_" + std::to_string(tmpName);
 
         std::string assetPath     = ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
         MetaMaterial meta(finalMaterialUID, assetPath, tmpNameString, useOcclusion, defaultTextureUID);
