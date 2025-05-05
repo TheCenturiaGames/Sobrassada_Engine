@@ -394,6 +394,7 @@
     <ClInclude Include="Character.h" />
     <ClInclude Include="CuChulainn.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="FreeCamera.h" />
     <ClInclude Include="FullscreenToggleScript.h" />
     <ClInclude Include="MainMenuSelectorScript.h" />
     <ClInclude Include="OptionsMenuSwitcherScript.h" />
@@ -1752,6 +1753,7 @@
     <ClCompile Include="CuChulainn.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="ExitGameScript.cpp" />
+    <ClCompile Include="FreeCamera.cpp" />
     <ClCompile Include="FullscreenToggleScript.cpp" />
     <ClCompile Include="MainMenuSelectorScript.cpp" />
     <ClCompile Include="OptionsMenuSwitcherScript.cpp" />

@@ -76,6 +76,9 @@
     <ClInclude Include="Projectile.h">
       <Filter>Characters</Filter>
     </ClInclude>
+    <ClInclude Include="FreeCamera.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Libs\MathGeoLib\include\Time\Clock.cpp">
@@ -707,6 +710,9 @@
     </ClCompile>
     <ClCompile Include="Projectile.cpp">
       <Filter>Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeCamera.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
