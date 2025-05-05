@@ -14,10 +14,10 @@
 #include "ProjectModule.h"
 #include "ResourceNavmesh.h"
 
+#include "GameObject.h"
 #include "ResourceStateMachine.h"
 #include "ResourcesModule.h"
 #include "SceneImporter.h"
-#include "GameObject.h"
 
 #include "SceneModule.h"
 #include "Script.h"
@@ -547,7 +547,7 @@ void EditorUIModule::LoadPrefabDialog(bool& loadPrefab)
     ImGui::InputText("Search", searchTextPrefab, IM_ARRAYSIZE(searchTextPrefab));
 
     ImGui::Separator();
-    if (ImGui::BeginListBox("##PrefabsList", ImVec2(-FLT_MIN, -40)))
+    if (ImGui::BeginListBox("##PrefabsList", ImVec2(-FLT_MIN, -65)))
     {
         int i = 0;
         for (const auto& valuePair : App->GetLibraryModule()->GetPrefabMap())
@@ -572,6 +572,10 @@ void EditorUIModule::LoadPrefabDialog(bool& loadPrefab)
     ImGui::SameLine();
 
     if (ImGui::Button("Cancel", ImVec2(0, 0))) loadPrefab = false;
+
+    ImGui::Dummy(ImVec2(0, 5));
+
+    if (ImGui::Button("DELETE!", ImVec2(0, 0))) App->GetLibraryModule()->DeletePrefabFiles(prefabUID);
 
     ImGui::End();
 

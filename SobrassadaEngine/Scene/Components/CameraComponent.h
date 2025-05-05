@@ -42,7 +42,7 @@ class CameraComponent : public Component
     unsigned int GetUbo() const { return ubo; }
     const float4x4 GetProjectionMatrix() { return camera.ProjectionMatrix(); }
     const float4x4 GetViewMatrix() { return camera.ViewMatrix(); }
-    const int GetType() { return (camera.type == OrthographicFrustum) ? 1 : 0; }
+    const int GetFrustumType() { return (camera.type == OrthographicFrustum) ? 1 : 0; }
     Framebuffer* GetFramebuffer() { return previewFramebuffer; }
 
     void SetAspectRatio(float newAspectRatio);
