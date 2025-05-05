@@ -34,6 +34,7 @@ class ImageComponent;
 class ButtonComponent;
 class AudioSourceComponent;
 class AudioListenerComponent;
+class CanvasScalerComponent;
 
 enum MobilitySettings
 {

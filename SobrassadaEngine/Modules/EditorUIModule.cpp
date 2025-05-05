@@ -62,6 +62,7 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"UI Button",            COMPONENT_BUTTON              },
         {"Audio Source",         COMPONENT_AUDIO_SOURCE        },
         {"Audio Listener",       COMPONENT_AUDIO_LISTENER      },
+        {"UI CanvasScaler",      COMPONENT_CANVAS_SCALER       },
     };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;
