@@ -189,6 +189,36 @@ bool AIAgentComponent::SetPathNavigation(const math::float3& destination)
     return true;
 }
 
+void AIAgentComponent::PauseMovement()
+{
+    if (isPaused || agentId == -1) return;
+
+    dtCrowdAgent* ag = App->GetPathfinderModule()->GetCrowd()->getEditableAgent(agentId);
+
+    if (!ag) return;
+
+    restoredSpeed = ag->params.maxSpeed;
+    restoredAccel   = ag->params.maxAcceleration;
+
+    ag->params.maxSpeed        = 0.f;
+    ag->params.maxAcceleration = 0.f;
+
+    isPaused                     = true;
+}
+
+void AIAgentComponent::ResumeMovement()
+{
+    if (!isPaused || agentId == -1) return;
+
+    dtCrowdAgent* ag = App->GetPathfinderModule()->GetCrowd()->getEditableAgent(agentId);
+    if (!ag) return;
+
+    ag->params.maxSpeed        = restoredSpeed;
+    ag->params.maxAcceleration = restoredAccel;
+
+    isPaused                     = false;
+}
+
 void AIAgentComponent::AddToCrowd()
 {
     if (agentId != -1)

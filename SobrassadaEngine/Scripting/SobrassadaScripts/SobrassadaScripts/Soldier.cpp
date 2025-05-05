@@ -10,7 +10,7 @@
 #include "Standalone/AnimationComponent.h"
 #include "Standalone/CharacterControllerComponent.h"
 
-Soldier::Soldier(GameObject* parent) : Character(parent, 3, 1, 0.5f, 1.0f, 1.0f, 1.0f, 2.0f, 10.0f, patrolPoints)
+Soldier::Soldier(GameObject* parent) : Character(parent, 3, 1, 0.5f, 1.0f, 1.0f, 2.0f, 10.0f, patrolPoint)
 {
     type = CharacterType::Soldier;
 }
@@ -28,7 +28,7 @@ bool Soldier::Init()
     else
     {
         agentAI->RecreateAgent();
-        agentAI->SetSpeed(speed);
+        speed = agentAI->GetSpeed();
     }
 
     return true;
@@ -97,6 +97,20 @@ void Soldier::PatrolAI()
 {
     if (CheckDistanceWithPlayer() == MEDIUM) currentState = SoldierStates::CHASE;
     else if (CheckDistanceWithPlayer() == CLOSE) currentState = SoldierStates::BASIC_ATTACK;
+
+    bool valid = false;
+    if (reachedPatrolPoint)
+    {
+        if (CheckDistanceWithPoint(float3::zero)) reachedPatrolPoint = false;
+        else valid = agentAI->SetPathNavigation(float3::zero);
+    }
+    else
+    {
+        if (CheckDistanceWithPoint(patrolPoint)) reachedPatrolPoint = true;
+        else valid = agentAI->SetPathNavigation(patrolPoint);
+    }
+
+    GLOG("Valid movement: %d", valid);
 }
 
 void Soldier::ChaseAI()
