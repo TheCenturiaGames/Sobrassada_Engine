@@ -389,6 +389,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ButtonScript.h" />
+    <ClInclude Include="CameraMovement.h" />
     <ClInclude Include="ExitGameScript.h" />
     <ClInclude Include="Character.h" />
     <ClInclude Include="CuChulainn.h" />
@@ -401,6 +402,7 @@
     <ClInclude Include="GodMode.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PressAnyKeyScript.h" />
+    <ClInclude Include="Projectile.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="RotateGameObject.h" />
     <ClInclude Include="Script.h" />
@@ -1746,6 +1748,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Game|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="ButtonScript.cpp" />
+    <ClCompile Include="CameraMovement.cpp" />
     <ClCompile Include="Character.cpp" />
     <ClCompile Include="CuChulainn.cpp" />
     <ClCompile Include="dllmain.cpp" />
@@ -1769,6 +1772,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Game|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="PressAnyKeyScript.cpp" />
+    <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="RotateGameObject.cpp" />
     <ClCompile Include="Script.cpp" />
     <ClCompile Include="ScriptExport.cpp" />

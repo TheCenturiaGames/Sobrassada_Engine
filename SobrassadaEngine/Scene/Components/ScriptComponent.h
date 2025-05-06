@@ -17,6 +17,8 @@ enum ScriptType
     SCRIPT_OPTIONS_MENU_SWITCHER,
     SCRIPT_MAIN_MENU_SELECTOR,
     SCRIPT_PRESS_ANY_KEY,
+    SCRIPT_CAMERA_MOVEMENT,
+    SCRIPT_PROJECTILE,
     SCRIPT_FREE_CAMERA,
 
     SCRIPT_TYPE_COUNT // Add at the end
@@ -43,6 +45,8 @@ constexpr const char* scripts[] = {
     "OptionsMenuSwitcherScript", // SCRIPT_OPTIONS_MENU_SWITCHER
     "MainMenuSelectorScript",    // SCRIPT_MAIN_MENU_SELECTOR
     "PressAnyKeyScript",         // SCRIPT_PRESS_ANY_KEY
+    "CameraMovement",            // SCRIPT_CAMERA_MOVEMENT
+    "Projectile",                 // SCRIPT_PROJECTILE
     "FreeCamera"                 // SCRIPT_FREE_CAMERA
 };
 
@@ -76,6 +80,17 @@ class ScriptComponent : public Component
 
     const std::vector<Script*>& GetScriptInstances() const { return scriptInstances; }
     const std::vector<std::string>& GetAllScriptNames() const { return scriptNames; }
+
+    template <typename T> T* GetScriptByType()
+    {
+        for (Script* script : scriptInstances)
+        {
+            T* currentScript = dynamic_cast<T*>(script);
+            if (currentScript) return currentScript;
+        }
+
+        return nullptr;
+    }
 
   private:
     int SearchIdxForString(const std::string& name) const;
