@@ -38,34 +38,37 @@ bool TileFloatScript::Init()
         return false;
     }
     initialY = parent->GetLocalTransform().TranslatePart().y;
+
+    float4x4 transform = parent->GetLocalTransform();
+    float3 pos         = transform.TranslatePart();
+    pos.y              = 3.0f;
+    transform.SetTranslatePart(pos);
+    parent->SetLocalTransform(transform);
+    parent->UpdateTransformForGOBranch();
+
+
     GLOG("Initiating TileFloatScript");
     return true;
 }
 
 void TileFloatScript::Update(float deltaTime)
 {
-    
-    if (character == nullptr) return;
-    float currentY = parent->GetLocalTransform().TranslatePart().y;
-    if (currentY == maxRiseDistance) return;
+    if (!character) return;
 
-    float distance = character->GetLastPosition().Distance(parent->GetPosition());
-    if (distance <= 2.0f)
-    {
-        float currentY      = parent->GetLocalTransform().TranslatePart().y;
-        float distanceRisen = currentY - initialY;
+    const float distance = character->GetLastPosition().Distance(parent->GetPosition());
+    if (distance > 10.0f) return;
 
-        if (distanceRisen < maxRiseDistance)
-        {
-            float riseStep = speed * deltaTime;
-            float clampedRise =
-                (distanceRisen + riseStep > maxRiseDistance) ? (maxRiseDistance - distanceRisen) : riseStep;
+    float3 currentPos   = parent->GetLocalTransform().TranslatePart();
 
-            float4x4 newTransform = parent->GetLocalTransform();
-            float3 currentPos     = parent->GetLocalTransform().TranslatePart();
-            newTransform.SetTranslatePart(currentPos.x, currentPos.y + clampedRise, currentPos.z);
-            parent->SetLocalTransform(newTransform);
-            parent->UpdateTransformForGOBranch();
-        }
-    }
+    if (currentPos.y >= initialY) return;
+
+    float riseStep         = speed * deltaTime * 5;
+    float clampedRise      = min(riseStep, currentPos.y);
+
+    currentPos.y          += clampedRise;
+
+    float4x4 newTransform  = parent->GetLocalTransform();
+    newTransform.SetTranslatePart(currentPos);
+    parent->SetLocalTransform(newTransform);
+    parent->UpdateTransformForGOBranch();
 }

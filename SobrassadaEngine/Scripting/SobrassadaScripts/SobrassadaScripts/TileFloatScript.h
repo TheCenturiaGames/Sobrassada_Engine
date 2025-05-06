@@ -13,7 +13,6 @@ class TileFloatScript : public Script
     void Load(const rapidjson::Value& initialState) override;
 
   private:
-    float speed           = 0.5f;
-    float maxRiseDistance = 15.0f;
+    float speed           = 50.0f;
     float initialY        = 0.0f;
 };
