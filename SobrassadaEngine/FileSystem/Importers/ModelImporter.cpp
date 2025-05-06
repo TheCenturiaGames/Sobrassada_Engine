@@ -117,7 +117,7 @@ namespace ModelImporter
                 GLOG("Animation channels: %zu", anim.channels.size());
 
                 UID animUID =
-                    AnimationImporter::ImportAnimation(model, anim, anim.name, filePath, targetFilePath, sourceUID);
+                    AnimationImporter::ImportAnimation(model, anim, anim.name, filePath, targetFilePath, sourceUID, i);
 
                 GLOG("Imported animation UID: %llu", animUID);
 

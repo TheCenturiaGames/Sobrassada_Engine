@@ -16,7 +16,7 @@ namespace AnimationImporter
 {
     UID ImportAnimation(
         const tinygltf::Model& model, const tinygltf::Animation& animation, const std::string& name,
-        const char* sourceFilePath, const std::string& targetFilePath, UID sourceUID
+        const char* sourceFilePath, const std::string& targetFilePath, UID sourceUID, int animationIndex
     )
     {
         std::vector<char> buffer;
@@ -220,9 +220,9 @@ namespace AnimationImporter
             if (finalAnimUID == INVALID_UID) finalAnimUID = animationUID;
             
             const std::string assetPath = ANIMATIONS_ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
-            MetaAnimation meta(finalAnimUID, assetPath);
+            MetaAnimation meta(finalAnimUID, assetPath, animationIndex);
 
-            meta.Save(animation.name, assetPath);
+            meta.Save(fileName, assetPath);
         }
         else
         {
