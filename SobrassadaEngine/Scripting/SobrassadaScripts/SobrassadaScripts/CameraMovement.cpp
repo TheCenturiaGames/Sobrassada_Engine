@@ -54,7 +54,7 @@ void CameraMovement::FollowTarget(float deltaTime)
     if (mouseOffsetEnabled)
     {
         currentLookAhead = 0;
-        float3 mouseWorldPos =
+        const float3 mouseWorldPos =
             AppEngine->GetSceneModule()->GetScene()->GetMainCamera()->ScreenPointToXZ(currentPosition.y);
         const float3 mouseOffset  = (desiredPosition + (mouseWorldPos)) * 0.5f - desiredPosition;
         desiredPosition          += mouseOffset * mouseOffsetIntensity;
