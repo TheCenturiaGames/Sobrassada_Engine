@@ -215,7 +215,7 @@ namespace AnimationImporter
 
             UID prefix                 = animationUID / UID_PREFIX_DIVISOR;
             const std::string savePath = App->GetProjectModule()->GetLoadedProjectPath() + METADATA_PATH +
-                                         std::to_string(prefix) + FILENAME_SEPARATOR + name + META_EXTENSION;
+                                         std::to_string(prefix) + FILENAME_SEPARATOR + fileName + META_EXTENSION;
             finalAnimUID = App->GetLibraryModule()->GetUIDFromMetaFile(savePath);
             if (finalAnimUID == INVALID_UID) finalAnimUID = animationUID;
             
