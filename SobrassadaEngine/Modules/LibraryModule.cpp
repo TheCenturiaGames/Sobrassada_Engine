@@ -181,7 +181,7 @@ bool LibraryModule::LoadLibraryMaps(const std::string& projectPath)
                 AddName(assetName, assetUID);
                 libraryPath = projectPath + ANIMATIONS_PATH + std::to_string(assetUID) + ANIMATION_EXTENSION;
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
-                else SceneImporter::CopyModel(assetPath, projectPath, assetName, assetUID);
+                else SceneImporter::ImportAnimationFromMetadata(assetPath, projectPath, assetName, assetUID);
                 break;
             case 16:
                 AddPrefab(assetUID, assetName);

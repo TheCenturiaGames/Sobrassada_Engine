@@ -34,6 +34,7 @@ AnimationComponent::AnimationComponent(const rapidjson::Value& initialState, Gam
     {
         resource            = initialState["Animations"].GetUint64();
         currentAnimResource = static_cast<ResourceAnimation*>(App->GetResourcesModule()->RequestResource(resource));
+        int x               = 0;
     }
     else
     {

@@ -222,7 +222,7 @@ namespace AnimationImporter
             const std::string assetPath = ANIMATIONS_ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
             MetaAnimation meta(finalAnimUID, assetPath);
 
-            meta.Save(fileName, assetPath);
+            meta.Save(animation.name, assetPath);
         }
         else
         {
