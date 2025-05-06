@@ -19,5 +19,5 @@ class SpawnPoint : public Script
     std::string playerName   = "";
     const GameObject* player = nullptr;
 
-    bool isOneUse;
+    bool isOneUse            = false;
 };

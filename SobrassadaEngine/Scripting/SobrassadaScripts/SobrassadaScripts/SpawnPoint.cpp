@@ -7,6 +7,7 @@
 #include "Scene.h"
 #include "SceneModule.h"
 #include "ScriptComponent.h"
+#include "Standalone/Physics/CubeColliderComponent.h"
 
 SpawnPoint::SpawnPoint(GameObject* parent) : Script(parent)
 {
@@ -37,7 +38,12 @@ void SpawnPoint::OnCollision(GameObject* otherObject, const float3& collisionNor
         if (playerScript)
         {
             playerScript->SetSpawnPosition(parent->GetPosition());
-            if (isOneUse) parent->SetEnabled(false);
+            if (isOneUse)
+            {
+                if (CubeColliderComponent* collider = parent->GetComponent<CubeColliderComponent*>())
+                    collider->SetEnabled(false);
+                parent->SetEnabled(false);
+            }
         }
     }
 }
