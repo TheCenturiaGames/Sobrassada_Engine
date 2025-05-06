@@ -4,6 +4,8 @@
 #include "FileSystem.h"
 #include "LibraryModule.h"
 #include "MetaModel.h"
+#include <algorithm>
+#include <cctype>
 
 ResourceStateMachine::ResourceStateMachine(UID uid, const std::string& name)
     : Resource(uid, name, ResourceType::Material)
@@ -105,7 +107,6 @@ void ResourceStateMachine::AddState(const std::string& stateName, const std::str
     if (states.size() == 1)
     {
         defaultStateIndex = 0;
-        activeStateIndex  = 0;
     }
 }
 
@@ -125,15 +126,6 @@ bool ResourceStateMachine::RemoveState(const std::string& stateName)
             else if (defaultStateIndex > (int)i)
             {
                 defaultStateIndex--;
-            }
-
-            if ((int)i == activeStateIndex)
-            {
-                activeStateIndex = states.empty() ? -1 : 0;
-            }
-            else if (activeStateIndex > (int)i)
-            {
-                activeStateIndex--;
             }
 
             return true;
@@ -286,6 +278,11 @@ const Transition* ResourceStateMachine::GetTransition(const std::string& fromSta
     return nullptr;
 }
 
+void ResourceStateMachine::ChangeCurrentState(int newStateIndex, const State*& currentState)
+{
+    if (newStateIndex >= 0 && newStateIndex < (int)states.size()) currentState = &states[newStateIndex];
+}
+
 bool ResourceStateMachine::ClipExists(const std::string& clipName) const
 {
     HashString hashClip(clipName);
@@ -294,4 +291,27 @@ bool ResourceStateMachine::ClipExists(const std::string& clipName) const
         if (clip.clipName == hashClip) return true;
     }
     return false;
+}
+
+bool ResourceStateMachine::UseTrigger(const std::string& triggerName, const State*& currentAnimState)
+{
+    bool triggerExists = false;
+    HashString incomingTrigger(triggerName);
+
+    for (const auto& transition : transitions)
+    {
+        if (transition.triggerName == incomingTrigger && transition.fromState == currentAnimState->name)
+        {
+            for (size_t i = 0; i < states.size(); ++i)
+            {
+                if (states[i].name == transition.toState)
+                {
+                    ChangeCurrentState((int)i, currentAnimState);
+                    triggerExists = true;
+                    break;
+                }
+            }
+        }
+    }
+    return triggerExists;
 }

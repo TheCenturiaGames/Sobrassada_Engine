@@ -38,7 +38,8 @@ namespace RaycastController
         {
             LineSegment localRay(ray.a, ray.b);
 
-            const MeshComponent* meshComponent = gameObject->GetMeshComponent();
+            //const MeshComponent* meshComponent = gameObject->GetMeshComponent();
+            const MeshComponent* meshComponent = gameObject->GetComponent<MeshComponent*>();
             if (meshComponent == nullptr) continue; // TODO REMOVE WHEN EMPTY GAMEOBJECT DON'T CONTAIN AN AABB
 
             const ResourceMesh* resourceMesh = meshComponent->GetResourceMesh();

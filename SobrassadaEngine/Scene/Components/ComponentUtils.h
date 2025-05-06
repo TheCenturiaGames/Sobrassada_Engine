@@ -10,7 +10,7 @@
 class Component;
 class GameObject;
 
-enum ComponentType
+enum ComponentType : int
 {
     // Empty type
     COMPONENT_NONE = 0,
@@ -32,8 +32,8 @@ enum ComponentType
     COMPONENT_AIAGENT,
     COMPONENT_IMAGE,
     COMPONENT_BUTTON,
-    FIRST = COMPONENT_NONE,
-    LAST  = COMPONENT_BUTTON
+    COMPONENT_AUDIO_SOURCE,
+    COMPONENT_AUDIO_LISTENER,
 };
 
 enum class ColliderType : uint8_t
@@ -64,7 +64,18 @@ typedef Delegate<void, GameObject*, float3> CollisionDelegate;
 class ComponentUtils
 {
   public:
-    static Component* CreateEmptyComponent(ComponentType type, UID uid, GameObject* parent);
+    static void CreateEmptyComponent(ComponentType type, UID uid, GameObject* parent);
 
-    static Component* CreateExistingComponent(const rapidjson::Value& initialState, GameObject* parent);
+    static void CreateExistingComponent(const rapidjson::Value& initialState, GameObject* parent);
 };
+
+#define COMPONENTS                                                                                                     \
+    MeshComponent*, PointLightComponent*, SpotLightComponent*, DirectionalLightComponent*,                             \
+        CharacterControllerComponent*, Transform2DComponent*, CanvasComponent*,         \
+        UILabelComponent*, CameraComponent*, ScriptComponent*, CubeColliderComponent*, SphereColliderComponent*,       \
+        CapsuleColliderComponent*, AnimationComponent*, AIAgentComponent*, ImageComponent*, ButtonComponent*,          \
+        AudioSourceComponent*, AudioListenerComponent*
+
+#define COMPONENTS_NULLPTR                                                                                             \
+    nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,        \
+        nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr

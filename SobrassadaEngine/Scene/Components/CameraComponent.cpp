@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "DebugDrawModule.h"
 #include "Framebuffer.h"
+#include "GBuffer.h"
 #include "GameObject.h"
 #include "InputModule.h"
 #include "OpenGLModule.h"
@@ -10,30 +11,32 @@
 #include "Math/Quat.h"
 
 #include "ImGui.h"
+#include "Math/MathFunc.h"
+#include "Math/Quat.h"
 #include "glew.h"
 #include <vector>
 
 CameraComponent::CameraComponent(UID uid, GameObject* parent) : Component(uid, parent, "Camera", COMPONENT_CAMERA)
 {
-    const float4x4 globalTransform  = GetGlobalTransform();
-    camera.type               = FrustumType::PerspectiveFrustum;
-    camera.pos                = float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
-    camera.front              = -float3(globalTransform[0][2], globalTransform[1][2], globalTransform[2][2]);
-    camera.up                 = float3(globalTransform[0][1], globalTransform[1][1], globalTransform[2][1]);
+    const float4x4 globalTransform = GetGlobalTransform();
+    camera.type                    = FrustumType::PerspectiveFrustum;
+    camera.pos                     = float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
+    camera.front                   = -float3(globalTransform[0][2], globalTransform[1][2], globalTransform[2][2]);
+    camera.up                      = float3(globalTransform[0][1], globalTransform[1][1], globalTransform[2][1]);
 
-    camera.nearPlaneDistance  = perspectiveNearPlane;
-    camera.farPlaneDistance   = perspectiveFarPlane;
+    camera.nearPlaneDistance       = perspectiveNearPlane;
+    camera.farPlaneDistance        = perspectiveFarPlane;
 
-    camera.horizontalFov      = (float)HFOV * DEGREE_RAD_CONV;
+    camera.horizontalFov           = (float)HFOV * DEGREE_RAD_CONV;
 
-    auto framebuffer          = App->GetOpenGLModule()->GetFramebuffer();
-    const int width                 = framebuffer->GetTextureWidth();
-    const int height                = framebuffer->GetTextureHeight();
+    auto framebuffer               = App->GetOpenGLModule()->GetFramebuffer();
+    const int width                = framebuffer->GetTextureWidth();
+    const int height               = framebuffer->GetTextureHeight();
 
-    camera.verticalFov        = 2.0f * atanf(tanf(camera.horizontalFov * 0.5f) * ((float)height / (float)width));
+    camera.verticalFov             = 2.0f * atanf(tanf(camera.horizontalFov * 0.5f) * ((float)height / (float)width));
 
-    matrices.viewMatrix       = camera.ViewMatrix();
-    matrices.projectionMatrix = camera.ProjectionMatrix();
+    matrices.viewMatrix            = camera.ViewMatrix();
+    matrices.projectionMatrix      = camera.ProjectionMatrix();
 
     glGenBuffers(1, &ubo);
     glBindBuffer(GL_UNIFORM_BUFFER, ubo);
@@ -218,6 +221,11 @@ void CameraComponent::Clone(const Component* other)
 
         firstTime                          = otherCamera->firstTime;
         seePreview                         = otherCamera->seePreview;
+
+        glGenBuffers(1, &ubo);
+        glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(CameraMatrices), nullptr, GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
     else
     {
@@ -231,7 +239,8 @@ void CameraComponent::RenderEditorInspector()
 
     if (enabled)
     {
-        ImGui::SeparatorText("Camera");
+        ImGui::SeparatorText("Camera Component");
+
         if (App->GetSceneModule()->GetScene()->GetMainCamera() != nullptr)
             isMainCamera = (App->GetSceneModule()->GetScene()->GetMainCamera()->GetUbo() == ubo);
         if (ImGui::Checkbox("Main Camera", &isMainCamera))
@@ -300,14 +309,14 @@ void CameraComponent::Update(float deltaTime)
     if (!freeCamera)
     {
         const float4x4 globalTransform = GetGlobalTransform();
-        camera.pos               = float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
+        camera.pos                     = float3(globalTransform[0][3], globalTransform[1][3], globalTransform[2][3]);
         camera.front = -float3(globalTransform[0][2], globalTransform[1][2], globalTransform[2][2]).Normalized();
         camera.up    = float3(globalTransform[0][1], globalTransform[1][1], globalTransform[2][1]).Normalized();
     }
 
     auto framebuffer = App->GetOpenGLModule()->GetFramebuffer();
-    const int width        = framebuffer->GetTextureWidth();
-    const int height       = framebuffer->GetTextureHeight();
+    const int width  = framebuffer->GetTextureWidth();
+    const int height = framebuffer->GetTextureHeight();
     SetAspectRatio((float)height / (float)width);
 
     matrices.projectionMatrix = camera.ProjectionMatrix();
@@ -332,14 +341,17 @@ void CameraComponent::RenderCameraPreview(float deltaTime)
     const int mainFramebufferWidth  = App->GetOpenGLModule()->GetFramebuffer()->GetTextureWidth();
     const int mainFramebufferHeight = App->GetOpenGLModule()->GetFramebuffer()->GetTextureHeight();
 
-    float scaleFactor         = 0.2f;
-    previewWidth              = static_cast<int>(mainFramebufferWidth * scaleFactor);
-    previewHeight             = static_cast<int>(previewWidth / camera.AspectRatio());
+    float scaleFactor               = 0.2f;
+    previewWidth                    = static_cast<int>(mainFramebufferWidth * scaleFactor);
+    previewHeight                   = static_cast<int>(previewWidth / camera.AspectRatio());
 
     if (!autorendering)
     {
         previewFramebuffer->Resize(previewWidth, previewHeight);
         previewFramebuffer->CheckResize();
+
+        App->GetOpenGLModule()->GetGBuffer()->Resize(previewWidth, previewHeight);
+        App->GetOpenGLModule()->GetGBuffer()->CheckResize();
 
         glViewport(0, 0, previewWidth, previewHeight);
 
@@ -347,6 +359,9 @@ void CameraComponent::RenderCameraPreview(float deltaTime)
         autorendering = true;
         App->GetSceneModule()->GetScene()->RenderScene(deltaTime, this);
         autorendering = false;
+
+        App->GetOpenGLModule()->GetGBuffer()->Resize(mainFramebufferWidth, mainFramebufferHeight);
+        App->GetOpenGLModule()->GetGBuffer()->CheckResize();
 
         App->GetOpenGLModule()->GetFramebuffer()->Bind();
 
@@ -395,16 +410,46 @@ void CameraComponent::Translate(const float3& direction)
 void SOBRASADA_API_ENGINE CameraComponent::Rotate(float yaw, float pitch)
 {
     const Quat yawRotation = Quat::RotateY(yaw);
-    camera.front     = yawRotation.Mul(camera.front).Normalized();
-    camera.up        = yawRotation.Mul(camera.up).Normalized();
+    camera.front           = yawRotation.Mul(camera.front).Normalized();
+    camera.up              = yawRotation.Mul(camera.up).Normalized();
 
     if ((currentPitchAngle + pitch) > maximumNegativePitch && (currentPitchAngle + pitch) < maximumPositivePitch)
     {
-        currentPitchAngle  += pitch;
+        currentPitchAngle        += pitch;
         const Quat pitchRotation  = Quat::RotateAxisAngle(camera.WorldRight(), pitch);
-        camera.front        = pitchRotation.Mul(camera.front).Normalized();
-        camera.up           = pitchRotation.Mul(camera.up).Normalized();
+        camera.front              = pitchRotation.Mul(camera.front).Normalized();
+        camera.up                 = pitchRotation.Mul(camera.up).Normalized();
     }
+}
+
+const LineSegment CameraComponent::CastCameraRay()
+{
+    const auto& windowPosition = App->GetSceneModule()->GetScene()->GetWindowPosition();
+    const auto& windowSize     = App->GetSceneModule()->GetScene()->GetWindowSize();
+    const auto& mousePos       = App->GetSceneModule()->GetScene()->GetMousePosition();
+
+    const float windowMinX     = std::get<0>(windowPosition);
+    const float windowMaxX     = std::get<0>(windowPosition) + std::get<0>(windowSize);
+
+    const float windowMinY     = std::get<1>(windowPosition);
+    const float windowMaxY     = std::get<1>(windowPosition) + std::get<1>(windowSize);
+
+    const float percentageX    = (std::get<0>(mousePos) - windowMinX) / (windowMaxX - windowMinX);
+    const float percentageY    = (std::get<1>(mousePos) - windowMinY) / (windowMaxY - windowMinY);
+
+    const float normalizedX    = Clamp(Lerp(-1.0f, 1.0f, percentageX), -1.0f, 1.0f);
+    const float normalizedY    = Clamp(Lerp(1.0f, -1.0f, percentageY), -1.0f, 1.0f);
+
+    return camera.UnProjectLineSegment(normalizedX, normalizedY);
+}
+
+const float3 CameraComponent::ScreenPointToXZ(const float y)
+{
+    // Converts the mouse position to a world position in the XZ plane, to the given height
+    const Ray ray         = CastCameraRay().ToRay();
+    const float t         = (y - ray.pos.y) / ray.dir.y;
+    const float3 worldPos = ray.pos + ray.dir * t;
+    return worldPos;
 }
 
 void CameraComponent::Render(float deltaTime)

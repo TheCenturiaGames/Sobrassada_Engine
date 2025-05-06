@@ -1,18 +1,27 @@
 #include "pch.h"
-#include "GodMode.h"
 #include "Application.h"
 #include "CameraComponent.h"
 #include "Components/Standalone/CharacterControllerComponent.h"
 #include "GameObject.h"
+#include "GodMode.h"
 #include "InputModule.h"
 #include <SDL_mouse.h>
 
 bool GodMode::Init()
 {
-    characterController =
-        dynamic_cast<CharacterControllerComponent*>(parent->GetComponentByType(COMPONENT_CHARACTER_CONTROLLER));
-    godCamera = dynamic_cast<CameraComponent*>(parent->GetComponentChildByType(COMPONENT_CAMERA));
+    characterController = parent->GetComponent<CharacterControllerComponent*>();
+    if (!characterController)
+    {
+        GLOG("GodMode character controller component not found for %s", parent->GetName().c_str());
+        return false;
+    }
 
+    godCamera = parent->GetComponentChild<CameraComponent*>(AppEngine);
+    if (!godCamera)
+    {
+        GLOG("GodMode camera component not found for %s", parent->GetName().c_str());
+        return false;
+    }
     return true;
 }
 
@@ -59,8 +68,4 @@ void GodMode::Update(float deltaTime)
         godCamera->SetFreeCamera(true);
         freeCamera = true;
     }
-}
-
-void GodMode::Inspector()
-{
 }

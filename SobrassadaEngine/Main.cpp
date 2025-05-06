@@ -28,7 +28,7 @@ Application* App         = NULL;
 std::vector<char*> *Logs = NULL;
 LCG* rng;
 
-int main(int argc, char** argv)
+int  main(int argc, char** argv)
 {
     int mainReturn      = EXIT_SUCCESS;
     MainState mainState = MAIN_CREATION;
@@ -45,7 +45,7 @@ int main(int argc, char** argv)
         {
         case MAIN_CREATION:
 
-            GLOG("----- Application Creation -----");
+            //GLOG("----- Application Creation -----");
             App       = new Application();
             mainState = MAIN_START;
             break;

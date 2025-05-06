@@ -1,12 +1,16 @@
 #include "ScriptComponent.h"
+
 #include "Application.h"
-#include "ImGui.h"
+#include "EditorUIModule.h"
+#include "GameObject.h"
+#include "GameTimer.h"
 #include "SceneModule.h"
 #include "Script.h"
 #include "ScriptModule.h"
 #include "EditorUIModule.h"
 
-// Do script of object rotating
+#include "ImGui.h"
+#include "Math/float3.h"
 
 ScriptComponent::ScriptComponent(UID uid, GameObject* parent) : Component(uid, parent, "Script", COMPONENT_SCRIPT)
 {
@@ -15,21 +19,55 @@ ScriptComponent::ScriptComponent(UID uid, GameObject* parent) : Component(uid, p
 ScriptComponent::ScriptComponent(const rapidjson::Value& initialState, GameObject* parent)
     : Component(initialState, parent)
 {
-    if (initialState.HasMember("Script Name"))
+    if (initialState.HasMember("Scripts") && initialState["Scripts"].IsArray())
     {
-        CreateScript(initialState["Script Name"].GetString());
+        for (const auto& scriptData : initialState["Scripts"].GetArray())
+        {
+            if (scriptData.HasMember("Script Name"))
+            {
+                const char* name = scriptData["Script Name"].GetString();
+                CreateScript(name);
+                scriptInstances.back()->Load(scriptData);
+            }
+        }
+    }
+}
+
+void ScriptComponent::Load(const rapidjson::Value& initialState)
+{
+    if (initialState.HasMember("Scripts") && initialState["Scripts"].IsArray())
+    {
+        for (const auto& scriptData : initialState["Scripts"].GetArray())
+        {
+            if (scriptData.HasMember("Script Name"))
+            {
+                const char* name = scriptData["Script Name"].GetString();
+                CreateScript(name);
+                scriptInstances.back()->Load(scriptData);
+            }
+        }
     }
 }
 
 ScriptComponent::~ScriptComponent()
 {
-    if (scriptInstance) DeleteScript();
+    DeleteAllScripts();
 }
 
 void ScriptComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
 {
     Component::Save(targetState, allocator);
-    targetState.AddMember("Script Name", rapidjson::Value(scriptName.c_str(), allocator), allocator);
+    rapidjson::Value scriptsArray(rapidjson::kArrayType);
+
+    for (size_t i = 0; i < scriptInstances.size(); ++i)
+    {
+        rapidjson::Value scriptData(rapidjson::kObjectType);
+        scriptData.AddMember("Script Name", rapidjson::Value(scriptNames[i].c_str(), allocator), allocator);
+        scriptInstances[i]->Save(scriptData, allocator);
+        scriptsArray.PushBack(scriptData, allocator);
+    }
+
+    targetState.AddMember("Scripts", scriptsArray, allocator);
 }
 
 void ScriptComponent::Clone(const Component* other)
@@ -39,7 +77,12 @@ void ScriptComponent::Clone(const Component* other)
         const ScriptComponent* otherScript = static_cast<const ScriptComponent*>(other);
         enabled                            = otherScript->enabled;
 
-        CreateScript(otherScript->scriptName);
+        for (size_t i = 0; i < otherScript->scriptNames.size(); ++i)
+        {
+            CreateScript(otherScript->scriptNames[i]);
+            const auto& a = otherScript->scriptInstances[i]->GetFields();
+            scriptInstances.back()->CloneFields(a);
+        }
     }
     else
     {
@@ -49,19 +92,16 @@ void ScriptComponent::Clone(const Component* other)
 
 void ScriptComponent::Update(float deltaTime)
 {
+    if (!IsEffectivelyEnabled()) return;
+
     if (App->GetSceneModule()->GetInPlayMode())
     {
-        if (scriptInstance != nullptr)
+        float gameTime = App->GetGameTimer()->GetDeltaTime() / 1000.0f;
+        for (auto& script : scriptInstances)
         {
-            if (!startScript)
-            {
-                scriptInstance->Init();
-                startScript = true;
-            }
-            scriptInstance->Update(deltaTime);
+            script->Update(gameTime);
         }
     }
-    else startScript = false;
 }
 
 void ScriptComponent::Render(float deltaTime)
@@ -70,7 +110,6 @@ void ScriptComponent::Render(float deltaTime)
 
 void ScriptComponent::RenderDebug(float deltaTime)
 {
-
 }
 
 void ScriptComponent::RenderEditorInspector()
@@ -79,41 +118,104 @@ void ScriptComponent::RenderEditorInspector()
     if (enabled)
     {
         ImGui::SeparatorText("Script Component");
-        ImGui::Text(scriptName.c_str());
-        ImGui::SameLine();
         if (ImGui::Button("Select script"))
         {
             ImGui::OpenPopup("Select Script");
         }
         if (ImGui::BeginPopup("Select Script"))
         {
-            for (const auto& scriptType : scripts)
+            for (int i = 0; i < SCRIPT_TYPE_COUNT; ++i)
             {
-                if (ImGui::Selectable(scriptType.c_str()))
+                if (ImGui::Selectable(scripts[i]))
                 {
-                    if (scriptInstance != nullptr) DeleteScript();
-                    CreateScript(scriptType);
+                    CreateScript(scripts[i]);
                 }
             }
             ImGui::EndPopup();
         }
-        if (scriptInstance != nullptr)
+        for (int i = 0; i < scriptInstances.size(); ++i)
         {
             ImGui::Separator();
-            scriptInstance->Inspector();
+            ImGui::PushID(static_cast<int>(i));
+
+            ImGui::Text(scriptNames[i].c_str());
+            ImGui::SameLine();
+            if (ImGui::Button("Delete"))
+            {
+                DeleteScript(i);
+                ImGui::PopID();
+                break;
+            }
+
+            if (scriptInstances[i])
+            {
+                scriptInstances[i]->Inspector();
+            }
+
+            ImGui::PopID();
         }
+    }
+}
+
+void ScriptComponent::InitScriptInstances()
+{
+    for (auto& script : scriptInstances)
+    {
+        script->Init();
+    }
+}
+
+void ScriptComponent::OnCollision(GameObject* otherObject, const float3& collisionNormal)
+{
+    for (auto& script : scriptInstances)
+    {
+        script->OnCollision(otherObject, collisionNormal);
     }
 }
 
 void ScriptComponent::CreateScript(const std::string& scriptType)
 {
-    scriptName     = scriptType;
-    scriptInstance = App->GetScriptModule()->CreateScript(scriptType, parent);
-    if (scriptInstance == nullptr) scriptName = "Not selected";
+    Script* instance = App->GetScriptModule()->CreateScript(scriptType, parent);
+    if (instance == nullptr) return;
+
+    scriptInstances.push_back(instance);
+    scriptNames.push_back(scriptType);
+    scriptTypes.push_back(static_cast<ScriptType>(SearchIdxForString(scriptType)));
 }
 
-void ScriptComponent::DeleteScript()
+void ScriptComponent::DeleteScript(const int index)
 {
-    App->GetScriptModule()->DestroyScript(scriptInstance);
-    scriptInstance = nullptr;
+    if (index >= scriptInstances.size()) return;
+
+    if (scriptInstances[index]) App->GetScriptModule()->DestroyScript(scriptInstances[index]);
+
+    scriptInstances.erase(scriptInstances.begin() + index);
+    scriptNames.erase(scriptNames.begin() + index);
+    scriptTypes.erase(scriptTypes.begin() + index);
+}
+
+void ScriptComponent::DeleteAllScripts()
+{
+    for (auto& script : scriptInstances)
+    {
+        if (script) App->GetScriptModule()->DestroyScript(script);
+    }
+
+    scriptInstances.clear();
+    scriptNames.clear();
+    scriptTypes.clear();
+}
+
+int ScriptComponent::SearchIdxForString(const std::string& scriptString) const
+{
+    int idx = 0;
+    for (int i = 0; i < SCRIPT_TYPE_COUNT; ++i)
+    {
+        if (scriptString == scripts[i])
+        {
+            idx = i;
+            break;
+        }
+    }
+    return idx;
 }

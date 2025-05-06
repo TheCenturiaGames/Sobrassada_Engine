@@ -16,6 +16,9 @@
 #include "RaycastController.h"
 #include "ResourcesModule.h"
 #include "Standalone/AnimationComponent.h"
+#include "Standalone/Lights/DirectionalLightComponent.h"
+#include "Standalone/Lights/PointLightComponent.h"
+#include "Standalone/Lights/SpotLightComponent.h"
 #include "Standalone/MeshComponent.h"
 
 #include <SDL_mouse.h>
@@ -140,7 +143,7 @@ bool SceneModule::ShutDown()
 void SceneModule::CreateScene()
 {
     CloseScene();
-
+    App->GetPathfinderModule()->ResetNavmesh();
     loadedScene = new Scene(DEFAULT_SCENE_NAME);
     loadedScene->Init();
 }
@@ -192,7 +195,11 @@ void SceneModule::SwitchPlayMode(bool play)
     }
     else
     {
-        if (App->GetLibraryModule()->SaveScene("", SaveMode::SavePlayMode)) inPlayMode = true;
+        if (App->GetLibraryModule()->SaveScene("", SaveMode::SavePlayMode))
+        {
+            inPlayMode       = true;
+            onlyOncePlayMode = true;
+        }
     }
 }
 
@@ -231,8 +238,8 @@ void SceneModule::HandleObjectDuplication()
 
     if (loadedScene->IsMultiselecting())
     {
-        const std::map<UID, UID> selectedGameObjects = loadedScene->GetMultiselectedObjects();
 
+        const std::map<UID, UID> selectedGameObjects = loadedScene->GetMultiselectedObjects();
         for (auto& childToDuplicate : selectedGameObjects)
         {
             objectsToDuplicate.push_back(childToDuplicate);
@@ -298,7 +305,7 @@ void SceneModule::HandleObjectDuplication()
         // ITERATE OVER ALL GAME OBJECTS TO CHECK IF ANY REMAPING IS NEEDED
         for (int i = 0; i < createdGameObjects.size(); ++i)
         {
-            MeshComponent* originalMeshComp = originalGameObjects[i]->GetMeshComponent();
+            MeshComponent* originalMeshComp = originalGameObjects[i]->GetComponent<MeshComponent*>();
             if (originalMeshComp && originalMeshComp->GetHasBones())
             {
                 // Remap the bones references
@@ -313,24 +320,39 @@ void SceneModule::HandleObjectDuplication()
                     newBonesObjects.push_back(loadedScene->GetGameObjectByUID(uid));
                 }
 
-                MeshComponent* newMesh = createdGameObjects[i]->GetMeshComponent();
+                MeshComponent* newMesh = createdGameObjects[i]->GetComponent<MeshComponent*>();
                 newMesh->SetBones(newBonesObjects, newBonesUIDs);
             }
 
-            AnimationComponent* animComp = createdGameObjects[i]->GetAnimationComponent();
+            AnimationComponent* animComp = createdGameObjects[i]->GetComponent<AnimationComponent*>();
             if (animComp) animComp->SetBoneMapping();
+
+            // LIGHTS NEED THE INIT AGAIN BECAUSE WHEN CREATING THE COMPONENT THE PARENT GO IS NOT IN THE MAP UNTIL CREATED SO IT DOESEN'T GET ADDED TO THE LIST
+            PointLightComponent* pointLight = createdGameObjects[i]->GetComponent<PointLightComponent*>();
+            if (pointLight) pointLight->Init();
+
+            DirectionalLightComponent* directionalLight = createdGameObjects[i]->GetComponent<DirectionalLightComponent*>();
+            if (directionalLight) directionalLight->Init();
+
+            SpotLightComponent* spotLight = createdGameObjects[i]->GetComponent<SpotLightComponent*>();
+            if (spotLight) spotLight->Init();
         }
     }
 
     if (loadedScene->IsMultiselecting())
     {
         const std::map<UID, MobilitySettings> originalObjectMobility = loadedScene->GetMultiselectedObjectsMobility();
+        const std::map<UID, float4x4> originalObjectLocals           = loadedScene->GetMultiselectedObjectsLocals();
 
         for (int i = 0; i < objectsToDuplicate.size(); ++i)
         {
             MobilitySettings originalMobility = originalObjectMobility.find(objectsToDuplicate[i].first)->second;
-            loadedScene->GetGameObjectByUID(remappingTable[objectsToDuplicate[i].first])
-                ->UpdateMobilityHierarchy(originalMobility);
+            const float4x4& ogLocal           = originalObjectLocals.find(objectsToDuplicate[i].first)->second;
+
+            GameObject* currentGameObject =
+                loadedScene->GetGameObjectByUID(remappingTable[objectsToDuplicate[i].first]);
+            currentGameObject->SetLocalTransform(ogLocal);
+            currentGameObject->UpdateMobilityHierarchy(originalMobility);
         }
     }
 }

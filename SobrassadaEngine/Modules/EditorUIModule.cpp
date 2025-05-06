@@ -14,6 +14,7 @@
 #include "ProjectModule.h"
 #include "ResourceNavmesh.h"
 
+#include "GameObject.h"
 #include "ResourceStateMachine.h"
 #include "ResourcesModule.h"
 #include "SceneImporter.h"
@@ -59,6 +60,8 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {"AI Agent",             COMPONENT_AIAGENT             },
         {"UI Image",             COMPONENT_IMAGE               },
         {"UI Button",            COMPONENT_BUTTON              },
+        {"Audio Source",         COMPONENT_AUDIO_SOURCE        },
+        {"Audio Listener",       COMPONENT_AUDIO_LISTENER      },
     };
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;
@@ -80,7 +83,7 @@ EditorUIModule::~EditorUIModule()
 
 bool EditorUIModule::Init()
 {
-    ImGuiContext* context = ImGui::CreateContext();
+    context = ImGui::CreateContext();
     ImGuizmo::SetImGuiContext(context);
     ImGuiIO& io     = ImGui::GetIO();
     io.ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
@@ -97,6 +100,15 @@ bool EditorUIModule::Init()
     fileDialogCurrentPath = App->GetProjectModule()->GetLoadedProjectPath();
 
     return true;
+}
+
+void EditorUIModule::DrawScriptInspector(std::function<void()> callback)
+{
+    ImGui::SetNextItemOpen(true, ImGuiCond_Always);
+    if (ImGui::CollapsingHeader("Script Inspector", ImGuiTreeNodeFlags_None))
+    {
+        callback();
+    }
 }
 
 update_status EditorUIModule::PreUpdate(float deltaTime)
@@ -423,15 +435,92 @@ void EditorUIModule::Navmesh(bool& navmesh)
 
     ImGui::Begin("NavMesh Creation", &navmesh, ImGuiWindowFlags_None);
 
+    // Draw config UI
+    App->GetPathfinderModule()->GetNavMeshConfig().RenderEditorUI();
+
+    ImGui::InputText("NavMesh Name", navmeshName, IM_ARRAYSIZE(navmeshName));
+
+    // Create navmesh
     if (ImGui::Button("Create NavMesh"))
     {
-        App->GetResourcesModule()->CreateNavMesh();
+        App->GetPathfinderModule()->CreateNavMesh();
         ImGui::Text("NavMesh created!");
     }
 
-    App->GetResourcesModule()->GetNavMesh()->RenderNavmeshEditor();
+    // Save navmesh
+    if (ImGui::Button("Save NavMesh"))
+    {
+        App->GetPathfinderModule()->SaveNavMesh(navmeshName); // or ask user for name
+        ImGui::Text("NavMesh saved!");
+    }
 
-    ImGui::End();
+    // Load navmesh
+    if (ImGui::Button("Load NavMesh"))
+    {
+        showNavLoadDialog = true;
+    }
+
+    ImGui::End(); // End NavMesh Creation
+
+    // Load dialog window
+    if (showNavLoadDialog)
+    {
+        ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_FirstUseEver);
+        bool open = true;
+        if (ImGui::Begin("Load NavMesh", &open, ImGuiWindowFlags_NoCollapse))
+        {
+            ImGui::InputText("Search", searchTextNavmesh, IM_ARRAYSIZE(searchTextNavmesh));
+            ImGui::Separator();
+
+            if (ImGui::BeginListBox("##NavmeshList", ImVec2(-FLT_MIN, -40)))
+            {
+                int i = 0;
+                for (const auto& pair : App->GetLibraryModule()->GetNavmeshMap())
+                {
+                    if (pair.first.find(searchTextNavmesh) != std::string::npos)
+                    {
+                        ++i;
+                        if (ImGui::Selectable(pair.first.c_str(), selectedNavmesh == i))
+                        {
+                            selectedNavmesh = i;
+                            navmeshUID      = pair.second;
+                        }
+                    }
+                }
+                ImGui::EndListBox();
+            }
+
+            ImGui::Dummy(ImVec2(0, 3));
+
+            if (ImGui::Button("Load"))
+            {
+                if (navmeshUID != INVALID_UID)
+                {
+                    App->GetPathfinderModule()->LoadNavMesh(App->GetLibraryModule()->GetResourceName(navmeshUID));
+                }
+                open = false;
+            }
+
+            ImGui::SameLine();
+
+            if (ImGui::Button("Cancel"))
+            {
+                open = false;
+            }
+
+            ImGui::End();
+        }
+
+        if (!open)
+        {
+            showNavLoadDialog    = false;
+
+            // Reset search and selection
+            searchTextNavmesh[0] = '\0';
+            selectedNavmesh      = -1;
+            navmeshUID           = INVALID_UID;
+        }
+    }
 }
 
 void EditorUIModule::CrowdControl(bool& crowdControl)
@@ -458,7 +547,7 @@ void EditorUIModule::LoadPrefabDialog(bool& loadPrefab)
     ImGui::InputText("Search", searchTextPrefab, IM_ARRAYSIZE(searchTextPrefab));
 
     ImGui::Separator();
-    if (ImGui::BeginListBox("##PrefabsList", ImVec2(-FLT_MIN, -40)))
+    if (ImGui::BeginListBox("##PrefabsList", ImVec2(-FLT_MIN, -65)))
     {
         int i = 0;
         for (const auto& valuePair : App->GetLibraryModule()->GetPrefabMap())
@@ -483,6 +572,10 @@ void EditorUIModule::LoadPrefabDialog(bool& loadPrefab)
     ImGui::SameLine();
 
     if (ImGui::Button("Cancel", ImVec2(0, 0))) loadPrefab = false;
+
+    ImGui::Dummy(ImVec2(0, 5));
+
+    if (ImGui::Button("DELETE!", ImVec2(0, 0))) App->GetLibraryModule()->DeletePrefabFiles(prefabUID);
 
     ImGui::End();
 
@@ -834,6 +927,54 @@ void EditorUIModule::DrawScriptInspector(const std::vector<InspectorField>& fiel
             ImGui::ColorEdit3(field.name, (float*)&color->Value);
             break;
         }
+        case InspectorField::FieldType::InputText:
+        {
+            // Use InputText with strings (I don't know how this works)
+            std::string* str = static_cast<std::string*>(field.data);
+            ImGui::InputText(
+                field.name, str->data(), str->capacity() + 1, ImGuiInputTextFlags_CallbackResize,
+                [](ImGuiInputTextCallbackData* data) -> int
+                {
+                    if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
+                    {
+                        std::string* str = static_cast<std::string*>(data->UserData);
+                        str->resize(data->BufTextLen);
+                    }
+                    return 0;
+                },
+                static_cast<void*>(str)
+            );
+            break;
+        }
+        case InspectorField::FieldType::GameObject:
+        {
+            GameObject** selectedGO = (GameObject**)field.data;
+            const char* currentName = (*selectedGO) ? (*selectedGO)->GetName().c_str() : "None";
+            if (ImGui::BeginCombo(field.name, currentName))
+            {
+                if (ImGui::Selectable("None", *selectedGO == nullptr))
+                {
+                    *selectedGO = nullptr;
+                }
+
+                for (const auto& pair : App->GetSceneModule()->GetScene()->GetAllGameObjects())
+                {
+                    GameObject* go          = pair.second;
+                    const std::string& name = go->GetName();
+
+                    if (name == "SceneModule GameObject" || name == "MULTISELECT_DUMMY") continue;
+
+                    std::string label = name + "##" + std::to_string(go->GetUID());
+                    bool isSelected   = (*selectedGO == go);
+                    if (ImGui::Selectable(label.c_str(), isSelected)) *selectedGO = go;
+
+                    if (isSelected) ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndCombo();
+            }
+
+            break;
+        }
         }
     }
 }
@@ -855,9 +996,21 @@ void EditorUIModule::Console(bool& consoleMenu) const
         return;
     }
 
+    int index = 0;
     for (const char* log : *Logs)
     {
-        ImGui::TextUnformatted(log);
+        std::string label = std::string(log) + "##" + std::to_string(index);
+        ImGui::Selectable(label.c_str());
+
+        if (ImGui::BeginPopupContextItem())
+        {
+            if (ImGui::MenuItem("Copy Text"))
+            {
+                ImGui::SetClipboardText(log);
+            }
+            ImGui::EndPopup();
+        }
+        ++index;
     }
 
     // Autoscroll only if the scroll is in the bottom position
@@ -991,7 +1144,9 @@ template ComponentType EditorUIModule::RenderResourceSelectDialog<ComponentType>
     const char* id, const std::unordered_map<std::string, ComponentType>& availableResources,
     const ComponentType& defaultResource
 );
-
+template uint32_t EditorUIModule::RenderResourceSelectDialog<uint32_t>(
+    const char* id, const std::unordered_map<std::string, uint32_t>& availableResources, const uint32_t& defaultResource
+);
 void EditorUIModule::RenderBasicTransformModifiers(
     float3& outputPosition, float3& outputRotation, float3& outputScale, bool& lockScaleAxis,
     bool& positionValueChanged, bool& rotationValueChanged, bool& scaleValueChanged
@@ -1262,7 +1417,8 @@ EngineEditorBase* EditorUIModule::CreateEditor(EditorType type)
         return new NodeEditor("NodeEditor_" + std::to_string(uid), uid);
 
     case EditorType::ANIMATION:
-        return stateMachineEditor = new StateMachineEditor("StateMachineEditor_" + std::to_string(uid), uid, stateMachine);
+        return stateMachineEditor =
+                   new StateMachineEditor("StateMachineEditor_" + std::to_string(uid), uid, stateMachine);
 
     case EditorType::TEXTURE:
         return new TextureEditor("TextureEditor_" + std::to_string(uid), uid);
@@ -1718,4 +1874,21 @@ std::string EditorUIModule::FormatWithCommas(unsigned int number) const
     ss.imbue(std::locale("en_US.UTF-8")); // use commas
     ss << number;
     return ss.str();
+}
+
+void EditorUIModule::RequestExit()
+{
+    closeApplication = true;
+}
+
+void EditorUIModule::ToggleFullscreen()
+{
+    const bool current = App->GetWindowModule()->GetFullscreen();
+    App->GetWindowModule()->SetFullscreen(!current);
+}
+
+void EditorUIModule::ToggleVSync()
+{
+    const bool current = App->GetWindowModule()->GetVsync();
+    App->GetWindowModule()->SetVsync(!current);
 }

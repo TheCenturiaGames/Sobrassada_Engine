@@ -40,6 +40,8 @@ class SceneModule : public Module
     Scene* GetScene() const { return loadedScene; }
 
     bool GetInPlayMode() const { return inPlayMode; }
+    bool GetOnlyOnceInPlayMode() const { return onlyOncePlayMode; }
+    void ResetOnlyOnceInPlayMode() { onlyOncePlayMode = false; }
 
     void AddGameObjectToUpdate(GameObject* gameObject) { loadedScene->AddGameObjectToUpdate(gameObject); };
 
@@ -50,6 +52,7 @@ class SceneModule : public Module
     void HandleTreesUpdates();
 
   private:
-    Scene* loadedScene = nullptr;
-    bool inPlayMode    = false;
+    Scene* loadedScene    = nullptr;
+    bool inPlayMode       = false;
+    bool onlyOncePlayMode = false;
 };

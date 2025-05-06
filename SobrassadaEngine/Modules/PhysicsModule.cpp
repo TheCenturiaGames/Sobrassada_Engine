@@ -38,6 +38,16 @@ bool PhysicsModule::Init()
 
 update_status PhysicsModule::PreUpdate(float deltaTime)
 {
+    // REMOVE RIGID BODIES
+    for (btRigidBody* rigidBody : bodiesToRemove)
+    {
+        dynamicsWorld->removeRigidBody(rigidBody);
+        btCollisionShape* shape = rigidBody->getCollisionShape();
+        delete shape;
+        delete rigidBody;
+    }
+    bodiesToRemove.clear();
+
     if (!App->GetSceneModule()->GetInPlayMode()) return UPDATE_CONTINUE;
 
     dynamicsWorld->stepSimulation(deltaTime, 10);
@@ -87,16 +97,6 @@ update_status PhysicsModule::PostUpdate(float deltaTime)
         dynamicsWorld->setGravity(btVector3(0, gravity, 0));
     }
 
-    // REMOVE RIGID BODIES
-    for (btRigidBody* rigidBody : bodiesToRemove)
-    {
-        dynamicsWorld->removeRigidBody(rigidBody);
-        btCollisionShape* shape = rigidBody->getCollisionShape();
-        delete shape;
-        delete rigidBody;
-    }
-    bodiesToRemove.clear();
-
     return UPDATE_CONTINUE;
 }
 
@@ -109,6 +109,7 @@ bool PhysicsModule::ShutDown()
     delete broadPhase;
     delete dispatcher;
     delete collisionConfiguration;
+    delete debugDraw;
 
     return true;
 }
@@ -153,6 +154,8 @@ void PhysicsModule::UpdateCubeRigidBody(CubeColliderComponent* colliderComponent
 
 void PhysicsModule::DeleteCubeRigidBody(CubeColliderComponent* colliderComponent)
 {
+    if (colliderComponent->rigidBody == nullptr) return;
+
     bodiesToRemove.push_back(colliderComponent->rigidBody);
     colliderComponent->rigidBody = nullptr;
 }
@@ -162,7 +165,7 @@ void PhysicsModule::CreateSphereRigidBody(SphereColliderComponent* colliderCompo
     // Collision shape
     btCollisionShape* collisionShape = new btSphereShape(colliderComponent->radius);
 
-    const bool isDynamic                   = (colliderComponent->mass != 0.f);
+    const bool isDynamic             = (colliderComponent->mass != 0.f);
 
     // Inertia
     btVector3 localInertia(0, 0, 0);
@@ -195,6 +198,8 @@ void PhysicsModule::UpdateSphereRigidBody(SphereColliderComponent* colliderCompo
 
 void PhysicsModule::DeleteSphereRigidBody(SphereColliderComponent* colliderComponent)
 {
+    if (colliderComponent->rigidBody == nullptr) return;
+
     bodiesToRemove.push_back(colliderComponent->rigidBody);
     colliderComponent->rigidBody = nullptr;
 }
@@ -204,10 +209,10 @@ void PhysicsModule::CreateCapsuleRigidBody(CapsuleColliderComponent* colliderCom
     // Collision shape
     btCollisionShape* collisionShape = new btCapsuleShape(colliderComponent->radius, colliderComponent->length);
 
-    const bool isDynamic                   = (colliderComponent->mass != 0.f);
+    const bool isDynamic             = (colliderComponent->mass != 0.f);
 
     // Inertia
-    btVector3 localInertia(0, 0, 0);
+    btVector3 localInertia(0.f, 0.f, 0.f);
     if (isDynamic) collisionShape->calculateLocalInertia(colliderComponent->mass, localInertia);
 
     // MotionState for RENDER AND
@@ -237,6 +242,8 @@ void PhysicsModule::UpdateCapsuleRigidBody(CapsuleColliderComponent* colliderCom
 
 void PhysicsModule::DeleteCapsuleRigidBody(CapsuleColliderComponent* colliderComponent)
 {
+    if (colliderComponent->rigidBody == nullptr) return;
+
     bodiesToRemove.push_back(colliderComponent->rigidBody);
     colliderComponent->rigidBody = nullptr;
 }
@@ -256,6 +263,7 @@ void PhysicsModule::AddRigidBody(btRigidBody* rigidBody, ColliderType colliderTy
     case ColliderType::KINEMATIC:
         rigidBody->setCollisionFlags(rigidBody->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
         rigidBody->setActivationState(DISABLE_DEACTIVATION);
+        rigidBody->setCustomDebugColor(btVector3(0.859f, 0.196f, 0.784f)); // COLOR TO NOT BE RED, COLORBLIND ISSUE
         break;
     case ColliderType::TRIGGER:
         rigidBody->setCollisionFlags(
@@ -270,7 +278,7 @@ void PhysicsModule::AddRigidBody(btRigidBody* rigidBody, ColliderType colliderTy
         break;
     }
 
-    const int group                     = 1 << (int)layerType;
+    const int group               = 1 << (int)layerType;
 
     int mask                      = 0;
     const LayerBitset& maskBitset = colliderLayerConfig[(int)layerType];
@@ -379,12 +387,12 @@ void PhysicsModule::EmptyWorld()
 
     bodiesToRemove.clear();
 
-    for (int i = dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i--)
+   /* for (int i = dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i--)
     {
         btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[i];
         dynamicsWorld->removeCollisionObject(obj);
         delete obj;
-    }
+    }*/
 }
 
 void PhysicsModule::RebuildWorld()
@@ -393,6 +401,6 @@ void PhysicsModule::RebuildWorld()
 
     for (const auto& gameObject : allGameObjects)
     {
-        gameObject.second->UpdateComponents();
+        gameObject.second->ParentUpdatedComponents();
     }
 }

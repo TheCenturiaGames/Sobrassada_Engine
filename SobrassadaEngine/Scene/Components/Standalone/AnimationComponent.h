@@ -4,6 +4,7 @@
 #include "Globals.h"
 
 #include "rapidjson/document.h"
+#include <map>
 #include <unordered_map>
 #include <map>
 
@@ -12,14 +13,16 @@ class ResourceStateMachine;
 class AnimController;
 class GameObject;
 
+struct State;
 
-class AnimationComponent : public Component
+class SOBRASADA_API_ENGINE AnimationComponent : public Component
 {
   public:
     AnimationComponent(UID uid, GameObject* parent);
     AnimationComponent(const rapidjson::Value& initialState, GameObject* parent);
     ~AnimationComponent() override;
 
+    void Init() override;
     void Clone(const Component* other) override;
     void Update(float deltaTime) override;
     void Render(float deltaTime) override;
@@ -33,13 +36,15 @@ class AnimationComponent : public Component
     void OnResume();
     void OnInspector();
     void AddAnimation(UID resource);
-   
+    bool UseTrigger(const std::string& triggerName);
 
-    UID GetAnimationResource() const { GLOG("Resource AnimUID  is: %d", resource) return resource; }
+    UID GetAnimationResource() const { return resource; }
     ResourceAnimation* GetCurrentAnimation() const { return currentAnimResource; }
     AnimController* GetAnimationController() { return animController; }
+    ResourceStateMachine* GetResourceStateMachine() const { return resourceStateMachine; }
     const std::unordered_map<std::string, GameObject*>& GetBoneMapping() const { return boneMapping; }
     bool IsPlaying() const;
+    bool IsFinished() const;
 
     void SetAnimationResource(UID animResource);
     void UpdateBoneHierarchy(GameObject* bone);
@@ -54,6 +59,7 @@ class AnimationComponent : public Component
     AnimController* animController             = nullptr;
     ResourceAnimation* currentAnimResource     = nullptr;
     ResourceStateMachine* resourceStateMachine = nullptr;
+    const State* currentState                  = nullptr;
 
     std::unordered_map<std::string, GameObject*> boneMapping;
     std::map<std::string, float4x4> bindPoseTransforms;
@@ -62,6 +68,4 @@ class AnimationComponent : public Component
     bool playing            = false;
     float currentTime       = 0.0f;
     float fadeTime          = 0.0f;
-
-    bool hasStartedPlayMode = false;
 };

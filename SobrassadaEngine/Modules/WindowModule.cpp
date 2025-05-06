@@ -2,6 +2,9 @@
 
 #include "Application.h"
 #include "GameUIModule.h"
+#include "OpenGLModule.h"
+#include "GBuffer.h"
+#include "Framebuffer.h"
 #include "ProjectModule.h"
 
 WindowModule::WindowModule()
@@ -14,7 +17,7 @@ WindowModule::~WindowModule()
 
 bool WindowModule::Init()
 {
-    GLOG("Init SDL window & surface");
+    //GLOG("Init SDL window & surface");
     bool returnStatus = true;
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -29,6 +32,14 @@ bool WindowModule::Init()
 
         windowWidth  = displayMode.w / 2;
         windowHeight = displayMode.h / 2;
+
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+
+        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+        SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+        SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
         Uint32 flags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 
@@ -60,7 +71,7 @@ bool WindowModule::Init()
 
 bool WindowModule::ShutDown()
 {
-    GLOG("Destroying SDL window and quitting all SDL systems");
+    //GLOG("Destroying SDL window and quitting all SDL systems");
 
     if (window != NULL)
     {
@@ -75,6 +86,9 @@ void WindowModule::WindowResized(const unsigned int width, const unsigned int he
 {
     windowWidth  = width;
     windowHeight = height;
+    App->GetOpenGLModule()->GetGBuffer()->Resize(width, height);
+    App->GetOpenGLModule()->GetFramebuffer()->Resize(width, height);
+
     App->GetGameUIModule()->OnWindowResize(width, height);
 }
 

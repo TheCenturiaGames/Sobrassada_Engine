@@ -31,6 +31,8 @@ class CameraComponent : public Component
 
     void SOBRASADA_API_ENGINE Translate(const float3& direction);
     void SOBRASADA_API_ENGINE Rotate(float yaw, float pitch);
+    const LineSegment CastCameraRay();
+    const SOBRASADA_API_ENGINE float3 ScreenPointToXZ(const float y);
 
     const FrustumPlanes& GetFrustrumPlanes() const { return frustumPlanes; }
     const float3& GetCameraPosition() const { return camera.pos; }
@@ -40,7 +42,8 @@ class CameraComponent : public Component
     unsigned int GetUbo() const { return ubo; }
     const float4x4 GetProjectionMatrix() { return camera.ProjectionMatrix(); }
     const float4x4 GetViewMatrix() { return camera.ViewMatrix(); }
-    const int GetType() { return (camera.type == OrthographicFrustum) ? 1 : 0; }
+    const int GetFrustumType() { return (camera.type == OrthographicFrustum) ? 1 : 0; }
+    Framebuffer* GetFramebuffer() { return previewFramebuffer; }
 
     void SetAspectRatio(float newAspectRatio);
     void SetCameraPosition(const float3& position) { camera.pos = position; }

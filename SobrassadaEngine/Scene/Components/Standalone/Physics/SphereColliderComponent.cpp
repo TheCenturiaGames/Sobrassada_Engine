@@ -4,6 +4,7 @@
 #include "GameObject.h"
 #include "PhysicsModule.h"
 #include "SceneModule.h"
+#include "ScriptComponent.h"
 
 #include "Geometry/Sphere.h"
 #include "ImGui.h"
@@ -62,7 +63,7 @@ SphereColliderComponent::SphereColliderComponent(const rapidjson::Value& initial
 
 SphereColliderComponent::~SphereColliderComponent()
 {
-    App->GetPhysicsModule()->DeleteSphereRigidBody(this);
+    DeleteRigidBody();
 }
 
 void SphereColliderComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
@@ -115,71 +116,79 @@ void SphereColliderComponent::Clone(const Component* other)
 
 void SphereColliderComponent::RenderEditorInspector()
 {
-    if (ImGui::BeginCombo("Collider type", ColliderTypeStrings[(int)colliderType]))
+    Component::RenderEditorInspector();
+
+    if (enabled)
     {
-        const int colliderStringSize = sizeof(ColliderTypeStrings) / sizeof(char*);
-        for (int i = 0; i < colliderStringSize; ++i)
+        ImGui::SeparatorText("Capsule Collider Component");
+
+        if (ImGui::BeginCombo("Collider type", ColliderTypeStrings[(int)colliderType]))
         {
-            if (ImGui::Selectable(ColliderTypeStrings[i]))
+            const int colliderStringSize = sizeof(ColliderTypeStrings) / sizeof(char*);
+            for (int i = 0; i < colliderStringSize; ++i)
             {
-                colliderType = ColliderType(i);
-                if (colliderType == ColliderType::STATIC)
+                if (ImGui::Selectable(ColliderTypeStrings[i]))
                 {
-                    parent->UpdateMobilityHierarchy(MobilitySettings::STATIC);
-                    mass = 0.f;
-                }
+                    colliderType = ColliderType(i);
+                    if (colliderType == ColliderType::STATIC)
+                    {
+                        parent->UpdateMobilityHierarchy(MobilitySettings::STATIC);
+                        mass = 0.f;
+                    }
 
-                else
-                {
-                    parent->UpdateMobilityHierarchy(MobilitySettings::DYNAMIC);
-                    mass = 1.f;
-                }
+                    else
+                    {
+                        parent->UpdateMobilityHierarchy(MobilitySettings::DYNAMIC);
+                        mass = 1.f;
+                    }
 
-                App->GetPhysicsModule()->UpdateSphereRigidBody(this);
+                    App->GetPhysicsModule()->UpdateSphereRigidBody(this);
+                }
             }
+            ImGui::EndCombo();
         }
-        ImGui::EndCombo();
-    }
 
-    ImGui::BeginDisabled(colliderType == ColliderType::STATIC);
-    if (ImGui::InputFloat("Mass", &mass))
-    {
-        App->GetPhysicsModule()->UpdateSphereRigidBody(this);
-    }
-    ImGui::EndDisabled();
-
-    if (ImGui::InputFloat3("Center offset", &centerOffset[0])) App->GetPhysicsModule()->UpdateSphereRigidBody(this);
-
-    if (ImGui::InputFloat("Radius", &radius)) App->GetPhysicsModule()->UpdateSphereRigidBody(this);
-
-    if (ImGui::Checkbox("Freeze rotation", &freezeRotation)) App->GetPhysicsModule()->UpdateSphereRigidBody(this);
-
-    if (ImGui::InputFloat3("Center rotation", &centerRotation[0])) App->GetPhysicsModule()->UpdateSphereRigidBody(this);
-
-    // COLLIDER LAYER SETTINGS
-    if (ImGui::BeginCombo("Layer options", ColliderLayerStrings[(int)layer]))
-    {
-        int colliderStringSize = sizeof(ColliderLayerStrings) / sizeof(char*);
-        for (int i = 0; i < colliderStringSize; ++i)
+        ImGui::BeginDisabled(colliderType == ColliderType::STATIC);
+        if (ImGui::InputFloat("Mass", &mass))
         {
-            if (ImGui::Selectable(ColliderLayerStrings[i]))
-            {
-                layer = ColliderLayer(i);
-                App->GetPhysicsModule()->UpdateSphereRigidBody(this);
-            }
+            App->GetPhysicsModule()->UpdateSphereRigidBody(this);
         }
-        ImGui::EndCombo();
-    }
+        ImGui::EndDisabled();
 
-    if (ImGui::Checkbox("Fit to size", &fitToSize))
-    {
-        CalculateCollider();
-        App->GetPhysicsModule()->UpdateSphereRigidBody(this);
-    }
+        if (ImGui::InputFloat3("Center offset", &centerOffset[0])) App->GetPhysicsModule()->UpdateSphereRigidBody(this);
 
-    if (ImGui::Checkbox("Generate Callbacks", &generateCallback))
-    {
-        userPointer = BulletUserPointer(this, &onCollissionCallback, generateCallback);
+        if (ImGui::InputFloat("Radius", &radius)) App->GetPhysicsModule()->UpdateSphereRigidBody(this);
+
+        if (ImGui::Checkbox("Freeze rotation", &freezeRotation)) App->GetPhysicsModule()->UpdateSphereRigidBody(this);
+
+        if (ImGui::InputFloat3("Center rotation", &centerRotation[0]))
+            App->GetPhysicsModule()->UpdateSphereRigidBody(this);
+
+        // COLLIDER LAYER SETTINGS
+        if (ImGui::BeginCombo("Layer options", ColliderLayerStrings[(int)layer]))
+        {
+            int colliderStringSize = sizeof(ColliderLayerStrings) / sizeof(char*);
+            for (int i = 0; i < colliderStringSize; ++i)
+            {
+                if (ImGui::Selectable(ColliderLayerStrings[i]))
+                {
+                    layer = ColliderLayer(i);
+                    App->GetPhysicsModule()->UpdateSphereRigidBody(this);
+                }
+            }
+            ImGui::EndCombo();
+        }
+
+        if (ImGui::Checkbox("Fit to size", &fitToSize))
+        {
+            CalculateCollider();
+            App->GetPhysicsModule()->UpdateSphereRigidBody(this);
+        }
+
+        if (ImGui::Checkbox("Generate Callbacks", &generateCallback))
+        {
+            userPointer = BulletUserPointer(this, &onCollissionCallback, generateCallback);
+        }
     }
 }
 
@@ -195,7 +204,6 @@ void SphereColliderComponent::Render(float deltaTime)
 
 void SphereColliderComponent::RenderDebug(float deltaTime)
 {
-
 }
 
 void SphereColliderComponent::ParentUpdated()
@@ -220,17 +228,29 @@ void SphereColliderComponent::ParentUpdated()
 
 void SphereColliderComponent::OnCollision(GameObject* otherObject, float3 collisionNormal)
 {
+    if (!enabled) return;
+
+    auto script = parent->GetComponent<ScriptComponent*>();
+
+    if (script) script->OnCollision(otherObject, collisionNormal);
+}
+
+void SphereColliderComponent::DeleteRigidBody()
+{
+    App->GetPhysicsModule()->DeleteSphereRigidBody(this);
 }
 
 void SphereColliderComponent::CalculateCollider()
 {
-    AABB heriachyAABB = parent->GetHierarchyAABB();
+    AABB heriachyAABB               = parent->GetHierarchyAABB();
+
+    const float4x4& globalTransform = parent->GetGlobalTransform();
 
     if (heriachyAABB.IsFinite() && !heriachyAABB.IsDegenerate())
     {
         Sphere sphere = heriachyAABB.MinimalEnclosingSphere();
 
         radius        = sphere.r;
-        centerOffset  = heriachyAABB.CenterPoint() - parent->GetPosition();
+        centerOffset  = heriachyAABB.CenterPoint() - globalTransform.TranslatePart();
     }
 }

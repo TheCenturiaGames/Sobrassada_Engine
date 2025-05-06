@@ -14,7 +14,7 @@
 #include "ResourceTexture.h"
 #include "SceneModule.h"
 #include "ShaderModule.h"
-#include "Standalone/MeshComponent.h"
+
 
 ResourcesModule::ResourcesModule()
 {
@@ -24,15 +24,8 @@ ResourcesModule::ResourcesModule()
 ResourcesModule::~ResourcesModule()
 {
     delete batchManager;
-    delete tmpNavmesh;
 }
 
-bool ResourcesModule::Init()
-{
-    // TODO Remove this once NavMeshImporter is done with saving and loading
-    tmpNavmesh = new ResourceNavMesh(15345456565, "defaultName");
-    return true;
-}
 
 bool ResourcesModule::ShutDown()
 {
@@ -95,50 +88,3 @@ void ResourcesModule::UnloadAllResources()
     resources.clear();
 }
 
-void ResourcesModule::CreateNavMesh()
-{
-
-    std::vector<std::pair<const ResourceMesh*, const float4x4&>> meshes;
-    float minPos[3]                                         = {FLT_MAX, FLT_MAX, FLT_MAX};
-    float maxPos[3]                                         = {FLT_MIN, FLT_MIN, FLT_MIN};
-
-    const std::unordered_map<UID, GameObject*>& gameObjects = App->GetSceneModule()->GetScene()->GetAllGameObjects();
-
-    if (!gameObjects.empty())
-    {
-        for (const auto& pair : gameObjects)
-        {
-            GameObject* gameObject = pair.second;
-            if (!gameObject || !gameObject->IsGloballyEnabled()) continue;
-            {
-                const MeshComponent* meshComponent = gameObject->GetMeshComponent();
-                const float4x4& globalMatrix       = gameObject->GetGlobalTransform();
-
-                if (meshComponent && meshComponent->GetEnabled())
-                {
-                    const ResourceMesh* resourceMesh = meshComponent->GetResourceMesh();
-                    if (resourceMesh == nullptr) continue; // If a meshComponent has no mesh attached, ignore it
-
-                    const AABB& aabb = gameObject->GetGlobalAABB();
-
-                    minPos[0]        = std::min(minPos[0], aabb.minPoint.x);
-                    minPos[1]        = std::min(minPos[1], aabb.minPoint.y);
-                    minPos[2]        = std::min(minPos[2], aabb.minPoint.z);
-
-                    maxPos[0]        = std::max(maxPos[0], aabb.maxPoint.x);
-                    maxPos[1]        = std::max(maxPos[1], aabb.maxPoint.y);
-                    maxPos[2]        = std::max(maxPos[2], aabb.maxPoint.z);
-
-                    meshes.push_back({resourceMesh, globalMatrix});
-                }
-            }
-        }
-    }
-    if (meshes.size() == 0)
-    {
-        GLOG("[WARNING] Trying to create NavMesh but no meshes are found in the scene");
-        return;
-    }
-    tmpNavmesh->BuildNavMesh(meshes, minPos, maxPos);
-    App->GetPathfinderModule()->InitQuerySystem();
-}
