@@ -46,6 +46,8 @@
 #include "optick.h"
 #endif
 
+#include <set>
+
 Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 {
     this->sceneName             = sceneName;
@@ -1185,10 +1187,40 @@ void Scene::LoadModel(const UID modelUID)
             rootGameObject->UpdateTransformForGOBranch();
         }
 
+        std::set<UID> visitedUID;
+
         // SET CHILD GAME OBJECTS TO SELECT THE PARENT
-        for (int i = 1; i < gameObjectsArray.size(); ++i)
+        for (int i = 0; i < gameObjectsArray.size(); ++i)
         {
-            gameObjectsArray[i]->SetSelectParent(true);
+            if (visitedUID.find(gameObjectsArray[i]->GetUID()) == visitedUID.end())
+            {
+                visitedUID.insert(gameObjectsArray[i]->GetUID());
+
+                std::stack<UID> childrenToVisit;
+
+                // ADDING CHILDREN TO START ITERATION FOR PARENT CHECKBOX SELECTION
+                for (const UID& currentChild : gameObjectsArray[i]->GetChildren())
+                {
+                    childrenToVisit.push(currentChild);
+                }
+
+                while (!childrenToVisit.empty())
+                {
+                    const UID currentUID = childrenToVisit.top();
+                    childrenToVisit.pop();
+                    visitedUID.insert(currentUID);
+
+                    GameObject* currentGameObject = GetGameObjectByUID(currentUID);
+
+                    currentGameObject->SetSelectParent(true);
+
+                    // ADDING CHILDREN TO START ITERATION FOR PARENT CHECKBOX SELECTION
+                    for (const UID& currentChild : currentGameObject->GetChildren())
+                    {
+                        if (visitedUID.find(currentChild) == visitedUID.end()) childrenToVisit.push(currentChild);
+                    }
+                }
+            }
         }
     }
 }
