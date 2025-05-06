@@ -52,7 +52,7 @@ void Projectile::OnCollision(GameObject* otherObject, const float3& collisionNor
     GLOG("COLLISION IN PROJECTILE with: %s", otherObject->GetName().c_str());
 
     parent->SetLocalPosition(startPos);
-    collider->SetEnabled(false);
+    if (collider) collider->SetEnabled(false);
     parent->SetEnabled(false);
 }
 
@@ -61,7 +61,7 @@ void Projectile::Move(float deltaTime)
     // Let 20 frames pass before enabling the collider, so it doesn't collide with the previous collided element.
     // TODO: Try to change this
     frames += 1;
-    if (frames > 20 && !collider->GetEnabled()) collider->SetEnabled(true);
+    if (frames > 20 && collider && !collider->GetEnabled()) collider->SetEnabled(true);
 
     float3 currentPos  = parent->GetPosition();
     currentPos        += direction * speed * deltaTime;
