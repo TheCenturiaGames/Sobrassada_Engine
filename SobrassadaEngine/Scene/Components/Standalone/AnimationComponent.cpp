@@ -232,7 +232,7 @@ void AnimationComponent::OnInspector()
             {
                 ImGui::Text("Animation Component Found");
 
-                // Get the current animation
+                
                 ResourceAnimation* anim = currentAnimComp->GetCurrentAnimation();
                 if (anim)
                 {
@@ -361,7 +361,7 @@ void AnimationComponent::OnInspector()
                         currentAnimComp->OnStop();
                     }
 
-                    //GLOG("Selected animation: %s (UID: %llu)", animationName.c_str(), resource);
+                   
                 }
             }
         }
@@ -594,11 +594,11 @@ void AnimationComponent::AddAnimation(UID animationUID)
         resource            = animationUID;
         SetBoneMapping();
 
-        //GLOG("Animation added successfully: %s (UID: %llu)", currentAnimName.c_str(), animationUID);
+      
     }
     else
     {
-        //GLOG("Failed to load animation resource with UID: %llu", animationUID);
+      
     }
 }
 
@@ -675,10 +675,7 @@ void AnimationComponent::SetBoneMapping()
     //GLOG("Bone mapping completed: %zu bones mapped", boneMapping.size());
 
    
-    for (const auto& pair : boneMapping)
-    {
-        //GLOG("Bone: %s -> GameObject: %s", pair.first.c_str(), pair.second ? pair.second->GetName().c_str() : "NULL");
-    }
+   
 }
 
 bool AnimationComponent::UseTrigger(const std::string& triggerName)
