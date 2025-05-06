@@ -65,6 +65,7 @@ class SOBRASADA_API_ENGINE AnimationComponent : public Component
     std::map<std::string, float4x4> bindPoseTransforms;
 
     float animationDuration = 0.0f;
+    bool hasStartedPlayMode = false;
     bool playing            = false;
     float currentTime       = 0.0f;
     float fadeTime          = 0.0f;

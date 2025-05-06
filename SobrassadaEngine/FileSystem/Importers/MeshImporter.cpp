@@ -1,6 +1,7 @@
 #include "MeshImporter.h"
 
 #include "Application.h"
+#include "ProjectModule.h"
 #include "FileSystem.h"
 #include "LibraryModule.h"
 #include "Mesh.h"

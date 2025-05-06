@@ -266,7 +266,7 @@ namespace AnimationImporter
         char* cursor    = buffer;
         char* bufferEnd = buffer + fileSize;
 
-        // Ensure  enough space to read the channel count
+        
         if (cursor + sizeof(uint32_t) > bufferEnd)
         {
             GLOG("Error: File too small to contain channel count");
@@ -284,10 +284,10 @@ namespace AnimationImporter
         ResourceAnimation* animation =
             new ResourceAnimation(animationUID, FileSystem::GetFileNameWithoutExtension(path));
 
-        // Parse channels
+      
         for (uint32_t i = 0; i < channelCount; ++i)
         {
-            // Check if enough buffer left for nameSize
+           
             if (cursor + sizeof(uint32_t) > bufferEnd)
             {
                 GLOG("Error: Unexpected end of file when reading channel %d nameSize", i);
@@ -298,7 +298,6 @@ namespace AnimationImporter
             memcpy(&nameSize, cursor, sizeof(uint32_t));
             cursor += sizeof(uint32_t);
 
-            // Check if enough buffer left for the name
             if (cursor + nameSize > bufferEnd)
             {
                 GLOG("Error: Unexpected end of file when reading channel %d name", i);
@@ -329,11 +328,6 @@ namespace AnimationImporter
             memcpy(&keyframeCount, cursor, sizeof(uint32_t));
             cursor += sizeof(uint32_t);
 
-            //GLOG(
-            //    "Channel %d: Node='%s', Type=%d, Keyframes=%d", i, nodeName.c_str(), static_cast<int>(animType),
-            //    keyframeCount
-            //);
-
             
             Channel& animChannel = animation->channels[nodeName];
 
@@ -353,23 +347,14 @@ namespace AnimationImporter
                     animChannel.positions.resize(keyframeCount);
                     memcpy(animChannel.positions.data(), cursor, posDataSize);
 
-                    // Debug log the loaded positions
-                   /* GLOG("  Loaded %d position keyframes for '%s'", keyframeCount, nodeName.c_str());
-                    for (int j = 0; j < std::min(3, (int)keyframeCount); j++)
-                    {
-                        GLOG(
-                            "    Frame %d: (%.3f, %.3f, %.3f) at time %.3f", j, animChannel.positions[j].x,
-                            animChannel.positions[j].y, animChannel.positions[j].z, animChannel.posTimeStamps[j]
-                        );
-                    }*/
 
                     cursor                   += posDataSize;
                     animChannel.numPositions  = keyframeCount;
                 }
                 else
                 {
-                    //GLOG("Error: Buffer overrun when reading position data for channel %d", i);
-                    break; // Stop parsing to avoid further issues
+                   
+                    break; 
                 }
             }
             else if (animType == AnimationType::ROTATION)
@@ -387,24 +372,13 @@ namespace AnimationImporter
                     animChannel.rotations.resize(keyframeCount);
                     memcpy(animChannel.rotations.data(), cursor, rotDataSize);
 
-                   
-                   /* GLOG("  Loaded %d rotation keyframes for '%s'", keyframeCount, nodeName.c_str());
-                    for (int j = 0; j < std::min(3, (int)keyframeCount); j++)
-                    {
-                        GLOG(
-                            "    Frame %d: (%.3f, %.3f, %.3f, %.3f) at time %.3f", j, animChannel.rotations[j].x,
-                            animChannel.rotations[j].y, animChannel.rotations[j].z, animChannel.rotations[j].w,
-                            animChannel.rotTimeStamps[j]
-                        );
-                    }*/
-
                     cursor                   += rotDataSize;
                     animChannel.numRotations  = keyframeCount;
                 }
                 else
                 {
-                    //GLOG("Error: Buffer overrun when reading rotation data for channel %d", i);
-                    break; // Stop parsing to avoid further issues
+                    
+                    break; 
                 }
             }
             else if (animType == AnimationType::SCALE)
@@ -422,23 +396,13 @@ namespace AnimationImporter
                     animChannel.scales.resize(keyframeCount);
                     memcpy(animChannel.scales.data(), cursor, scaleDataSize);
 
-                    
-                    //GLOG("  Loaded %d scale keyframes for '%s'", keyframeCount, nodeName.c_str());
-                    for (int j = 0; j < std::min(3, (int)keyframeCount); j++)
-                    {
-                        /*GLOG(
-                            "    Frame %d: (%.3f, %.3f, %.3f) at time %.3f", j, animChannel.scales[j].x,
-                            animChannel.scales[j].y, animChannel.scales[j].z, animChannel.scaleTimeStamps[j]
-                        );*/
-                    }
 
                     cursor                += scaleDataSize;
                     animChannel.numScales  = keyframeCount;
                 }
                 else
                 {
-                    //GLOG("Error: Buffer overrun when reading scale data for channel %d", i);
-                    break; // Stop parsing to avoid further issues
+                    break; 
                 }
             }
         }

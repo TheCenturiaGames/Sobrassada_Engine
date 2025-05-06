@@ -8,7 +8,6 @@
 #include "FileSystem.h"
 #include "GameObject.h"
 #include "LibraryModule.h"
-#include "ProjectModule.h"
 #include "Resource.h"
 #include "ResourceAnimation.h"
 #include "ResourceModel.h"
@@ -128,7 +127,7 @@ void AnimationComponent::OnPlay(bool isTransition)
         {
             animController->Play(resource, true);
             playing = true;
-           // GLOG("Playing animation: %s (UID: %llu)", currentAnimResource->GetName().c_str(), resource);
+      
         }
         
     }
@@ -609,9 +608,9 @@ bool AnimationComponent::IsPlaying() const
     return animController ? animController->IsPlaying() : false;
 }
 
-bool AnimationComponent::IsPlaying() const
+bool AnimationComponent::IsFinished() const
 {
-    return animController ? animController->IsPlaying() : false;
+    return animController ? animController->IsFinished() : false;
 }
 
 void AnimationComponent::SetAnimationResource(UID animResource)
@@ -627,8 +626,6 @@ void AnimationComponent::UpdateBoneHierarchy(GameObject* bone)
 
    
     bone->OnTransformUpdated();
-
-    //GLOG("Updated bone %s global transform", bone->GetName().c_str());
 
     
     for (const UID childUID : bone->GetChildren())
@@ -649,7 +646,6 @@ void AnimationComponent::SetBoneMapping()
     
     if (parent == nullptr)
     {
-        //GLOG("Cannot set bone mapping: parent is null");
         return;
     }
 
