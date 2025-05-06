@@ -219,7 +219,7 @@ namespace AnimationImporter
             finalAnimUID = App->GetLibraryModule()->GetUIDFromMetaFile(savePath);
             if (finalAnimUID == INVALID_UID) finalAnimUID = animationUID;
             
-            const std::string assetPath = ANIMATIONS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
+            const std::string assetPath = ANIMATIONS_ASSETS_PATH + FileSystem::GetFileNameWithExtension(sourceFilePath);
             MetaAnimation meta(finalAnimUID, assetPath);
 
             meta.Save(fileName, assetPath);
