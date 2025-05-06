@@ -51,6 +51,7 @@ void Projectile::OnCollision(GameObject* otherObject, const float3& collisionNor
 {
     GLOG("COLLISION IN PROJECTILE with: %s", otherObject->GetName().c_str());
 
+    parent->SetLocalPosition(startPos);
     collider->SetEnabled(false);
     parent->SetEnabled(false);
 }
@@ -66,5 +67,10 @@ void Projectile::Move(float deltaTime)
     currentPos        += direction * speed * deltaTime;
     parent->SetLocalPosition(currentPos);
 
-    if (currentPos.Distance(startPos) > range) parent->SetEnabled(false);
+    if (currentPos.Distance(startPos) > range)
+    {
+        parent->SetLocalPosition(startPos);
+        collider->SetEnabled(false);
+        parent->SetEnabled(false);
+    }
 }

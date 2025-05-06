@@ -174,7 +174,11 @@ void CuChulainn::UpdateTimers(float deltaTime)
     throwTimer -= deltaTime;
     if (throwTimer < 0)
     {
-        if (weapon && !weapon->IsEnabled()) weapon->SetEnabled(true);
+        if (resetWeapon)
+        {
+            weapon->SetEnabled(true);
+            resetWeapon = false;
+        }
         throwTimer = 0;
     }
 }
@@ -195,7 +199,11 @@ void CuChulainn::ThrowSpear()
     if (camera) camera->EnableMouseOffset(false);
     GLOG("THROW SPEAR");
     throwTimer = throwCooldown;
-    if (weapon) weapon->SetEnabled(false);
+    if (weapon)
+    {
+        weapon->SetEnabled(false);
+        resetWeapon = true;
+    }
 
     spear->Shoot(parent->GetPosition(), character->GetFrontDirection());
 }

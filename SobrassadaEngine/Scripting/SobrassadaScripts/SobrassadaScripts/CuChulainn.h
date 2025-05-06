@@ -71,6 +71,7 @@ class CuChulainn : public Character
     bool desiredAim         = false;
     float throwTimer        = 0.0f;
     float throwCooldown     = 1.0f;
+    bool resetWeapon        = false;
 
     CharacterStates state   = CharacterStates::IDLE;
 };
