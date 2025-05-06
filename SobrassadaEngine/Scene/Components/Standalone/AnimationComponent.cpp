@@ -311,6 +311,7 @@ void AnimationComponent::OnInspector()
                 {
                     selectedZombunnyAnim = animationName;
                     resource             = pair.second;
+                    AddAnimation(resource);
 
                     if (currentAnimComp->playing)
                     {
