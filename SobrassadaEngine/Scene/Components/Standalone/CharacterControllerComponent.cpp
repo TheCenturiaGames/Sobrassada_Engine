@@ -269,7 +269,7 @@ void CharacterControllerComponent::Move(float deltaTime)
 
     if (!navMeshQuery || currentPolyRef == 0) return;
 
-    const float3& currentPos = parent->GetPosition();
+    const float3& currentPos = parent->GetGlobalTransform().TranslatePart();
     currentSpeed          = targetDirection.LengthSq() > 0.001f ? Lerp(currentSpeed, maxSpeed, acceleration * deltaTime)
                                                                 : Lerp(currentSpeed, 0, 100 * deltaTime);
 
@@ -300,7 +300,7 @@ void CharacterControllerComponent::Move(float deltaTime)
     desiredPos.x   = nearest[0];
     desiredPos.z   = nearest[2];
 
-    parent->SetLocalPosition(desiredPos);
+    parent->SetLocalPosition(desiredPos - parent->GetParentGlobalTransform().TranslatePart());
 }
 
 void CharacterControllerComponent::LookAtMovement(const float3& moveDir, float deltaTime)

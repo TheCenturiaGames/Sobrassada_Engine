@@ -196,7 +196,7 @@ void CuChulainn::LookAtMouse()
     const float3 mouseWorldPos = AppEngine->GetSceneModule()->GetScene()->GetMainCamera()->ScreenPointToXZ(
         parent->GetGlobalTransform().TranslatePart().y
     );
-    float3 direction = mouseWorldPos - parent->GetPosition();
+    float3 direction = mouseWorldPos - parent->GetGlobalTransform().TranslatePart();
     direction.y      = 0;
     direction.Normalize();
     character->LookAt(direction);
