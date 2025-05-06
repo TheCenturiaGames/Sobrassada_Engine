@@ -148,13 +148,13 @@ void CharacterControllerComponent::Update(float deltaTime) // SO many navmesh ge
     verticalSpeed     += gravity * deltaTime;
     verticalSpeed      = std::max(verticalSpeed, maxFallSpeed); // Clamp fall speed
 
-    float3 currentPos  = parent->GetPosition();
+    float3 currentPos  = parent->GetGlobalTransform().TranslatePart();
     currentPos.y      += (verticalSpeed * deltaTime);
 
     AdjustHeightToNavMesh(currentPos);
 
     lastPosition = currentPos;
-    parent->SetLocalPosition(currentPos);
+    parent->SetLocalPosition(currentPos - parent->GetParentGlobalTransform().TranslatePart());
 
     if (isRotating)
     {
