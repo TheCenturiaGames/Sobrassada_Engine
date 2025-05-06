@@ -42,7 +42,7 @@ AnimationComponent::AnimationComponent(const rapidjson::Value& initialState, Gam
             {
                 currentAnimName = currentAnimResource->GetName();
                 
-                SetBoneMapping();
+              
             }
         }
     }
