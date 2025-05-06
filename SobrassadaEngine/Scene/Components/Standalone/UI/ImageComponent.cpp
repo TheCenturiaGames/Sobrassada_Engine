@@ -157,8 +157,12 @@ void ImageComponent::RenderUI(const float4x4& view, const float4x4& proj) const
 {
     if (parentCanvas == nullptr || transform2D == nullptr || !IsEffectivelyEnabled()) return;
 
-    const float3 startPos =
-        float3(transform2D->GetRenderingPosition(), 0) - parent->GetGlobalTransform().TranslatePart();
+   float3 startPos = float3(transform2D->GetRenderingPosition(), 0);
+    if (parentCanvas->IsInWorldSpace())
+    {
+        startPos -= parent->GetGlobalTransform().TranslatePart();
+    }
+
     glUniformMatrix4fv(0, 1, GL_TRUE, parent->GetGlobalTransform().ptr());
     glUniformMatrix4fv(1, 1, GL_TRUE, view.ptr());
     glUniformMatrix4fv(2, 1, GL_TRUE, proj.ptr());

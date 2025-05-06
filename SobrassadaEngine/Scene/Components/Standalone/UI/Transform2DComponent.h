@@ -3,6 +3,7 @@
 #include "Component.h"
 #include "Math/float2.h"
 #include "Math/float4.h"
+#include "CanvasComponent.h"
 
 class CanvasComponent;
 
@@ -21,13 +22,15 @@ class Transform2DComponent : public Component
 
     void Update(float deltaTime) override {};
     void Render(float deltaTime) override {};
-    void RenderDebug(float deltaTime) override;
+    void RenderDebug(float deltaTime) override {};
     void RenderEditorInspector() override;
 
     void RenderWidgets() const;
     void UpdateParent3DTransform();
     void OnTransform3DUpdated(const float4x4& transform3D);
     void OnParentChange();
+    void OnCanvasRenderModeChanged(CanvasComponent::CanvasRenderMode newMode);
+    float2 GetAbsoluteWorldPosition() const;
     void GetCanvas();
     void AdaptToParentChanges();
 

@@ -254,14 +254,15 @@ float CanvasComponent::GetScreenScale() const
 
 void CanvasComponent::UpdateBoundingBox()
 {
-    float2 center      = transform2D->GetGlobalPosition();
-    float2 size        = transform2D->size;
+    float2 center = transform2D->GetGlobalPosition();
+    float2 size   = transform2D->size;
 
     localComponentAABB = AABB(
         float3(center.x - size.x / 2.0f, center.y - size.y / 2.0f, 0),
         float3(center.x + size.x / 2.0f, center.y + size.y / 2.0f, 0)
     );
 }
+
 
 float CanvasComponent::GetWidth() const
 {
@@ -274,6 +275,20 @@ float CanvasComponent::GetHeight() const
 
 void CanvasComponent::SetRenderMode(CanvasRenderMode newMode)
 {
+    GLOG("Canvas switching to: %d", newMode);
+
+    for (UID childUID : parent->GetChildren())
+    {
+        GameObject* child = App->GetSceneModule()->GetScene()->GetGameObjectByUID(childUID);
+        if (!child) continue;
+
+        if (Transform2DComponent* transform = child->GetComponent<Transform2DComponent*>())
+        {
+            transform->OnCanvasRenderModeChanged(newMode); 
+        }
+    }
+
     renderMode = newMode;
+
     UpdateBoundingBox();
 }
