@@ -80,3 +80,8 @@ void CameraMovement::FollowTarget(float deltaTime)
 
     parent->SetLocalPosition(finalPosition);
 }
+
+void CameraMovement::SetPosition(const float3& newPos)
+{
+    parent->SetLocalPosition(newPos);
+}

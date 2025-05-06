@@ -15,6 +15,7 @@
 #include "Projectile.h"
 #include "RotateGameObject.h"
 #include "Soldier.h"
+#include "SpawnPoint.h"
 #include "VSyncToggleScript.h"
 
 #include <string>
@@ -50,6 +51,7 @@ extern "C" SOBRASSADA_API Script* CreateScript(const std::string& scriptType, Ga
     if (scriptType == "SoldierScript") return new Soldier(parent);
     if (scriptType == "CameraMovement") return new CameraMovement(parent);
     if (scriptType == "Projectile") return new Projectile(parent);
+    if (scriptType == "SpawnPoint") return new SpawnPoint(parent);
 
     /* Utils */
     if (scriptType == "RotateGameObject") return new RotateGameObject(parent);
