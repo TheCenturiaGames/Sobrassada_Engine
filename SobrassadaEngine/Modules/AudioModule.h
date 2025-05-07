@@ -4,11 +4,13 @@
 
 #include "AkFilePackageLowLevelIODeferred.h"
 #include <vector>
+
 #include <unordered_map>
 
+#include "HashString.h"
 class AudioSourceComponent;
 class AudioListenerComponent;
-struct HashString;
+
 
 class AudioModule : public Module
 {

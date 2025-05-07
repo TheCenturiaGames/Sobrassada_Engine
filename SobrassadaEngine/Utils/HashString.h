@@ -1,7 +1,8 @@
 #pragma once
-#pragma message("Including HashString.h")
+
 
 #include <string>
+#include <functional> 
 
 struct HashString
 {
@@ -12,7 +13,7 @@ struct HashString
     HashString(const std::string& str)
     {
         original = str;
-        hash     = std::hash<std::string> {}(str);
+        hash     = 0; // std::hash<std::string> {}(str); // std::hash<std::string> {}(str);
     }
 
     bool operator==(const HashString& other) const { return hash == other.hash; }
@@ -24,3 +25,11 @@ struct HashString
     const char* c_str() const { return original.c_str(); }
     const size_t size() const { return original.size(); }
 };
+
+namespace std
+{
+    template <> struct hash<HashString>
+    {
+        size_t operator()(const HashString& hs) const { return hash<string> {}(hs.original); }
+    };
+}
