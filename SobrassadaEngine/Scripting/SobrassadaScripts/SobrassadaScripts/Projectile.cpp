@@ -51,7 +51,10 @@ void Projectile::OnCollision(GameObject* otherObject, const float3& collisionNor
 {
     GLOG("COLLISION IN PROJECTILE with: %s", otherObject->GetName().c_str());
 
-    parent->SetLocalPosition(startPos);
+    // If collides with a character don't disable, do that in the character onCollision
+    ScriptComponent* script = otherObject->GetComponent<ScriptComponent*>();
+    if (script && script->GetScriptByType<Character>()) return;
+
     if (collider) collider->SetEnabled(false);
     parent->SetEnabled(false);
 }
@@ -69,7 +72,6 @@ void Projectile::Move(float deltaTime)
 
     if (currentPos.Distance(startPos) > range)
     {
-        parent->SetLocalPosition(startPos);
         collider->SetEnabled(false);
         parent->SetEnabled(false);
     }

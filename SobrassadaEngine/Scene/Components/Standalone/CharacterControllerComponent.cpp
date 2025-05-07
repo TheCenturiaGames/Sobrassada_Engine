@@ -6,6 +6,7 @@
 #include "DetourNavMeshQuery.h"
 #include "EditorUIModule.h"
 #include "GameObject.h"
+#include "GameTimer.h"
 #include "InputModule.h"
 #include "PathfinderModule.h"
 #include "ResourceNavMesh.h"
@@ -99,19 +100,19 @@ void CharacterControllerComponent::Clone(const Component* other)
     }
 }
 
-void CharacterControllerComponent::Update(float deltaTime) // SO many navmesh getters!!!! Memo to rethink this
+void CharacterControllerComponent::Update(float time) // SO many navmesh getters!!!! Memo to rethink this
 {
     if (!IsEffectivelyEnabled()) return;
 
     if (!App->GetSceneModule()->GetInPlayMode()) return;
 
-    if (deltaTime <= 0.0f) return;
+    float deltaTime = App->GetGameTimer()->GetDeltaTime() / 1000.0f;
 
-    dtNavMesh* dtNav         = App->GetPathfinderModule()->GetNavMesh()->GetDetourNavMesh();
+    if (deltaTime == 0.0f) return;
+
+    dtNavMesh* dtNav         = App->GetPathfinderModule()->GetNavMesh()->GetDetourNavMesh(); // crash here means no navmesh loaded
 
     dtNavMeshQuery* tmpQuery = App->GetPathfinderModule()->GetDetourNavMeshQuery();
-
-    if (!dtNav) return;
 
     if (!tmpQuery || !dtNav) return;
 
@@ -145,16 +146,19 @@ void CharacterControllerComponent::Update(float deltaTime) // SO many navmesh ge
 
     if (!navMeshQuery || currentPolyRef == 0) return;
 
-    verticalSpeed     += gravity * deltaTime;
-    verticalSpeed      = std::max(verticalSpeed, maxFallSpeed); // Clamp fall speed
+    if (deltaTime < 0.1f) // TODO: deltaTime spikes, need to know why
+    {
+        verticalSpeed     += gravity * deltaTime;
+        verticalSpeed      = std::max(verticalSpeed, maxFallSpeed); // Clamp fall speed
 
-    float3 currentPos  = parent->GetGlobalTransform().TranslatePart();
-    currentPos.y      += (verticalSpeed * deltaTime);
+        float3 currentPos  = parent->GetGlobalTransform().TranslatePart();
+        currentPos.y      += (verticalSpeed * deltaTime);
 
-    AdjustHeightToNavMesh(currentPos);
+        AdjustHeightToNavMesh(currentPos);
 
-    lastPosition = currentPos;
-    parent->SetLocalPosition(currentPos - parent->GetParentGlobalTransform().TranslatePart());
+        lastPosition = currentPos;
+        parent->SetLocalPosition(currentPos - parent->GetParentGlobalTransform().TranslatePart());
+    }
 
     if (isRotating)
     {

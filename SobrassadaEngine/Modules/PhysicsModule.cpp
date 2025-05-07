@@ -4,6 +4,7 @@
 #include "BulletDebugDraw.h"
 #include "DebugDrawModule.h"
 #include "GameObject.h"
+#include "GameTimer.h"
 #include "SceneModule.h"
 #include "Standalone/Physics/CapsuleColliderComponent.h"
 #include "Standalone/Physics/CubeColliderComponent.h"
@@ -36,8 +37,10 @@ bool PhysicsModule::Init()
     return true;
 }
 
-update_status PhysicsModule::PreUpdate(float deltaTime)
+update_status PhysicsModule::PreUpdate(float time)
 {
+    float deltaTime = App->GetGameTimer()->GetDeltaTime() / 1000.0f;
+
     // REMOVE RIGID BODIES
     for (btRigidBody* rigidBody : bodiesToRemove)
     {
@@ -49,6 +52,10 @@ update_status PhysicsModule::PreUpdate(float deltaTime)
     bodiesToRemove.clear();
 
     if (!App->GetSceneModule()->GetInPlayMode()) return UPDATE_CONTINUE;
+
+    if (deltaTime == 0.0f) return UPDATE_CONTINUE;
+
+    if (deltaTime > 0.1f) return UPDATE_CONTINUE; // TODO: deltaTime spikes, need to know why
 
     dynamicsWorld->stepSimulation(deltaTime, 10);
 
