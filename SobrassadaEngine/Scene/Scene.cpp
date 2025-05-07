@@ -418,7 +418,7 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
     ImGui::SameLine();
     if (ImGui::Button("Step"))
     {
-        gameTimer->Step();
+        stepPlaying = true;
     }
     ImGui::SameLine();
     if (ImGui::Button("Stop"))

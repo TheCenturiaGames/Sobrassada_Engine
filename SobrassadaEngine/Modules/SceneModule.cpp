@@ -57,6 +57,11 @@ update_status SceneModule::PreUpdate(float deltaTime)
 {
     if (loadedScene->GetStopPlaying()) SwitchPlayMode(false);
     else if (loadedScene->GetStartPlaying()) SwitchPlayMode(true);
+    else if (loadedScene->GetStepPlaying())
+    {
+        App->GetGameTimer()->Step();
+        loadedScene->SetStepPlaying(false);
+    }
 
     return UPDATE_CONTINUE;
 }

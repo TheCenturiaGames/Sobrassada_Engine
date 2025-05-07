@@ -100,13 +100,15 @@ void CharacterControllerComponent::Clone(const Component* other)
     }
 }
 
-void CharacterControllerComponent::Update(float deltaTime) // SO many navmesh getters!!!! Memo to rethink this
+void CharacterControllerComponent::Update(float time) // SO many navmesh getters!!!! Memo to rethink this
 {
     if (!IsEffectivelyEnabled()) return;
 
-    if (!App->GetSceneModule()->GetInPlayMode() || App->GetSceneModule()->GetOnlyOnceInPlayMode()) return;
+    if (!App->GetSceneModule()->GetInPlayMode()) return;
 
-    if (deltaTime <= 0.0f) return;
+    float deltaTime = App->GetGameTimer()->GetDeltaTime() / 1000.0f;
+
+    if (deltaTime == 0.0f) return; // TODO: deltaTime spikes, need to know why
 
     dtNavMesh* dtNav         = App->GetPathfinderModule()->GetNavMesh()->GetDetourNavMesh();
 
@@ -144,35 +146,19 @@ void CharacterControllerComponent::Update(float deltaTime) // SO many navmesh ge
 
     if (!navMeshQuery || currentPolyRef == 0) return;
 
-    verticalSpeed += gravity * deltaTime;
-    verticalSpeed  = std::max(verticalSpeed, maxFallSpeed); // Clamp fall speed
-
-    if (verticalSpeed < 1.0f)
+    if (deltaTime < 0.1f)
     {
-        GLOG("Engine Time: %.3f", deltaTime);
-        GLOG("Vertical: %.2f", verticalSpeed);
+        verticalSpeed     += gravity * deltaTime;
+        verticalSpeed      = std::max(verticalSpeed, maxFallSpeed); // Clamp fall speed
+
+        float3 currentPos  = parent->GetPosition();
+        currentPos.y      += (verticalSpeed * deltaTime);
+
+        AdjustHeightToNavMesh(currentPos);
+
+        lastPosition = currentPos;
+        parent->SetLocalPosition(currentPos);
     }
-
-    if (verticalSpeed <= -5.0f) return;
-
-    GLOG("Engine Time: %.3f", deltaTime);
-
-    if (deltaTime >= 0.4f) 
-        int x = 0;
-
-    if (verticalSpeed != 0.0f) GLOG("Vertical: %.2f", verticalSpeed);
-
-    float3 currentPos  = parent->GetPosition();
-    currentPos.y      += (verticalSpeed * deltaTime);
-
-    GLOG("Pos: %2.f %.2f %.2f", currentPos.x, currentPos.y, currentPos.z);
-
-    AdjustHeightToNavMesh(currentPos);
-
-    GLOG("After Pos: %2.f %.2f %.2f", currentPos.x, currentPos.y, currentPos.z);
-
-    lastPosition = currentPos;
-    parent->SetLocalPosition(currentPos);
 
     if (isRotating)
     {
