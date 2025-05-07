@@ -237,12 +237,8 @@ GameObject::GameObject(UID parentUID, GameObject* refObject)
     OnAABBUpdated();
 }
 
-
-
-GameObject::GameObject(const rapidjson::Value& initialState)
-    : uid(initialState["UID"].GetUint64())
+GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState["UID"].GetUint64())
 {
-    
 }
 
 GameObject::~GameObject()
@@ -250,7 +246,8 @@ GameObject::~GameObject()
     std::apply([](auto&... tupleVar) { ((delete tupleVar, tupleVar = nullptr), ...); }, compTuple);
 }
 
-void GameObject::LoadData(const rapidjson::Value& initialState){
+void GameObject::LoadData(const rapidjson::Value& initialState)
+{
     compTuple = std::make_tuple(COMPONENTS_NULLPTR);
     createdComponents.reset();
 
@@ -660,7 +657,6 @@ void GameObject::RenderHierarchyNode(UID& selectedGameObjectUUID)
         ImGui::SetNextItemOpen(openHierarchyNode);
         flags |= ImGuiTreeNodeFlags_DefaultOpen;
     }
-    
 
     bool hasChildren = !children.empty();
 
@@ -768,10 +764,16 @@ void GameObject::RenderContextMenu()
         if (ImGui::MenuItem("New GameObject"))
         {
             auto newGameObject = new GameObject(uid, "new Game Object");
+
             App->GetSceneModule()->GetScene()->AddGameObject(newGameObject->GetUID(), newGameObject);
+
+            GameObject* parent = App->GetSceneModule()->GetScene()->GetGameObjectByUID(uid);
+            if (parent != nullptr) parent->AddGameObject(newGameObject->GetUID());
 
             if (newGameObject->IsStatic()) App->GetSceneModule()->GetScene()->SetStaticModified();
             else App->GetSceneModule()->GetScene()->SetDynamicModified();
+
+            newGameObject->UpdateTransformForGOBranch();
         }
 
         if (ImGui::MenuItem("Rename"))
