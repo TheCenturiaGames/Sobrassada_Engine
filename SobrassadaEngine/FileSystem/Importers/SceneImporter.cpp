@@ -29,8 +29,7 @@ namespace SceneImporter
         importFolderPath.pop_back();
         std::string projectFolderPath = App->GetProjectModule()->GetLoadedProjectPath() + ASSETS_PATH;
         projectFolderPath.pop_back();
-        if (importFolderPath == projectFolderPath)
-            return;
+        if (importFolderPath == projectFolderPath) return;
         // TODO Is it necessary to create directories here? They should be already created
         const std::string engineDefaultPath = ENGINE_DEFAULT_ASSETS;
         CreateLibraryDirectories(App->GetProjectModule()->GetLoadedProjectPath());
@@ -197,21 +196,22 @@ namespace SceneImporter
     }
 
     void ImportAnimationFromMetadata(
-        const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID
+        const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID,
+        const rapidjson::Value& importOptions
     )
     {
-        tinygltf::Model model = LoadModelGLTF(filePath.c_str());
+        if (!importOptions.IsObject()) return;
 
-        // find material name that equals to name
-        for (int i = 0; i < model.animations.size(); i++)
+        tinygltf::Model model = LoadModelGLTF(filePath.c_str());
+         int animIndex = importOptions.HasMember("animationIndex") ? importOptions["animationIndex"].GetInt() : 0;
+
+        // ONLY IMPORT ANIMATION IF INDEX IS INSIDE ANIMATION RANGE
+        if (model.animations.size() > animIndex)
         {
-            if (model.animations[i].name == name)
-            {
-                AnimationImporter::ImportAnimation(
-                    model, model.animations[i], name, filePath.c_str(), targetFilePath, sourceUID
-                );
-                return; // only one animation with the same name
-            }
+            AnimationImporter::ImportAnimation(
+                model, model.animations[animIndex], name, filePath.c_str(), targetFilePath, sourceUID, animIndex
+            );
+            return;
         }
     }
 
