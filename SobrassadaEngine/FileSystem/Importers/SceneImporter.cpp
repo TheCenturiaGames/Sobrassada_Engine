@@ -276,6 +276,16 @@ namespace SceneImporter
                 GLOG("Failed to create directory: %s", convertedStateMachinePath.c_str());
             }
         }
+
+        const std::string convertedNavmeshPath    = projectFilePath + NAVMESH_ASSETS_PATH;
+        if (!FileSystem::IsDirectory(convertedNavmeshPath.c_str()))
+        {
+            if (!FileSystem::CreateDirectories(convertedNavmeshPath.c_str()))
+            {
+                GLOG("Failed to create directory: %s", convertedNavmeshPath.c_str());
+            }
+        }
+
         const std::string convertedAnimationsPath = projectFilePath + ANIMATIONS_PATH;
         if (!FileSystem::IsDirectory(convertedAnimationsPath.c_str()))
         {
