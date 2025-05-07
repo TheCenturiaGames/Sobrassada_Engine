@@ -568,10 +568,10 @@ void Scene::RenderHierarchyUI(bool& hierarchyMenu)
 
     if (ImGui::Button("Add GameObject"))
     {
-        GameObject* parent = GetGameObjectByUID(selectedGameObjectUID);
+        GameObject* parent = GetGameObjectByUID(gameObjectRootUID);
         if (parent != nullptr)
         {
-            GameObject* newGameObject = new GameObject(selectedGameObjectUID, "new Game Object");
+            GameObject* newGameObject = new GameObject(gameObjectRootUID, "new Game Object");
 
             gameObjectsContainer.insert({newGameObject->GetUID(), newGameObject});
             parent->AddGameObject(newGameObject->GetUID());
