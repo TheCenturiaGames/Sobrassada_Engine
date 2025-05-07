@@ -286,9 +286,10 @@ namespace AnimationImporter
 
         GLOG("Loading animation with %d channels from %s", channelCount, path.c_str());
 
-       
-        ResourceAnimation* animation =
-            new ResourceAnimation(animationUID, FileSystem::GetFileNameWithoutExtension(path));
+        const auto& map = App->GetLibraryModule()->GetAnimMap();
+        std::string animName = App->GetLibraryModule()->GetResourceName(animationUID);
+
+        ResourceAnimation* animation = new ResourceAnimation(animationUID, animName);
 
         // Parse channels
         for (uint32_t i = 0; i < channelCount; ++i)
