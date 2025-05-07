@@ -55,7 +55,7 @@ update_status PhysicsModule::PreUpdate(float time)
 
     if (deltaTime == 0.0f) return UPDATE_CONTINUE;
 
-    if (deltaTime < 0.1f) return UPDATE_CONTINUE; // TODO: deltaTime spikes, need to know why
+    if (deltaTime > 0.1f) return UPDATE_CONTINUE; // TODO: deltaTime spikes, need to know why
 
     dynamicsWorld->stepSimulation(deltaTime, 10);
 
