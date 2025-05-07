@@ -580,6 +580,30 @@ void Scene::RenderHierarchyUI(bool& hierarchyMenu)
         }
     }
 
+    if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+    {
+        ImGui::OpenPopup("HierarchyContextMenu");
+    }
+
+    if (ImGui::BeginPopup("HierarchyContextMenu"))
+    {
+        if (ImGui::MenuItem("Add GameObject"))
+        {
+            GameObject* parent = GetGameObjectByUID(selectedGameObjectUID);
+            if (parent != nullptr)
+            {
+                GameObject* newGameObject = new GameObject(selectedGameObjectUID, "new Game Object");
+
+                gameObjectsContainer.insert({newGameObject->GetUID(), newGameObject});
+                parent->AddGameObject(newGameObject->GetUID());
+
+                newGameObject->UpdateTransformForGOBranch();
+            }
+        }
+
+        ImGui::EndPopup();
+    }
+
     if (selectedGameObjectUID != gameObjectRootUID)
     {
         ImGui::SameLine();
