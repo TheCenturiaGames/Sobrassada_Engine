@@ -209,9 +209,13 @@ bool LibraryModule::LoadLibraryMaps(const std::string& projectPath)
                 AddName(assetName, assetUID);
                 libraryPath = projectPath + NAVMESHES_PATH + assetName + NAVMESH_EXTENSION;
 
-                if (FileSystem::Exists(libraryPath.c_str()))
-                    AddResource(libraryPath, assetUID); // Register for loading later
-                else GLOG("Navmesh binary missing for UID %llu (%s)", assetUID, assetName.c_str()); // Optional warning
+                if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
+                else if (FileSystem::Exists(assetPath.c_str()))
+                {
+                    std::string copylibraryPath = projectPath + NAVMESHES_PATH;
+                    if (FileSystem::Copy(assetPath.c_str(), copylibraryPath.c_str()))
+                        AddResource(libraryPath, assetUID);
+                }
                 break;
             default:
                 GLOG("Unknown UID prefix (%s) for: %s", std::to_string(prefix).c_str(), assetName.c_str());
@@ -314,14 +318,14 @@ UID LibraryModule::AssignFiletypeUID(UID originalUID, FileType fileType)
 void LibraryModule::DeletePrefabFiles(UID prefabUID)
 {
     const std::string metaPath = App->GetProjectModule()->GetLoadedProjectPath() + METADATA_PATH +
-                           std::to_string((int)ResourceType::Prefab) + FILENAME_SEPARATOR + GetResourceName(prefabUID) +
-                           META_EXTENSION;
-    
+                                 std::to_string((int)ResourceType::Prefab) + FILENAME_SEPARATOR +
+                                 GetResourceName(prefabUID) + META_EXTENSION;
+
     FileSystem::Delete(metaPath.c_str());
 
     const std::string assetPath = App->GetProjectModule()->GetLoadedProjectPath() + PREFABS_ASSETS_PATH +
-                            GetResourceName(prefabUID) + PREFAB_EXTENSION;
-    
+                                  GetResourceName(prefabUID) + PREFAB_EXTENSION;
+
     FileSystem::Delete(assetPath.c_str());
 
     const std::string& resourcePath = App->GetProjectModule()->GetLoadedProjectPath() + PREFABS_LIB_PATH +
