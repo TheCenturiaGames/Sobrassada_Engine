@@ -24,12 +24,19 @@ namespace SceneImporter
 {
     void Import(const char* filePath)
     {
+        // Don´t accept imports from the assets folder directly
+        std::string importFolderPath = FileSystem::GetFilePath(filePath);
+        importFolderPath.pop_back();
+        std::string projectFolderPath = App->GetProjectModule()->GetLoadedProjectPath() + ASSETS_PATH;
+        projectFolderPath.pop_back();
+        if (importFolderPath == projectFolderPath)
+            return;
         // TODO Is it necessary to create directories here? They should be already created
         const std::string engineDefaultPath = ENGINE_DEFAULT_ASSETS;
         CreateLibraryDirectories(App->GetProjectModule()->GetLoadedProjectPath());
         CreateLibraryDirectories(engineDefaultPath);
 
-        std::string extension = FileSystem::GetFileExtension(filePath);
+        const std::string& extension = FileSystem::GetFileExtension(filePath);
 
         if (extension == ASSET_EXTENSION) ImportGLTF(filePath, App->GetProjectModule()->GetLoadedProjectPath());
         else if (extension == FONT_EXTENSION)

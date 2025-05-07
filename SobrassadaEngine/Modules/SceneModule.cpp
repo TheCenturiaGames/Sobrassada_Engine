@@ -16,6 +16,9 @@
 #include "RaycastController.h"
 #include "ResourcesModule.h"
 #include "Standalone/AnimationComponent.h"
+#include "Standalone/Lights/DirectionalLightComponent.h"
+#include "Standalone/Lights/PointLightComponent.h"
+#include "Standalone/Lights/SpotLightComponent.h"
 #include "Standalone/MeshComponent.h"
 
 #include <SDL_mouse.h>
@@ -323,6 +326,16 @@ void SceneModule::HandleObjectDuplication()
 
             AnimationComponent* animComp = createdGameObjects[i]->GetComponent<AnimationComponent*>();
             if (animComp) animComp->SetBoneMapping();
+
+            // LIGHTS NEED THE INIT AGAIN BECAUSE WHEN CREATING THE COMPONENT THE PARENT GO IS NOT IN THE MAP UNTIL CREATED SO IT DOESEN'T GET ADDED TO THE LIST
+            PointLightComponent* pointLight = createdGameObjects[i]->GetComponent<PointLightComponent*>();
+            if (pointLight) pointLight->Init();
+
+            DirectionalLightComponent* directionalLight = createdGameObjects[i]->GetComponent<DirectionalLightComponent*>();
+            if (directionalLight) directionalLight->Init();
+
+            SpotLightComponent* spotLight = createdGameObjects[i]->GetComponent<SpotLightComponent*>();
+            if (spotLight) spotLight->Init();
         }
     }
 
