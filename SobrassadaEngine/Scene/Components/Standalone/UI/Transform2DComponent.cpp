@@ -638,16 +638,30 @@ void Transform2DComponent::OnCanvasRenderModeChanged(CanvasComponent::CanvasRend
 {
     if (!parentCanvas) return;
 
-    float2 worldPos = GetAbsoluteWorldPosition(); // nova funció que retorna posició absoluta del GameObject
+    float2 worldPos = GetAbsoluteWorldPosition();
     float scale     = parentCanvas->GetScreenScale();
+
+    float2 newLocalPos = worldPos;
+
+    if (parent != parentCanvas->GetParent())
+    {
+        float2 parentWorldPos  = parent->GetComponent<Transform2DComponent*>()->GetAbsoluteWorldPosition();
+        newLocalPos           -= parentWorldPos;
+    }
 
     if (newMode == CanvasComponent::CanvasRenderMode::ScreenSpaceOverlay)
     {
-        position = worldPos / scale;
+        position = newLocalPos / scale;
+    }
+    else if (newMode == CanvasComponent::CanvasRenderMode::WorldSpace)
+    {
+        position = newLocalPos * scale;
     }
 
     UpdateParent3DTransform();
 }
+
+
 
 float2 Transform2DComponent::GetAbsoluteWorldPosition() const
 {
