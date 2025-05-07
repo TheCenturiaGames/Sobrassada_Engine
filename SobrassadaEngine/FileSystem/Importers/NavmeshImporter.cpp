@@ -58,7 +58,7 @@ UID NavmeshImporter::SaveNavmesh(const char* name, const ResourceNavMesh* resour
     UID finalNavmeshUID = App->GetLibraryModule()->GetUIDFromMetaFile(savePath);
     if (finalNavmeshUID == INVALID_UID) finalNavmeshUID = navmeshUID;
     
-    const std::string metaNavPath = ASSETS_PATH + std::string(name) + META_EXTENSION;
+    const std::string metaNavPath = NAVMESH_ASSETS_PATH + std::string(name) + NAVMESH_EXTENSION;
     const std::string navPath =
         App->GetProjectModule()->GetLoadedProjectPath() + NAVMESHES_PATH + std::string(name) + NAVMESH_EXTENSION;
 
@@ -69,6 +69,11 @@ UID NavmeshImporter::SaveNavmesh(const char* name, const ResourceNavMesh* resour
     // Write binary navmesh
     const unsigned int bytesWritten =
         (unsigned int)FileSystem::Save(navPath.c_str(), fileBuffer, (unsigned int)totalSize, true);
+    
+    // Write binary in assets so its shared across Git
+
+    const std::string assetNavmeshPath = App->GetProjectModule()->GetLoadedProjectPath() + metaNavPath;
+    FileSystem::Save(assetNavmeshPath.c_str(), fileBuffer, (unsigned int)totalSize, true);
 
     delete[] fileBuffer;
 
