@@ -108,7 +108,7 @@ void CharacterControllerComponent::Update(float time) // SO many navmesh getters
 
     float deltaTime = App->GetGameTimer()->GetDeltaTime() / 1000.0f;
 
-    if (deltaTime == 0.0f) return; // TODO: deltaTime spikes, need to know why
+    if (deltaTime == 0.0f) return;
 
     dtNavMesh* dtNav         = App->GetPathfinderModule()->GetNavMesh()->GetDetourNavMesh();
 
@@ -146,18 +146,19 @@ void CharacterControllerComponent::Update(float time) // SO many navmesh getters
 
     if (!navMeshQuery || currentPolyRef == 0) return;
 
-    if (deltaTime < 0.1f)
+    if (deltaTime < 0.1f) // TODO: deltaTime spikes, need to know why
     {
         verticalSpeed     += gravity * deltaTime;
         verticalSpeed      = std::max(verticalSpeed, maxFallSpeed); // Clamp fall speed
 
-    float3 currentPos  = parent->GetGlobalTransform().TranslatePart();
-    currentPos.y      += (verticalSpeed * deltaTime);
+        float3 currentPos  = parent->GetGlobalTransform().TranslatePart();
+        currentPos.y      += (verticalSpeed * deltaTime);
 
         AdjustHeightToNavMesh(currentPos);
 
-    lastPosition = currentPos;
-    parent->SetLocalPosition(currentPos - parent->GetParentGlobalTransform().TranslatePart());
+        lastPosition = currentPos;
+        parent->SetLocalPosition(currentPos - parent->GetParentGlobalTransform().TranslatePart());
+    }
 
     if (isRotating)
     {
