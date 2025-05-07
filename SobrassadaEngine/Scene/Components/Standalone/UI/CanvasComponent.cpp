@@ -41,6 +41,11 @@ void CanvasComponent::Init()
         transform2D = parent->GetComponent<Transform2DComponent*>();
     }
 
+    if (parent->GetComponent<CanvasScalerComponent*>() == nullptr)
+    {
+        parent->CreateComponent(COMPONENT_CANVAS_SCALER);
+    }
+
     App->GetGameUIModule()->AddCanvas(this);
     UpdateBoundingBox();
 }

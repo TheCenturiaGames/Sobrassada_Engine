@@ -155,7 +155,11 @@ void UILabelComponent::RenderUI(const float4x4& view, const float4x4 proj) const
     float3 startPos;
     if (transform2D)
     {
-        startPos = float3(transform2D->GetRenderingPosition(), 0) - parent->GetGlobalTransform().TranslatePart();
+        startPos = float3(transform2D->GetRenderingPosition(), 0);
+        if (parentCanvas->IsInWorldSpace())
+        {
+            startPos -= parent->GetGlobalTransform().TranslatePart();
+        }
         width = transform2D->size.x;
     }
     glUniformMatrix4fv(0, 1, GL_TRUE, parent->GetGlobalTransform().ptr());

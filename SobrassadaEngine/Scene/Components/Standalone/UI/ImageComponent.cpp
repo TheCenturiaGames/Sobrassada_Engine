@@ -157,7 +157,7 @@ void ImageComponent::RenderUI(const float4x4& view, const float4x4& proj) const
 {
     if (parentCanvas == nullptr || transform2D == nullptr || !IsEffectivelyEnabled()) return;
 
-   float3 startPos = float3(transform2D->GetRenderingPosition(), 0);
+    float3 startPos = float3(transform2D->GetRenderingPosition(), 0);
     if (parentCanvas->IsInWorldSpace())
     {
         startPos -= parent->GetGlobalTransform().TranslatePart();
