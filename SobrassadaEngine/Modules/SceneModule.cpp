@@ -55,14 +55,6 @@ bool SceneModule::Init()
 
 update_status SceneModule::PreUpdate(float deltaTime)
 {
-    if (loadedScene->GetStopPlaying()) SwitchPlayMode(false);
-    else if (loadedScene->GetStartPlaying()) SwitchPlayMode(true);
-    else if (loadedScene->GetStepPlaying())
-    {
-        App->GetGameTimer()->Step();
-        loadedScene->SetStepPlaying(false);
-    }
-
     return UPDATE_CONTINUE;
 }
 
@@ -135,6 +127,14 @@ update_status SceneModule::PostUpdate(float deltaTime)
 
         // IF SCENE NOT FOCUSED AND WAS MULTISELECTING RELEASE
         if (loadedScene->IsMultiselecting() && !loadedScene->IsSceneFocused()) loadedScene->ClearObjectSelection();
+
+        if (loadedScene->GetStopPlaying()) SwitchPlayMode(false);
+        else if (loadedScene->GetStartPlaying()) SwitchPlayMode(true);
+        else if (loadedScene->GetStepPlaying())
+        {
+            App->GetGameTimer()->Step();
+            loadedScene->SetStepPlaying(false);
+        }
     }
 
     return UPDATE_CONTINUE;
