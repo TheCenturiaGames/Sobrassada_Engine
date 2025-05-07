@@ -96,10 +96,12 @@ void Character::OnCollision(GameObject* otherObject, const float3& collisionNorm
     CubeColliderComponent* otherWeapon = otherObject->GetComponent<CubeColliderComponent*>();
     ScriptComponent* otherScript       = otherObject->GetComponentParent<ScriptComponent*>(AppEngine);
 
-    if (!isInvulnerable && otherScript != nullptr && otherWeapon != nullptr && otherWeapon->GetEnabled())
+    if (isInvulnerable) return;
+
+    if (otherScript && otherWeapon && otherWeapon->GetEnabled())
     {
         Character* enemyScript = otherScript->GetScriptByType<Character>();
-        if (enemyScript = otherScript->GetScriptByType<Character>())
+        if (enemyScript)
         {
             if (!enemyScript->isAttacking) return;
             TakeDamage(enemyScript->damage);
@@ -109,9 +111,10 @@ void Character::OnCollision(GameObject* otherObject, const float3& collisionNorm
     // Projectile check
     otherScript = otherObject->GetComponent<ScriptComponent*>();
 
-    if (!isInvulnerable && otherScript != nullptr)
+    if (otherScript)
     {
-        if (Projectile* projectile = otherScript->GetScriptByType<Projectile>()) TakeDamage(projectile->GetDamage());
+        Projectile* projectile = otherScript->GetScriptByType<Projectile>();
+        if (projectile && otherWeapon && otherWeapon->GetEnabled()) TakeDamage(projectile->GetDamage());
     }
 }
 
