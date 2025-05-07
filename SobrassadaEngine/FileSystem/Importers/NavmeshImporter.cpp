@@ -22,7 +22,7 @@ UID NavmeshImporter::SaveNavmesh(const char* name, const ResourceNavMesh* resour
     const int NAVMESHSET_MAGIC   = 'S' << 24 | 'O' << 16 | 'B' << 8 | 'R';
     const int NAVMESHSET_VERSION = 1;
 
-    const dtNavMesh* navmesh           = resource->GetDetourNavMesh();
+    const dtNavMesh* navmesh     = resource->GetDetourNavMesh();
     if (!navmesh) return 0;
 
     const dtNavMeshParams* params = navmesh->getParams();
@@ -49,15 +49,15 @@ UID NavmeshImporter::SaveNavmesh(const char* name, const ResourceNavMesh* resour
     memcpy(cursor, tile->data, tile->dataSize);
 
     // Generate UID and file path
-    UID navmeshUID = GenerateUID();
-    navmeshUID     = App->GetLibraryModule()->AssignFiletypeUID(navmeshUID, FileType::Navmesh);
+    UID navmeshUID             = GenerateUID();
+    navmeshUID                 = App->GetLibraryModule()->AssignFiletypeUID(navmeshUID, FileType::Navmesh);
 
     UID prefix                 = navmeshUID / UID_PREFIX_DIVISOR;
     const std::string savePath = App->GetProjectModule()->GetLoadedProjectPath() + METADATA_PATH +
                                  std::to_string(prefix) + FILENAME_SEPARATOR + name + META_EXTENSION;
     UID finalNavmeshUID = App->GetLibraryModule()->GetUIDFromMetaFile(savePath);
     if (finalNavmeshUID == INVALID_UID) finalNavmeshUID = navmeshUID;
-    
+
     const std::string metaNavPath = NAVMESH_ASSETS_PATH + std::string(name) + NAVMESH_EXTENSION;
     const std::string navPath =
         App->GetProjectModule()->GetLoadedProjectPath() + NAVMESHES_PATH + std::string(name) + NAVMESH_EXTENSION;
@@ -69,7 +69,7 @@ UID NavmeshImporter::SaveNavmesh(const char* name, const ResourceNavMesh* resour
     // Write binary navmesh
     const unsigned int bytesWritten =
         (unsigned int)FileSystem::Save(navPath.c_str(), fileBuffer, (unsigned int)totalSize, true);
-    
+
     // Write binary in assets so its shared across Git
 
     const std::string assetNavmeshPath = App->GetProjectModule()->GetLoadedProjectPath() + metaNavPath;
@@ -86,17 +86,15 @@ UID NavmeshImporter::SaveNavmesh(const char* name, const ResourceNavMesh* resour
     return finalNavmeshUID;
 }
 
-
-
 ResourceNavMesh* NavmeshImporter::LoadNavmesh(const UID navmeshUID)
 {
-    const int NAVMESHSET_MAGIC = 'S' << 24 | 'O' << 16 | 'B' << 8 | 'R';
+    const int NAVMESHSET_MAGIC   = 'S' << 24 | 'O' << 16 | 'B' << 8 | 'R';
     const int NAVMESHSET_VERSION = 1;
 
-    const std::string navPath = App->GetLibraryModule()->GetResourcePath(navmeshUID);
+    const std::string navPath    = App->GetLibraryModule()->GetResourcePath(navmeshUID);
 
-    char* buffer = nullptr;
-    unsigned int size = FileSystem::LoadForDetour(navPath.c_str(), &buffer);
+    char* buffer                 = nullptr;
+    unsigned int size            = FileSystem::LoadForDetour(navPath.c_str(), &buffer);
     if (size == 0 || !buffer)
     {
         GLOG("Failed to load navmesh binary: %s", navPath.c_str());
@@ -133,7 +131,7 @@ ResourceNavMesh* NavmeshImporter::LoadNavmesh(const UID navmeshUID)
         return nullptr;
     }
     unsigned char* tileData = (unsigned char*)cursor;
-    int tileRef = 0;
+    int tileRef             = 0;
     status = navMesh->addTile(tileData, size - sizeof(NavMeshSetHeader), DT_TILE_FREE_DATA, 0, (dtTileRef*)&tileRef);
     if (dtStatusFailed(status))
     {
@@ -147,4 +145,16 @@ ResourceNavMesh* NavmeshImporter::LoadNavmesh(const UID navmeshUID)
     GLOG("Loaded navmesh binary: %s", navPath.c_str());
 
     return resource;
+}
+
+void NavmeshImporter::CopyNavmesh(
+    const std::string& assetPath, const std::string& projectPath, const std::string& libraryPath, UID assetUID
+)
+{
+    if (FileSystem::Exists(assetPath.c_str()))
+    {
+        std::string copylibraryPath = projectPath + NAVMESHES_PATH;
+        if (FileSystem::Copy(assetPath.c_str(), copylibraryPath.c_str()))
+            App->GetLibraryModule()->AddResource(libraryPath, assetUID);
+    }
 }

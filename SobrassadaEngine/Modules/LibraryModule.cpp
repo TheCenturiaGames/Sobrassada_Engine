@@ -6,6 +6,7 @@
 #include "FileSystem.h"
 #include "FileSystem/StateMachineManager.h"
 #include "GameObject.h"
+#include "NavmeshImporter.h"
 #include "ProjectModule.h"
 #include "Resource.h"
 #include "SceneImporter.h"
@@ -210,12 +211,7 @@ bool LibraryModule::LoadLibraryMaps(const std::string& projectPath)
                 libraryPath = projectPath + NAVMESHES_PATH + assetName + NAVMESH_EXTENSION;
 
                 if (FileSystem::Exists(libraryPath.c_str())) AddResource(libraryPath, assetUID);
-                else if (FileSystem::Exists(assetPath.c_str()))
-                {
-                    std::string copylibraryPath = projectPath + NAVMESHES_PATH;
-                    if (FileSystem::Copy(assetPath.c_str(), copylibraryPath.c_str()))
-                        AddResource(libraryPath, assetUID);
-                }
+                else NavmeshImporter::CopyNavmesh(assetPath, projectPath, libraryPath, assetUID);
                 break;
             default:
                 GLOG("Unknown UID prefix (%s) for: %s", std::to_string(prefix).c_str(), assetName.c_str());
