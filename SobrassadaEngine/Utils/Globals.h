@@ -96,6 +96,7 @@ constexpr const char* METADATA_PATH                  = "Assets/Metadata/";
 constexpr const char* PREFABS_ASSETS_PATH            = "Assets/Prefabs/";
 constexpr const char* MODELS_ASSETS_PATH             = "Assets/Models/";
 constexpr const char* STATEMACHINES_ASSETS_PATH      = "Assets/StateMachines/";
+constexpr const char* NAVMESH_ASSETS_PATH            = "Assets/Navmeshes/";
 
 constexpr const char* LIBRARY_PATH                   = "Library/";
 constexpr const char* ANIMATIONS_PATH                = "Library/Animations/";
