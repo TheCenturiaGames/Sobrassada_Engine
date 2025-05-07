@@ -132,6 +132,14 @@ void CuChulainn::GetInputs()
     {
         if (state == CharacterStates::AIM) ThrowSpear();
     }
+    if (keyboard[SDL_SCANCODE_F5])
+    {
+        Respawn();
+    }
+    if (keyboard[SDL_SCANCODE_F6])
+    {
+        spawnPos = parent->GetPosition();
+    }
 }
 
 bool CuChulainn::CanDash()
@@ -188,7 +196,7 @@ void CuChulainn::LookAtMouse()
     const float3 mouseWorldPos = AppEngine->GetSceneModule()->GetScene()->GetMainCamera()->ScreenPointToXZ(
         parent->GetGlobalTransform().TranslatePart().y
     );
-    float3 direction = mouseWorldPos - parent->GetPosition();
+    float3 direction = mouseWorldPos - parent->GetGlobalTransform().TranslatePart();
     direction.y      = 0;
     direction.Normalize();
     character->LookAt(direction);
@@ -274,4 +282,10 @@ void CuChulainn::Move()
         if (state != CharacterStates::IDLE && animComponent) animComponent->UseTrigger("idle");
         state = CharacterStates::IDLE;
     }
+}
+
+void CuChulainn::Respawn()
+{
+    parent->SetLocalPosition(spawnPos);
+    if (camera) camera->SetPosition(spawnPos);
 }

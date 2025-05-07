@@ -15,6 +15,7 @@ class CameraMovement : public Script
     void Update(float deltaTime) override;
 
     void EnableMouseOffset(bool enable) { mouseOffsetEnabled = enable; }
+    void SetPosition(const float3& newPos);
 
   private:
     void FollowTarget(float deltaTime);

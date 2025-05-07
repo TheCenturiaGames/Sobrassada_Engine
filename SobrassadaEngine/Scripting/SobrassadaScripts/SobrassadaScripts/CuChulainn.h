@@ -26,6 +26,8 @@ class CuChulainn : public Character
     bool Init() override;
     void Update(float deltaTime) override;
 
+    void SetSpawnPosition(const float3& newPos) { spawnPos = newPos; }
+
   private:
     void OnDeath() override;
     void OnDamageTaken(int amount) override;
@@ -45,6 +47,7 @@ class CuChulainn : public Character
     void Dash();
     void Aim();
     void Move();
+    void Respawn();
 
   private:
     std::string cameraName  = "";
@@ -74,6 +77,7 @@ class CuChulainn : public Character
     bool resetWeapon        = false;
 
     CharacterStates state   = CharacterStates::IDLE;
+    float3 spawnPos         = float3::zero;
 };
 
 extern CharacterControllerComponent* character;

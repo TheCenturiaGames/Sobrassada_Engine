@@ -48,14 +48,14 @@ void CameraMovement::FollowTarget(float deltaTime)
 {
     if (!target) return;
 
-    float3 desiredPosition        = target->GetPosition();
-    const float3& currentPosition = parent->GetPosition();
+    float3 desiredPosition        = target->GetGlobalTransform().TranslatePart();
+    const float3& currentPosition = parent->GetGlobalTransform().TranslatePart();
 
     if (mouseOffsetEnabled)
     {
         currentLookAhead = 0;
         const float3 mouseWorldPos =
-            AppEngine->GetSceneModule()->GetScene()->GetMainCamera()->ScreenPointToXZ(parent->GetPosition().y);
+            AppEngine->GetSceneModule()->GetScene()->GetMainCamera()->ScreenPointToXZ(currentPosition.y);
         const float3 mouseOffset  = (desiredPosition + (mouseWorldPos)) * 0.5f - desiredPosition;
         desiredPosition          += mouseOffset * mouseOffsetIntensity;
     }
@@ -78,5 +78,10 @@ void CameraMovement::FollowTarget(float deltaTime)
     }
     finalPosition = Lerp(currentPosition, desiredPosition, smoothnessVelocity * deltaTime);
 
-    parent->SetLocalPosition(finalPosition);
+    parent->SetLocalPosition(finalPosition - parent->GetParentGlobalTransform().TranslatePart());
+}
+
+void CameraMovement::SetPosition(const float3& newPos)
+{
+    parent->SetLocalPosition(newPos);
 }

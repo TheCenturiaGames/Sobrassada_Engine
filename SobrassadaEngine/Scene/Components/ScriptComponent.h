@@ -20,6 +20,7 @@ enum ScriptType
     SCRIPT_CAMERA_MOVEMENT,
     SCRIPT_PROJECTILE,
     SCRIPT_FREE_CAMERA,
+    SCRIPT_SPAWN_POINT,
 
     SCRIPT_TYPE_COUNT // Add at the end
 };
@@ -46,8 +47,9 @@ constexpr const char* scripts[] = {
     "MainMenuSelectorScript",    // SCRIPT_MAIN_MENU_SELECTOR
     "PressAnyKeyScript",         // SCRIPT_PRESS_ANY_KEY
     "CameraMovement",            // SCRIPT_CAMERA_MOVEMENT
-    "Projectile",                 // SCRIPT_PROJECTILE
-    "FreeCamera"                 // SCRIPT_FREE_CAMERA
+    "Projectile",                // SCRIPT_PROJECTILE
+    "FreeCamera",                // SCRIPT_FREE_CAMERA
+    "SpawnPoint"                 // SCRIPT_SPAWN_POINT
 };
 
 static_assert(
