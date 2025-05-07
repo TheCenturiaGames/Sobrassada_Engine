@@ -169,12 +169,6 @@ void Scene::Init()
     lightsConfig->InitSkybox();
     lightsConfig->InitLightBuffers();
 
-    // Load navmesh from scene.
-    if (navmeshUID != INVALID_UID)
-    {
-        std::string navmeshName = App->GetLibraryModule()->GetResourceName(navmeshUID);
-        App->GetPathfinderModule()->LoadNavMesh(navmeshName);
-    }
     // Call this after overriding the prefabs to avoid duplicates in gameObjectsToUpdate
     GetGameObjectByUID(gameObjectRootUID)->UpdateTransformForGOBranch();
 
@@ -414,8 +408,7 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
 
     if (ImGui::Button("Play"))
     {
-        App->GetSceneModule()->SwitchPlayMode(true);
-        gameTimer->Start();
+        startPlaying = true;
     }
     ImGui::SameLine();
     if (ImGui::Button("Pause"))
@@ -431,7 +424,6 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
     if (ImGui::Button("Stop"))
     {
         stopPlaying = true;
-        gameTimer->Reset();
     }
     ImGui::SameLine();
     ImGui::SetNextItemWidth(100.0f);

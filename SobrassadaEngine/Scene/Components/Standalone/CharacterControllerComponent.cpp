@@ -6,6 +6,7 @@
 #include "DetourNavMeshQuery.h"
 #include "EditorUIModule.h"
 #include "GameObject.h"
+#include "GameTimer.h"
 #include "InputModule.h"
 #include "PathfinderModule.h"
 #include "ResourceNavMesh.h"
@@ -103,15 +104,13 @@ void CharacterControllerComponent::Update(float deltaTime) // SO many navmesh ge
 {
     if (!IsEffectivelyEnabled()) return;
 
-    if (!App->GetSceneModule()->GetInPlayMode()) return;
+    if (!App->GetSceneModule()->GetInPlayMode() || App->GetSceneModule()->GetOnlyOnceInPlayMode()) return;
 
     if (deltaTime <= 0.0f) return;
 
     dtNavMesh* dtNav         = App->GetPathfinderModule()->GetNavMesh()->GetDetourNavMesh();
 
     dtNavMeshQuery* tmpQuery = App->GetPathfinderModule()->GetDetourNavMeshQuery();
-
-    if (!dtNav) return;
 
     if (!tmpQuery || !dtNav) return;
 
@@ -145,13 +144,32 @@ void CharacterControllerComponent::Update(float deltaTime) // SO many navmesh ge
 
     if (!navMeshQuery || currentPolyRef == 0) return;
 
-    verticalSpeed     += gravity * deltaTime;
-    verticalSpeed      = std::max(verticalSpeed, maxFallSpeed); // Clamp fall speed
+    verticalSpeed += gravity * deltaTime;
+    verticalSpeed  = std::max(verticalSpeed, maxFallSpeed); // Clamp fall speed
+
+    if (verticalSpeed < 1.0f)
+    {
+        GLOG("Engine Time: %.3f", deltaTime);
+        GLOG("Vertical: %.2f", verticalSpeed);
+    }
+
+    if (verticalSpeed <= -5.0f) return;
+
+    GLOG("Engine Time: %.3f", deltaTime);
+
+    if (deltaTime >= 0.4f) 
+        int x = 0;
+
+    if (verticalSpeed != 0.0f) GLOG("Vertical: %.2f", verticalSpeed);
 
     float3 currentPos  = parent->GetPosition();
     currentPos.y      += (verticalSpeed * deltaTime);
 
+    GLOG("Pos: %2.f %.2f %.2f", currentPos.x, currentPos.y, currentPos.z);
+
     AdjustHeightToNavMesh(currentPos);
+
+    GLOG("After Pos: %2.f %.2f %.2f", currentPos.x, currentPos.y, currentPos.z);
 
     lastPosition = currentPos;
     parent->SetLocalPosition(currentPos);

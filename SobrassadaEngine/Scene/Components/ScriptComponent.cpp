@@ -95,7 +95,7 @@ void ScriptComponent::Update(float deltaTime)
 
     if (App->GetSceneModule()->GetInPlayMode())
     {
-        float gameTime = App->GetGameTimer()->GetDeltaTime() / 1000.0f;
+        float gameTime = deltaTime / 1000.0f; // seconds
         for (auto& script : scriptInstances)
         {
             script->Update(gameTime);

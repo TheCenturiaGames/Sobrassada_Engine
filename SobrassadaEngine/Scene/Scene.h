@@ -90,6 +90,7 @@ class SOBRASADA_API_ENGINE Scene
 
     bool GetDoInputs() const { return doInputs; }
     bool GetDoMouseInputs() const { return doMouseInputs; }
+    bool GetStartPlaying() const { return startPlaying; }
     bool GetStopPlaying() const { return stopPlaying; }
     bool GetSceneVisible() const { return sceneVisible; }
 
@@ -112,6 +113,7 @@ class SOBRASADA_API_ENGINE Scene
     void SetMainCamera(CameraComponent* camera) { mainCamera = camera; }
     void SetSelectedGameObject(UID newSelectedGameObject) { selectedGameObjectUID = newSelectedGameObject; };
     void SetNavmeshUID(UID navUID) { navmeshUID = navUID; }
+    void SetStartPlaying(bool start) { startPlaying = start; }
     void SetStopPlaying(bool stop) { stopPlaying = stop; }
 
     void SetStaticModified() { staticModified = true; }
@@ -136,6 +138,7 @@ class SOBRASADA_API_ENGINE Scene
     UID gameObjectRootUID       = INVALID_UID;
     UID selectedGameObjectUID   = INVALID_UID;
     CameraComponent* mainCamera = nullptr;
+    bool startPlaying           = false;
     bool stopPlaying            = false;
     bool doInputs               = false;
     bool doMouseInputs          = false;
