@@ -256,7 +256,6 @@ void AnimationComponent::OnInspector()
 
     if (ImGui::CollapsingHeader("Animation Library"))
     {
-        std::string selectedZombunnyAnim = "";
 
         ImGui::Text("Available Animations:");
         const std::unordered_map<std::string, UID>& animationMap = App->GetLibraryModule()->GetAnimMap();
@@ -267,13 +266,12 @@ void AnimationComponent::OnInspector()
 
             if (animationName.rfind(originAnimation, 0) == 0)
             {
-                const bool isSelected = (selectedZombunnyAnim == animationName);
+                const bool isSelected = (currentAnimName == animationName);
 
                 if (ImGui::Selectable(animationName.c_str(), isSelected))
                 {
-                    selectedZombunnyAnim = animationName;
-                    resource             = pair.second;
-                    AddAnimation(resource);
+                    currentAnimName = pair.first;
+                    resource        = pair.second;
 
                     if (playing)
                     {
