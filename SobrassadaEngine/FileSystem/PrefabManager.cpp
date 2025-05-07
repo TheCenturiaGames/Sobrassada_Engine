@@ -42,7 +42,7 @@ namespace PrefabManager
             updateName = false;
             for (const auto& savedPrefab : App->GetLibraryModule()->GetPrefabMap())
             {
-                if (savedPrefab.first.GetString() == name)
+                if (savedPrefab.first == name)
                 {
                     updateName = true;
                     ++numRepeated;

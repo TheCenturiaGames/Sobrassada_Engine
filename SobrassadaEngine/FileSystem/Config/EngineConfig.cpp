@@ -1,11 +1,8 @@
 ﻿#include "EngineConfig.h"
 
 #include "FileSystem.h"
-
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
-
-#include "HashString.h"
 
 EngineConfig::EngineConfig()
 {
@@ -21,7 +18,7 @@ void EngineConfig::SetStartupProjectPath(const std::string& newStartupProjectPat
     startupProjectPath = newStartupProjectPath;
     if (!newStartupProjectPath.empty())
     {
-        previouslyLoadedProjectPaths.insert(startupProjectPath);
+        previouslyLoadedProjectPaths.insert(HashString(startupProjectPath));
     }
     Save();
 }

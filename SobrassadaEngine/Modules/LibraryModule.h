@@ -7,7 +7,7 @@
 #include <string>
 #include <unordered_map>
 
-struct HashString;
+#include "HashString.h"
 
 enum class SaveMode
 {

@@ -11,7 +11,6 @@
 #include "SceneImporter.h"
 #include "SceneModule.h"
 #include "TextureImporter.h"
-#include "HashString.h"
 
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"

@@ -1,6 +1,4 @@
 #pragma once
-
-
 #include <string>
 #include <functional> 
 
@@ -13,7 +11,7 @@ struct HashString
     HashString(const std::string& str)
     {
         original = str;
-        hash     = 0; // std::hash<std::string> {}(str); // std::hash<std::string> {}(str);
+        hash     = std::hash<std::string> {}(str);
     }
 
     bool operator==(const HashString& other) const { return hash == other.hash; }

@@ -26,7 +26,6 @@
 #include "TextureEditor.h"
 #include "TextureImporter.h"
 #include "WindowModule.h"
-#include "HashString.h"
 
 #include "Math/Quat.h"
 #include "SDL.h"
@@ -64,6 +63,7 @@ EditorUIModule::EditorUIModule() : width(0), height(0)
         {HashString("Audio Source"),         COMPONENT_AUDIO_SOURCE        },
         {HashString("Audio Listener"),       COMPONENT_AUDIO_LISTENER      },
     };
+
     fullscreen    = FULLSCREEN;
     full_desktop  = FULL_DESKTOP;
     borderless    = BORDERLESS;
@@ -1164,7 +1164,7 @@ T EditorUIModule::RenderResourceSelectDialog(
             for (const auto& valuePair : availableResources)
             {
                 {
-                    if (valuePair.first.find(searchTextResource) != std::string::npos)
+                    if (valuePair.first.GetString().find(searchTextResource) != std::string::npos)
                     {
                         if (ImGui::Selectable(valuePair.first.c_str(), false))
                         {

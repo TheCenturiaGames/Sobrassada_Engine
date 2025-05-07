@@ -1,11 +1,9 @@
 ﻿#pragma once
 
 #include "ConfigFile.h"
-
+#include "HashString.h"
 #include <string>
 #include <unordered_set>
-
-struct HashString;
 
 class EngineConfig : public ConfigFile
 {

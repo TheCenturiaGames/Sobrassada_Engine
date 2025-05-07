@@ -9,7 +9,6 @@
 #include "ResourcesModule.h"
 #include "SceneModule.h"
 #include "Transform2DComponent.h"
-#include "HashString.h"
 
 #include "ImGui.h"
 #include "glew.h"

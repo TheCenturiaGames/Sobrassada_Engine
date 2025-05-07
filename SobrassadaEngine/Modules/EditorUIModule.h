@@ -4,6 +4,7 @@
 #include "Globals.h"
 #include "Module.h"
 #include "NodeEditor.h"
+#include "HashString.h"
 
 #include "Math/float3.h"
 #include "Math/float4x4.h"

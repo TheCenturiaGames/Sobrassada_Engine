@@ -38,9 +38,9 @@ void ResourceMaterial::OnEditorUpdate()
             ImGui::SetTooltip("Texture Dimensions: %d, %d", diffuseTexture.width, diffuseTexture.height);
         }
 
-        //ImGui::SameLine();
+        // ImGui::SameLine();
 
-        //TODO: commented all select buttons until save data to meta is implemented
+        // TODO: commented all select buttons until save data to meta is implemented
         /*if (ImGui::Button("Select Diffuse Texture"))
         {
             ImGui::OpenPopup(CONSTANT_DIFFUSE_TEXTURE_SELECT_DIALOG_ID);
@@ -73,7 +73,7 @@ void ResourceMaterial::OnEditorUpdate()
         {
             ImGui::SetTooltip("Texture Dimensions: %d, %d", metallicTexture.width, metallicTexture.height);
         }
-        
+
         // TODO: commented all select buttons until save data to meta is implemented
         /*ImGui::SameLine();
         if (ImGui::Button("Select Metallic Texture"))
@@ -96,7 +96,7 @@ void ResourceMaterial::OnEditorUpdate()
                 updated              = true;
             }
         }*/
-        
+
         updated |= ImGui::SliderFloat("Metallic Factor", &material.metallicFactor, 0.0f, 1.0f);
         updated |= ImGui::SliderFloat("Roughness Factor", &material.roughnessFactor, 0.0f, 1.0f);
     }
@@ -111,9 +111,9 @@ void ResourceMaterial::OnEditorUpdate()
             {
                 ImGui::SetTooltip("Texture Dimensions: %d, %d", specularTexture.width, specularTexture.height);
             }
-            //ImGui::SameLine();
+            // ImGui::SameLine();
         }
-        
+
         // TODO: commented all select buttons until save data to meta is implemented
         /*if (ImGui::Button("Select Specular Texture"))
         {
@@ -135,7 +135,7 @@ void ResourceMaterial::OnEditorUpdate()
                 updated              = true;
             }
         }*/
-        
+
         updated |= ImGui::SliderFloat3("Specular Color", &material.specColor.x, 0.0f, 1.0f);
         if (!material.shininessInAlpha) updated |= ImGui::SliderFloat("Shininess", &material.shininess, 0.0f, 500.0f);
     }
@@ -170,11 +170,10 @@ void ResourceMaterial::OnEditorUpdate()
                 updated              = true;
             }
         }*/
-        
     }
 
-    //TODO: override metadata material
-    //if (updated)
+    // TODO: override metadata material
+    // if (updated)
 }
 
 UID ResourceMaterial::ChangeTexture(UID newTexture, TextureInfo& textureToChange, UID textureGPU)
@@ -235,7 +234,7 @@ void ResourceMaterial::LoadMaterialData(Material mat)
 
         diffuseTexture.width  = fallbackTexture->GetTextureWidth();
         diffuseTexture.height = fallbackTexture->GetTextureHeight();
-        
+
         delete fallbackTexture;
     }
 
@@ -305,15 +304,27 @@ void ResourceMaterial::LoadMaterialData(Material mat)
 
 void ResourceMaterial::FreeMaterials() const
 {
-    glMakeTextureHandleNonResidentARB(material.diffuseTex);
-    glDeleteTextures(1, &diffuseTexture.textureID);
+    if (diffuseTexture.textureID != 0)
+    {
+        glMakeTextureHandleNonResidentARB(material.diffuseTex);
+        glDeleteTextures(1, &diffuseTexture.textureID);
+    }
 
-    glMakeTextureHandleNonResidentARB(material.specularTex);
-    glDeleteTextures(1, &specularTexture.textureID);
+    if (specularTexture.textureID != 0)
+    {
+        glMakeTextureHandleNonResidentARB(material.specularTex);
+        glDeleteTextures(1, &specularTexture.textureID);
+    }
 
-    glMakeTextureHandleNonResidentARB(material.metallicTex);
-    glDeleteTextures(1, &metallicTexture.textureID);
+    if (metallicTexture.textureID != 0)
+    {
+        glMakeTextureHandleNonResidentARB(material.metallicTex);
+        glDeleteTextures(1, &metallicTexture.textureID);
+    }
 
-    glMakeTextureHandleNonResidentARB(material.normalTex);
-    glDeleteTextures(1, &normalTexture.textureID);
+    if (normalTexture.textureID != 0)
+    {
+        glMakeTextureHandleNonResidentARB(material.normalTex);
+        glDeleteTextures(1, &normalTexture.textureID);
+    }
 }
