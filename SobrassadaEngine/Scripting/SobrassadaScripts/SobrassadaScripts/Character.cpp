@@ -114,7 +114,12 @@ void Character::OnCollision(GameObject* otherObject, const float3& collisionNorm
     if (otherScript)
     {
         Projectile* projectile = otherScript->GetScriptByType<Projectile>();
-        if (projectile && otherWeapon && otherWeapon->GetEnabled()) TakeDamage(projectile->GetDamage());
+        if (projectile && otherWeapon && otherWeapon->GetEnabled())
+        {
+            TakeDamage(projectile->GetDamage());
+            otherWeapon->SetEnabled(false);
+            otherObject->SetEnabled(false);
+        }
     }
 }
 
