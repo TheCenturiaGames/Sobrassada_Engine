@@ -568,10 +568,11 @@ void Scene::RenderHierarchyUI(bool& hierarchyMenu)
 
     if (ImGui::Button("Add GameObject"))
     {
-        GameObject* parent = GetGameObjectByUID(gameObjectRootUID);
+
+        GameObject* parent = GetGameObjectByUID(selectedGameObjectUID);
         if (parent != nullptr)
         {
-            GameObject* newGameObject = new GameObject(gameObjectRootUID, "new Game Object");
+            GameObject* newGameObject = new GameObject(selectedGameObjectUID, "new Game Object");
 
             gameObjectsContainer.insert({newGameObject->GetUID(), newGameObject});
             parent->AddGameObject(newGameObject->GetUID());
@@ -589,10 +590,11 @@ void Scene::RenderHierarchyUI(bool& hierarchyMenu)
     {
         if (ImGui::MenuItem("Add GameObject"))
         {
-            GameObject* parent = GetGameObjectByUID(selectedGameObjectUID);
+            GameObject* parent = GetGameObjectByUID(gameObjectRootUID);
+
             if (parent != nullptr)
             {
-                GameObject* newGameObject = new GameObject(selectedGameObjectUID, "new Game Object");
+                GameObject* newGameObject = new GameObject(gameObjectRootUID, "new Game Object");
 
                 gameObjectsContainer.insert({newGameObject->GetUID(), newGameObject});
                 parent->AddGameObject(newGameObject->GetUID());
@@ -1038,7 +1040,8 @@ GameObject* Scene::GetGameObjectByUID(UID gameObjectUUID)
 
 GameObject* Scene::GetGameObjectByName(const std::string& name)
 {
-    // TODO: Replace gameObject name to a HashString, I've seen it is also compared in some scripts and would improve performance
+    // TODO: Replace gameObject name to a HashString, I've seen it is also compared in some scripts and would improve
+    // performance
 
     // Returns the first object with that name, if there are more they are ignored
     for (const auto& obj : gameObjectsContainer)
