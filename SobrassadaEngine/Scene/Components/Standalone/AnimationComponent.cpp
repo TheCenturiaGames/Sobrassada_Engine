@@ -271,7 +271,7 @@ void AnimationComponent::OnInspector()
 
                 if (ImGui::Selectable(animationName.c_str(), isSelected))
                 {
-                    currentAnimName = pair.first;
+                    currentAnimName = pair.first.GetString();
                     resource        = pair.second;
 
                     if (playing)
