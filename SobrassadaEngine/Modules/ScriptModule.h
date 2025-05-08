@@ -8,6 +8,7 @@
 #include <atomic>
 #include <filesystem>
 #include <thread>
+#include <unordered_map>
 #include <windows.h>
 
 class Application;
