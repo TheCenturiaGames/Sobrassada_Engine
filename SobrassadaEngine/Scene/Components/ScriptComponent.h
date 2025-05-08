@@ -17,8 +17,12 @@ enum ScriptType
     SCRIPT_OPTIONS_MENU_SWITCHER,
     SCRIPT_MAIN_MENU_SELECTOR,
     SCRIPT_PRESS_ANY_KEY,
+    SCRIPT_CAMERA_MOVEMENT,
+    SCRIPT_PROJECTILE,
+    SCRIPT_FREE_CAMERA,
+    SCRIPT_SPAWN_POINT,
 
-    SCRIPT_TYPE_COUNT //Add at the end
+    SCRIPT_TYPE_COUNT // Add at the end
 };
 
 namespace math
@@ -41,7 +45,11 @@ constexpr const char* scripts[] = {
     "PauseMenuScript",           // SCRIPT_PAUSE_MENU
     "OptionsMenuSwitcherScript", // SCRIPT_OPTIONS_MENU_SWITCHER
     "MainMenuSelectorScript",    // SCRIPT_MAIN_MENU_SELECTOR
-    "PressAnyKeyScript"          // SCRIPT_PRESS_ANY_KEY
+    "PressAnyKeyScript",         // SCRIPT_PRESS_ANY_KEY
+    "CameraMovement",            // SCRIPT_CAMERA_MOVEMENT
+    "Projectile",                // SCRIPT_PROJECTILE
+    "FreeCamera",                // SCRIPT_FREE_CAMERA
+    "SpawnPoint"                 // SCRIPT_SPAWN_POINT
 };
 
 static_assert(
@@ -55,6 +63,9 @@ class ScriptComponent : public Component
     ScriptComponent(const rapidjson::Value& initialState, GameObject* parent);
     ~ScriptComponent() override;
 
+    void Load(const rapidjson::Value& initialState);
+    void LoadScripts();
+
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
     void Clone(const Component* other) override;
 
@@ -66,16 +77,28 @@ class ScriptComponent : public Component
     void InitScriptInstances();
     void OnCollision(GameObject* otherObject, const float3& collisionNormal);
     void CreateScript(const std::string& scriptType);
-    void DeleteScript();
+    void DeleteScript(const int index);
+    void DeleteAllScripts();
 
-    const std::string& GetScriptName() const { return scriptName; }
-    Script* GetScriptInstance() const { return scriptInstance; }
-    const ScriptType GetScriptType() const { return scriptType; }
+    const std::vector<Script*>& GetScriptInstances() const { return scriptInstances; }
+    const std::vector<std::string>& GetAllScriptNames() const { return scriptNames; }
+
+    template <typename T> T* GetScriptByType()
+    {
+        for (Script* script : scriptInstances)
+        {
+            T* currentScript = dynamic_cast<T*>(script);
+            if (currentScript) return currentScript;
+        }
+
+        return nullptr;
+    }
 
   private:
     int SearchIdxForString(const std::string& name) const;
-    std::string scriptName = "Not selected";
-    Script* scriptInstance = nullptr;
-    bool startScript       = false;
-    ScriptType scriptType  = SCRIPT_ROTATE_GAME_OBJECT;
+    bool startScript = false;
+
+    std::vector<std::string> scriptNames;
+    std::vector<Script*> scriptInstances;
+    std::vector<ScriptType> scriptTypes;
 };

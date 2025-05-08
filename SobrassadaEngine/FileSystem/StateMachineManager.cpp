@@ -51,7 +51,7 @@ namespace StateMachineManager
         {
             rapidjson::Value clipJSON(rapidjson::kObjectType);
             clipJSON.AddMember("ClipUID", clip.animationResourceUID, allocator);
-            clipJSON.AddMember("ClipName", rapidjson::Value(clip.clipName.GetString().c_str(), allocator), allocator);
+            clipJSON.AddMember("ClipName", rapidjson::Value(clip.clipName.c_str(), allocator), allocator);
             clipJSON.AddMember("Loop", clip.loop, allocator);
 
             clipsArray.PushBack(clipJSON, allocator);
@@ -63,8 +63,8 @@ namespace StateMachineManager
         for (const auto& state : resource->states)
         {
             rapidjson::Value stateJSON(rapidjson::kObjectType);
-            stateJSON.AddMember("StateName", rapidjson::Value(state.name.GetString().c_str(), allocator), allocator);
-            stateJSON.AddMember("ClipName", rapidjson::Value(state.clipName.GetString().c_str(), allocator), allocator);
+            stateJSON.AddMember("StateName", rapidjson::Value(state.name.c_str(), allocator), allocator);
+            stateJSON.AddMember("ClipName", rapidjson::Value(state.clipName.c_str(), allocator), allocator);
             rapidjson::Value position(rapidjson::kObjectType);
             position.AddMember("x", state.position.x, allocator);
             position.AddMember("y", state.position.y, allocator);
@@ -80,13 +80,13 @@ namespace StateMachineManager
         {
             rapidjson::Value transitionJSON(rapidjson::kObjectType);
             transitionJSON.AddMember(
-                "FromState", rapidjson::Value(transition.fromState.GetString().c_str(), allocator), allocator
+                "FromState", rapidjson::Value(transition.fromState.c_str(), allocator), allocator
             );
             transitionJSON.AddMember(
-                "ToState", rapidjson::Value(transition.toState.GetString().c_str(), allocator), allocator
+                "ToState", rapidjson::Value(transition.toState.c_str(), allocator), allocator
             );
             transitionJSON.AddMember(
-                "Trigger", rapidjson::Value(transition.triggerName.GetString().c_str(), allocator), allocator
+                "Trigger", rapidjson::Value(transition.triggerName.c_str(), allocator), allocator
             );
             transitionJSON.AddMember("InterpolationTime", transition.interpolationTime, allocator);
 
@@ -229,7 +229,6 @@ namespace StateMachineManager
         }
 
         stateMachine->SetDefaultState(0);
-        stateMachine->SetActiveState(0);
         GLOG("StateMachine %llu loaded successfully from: %s", stateMachineUID, path.c_str());
 
         return stateMachine;
@@ -244,7 +243,7 @@ std::vector<std::string> StateMachineManager::GetAllStateMachineNames()
 
     for (const auto& pair : stateMachineMap)
     {
-        names.push_back(pair.first);
+        names.push_back(pair.first.GetString());
     }
 
     return names;

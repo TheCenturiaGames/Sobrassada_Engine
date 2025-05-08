@@ -17,19 +17,24 @@
 #define TINYGLTF_IMPLEMENTATION /* Only in one of the includes */
 #include "MetaMesh.h"
 #include "tiny_gltf.h"
-#include <unordered_set>
 #include <utility>
 
 namespace SceneImporter
 {
     void Import(const char* filePath)
     {
+        // Don´t accept imports from the assets folder directly
+        std::string importFolderPath = FileSystem::GetFilePath(filePath);
+        importFolderPath.pop_back();
+        std::string projectFolderPath = App->GetProjectModule()->GetLoadedProjectPath() + ASSETS_PATH;
+        projectFolderPath.pop_back();
+        if (importFolderPath == projectFolderPath) return;
         // TODO Is it necessary to create directories here? They should be already created
         const std::string engineDefaultPath = ENGINE_DEFAULT_ASSETS;
         CreateLibraryDirectories(App->GetProjectModule()->GetLoadedProjectPath());
         CreateLibraryDirectories(engineDefaultPath);
 
-        std::string extension = FileSystem::GetFileExtension(filePath);
+        const std::string& extension = FileSystem::GetFileExtension(filePath);
 
         if (extension == ASSET_EXTENSION) ImportGLTF(filePath, App->GetProjectModule()->GetLoadedProjectPath());
         else if (extension == FONT_EXTENSION)
@@ -190,21 +195,22 @@ namespace SceneImporter
     }
 
     void ImportAnimationFromMetadata(
-        const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID
+        const std::string& filePath, const std::string& targetFilePath, const std::string& name, UID sourceUID,
+        const rapidjson::Value& importOptions
     )
     {
-        tinygltf::Model model = LoadModelGLTF(filePath.c_str());
+        if (!importOptions.IsObject()) return;
 
-        // find material name that equals to name
-        for (int i = 0; i < model.animations.size(); i++)
+        tinygltf::Model model = LoadModelGLTF(filePath.c_str());
+         int animIndex = importOptions.HasMember("animationIndex") ? importOptions["animationIndex"].GetInt() : 0;
+
+        // ONLY IMPORT ANIMATION IF INDEX IS INSIDE ANIMATION RANGE
+        if (model.animations.size() > animIndex)
         {
-            if (model.animations[i].name == name)
-            {
-                AnimationImporter::ImportAnimation(
-                    model, model.animations[i], name, filePath.c_str(), targetFilePath, sourceUID
-                );
-                return; // only one animation with the same name
-            }
+            AnimationImporter::ImportAnimation(
+                model, model.animations[animIndex], name, filePath.c_str(), targetFilePath, sourceUID, animIndex
+            );
+            return;
         }
     }
 
@@ -276,6 +282,16 @@ namespace SceneImporter
                 GLOG("Failed to create directory: %s", convertedStateMachinePath.c_str());
             }
         }
+
+        const std::string convertedNavmeshPath    = projectFilePath + NAVMESH_ASSETS_PATH;
+        if (!FileSystem::IsDirectory(convertedNavmeshPath.c_str()))
+        {
+            if (!FileSystem::CreateDirectories(convertedNavmeshPath.c_str()))
+            {
+                GLOG("Failed to create directory: %s", convertedNavmeshPath.c_str());
+            }
+        }
+
         const std::string convertedAnimationsPath = projectFilePath + ANIMATIONS_PATH;
         if (!FileSystem::IsDirectory(convertedAnimationsPath.c_str()))
         {

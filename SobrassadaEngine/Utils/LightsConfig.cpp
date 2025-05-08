@@ -37,6 +37,7 @@ LightsConfig::~LightsConfig()
     glDeleteBuffers(1, &skyboxVbo);
     glDeleteProgram(skyboxProgram);
     FreeCubemap();
+    delete currentTexture;
 }
 
 void LightsConfig::FreeCubemap() const
@@ -86,7 +87,7 @@ void LightsConfig::InitSkybox()
     glBindVertexArray(0);
 
     // default skybox texture
-    LoadSkyboxTexture(App->GetLibraryModule()->GetTextureUID("cubemap"));
+    if(skyboxID == 0) LoadSkyboxTexture(App->GetLibraryModule()->GetTextureUID("cubemap"));
 
     cubemapIrradiance = CubeMapToTexture(irradianceMapResolution, irradianceMapResolution);
     irradianceHandle  = glGetTextureHandleARB(cubemapIrradiance);
@@ -156,22 +157,6 @@ void LightsConfig::LoadSkyboxTexture(UID resource)
         skyboxID           = currentTexture->GetTextureID();
         skyboxHandle       = glGetTextureHandleARB(currentTexture->GetTextureID());
         glMakeTextureHandleResidentARB(skyboxHandle);
-
-        App->GetOpenGLModule()->SetDepthFunc(false);
-
-        cubemapIrradiance = CubeMapToTexture(irradianceMapResolution, irradianceMapResolution);
-        irradianceHandle  = glGetTextureHandleARB(cubemapIrradiance);
-        glMakeTextureHandleResidentARB(irradianceHandle);
-
-        prefilteredEnvironmentMap       = PreFilteredEnvironmentMapGeneration(prefilteredMapResolution, prefilteredMapResolution);
-        prefilteredEnvironmentMapHandle = glGetTextureHandleARB(prefilteredEnvironmentMap);
-        glMakeTextureHandleResidentARB(prefilteredEnvironmentMapHandle);
-
-        environmentBRDF       = EnvironmentBRDFGeneration(environmentBRDFResolution, environmentBRDFResolution);
-        environmentBRDFHandle = glGetTextureHandleARB(environmentBRDF);
-        glMakeTextureHandleResidentARB(environmentBRDFHandle);
-
-        App->GetOpenGLModule()->SetDepthFunc(true);
 
         glViewport(
             0, 0, App->GetOpenGLModule()->GetFramebuffer()->GetTextureWidth(),

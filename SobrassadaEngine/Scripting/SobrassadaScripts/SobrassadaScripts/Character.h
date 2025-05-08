@@ -27,15 +27,14 @@ class Character : public Script
 
     virtual bool Init() override;
     virtual void Update(float deltaTime) override;
-    void Inspector() override;
     void OnCollision(GameObject* otherObject, const float3& collisionNormal) override;
 
     void TakeDamage(int amount);
 
   protected:
-    void Attack(float deltaTime);
+    virtual void Attack(float deltaTime);
     void Heal(int amount);
-    bool CanAttack(float deltaTime);
+    virtual bool CanAttack(float deltaTime);
     AIStates CheckDistanceWithPlayer() const;
 
   private:
@@ -55,7 +54,7 @@ class Character : public Script
     int damage                                  = 0;
     float attackDuration                        = 0.0f;
     float speed                                 = 0.0f;
-    float cooldown                              = 0.0f;
+    float attackCooldown                        = 0.0f;
     float range                                 = 0.0f;
     AnimationComponent* animComponent           = nullptr;
     CapsuleColliderComponent* characterCollider = nullptr;

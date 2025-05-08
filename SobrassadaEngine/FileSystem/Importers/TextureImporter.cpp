@@ -70,8 +70,14 @@ namespace TextureImporter
         if (sourceUID == INVALID_UID)
         {
             UID textureUID  = GenerateUID();
-            finalTextureUID = App->GetLibraryModule()->AssignFiletypeUID(textureUID, FileType::Texture);
+            textureUID = App->GetLibraryModule()->AssignFiletypeUID(textureUID, FileType::Texture);
 
+            UID prefix                 = textureUID / UID_PREFIX_DIVISOR;
+            const std::string savePath = App->GetProjectModule()->GetLoadedProjectPath() + METADATA_PATH +
+                                         std::to_string(prefix) + FILENAME_SEPARATOR + fileName + META_EXTENSION;
+            finalTextureUID = App->GetLibraryModule()->GetUIDFromMetaFile(savePath);
+            if (finalTextureUID == INVALID_UID) finalTextureUID = textureUID;
+            
             MetaTexture meta(finalTextureUID, relativePath, (int)image.GetMetadata().mipLevels);
             meta.Save(fileName, relativePath);
         }
@@ -168,7 +174,7 @@ namespace TextureImporter
 
         const std::string& filename = App->GetLibraryModule()->GetResourceName(textureUID);
 
-        unsigned int textureID      = 0;
+        unsigned int textureID;
         const std::wstring& wPath   = std::wstring(path.begin(), path.end());
 
         DirectX::ScratchImage scratchImage;

@@ -1,11 +1,11 @@
 #include "StateMachineEditor.h"
 
 #include "Application.h"
+#include "Components/Standalone/AnimationComponent.h"
 #include "FileSystem/StateMachineManager.h"
 #include "LibraryModule.h"
 #include "ResourcesModule.h"
 #include "StateNode.h"
-#include "Components/Standalone/AnimationComponent.h"
 
 StateMachineEditor::StateMachineEditor(const std::string& editorName, UID uid, ResourceStateMachine* stateMachine)
     : EngineEditorBase(editorName, uid), uid(uid), resource(stateMachine)
@@ -72,7 +72,7 @@ bool StateMachineEditor::RenderEditor()
     }
     ShowTriggersPopup();
 
-    const State* activeState = resource->GetActiveState();
+    const State* activeState = resource->GetDefaultState();
     for (const auto& pair : graph->getNodes())
     {
         auto stateNode = std::dynamic_pointer_cast<StateNode>(pair.second);
@@ -80,7 +80,7 @@ bool StateMachineEditor::RenderEditor()
 
         if (activeState && stateNode->GetStateName() == activeState->name.GetString())
         {
-            stateNode->SetColor(ImColor(0.2f, 0.8f, 0.2f)); // Verde
+            stateNode->SetColor(ImColor(0.58f, 0.573f, 0.075f)); // Verde
         }
         else
         {
@@ -198,7 +198,7 @@ void StateMachineEditor::ShowInspector()
             ImGui::Text("- Default");
         }
     }
-    const State* activeState = resource->GetActiveState();
+    const State* activeState = resource->GetDefaultState();
     if (activeState)
     {
         if (selectedNode->GetStateName() == activeState->name.GetString())
@@ -238,8 +238,8 @@ void StateMachineEditor::ShowInspector()
                     {
                         if (transition.fromState.GetString() == stateName)
                         {
-                            const std::string& prevTrigger    = transition.triggerName.GetString();
-                            uint32_t prevInterpolation = transition.interpolationTime;
+                            const std::string& prevTrigger = transition.triggerName.GetString();
+                            uint32_t prevInterpolation     = transition.interpolationTime;
                             resource->RemoveTransition(
                                 transition.fromState.GetString(), transition.toState.GetString()
                             );
@@ -249,8 +249,8 @@ void StateMachineEditor::ShowInspector()
                         }
                         if (transition.toState.GetString() == stateName)
                         {
-                            const std::string& prevTrigger    = transition.triggerName.GetString();
-                            uint32_t prevInterpolation = transition.interpolationTime;
+                            const std::string& prevTrigger = transition.triggerName.GetString();
+                            uint32_t prevInterpolation     = transition.interpolationTime;
                             resource->RemoveTransition(
                                 transition.toState.GetString(), transition.fromState.GetString()
                             );
@@ -275,7 +275,7 @@ void StateMachineEditor::ShowInspector()
 
     for (const auto& [name, uid] : animMap)
     {
-        animationNames.push_back(name);
+        animationNames.push_back(name.GetString());
     }
 
     int currentClipIndex        = -1;
@@ -305,7 +305,7 @@ void StateMachineEditor::ShowInspector()
         {
             const std::string& newClipName = animationNames[currentClipIndex];
             UID newClipUID                 = App->GetLibraryModule()->GetAnimUID(newClipName);
-            //resource->EditClipInfo(currentClipName, newClipUID, newClipName, false);
+            // resource->EditClipInfo(currentClipName, newClipUID, newClipName, false);
             resource->AddClip(newClipUID, newClipName, false);
             resource->EditState(selectedNode->GetStateName(), selectedNode->GetStateName(), newClipName);
             selectedNode->SetClipName(newClipName);
@@ -551,7 +551,6 @@ void StateMachineEditor::BuildGraph()
 
     GLOG("Total links in graph after adding them: %d", graph->getLinks().size());
     resource->SetDefaultState(0);
-    resource->SetActiveState(0);
 }
 
 void StateMachineEditor::DetectNewTransitions()
@@ -769,12 +768,12 @@ void StateMachineEditor::DeleteStateResource(StateNode& node)
     resource->RemoveClip(clip->clipName.GetString());
 }
 
- void StateMachineEditor::ShowTriggers()
+void StateMachineEditor::ShowTriggers()
 {
     ImGui::OpenPopup("Available Triggers");
 }
 
- void StateMachineEditor::ShowTriggersPopup()
+void StateMachineEditor::ShowTriggersPopup()
 {
 
     if (ImGui::BeginPopupModal("Available Triggers", NULL, ImGuiWindowFlags_AlwaysAutoResize))
@@ -803,22 +802,7 @@ void StateMachineEditor::DeleteStateResource(StateNode& node)
 
         for (const std::string& trigger : resource->availableTriggers)
         {
-            if (ImGui::Button(trigger.c_str()))
-            {
-                bool triggerAvailable = false;
-                if (animComponent)
-                {
-                    if (animComponent->IsPlaying())
-                    {
-                        GLOG("Trigger selected: %s", trigger.c_str());
-                        triggerAvailable = resource->UseTrigger(trigger);
-                        if (triggerAvailable)
-                        {
-                            animComponent->OnPlay(true);
-                        }
-                    }
-                }
-            }
+            ImGui::Button(trigger.c_str());
         }
 
         ImGui::Separator();
@@ -831,7 +815,3 @@ void StateMachineEditor::DeleteStateResource(StateNode& node)
         ImGui::EndPopup();
     }
 }
-
-
-
-

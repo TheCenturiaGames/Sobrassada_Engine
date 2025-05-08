@@ -218,7 +218,7 @@ GameObject::GameObject(UID parentUID, GameObject* refObject)
 
     globalOBB        = OBB(localAABB);
     globalAABB       = AABB(globalOBB);
-    isTopParent      = refObject->isTopParent;
+    selectParent     = refObject->selectParent;
     mobilitySettings = refObject->mobilitySettings;
 
     position         = refObject->position;
@@ -240,6 +240,15 @@ GameObject::GameObject(UID parentUID, GameObject* refObject)
 
 GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState["UID"].GetUint64())
 {
+}
+
+GameObject::~GameObject()
+{
+    std::apply([](auto&... tupleVar) { ((delete tupleVar, tupleVar = nullptr), ...); }, compTuple);
+}
+
+void GameObject::LoadData(const rapidjson::Value& initialState)
+{
     compTuple = std::make_tuple(COMPONENTS_NULLPTR);
     createdComponents.reset();
 
@@ -250,7 +259,7 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
 
     if (initialState.HasMember("Enabled")) enabled = initialState["Enabled"].GetBool();
 
-    if (initialState.HasMember("IsTopParent")) isTopParent = initialState["IsTopParent"].GetBool();
+    if (initialState.HasMember("SelectParent")) selectParent = initialState["SelectParent"].GetBool();
 
     if (initialState.HasMember("PrefabUID")) prefabUID = initialState["PrefabUID"].GetUint64();
     if (initialState.HasMember("NavmeshValid")) navMeshValid = initialState["NavmeshValid"].GetBool();
@@ -296,11 +305,6 @@ GameObject::GameObject(const rapidjson::Value& initialState) : uid(initialState[
             children.push_back(initChildren[i].GetUint64());
         }
     }
-}
-
-GameObject::~GameObject()
-{
-    std::apply([](auto&... tupleVar) { ((delete tupleVar, tupleVar = nullptr), ...); }, compTuple);
 }
 
 void GameObject::Init()
@@ -364,7 +368,7 @@ void GameObject::Save(rapidjson::Value& targetState, rapidjson::Document::Alloca
     targetState.AddMember("ParentUID", parentUID, allocator);
     targetState.AddMember("Name", rapidjson::Value(name.c_str(), allocator), allocator);
     targetState.AddMember("Mobility", mobilitySettings, allocator);
-    targetState.AddMember("IsTopParent", isTopParent, allocator);
+    targetState.AddMember("SelectParent", selectParent, allocator);
     targetState.AddMember("Enabled", enabled, allocator);
     targetState.AddMember("NavmeshValid", navMeshValid, allocator);
 
@@ -424,7 +428,7 @@ void GameObject::RenderEditorInspector()
     {
         ImGui::SameLine();
         if (ImGui::Checkbox("Draw nodes", &drawNodes)) OnDrawConnectionsToggle();
-        ImGui::Checkbox("Is top parent", &isTopParent);
+        ImGui::Checkbox("Select parent", &selectParent);
         ImGui::SameLine();
         ImGui::Checkbox("Navmesh valid", &navMeshValid);
 
@@ -553,9 +557,9 @@ void GameObject::UpdateTransformForGOBranch()
 
 void GameObject::OnTransformUpdated()
 {
-    globalTransform = GetParentGlobalTransform() * localTransform;
-    globalOBB       = globalTransform * OBB(localAABB);
-    globalAABB      = AABB(globalOBB);
+    globalTransform              = GetParentGlobalTransform() * localTransform;
+    globalOBB                    = globalTransform * OBB(localAABB);
+    globalAABB                   = AABB(globalOBB);
 
     // MeshComponent* meshComponent = GetMeshComponent();
     MeshComponent* meshComponent = GetComponent<MeshComponent*>();
@@ -622,11 +626,40 @@ void GameObject::UpdateLocalTransform(const float4x4& parentGlobalTransform)
     localTransform = parentGlobalTransform.Inverted() * globalTransform;
 }
 
+void GameObject::UpdateOpenNodeHierarchy(bool openValue)
+{
+    openHierarchyNode = openValue;
+
+    std::stack<UID> gameObjectsToVisit;
+
+    if (parentUID != INVALID_UID) gameObjectsToVisit.push(parentUID);
+
+    while (!gameObjectsToVisit.empty())
+    {
+        const UID currentUID = gameObjectsToVisit.top();
+        gameObjectsToVisit.pop();
+
+        GameObject* gameObjectToUpdate = App->GetSceneModule()->GetScene()->GetGameObjectByUID(currentUID);
+
+        if (gameObjectToUpdate)
+        {
+            gameObjectToUpdate->UpdateOpenNodeHierarchy(openValue);
+            if (gameObjectToUpdate->GetParent() != INVALID_UID)
+                gameObjectsToVisit.push(gameObjectToUpdate->GetParent());
+        }
+    }
+}
+
 void GameObject::RenderHierarchyNode(UID& selectedGameObjectUUID)
 {
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+    if (openHierarchyNode)
+    {
+        ImGui::SetNextItemOpen(openHierarchyNode);
+        flags |= ImGuiTreeNodeFlags_DefaultOpen;
+    }
 
-    bool hasChildren         = !children.empty();
+    bool hasChildren = !children.empty();
 
     if (!hasChildren) flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
     if (selectedGameObjectUUID == uid) flags |= ImGuiTreeNodeFlags_Selected;
@@ -686,6 +719,8 @@ void GameObject::HandleNodeClick(UID& selectedGameObjectUUID)
     if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
     {
         selectedGameObjectUUID = uid;
+        openHierarchyNode      = !openHierarchyNode;
+        UpdateOpenNodeHierarchy(openHierarchyNode);
     }
 
     if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right))
@@ -730,10 +765,16 @@ void GameObject::RenderContextMenu()
         if (ImGui::MenuItem("New GameObject"))
         {
             auto newGameObject = new GameObject(uid, "new Game Object");
+
             App->GetSceneModule()->GetScene()->AddGameObject(newGameObject->GetUID(), newGameObject);
+
+            GameObject* parent = App->GetSceneModule()->GetScene()->GetGameObjectByUID(uid);
+            if (parent != nullptr) parent->AddGameObject(newGameObject->GetUID());
 
             if (newGameObject->IsStatic()) App->GetSceneModule()->GetScene()->SetStaticModified();
             else App->GetSceneModule()->GetScene()->SetDynamicModified();
+
+            newGameObject->UpdateTransformForGOBranch();
         }
 
         if (ImGui::MenuItem("Rename"))
@@ -907,6 +948,14 @@ void GameObject::SetLocalTransform(const float4x4& newTransform)
     position       = localTransform.TranslatePart();
     rotation       = localTransform.RotatePart().ToEulerXYZ();
     scale          = localTransform.GetScale();
+    UpdateTransformForGOBranch();
+}
+
+void GameObject::SetLocalPosition(const float3& newPos)
+{
+    // Helper function to set only the position, to avoid having to copy the whole transform and modify it outside
+    localTransform.SetTranslatePart(newPos);
+    position = localTransform.TranslatePart();
     UpdateTransformForGOBranch();
 }
 
