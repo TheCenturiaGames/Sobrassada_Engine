@@ -169,6 +169,6 @@ void AudioSourceComponent::UpdateEventsNames()
 {
     for (const auto& event : App->GetAudioModule()->GetEventsMap())
     {
-        if (event.second == defaultEvent) defaultEventName = event.first;
+        if (event.second == defaultEvent) defaultEventName = event.first.GetString();
     }
 }

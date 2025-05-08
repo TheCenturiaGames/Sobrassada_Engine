@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "ButtonScript.h"
+#include "CameraMovement.h"
 #include "CuChulainn.h"
 #include "ExitGameScript.h"
 #include "FreeCamera.h"
@@ -11,8 +12,10 @@
 #include "OptionsMenuSwitcherScript.h"
 #include "PauseMenuScript.h"
 #include "PressAnyKeyScript.h"
+#include "Projectile.h"
 #include "RotateGameObject.h"
 #include "Soldier.h"
+#include "SpawnPoint.h"
 #include "VSyncToggleScript.h"
 
 #include <string>
@@ -32,7 +35,7 @@ extern "C" SOBRASSADA_API void InitSobrassadaScripts(Application* App)
 
 extern "C" SOBRASSADA_API Script* CreateScript(const std::string& scriptType, GameObject* parent)
 {
-    if (scriptType == "RotateGameObject") return new RotateGameObject(parent);
+    /* UI */
     if (scriptType == "ButtonScript") return new ButtonScript(parent);
     if (scriptType == "ExitGameScript") return new ExitGameScript(parent);
     if (scriptType == "FullscreenToggleScript") return new FullscreenToggleScript(parent);
@@ -43,9 +46,16 @@ extern "C" SOBRASSADA_API Script* CreateScript(const std::string& scriptType, Ga
     if (scriptType == "PressAnyKeyScript") return new PressAnyKeyScript(parent);
     if (scriptType == "FreeCamera") return new FreeCamera(parent);
 
-    if (scriptType == "GodMode") return new GodMode(parent);
+    /* Characters */
     if (scriptType == "CuChulainnScript") return new CuChulainn(parent);
     if (scriptType == "SoldierScript") return new Soldier(parent);
+    if (scriptType == "CameraMovement") return new CameraMovement(parent);
+    if (scriptType == "Projectile") return new Projectile(parent);
+    if (scriptType == "SpawnPoint") return new SpawnPoint(parent);
+
+    /* Utils */
+    if (scriptType == "RotateGameObject") return new RotateGameObject(parent);
+    if (scriptType == "GodMode") return new GodMode(parent);
     return nullptr;
 }
 

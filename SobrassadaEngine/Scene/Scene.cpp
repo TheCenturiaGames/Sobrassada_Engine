@@ -46,6 +46,8 @@
 #include "optick.h"
 #endif
 
+#include <set>
+
 Scene::Scene(const char* sceneName) : sceneUID(GenerateUID())
 {
     this->sceneName             = sceneName;
@@ -167,12 +169,6 @@ void Scene::Init()
     lightsConfig->InitSkybox();
     lightsConfig->InitLightBuffers();
 
-    // Load navmesh from scene.
-    if (navmeshUID != INVALID_UID)
-    {
-        std::string navmeshName = App->GetLibraryModule()->GetResourceName(navmeshUID);
-        App->GetPathfinderModule()->LoadNavMesh(navmeshName);
-    }
     // Call this after overriding the prefabs to avoid duplicates in gameObjectsToUpdate
     GetGameObjectByUID(gameObjectRootUID)->UpdateTransformForGOBranch();
 
@@ -412,8 +408,7 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
 
     if (ImGui::Button("Play"))
     {
-        App->GetSceneModule()->SwitchPlayMode(true);
-        gameTimer->Start();
+        startPlaying = true;
     }
     ImGui::SameLine();
     if (ImGui::Button("Pause"))
@@ -423,13 +418,12 @@ void Scene::RenderEditorControl(bool& editorControlMenu)
     ImGui::SameLine();
     if (ImGui::Button("Step"))
     {
-        gameTimer->Step();
+        stepPlaying = true;
     }
     ImGui::SameLine();
     if (ImGui::Button("Stop"))
     {
         stopPlaying = true;
-        gameTimer->Reset();
     }
     ImGui::SameLine();
     ImGui::SetNextItemWidth(100.0f);
@@ -566,6 +560,7 @@ void Scene::RenderHierarchyUI(bool& hierarchyMenu)
 
     if (ImGui::Button("Add GameObject"))
     {
+
         GameObject* parent = GetGameObjectByUID(selectedGameObjectUID);
         if (parent != nullptr)
         {
@@ -576,6 +571,31 @@ void Scene::RenderHierarchyUI(bool& hierarchyMenu)
 
             newGameObject->UpdateTransformForGOBranch();
         }
+    }
+
+    if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+    {
+        ImGui::OpenPopup("HierarchyContextMenu");
+    }
+
+    if (ImGui::BeginPopup("HierarchyContextMenu"))
+    {
+        if (ImGui::MenuItem("Add GameObject"))
+        {
+            GameObject* parent = GetGameObjectByUID(gameObjectRootUID);
+
+            if (parent != nullptr)
+            {
+                GameObject* newGameObject = new GameObject(gameObjectRootUID, "new Game Object");
+
+                gameObjectsContainer.insert({newGameObject->GetUID(), newGameObject});
+                parent->AddGameObject(newGameObject->GetUID());
+
+                newGameObject->UpdateTransformForGOBranch();
+            }
+        }
+
+        ImGui::EndPopup();
     }
 
     if (selectedGameObjectUID != gameObjectRootUID)
@@ -1010,6 +1030,21 @@ GameObject* Scene::GetGameObjectByUID(UID gameObjectUUID)
     return nullptr;
 }
 
+GameObject* Scene::GetGameObjectByName(const std::string& name)
+{
+    // TODO: Replace gameObject name to a HashString, I've seen it is also compared in some scripts and would improve
+    // performance
+
+    // Returns the first object with that name, if there are more they are ignored
+    for (const auto& obj : gameObjectsContainer)
+    {
+        if (obj.second->GetName() == name) return obj.second;
+    }
+
+    GLOG("[WARNING] No gameObject found with name %s", name.c_str());
+    return nullptr;
+}
+
 void Scene::LoadModel(const UID modelUID)
 {
     if (modelUID != INVALID_UID)
@@ -1123,6 +1158,8 @@ void Scene::LoadModel(const UID modelUID)
                                 currentGameObject->GetName() + " Mesh " + std::to_string(meshNum)
                             );
                             ++meshNum;
+
+                            gameObjectsArray.push_back(meshObject);
                         }
                         else
                         {
@@ -1194,6 +1231,42 @@ void Scene::LoadModel(const UID modelUID)
             }
             rootGameObject->UpdateTransformForGOBranch();
         }
+
+        std::set<UID> visitedUID;
+
+        // SET CHILD GAME OBJECTS TO SELECT THE PARENT
+        for (int i = 0; i < gameObjectsArray.size(); ++i)
+        {
+            if (visitedUID.find(gameObjectsArray[i]->GetUID()) == visitedUID.end())
+            {
+                visitedUID.insert(gameObjectsArray[i]->GetUID());
+
+                std::stack<UID> childrenToVisit;
+
+                // ADDING CHILDREN TO START ITERATION FOR PARENT CHECKBOX SELECTION
+                for (const UID& currentChild : gameObjectsArray[i]->GetChildren())
+                {
+                    childrenToVisit.push(currentChild);
+                }
+
+                while (!childrenToVisit.empty())
+                {
+                    const UID currentUID = childrenToVisit.top();
+                    childrenToVisit.pop();
+                    visitedUID.insert(currentUID);
+
+                    GameObject* currentGameObject = GetGameObjectByUID(currentUID);
+
+                    currentGameObject->SetSelectParent(true);
+
+                    // ADDING CHILDREN TO START ITERATION FOR PARENT CHECKBOX SELECTION
+                    for (const UID& currentChild : currentGameObject->GetChildren())
+                    {
+                        if (visitedUID.find(currentChild) == visitedUID.end()) childrenToVisit.push(currentChild);
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -1237,6 +1310,7 @@ void Scene::LoadPrefab(const UID prefabUID, const ResourcePrefab* prefab, const 
             newObjects[parentIndices[i]]->AddGameObject(newObjects[i]->GetUID());
             AddGameObject(newObjects[i]->GetUID(), newObjects[i]);
             remappingTable.insert({referenceObjects[i]->GetUID(), newObjects[i]->GetUID()});
+            newObjects[i]->SetEnabled(referenceObjects[i]->IsEnabled());
         }
 
         // Then do a second loop to update all components UIDs reference (ex. skinning)
