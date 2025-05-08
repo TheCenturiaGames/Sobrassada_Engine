@@ -17,7 +17,6 @@
 #define TINYGLTF_IMPLEMENTATION /* Only in one of the includes */
 #include "MetaMesh.h"
 #include "tiny_gltf.h"
-#include <unordered_set>
 #include <utility>
 
 namespace SceneImporter
