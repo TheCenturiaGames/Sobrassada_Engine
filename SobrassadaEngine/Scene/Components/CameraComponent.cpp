@@ -424,7 +424,7 @@ void SOBRASADA_API_ENGINE CameraComponent::Rotate(float yaw, float pitch)
 
 const LineSegment CameraComponent::CastCameraRay()
 {
-#if defined(GAME)
+#ifdef GAME
     // In game, just get the mouse position because it covers all the window
     const float2 mousePosition    = App->GetInputModule()->GetMousePosition();
 
