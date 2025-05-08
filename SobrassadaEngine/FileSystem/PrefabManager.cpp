@@ -32,24 +32,7 @@ namespace PrefabManager
         const std::string& savePath = App->GetProjectModule()->GetLoadedProjectPath() + PREFABS_LIB_PATH +
                                       std::to_string(finalPrefabUID) + PREFAB_EXTENSION;
 
-        const std::string& name = gameObject->GetName();
-
-        // int numRepeated                 = 0;
-        // bool updateName                 = true;
-        // while (updateName)
-        //{
-        //     updateName = false;
-        //     for (const auto& savedPrefab : App->GetLibraryModule()->GetPrefabMap())
-        //     {
-        //         if (savedPrefab.first == name)
-        //         {
-        //             updateName = true;
-        //             ++numRepeated;
-        //             name = originalName + "(" + std::to_string(numRepeated) + ")";
-        //             break;
-        //         }
-        //     }
-        // }
+        std::string name = gameObject->GetName();
 
         // Create structure
         prefab.AddMember("UID", finalPrefabUID, allocator);
