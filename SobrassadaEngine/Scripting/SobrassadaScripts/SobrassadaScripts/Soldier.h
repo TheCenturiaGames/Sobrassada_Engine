@@ -34,4 +34,6 @@ class Soldier : public Character
   private:
     AIAgentComponent* agentAI         = nullptr;
     SoldierStates currentState        = SoldierStates::NONE;
+
+    float attackCooldown              = 0.0f;
 };

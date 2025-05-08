@@ -1,8 +1,10 @@
 #include "pch.h"
 
+#include "Application.h"
 #include "Component.h"
 #include "CuChulainn.h"
 #include "GameObject.h"
+#include "GameTimer.h"
 #include "Globals.h"
 #include "ResourceStateMachine.h"
 #include "Soldier.h"
@@ -39,8 +41,13 @@ void Soldier::Update(float deltaTime)
     Character::Update(deltaTime);
 
     if (agentAI == nullptr) return;
+    
+    float gameTime = AppEngine->GetGameTimer()->GetTime() / 1000.0f;
 
-    if (character != nullptr && currentState != SoldierStates::PATROL)
+    if (!CanAttack(gameTime) && !agentAI->IsPaused()) agentAI->PauseMovement();
+    else if (CanAttack(gameTime) && agentAI->IsPaused()) agentAI->ResumeMovement();
+
+    if (character != nullptr && currentState != SoldierStates::PATROL && !agentAI->IsPaused())
         agentAI->LookAtMovement(character->GetLastPosition(), deltaTime);
 }
 
@@ -62,6 +69,7 @@ void Soldier::PerformAttack()
     // TODO: make interaction with hitboxes with the character
     // TODO: activate and disable the box collider located on one on the gameobjects weapon
     // TODO: trails, particles and animation
+
 }
 
 void Soldier::HandleState(float gameTime)
@@ -76,12 +84,12 @@ void Soldier::HandleState(float gameTime)
         PatrolAI();
         break;
     case SoldierStates::CHASE:
-        // GLOG("Soldier Chasing");
+        GLOG("Soldier Chasing");
         // animComponent->UseTrigger("Run");
         ChaseAI();
         break;
     case SoldierStates::BASIC_ATTACK:
-        // GLOG("Soldier Basic Attack");
+        GLOG("Soldier Basic Attack");
         // animComponent->UseTrigger("attack");
         Attack(gameTime);
         if (CheckDistanceWithPlayer() != CLOSE) currentState = SoldierStates::CHASE;
@@ -98,7 +106,7 @@ void Soldier::PatrolAI()
     if (CheckDistanceWithPlayer() == MEDIUM) currentState = SoldierStates::CHASE;
     else if (CheckDistanceWithPlayer() == CLOSE) currentState = SoldierStates::BASIC_ATTACK;
 
-    bool valid = false;
+    /*bool valid = false;
     if (reachedPatrolPoint)
     {
         if (CheckDistanceWithPoint(float3::zero)) reachedPatrolPoint = false;
@@ -110,7 +118,7 @@ void Soldier::PatrolAI()
         else valid = agentAI->SetPathNavigation(patrolPoint);
     }
 
-    GLOG("Valid movement: %d", valid);
+    GLOG("Valid movement: %d", valid);*/
 }
 
 void Soldier::ChaseAI()
@@ -118,7 +126,9 @@ void Soldier::ChaseAI()
     if (character != nullptr)
     {
         if (CheckDistanceWithPlayer() == CLOSE) currentState = SoldierStates::BASIC_ATTACK;
-        else if (!agentAI->SetPathNavigation(character->GetLastPosition())) currentState = SoldierStates::PATROL;
+        else 
+            if (!agentAI->SetPathNavigation(character->GetLastPosition())) 
+                currentState = SoldierStates::PATROL;
     }
     else currentState = SoldierStates::PATROL;
 }

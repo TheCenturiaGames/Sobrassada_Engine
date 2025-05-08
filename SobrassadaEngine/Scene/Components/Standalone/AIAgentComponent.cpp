@@ -65,13 +65,34 @@ void AIAgentComponent::Update(float deltaTime)
     if (agentId == -1) return;
 
     const dtCrowdAgent* ag = crowd->getAgent(agentId);
-    if (ag && ag->active)
+
+    if (!ag || !ag->active) return;
+    
+    float3 newPos;
+    
+    if (isPaused)
     {
-        float3 newPos(ag->npos[0], ag->npos[1], ag->npos[2]);
-        float4x4 transform = parent->GetLocalTransform();
-        transform.SetTranslatePart(newPos);
-        parent->SetLocalTransform(transform); // Change parent position
+        newPos = frozenPosition;
+
+        dtCrowdAgent* editAg = crowd->getEditableAgent(agentId);
+        
+        if (editAg)
+        {
+            editAg->npos[0] = frozenPosition.x;
+            editAg->npos[1] = frozenPosition.y;
+            editAg->npos[2] = frozenPosition.z;
+
+            editAg->vel[0] = editAg->vel[1] = editAg->vel[2] = 0.f;
+            editAg->nvel[0] = editAg->nvel[1] = editAg->nvel[2] = 0.f;
+            editAg->dvel[0] = editAg->dvel[1] = editAg->dvel[2] = 0.f;
+        }
     }
+    else newPos = float3(ag->npos[0], ag->npos[1], ag->npos[2]);
+
+    float4x4 transform = parent->GetLocalTransform();
+    transform.SetTranslatePart(newPos);
+    parent->SetLocalTransform(transform); // Change parent position
+
 }
 
 void AIAgentComponent::Render(float deltaTime)
@@ -193,15 +214,23 @@ void AIAgentComponent::PauseMovement()
 {
     if (isPaused || agentId == -1) return;
 
-    dtCrowdAgent* ag = App->GetPathfinderModule()->GetCrowd()->getEditableAgent(agentId);
+    dtCrowd* crowd   = App->GetPathfinderModule()->GetCrowd();
+    dtCrowdAgent* ag = crowd ? crowd->getEditableAgent(agentId) : nullptr;
 
     if (!ag) return;
 
     restoredSpeed = ag->params.maxSpeed;
     restoredAccel   = ag->params.maxAcceleration;
+    restoreAngular               = maxAngularSpeed;
 
-    ag->params.maxSpeed        = 0.f;
-    ag->params.maxAcceleration = 0.f;
+    ag->params.maxSpeed        = 0.0f;
+    ag->params.maxAcceleration = 0.0f;
+    speed                        = 0.0f;
+    maxAngularSpeed              = 0.0f;
+
+    crowd->resetMoveTarget(agentId);
+
+    frozenPosition               = parent->GetGlobalTransform().TranslatePart();
 
     isPaused                     = true;
 }
@@ -215,6 +244,8 @@ void AIAgentComponent::ResumeMovement()
 
     ag->params.maxSpeed        = restoredSpeed;
     ag->params.maxAcceleration = restoredAccel;
+    speed                        = restoredSpeed;
+    maxAngularSpeed              = restoreAngular;
 
     isPaused                     = false;
 }
