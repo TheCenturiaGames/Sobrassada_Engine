@@ -297,9 +297,9 @@ void Scene::RenderScene(float deltaTime, CameraComponent* camera)
 
     if (App->GetDebugDrawModule()->GetDebugOptionValue(static_cast<int>(DebugOptions::RENDER_WIREFRAME)))
     {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        App->GetOpenGLModule()->SetRenderWireframe(true);
         GeometryPassRender(objectsToRender, camera, gbuffer);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        App->GetOpenGLModule()->SetRenderWireframe(false);
     }
     else GeometryPassRender(objectsToRender, camera, gbuffer);
 
