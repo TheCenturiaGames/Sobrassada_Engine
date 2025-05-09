@@ -192,7 +192,15 @@ void SphereColliderComponent::RenderEditorInspector()
 
 void SphereColliderComponent::Update(float deltaTime)
 {
-    if (!IsEffectivelyEnabled()) return;
+    if (!IsEffectivelyEnabled())
+    {
+        if (rigidBody) App->GetPhysicsModule()->DeleteSphereRigidBody(this);
+        return;
+    }
+    else
+    {
+        if (rigidBody == nullptr) App->GetPhysicsModule()->CreateSphereRigidBody(this);
+    }
 }
 
 void SphereColliderComponent::Render(float deltaTime)

@@ -195,7 +195,15 @@ void CapsuleColliderComponent::RenderEditorInspector()
 
 void CapsuleColliderComponent::Update(float deltaTime)
 {
-    if (!IsEffectivelyEnabled()) return;
+    if (!IsEffectivelyEnabled())
+    {
+        if (rigidBody) App->GetPhysicsModule()->DeleteCapsuleRigidBody(this);
+        return;
+    }
+    else
+    {
+        if (rigidBody == nullptr) App->GetPhysicsModule()->CreateCapsuleRigidBody(this);
+    }
 }
 
 void CapsuleColliderComponent::Render(float deltaTime)

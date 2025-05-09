@@ -198,7 +198,15 @@ void CubeColliderComponent::RenderEditorInspector()
 
 void CubeColliderComponent::Update(float deltaTime)
 {
-    if (!IsEffectivelyEnabled()) return;
+    if (!IsEffectivelyEnabled())
+    {
+        if (rigidBody) App->GetPhysicsModule()->DeleteCubeRigidBody(this);
+        return;
+    }
+    else
+    {
+        if (rigidBody == nullptr) App->GetPhysicsModule()->CreateCubeRigidBody(this);
+    }
 }
 
 void CubeColliderComponent::Render(float deltaTime)
