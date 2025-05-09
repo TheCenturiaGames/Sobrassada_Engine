@@ -110,6 +110,24 @@ void CharacterControllerComponent::Update(float time) // SO many navmesh getters
 
     if (deltaTime == 0.0f) return;
 
+    DashThroughNavMesh();
+
+    if (dashTimeRemaining > 0.0f)
+    {
+        float3 currentPos = parent->GetGlobalTransform().TranslatePart();
+        float3 dashOffset = dashDirection * dashSpeed * deltaTime;
+        parent->SetLocalPosition(currentPos + dashOffset - parent->GetParentGlobalTransform().TranslatePart());
+
+        dashTimeRemaining -= deltaTime;
+        if (dashTimeRemaining <= 0.0f)
+        {
+            float3 adjustedPos = parent->GetGlobalTransform().TranslatePart();
+            AdjustHeightToNavMesh(adjustedPos);
+            parent->SetLocalPosition(adjustedPos - parent->GetParentGlobalTransform().TranslatePart());
+        }
+        return; 
+    }
+
     dtNavMesh* dtNav         = App->GetPathfinderModule()->GetNavMesh()->GetDetourNavMesh(); // crash here means no navmesh loaded
 
     dtNavMeshQuery* tmpQuery = App->GetPathfinderModule()->GetDetourNavMeshQuery();
@@ -401,3 +419,23 @@ void CharacterControllerComponent::LookAt(const float3& direction)
     isRotating      = true;
     rotateDirection = direction;
 }
+
+void CharacterControllerComponent::DashThroughNavMesh()
+{
+    const KeyState* keyboard = App->GetInputModule()->GetKeyboard();
+    if (keyboard[SDL_SCANCODE_LSHIFT] != KEY_DOWN) return;
+
+    if (dashTimeRemaining > 0.0f) return; 
+
+    const float dashDistance = 3.0f; 
+    const float dashDuration = 0.2f; 
+
+    dashDirection            = rotateDirection;     
+    if (dashDirection.LengthSq() < 0.0001f) return; 
+    dashDirection.Normalize();
+
+    dashSpeed         = dashDistance / dashDuration; 
+    dashTimeRemaining = dashDuration;               
+}
+
+
