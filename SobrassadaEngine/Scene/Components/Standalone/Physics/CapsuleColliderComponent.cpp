@@ -101,6 +101,8 @@ void CapsuleColliderComponent::Clone(const Component* other)
     {
         const CapsuleColliderComponent* capsule = static_cast<const CapsuleColliderComponent*>(other);
 
+        enabled                                 = capsule->enabled;
+        wasEnabled                              = capsule->wasEnabled;
         generateCallback                        = capsule->generateCallback;
         freezeRotation                          = capsule->freezeRotation;
         fitToSize                               = capsule->fitToSize;

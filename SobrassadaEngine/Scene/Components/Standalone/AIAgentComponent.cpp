@@ -51,13 +51,29 @@ AIAgentComponent::~AIAgentComponent()
 // Updates agent position evey frame
 void AIAgentComponent::Update(float deltaTime)
 {
-    if (!IsEffectivelyEnabled()) return;
+    if (!IsEffectivelyEnabled())
+    {
+        if (agentId != -1)
+        {
+            App->GetPathfinderModule()->RemoveAgent(agentId);
+            agentId = -1;
+        }
+        return;
+    }
+    else
+    {
+        if (agentId == -1)
+        {
+            RecreateAgent();
+        }
+    }
 
     if (!App->GetSceneModule()->GetInPlayMode()) return;
 
     if (agentId == -1) return;
 
     const dtCrowdAgent* ag = App->GetPathfinderModule()->GetCrowd()->getAgent(agentId);
+
     if (ag && ag->active)
     {
         float3 newPos(ag->npos[0], ag->npos[1], ag->npos[2]);
@@ -117,10 +133,12 @@ void AIAgentComponent::RenderEditorInspector()
 
 void AIAgentComponent::Clone(const Component* other)
 {
-
     if (other->GetType() == ComponentType::COMPONENT_AIAGENT)
     {
         const AIAgentComponent* otherAIAgent = static_cast<const AIAgentComponent*>(other);
+        enabled                              = otherAIAgent->enabled;
+        wasEnabled                           = otherAIAgent->wasEnabled;
+
         speed                                = otherAIAgent->speed;
         radius                               = otherAIAgent->radius;
         height                               = otherAIAgent->height;

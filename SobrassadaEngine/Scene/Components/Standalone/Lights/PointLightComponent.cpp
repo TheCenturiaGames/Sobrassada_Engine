@@ -51,6 +51,7 @@ void PointLightComponent::Clone(const Component* other)
     {
         const PointLightComponent* otherLight = static_cast<const PointLightComponent*>(other);
         enabled                               = otherLight->enabled;
+        wasEnabled                            = otherLight->wasEnabled;
 
         intensity                             = otherLight->intensity;
         color                                 = otherLight->color;

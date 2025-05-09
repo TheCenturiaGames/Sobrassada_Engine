@@ -200,6 +200,7 @@ void CameraComponent::Clone(const Component* other)
     {
         const CameraComponent* otherCamera = static_cast<const CameraComponent*>(other);
         enabled                            = otherCamera->enabled;
+        wasEnabled                         = otherCamera->wasEnabled;
 
         camera                             = otherCamera->camera;
         matrices                           = otherCamera->matrices;

@@ -99,6 +99,8 @@ void SphereColliderComponent::Clone(const Component* other)
     {
         const SphereColliderComponent* sphere = static_cast<const SphereColliderComponent*>(other);
 
+        enabled                               = sphere->enabled;
+        wasEnabled                            = sphere->wasEnabled;
         generateCallback                      = sphere->generateCallback;
         freezeRotation                        = sphere->freezeRotation;
         mass                                  = sphere->mass;

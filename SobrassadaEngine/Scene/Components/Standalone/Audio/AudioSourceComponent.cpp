@@ -6,8 +6,8 @@
 #include "GameObject.h"
 #include "InputModule.h" // TODO:  Delete this after testing
 
-#include "ImGui.h"
 #include "AK/SoundEngine/Common/AkSoundEngine.h"
+#include "ImGui.h"
 
 AudioSourceComponent::AudioSourceComponent(UID uid, GameObject* parent)
     : Component(uid, parent, "Audio Source", COMPONENT_AUDIO_SOURCE)
@@ -50,6 +50,7 @@ void AudioSourceComponent::Clone(const Component* other)
     {
         const AudioSourceComponent* otherAudioSource = static_cast<const AudioSourceComponent*>(other);
         enabled                                      = otherAudioSource->enabled;
+        wasEnabled                                   = otherAudioSource->wasEnabled;
 
         defaultEvent                                 = otherAudioSource->defaultEvent;
         volume                                       = otherAudioSource->volume;

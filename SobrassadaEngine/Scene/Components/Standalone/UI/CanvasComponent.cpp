@@ -71,6 +71,9 @@ void CanvasComponent::Clone(const Component* other)
         width                              = otherCanvas->width;
         height                             = otherCanvas->height;
 
+        enabled                            = otherCanvas->enabled;
+        wasEnabled                         = otherCanvas->wasEnabled;
+
         isInWorldSpaceEditor               = otherCanvas->isInWorldSpaceEditor;
         isInWorldSpaceGame                 = otherCanvas->isInWorldSpaceGame;
     }

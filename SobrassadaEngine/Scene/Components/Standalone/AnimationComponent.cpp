@@ -362,6 +362,7 @@ void AnimationComponent::Clone(const Component* other)
     {
         const AnimationComponent* otherAnimation = static_cast<const AnimationComponent*>(other);
         enabled                                  = otherAnimation->enabled;
+        wasEnabled                               = otherAnimation->wasEnabled;
 
         resource                                 = otherAnimation->resource;
         AddAnimation(resource);

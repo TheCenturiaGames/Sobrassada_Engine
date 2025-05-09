@@ -106,6 +106,8 @@ void CubeColliderComponent::Clone(const Component* other)
     {
         const CubeColliderComponent* cube = static_cast<const CubeColliderComponent*>(other);
 
+        enabled                           = cube->enabled;
+        wasEnabled                        = cube->wasEnabled;
         generateCallback                  = cube->generateCallback;
         freezeRotation                    = cube->freezeRotation;
         fitToSize                         = cube->fitToSize;

@@ -107,6 +107,7 @@ void MeshComponent::Clone(const Component* other)
     {
         const MeshComponent* otherMesh = static_cast<const MeshComponent*>(other);
         enabled                        = otherMesh->enabled;
+        wasEnabled                     = otherMesh->wasEnabled;
 
         UID otherMeshUID               = otherMesh->currentMesh ? otherMesh->currentMesh->GetUID() : INVALID_UID;
         UID otherMatUID = otherMesh->currentMaterial ? otherMesh->currentMaterial->GetUID() : INVALID_UID;

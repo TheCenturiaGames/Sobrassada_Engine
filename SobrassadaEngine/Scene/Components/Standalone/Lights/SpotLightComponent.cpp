@@ -58,6 +58,7 @@ void SpotLightComponent::Clone(const Component* other)
     {
         const SpotLightComponent* otherLight = static_cast<const SpotLightComponent*>(other);
         enabled                              = otherLight->enabled;
+        wasEnabled                           = otherLight->wasEnabled;
 
         intensity                            = otherLight->intensity;
         color                                = otherLight->color;

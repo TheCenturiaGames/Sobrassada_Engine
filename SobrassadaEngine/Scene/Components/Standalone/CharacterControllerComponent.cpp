@@ -87,6 +87,7 @@ void CharacterControllerComponent::Clone(const Component* other)
     {
         const CharacterControllerComponent* otherCharacter = static_cast<const CharacterControllerComponent*>(other);
         enabled                                            = otherCharacter->enabled;
+        wasEnabled                                         = otherCharacter->wasEnabled;
 
         maxSpeed                                           = otherCharacter->maxSpeed;
         acceleration                                       = otherCharacter->acceleration;

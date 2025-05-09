@@ -36,6 +36,7 @@ void AudioListenerComponent::Clone(const Component* other)
     {
         const AudioListenerComponent* otherAudioListener = static_cast<const AudioListenerComponent*>(other);
         enabled                                          = otherAudioListener->enabled;
+        wasEnabled                                       = otherAudioListener->wasEnabled;
     }
     else
     {

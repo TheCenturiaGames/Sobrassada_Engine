@@ -125,6 +125,9 @@ void Transform2DComponent::Clone(const Component* other)
     if (other->GetType() == ComponentType::COMPONENT_TRANSFORM_2D)
     {
         const Transform2DComponent* otherTransform = static_cast<const Transform2DComponent*>(other);
+        enabled                                    = otherTransform->enabled;
+        wasEnabled                                 = otherTransform->wasEnabled;
+
         position                                   = otherTransform->position;
         size                                       = otherTransform->size;
         pivot                                      = otherTransform->pivot;
