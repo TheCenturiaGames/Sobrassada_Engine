@@ -123,11 +123,12 @@ void ScriptComponent::RenderEditorInspector()
         }
         if (ImGui::BeginPopup("Select Script"))
         {
-            for (int i = 0; i < SCRIPT_TYPE_COUNT; ++i)
+            for (int i = 0; i < App->GetScriptModule()->GetScriptCount(); ++i)
             {
-                if (ImGui::Selectable(scripts[i]))
+                const char* name = App->GetScriptModule()->GetScriptName(i);
+                if (name && ImGui::Selectable(name))
                 {
-                    CreateScript(scripts[i]);
+                    CreateScript(name);
                 }
             }
             ImGui::EndPopup();
@@ -179,7 +180,7 @@ void ScriptComponent::CreateScript(const std::string& scriptType)
 
     scriptInstances.push_back(instance);
     scriptNames.push_back(scriptType);
-    scriptTypes.push_back(static_cast<ScriptType>(SearchIdxForString(scriptType)));
+    scriptTypes.push_back(App->GetScriptModule()->GetScriptIdx(scriptType));
 }
 
 void ScriptComponent::DeleteScript(const int index)
@@ -203,18 +204,4 @@ void ScriptComponent::DeleteAllScripts()
     scriptInstances.clear();
     scriptNames.clear();
     scriptTypes.clear();
-}
-
-int ScriptComponent::SearchIdxForString(const std::string& scriptString) const
-{
-    int idx = 0;
-    for (int i = 0; i < SCRIPT_TYPE_COUNT; ++i)
-    {
-        if (scriptString == scripts[i])
-        {
-            idx = i;
-            break;
-        }
-    }
-    return idx;
 }
