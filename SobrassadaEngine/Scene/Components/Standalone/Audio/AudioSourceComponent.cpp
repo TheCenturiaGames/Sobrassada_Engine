@@ -78,28 +78,25 @@ void AudioSourceComponent::RenderEditorInspector()
 {
     Component::RenderEditorInspector();
 
-    if (enabled)
+    ImGui::SeparatorText("Audio Soure");
+    ImGui::Text(defaultEventName.c_str());
+    ImGui::SameLine();
+    if (ImGui::Button("Select default event"))
     {
-        ImGui::SeparatorText("Audio Soure");
-        ImGui::Text(defaultEventName.c_str());
-        ImGui::SameLine();
-        if (ImGui::Button("Select default event"))
-        {
-            ImGui::OpenPopup(CONSTANT_EVENT_SELECT_DIALOG_ID);
-        }
-
-        if (ImGui::IsPopupOpen(CONSTANT_EVENT_SELECT_DIALOG_ID))
-        {
-            SetDefaultEvent(App->GetEditorUIModule()->RenderResourceSelectDialog<uint32_t>(
-                CONSTANT_EVENT_SELECT_DIALOG_ID, App->GetAudioModule()->GetEventsMap(), (uint32_t)0
-            ));
-        }
-
-        if (ImGui::DragFloat("Volume", &volume, 0.01f, 0, 1, "%.3f", ImGuiSliderFlags_AlwaysClamp)) SetVolume(volume);
-        if (ImGui::DragFloat("Pitch", &pitch, 0.01f, 0, 1, "%.3f", ImGuiSliderFlags_AlwaysClamp)) SetPitch(pitch);
-        if (ImGui::DragFloat("3D Spatialization", &spatialization, 0.01f, 0, 1, "%.3f", ImGuiSliderFlags_AlwaysClamp))
-            SetSpatialization(spatialization);
+        ImGui::OpenPopup(CONSTANT_EVENT_SELECT_DIALOG_ID);
     }
+
+    if (ImGui::IsPopupOpen(CONSTANT_EVENT_SELECT_DIALOG_ID))
+    {
+        SetDefaultEvent(App->GetEditorUIModule()->RenderResourceSelectDialog<uint32_t>(
+            CONSTANT_EVENT_SELECT_DIALOG_ID, App->GetAudioModule()->GetEventsMap(), (uint32_t)0
+        ));
+    }
+
+    if (ImGui::DragFloat("Volume", &volume, 0.01f, 0, 1, "%.3f", ImGuiSliderFlags_AlwaysClamp)) SetVolume(volume);
+    if (ImGui::DragFloat("Pitch", &pitch, 0.01f, 0, 1, "%.3f", ImGuiSliderFlags_AlwaysClamp)) SetPitch(pitch);
+    if (ImGui::DragFloat("3D Spatialization", &spatialization, 0.01f, 0, 1, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+        SetSpatialization(spatialization);
 }
 
 void AudioSourceComponent::EmitEvent(const AkUniqueID event) const

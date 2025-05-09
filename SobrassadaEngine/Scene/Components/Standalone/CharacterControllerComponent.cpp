@@ -110,7 +110,8 @@ void CharacterControllerComponent::Update(float time) // SO many navmesh getters
 
     if (deltaTime == 0.0f) return;
 
-    dtNavMesh* dtNav         = App->GetPathfinderModule()->GetNavMesh()->GetDetourNavMesh(); // crash here means no navmesh loaded
+    dtNavMesh* dtNav =
+        App->GetPathfinderModule()->GetNavMesh()->GetDetourNavMesh(); // crash here means no navmesh loaded
 
     dtNavMeshQuery* tmpQuery = App->GetPathfinderModule()->GetDetourNavMeshQuery();
 
@@ -185,44 +186,41 @@ void CharacterControllerComponent::RenderEditorInspector()
 {
     Component::RenderEditorInspector();
 
-    if (enabled)
+    ImGui::SeparatorText("Character Controller Component");
+
+    float availableWidth = ImGui::GetContentRegionAvail().x;
+
+    ImGui::Separator();
+    ImGui::Text("Character Controller");
+
+    ImGui::DragFloat("Max Speed", &maxSpeed, 0.1f, 0.0f, 100.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+    ImGui::DragFloat("Acceleration", &acceleration, 0.1f, 0.0f, 100.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+
+    float dragStep = isRadians ? 1.0f / RAD_DEGREE_CONV : 1.0f;
+    float minVal   = 0.0f;
+    float maxVal   = isRadians ? 360.0f / RAD_DEGREE_CONV : 360.0f;
+
+    ImGui::DragFloat(
+        "Max Angular Speed##maxAngSpeed", &maxAngularSpeed, dragStep, minVal, maxVal, "%.3f",
+        ImGuiSliderFlags_AlwaysClamp
+    );
+
+    if (maxAngularSpeed > maxVal) maxAngularSpeed = maxVal;
+
+    bool prevUseRad = isRadians;
+
+    ImGui::SameLine();
+    ImGui::Checkbox("Radians##maxAngCheck", &isRadians);
+
+    if (isRadians != prevUseRad)
     {
-        ImGui::SeparatorText("Character Controller Component");
-
-        float availableWidth = ImGui::GetContentRegionAvail().x;
-
-        ImGui::Separator();
-        ImGui::Text("Character Controller");
-
-        ImGui::DragFloat("Max Speed", &maxSpeed, 0.1f, 0.0f, 100.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
-        ImGui::DragFloat("Acceleration", &acceleration, 0.1f, 0.0f, 100.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
-
-        float dragStep = isRadians ? 1.0f / RAD_DEGREE_CONV : 1.0f;
-        float minVal   = 0.0f;
-        float maxVal   = isRadians ? 360.0f / RAD_DEGREE_CONV : 360.0f;
-
-        ImGui::DragFloat(
-            "Max Angular Speed##maxAngSpeed", &maxAngularSpeed, dragStep, minVal, maxVal, "%.3f",
-            ImGuiSliderFlags_AlwaysClamp
-        );
-
-        if (maxAngularSpeed > maxVal) maxAngularSpeed = maxVal;
-
-        bool prevUseRad = isRadians;
-
-        ImGui::SameLine();
-        ImGui::Checkbox("Radians##maxAngCheck", &isRadians);
-
-        if (isRadians != prevUseRad)
+        if (isRadians)
         {
-            if (isRadians)
-            {
-                maxAngularSpeed /= RAD_DEGREE_CONV;
-            }
-            else
-            {
-                maxAngularSpeed *= RAD_DEGREE_CONV;
-            }
+            maxAngularSpeed /= RAD_DEGREE_CONV;
+        }
+        else
+        {
+            maxAngularSpeed *= RAD_DEGREE_CONV;
         }
     }
 }

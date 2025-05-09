@@ -131,44 +131,41 @@ void MeshComponent::RenderEditorInspector()
 {
     Component::RenderEditorInspector();
 
-    if (enabled)
+    ImGui::SeparatorText("Mesh Component");
+
+    ImGui::Text(currentMeshName.c_str());
+    ImGui::SameLine();
+    if (ImGui::Button("Select mesh"))
     {
-        ImGui::SeparatorText("Mesh Component");
-
-        ImGui::Text(currentMeshName.c_str());
-        ImGui::SameLine();
-        if (ImGui::Button("Select mesh"))
-        {
-            ImGui::OpenPopup(CONSTANT_MESH_SELECT_DIALOG_ID);
-        }
-
-        if (ImGui::IsPopupOpen(CONSTANT_MESH_SELECT_DIALOG_ID))
-        {
-            AddMesh(App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
-                CONSTANT_MESH_SELECT_DIALOG_ID, App->GetLibraryModule()->GetMeshMap(), INVALID_UID
-            ));
-        }
-
-        ImGui::SeparatorText("Material");
-        ImGui::Text(currentMaterialName.c_str());
-        ImGui::SameLine();
-        if (ImGui::Button("Select material"))
-        {
-            ImGui::OpenPopup(CONSTANT_MATERIAL_SELECT_DIALOG_ID);
-        }
-
-        if (ImGui::IsPopupOpen(CONSTANT_MATERIAL_SELECT_DIALOG_ID))
-        {
-
-            const UID chosenMatUID = App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
-                CONSTANT_MATERIAL_SELECT_DIALOG_ID, App->GetLibraryModule()->GetMaterialMap(), INVALID_UID
-            );
-
-            if (chosenMatUID != INVALID_UID) AddMaterial(chosenMatUID);
-        }
-
-        if (currentMaterial != nullptr) currentMaterial->OnEditorUpdate();
+        ImGui::OpenPopup(CONSTANT_MESH_SELECT_DIALOG_ID);
     }
+
+    if (ImGui::IsPopupOpen(CONSTANT_MESH_SELECT_DIALOG_ID))
+    {
+        AddMesh(App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
+            CONSTANT_MESH_SELECT_DIALOG_ID, App->GetLibraryModule()->GetMeshMap(), INVALID_UID
+        ));
+    }
+
+    ImGui::SeparatorText("Material");
+    ImGui::Text(currentMaterialName.c_str());
+    ImGui::SameLine();
+    if (ImGui::Button("Select material"))
+    {
+        ImGui::OpenPopup(CONSTANT_MATERIAL_SELECT_DIALOG_ID);
+    }
+
+    if (ImGui::IsPopupOpen(CONSTANT_MATERIAL_SELECT_DIALOG_ID))
+    {
+
+        const UID chosenMatUID = App->GetEditorUIModule()->RenderResourceSelectDialog<UID>(
+            CONSTANT_MATERIAL_SELECT_DIALOG_ID, App->GetLibraryModule()->GetMaterialMap(), INVALID_UID
+        );
+
+        if (chosenMatUID != INVALID_UID) AddMaterial(chosenMatUID);
+    }
+
+    if (currentMaterial != nullptr) currentMaterial->OnEditorUpdate();
 }
 
 void MeshComponent::Update(float deltaTime)

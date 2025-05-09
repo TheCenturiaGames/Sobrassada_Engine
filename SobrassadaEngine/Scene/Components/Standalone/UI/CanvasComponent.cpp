@@ -168,12 +168,8 @@ void CanvasComponent::RenderEditorInspector()
 {
     Component::RenderEditorInspector();
 
-    if (enabled)
-    {
-        ImGui::Text("Canvas");
-
-        ImGui::Checkbox("Show in world space", &isInWorldSpaceEditor);
-    }
+    ImGui::Text("Canvas");
+    ImGui::Checkbox("Show in world space", &isInWorldSpaceEditor);
 }
 
 void CanvasComponent::OnWindowResize(const float width, const float height)

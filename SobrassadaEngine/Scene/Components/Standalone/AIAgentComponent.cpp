@@ -80,40 +80,37 @@ void AIAgentComponent::RenderEditorInspector()
 {
     Component::RenderEditorInspector();
 
-    if (enabled)
+    ImGui::SeparatorText("AIAgent Component");
+
+    if (ImGui::DragFloat("Speed", &speed, 0.1f, 0.1f, 200.f, "%.2f")) RecreateAgent();
+    if (ImGui::DragFloat("Radius", &radius, 0.1f, 0.1f, 200.f, "%.2f")) RecreateAgent();
+    if (ImGui::DragFloat("Height", &height, 0.1f, 0.1f, 200.f, "%.2f")) RecreateAgent();
+
+    float dragStep = isRadians ? 1.0f / RAD_DEGREE_CONV : 1.0f;
+    float minVal   = 0.0f;
+    float maxVal   = isRadians ? 360.0f / RAD_DEGREE_CONV : 360.0f;
+
+    ImGui::DragFloat(
+        "Max Angular Speed##maxAngSpeed", &maxAngularSpeed, dragStep, minVal, maxVal, "%.3f",
+        ImGuiSliderFlags_AlwaysClamp
+    );
+
+    if (maxAngularSpeed > maxVal) maxAngularSpeed = maxVal;
+
+    bool prevUseRad = isRadians;
+
+    ImGui::SameLine();
+    ImGui::Checkbox("Radians##maxAngCheck", &isRadians);
+
+    if (isRadians != prevUseRad)
     {
-        ImGui::SeparatorText("AIAgent Component");
-
-        if (ImGui::DragFloat("Speed", &speed, 0.1f, 0.1f, 200.f, "%.2f")) RecreateAgent();
-        if (ImGui::DragFloat("Radius", &radius, 0.1f, 0.1f, 200.f, "%.2f")) RecreateAgent();
-        if (ImGui::DragFloat("Height", &height, 0.1f, 0.1f, 200.f, "%.2f")) RecreateAgent();
-
-        float dragStep = isRadians ? 1.0f / RAD_DEGREE_CONV : 1.0f;
-        float minVal   = 0.0f;
-        float maxVal   = isRadians ? 360.0f / RAD_DEGREE_CONV : 360.0f;
-
-        ImGui::DragFloat(
-            "Max Angular Speed##maxAngSpeed", &maxAngularSpeed, dragStep, minVal, maxVal, "%.3f",
-            ImGuiSliderFlags_AlwaysClamp
-        );
-
-        if (maxAngularSpeed > maxVal) maxAngularSpeed = maxVal;
-
-        bool prevUseRad = isRadians;
-
-        ImGui::SameLine();
-        ImGui::Checkbox("Radians##maxAngCheck", &isRadians);
-
-        if (isRadians != prevUseRad)
+        if (isRadians)
         {
-            if (isRadians)
-            {
-                maxAngularSpeed /= RAD_DEGREE_CONV;
-            }
-            else
-            {
-                maxAngularSpeed *= RAD_DEGREE_CONV;
-            }
+            maxAngularSpeed /= RAD_DEGREE_CONV;
+        }
+        else
+        {
+            maxAngularSpeed *= RAD_DEGREE_CONV;
         }
     }
 }

@@ -114,45 +114,43 @@ void ScriptComponent::RenderDebug(float deltaTime)
 void ScriptComponent::RenderEditorInspector()
 {
     Component::RenderEditorInspector();
-    if (enabled)
+
+    ImGui::SeparatorText("Script Component");
+    if (ImGui::Button("Select script"))
     {
-        ImGui::SeparatorText("Script Component");
-        if (ImGui::Button("Select script"))
+        ImGui::OpenPopup("Select Script");
+    }
+    if (ImGui::BeginPopup("Select Script"))
+    {
+        for (int i = 0; i < SCRIPT_TYPE_COUNT; ++i)
         {
-            ImGui::OpenPopup("Select Script");
+            if (ImGui::Selectable(scripts[i]))
+            {
+                CreateScript(scripts[i]);
+            }
         }
-        if (ImGui::BeginPopup("Select Script"))
+        ImGui::EndPopup();
+    }
+    for (int i = 0; i < scriptInstances.size(); ++i)
+    {
+        ImGui::Separator();
+        ImGui::PushID(static_cast<int>(i));
+
+        ImGui::Text(scriptNames[i].c_str());
+        ImGui::SameLine();
+        if (ImGui::Button("Delete"))
         {
-            for (int i = 0; i < SCRIPT_TYPE_COUNT; ++i)
-            {
-                if (ImGui::Selectable(scripts[i]))
-                {
-                    CreateScript(scripts[i]);
-                }
-            }
-            ImGui::EndPopup();
-        }
-        for (int i = 0; i < scriptInstances.size(); ++i)
-        {
-            ImGui::Separator();
-            ImGui::PushID(static_cast<int>(i));
-
-            ImGui::Text(scriptNames[i].c_str());
-            ImGui::SameLine();
-            if (ImGui::Button("Delete"))
-            {
-                DeleteScript(i);
-                ImGui::PopID();
-                break;
-            }
-
-            if (scriptInstances[i])
-            {
-                scriptInstances[i]->Inspector();
-            }
-
+            DeleteScript(i);
             ImGui::PopID();
+            break;
         }
+
+        if (scriptInstances[i])
+        {
+            scriptInstances[i]->Inspector();
+        }
+
+        ImGui::PopID();
     }
 }
 

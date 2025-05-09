@@ -225,6 +225,7 @@ GameObject::GameObject(UID parentUID, GameObject* refObject)
     scale            = refObject->scale;
     prefabUID        = refObject->prefabUID;
     navMeshValid     = refObject->navMeshValid;
+    enabled          = refObject->enabled;
 
     // Must make a copy of each manually
     for (int i = 0; i < std::tuple_size<decltype(compTuple)>::value; ++i)
