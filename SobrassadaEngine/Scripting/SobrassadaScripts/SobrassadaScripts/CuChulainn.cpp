@@ -13,9 +13,11 @@
 #include "SceneModule.h"
 #include "ScriptComponent.h"
 #include "Standalone/AnimationComponent.h"
+#include "Standalone/Audio/AudioSourceComponent.h"
 #include "Standalone/CharacterControllerComponent.h"
 
 #include "SDL.h"
+#include "Wwise_IDs.h"
 
 CharacterControllerComponent* character = nullptr;
 
@@ -62,6 +64,12 @@ bool CuChulainn::Init()
     {
         GLOG("[WARNING] No weapon found by the name %s", weaponName.c_str());
         return false;
+    }
+
+    audio = parent->GetComponent<AudioSourceComponent*>();
+    if (!audio)
+    {
+        GLOG("[WARNING] Cu Chulain: No Audio Source Component found");
     }
 
     return true;
@@ -207,6 +215,10 @@ void CuChulainn::ThrowSpear()
     if (camera) camera->EnableMouseOffset(false);
     GLOG("THROW SPEAR");
     throwTimer = throwCooldown;
+
+    // Test sound
+    if (audio) audio->EmitEvent(AK::EVENTS::ICE_BLAST);
+
     if (weapon)
     {
         weapon->SetEnabled(false);

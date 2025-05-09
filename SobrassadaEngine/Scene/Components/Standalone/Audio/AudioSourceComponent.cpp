@@ -6,8 +6,8 @@
 #include "GameObject.h"
 #include "InputModule.h" // TODO:  Delete this after testing
 
-#include "ImGui.h"
 #include "AK/SoundEngine/Common/AkSoundEngine.h"
+#include "ImGui.h"
 
 AudioSourceComponent::AudioSourceComponent(UID uid, GameObject* parent)
     : Component(uid, parent, "Audio Source", COMPONENT_AUDIO_SOURCE)
@@ -32,6 +32,7 @@ void AudioSourceComponent::Init()
 {
     App->GetAudioModule()->AddAudioSource(this);
     SetInitValues();
+    isInited = true;
 }
 
 void AudioSourceComponent::Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const
@@ -104,37 +105,37 @@ void AudioSourceComponent::RenderEditorInspector()
 
 void AudioSourceComponent::EmitEvent(const AkUniqueID event) const
 {
-    AK::SoundEngine::PostEvent(event, (AkGameObjectID)parent->GetUID());
+    if (enabled) AK::SoundEngine::PostEvent(event, (AkGameObjectID)parent->GetUID());
 }
 
 void AudioSourceComponent::EmitEvent(const std::string& event) const
 {
-    AK::SoundEngine::PostEvent(event.c_str(), (AkGameObjectID)parent->GetUID());
+    if (enabled) AK::SoundEngine::PostEvent(event.c_str(), (AkGameObjectID)parent->GetUID());
 }
 
 void AudioSourceComponent::SetVolume(const float newVolume)
 {
     volume = newVolume;
-    AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::VOLUME, volume, parent->GetUID());
+    AK::SoundEngine::SetRTPCValue("Volume", volume, parent->GetUID());
 }
 
 void AudioSourceComponent::SetPitch(const float newPitch)
 {
     pitch = newPitch;
-    AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::PITCH, pitch, parent->GetUID());
+    AK::SoundEngine::SetRTPCValue("Pitch", pitch, parent->GetUID());
 }
 
 void AudioSourceComponent::SetSpatialization(const float newSpatialization)
 {
     spatialization = newSpatialization;
-    AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::SPATIALIZATION, spatialization, parent->GetUID());
+    AK::SoundEngine::SetRTPCValue("Spatialization", spatialization, parent->GetUID());
 }
 
 void AudioSourceComponent::SetInitValues()
 {
-    AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::VOLUME, volume, parent->GetUID());
-    AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::PITCH, pitch, parent->GetUID());
-    AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::SPATIALIZATION, spatialization, parent->GetUID());
+    AK::SoundEngine::SetRTPCValue("Volume", volume, parent->GetUID());
+    AK::SoundEngine::SetRTPCValue("Pitch", pitch, parent->GetUID());
+    AK::SoundEngine::SetRTPCValue("Spatialization", spatialization, parent->GetUID());
 }
 
 void AudioSourceComponent::SetRTPCValue(const AkUniqueID parameterID, const float value)
