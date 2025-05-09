@@ -62,10 +62,7 @@ void AIAgentComponent::Update(float deltaTime)
     }
     else
     {
-        if (agentId == -1)
-        {
-            RecreateAgent();
-        }
+        if (agentId == -1) RecreateAgent();
     }
 
     if (!App->GetSceneModule()->GetInPlayMode()) return;
