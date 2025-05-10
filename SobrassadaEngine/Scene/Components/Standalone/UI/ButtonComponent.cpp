@@ -143,6 +143,12 @@ void ButtonComponent::Clone(const Component* other)
 
 void ButtonComponent::RenderDebug(float deltaTime)
 {
+    CanvasComponent* canvas = parent->GetComponentParent<CanvasComponent*>(App);
+    if (canvas != nullptr)
+    {
+        float3 highlightColor = float3(0.0f, 0.0f, 0.0f);
+        canvas->RenderDebug(deltaTime, highlightColor);
+    }
 }
 
 void ButtonComponent::RenderEditorInspector()
