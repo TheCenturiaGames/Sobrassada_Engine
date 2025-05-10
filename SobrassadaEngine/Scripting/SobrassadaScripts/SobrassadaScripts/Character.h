@@ -67,6 +67,8 @@ class Character : public Script
     float range                                 = 0.0f;
     AnimationComponent* animComponent           = nullptr;
     CapsuleColliderComponent* characterCollider = nullptr;
+    std::string weaponName                      = "";
+    GameObject* weapon                          = nullptr;
     CubeColliderComponent* weaponCollider       = nullptr;
 
     float lastAttackTime                        = -1.0f;

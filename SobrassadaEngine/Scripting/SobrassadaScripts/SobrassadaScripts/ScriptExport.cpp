@@ -44,18 +44,18 @@ extern "C" SOBRASSADA_API Script* CreateScript(const std::string& scriptType, Ga
     if (scriptType == "OptionsMenuSwitcherScript") return new OptionsMenuSwitcherScript(parent);
     if (scriptType == "MainMenuSelectorScript") return new MainMenuSelectorScript(parent);
     if (scriptType == "PressAnyKeyScript") return new PressAnyKeyScript(parent);
-    if (scriptType == "FreeCameraScript") return new FreeCamera(parent);
+    if (scriptType == "FreeCamera") return new FreeCamera(parent);
 
     /* Characters */
     if (scriptType == "CuChulainnScript") return new CuChulainn(parent);
     if (scriptType == "SoldierScript") return new Soldier(parent);
-    if (scriptType == "CameraMovementScript") return new CameraMovement(parent);
-    if (scriptType == "ProjectileScript") return new Projectile(parent);
-    if (scriptType == "SpawnPointScript") return new SpawnPoint(parent);
+    if (scriptType == "CameraMovement") return new CameraMovement(parent);
+    if (scriptType == "Projectile") return new Projectile(parent);
+    if (scriptType == "SpawnPoint") return new SpawnPoint(parent);
 
     /* Utils */
-    if (scriptType == "RotateGameObjectScript") return new RotateGameObject(parent);
-    if (scriptType == "GodModeScript") return new GodMode(parent);
+    if (scriptType == "RotateGameObject") return new RotateGameObject(parent);
+    if (scriptType == "GodMode") return new GodMode(parent);
     return nullptr;
 }
 

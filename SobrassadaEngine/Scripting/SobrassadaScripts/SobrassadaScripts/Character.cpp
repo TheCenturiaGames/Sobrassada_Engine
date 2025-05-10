@@ -16,12 +16,12 @@
 #include <string>
 
 Character::Character(
-    GameObject* parent, int newMaxHealth, int newDamage, float newAttackDuration, float newAttackCooldown, float newRange,
-    float newRangeAIAttack, float newRangeAIChase, const float3& newPatrolPoint
+    GameObject* parent, int newMaxHealth, int newDamage, float newAttackDuration, float newAttackCooldown,
+    float newRange, float newRangeAIAttack, float newRangeAIChase, const float3& newPatrolPoint
 )
     : Script(parent), maxHealth(newMaxHealth), damage(newDamage), attackDuration(newAttackDuration),
-      attackCooldown(newAttackCooldown), range(newRange), rangeAIAttack(newRangeAIAttack), rangeAIChase(newRangeAIChase),
-      patrolPoint(newPatrolPoint)
+      attackCooldown(newAttackCooldown), range(newRange), rangeAIAttack(newRangeAIAttack),
+      rangeAIChase(newRangeAIChase), patrolPoint(newPatrolPoint)
 {
     currentHealth = maxHealth;
 
@@ -33,6 +33,7 @@ Character::Character(
     fields.push_back({"Attack Duration", InspectorField::FieldType::Float, &attackDuration, 0.0f, 1.0f});
     fields.push_back({"Attack Cooldown", InspectorField::FieldType::Float, &attackCooldown, 0.0f, 2.0f});
     fields.push_back({"Attack Range", InspectorField::FieldType::Float, &range, 0.0f, 3.0f});
+    fields.push_back({"Weapon Name", InspectorField::FieldType::InputText, &weaponName});
 
     if (type != CharacterType::CuChulainn)
     {
@@ -49,13 +50,21 @@ bool Character::Init()
     else animComponent->OnPlay(false);
 
     characterCollider = parent->GetComponent<CapsuleColliderComponent*>();
-    if (characterCollider == nullptr)
+    if (!characterCollider)
         GLOG("Character capsule collider component not found for %s", parent->GetName().c_str())
 
-    weaponCollider = parent->GetComponentChild<CubeColliderComponent*>(AppEngine);
-    if (weaponCollider == nullptr) GLOG("Weapon cube collider component not found for %s", parent->GetName().c_str())
-    else weaponCollider->SetEnabled(false);
-
+    weapon = AppEngine->GetSceneModule()->GetScene()->GetGameObjectByName(weaponName);
+    if (!weapon)
+    {
+        GLOG("[WARNING] No weapon found by the name %s", weaponName.c_str());
+    }
+    else
+    {
+        weaponCollider = weapon->GetComponent<CubeColliderComponent*>();
+        if (!weaponCollider)
+            GLOG("Weapon cube collider component not found for %s", parent->GetName().c_str())
+        else weaponCollider->SetEnabled(false);
+    }
     lastAttackTime = -1.0f;
     lastTimeHit    = -1.0f;
 
@@ -68,7 +77,7 @@ void Character::Update(float deltaTime)
 {
     if (isDead) return;
 
-    if (characterCollider == nullptr || weaponCollider == nullptr) return;
+    if (!characterCollider || !weaponCollider || !weapon) return;
 
     float gameTime = AppEngine->GetGameTimer()->GetTime() / 1000.0f;
     if (isAttacking && gameTime - lastAttackTime >= attackDuration)

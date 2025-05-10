@@ -28,7 +28,6 @@ CuChulainn::CuChulainn(GameObject* parent)
     // TODO: Replace target names by gameObjects when overriding prefabs doesn't break the link
     fields.push_back({"Camera Object Name", InspectorField::FieldType::InputText, &cameraName});
     fields.push_back({"Spear Projectile Name", InspectorField::FieldType::InputText, &spearName});
-    fields.push_back({"Weapon Name", InspectorField::FieldType::InputText, &weaponName});
     fields.push_back({"Range attack cooldown", InspectorField::FieldType::Float, &throwCooldown, 0.0f, 2.0f});
 }
 
@@ -56,13 +55,6 @@ bool CuChulainn::Init()
     {
         spear = spearObj->GetComponent<ScriptComponent*>()->GetScriptByType<Projectile>();
         if (!spear) GLOG("[WARNING] No projectile found by the name %s", spearName.c_str());
-    }
-
-    weapon = AppEngine->GetSceneModule()->GetScene()->GetGameObjectByName(weaponName);
-    if (!weapon)
-    {
-        GLOG("[WARNING] No weapon found by the name %s", weaponName.c_str());
-        return false;
     }
 
     return true;

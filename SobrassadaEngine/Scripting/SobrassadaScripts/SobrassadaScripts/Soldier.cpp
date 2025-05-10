@@ -83,13 +83,13 @@ void Soldier::HandleState(float gameTime)
         PatrolAI();
         break;
     case SoldierStates::CHASE:
-        GLOG("Soldier Chasing");
-        // animComponent->UseTrigger("Run");
+        // GLOG("Soldier Chasing");
+        //  animComponent->UseTrigger("Run");
         ChaseAI();
         break;
     case SoldierStates::BASIC_ATTACK:
-        GLOG("Soldier Basic Attack");
-        // animComponent->UseTrigger("attack");
+        // GLOG("Soldier Basic Attack");
+        //  animComponent->UseTrigger("attack");
         Attack(gameTime);
         if (CheckDistanceWithPlayer() != CLOSE) currentState = SoldierStates::CHASE;
         break;
@@ -122,8 +122,6 @@ void Soldier::PatrolAI()
 
         agentAI->LookAtMovement(patrolPoint, deltaTime);
     }
-
-    GLOG("Valid movement: %d", valid);
 }
 
 void Soldier::ChaseAI()
