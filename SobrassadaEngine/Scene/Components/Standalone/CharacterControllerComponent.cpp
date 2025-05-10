@@ -110,7 +110,7 @@ void CharacterControllerComponent::Update(float time) // SO many navmesh getters
 
     if (deltaTime == 0.0f) return;
 
-    DashThroughNavMesh();
+    DashThroughNavMesh(deltaTime);
 
     if (dashTimeRemaining > 0.0f)
     {
@@ -125,10 +125,11 @@ void CharacterControllerComponent::Update(float time) // SO many navmesh getters
             AdjustHeightToNavMesh(adjustedPos);
             parent->SetLocalPosition(adjustedPos - parent->GetParentGlobalTransform().TranslatePart());
         }
-        return; 
+        return;
     }
 
-    dtNavMesh* dtNav         = App->GetPathfinderModule()->GetNavMesh()->GetDetourNavMesh(); // crash here means no navmesh loaded
+    dtNavMesh* dtNav =
+        App->GetPathfinderModule()->GetNavMesh()->GetDetourNavMesh(); // crash here means no navmesh loaded
 
     dtNavMeshQuery* tmpQuery = App->GetPathfinderModule()->GetDetourNavMeshQuery();
 
@@ -420,22 +421,41 @@ void CharacterControllerComponent::LookAt(const float3& direction)
     rotateDirection = direction;
 }
 
-void CharacterControllerComponent::DashThroughNavMesh()
+void CharacterControllerComponent::DashThroughNavMesh(float deltaTime)
 {
     const KeyState* keyboard = App->GetInputModule()->GetKeyboard();
     if (keyboard[SDL_SCANCODE_LSHIFT] != KEY_DOWN) return;
 
-    if (dashTimeRemaining > 0.0f) return; 
+    if (dashTimeRemaining > 0.0f) return;
 
-    const float dashDistance = 3.0f; 
-    const float dashDuration = 0.2f; 
+    const float dashDistance = 3.0f;
+    const float dashDuration = 0.2f;
 
-    dashDirection            = rotateDirection;     
-    if (dashDirection.LengthSq() < 0.0001f) return; 
+    dashDirection            = rotateDirection;
+    if (dashDirection.LengthSq() < 0.0001f) return;
     dashDirection.Normalize();
 
-    dashSpeed         = dashDistance / dashDuration; 
-    dashTimeRemaining = dashDuration;               
+    const float3 currentPos = parent->GetGlobalTransform().TranslatePart();
+    float3 dashTarget       = currentPos + dashDirection * dashDistance;
+
+    if (!navMeshQuery) return; 
+
+    dtQueryFilter filter;
+    filter.setIncludeFlags(SAMPLE_POLYFLAGS_WALK);
+    filter.setExcludeFlags(0);
+
+    float extents[3] = {0.5f, 1.0f, 0.5f}; // Tamaño de la caja de búsqueda
+    float nearestPoint[3];
+    dtPolyRef targetRef = 0;
+
+    dtStatus status     = navMeshQuery->findNearestPoly(dashTarget.ptr(), extents, &filter, &targetRef, nearestPoint);
+
+    if (dtStatusFailed(status) || targetRef == 0)
+    {
+        GLOG("No navmesh found at dash target position. Dash canceled.");
+        return; 
+    }
+
+    dashSpeed         = dashDistance / dashDuration;
+    dashTimeRemaining = dashDuration;
 }
-
-
