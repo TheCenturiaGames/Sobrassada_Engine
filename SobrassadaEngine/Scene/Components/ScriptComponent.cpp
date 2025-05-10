@@ -163,9 +163,24 @@ void ScriptComponent::RenderEditorInspector()
 
         if (scriptInstances[i])
         {
-            bool isEnabled = scriptEnabled[i];
             ImGui::SameLine();
-            if (ImGui::Checkbox("Enabled", &isEnabled)) scriptEnabled[i] = isEnabled;
+            if (parent->IsGloballyEnabled() && enabled)
+            {
+                bool isEnabled = scriptEnabled[i];
+                
+                if (ImGui::Checkbox("Enabled", &isEnabled))
+                {
+                    scriptWasEnabledLastFrame[i] = isEnabled;
+                }
+                scriptEnabled[i] = scriptWasEnabledLastFrame[i];
+            }
+            else
+            {
+                bool isEnabled = scriptEnabled[i];
+                ImGui::Checkbox("Enabled", &isEnabled);
+                scriptEnabled[i] = false;
+            }
+
             scriptInstances[i]->Inspector();
         }
 

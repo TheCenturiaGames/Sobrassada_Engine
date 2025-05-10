@@ -411,6 +411,20 @@ void GameObject::Save(rapidjson::Value& targetState, rapidjson::Document::Alloca
     targetState.AddMember("Children", valChildren, allocator);
 }
 
+void GameObject::UpdateEnabledStateRecursive()
+{
+    for (UID childUID : children)
+    {
+        GameObject* child = App->GetSceneModule()->GetScene()->GetGameObjectByUID(childUID);
+        if (child)
+        {
+            child->UpdateEnabledStateRecursive();
+        }
+    }
+
+    enabled = wasEnabled;
+}
+
 void GameObject::RenderEditorInspector()
 {
     if (!ImGui::Begin("Inspector", &App->GetEditorUIModule()->inspectorMenu))
@@ -422,7 +436,19 @@ void GameObject::RenderEditorInspector()
     ImGui::Text(name.c_str());
 
     ImGui::SameLine();
-    ImGui::Checkbox("Enabled", &enabled);
+
+    if (IsGloballyEnabled())
+    {
+        if (ImGui::Checkbox("Enabled", &enabled)) wasEnabled = enabled;
+    }
+    else
+    {
+        if (ImGui::Checkbox("Enabled", &enabled))
+        {
+            wasEnabled = enabled;
+            UpdateEnabledStateRecursive();
+        }
+    }
 
     if (uid != App->GetSceneModule()->GetScene()->GetGameObjectRootUID())
     {
@@ -704,6 +730,7 @@ void GameObject::RenderHierarchyNode(UID& selectedGameObjectUUID)
             GameObject* childGameObject = App->GetSceneModule()->GetScene()->GetGameObjectByUID(childUID);
             if (childGameObject && childUID != uid)
             {
+                if (!enabled) childGameObject->enabled = false;
                 childGameObject->RenderHierarchyNode(selectedGameObjectUUID);
             }
         }
