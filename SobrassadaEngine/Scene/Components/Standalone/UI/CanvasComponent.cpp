@@ -259,14 +259,15 @@ float CanvasComponent::GetScreenScale() const
 
 void CanvasComponent::UpdateBoundingBox()
 {
-    float2 center = transform2D->GetGlobalPosition();
-    float2 size   = transform2D->size;
+    float2 center      = transform2D->GetGlobalPosition();
 
+    float maxHalfSize  = 250.0f;
     localComponentAABB = AABB(
-        float3(center.x - size.x / 2.0f, center.y - size.y / 2.0f, 0),
-        float3(center.x + size.x / 2.0f, center.y + size.y / 2.0f, 0)
+        float3(center.x - maxHalfSize, center.y - maxHalfSize, -0.1f),
+        float3(center.x + maxHalfSize, center.y + maxHalfSize, 0.1f)
     );
 }
+
 
 
 float CanvasComponent::GetWidth() const

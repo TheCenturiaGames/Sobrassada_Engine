@@ -18,8 +18,7 @@ class CanvasComponent : public Component
   public:
     static const ComponentType STATIC_TYPE = ComponentType::COMPONENT_CANVAS;
 
-
-       enum class CanvasRenderMode
+    enum class CanvasRenderMode
     {
         ScreenSpaceOverlay,
         WorldSpace
@@ -55,12 +54,11 @@ class CanvasComponent : public Component
     float GetHeight() const;
 
   private:
-
     // Reference resolution
-    float referenceWidth        = 1920.0f;
-    float referenceHeight       = 1080.0f;
+    float referenceWidth              = 1920.0f;
+    float referenceHeight             = 1080.0f;
 
-    CanvasRenderMode renderMode = CanvasRenderMode::ScreenSpaceOverlay;
+    CanvasRenderMode renderMode       = CanvasRenderMode::ScreenSpaceOverlay;
     Transform2DComponent* transform2D = nullptr;
 
     std::vector<const GameObject*> sortedChildren;
