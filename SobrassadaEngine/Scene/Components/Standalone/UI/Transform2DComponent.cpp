@@ -331,27 +331,23 @@ float2 Transform2DComponent::GetRenderingPosition() const
 {
     float2 pos = GetGlobalPosition();
 
-    if (parentCanvas && !parentCanvas->IsInWorldSpace())
-    {
-        float scale  = parentCanvas->GetScreenScale();
-        pos         *= scale;
-    }
-
-    float2 renderPos = float2(pos.x - (size.x * pivot.x), pos.y + (size.y * (1 - pivot.y)));
-    return renderPos;
+    return float2(
+        pos.x - (size.x * pivot.x),
+        pos.y - (size.y * pivot.y) 
+    );
 }
+
+
 
 float2 Transform2DComponent::GetGlobalPosition() const
 {
     if (parentCanvas && !parentCanvas->IsInWorldSpace())
     {
-        float2 pos  = float2(0.0f, 0.0f);
-        float scale = parentCanvas->GetScreenScale();
-        return pos * scale;
+        return position;
     }
-
     return float2(parent->GetGlobalTransform().TranslatePart().x, parent->GetGlobalTransform().TranslatePart().y);
 }
+
 
 float2 Transform2DComponent::GetCenterPosition() const
 {
@@ -638,29 +634,29 @@ void Transform2DComponent::OnCanvasRenderModeChanged(CanvasComponent::CanvasRend
 {
     if (!parentCanvas) return;
 
-    float2 worldPos = GetAbsoluteWorldPosition();
-    float scale     = parentCanvas->GetScreenScale();
+    float scale        = parentCanvas->GetScreenScale();
 
-    float2 newLocalPos = worldPos;
-
-    if (parent != parentCanvas->GetParent())
-    {
-        float2 parentWorldPos  = parent->GetComponent<Transform2DComponent*>()->GetAbsoluteWorldPosition();
-        newLocalPos           -= parentWorldPos;
-    }
+    float2 oldPosition = position;
+    float2 oldSize     = size;
 
     if (newMode == CanvasComponent::CanvasRenderMode::ScreenSpaceOverlay)
     {
-        position = newLocalPos / scale;
+        position = oldPosition * scale;
+        size     = oldSize * scale;
     }
-    else if (newMode == CanvasComponent::CanvasRenderMode::WorldSpace)
+    else // WorldSpace
     {
-        position = newLocalPos * scale;
+        position = oldPosition / scale;
+        size     = oldSize / scale;
     }
 
     UpdateParent3DTransform();
-}
 
+    for (Transform2DComponent* child : childTransforms)
+    {
+        child->OnCanvasRenderModeChanged(newMode);
+    }
+}
 
 
 float2 Transform2DComponent::GetAbsoluteWorldPosition() const
