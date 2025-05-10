@@ -81,4 +81,5 @@ class Character : public Script
     float rangeAIAttack                         = 0.0f;
     float3 patrolPoint                          = float3::zero;
     bool reachedPatrolPoint                     = false;
+    float3 startPos                             = float3::zero;
 };

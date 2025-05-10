@@ -58,6 +58,8 @@ bool Character::Init()
     lastAttackTime = -1.0f;
     lastTimeHit    = -1.0f;
 
+    startPos       = parent->GetPosition();
+
     return true;
 }
 

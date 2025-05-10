@@ -41,7 +41,7 @@ void Soldier::Update(float deltaTime)
     Character::Update(deltaTime);
 
     if (agentAI == nullptr) return;
-    
+
     float gameTime = AppEngine->GetGameTimer()->GetTime() / 1000.0f;
 
     if (!CanAttack(gameTime) && !agentAI->IsPaused()) agentAI->PauseMovement();
@@ -69,7 +69,6 @@ void Soldier::PerformAttack()
     // TODO: make interaction with hitboxes with the character
     // TODO: activate and disable the box collider located on one on the gameobjects weapon
     // TODO: trails, particles and animation
-
 }
 
 void Soldier::HandleState(float gameTime)
@@ -103,22 +102,28 @@ void Soldier::HandleState(float gameTime)
 
 void Soldier::PatrolAI()
 {
+    float deltaTime = AppEngine->GetGameTimer()->GetDeltaTime();
+
     if (CheckDistanceWithPlayer() == MEDIUM) currentState = SoldierStates::CHASE;
     else if (CheckDistanceWithPlayer() == CLOSE) currentState = SoldierStates::BASIC_ATTACK;
 
-    /*bool valid = false;
+    bool valid = false;
     if (reachedPatrolPoint)
     {
-        if (CheckDistanceWithPoint(float3::zero)) reachedPatrolPoint = false;
-        else valid = agentAI->SetPathNavigation(float3::zero);
+        if (CheckDistanceWithPoint(startPos)) reachedPatrolPoint = false;
+        else valid = agentAI->SetPathNavigation(startPos);
+
+        agentAI->LookAtMovement(startPos, deltaTime);
     }
     else
     {
         if (CheckDistanceWithPoint(patrolPoint)) reachedPatrolPoint = true;
         else valid = agentAI->SetPathNavigation(patrolPoint);
+
+        agentAI->LookAtMovement(patrolPoint, deltaTime);
     }
 
-    GLOG("Valid movement: %d", valid);*/
+    GLOG("Valid movement: %d", valid);
 }
 
 void Soldier::ChaseAI()
@@ -126,9 +131,7 @@ void Soldier::ChaseAI()
     if (character != nullptr)
     {
         if (CheckDistanceWithPlayer() == CLOSE) currentState = SoldierStates::BASIC_ATTACK;
-        else 
-            if (!agentAI->SetPathNavigation(character->GetLastPosition())) 
-                currentState = SoldierStates::PATROL;
+        else if (!agentAI->SetPathNavigation(character->GetLastPosition())) currentState = SoldierStates::PATROL;
     }
     else currentState = SoldierStates::PATROL;
 }

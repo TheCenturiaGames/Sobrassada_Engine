@@ -55,27 +55,25 @@ void AIAgentComponent::Update(float deltaTime)
     if (!App->GetSceneModule()->GetInPlayMode()) return;
 
     dtCrowd* crowd = App->GetPathfinderModule()->GetCrowd();
-    
+
     if (!crowd) return;
 
-    if (agentId == -1 ||
-        agentId >= crowd->getAgentCount() || 
-        crowd->getAgent(agentId) == nullptr) RecreateAgent();
+    if (agentId == -1 || agentId >= crowd->getAgentCount() || crowd->getAgent(agentId) == nullptr) RecreateAgent();
 
     if (agentId == -1) return;
 
     const dtCrowdAgent* ag = crowd->getAgent(agentId);
 
     if (!ag || !ag->active) return;
-    
+
     float3 newPos;
-    
+
     if (isPaused)
     {
-        newPos = frozenPosition;
+        newPos               = frozenPosition;
 
         dtCrowdAgent* editAg = crowd->getEditableAgent(agentId);
-        
+
         if (editAg)
         {
             editAg->npos[0] = frozenPosition.x;
@@ -92,7 +90,6 @@ void AIAgentComponent::Update(float deltaTime)
     float4x4 transform = parent->GetLocalTransform();
     transform.SetTranslatePart(newPos);
     parent->SetLocalTransform(transform); // Change parent position
-
 }
 
 void AIAgentComponent::Render(float deltaTime)
@@ -210,6 +207,7 @@ bool AIAgentComponent::SetPathNavigation(const math::float3& destination)
     return true;
 }
 
+
 void AIAgentComponent::PauseMovement()
 {
     if (isPaused || agentId == -1) return;
@@ -219,20 +217,20 @@ void AIAgentComponent::PauseMovement()
 
     if (!ag) return;
 
-    restoredSpeed = ag->params.maxSpeed;
-    restoredAccel   = ag->params.maxAcceleration;
-    restoreAngular               = maxAngularSpeed;
+    restoredSpeed              = ag->params.maxSpeed;
+    restoredAccel              = ag->params.maxAcceleration;
+    restoreAngular             = maxAngularSpeed;
 
     ag->params.maxSpeed        = 0.0f;
     ag->params.maxAcceleration = 0.0f;
-    speed                        = 0.0f;
-    maxAngularSpeed              = 0.0f;
+    speed                      = 0.0f;
+    maxAngularSpeed            = 0.0f;
 
     crowd->resetMoveTarget(agentId);
 
-    frozenPosition               = parent->GetGlobalTransform().TranslatePart();
+    frozenPosition = parent->GetGlobalTransform().TranslatePart();
 
-    isPaused                     = true;
+    isPaused       = true;
 }
 
 void AIAgentComponent::ResumeMovement()
@@ -244,10 +242,10 @@ void AIAgentComponent::ResumeMovement()
 
     ag->params.maxSpeed        = restoredSpeed;
     ag->params.maxAcceleration = restoredAccel;
-    speed                        = restoredSpeed;
-    maxAngularSpeed              = restoreAngular;
+    speed                      = restoredSpeed;
+    maxAngularSpeed            = restoreAngular;
 
-    isPaused                     = false;
+    isPaused                   = false;
 }
 
 void AIAgentComponent::AddToCrowd()
@@ -280,14 +278,14 @@ void AIAgentComponent::RecreateAgent()
 void AIAgentComponent::LookAtMovement(const float3& targetPos, float deltaTime)
 {
     float3 selfPos = parent->GetGlobalTransform().TranslatePart();
-    float3 desired = targetPos - selfPos; 
-    desired.y = 0.0f;
+    float3 desired = targetPos - selfPos;
+    desired.y      = 0.0f;
 
     if (desired.LengthSq() < 0.0001f) return;
     desired.Normalize();
 
-    float3 forward  = parent->GetGlobalTransform().WorldZ();
-    forward.y       = 0.0f;
+    float3 forward = parent->GetGlobalTransform().WorldZ();
+    forward.y      = 0.0f;
     forward.Normalize();
 
     float angle   = atan2(forward.Cross(desired).y, forward.Dot(desired));
@@ -297,10 +295,10 @@ void AIAgentComponent::LookAtMovement(const float3& targetPos, float deltaTime)
 
     if (fabs(angle) < 0.0001f) return;
 
-    float4x4 rotY  = float4x4::FromEulerXYZ(0.0f, angle, 0.0f);
+    float4x4 rotY      = float4x4::FromEulerXYZ(0.0f, angle, 0.0f);
     float4x4 newGlobal = parent->GetGlobalTransform() * rotY;
-    
-    float4x4 newlocal = parent->GetParentGlobalTransform().Transposed() * newGlobal;
+
+    float4x4 newlocal  = parent->GetParentGlobalTransform().Transposed() * newGlobal;
 
     parent->SetLocalTransform(newlocal);
     parent->UpdateTransformForGOBranch();
