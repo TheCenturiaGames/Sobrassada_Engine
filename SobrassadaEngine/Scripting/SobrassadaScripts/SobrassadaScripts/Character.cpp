@@ -161,8 +161,11 @@ AIStates Character::CheckDistanceWithPlayer() const
 
 bool Character::CheckDistanceWithPoint(const float3& point) const
 {
-    float distance = parent->GetPosition().Distance(point);
-    if (distance <= 1.0f) return true;
+    float3 parentPoint = parent->GetPosition();
+    parentPoint.y      = point.y;
+
+    float distance     = parentPoint.Distance(point);
+    if (distance <= 0.5f) return true;
     return false;
 }
 

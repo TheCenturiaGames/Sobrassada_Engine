@@ -76,6 +76,8 @@ int PathfinderModule::CreateAgent(const float3& position, const float radius, co
     params.obstacleAvoidanceType = 3;
     params.separationWeight      = 2.0f;
 
+    if (!crowd) return 0;
+
     return crowd->addAgent(position.ptr(), &params);
 }
 
@@ -153,6 +155,19 @@ void PathfinderModule::HandleClickNavigation()
         AIAgentComponent* comp = pair.second;
         if (comp != nullptr) comp->SetPathNavigation(hitPoint);
     }
+}
+
+void PathfinderModule::GetClickNavigation()
+{
+    if (!clickNavigationEnabled || App->GetSceneModule()->GetInPlayMode()) return; // from UI
+
+    LineSegment ray = App->GetCameraModule()->CastCameraRay();
+
+    float3 hitPoint;
+
+    RaycastToGround(ray, hitPoint);
+
+    GLOG("Navmesh point: %.2f, %.2f, %.2f", hitPoint.x, hitPoint.y, hitPoint.z);
 }
 
 bool PathfinderModule::RaycastToGround(const LineSegment& ray, float3& outHitPoint)

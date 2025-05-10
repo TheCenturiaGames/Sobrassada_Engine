@@ -27,7 +27,7 @@ class SOBRASADA_API_ENGINE AIAgentComponent : public Component
     void AddToCrowd();
     void RecreateAgent();
     void LookAtMovement(const float3& moveDir, float deltaTime);
-    bool SetPathNavigation(const math::float3& destination);
+    bool SetPathNavigation(const math::float3& destination, bool move = true);
     void PauseMovement();
     void ResumeMovement();
 

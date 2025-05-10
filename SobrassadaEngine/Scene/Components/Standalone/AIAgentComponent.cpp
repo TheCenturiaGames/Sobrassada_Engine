@@ -176,7 +176,7 @@ void AIAgentComponent::Save(rapidjson::Value& targetState, rapidjson::Document::
 }
 
 // finds closest navmesh walkable triangle.
-bool AIAgentComponent::SetPathNavigation(const math::float3& destination)
+bool AIAgentComponent::SetPathNavigation(const math::float3& destination, bool move)
 {
     if (agentId == -1) return false;
 
@@ -196,6 +196,8 @@ bool AIAgentComponent::SetPathNavigation(const math::float3& destination)
         GLOG("Failed to find valid target poly for movement.");
         return false;
     }
+
+    if (!move) return true;
 
     // Request move to destination
     bool result = pathfinder->GetCrowd()->requestMoveTarget(agentId, targetRef, destination.ptr());
