@@ -269,7 +269,7 @@ update_status Scene::Render(float deltaTime)
     CameraComponent* mainCamera = App->GetSceneModule()->GetScene()->GetMainCamera();
     if (App->GetSceneModule()->GetInPlayMode() && mainCamera != nullptr)
     {
-        if (mainCamera->GetEnabled() && mainCamera->IsEffectivelyEnabled()) RenderScene(deltaTime, mainCamera);
+        if (mainCamera->IsEffectivelyEnabled()) RenderScene(deltaTime, mainCamera);
         else RenderScene(deltaTime, nullptr);
     }
     else RenderScene(deltaTime, nullptr);
