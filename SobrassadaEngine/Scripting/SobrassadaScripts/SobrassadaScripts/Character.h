@@ -40,9 +40,9 @@ class Character : public Script
     void TakeDamage(int amount);
 
   protected:
-    void Attack(float deltaTime);
+    virtual void Attack(float deltaTime);
     void Heal(int amount);
-    bool CanAttack(float deltaTime);
+    virtual bool CanAttack(float deltaTime);
     AIStates CheckDistanceWithPlayer() const;
     bool CheckDistanceWithPoint(const float3& point) const;
 
@@ -63,7 +63,7 @@ class Character : public Script
     int damage                                  = 0;
     float attackDuration                        = 0.0f;
     float speed                                 = 0.0f;
-    float cooldown                              = 0.0f;
+    float attackCooldown                        = 0.0f;
     float range                                 = 0.0f;
     AnimationComponent* animComponent           = nullptr;
     CapsuleColliderComponent* characterCollider = nullptr;

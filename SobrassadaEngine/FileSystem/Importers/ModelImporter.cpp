@@ -88,8 +88,14 @@ namespace ModelImporter
         if (sourceUID == INVALID_UID)
         {
             UID modelUID  = GenerateUID();
-            finalModelUID = App->GetLibraryModule()->AssignFiletypeUID(modelUID, FileType::Model);
+            modelUID = App->GetLibraryModule()->AssignFiletypeUID(modelUID, FileType::Model);
 
+            UID prefix                 = modelUID / UID_PREFIX_DIVISOR;
+            const std::string savePath = App->GetProjectModule()->GetLoadedProjectPath() + METADATA_PATH +
+                                         std::to_string(prefix) + FILENAME_SEPARATOR + modelName + META_EXTENSION;
+            finalModelUID = App->GetLibraryModule()->GetUIDFromMetaFile(savePath);
+            if (finalModelUID == INVALID_UID) finalModelUID = modelUID;
+            
             MetaModel meta(finalModelUID, assetPath);
             meta.Save(modelName, assetPath);
         }
@@ -111,7 +117,7 @@ namespace ModelImporter
                 GLOG("Animation channels: %zu", anim.channels.size());
 
                 UID animUID =
-                    AnimationImporter::ImportAnimation(model, anim, anim.name, filePath, targetFilePath, sourceUID);
+                    AnimationImporter::ImportAnimation(model, anim, anim.name, filePath, targetFilePath, sourceUID, i);
 
                 GLOG("Imported animation UID: %llu", animUID);
 

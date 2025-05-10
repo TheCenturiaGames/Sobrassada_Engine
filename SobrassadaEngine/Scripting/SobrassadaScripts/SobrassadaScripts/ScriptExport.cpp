@@ -1,8 +1,10 @@
 #include "pch.h"
 
 #include "ButtonScript.h"
+#include "CameraMovement.h"
 #include "CuChulainn.h"
 #include "ExitGameScript.h"
+#include "FreeCamera.h"
 #include "FullscreenToggleScript.h"
 #include "Globals.h"
 #include "GodMode.h"
@@ -10,8 +12,10 @@
 #include "OptionsMenuSwitcherScript.h"
 #include "PauseMenuScript.h"
 #include "PressAnyKeyScript.h"
+#include "Projectile.h"
 #include "RotateGameObject.h"
 #include "Soldier.h"
+#include "SpawnPoint.h"
 #include "VSyncToggleScript.h"
 
 #include <string>
@@ -31,7 +35,7 @@ extern "C" SOBRASSADA_API void InitSobrassadaScripts(Application* App)
 
 extern "C" SOBRASSADA_API Script* CreateScript(const std::string& scriptType, GameObject* parent)
 {
-    if (scriptType == "RotateGameObjectScript") return new RotateGameObject(parent);
+    /* UI */
     if (scriptType == "ButtonScript") return new ButtonScript(parent);
     if (scriptType == "ExitGameScript") return new ExitGameScript(parent);
     if (scriptType == "FullscreenToggleScript") return new FullscreenToggleScript(parent);
@@ -40,10 +44,18 @@ extern "C" SOBRASSADA_API Script* CreateScript(const std::string& scriptType, Ga
     if (scriptType == "OptionsMenuSwitcherScript") return new OptionsMenuSwitcherScript(parent);
     if (scriptType == "MainMenuSelectorScript") return new MainMenuSelectorScript(parent);
     if (scriptType == "PressAnyKeyScript") return new PressAnyKeyScript(parent);
+    if (scriptType == "FreeCameraScript") return new FreeCamera(parent);
 
-    if (scriptType == "GodModeScript") return new GodMode(parent);
+    /* Characters */
     if (scriptType == "CuChulainnScript") return new CuChulainn(parent);
     if (scriptType == "SoldierScript") return new Soldier(parent);
+    if (scriptType == "CameraMovementScript") return new CameraMovement(parent);
+    if (scriptType == "ProjectileScript") return new Projectile(parent);
+    if (scriptType == "SpawnPointScript") return new SpawnPoint(parent);
+
+    /* Utils */
+    if (scriptType == "RotateGameObjectScript") return new RotateGameObject(parent);
+    if (scriptType == "GodModeScript") return new GodMode(parent);
     return nullptr;
 }
 

@@ -17,6 +17,10 @@ enum ScriptType
     SCRIPT_OPTIONS_MENU_SWITCHER,
     SCRIPT_MAIN_MENU_SELECTOR,
     SCRIPT_PRESS_ANY_KEY,
+    SCRIPT_CAMERA_MOVEMENT,
+    SCRIPT_PROJECTILE,
+    SCRIPT_FREE_CAMERA,
+    SCRIPT_SPAWN_POINT,
 
     SCRIPT_TYPE_COUNT // Add at the end
 };
@@ -30,9 +34,9 @@ class Script;
 class GameObject;
 
 constexpr const char* scripts[] = {
-    "RotateGameObjectScript",          // SCRIPT_ROTATE_GAME_OBJECT
+    "RotateGameObjectScript",    // SCRIPT_ROTATE_GAME_OBJECT
     "ButtonScript",              // SCRIPT_BUTTON
-    "GodModeScript",                   // SCRIPT_GOD_MODE
+    "GodModeScript",             // SCRIPT_GOD_MODE
     "CuChulainnScript",          // SCRIPT_CU_CHULAINN
     "SoldierScript",             // SCRIPT_SOLDIER
     "ExitGameScript",            // SCRIPT_EXIT_GAME
@@ -41,7 +45,11 @@ constexpr const char* scripts[] = {
     "PauseMenuScript",           // SCRIPT_PAUSE_MENU
     "OptionsMenuSwitcherScript", // SCRIPT_OPTIONS_MENU_SWITCHER
     "MainMenuSelectorScript",    // SCRIPT_MAIN_MENU_SELECTOR
-    "PressAnyKeyScript"          // SCRIPT_PRESS_ANY_KEY
+    "PressAnyKeyScript",         // SCRIPT_PRESS_ANY_KEY
+    "CameraMovementScript",      // SCRIPT_CAMERA_MOVEMENT
+    "ProjectileScript",          // SCRIPT_PROJECTILE
+    "FreeCameraScript",          // SCRIPT_FREE_CAMERA
+    "SpawnPointScript"           // SCRIPT_SPAWN_POINT
 };
 
 static_assert(
@@ -55,9 +63,6 @@ class ScriptComponent : public Component
     ScriptComponent(const rapidjson::Value& initialState, GameObject* parent);
     ~ScriptComponent() override;
 
-    void Load(const rapidjson::Value& initialState);
-    void LoadScripts();
-
     void Save(rapidjson::Value& targetState, rapidjson::Document::AllocatorType& allocator) const override;
     void Clone(const Component* other) override;
 
@@ -66,6 +71,7 @@ class ScriptComponent : public Component
     void RenderDebug(float deltaTime) override;
     void RenderEditorInspector() override;
 
+    void Load(const rapidjson::Value& initialState);
     void InitScriptInstances();
     void OnCollision(GameObject* otherObject, const float3& collisionNormal);
     void CreateScript(const std::string& scriptType);
@@ -74,6 +80,17 @@ class ScriptComponent : public Component
 
     const std::vector<Script*>& GetScriptInstances() const { return scriptInstances; }
     const std::vector<std::string>& GetAllScriptNames() const { return scriptNames; }
+
+    template <typename T> T* GetScriptByType() // TODO: scriptType instead of dynamic cast
+    {
+        for (Script* script : scriptInstances)
+        {
+            T* currentScript = dynamic_cast<T*>(script);
+            if (currentScript) return currentScript;
+        }
+
+        return nullptr;
+    }
 
   private:
     int SearchIdxForString(const std::string& name) const;

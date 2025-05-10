@@ -28,8 +28,6 @@ bool PathfinderModule::Init()
 {
     if (!crowd) crowd = dtAllocCrowd();
 
-    if (!App->GetSceneModule()->GetScene()) return true;
-
     return true;
 }
 
@@ -135,10 +133,12 @@ void PathfinderModule::InitQuerySystem()
         GLOG("Failed to initialize Pathfinder crowd system.");
     }
 }
+
 void PathfinderModule::ResetNavmesh()
 {
     tmpNavmesh = new ResourceNavMesh(GenerateUID(), DEFAULT_NAVMESH_NAME);
 }
+
 // Currently called by clicking in the game, but any float3 will move the agents there. ONLY WORKS IN PLAY MODE
 void PathfinderModule::HandleClickNavigation()
 {

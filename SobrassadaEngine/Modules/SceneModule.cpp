@@ -7,6 +7,7 @@
 #include "EditorUIModule.h"
 #include "FileSystem.h"
 #include "GameObject.h"
+#include "GameTimer.h"
 #include "ImGuizmo.h"
 #include "InputModule.h"
 #include "LibraryModule.h"
@@ -16,6 +17,9 @@
 #include "RaycastController.h"
 #include "ResourcesModule.h"
 #include "Standalone/AnimationComponent.h"
+#include "Standalone/Lights/DirectionalLightComponent.h"
+#include "Standalone/Lights/PointLightComponent.h"
+#include "Standalone/Lights/SpotLightComponent.h"
 #include "Standalone/MeshComponent.h"
 
 #include <SDL_mouse.h>
@@ -42,9 +46,9 @@ bool SceneModule::Init()
     bool startupSceneLoaded =
         !startupScene.empty() && App->GetLibraryModule()->LoadScene((startupScene + SCENE_EXTENSION).c_str());
 
-    if (startupSceneLoaded && App->GetEngineConfig()->ShouldStartGameOnStartup()) SwitchPlayMode(true);
-
     if (!startupSceneLoaded) CreateScene();
+
+    if (App->GetEngineConfig()->ShouldStartGameOnStartup()) loadedScene->SetStartPlaying(true);
 
     return true;
 }
@@ -132,6 +136,12 @@ update_status SceneModule::PostUpdate(float deltaTime)
         if (loadedScene->IsMultiselecting() && !loadedScene->IsSceneFocused()) loadedScene->ClearObjectSelection();
 
         if (loadedScene->GetStopPlaying()) SwitchPlayMode(false);
+        else if (loadedScene->GetStartPlaying()) SwitchPlayMode(true);
+        else if (loadedScene->GetStepPlaying())
+        {
+            App->GetGameTimer()->Step();
+            loadedScene->SetStepPlaying(false);
+        }
     }
 
     return UPDATE_CONTINUE;
@@ -192,7 +202,9 @@ void SceneModule::SwitchPlayMode(bool play)
         std::string tmpScene = std::to_string(loadedScene->GetSceneUID()) + SCENE_EXTENSION;
         if (App->GetLibraryModule()->LoadScene(tmpScene.c_str(), true))
         {
+            GLOG("----- Stopped Playing -----");
             FileSystem::Delete((App->GetProjectModule()->GetLoadedProjectPath() + SCENES_PLAY_PATH + tmpScene).c_str());
+            App->GetGameTimer()->Reset();
             inPlayMode = false;
             loadedScene->SetStopPlaying(false);
         }
@@ -201,8 +213,11 @@ void SceneModule::SwitchPlayMode(bool play)
     {
         if (App->GetLibraryModule()->SaveScene("", SaveMode::SavePlayMode))
         {
+            GLOG("----- Started Playing -----");
+            App->GetGameTimer()->Start();
             inPlayMode       = true;
             onlyOncePlayMode = true;
+            loadedScene->SetStartPlaying(false);
         }
     }
 }
@@ -330,6 +345,18 @@ void SceneModule::HandleObjectDuplication()
 
             AnimationComponent* animComp = createdGameObjects[i]->GetComponent<AnimationComponent*>();
             if (animComp) animComp->SetBoneMapping();
+
+            // LIGHTS NEED THE INIT AGAIN BECAUSE WHEN CREATING THE COMPONENT THE PARENT GO IS NOT IN THE MAP UNTIL
+            // CREATED SO IT DOESEN'T GET ADDED TO THE LIST
+            PointLightComponent* pointLight = createdGameObjects[i]->GetComponent<PointLightComponent*>();
+            if (pointLight) pointLight->Init();
+
+            DirectionalLightComponent* directionalLight =
+                createdGameObjects[i]->GetComponent<DirectionalLightComponent*>();
+            if (directionalLight) directionalLight->Init();
+
+            SpotLightComponent* spotLight = createdGameObjects[i]->GetComponent<SpotLightComponent*>();
+            if (spotLight) spotLight->Init();
         }
     }
 
